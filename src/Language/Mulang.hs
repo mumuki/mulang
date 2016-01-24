@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Language.Mulang (
     Program(..),
     Declaration(..),
@@ -13,8 +15,13 @@ module Language.Mulang (
     LiteralValue(..)
   ) where
 
+import           GHC.Generics
+import           Data.Aeson
 
-data Program = Program [Declaration] deriving (Show)
+data Program = Program [Declaration] deriving (Eq, Show, Generic)
+
+instance FromJSON Program
+instance ToJSON Program
 
 type Identifier = String
 
@@ -24,16 +31,29 @@ data Declaration
          | TypeSignature Identifier
          | FunctionDeclaration Identifier [Equation]
          | ConstantDeclaration Identifier Rhs [Declaration]
-  deriving (Eq,Show)
+  deriving (Eq, Show, Generic)
 
-data Equation = Equation [Pattern] Rhs [Declaration] deriving (Eq,Show)
+instance FromJSON Declaration
+instance ToJSON Declaration
+
+data Equation = Equation [Pattern] Rhs [Declaration] deriving (Eq, Show, Generic)
+
+instance FromJSON Equation
+instance ToJSON Equation
 
 data Rhs
          = UnguardedRhs Expression
          | GuardedRhss  [GuardedRhs]
-  deriving (Eq,Show)
+  deriving (Eq, Show, Generic)
 
-data GuardedRhs = GuardedRhs Expression Expression deriving (Eq,Show)
+instance FromJSON Rhs
+instance ToJSON Rhs
+
+
+data GuardedRhs = GuardedRhs Expression Expression deriving (Eq, Show, Generic)
+
+instance FromJSON GuardedRhs
+instance ToJSON GuardedRhs
 
 data Expression
         = Variable Identifier
@@ -48,7 +68,10 @@ data Expression
         | MuList [Expression]
         | ListComprehension Expression [MuStmt]
         | ExpressionOther
-  deriving (Eq,Show)
+  deriving (Eq, Show, Generic)
+
+instance FromJSON Expression
+instance ToJSON Expression
 
 data Pattern
         = VariablePattern String                 -- ^ variable
@@ -60,26 +83,46 @@ data Pattern
         | AsPattern String Pattern         -- ^ @\@@-pattern
         | WildcardPattern                   -- ^ wildcard pattern (@_@)
         | OtherPattern
-  deriving (Eq,Show)
+  deriving (Eq, Show, Generic)
+
+instance FromJSON Pattern
+instance ToJSON Pattern
 
 data MuStmt
         = MuGenerator Pattern Expression
         | MuQualifier Expression
         | LetStmt [Declaration]
-  deriving (Eq,Show)
+  deriving (Eq, Show, Generic)
 
-data Alternative = Alternative Pattern GuardedAlternatives [Declaration] deriving (Eq,Show)
+instance FromJSON MuStmt
+instance ToJSON MuStmt
+
+data Alternative = Alternative Pattern GuardedAlternatives [Declaration] deriving (Eq, Show,Generic)
+
+instance FromJSON Alternative
+instance ToJSON Alternative
+
 
 data GuardedAlternatives
         = UnguardedAlternative Expression          -- ^ @->@ /exp/
         | GuardedAlternatives  [GuardedAlternative] -- ^ /gdpat/
-  deriving (Eq,Show)
+  deriving (Eq, Show, Generic)
 
-data GuardedAlternative = GuardedAlternative Expression Expression deriving (Eq,Show)
+instance FromJSON GuardedAlternatives
+instance ToJSON GuardedAlternatives
+
+data GuardedAlternative = GuardedAlternative Expression Expression deriving (Eq, Show, Generic)
+
+instance FromJSON GuardedAlternative
+instance ToJSON GuardedAlternative
 
 data LiteralValue
           = MuBool Bool
           | MuInteger Integer
           | MuFloat Rational
           | MuString String
-    deriving (Eq,Show)
+    deriving (Eq, Show, Generic)
+
+
+instance FromJSON LiteralValue
+instance ToJSON LiteralValue

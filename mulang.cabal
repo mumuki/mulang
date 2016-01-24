@@ -22,8 +22,11 @@ library
     Language.Mulang
     Language.Mulang.Explorer
     Language.Mulang.Inspector
+    Language.Mulang.Instances.Json
   build-depends:
-    base                      >= 4     && < 5
+    base                      >= 4     && < 5,
+    aeson                     == 0.8.1.1
+
 
 test-suite spec
   type:
@@ -37,5 +40,6 @@ test-suite spec
       Spec.hs
   build-depends:
     base                      >= 4     && < 5,
+    aeson                     == 0.8.1.1,
     hspec                     >= 2     && < 3,
     mulang
