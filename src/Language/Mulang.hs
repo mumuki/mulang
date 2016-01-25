@@ -17,7 +17,7 @@ module Language.Mulang (
 
 import           GHC.Generics
 
-data Program = Program [Declaration] deriving (Eq, Show, Read, Generic)
+data Program = Program [Expression] deriving (Eq, Show, Read, Generic)
 
 type Identifier = String
 
@@ -30,10 +30,10 @@ data Declaration
                                                         -- optionally guarded,
                                                         -- optionally pattern matched function
          | ProcedureDeclaration Identifier              -- classic imperative-style procedure
-         | ConstantDeclaration Identifier Rhs [Declaration]
+         | ConstantDeclaration Identifier Rhs
   deriving (Eq, Show, Read, Generic)
 
-data Equation = Equation [Pattern] Rhs [Declaration] deriving (Eq, Show, Read, Generic)
+data Equation = Equation [Pattern] Rhs deriving (Eq, Show, Read, Generic)
 
 data Rhs
          = UnguardedRhs Expression
@@ -45,7 +45,8 @@ data GuardedRhs = GuardedRhs Expression Expression deriving (Eq, Show, Read, Gen
 -- expression or statement
 -- may have effects
 data Expression
-        = Variable Identifier
+        = DeclarationExpression Declaration
+        | Variable Identifier
         | Literal LiteralValue
         | InfixApplication Expression String Expression
         | Application Expression Expression
@@ -75,11 +76,11 @@ data Pattern
 data ComprehensionStatement
         = MuGenerator Pattern Expression
         | MuQualifier Expression
-        | LetStmt [Declaration]
+        | LetStmt [Expression]
   deriving (Eq, Show, Read, Generic)
 
 
-data Alternative = Alternative Pattern GuardedAlternatives [Declaration] deriving (Eq, Show, Read, Generic)
+data Alternative = Alternative Pattern GuardedAlternatives [Expression] deriving (Eq, Show, Read, Generic)
 
 data GuardedAlternatives
         = UnguardedAlternative Expression          -- ^ @->@ /exp/

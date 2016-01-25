@@ -45,9 +45,9 @@ hasRedundantLambda = hasExpression f
 -- | Inspection that tells whether a binding has parameters that
 -- can be avoided using point-free
 hasRedundantParameter :: Inspection
-hasRedundantParameter binding = any f . declsOf binding
+hasRedundantParameter binding = any f . declarationsBindedTo binding
   where f (FunctionDeclaration _ [
-             Equation params (UnguardedRhs (Application _ (Variable arg))) _ ]) | (VariablePattern param) <- last params = param == arg
+             Equation params (UnguardedRhs (Application _ (Variable arg)))]) | (VariablePattern param) <- last params = param == arg
         f _ = False
 
 isBooleanLiteral (Literal (MuBool _)) = True

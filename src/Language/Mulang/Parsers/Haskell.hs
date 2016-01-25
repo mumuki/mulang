@@ -16,19 +16,19 @@ parseHaskell code | ParseOk ast <- parseModule code = Just (mu ast)
                   | otherwise = Nothing
 
 mu :: HsModule -> Program
-mu (HsModule _ _ _ _ decls) = (Program (concatMap muDecls decls))
+mu (HsModule _ _ _ _ decls) = (Program (map (DeclarationExpression) $ concatMap muDecls decls))
   where
     muDecls (HsTypeDecl _ name _ _)      = [TypeAlias (muName name)]
     muDecls (HsDataDecl _ _ name _ _ _ ) = [RecordDeclaration (muName name)]
     muDecls (HsTypeSig _ names _) = map (\name -> TypeSignature (muName name)) names
     muDecls (HsFunBind equations) | (HsMatch _ name _ _ _) <- head equations =
                                         [FunctionDeclaration (muName name) (map muEquation equations)]
-    muDecls (HsPatBind _ (HsPVar name) rhs decls) = [ConstantDeclaration (muName name) (muRhs rhs) (concatMap muDecls decls)]
+    muDecls (HsPatBind _ (HsPVar name) rhs _) = [ConstantDeclaration (muName name) (muRhs rhs)]
     muDecls _ = []
 
     muEquation :: HsMatch -> Equation
-    muEquation (HsMatch _ _ patterns rhs locals) =
-         Equation (map muPat patterns) (muRhs rhs) (concatMap muDecls locals)
+    muEquation (HsMatch _ _ patterns rhs _) =
+         Equation (map muPat patterns) (muRhs rhs)
 
     muRhs (HsUnGuardedRhs exp)          = UnguardedRhs (muExp exp)
     muRhs (HsGuardedRhss  guards) = GuardedRhss (map muGuardedRhs guards)

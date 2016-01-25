@@ -1,7 +1,8 @@
 module Language.Mulang.Explorer (
-  parseDecls,
-  parseBindings,
-  declsOf,
+  topLevelExpressions,
+  topLevelDeclarations,
+  topLevelBindings,
+  declarationsBindedTo,
   rhssOf,
   bindingsOf,
   transitiveBindingsOf,
@@ -16,18 +17,20 @@ import Data.List (nub)
 
 type Binding = String
 
-declName :: Declaration -> String
-declName (TypeSignature b ) = b
-declName (TypeAlias b ) = b
-declName (ConstantDeclaration n _ _) = n
-declName (FunctionDeclaration n _)  = n
-declName _                  = []
+declaratioBinding :: Declaration -> Binding
+declaratioBinding (TypeSignature b ) = b
+declaratioBinding (TypeAlias b ) = b
+declaratioBinding (ConstantDeclaration n _) = n
+declaratioBinding (FunctionDeclaration n _)  = n
+declaratioBinding (RecordDeclaration n)  = n
+declaratioBinding (ProcedureDeclaration n)  = n
 
-declsOf :: Binding -> Program -> [Declaration]
-declsOf binding = filter (isBinding binding) . parseDecls
+
+declarationsBindedTo :: Binding -> Program -> [Declaration]
+declarationsBindedTo binding = filter (isBinding binding) . topLevelDeclarations
 
 rhssOf :: Binding -> Program -> [Rhs]
-rhssOf binding = concatMap rhsForBinding . declsOf binding
+rhssOf binding = concatMap rhsForBinding . declarationsBindedTo binding
 
 expressionsOf :: Binding -> Program -> [Expression]
 expressionsOf binding code = do
@@ -43,15 +46,21 @@ bindingsOf binding code = nub $ do
 transitiveBindingsOf :: Binding -> Program -> [Binding]
 transitiveBindingsOf binding code =  expand (`bindingsOf` code) binding
 
-parseDecls :: Program -> [Declaration]
-parseDecls (Program decls) = decls
+topLevelExpressions :: Program -> [Expression]
+topLevelExpressions (Program decls) = decls
 
-parseBindings :: Program -> [Binding]
-parseBindings = map declName . parseDecls
+topLevelBindings :: Program -> [Binding]
+topLevelBindings = map declaratioBinding . topLevelDeclarations
+
+topLevelDeclarations :: Program -> [Declaration]
+topLevelDeclarations = concatMap getDeclaration . topLevelExpressions
+        where
+          getDeclaration (DeclarationExpression d) = [d]
+          getDeclaration  _                        = []
 
 expressionToBinding :: Expression -> Maybe Binding
 expressionToBinding (Variable    q) = Just q
-expressionToBinding _                = Nothing
+expressionToBinding _               = Nothing
 
 -- private
 
@@ -73,15 +82,12 @@ subExpressions (If a b c)       = [a, b, c]
 subExpressions _ = []
 
 isBinding :: Binding -> Declaration -> Bool
-isBinding binding = (==binding).declName
+isBinding binding = (==binding).declaratioBinding
 
 rhsForBinding :: Declaration -> [Rhs]
-rhsForBinding (ConstantDeclaration _ rhs localDecls) = concatRhs rhs localDecls
-rhsForBinding (FunctionDeclaration _ cases) = cases >>= \(Equation _ rhs localDecls) -> concatRhs rhs localDecls
+rhsForBinding (ConstantDeclaration _ rhs) = [rhs]
+rhsForBinding (FunctionDeclaration _ cases) = cases >>= \(Equation _ rhs) -> [rhs]
 rhsForBinding _ = []
-
-concatRhs rhs l = [rhs] ++ concatMap rhsForBinding l
-
 
 expand :: Eq a => (a-> [a]) -> a -> [a]
 expand f x = expand' [] f [x]

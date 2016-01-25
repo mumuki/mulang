@@ -81,22 +81,22 @@ hasComprehension = hasExpression f
 
 -- | Inspection that tells whether a top level binding exists
 hasBinding :: Inspection
-hasBinding binding = not.null.rhssOf binding
+hasBinding binding = not.null.declarationsBindedTo binding
 
 hasFunctionDeclaration :: Inspection
-hasFunctionDeclaration funBinding = has f (declsOf funBinding)
+hasFunctionDeclaration funBinding = has f (declarationsBindedTo funBinding)
   where f (FunctionDeclaration _ _) = True
-        f (ConstantDeclaration _ (UnguardedRhs (Lambda _ _)) _) = True
-        f (ConstantDeclaration _ (UnguardedRhs (Variable _)) _) = True -- not actually always true
+        f (ConstantDeclaration _ (UnguardedRhs (Lambda _ _))) = True
+        f (ConstantDeclaration _ (UnguardedRhs (Variable _))) = True -- not actually always true
         f _  = False
 
 hasArity :: Int -> Inspection
-hasArity arity funBinding = has f (declsOf funBinding)
+hasArity arity funBinding = has f (declarationsBindedTo funBinding)
   where f (FunctionDeclaration _ equations) = any equationHasArity equations
-        f (ConstantDeclaration _ (UnguardedRhs (Lambda args _)) _) = argsHaveArity args
+        f (ConstantDeclaration _ (UnguardedRhs (Lambda args _))) = argsHaveArity args
         f _  = False
 
-        equationHasArity = \(Equation args _ _) -> argsHaveArity args
+        equationHasArity = \(Equation args _) -> argsHaveArity args
 
         argsHaveArity args = length args == arity
 
@@ -111,10 +111,10 @@ hasTypeSignature binding = hasDecl f
         f _                       = False
 
 hasAnonymousVariable :: Inspection
-hasAnonymousVariable binding = has f (declsOf binding)
+hasAnonymousVariable binding = has f (declarationsBindedTo binding)
   where f (FunctionDeclaration _ equations)    = any (any (== WildcardPattern) . p) equations
         f _                        = False
-        p (Equation params _ _) = params
+        p (Equation params _) = params
 
 hasExpression :: (Expression -> Bool) -> Inspection
 hasExpression f binding = has f (expressionsOf binding)
@@ -123,7 +123,7 @@ hasRhs :: (Rhs -> Bool)-> Inspection
 hasRhs f binding = has f (rhssOf binding)
 
 hasDecl :: (Declaration -> Bool) -> GlobalInspection
-hasDecl f = has f parseDecls
+hasDecl f = has f topLevelDeclarations
 
 -- private
 

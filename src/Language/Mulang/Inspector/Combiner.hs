@@ -8,7 +8,7 @@ import Language.Mulang.Inspector
 import Language.Mulang.Explorer
 
 detect :: Inspection -> Program -> [Binding]
-detect inspection code = filter (`inspection` code) $ parseBindings code
+detect inspection code = filter (`inspection` code) $ topLevelBindings code
 
 negative :: Inspection -> Inspection
 negative f code = not . f code
