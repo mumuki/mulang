@@ -8,6 +8,7 @@ module Language.Mulang.Inspector (
   hasUsage,
   hasComprehension,
   hasBinding,
+  hasFunctionDeclaration,
   hasTypeDeclaration,
   hasTypeSignature,
   hasAnonymousVariable,
@@ -80,6 +81,13 @@ hasComprehension = hasExpression f
 hasBinding :: Inspection
 hasBinding binding = not.null.rhssOf binding
 
+hasFunctionDeclaration :: Inspection
+hasFunctionDeclaration funBinding = has f (declsOf funBinding)
+  where f (FunctionDeclaration _ _) = True
+        f (ConstantDeclaration _ (UnguardedRhs (Lambda _ _)) _) = True
+        f (ConstantDeclaration _ (UnguardedRhs (Variable _)) _) = True -- not actually always true
+        f _  = False
+
 hasTypeDeclaration :: Inspection
 hasTypeDeclaration binding = hasDecl f
   where f (TypeAlias name) = binding == name
@@ -91,7 +99,7 @@ hasTypeSignature binding = hasDecl f
         f _                       = False
 
 hasAnonymousVariable :: Inspection
-hasAnonymousVariable binding = any f . declsOf binding
+hasAnonymousVariable binding = has f (declsOf binding)
   where f (FunctionDeclaration _ equations)    = any (any (== WildcardPattern) . p) equations
         f _                        = False
         p (Equation params _ _) = params

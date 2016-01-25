@@ -17,6 +17,30 @@ spec = do
     it "is False whn type signature is absent " $ do
       hasTypeSignature "x" "x = 2" `shouldBe` False
 
+  describe "hasFunctionDeclaration" $ do
+    describe "with function declarations" $ do
+      it "is True when functions is declared" $ do
+        hasFunctionDeclaration "f"  "f x = 1" `shouldBe` True
+
+      it "is False when functions is not declared" $ do
+        hasFunctionDeclaration "g"  "f x = 1" `shouldBe` False
+
+      it "is False when constant is declared with a non lambda literal" $ do
+        hasFunctionDeclaration "f"  "f = 2" `shouldBe` False
+
+      it "is True when constant is declared with a lambda literal" $ do
+        hasFunctionDeclaration "f"  "f = \\x -> x + 1" `shouldBe` True
+
+      it "is False when constant is declared with a number literal" $ do
+        hasFunctionDeclaration "f"  "f = 3" `shouldBe` False
+
+      it "is False when constant is declared with a list literal" $ do
+        hasFunctionDeclaration "f"  "f = []" `shouldBe` False
+
+      it "is True when constant is declared with a variable literal" $ do
+        hasFunctionDeclaration "f"  "f = snd" `shouldBe` True
+
+
   describe "hasBinding" $ do
     describe "with constants" $ do
       it "is True when binding exists" $ do
