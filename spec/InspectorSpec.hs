@@ -60,7 +60,6 @@ spec = do
         hasArity 1 "f" "f = snd" `shouldBe` False
 
 
-
   describe "hasBinding" $ do
     describe "with constants" $ do
       it "is True when binding exists" $ do

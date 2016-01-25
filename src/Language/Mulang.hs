@@ -21,11 +21,15 @@ data Program = Program [Declaration] deriving (Eq, Show, Read, Generic)
 
 type Identifier = String
 
+-- declaration or directive
 data Declaration
          = TypeAlias Identifier
          | RecordDeclaration Identifier
          | TypeSignature Identifier
-         | FunctionDeclaration Identifier [Equation]
+         | FunctionDeclaration Identifier [Equation]    -- functional, maybe pure,
+                                                        -- optionally guarded,
+                                                        -- optionally pattern matched function
+         | ProcedureDeclaration Identifier              -- classic imperative-style procedure
          | ConstantDeclaration Identifier Rhs [Declaration]
   deriving (Eq, Show, Read, Generic)
 
@@ -38,18 +42,20 @@ data Rhs
 
 data GuardedRhs = GuardedRhs Expression Expression deriving (Eq, Show, Read, Generic)
 
+-- expression or statement
 data Expression
         = Variable Identifier
         | Literal LiteralValue
         | InfixApplication Expression String Expression
         | Application Expression Expression
         | Lambda [Pattern] Expression
-        | Let [Declaration] Expression          -- ^ local declarations with @let@
+        | Let [Declaration] Expression
         | If Expression Expression Expression
         | Match Expression [Alternative]
         | MuTuple [Expression]
         | MuList [Expression]
         | ListComprehension Expression [MuStmt]
+        | Sequence [Expression]                   -- sequence of statements
         | ExpressionOther
   deriving (Eq, Show, Read, Generic)
 
