@@ -7,7 +7,7 @@ module Language.Mulang (
     Rhs(..),
     GuardedRhs(..),
     Expression(..),
-    MuStmt(..),
+    ComprehensionStatement(..),
     Alternative(..),
     GuardedAlternatives(..),
     GuardedAlternative(..),
@@ -43,6 +43,7 @@ data Rhs
 data GuardedRhs = GuardedRhs Expression Expression deriving (Eq, Show, Read, Generic)
 
 -- expression or statement
+-- may have effects
 data Expression
         = Variable Identifier
         | Literal LiteralValue
@@ -54,7 +55,7 @@ data Expression
         | Match Expression [Alternative]
         | MuTuple [Expression]
         | MuList [Expression]
-        | ListComprehension Expression [MuStmt]
+        | Comprehension Expression [ComprehensionStatement]
         | Sequence [Expression]                   -- sequence of statements
         | ExpressionOther
   deriving (Eq, Show, Read, Generic)
@@ -71,7 +72,7 @@ data Pattern
         | OtherPattern
   deriving (Eq, Show, Read, Generic)
 
-data MuStmt
+data ComprehensionStatement
         = MuGenerator Pattern Expression
         | MuQualifier Expression
         | LetStmt [Declaration]

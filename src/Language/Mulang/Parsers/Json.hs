@@ -30,8 +30,8 @@ instance ToJSON Expression
 instance FromJSON Pattern
 instance ToJSON Pattern
 
-instance FromJSON MuStmt
-instance ToJSON MuStmt
+instance FromJSON ComprehensionStatement
+instance ToJSON ComprehensionStatement
 
 instance FromJSON Alternative
 instance ToJSON Alternative

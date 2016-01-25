@@ -65,7 +65,8 @@ mu (HsModule _ _ _ _ decls) = (Program (concatMap muDecls decls))
     muExp (HsEnumFromTo from to)         = Application (Application (Variable "enumFromTo") (muExp from)) (muExp to)
     muExp (HsEnumFromThen from thn)      = Application (Application (Variable "enumFromThen") (muExp from)) (muExp thn)
     muExp (HsEnumFromThenTo from thn to) = Application (Application (Application (Variable "enumFromThenTo") (muExp from)) (muExp thn)) (muExp to)
-    muExp (HsListComp exp stmts)         = ListComprehension (muExp exp) (map muStmt stmts)
+    muExp (HsListComp exp stmts)         = Comprehension (muExp exp) (map muStmt stmts)
+    muExp (HsDo stmts) | (HsQualifier exp) <- last stmts  = Comprehension (muExp exp) (map muStmt stmts)
     muExp _ = ExpressionOther
 
     muLit (HsChar        v) = MuString [v]

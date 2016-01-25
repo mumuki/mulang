@@ -76,11 +76,14 @@ spec = do
         hasBinding "y"  "x m = 1" `shouldBe` False
 
   describe "hasComprehension" $ do
-    it "is True when comprehension exists" $ do
+    it "is True when list comprehension exists" $ do
       hasComprehension "x"  "x = [m|m<-t]" `shouldBe` True
 
     it "is False when comprehension doesnt exists" $ do
-      hasComprehension "y"  "x = []" `shouldBe` False
+      hasComprehension "x"  "x = []" `shouldBe` False
+
+    it "is True when do syntax is used" $ do
+      hasComprehension "y"  "y = do { x <- xs; return x }" `shouldBe` True
 
   describe "hasUsage" $ do
     it "is True when required function is used on application" $ do

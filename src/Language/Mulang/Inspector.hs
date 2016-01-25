@@ -71,11 +71,12 @@ hasUsage target = hasExpression f
   where f expr | (Just n) <- expressionToBinding expr = n == target
                | otherwise = False
 
--- | Inspection that tells whether a binding uses lists comprehensions
--- in its definition
+-- | Inspection that tells whether a binding uses
+-- comprehensions - list comprehension, for comprehension, do-syntax, etc -
+-- in its definitions
 hasComprehension :: Inspection
 hasComprehension = hasExpression f
-  where f (ListComprehension _ _) = True
+  where f (Comprehension _ _) = True
         f _ = False
 
 -- | Inspection that tells whether a top level binding exists
