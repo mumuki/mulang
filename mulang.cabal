@@ -23,6 +23,8 @@ library
   exposed-modules:
     Language.Mulang
     Language.Mulang.Explorer
+    Language.Mulang.Inspector.Smell
+    Language.Mulang.Inspector.Combiner
     Language.Mulang.Inspector
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Json
