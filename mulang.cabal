@@ -16,15 +16,20 @@ library
   ghc-options:
       -Wall
       -fno-warn-missing-signatures
+      -fno-warn-orphans
+      -fno-warn-name-shadowing
   hs-source-dirs:
       src
   exposed-modules:
     Language.Mulang
     Language.Mulang.Explorer
     Language.Mulang.Inspector
-    Language.Mulang.Instances.Json
+    Language.Mulang.Parsers.Haskell
+    Language.Mulang.Parsers.Json
   build-depends:
     base                      >= 4     && < 5,
+    bytestring                == 0.10.6.0,
+    haskell-src               >= 1     && < 1.1,
     aeson                     == 0.8.1.1
 
 
@@ -34,12 +39,16 @@ test-suite spec
   ghc-options:
       -Wall
       -fno-warn-missing-signatures
+      -fno-warn-orphans
+      -fno-warn-name-shadowing
   hs-source-dirs:
       spec
   main-is:
       Spec.hs
   build-depends:
     base                      >= 4     && < 5,
+    bytestring                == 0.10.6.0,
     aeson                     == 0.8.1.1,
+    haskell-src               >= 1     && < 1.1,
     hspec                     >= 2     && < 3,
     mulang

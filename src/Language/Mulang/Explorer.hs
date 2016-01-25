@@ -12,7 +12,7 @@ module Language.Mulang.Explorer (
 
 import Language.Mulang
 import Data.Maybe (maybeToList)
-import Data.List (nub, intercalate)
+import Data.List (nub)
 
 type Binding = String
 
@@ -20,7 +20,7 @@ declName :: Declaration -> String
 declName (TypeSignature b ) = b
 declName (TypeAlias b ) = b
 declName (ConstantDeclaration n _ _) = n
-declName (FunctionDeclaration n cases)  = n
+declName (FunctionDeclaration n _)  = n
 declName _                  = []
 
 declsOf :: Binding -> Program -> [Declaration]
