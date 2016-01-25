@@ -28,12 +28,16 @@ library
     Language.Mulang.Inspector
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Json
+    Language.Mulang.Parsers.JavaScript
   build-depends:
     base                      >= 4     && < 5,
     bytestring                == 0.10.6.0,
-    haskell-src               >= 1     && < 1.1,
+    haskell-src               >= 1       && < 1.1,
+    language-javascript       >= 0.5.14  && <= 0.5.15,
     aeson                     == 0.8.1.1
-
+  build-tools:
+    happy,
+    alex
 
 test-suite spec
   type:
@@ -52,5 +56,9 @@ test-suite spec
     bytestring                == 0.10.6.0,
     aeson                     == 0.8.1.1,
     haskell-src               >= 1     && < 1.1,
+    language-javascript       >= 0.5.14  && <= 0.5.15,
     hspec                     >= 2     && < 3,
     mulang
+  build-tools:
+    happy,
+    alex
