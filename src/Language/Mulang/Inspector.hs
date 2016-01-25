@@ -9,6 +9,7 @@ module Language.Mulang.Inspector (
   hasComprehension,
   hasBinding,
   hasFunctionDeclaration,
+  hasArity,
   hasTypeDeclaration,
   hasTypeSignature,
   hasAnonymousVariable,
@@ -87,6 +88,16 @@ hasFunctionDeclaration funBinding = has f (declsOf funBinding)
         f (ConstantDeclaration _ (UnguardedRhs (Lambda _ _)) _) = True
         f (ConstantDeclaration _ (UnguardedRhs (Variable _)) _) = True -- not actually always true
         f _  = False
+
+hasArity :: Int -> Inspection
+hasArity arity funBinding = has f (declsOf funBinding)
+  where f (FunctionDeclaration _ equations) = any equationHasArity equations
+        f (ConstantDeclaration _ (UnguardedRhs (Lambda args _)) _) = argsHaveArity args
+        f _  = False
+
+        equationHasArity = \(Equation args _ _) -> argsHaveArity args
+
+        argsHaveArity args = length args == arity
 
 hasTypeDeclaration :: Inspection
 hasTypeDeclaration binding = hasDecl f

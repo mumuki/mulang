@@ -25,6 +25,7 @@ spec = do
       it "is False when functions is not declared" $ do
         hasFunctionDeclaration "g"  "f x = 1" `shouldBe` False
 
+    describe "with constants" $ do
       it "is False when constant is declared with a non lambda literal" $ do
         hasFunctionDeclaration "f"  "f = 2" `shouldBe` False
 
@@ -39,6 +40,25 @@ spec = do
 
       it "is True when constant is declared with a variable literal" $ do
         hasFunctionDeclaration "f"  "f = snd" `shouldBe` True
+
+  describe "hasArity" $ do
+    describe "with function declarations" $ do
+      it "is True when function is declared with the given arity" $ do
+        hasArity 1 "f" "f x = x + 1" `shouldBe` True
+
+      it "is False when function is declared with another arity" $ do
+        hasArity 2 "f" "f x = x + 1" `shouldBe` False
+
+    describe "with constant declaration" $ do
+      it "is True when constant is declared with lambda of given arity" $ do
+        hasArity 2 "f" "f = \\x y -> x + y" `shouldBe` True
+
+      it "is False when constant is declared with lambda of given arity" $ do
+        hasArity 3 "f" "f = \\x y -> x + y" `shouldBe` False
+
+      it "is False if it is a variable" $ do
+        hasArity 1 "f" "f = snd" `shouldBe` False
+
 
 
   describe "hasBinding" $ do
