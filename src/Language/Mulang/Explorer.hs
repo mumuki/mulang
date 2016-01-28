@@ -20,7 +20,7 @@ type Binding = String
 declaratioBinding :: Declaration -> Binding
 declaratioBinding (TypeSignature b ) = b
 declaratioBinding (TypeAlias b ) = b
-declaratioBinding (ConstantDeclaration n _) = n
+declaratioBinding (VariableDeclaration n _) = n
 declaratioBinding (FunctionDeclaration n _)  = n
 declaratioBinding (RecordDeclaration n)  = n
 declaratioBinding (ProcedureDeclaration n)  = n
@@ -86,7 +86,7 @@ isBinding :: Binding -> Declaration -> Bool
 isBinding binding = (==binding).declaratioBinding
 
 rhsForBinding :: Declaration -> [Rhs]
-rhsForBinding (ConstantDeclaration _ exp) = [UnguardedRhs exp]
+rhsForBinding (VariableDeclaration _ exp) = [UnguardedRhs exp]
 rhsForBinding (FunctionDeclaration _ cases) = cases >>= \(Equation _ rhs) -> [rhs]
 rhsForBinding _ = []
 

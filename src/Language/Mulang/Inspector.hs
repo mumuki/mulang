@@ -86,14 +86,14 @@ hasBinding binding = not.null.declarationsBindedTo binding
 hasFunctionDeclaration :: Inspection
 hasFunctionDeclaration funBinding = has f (declarationsBindedTo funBinding)
   where f (FunctionDeclaration _ _) = True
-        f (ConstantDeclaration _ (Lambda _ _)) = True
-        f (ConstantDeclaration _ (Variable _)) = True -- not actually always true
+        f (VariableDeclaration _ (Lambda _ _)) = True
+        f (VariableDeclaration _ (Variable _)) = True -- not actually always true
         f _  = False
 
 hasArity :: Int -> Inspection
 hasArity arity funBinding = has f (declarationsBindedTo funBinding)
   where f (FunctionDeclaration _ equations) = any equationHasArity equations
-        f (ConstantDeclaration _ (Lambda args _)) = argsHaveArity args
+        f (VariableDeclaration _ (Lambda args _)) = argsHaveArity args
         f _  = False
 
         equationHasArity = \(Equation args _) -> argsHaveArity args

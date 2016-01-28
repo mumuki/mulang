@@ -24,7 +24,7 @@ mu (NN (JSSourceElementsTop staments)) =  compact (mapMuNode staments)
     muNode (JSVariables _ decls _)                           = mapMuNode decls
     muNode (JSArrayLiteral _ es _)                           = [MuList (mapMuNode es)]
     muNode (JSVarDecl (NT (JSIdentifier var) _ _) initial)   = [
-                             (DeclarationExpression . ConstantDeclaration var) (compact . mapMuNode $ initial)]
+                             (DeclarationExpression . VariableDeclaration var) (compact . mapMuNode $ initial)]
     muNode (JSWith _ _ _ _ _)                                = [ExpressionOther]
     muNode (JSExpressionTernary cond _ true _ false)         = [muIf (head cond) (head true) false]
     muNode (JSIf _ _ cond _ true false)                      = [muIf cond (head true) false]
