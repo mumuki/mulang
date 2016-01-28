@@ -48,10 +48,10 @@ mu (HsModule _ _ _ _ decls) = compact (map (DeclarationExpression) $ concatMap m
     muPat _ = OtherPattern
 
     muExp (HsVar name) = Variable (muQName name)
-    muExp (HsCon (UnQual (HsIdent "True")))  = Literal (MuBool True)
-    muExp (HsCon (UnQual (HsIdent "False"))) = Literal (MuBool False)
+    muExp (HsCon (UnQual (HsIdent "True")))  = MuBool True
+    muExp (HsCon (UnQual (HsIdent "False"))) = MuBool False
     muExp (HsCon name)                       = Variable (muQName name)
-    muExp (HsLit lit) = Literal (muLit lit)
+    muExp (HsLit lit) = muLit lit
     muExp (HsInfixApp e1 op e2) = InfixApplication (muExp e1) (muQOp op) (muExp e2)  -- ^ infix application
     muExp (HsApp e1 e2) = Application (muExp e1) (muExp e2)             -- ^ ordinary application
     muExp (HsNegApp e) = Application (Variable "-") (muExp e)
@@ -70,15 +70,15 @@ mu (HsModule _ _ _ _ decls) = compact (map (DeclarationExpression) $ concatMap m
     muExp (HsDo stmts) | (HsQualifier exp) <- last stmts  = Comprehension (muExp exp) (map muStmt stmts)
     muExp _ = ExpressionOther
 
-    muLit (HsChar        v) = MuString [v]
-    muLit (HsString      v) = MuString v
-    muLit (HsInt         v) = MuInteger v
-    muLit (HsFrac        v) = MuFloat . fromRational $ v
     muLit (HsCharPrim    v) = MuString [v]
     muLit (HsStringPrim  v) = MuString v
-    muLit (HsIntPrim     v) = MuInteger v
-    muLit (HsFloatPrim   v) = MuFloat . fromRational $ v
-    muLit (HsDoublePrim  v) = MuFloat . fromRational $ v
+    muLit (HsChar        v) = MuString [v]
+    muLit (HsString      v) = MuString v
+    muLit (HsIntPrim     v) = MuNumber . fromIntegral $ v
+    muLit (HsInt         v) = MuNumber . fromIntegral $ v
+    muLit (HsFrac        v) = MuNumber . fromRational $ v
+    muLit (HsFloatPrim   v) = MuNumber . fromRational $ v
+    muLit (HsDoublePrim  v) = MuNumber . fromRational $ v
 
     muName :: HsName -> String
     muName (HsSymbol n) = n

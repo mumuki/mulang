@@ -10,8 +10,7 @@ module Language.Mulang (
     Alternative(..),
     GuardedAlternatives(..),
     GuardedAlternative(..),
-    Pattern(..),
-    LiteralValue(..)
+    Pattern(..)
   ) where
 
 import           GHC.Generics
@@ -44,18 +43,20 @@ data GuardedRhs = GuardedRhs Expression Expression deriving (Eq, Show, Read, Gen
 data Expression
         = DeclarationExpression Declaration
         | Variable Identifier
-        | Literal LiteralValue
         | InfixApplication Expression String Expression
         | Application Expression Expression
         | Lambda [Pattern] Expression
         | Let [Declaration] Expression
         | If Expression Expression Expression
         | Match Expression [Alternative]
-        | MuTuple [Expression]
-        | MuList [Expression]
         | Comprehension Expression [ComprehensionStatement]
         | Sequence [Expression]                   -- sequence of statements
         | ExpressionOther
+        | MuNumber Double
+        | MuBool Bool
+        | MuString String
+        | MuTuple [Expression]
+        | MuList [Expression]
   deriving (Eq, Show, Read, Generic)
 
 data Pattern
@@ -86,10 +87,3 @@ data GuardedAlternatives
 
 
 data GuardedAlternative = GuardedAlternative Expression Expression deriving (Eq, Show, Read, Generic)
-
-data LiteralValue
-          = MuBool Bool
-          | MuInteger Integer
-          | MuFloat Double
-          | MuString String
-    deriving (Eq, Show, Read, Generic)

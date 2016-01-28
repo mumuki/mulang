@@ -50,5 +50,5 @@ hasRedundantParameter binding = any f . declarationsBindedTo binding
              Equation params (UnguardedRhs (Application _ (Variable arg)))]) | (VariablePattern param) <- last params = param == arg
         f _ = False
 
-isBooleanLiteral (Literal (MuBool _)) = True
-isBooleanLiteral _                  = False
+isBooleanLiteral (MuBool _) = True
+isBooleanLiteral _          = False

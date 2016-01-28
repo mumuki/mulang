@@ -38,6 +38,3 @@ instance ToJSON GuardedAlternatives
 
 instance FromJSON GuardedAlternative
 instance ToJSON GuardedAlternative
-
-instance FromJSON LiteralValue
-instance ToJSON LiteralValue

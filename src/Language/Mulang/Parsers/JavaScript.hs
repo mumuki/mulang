@@ -15,12 +15,12 @@ parseJavaScript code = Just . mu $ readJs code
 mu (NN (JSSourceElementsTop staments)) =  compact (mapMuNode staments)
   where
     muNode (JSIdentifier n)                                  = [Variable n]
-    muNode (JSDecimal val)                                   = [Literal (MuFloat (read val))]
+    muNode (JSDecimal val)                                   = [MuNumber (read val)]
     muNode (JSExpression es)                                 = [compact (mapMuNode es)]
     muNode (JSLiteral _)                                     = []
     muNode (JSHexInteger v)                                  = muNode (JSStringLiteral '\'' v)
     muNode (JSOctal v)                                       = muNode (JSStringLiteral '"' v)
-    muNode (JSStringLiteral _ v)                             = [Literal (MuString v)]
+    muNode (JSStringLiteral _ v)                             = [MuString v]
     muNode (JSVariables _ decls _)                           = mapMuNode decls
     muNode (JSArrayLiteral _ es _)                           = [MuList (mapMuNode es)]
     muNode (JSVarDecl (NT (JSIdentifier var) _ _) initial)   = [
