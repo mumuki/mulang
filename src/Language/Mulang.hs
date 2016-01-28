@@ -26,7 +26,7 @@ data Declaration
                                                         -- optionally guarded,
                                                         -- optionally pattern matched function
          | ProcedureDeclaration Identifier              -- classic imperative-style procedure
-         | ConstantDeclaration Identifier Rhs
+         | ConstantDeclaration Identifier Expression
   deriving (Eq, Show, Read, Generic)
 
 data Equation = Equation [Pattern] Rhs deriving (Eq, Show, Read, Generic)

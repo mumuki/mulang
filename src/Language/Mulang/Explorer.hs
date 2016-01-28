@@ -86,7 +86,7 @@ isBinding :: Binding -> Declaration -> Bool
 isBinding binding = (==binding).declaratioBinding
 
 rhsForBinding :: Declaration -> [Rhs]
-rhsForBinding (ConstantDeclaration _ rhs) = [rhs]
+rhsForBinding (ConstantDeclaration _ exp) = [UnguardedRhs exp]
 rhsForBinding (FunctionDeclaration _ cases) = cases >>= \(Equation _ rhs) -> [rhs]
 rhsForBinding _ = []
 

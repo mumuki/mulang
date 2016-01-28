@@ -21,7 +21,7 @@ spec = do
       parseJavaScript "var x = \"hello\"" `shouldBe` parseJavaScript "var x = 'hello'"
 
     it "simple assignation 2" $ do
-      parseHaskell "x = 1" `shouldBe` parseJavaScript "x"
+      parseJavaScript "x" `shouldBe` Just (Variable "x")
 
     it "simple function declaration" $ do
       parseHaskell "f x = 1" `shouldBe` parseJavaScript "function f(x) { return 1 }"
@@ -49,5 +49,8 @@ spec = do
 
     it "handles whiles" $ do
       parseJavaScript "while (x) { y }" `shouldBe` Just (While (Variable "x") (Variable "y"))
+
+    it "handles objects" $ do
+      parseJavaScript "{x: 6}" `shouldBe` Just (MuObject (DeclarationExpression (ConstantDeclaration "x" (MuNumber 6))))
 
 

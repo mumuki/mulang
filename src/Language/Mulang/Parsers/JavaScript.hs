@@ -24,18 +24,24 @@ mu (NN (JSSourceElementsTop staments)) =  compact (mapMuNode staments)
     muNode (JSVariables _ decls _)                           = mapMuNode decls
     muNode (JSArrayLiteral _ es _)                           = [MuList (mapMuNode es)]
     muNode (JSVarDecl (NT (JSIdentifier var) _ _) initial)   = [
-                             (DeclarationExpression . ConstantDeclaration var) (UnguardedRhs . head . mapMuNode $ initial)]
+                             (DeclarationExpression . ConstantDeclaration var) (compact . mapMuNode $ initial)]
     muNode (JSWith _ _ _ _ _)                                = [ExpressionOther]
     muNode (JSExpressionTernary cond _ true _ false)         = [muIf (head cond) (head true) false]
-    muNode (JSIf _ _ cond _ true false)                      = [muIf cond true false]
+    muNode (JSIf _ _ cond _ true false)                      = [muIf cond (head true) false]
+    muNode (JSWhile _ _ cond _ action)                       = [muWhile cond action]
+
     muNode _ = []
 
     gc (NN n) = n
     gc (NT n _ _) = n
 
     mapMuNode = concatMap (muNode.gc)
+    muNodeSingle = compact . muNode . gc
 
-    muIf cond true false = ExpressionOther
+    muIf :: JSNode -> JSNode -> [JSNode] -> Expression
+    muIf cond true [false] = If (muNodeSingle cond) (muNodeSingle true) (muNodeSingle false)
+
+    muWhile cond action  = While (muNodeSingle cond) (muNodeSingle action)
 
 {-JSRegEx String
 JSArguments JSNode [JSNode] JSNode
@@ -80,8 +86,7 @@ JSFunction JSNode JSNode JSNode [JSNode] JSNode JSNode
 fn,name, lb,parameter list,rb,block | JSFunctionBody [JSNode] -- ^body
 JSFunctionExpression JSNode [JSNode] JSNode [JSNode] JSNode JSNode
 fn,[name],lb, parameter list,rb,block`
-JSIf JSNode JSNode JSNode JSNode [JSNode] [JSNode]
-if,(,expr,),stmt,optional rest
+
 JSLabelled JSNode JSNode JSNode
 identifier,colon,stmt
 JSMemberDot [JSNode] JSNode JSNode
@@ -108,6 +113,5 @@ JSTry JSNode JSNode [JSNode]
 try,block,rest
 JSUnary String JSNode
 type, operator
-JSWhile JSNode JSNode JSNode JSNode JSNode
 while,lb,expr,rb,stmt
  -}
