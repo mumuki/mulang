@@ -53,6 +53,7 @@ data Expression
         | Comprehension Expression [ComprehensionStatement]
         | Sequence [Expression]
         | ExpressionOther
+        | MuUnit
         | MuObject Expression
         | MuNumber Double
         | MuBool Bool

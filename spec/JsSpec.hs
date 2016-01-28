@@ -44,6 +44,9 @@ spec = do
     it "handles ifs" $ do
       parseJavaScript "if(x) y else z" `shouldBe` Just (If (Variable "x") (Variable "y") (Variable "z"))
 
+    it "handles partial ifs" $ do
+      parseJavaScript "if(x) y" `shouldBe` Just (If (Variable "x") (Variable "y") MuUnit)
+
     it "handles ternarys as ifs" $ do
       parseJavaScript "x ? y : z " `shouldBe` parseJavaScript "if (x) { y } else { z }"
 

@@ -39,7 +39,8 @@ mu (NN (JSSourceElementsTop staments)) =  compact (mapMuNode staments)
     muNodeSingle = compact . muNode . gc
 
     muIf :: JSNode -> JSNode -> [JSNode] -> Expression
-    muIf cond true [false] = If (muNodeSingle cond) (muNodeSingle true) (muNodeSingle false)
+    muIf cond true [] = If (muNodeSingle cond) (muNodeSingle true) MuUnit
+    muIf cond true false = If (muNodeSingle cond) (muNodeSingle true) (compact.mapMuNode $ false)
 
     muWhile cond action  = While (muNodeSingle cond) (muNodeSingle action)
 
