@@ -31,8 +31,8 @@ hasRedundantIf = hasExpression f
 hasRedundantGuards :: Inspection
 hasRedundantGuards = hasRhs f -- TODO not true when condition is a pattern
   where f (GuardedRhss [
-            GuardedRhs _ x,
-            GuardedRhs (Variable "otherwise") y]) = all isBooleanLiteral [x, y]
+            GuardedBody _ x,
+            GuardedBody (Variable "otherwise") y]) = all isBooleanLiteral [x, y]
         f _ = False
 
 
@@ -47,7 +47,7 @@ hasRedundantLambda = hasExpression f
 hasRedundantParameter :: Inspection
 hasRedundantParameter binding = any f . declarationsBindedTo binding
   where f (FunctionDeclaration _ [
-             Equation params (UnguardedRhs (Application _ (Variable arg)))]) | (VariablePattern param) <- last params = param == arg
+             Equation params (UnguardedBody (Application _ (Variable arg)))]) | (VariablePattern param) <- last params = param == arg
         f _ = False
 
 isBooleanLiteral (MuBool _) = True

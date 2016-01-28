@@ -31,10 +31,10 @@ mu (HsModule _ _ _ _ decls) = compact (map (DeclarationExpression) $ concatMap m
     muEquation (HsMatch _ _ patterns rhs _) =
          Equation (map muPat patterns) (muRhs rhs)
 
-    muRhs (HsUnGuardedRhs exp)          = UnguardedRhs (muExp exp)
+    muRhs (HsUnGuardedRhs exp)          = UnguardedBody (muExp exp)
     muRhs (HsGuardedRhss  guards) = GuardedRhss (map muGuardedRhs guards)
 
-    muGuardedRhs (HsGuardedRhs _ condition body) = (GuardedRhs (muExp condition) (muExp body))
+    muGuardedRhs (HsGuardedRhs _ condition body) = (GuardedBody (muExp condition) (muExp body))
 
     muPat (HsPVar name) = VariablePattern (muName name)                 -- ^ variable
     muPat (HsPLit _) = LiteralPattern ""              -- ^ literal constant

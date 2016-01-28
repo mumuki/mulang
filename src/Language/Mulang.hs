@@ -3,8 +3,8 @@
 module Language.Mulang (
     Declaration(..),
     Equation(..),
-    Rhs(..),
-    GuardedRhs(..),
+    EquationBody(..),
+    GuardedBody(..),
     Expression(..),
     ComprehensionStatement(..),
     Alternative(..),
@@ -29,14 +29,14 @@ data Declaration
          | VariableDeclaration Identifier Expression
   deriving (Eq, Show, Read, Generic)
 
-data Equation = Equation [Pattern] Rhs deriving (Eq, Show, Read, Generic)
+data Equation = Equation [Pattern] EquationBody deriving (Eq, Show, Read, Generic)
 
-data Rhs
-         = UnguardedRhs Expression
-         | GuardedRhss  [GuardedRhs]
+data EquationBody
+         = UnguardedBody Expression
+         | GuardedRhss  [GuardedBody]
   deriving (Eq, Show, Read, Generic)
 
-data GuardedRhs = GuardedRhs Expression Expression deriving (Eq, Show, Read, Generic)
+data GuardedBody = GuardedBody Expression Expression deriving (Eq, Show, Read, Generic)
 
 -- expression or statement
 -- may have effects
@@ -53,9 +53,9 @@ data Expression
         | Comprehension Expression [ComprehensionStatement]
         | Sequence [Expression]
         | ExpressionOther
-        | MuUnit
-        | MuObject Expression
-        | MuNumber Double
+        | MuUnit                                               -- nil, null, undefined or ()
+        | MuObject Expression                                  -- literal, unnamed object
+        | MuNumber Double                                      -- any number
         | MuBool Bool
         | MuString String
         | MuTuple [Expression]

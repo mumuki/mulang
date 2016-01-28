@@ -29,7 +29,7 @@ declaratioBinding (ProcedureDeclaration n)  = n
 declarationsBindedTo :: Binding -> Expression -> [Declaration]
 declarationsBindedTo binding = filter (isBinding binding) . topLevelDeclarations
 
-rhssOf :: Binding -> Expression -> [Rhs]
+rhssOf :: Binding -> Expression -> [EquationBody]
 rhssOf binding = concatMap rhsForBinding . declarationsBindedTo binding
 
 expressionsOf :: Binding -> Expression -> [Expression]
@@ -65,9 +65,9 @@ expressionToBinding _               = Nothing
 
 -- private
 
-topExpressions :: Rhs -> [Expression]
-topExpressions (UnguardedRhs e) = [e]
-topExpressions (GuardedRhss rhss) = rhss >>= \(GuardedRhs es1 es2) -> [es1, es2]
+topExpressions :: EquationBody -> [Expression]
+topExpressions (UnguardedBody e) = [e]
+topExpressions (GuardedRhss rhss) = rhss >>= \(GuardedBody es1 es2) -> [es1, es2]
 
 unfoldExpression :: Expression -> [Expression]
 unfoldExpression expr = expr : concatMap unfoldExpression (subExpressions expr)
@@ -85,8 +85,8 @@ subExpressions _ = []
 isBinding :: Binding -> Declaration -> Bool
 isBinding binding = (==binding).declaratioBinding
 
-rhsForBinding :: Declaration -> [Rhs]
-rhsForBinding (VariableDeclaration _ exp) = [UnguardedRhs exp]
+rhsForBinding :: Declaration -> [EquationBody]
+rhsForBinding (VariableDeclaration _ exp) = [UnguardedBody exp]
 rhsForBinding (FunctionDeclaration _ cases) = cases >>= \(Equation _ rhs) -> [rhs]
 rhsForBinding _ = []
 

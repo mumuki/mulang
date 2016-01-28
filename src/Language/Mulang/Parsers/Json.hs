@@ -15,11 +15,11 @@ instance ToJSON Declaration
 instance FromJSON Equation
 instance ToJSON Equation
 
-instance FromJSON Rhs
-instance ToJSON Rhs
+instance FromJSON EquationBody
+instance ToJSON EquationBody
 
-instance FromJSON GuardedRhs
-instance ToJSON GuardedRhs
+instance FromJSON GuardedBody
+instance ToJSON GuardedBody
 
 instance FromJSON Expression
 instance ToJSON Expression

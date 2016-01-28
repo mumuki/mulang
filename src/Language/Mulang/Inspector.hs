@@ -119,7 +119,7 @@ hasAnonymousVariable binding = has f (declarationsBindedTo binding)
 hasExpression :: (Expression -> Bool) -> Inspection
 hasExpression f binding = has f (expressionsOf binding)
 
-hasRhs :: (Rhs -> Bool)-> Inspection
+hasRhs :: (EquationBody -> Bool)-> Inspection
 hasRhs f binding = has f (rhssOf binding)
 
 hasDecl :: (Declaration -> Bool) -> GlobalInspection
