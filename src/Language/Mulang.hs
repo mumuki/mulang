@@ -74,11 +74,11 @@ data Pattern
 data ComprehensionStatement
         = MuGenerator Pattern Expression
         | MuQualifier Expression
-        | LetStmt [Expression]
+        | LetStmt     Expression
   deriving (Eq, Show, Read, Generic)
 
 
-data Alternative = Alternative Pattern GuardedAlternatives [Expression] deriving (Eq, Show, Read, Generic)
+data Alternative = Alternative Pattern GuardedAlternatives deriving (Eq, Show, Read, Generic)
 
 data GuardedAlternatives
         = UnguardedAlternative Expression          -- ^ @->@ /exp/
