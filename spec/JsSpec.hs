@@ -41,5 +41,13 @@ spec = do
     it "handles blocks as sequences" $ do
       parseJavaScript "8; 9" `shouldBe` parseJavaScript "{8; 9}"
 
+    it "handles ifs" $ do
+      parseJavaScript "if(x) y else z" `shouldBe` Just (If (Variable "x") (Variable "y") (Variable "z"))
+
+    it "handles ternarys as ifs" $ do
+      parseJavaScript "x ? y : z " `shouldBe` parseJavaScript "if (x) { y } else { z }"
+
+    it "handles whiles" $ do
+      parseJavaScript "while (x) { y }" `shouldBe` Just (While (Variable "x") (Variable "y"))
 
 

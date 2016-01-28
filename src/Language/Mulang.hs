@@ -48,10 +48,12 @@ data Expression
         | Lambda [Pattern] Expression
         | Let [Declaration] Expression
         | If Expression Expression Expression
+        | While Expression Expression
         | Match Expression [Alternative]
         | Comprehension Expression [ComprehensionStatement]
-        | Sequence [Expression]                   -- sequence of statements
+        | Sequence [Expression]
         | ExpressionOther
+        | MuObject Expression
         | MuNumber Double
         | MuBool Bool
         | MuString String
