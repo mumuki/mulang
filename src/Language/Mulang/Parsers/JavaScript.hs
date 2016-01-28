@@ -1,6 +1,7 @@
 module Language.Mulang.Parsers.JavaScript where
 
 import Language.Mulang
+import Language.Mulang.Builder
 import Language.Haskell.Syntax
 import Language.Haskell.Parser
 
@@ -11,7 +12,7 @@ import Language.JavaScript.Parser.AST
 parseJavaScript :: String -> Maybe Expression
 parseJavaScript code = Just . mu $ readJs code
 
-mu (NN (JSSourceElementsTop staments)) =  Sequence (mapMuNode staments)
+mu (NN (JSSourceElementsTop staments)) =  compact (mapMuNode staments)
   where
     muNode (JSIdentifier n)                                  = [Variable n]
     muNode (JSDecimal val)                                   = [Literal (MuFloat (read val))]
@@ -36,9 +37,6 @@ mu (NN (JSSourceElementsTop staments)) =  Sequence (mapMuNode staments)
 
     muIf cond true false = ExpressionOther
 
-    compact :: [Expression] -> Expression
-    compact [e] = e
-    compact  es  = Sequence es
 {-JSRegEx String
 JSArguments JSNode [JSNode] JSNode
 lb, args, rb

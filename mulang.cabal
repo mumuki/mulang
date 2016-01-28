@@ -22,6 +22,7 @@ library
       src
   exposed-modules:
     Language.Mulang
+    Language.Mulang.Builder
     Language.Mulang.Explorer
     Language.Mulang.Inspector.Smell
     Language.Mulang.Inspector.Combiner

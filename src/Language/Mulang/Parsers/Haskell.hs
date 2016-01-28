@@ -1,6 +1,7 @@
 module Language.Mulang.Parsers.Haskell (parseHaskell) where
 
 import Language.Mulang
+import Language.Mulang.Builder
 import Language.Haskell.Syntax
 import Language.Haskell.Parser
 
@@ -16,7 +17,7 @@ parseHaskell code | ParseOk ast <- parseModule code = Just (mu ast)
                   | otherwise = Nothing
 
 mu :: HsModule -> Expression
-mu (HsModule _ _ _ _ decls) = Sequence (map (DeclarationExpression) $ concatMap muDecls decls)
+mu (HsModule _ _ _ _ decls) = compact (map (DeclarationExpression) $ concatMap muDecls decls)
   where
     muDecls (HsTypeDecl _ name _ _)      = [TypeAlias (muName name)]
     muDecls (HsDataDecl _ _ name _ _ _ ) = [RecordDeclaration (muName name)]

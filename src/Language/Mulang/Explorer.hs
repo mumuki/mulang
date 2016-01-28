@@ -47,7 +47,8 @@ transitiveBindingsOf :: Binding -> Expression -> [Binding]
 transitiveBindingsOf binding code =  expand (`bindingsOf` code) binding
 
 topLevelExpressions :: Expression -> [Expression]
-topLevelExpressions (Sequence decls) = decls
+topLevelExpressions (Sequence es) = es
+topLevelExpressions e             = [e]
 
 topLevelBindings :: Expression -> [Binding]
 topLevelBindings = map declaratioBinding . topLevelDeclarations
