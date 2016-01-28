@@ -11,16 +11,105 @@ import Language.JavaScript.Parser.AST
 parseJavaScript :: String -> Maybe Program
 parseJavaScript code = Just . mu $ readJs code
 
-mu (NN (JSSourceElementsTop staments)) =  Program (concatMap (muNode.gc) staments)
+mu (NN (JSSourceElementsTop staments)) =  Program (mapMuNode staments)
   where
-    muNode (JSLiteral _) = []
-    muNode (JSIdentifier n) = [Variable n]
-    muNode (JSDecimal val) = [Literal (MuFloat (read val))]
-    muNode (JSVariables _ decls _)  = concatMap (muNode.gc) decls
-    muNode (JSVarDecl (NT (JSIdentifier var) _ _) initial) = [
-                             (DeclarationExpression . ConstantDeclaration var) (UnguardedRhs . head . concatMap (muNode . gc) $ initial)]
+    muNode (JSIdentifier n)                                  = [Variable n]
+    muNode (JSDecimal val)                                   = [Literal (MuFloat (read val))]
+    muNode (JSExpression es)                                 = [compact (mapMuNode es)]
+    muNode (JSLiteral _)                                     = []
+    muNode (JSHexInteger v)                                  = muNode (JSStringLiteral '\'' v)
+    muNode (JSOctal v)                                       = muNode (JSStringLiteral '"' v)
+    muNode (JSStringLiteral _ v)                             = [Literal (MuString v)]
+    muNode (JSVariables _ decls _)                           = mapMuNode decls
+    muNode (JSArrayLiteral _ es _)                           = [MuList (mapMuNode es)]
+    muNode (JSVarDecl (NT (JSIdentifier var) _ _) initial)   = [
+                             (DeclarationExpression . ConstantDeclaration var) (UnguardedRhs . head . mapMuNode $ initial)]
+    muNode (JSWith _ _ _ _ _)                                = [ExpressionOther]
+    muNode (JSExpressionTernary cond _ true _ false)         = [muIf (head cond) (head true) false]
+    muNode (JSIf _ _ cond _ true false)                      = [muIf cond true false]
     muNode _ = []
 
     gc (NN n) = n
     gc (NT n _ _) = n
 
+    mapMuNode = concatMap (muNode.gc)
+
+    muIf cond true false = ExpressionOther
+
+    compact :: [Expression] -> Expression
+    compact [e] = e
+    compact  es  = Sequence es
+{-JSRegEx String
+JSArguments JSNode [JSNode] JSNode
+lb, args, rb
+JSBlock [JSNode] [JSNode] [JSNode]
+optional lb,optional block statements,optional rb
+JSBreak JSNode [JSNode] JSNode
+break, optional identifier, autosemi
+JSCallExpression String [JSNode] [JSNode] [JSNode]
+type : ., (), []; opening [ or ., contents, closing
+JSCase JSNode JSNode JSNode [JSNode]
+case,expr,colon,stmtlist
+JSCatch JSNode JSNode JSNode [JSNode] JSNode JSNode
+catch,lb,ident,[if,expr],rb,block
+JSContinue JSNode [JSNode] JSNode
+continue,optional identifier,autosemi
+JSDefault JSNode JSNode [JSNode]
+default,colon,stmtlist
+JSDoWhile JSNode JSNode JSNode JSNode JSNode JSNode JSNode
+do,stmt,while,lb,expr,rb,autosemi
+JSElision JSNode
+comma
+JSExpressionBinary String [JSNode] JSNode [JSNode]
+what, lhs, op, rhs
+JSExpressionParen JSNode JSNode JSNode
+lb,expression,rb
+JSExpressionPostfix String [JSNode] JSNode
+type, expression, operator
+JSExpressionTernary [JSNode] JSNode [JSNode] JSNode [JSNode]
+cond, ?, trueval, :, falseval
+JSFinally JSNode JSNode
+finally,block
+JSFor JSNode JSNode [JSNode] JSNode [JSNode] JSNode [JSNode] JSNode JSNode
+for,lb,expr,semi,expr,semi,expr,rb.stmt
+JSForIn JSNode JSNode [JSNode] JSNode JSNode JSNode JSNode
+for,lb,expr,in,expr,rb,stmt
+JSForVar JSNode JSNode JSNode [JSNode] JSNode [JSNode] JSNode [JSNode] JSNode JSNode
+for,lb,var,vardecl,semi,expr,semi,expr,rb,stmt
+JSForVarIn JSNode JSNode JSNode JSNode JSNode JSNode JSNode JSNode
+for,lb,var,vardecl,in,expr,rb,stmt
+JSFunction JSNode JSNode JSNode [JSNode] JSNode JSNode
+fn,name, lb,parameter list,rb,block | JSFunctionBody [JSNode] -- ^body
+JSFunctionExpression JSNode [JSNode] JSNode [JSNode] JSNode JSNode
+fn,[name],lb, parameter list,rb,block`
+JSIf JSNode JSNode JSNode JSNode [JSNode] [JSNode]
+if,(,expr,),stmt,optional rest
+JSLabelled JSNode JSNode JSNode
+identifier,colon,stmt
+JSMemberDot [JSNode] JSNode JSNode
+firstpart, dot, name
+JSMemberSquare [JSNode] JSNode JSNode JSNode
+firstpart, lb, expr, rb
+JSObjectLiteral JSNode [JSNode] JSNode
+lbrace contents rbrace
+JSOperator JSNode
+opnode
+JSPropertyAccessor JSNode JSNode JSNode [JSNode] JSNode JSNode
+(get|set), name, lb, params, rb, block
+JSPropertyNameandValue JSNode JSNode [JSNode]
+name, colon, value
+JSReturn JSNode [JSNode] JSNode
+return,optional expression,autosemi | JSSourceElements [JSNode] -- ^source elements
+JSSourceElementsTop [JSNode]
+source elements | JSStatementBlock JSNode JSNode JSNode -- ^lb,block,rb | JSStatementList [JSNode] -- ^statements
+JSSwitch JSNode JSNode JSNode JSNode JSNode
+switch,lb,expr,rb,caseblock
+JSThrow JSNode JSNode
+throw val
+JSTry JSNode JSNode [JSNode]
+try,block,rest
+JSUnary String JSNode
+type, operator
+JSWhile JSNode JSNode JSNode JSNode JSNode
+while,lb,expr,rb,stmt
+ -}
