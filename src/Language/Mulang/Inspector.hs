@@ -23,8 +23,8 @@ module Language.Mulang.Inspector (
 import  Language.Mulang
 import  Language.Mulang.Explorer
 
-type Inspection = Binding -> Program  -> Bool
-type GlobalInspection = Program  -> Bool
+type Inspection = Binding -> Expression  -> Bool
+type GlobalInspection = Expression  -> Bool
 
 -- | Inspection that tells whether a binding uses the composition operator '.'
 -- in its definition

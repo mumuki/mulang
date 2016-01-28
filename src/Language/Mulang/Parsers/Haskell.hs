@@ -8,15 +8,15 @@ import Data.String (IsString(..))
 import Data.Maybe (fromJust)
 import Data.List (intercalate)
 
-instance IsString Program where
+instance IsString Expression where
   fromString = fromJust.parseHaskell
 
-parseHaskell :: String -> Maybe Program
+parseHaskell :: String -> Maybe Expression
 parseHaskell code | ParseOk ast <- parseModule code = Just (mu ast)
                   | otherwise = Nothing
 
-mu :: HsModule -> Program
-mu (HsModule _ _ _ _ decls) = (Program (map (DeclarationExpression) $ concatMap muDecls decls))
+mu :: HsModule -> Expression
+mu (HsModule _ _ _ _ decls) = Sequence (map (DeclarationExpression) $ concatMap muDecls decls)
   where
     muDecls (HsTypeDecl _ name _ _)      = [TypeAlias (muName name)]
     muDecls (HsDataDecl _ _ name _ _ _ ) = [RecordDeclaration (muName name)]

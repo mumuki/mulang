@@ -30,13 +30,13 @@ spec = do
       parseHaskell "f = \\x -> x + 1" `shouldBe` parseJavaScript "var f = function(x) { return x + 1 }"
 
     it "numeric top level expression" $ do
-      parseJavaScript "8" `shouldBe` Just (Program [Literal (MuInteger 8)])
+      parseJavaScript "8" `shouldBe` Just (Sequence [Literal (MuInteger 8)])
 
     it "list literal top level expression" $ do
-      parseJavaScript "[8, 7]" `shouldBe` Just (Program [MuList [Literal (MuInteger 8), Literal (MuInteger 7)]])
+      parseJavaScript "[8, 7]" `shouldBe` Just (Sequence [MuList [Literal (MuInteger 8), Literal (MuInteger 7)]])
 
     it "compacts everything" $ do
-      parseJavaScript "8; 9" `shouldBe` Just (Program [Literal (MuInteger 8)])
+      parseJavaScript "8; 9" `shouldBe` Just (Sequence [Literal (MuInteger 8)])
 
     it "handles blocks as sequences" $ do
       parseJavaScript "8; 9" `shouldBe` parseJavaScript "{8; 9}"

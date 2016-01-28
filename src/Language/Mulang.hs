@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Language.Mulang (
-    Program(..),
     Declaration(..),
     Equation(..),
     Rhs(..),
@@ -16,8 +15,6 @@ module Language.Mulang (
   ) where
 
 import           GHC.Generics
-
-data Program = Program [Expression] deriving (Eq, Show, Read, Generic)
 
 type Identifier = String
 

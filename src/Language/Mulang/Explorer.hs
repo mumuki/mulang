@@ -26,33 +26,33 @@ declaratioBinding (RecordDeclaration n)  = n
 declaratioBinding (ProcedureDeclaration n)  = n
 
 
-declarationsBindedTo :: Binding -> Program -> [Declaration]
+declarationsBindedTo :: Binding -> Expression -> [Declaration]
 declarationsBindedTo binding = filter (isBinding binding) . topLevelDeclarations
 
-rhssOf :: Binding -> Program -> [Rhs]
+rhssOf :: Binding -> Expression -> [Rhs]
 rhssOf binding = concatMap rhsForBinding . declarationsBindedTo binding
 
-expressionsOf :: Binding -> Program -> [Expression]
+expressionsOf :: Binding -> Expression -> [Expression]
 expressionsOf binding code = do
   rhs <- rhssOf binding code
   top <- topExpressions rhs
   unfoldExpression top
 
-bindingsOf :: Binding -> Program -> [Binding]
+bindingsOf :: Binding -> Expression -> [Binding]
 bindingsOf binding code = nub $ do
           expr <- expressionsOf binding code
           maybeToList . expressionToBinding $ expr
 
-transitiveBindingsOf :: Binding -> Program -> [Binding]
+transitiveBindingsOf :: Binding -> Expression -> [Binding]
 transitiveBindingsOf binding code =  expand (`bindingsOf` code) binding
 
-topLevelExpressions :: Program -> [Expression]
-topLevelExpressions (Program decls) = decls
+topLevelExpressions :: Expression -> [Expression]
+topLevelExpressions (Sequence decls) = decls
 
-topLevelBindings :: Program -> [Binding]
+topLevelBindings :: Expression -> [Binding]
 topLevelBindings = map declaratioBinding . topLevelDeclarations
 
-topLevelDeclarations :: Program -> [Declaration]
+topLevelDeclarations :: Expression -> [Declaration]
 topLevelDeclarations = concatMap getDeclaration . topLevelExpressions
         where
           getDeclaration (DeclarationExpression d) = [d]

@@ -8,10 +8,10 @@ import Language.JavaScript.Parser.Parser
 import Language.JavaScript.Parser.AST
 
 
-parseJavaScript :: String -> Maybe Program
+parseJavaScript :: String -> Maybe Expression
 parseJavaScript code = Just . mu $ readJs code
 
-mu (NN (JSSourceElementsTop staments)) =  Program (mapMuNode staments)
+mu (NN (JSSourceElementsTop staments)) =  Sequence (mapMuNode staments)
   where
     muNode (JSIdentifier n)                                  = [Variable n]
     muNode (JSDecimal val)                                   = [Literal (MuFloat (read val))]
