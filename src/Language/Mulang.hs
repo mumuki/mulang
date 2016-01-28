@@ -93,6 +93,6 @@ data GuardedAlternative = GuardedAlternative Expression Expression deriving (Eq,
 data LiteralValue
           = MuBool Bool
           | MuInteger Integer
-          | MuFloat Rational
+          | MuFloat Double
           | MuString String
     deriving (Eq, Show, Read, Generic)

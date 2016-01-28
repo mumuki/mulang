@@ -72,12 +72,12 @@ mu (HsModule _ _ _ _ decls) = (Program (map (DeclarationExpression) $ concatMap 
     muLit (HsChar        v) = MuString [v]
     muLit (HsString      v) = MuString v
     muLit (HsInt         v) = MuInteger v
-    muLit (HsFrac        v) = MuFloat v
+    muLit (HsFrac        v) = MuFloat . fromRational $ v
     muLit (HsCharPrim    v) = MuString [v]
     muLit (HsStringPrim  v) = MuString v
     muLit (HsIntPrim     v) = MuInteger v
-    muLit (HsFloatPrim   v) = MuFloat v
-    muLit (HsDoublePrim  v) = MuFloat v
+    muLit (HsFloatPrim   v) = MuFloat . fromRational $ v
+    muLit (HsDoublePrim  v) = MuFloat . fromRational $ v
 
     muName :: HsName -> String
     muName (HsSymbol n) = n
