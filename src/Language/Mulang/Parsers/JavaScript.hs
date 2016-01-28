@@ -12,42 +12,52 @@ import Language.JavaScript.Parser.AST
 parseJavaScript :: String -> Maybe Expression
 parseJavaScript code = Just . mu $ readJs code
 
-mu (NN (JSSourceElementsTop staments)) =  compact (mapMuNode staments)
+mu :: JSNode -> Expression
+mu = compact . muNode . gc
   where
+    muNode (JSSourceElementsTop statements)                  = [muSequence statements]
     muNode (JSIdentifier n)                                  = [Variable n]
     muNode (JSDecimal val)                                   = [MuNumber (read val)]
-    muNode (JSExpression es)                                 = [compact (mapMuNode es)]
+    muNode (JSExpression es)                                 = [muSequence es]
     muNode (JSLiteral _)                                     = []
+    muNode (JSElision _)                                     = []
     muNode (JSHexInteger v)                                  = muNode (JSStringLiteral '\'' v)
     muNode (JSOctal v)                                       = muNode (JSStringLiteral '"' v)
     muNode (JSStringLiteral _ v)                             = [MuString v]
-    muNode (JSVariables _ decls _)                           = mapMuNode decls
-    muNode (JSArrayLiteral _ es _)                           = [MuList (mapMuNode es)]
+    muNode (JSVariables _ decls _)                           = map mu decls
+    muNode (JSArrayLiteral _ es _)                           = [MuList (concatMap (muNode . gc) es)]
     muNode (JSVarDecl (NT (JSIdentifier var) _ _) initial)   = [
-                             (DeclarationExpression . VariableDeclaration var) (compact . mapMuNode $ initial)]
+                             (DeclarationExpression . VariableDeclaration var) (muSequence initial)]
     muNode (JSWith _ _ _ _ _)                                = [ExpressionOther]
     muNode (JSExpressionTernary cond _ true _ false)         = [muIf (head cond) (head true) false]
     muNode (JSIf _ _ cond _ true false)                      = [muIf cond (head true) false]
     muNode (JSWhile _ _ cond _ action)                       = [muWhile cond action]
+    muNode (JSBlock _ exps _)                                = [muSequence exps]
+    muNode (JSFunctionExpression _ [] _ params _ body)       = [Lambda (muParams params) (mu body)]
+    muNode (JSFunctionExpression _ name _ params _ body)     =
+                    [DeclarationExpression (FunctionDeclaration (muIdentifier name) [Equation (muParams params) (UnguardedBody (mu body))])]
+    muNode (JSReturn _ e _)                                  = [muSequence e]
+    muNode e = error (show e)
 
-    muNode _ = []
+    muParams _ = [OtherPattern]
+
+    muIdentifier = show
 
     gc (NN n) = n
     gc (NT n _ _) = n
 
-    mapMuNode = concatMap (muNode.gc)
-    muNodeSingle = compact . muNode . gc
+    muSequence :: [JSNode] -> Expression
+    muSequence  = compact . concatMap (muNode . gc)
 
     muIf :: JSNode -> JSNode -> [JSNode] -> Expression
-    muIf cond true [] = If (muNodeSingle cond) (muNodeSingle true) MuUnit
-    muIf cond true false = If (muNodeSingle cond) (muNodeSingle true) (compact.mapMuNode $ false)
+    muIf cond true [] = If (mu cond) (mu true) MuUnit
+    muIf cond true false = If (mu cond) (mu true) (muSequence false)
 
-    muWhile cond action  = While (muNodeSingle cond) (muNodeSingle action)
+    muWhile cond action  = While (mu cond) (mu action)
 
 {-JSRegEx String
 JSArguments JSNode [JSNode] JSNode
 lb, args, rb
-JSBlock [JSNode] [JSNode] [JSNode]
 optional lb,optional block statements,optional rb
 JSBreak JSNode [JSNode] JSNode
 break, optional identifier, autosemi
@@ -85,8 +95,7 @@ JSForVarIn JSNode JSNode JSNode JSNode JSNode JSNode JSNode JSNode
 for,lb,var,vardecl,in,expr,rb,stmt
 JSFunction JSNode JSNode JSNode [JSNode] JSNode JSNode
 fn,name, lb,parameter list,rb,block | JSFunctionBody [JSNode] -- ^body
-JSFunctionExpression JSNode [JSNode] JSNode [JSNode] JSNode JSNode
-fn,[name],lb, parameter list,rb,block`
+
 
 JSLabelled JSNode JSNode JSNode
 identifier,colon,stmt
@@ -102,10 +111,6 @@ JSPropertyAccessor JSNode JSNode JSNode [JSNode] JSNode JSNode
 (get|set), name, lb, params, rb, block
 JSPropertyNameandValue JSNode JSNode [JSNode]
 name, colon, value
-JSReturn JSNode [JSNode] JSNode
-return,optional expression,autosemi | JSSourceElements [JSNode] -- ^source elements
-JSSourceElementsTop [JSNode]
-source elements | JSStatementBlock JSNode JSNode JSNode -- ^lb,block,rb | JSStatementList [JSNode] -- ^statements
 JSSwitch JSNode JSNode JSNode JSNode JSNode
 switch,lb,expr,rb,caseblock
 JSThrow JSNode JSNode
