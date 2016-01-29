@@ -1,5 +1,7 @@
 module Language.Mulang.Inspector (
   hasObject,
+  hasAttribute,
+  hasMethod,
   hasComposition,
   hasGuards,
   hasIf,
@@ -27,10 +29,21 @@ type Inspection = Binding -> Expression  -> Bool
 type GlobalInspection = Expression  -> Bool
 
 hasObject :: Inspection
-hasObject =  hasDeclaration f
+hasObject =  hasTopLevelDeclaration f
   where f (VariableDeclaration _ (MuObject _)) = True
         f _  = False
 
+hasAttribute :: Binding -> Inspection
+hasAttribute name =  hasExpression f
+  where f (VariableDeclaration _ (Lambda _ _)) = False
+        f (VariableDeclaration n _) = n == name
+        f _  = False
+
+hasMethod :: Binding -> Inspection
+hasMethod name =  hasExpression f
+  where f (FunctionDeclaration n _) = n == name
+        f (VariableDeclaration n (Lambda _ _)) = n == name
+        f _  = False
 
 -- | Inspection that tells whether a binding uses the composition operator '.'
 -- in its definition
@@ -90,14 +103,14 @@ hasBinding :: Inspection
 hasBinding binding = not.null.declarationsBindedTo binding
 
 hasFunctionDeclaration :: Inspection
-hasFunctionDeclaration = hasDeclaration f
+hasFunctionDeclaration = hasTopLevelDeclaration f
   where f (FunctionDeclaration _ _) = True
         f (VariableDeclaration _ (Lambda _ _)) = True
         f (VariableDeclaration _ (Variable _)) = True -- not actually always true
         f _  = False
 
 hasArity :: Int -> Inspection
-hasArity arity = hasDeclaration f
+hasArity arity = hasTopLevelDeclaration f
   where f (FunctionDeclaration _ equations) = any equationHasArity equations
         f (VariableDeclaration _ (Lambda args _)) = argsHaveArity args
         f _  = False
@@ -107,17 +120,17 @@ hasArity arity = hasDeclaration f
         argsHaveArity args = length args == arity
 
 hasTypeDeclaration :: Inspection
-hasTypeDeclaration = hasDeclaration f
+hasTypeDeclaration = hasTopLevelDeclaration f
   where f (TypeAliasDeclaration _) = True
         f _             = False
 
 hasTypeSignature :: Inspection
-hasTypeSignature = hasDeclaration f
+hasTypeSignature = hasTopLevelDeclaration f
   where f (TypeSignature _)  = True
         f _                  = False
 
 hasAnonymousVariable :: Inspection
-hasAnonymousVariable = hasDeclaration f
+hasAnonymousVariable = hasTopLevelDeclaration f
   where f (FunctionDeclaration _ equations)    = any (any (== WildcardPattern) . p) equations
         f _                        = False
         p (Equation params _) = params
@@ -128,8 +141,8 @@ hasExpression f binding = has f (expressionsOf binding)
 hasBody :: (EquationBody -> Bool)-> Inspection
 hasBody f binding = has f (rhssOf binding)
 
-hasDeclaration :: (Expression -> Bool) -> Inspection
-hasDeclaration f  = has f . declarationsBindedTo
+hasTopLevelDeclaration :: (Expression -> Bool) -> Inspection
+hasTopLevelDeclaration f  = has f . declarationsBindedTo
 
 -- private
 

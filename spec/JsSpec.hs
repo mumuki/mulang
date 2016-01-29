@@ -25,6 +25,9 @@ spec = do
     it "simple function declaration" $ do
       parseHaskell "f x = 1" `shouldBe` parseJavaScript "function f(x) { return 1 }"
 
+    it "multiple params function declaration" $ do
+      parseHaskell "f x y = 1" `shouldBe` parseJavaScript "function f(x, y) { return 1 }"
+
     it "constant function declaration" $ do
       parseHaskell "f = \\x -> x + 1" `shouldBe` parseJavaScript "var f = function(x) { return x + 1 }"
 

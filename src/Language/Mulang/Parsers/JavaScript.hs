@@ -39,13 +39,14 @@ mu = compact . muNode . gc
     muNode (JSLabelled _ _ e)                                = [mu e]
     muNode (JSPropertyNameandValue var _ initial)            = [muVar var initial]
     muNode (JSFunction _ name _ params _ body)               = [muFunction name params body]
-
+    muNode (JSFunction _ name _ params _ body)               = [muFunction name params body]
+    muNode (JSExpressionBinary op l _ r)                     = [InfixApplication (mus l) op (mus r)]
 
     muNode e = error (show e)
 
     muParams _ = [OtherPattern]
 
-    muIdentifier = show
+    muIdentifier (JSIdentifier id) = id
 
     gc (NN n) = n
     gc (NT n _ _) = n
@@ -62,7 +63,7 @@ mu = compact . muNode . gc
     muVar (NT (JSIdentifier var) _ _) initial = VariableDeclaration var (mus initial)
 
     muFunction :: JSNode -> [JSNode] -> JSNode -> Expression
-    muFunction name params body =  FunctionDeclaration (muIdentifier name) [Equation (muParams params) (UnguardedBody (mu body))]
+    muFunction name params body =  FunctionDeclaration ((muIdentifier.gc) name) [Equation (muParams params) (UnguardedBody (mu body))]
 
 
 {-JSRegEx String
@@ -83,8 +84,6 @@ JSDefault JSNode JSNode [JSNode]
 default,colon,stmtlist
 JSDoWhile JSNode JSNode JSNode JSNode JSNode JSNode JSNode
 do,stmt,while,lb,expr,rb,autosemi
-JSExpressionBinary String [JSNode] JSNode [JSNode]
-what, lhs, op, rhs
 JSExpressionPostfix String [JSNode] JSNode
 type, expression, operator
 JSExpressionTernary [JSNode] JSNode [JSNode] JSNode [JSNode]

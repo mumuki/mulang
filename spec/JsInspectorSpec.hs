@@ -55,4 +55,29 @@ spec = do
     it "is False when present on another binding" $ do
       hasObject "f" (js "var g = {}")  `shouldBe` False
 
+  describe "hasMethod" $ do
+    it "is True when present" $ do
+      hasMethod "x" "f" (js "var f = {x: function(){}}")  `shouldBe` True
+
+    it "is False when not present" $ do
+      hasMethod "m" "f" (js "var f = {x: function(){}}")  `shouldBe` False
+
+    it "is False when not a method" $ do
+      hasMethod "m" "f" (js "var f = {x: 6")  `shouldBe` False
+
+    it "is False when object not present" $ do
+      hasMethod "x" "p" (js "var f = {x: function(){}}")  `shouldBe` False
+
+  describe "hasAttribute" $ do
+    it "is True when present" $ do
+      hasAttribute "x" "f" (js "var f = {x: 6}")  `shouldBe` True
+
+    it "is True when present and there are many" $ do
+      hasAttribute "x" "f" (js "var f = {j: 20, x: 6}")  `shouldBe` True
+
+    it "is False when not present" $ do
+      hasAttribute "m" "f" (js "var f = {x: 6}")  `shouldBe` False
+
+    it "is False when object not present" $ do
+      hasAttribute "x" "p" (js "var f = {x: 6}")  `shouldBe` False
 

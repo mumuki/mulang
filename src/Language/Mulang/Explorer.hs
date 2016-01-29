@@ -74,12 +74,14 @@ unfoldExpression expr = expr : concatMap unfoldExpression (subExpressions expr)
 subExpressions :: Expression -> [Expression]
 subExpressions (InfixApplication a b c) = [a, (Variable b), c]
 subExpressions (Application a b)        = [a, b]
-subExpressions (Lambda _ a)   = [a]
-subExpressions (MuList as)      = as
-subExpressions (Comprehension a _)   = [a] --TODO
-subExpressions (MuTuple as)      = as
-subExpressions (If a b c)       = [a, b, c]
-subExpressions _ = []
+subExpressions (Lambda _ a)             = [a]
+subExpressions (Comprehension a _)      = [a] --TODO
+subExpressions (MuTuple as)             = as
+subExpressions (MuList as)              = as
+subExpressions (MuObject es)            = [es]
+subExpressions (If a b c)               = [a, b, c]
+subExpressions (Sequence es)            = es
+subExpressions _                        = []
 
 rhsForBinding :: Expression -> [EquationBody]
 rhsForBinding (VariableDeclaration _ exp) = [UnguardedBody exp]
