@@ -4,7 +4,6 @@ module JsSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang
-import           Language.Mulang.Inspector.Smell
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 
@@ -54,6 +53,9 @@ spec = do
       parseJavaScript "while (x) { y }" `shouldBe` Just (While (Variable "x") (Variable "y"))
 
     it "handles objects" $ do
-      parseJavaScript "{x: 6}" `shouldBe` Just (MuObject (DeclarationExpression (VariableDeclaration "x" (MuNumber 6))))
+      parseJavaScript "({x: 6})" `shouldBe` Just (MuObject (DeclarationExpression (VariableDeclaration "x" (MuNumber 6))))
+
+    it "handles empty objects" $ do
+      parseJavaScript "({})" `shouldBe` Just (MuObject MuUnit)
 
 

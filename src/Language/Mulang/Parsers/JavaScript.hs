@@ -2,12 +2,11 @@ module Language.Mulang.Parsers.JavaScript where
 
 import Language.Mulang
 import Language.Mulang.Builder
-import Language.Haskell.Syntax
-import Language.Haskell.Parser
 
 import Language.JavaScript.Parser.Parser
 import Language.JavaScript.Parser.AST
 
+import Data.Maybe (fromJust)
 
 parseJavaScript :: String -> Maybe Expression
 parseJavaScript code = Just . mu $ readJs code
@@ -15,10 +14,10 @@ parseJavaScript code = Just . mu $ readJs code
 mu :: JSNode -> Expression
 mu = compact . muNode . gc
   where
-    muNode (JSSourceElementsTop statements)                  = [muSequence statements]
+    muNode (JSSourceElementsTop statements)                  = [mus statements]
     muNode (JSIdentifier n)                                  = [Variable n]
     muNode (JSDecimal val)                                   = [MuNumber (read val)]
-    muNode (JSExpression es)                                 = [muSequence es]
+    muNode (JSExpression es)                                 = [mus es]
     muNode (JSLiteral _)                                     = []
     muNode (JSElision _)                                     = []
     muNode (JSHexInteger v)                                  = muNode (JSStringLiteral '\'' v)
@@ -26,17 +25,22 @@ mu = compact . muNode . gc
     muNode (JSStringLiteral _ v)                             = [MuString v]
     muNode (JSVariables _ decls _)                           = map mu decls
     muNode (JSArrayLiteral _ es _)                           = [MuList (concatMap (muNode . gc) es)]
-    muNode (JSVarDecl (NT (JSIdentifier var) _ _) initial)   = [
-                             (DeclarationExpression . VariableDeclaration var) (muSequence initial)]
+    muNode (JSVarDecl var initial)                           = [muVar var initial]
     muNode (JSWith _ _ _ _ _)                                = [ExpressionOther]
     muNode (JSExpressionTernary cond _ true _ false)         = [muIf (head cond) (head true) false]
     muNode (JSIf _ _ cond _ true false)                      = [muIf cond (head true) false]
     muNode (JSWhile _ _ cond _ action)                       = [muWhile cond action]
-    muNode (JSBlock _ exps _)                                = [muSequence exps]
+    muNode (JSBlock _ exps _)                                = [mus exps]
     muNode (JSFunctionExpression _ [] _ params _ body)       = [Lambda (muParams params) (mu body)]
-    muNode (JSFunctionExpression _ name _ params _ body)     =
-                    [DeclarationExpression (FunctionDeclaration (muIdentifier name) [Equation (muParams params) (UnguardedBody (mu body))])]
-    muNode (JSReturn _ e _)                                  = [muSequence e]
+    muNode (JSFunctionExpression _ name _ params _ body)     = [muFunction (head name) params body]
+    muNode (JSReturn _ e _)                                  = [mus e]
+    muNode (JSExpressionParen _ e _)                         = [mu e]
+    muNode (JSObjectLiteral _ es _)                          = [MuObject (mus es)]
+    muNode (JSLabelled _ _ e)                                = [mu e]
+    muNode (JSPropertyNameandValue var _ initial)            = [muVar var initial]
+    muNode (JSFunction _ name _ params _ body)               = [muFunction name params body]
+
+
     muNode e = error (show e)
 
     muParams _ = [OtherPattern]
@@ -46,14 +50,20 @@ mu = compact . muNode . gc
     gc (NN n) = n
     gc (NT n _ _) = n
 
-    muSequence :: [JSNode] -> Expression
-    muSequence  = compact . concatMap (muNode . gc)
+    mus :: [JSNode] -> Expression
+    mus  = compact . concatMap (muNode . gc)
 
     muIf :: JSNode -> JSNode -> [JSNode] -> Expression
     muIf cond true [] = If (mu cond) (mu true) MuUnit
-    muIf cond true false = If (mu cond) (mu true) (muSequence false)
+    muIf cond true false = If (mu cond) (mu true) (mus false)
 
     muWhile cond action  = While (mu cond) (mu action)
+
+    muVar (NT (JSIdentifier var) _ _) initial = (DeclarationExpression . VariableDeclaration var) (mus initial)
+
+    muFunction :: JSNode -> [JSNode] -> JSNode -> Expression
+    muFunction name params body = DeclarationExpression (FunctionDeclaration (muIdentifier name) [Equation (muParams params) (UnguardedBody (mu body))])
+
 
 {-JSRegEx String
 JSArguments JSNode [JSNode] JSNode
@@ -73,12 +83,8 @@ JSDefault JSNode JSNode [JSNode]
 default,colon,stmtlist
 JSDoWhile JSNode JSNode JSNode JSNode JSNode JSNode JSNode
 do,stmt,while,lb,expr,rb,autosemi
-JSElision JSNode
-comma
 JSExpressionBinary String [JSNode] JSNode [JSNode]
 what, lhs, op, rhs
-JSExpressionParen JSNode JSNode JSNode
-lb,expression,rb
 JSExpressionPostfix String [JSNode] JSNode
 type, expression, operator
 JSExpressionTernary [JSNode] JSNode [JSNode] JSNode [JSNode]
@@ -93,24 +99,16 @@ JSForVar JSNode JSNode JSNode [JSNode] JSNode [JSNode] JSNode [JSNode] JSNode JS
 for,lb,var,vardecl,semi,expr,semi,expr,rb,stmt
 JSForVarIn JSNode JSNode JSNode JSNode JSNode JSNode JSNode JSNode
 for,lb,var,vardecl,in,expr,rb,stmt
-JSFunction JSNode JSNode JSNode [JSNode] JSNode JSNode
-fn,name, lb,parameter list,rb,block | JSFunctionBody [JSNode] -- ^body
 
 
-JSLabelled JSNode JSNode JSNode
-identifier,colon,stmt
 JSMemberDot [JSNode] JSNode JSNode
 firstpart, dot, name
 JSMemberSquare [JSNode] JSNode JSNode JSNode
 firstpart, lb, expr, rb
-JSObjectLiteral JSNode [JSNode] JSNode
-lbrace contents rbrace
 JSOperator JSNode
 opnode
 JSPropertyAccessor JSNode JSNode JSNode [JSNode] JSNode JSNode
 (get|set), name, lb, params, rb, block
-JSPropertyNameandValue JSNode JSNode [JSNode]
-name, colon, value
 JSSwitch JSNode JSNode JSNode JSNode JSNode
 switch,lb,expr,rb,caseblock
 JSThrow JSNode JSNode
@@ -119,5 +117,4 @@ JSTry JSNode JSNode [JSNode]
 try,block,rest
 JSUnary String JSNode
 type, operator
-while,lb,expr,rb,stmt
  -}
