@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Language.Mulang (
-    Declaration(..),
     Equation(..),
     EquationBody(..),
     GuardedBody(..),
@@ -17,23 +16,11 @@ import           GHC.Generics
 
 type Identifier = String
 
--- declaration or directive
-data Declaration
-         = TypeAlias Identifier
-         | RecordDeclaration Identifier
-         | TypeSignature Identifier
-         | FunctionDeclaration Identifier [Equation]    -- functional, maybe pure,
-                                                        -- optionally guarded,
-                                                        -- optionally pattern matched function
-         | ProcedureDeclaration Identifier              -- classic imperative-style procedure
-         | VariableDeclaration Identifier Expression
-  deriving (Eq, Show, Read, Generic)
-
 data Equation = Equation [Pattern] EquationBody deriving (Eq, Show, Read, Generic)
 
 data EquationBody
          = UnguardedBody Expression
-         | GuardedRhss  [GuardedBody]
+         | GuardedBodies  [GuardedBody]
   deriving (Eq, Show, Read, Generic)
 
 data GuardedBody = GuardedBody Expression Expression deriving (Eq, Show, Read, Generic)
@@ -41,12 +28,19 @@ data GuardedBody = GuardedBody Expression Expression deriving (Eq, Show, Read, G
 -- expression or statement
 -- may have effects
 data Expression
-        = DeclarationExpression Declaration
+        = TypeAliasDeclaration Identifier
+        | RecordDeclaration Identifier
+        | TypeSignature Identifier
+        | FunctionDeclaration Identifier [Equation]    -- functional, maybe pure,
+                                                        -- optionally guarded,
+                                                        -- optionally pattern matched function
+        | ProcedureDeclaration Identifier              -- classic imperative-style procedure
+        | VariableDeclaration Identifier Expression
         | Variable Identifier
         | InfixApplication Expression String Expression
         | Application Expression Expression
         | Lambda [Pattern] Expression
-        | Let [Declaration] Expression
+        | Let [Expression] Expression
         | If Expression Expression Expression
         | While Expression Expression
         | Match Expression [Alternative]

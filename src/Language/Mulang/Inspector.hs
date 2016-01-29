@@ -15,7 +15,7 @@ module Language.Mulang.Inspector (
   hasTypeSignature,
   hasAnonymousVariable,
   hasExpression,
-  hasRhs,
+  hasBody,
   Inspection,
   GlobalInspection
   ) where
@@ -42,8 +42,8 @@ hasComposition = hasExpression f
 -- | Inspection that tells whether a binding uses guards
 -- in its definition
 hasGuards :: Inspection
-hasGuards = hasRhs f
-  where f (GuardedRhss _) = True
+hasGuards = hasBody f
+  where f (GuardedBodies _) = True
         f _ = False
 
 -- | Inspection that tells whether a binding uses ifs
@@ -108,7 +108,7 @@ hasArity arity = hasDeclaration f
 
 hasTypeDeclaration :: Inspection
 hasTypeDeclaration = hasDeclaration f
-  where f (TypeAlias _) = True
+  where f (TypeAliasDeclaration _) = True
         f _             = False
 
 hasTypeSignature :: Inspection
@@ -125,10 +125,10 @@ hasAnonymousVariable = hasDeclaration f
 hasExpression :: (Expression -> Bool) -> Inspection
 hasExpression f binding = has f (expressionsOf binding)
 
-hasRhs :: (EquationBody -> Bool)-> Inspection
-hasRhs f binding = has f (rhssOf binding)
+hasBody :: (EquationBody -> Bool)-> Inspection
+hasBody f binding = has f (rhssOf binding)
 
-hasDeclaration :: (Declaration -> Bool) -> Inspection
+hasDeclaration :: (Expression -> Bool) -> Inspection
 hasDeclaration f  = has f . declarationsBindedTo
 
 -- private

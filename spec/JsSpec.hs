@@ -53,7 +53,7 @@ spec = do
       parseJavaScript "while (x) { y }" `shouldBe` Just (While (Variable "x") (Variable "y"))
 
     it "handles objects" $ do
-      parseJavaScript "({x: 6})" `shouldBe` Just (MuObject (DeclarationExpression (VariableDeclaration "x" (MuNumber 6))))
+      parseJavaScript "({x: 6})" `shouldBe` Just (MuObject (VariableDeclaration "x" (MuNumber 6)))
 
     it "handles empty objects" $ do
       parseJavaScript "({})" `shouldBe` Just (MuObject MuUnit)

@@ -29,8 +29,8 @@ hasRedundantIf = hasExpression f
 -- | Inspection that tells whether a binding has guards where both branches return
 -- boolean literals
 hasRedundantGuards :: Inspection
-hasRedundantGuards = hasRhs f -- TODO not true when condition is a pattern
-  where f (GuardedRhss [
+hasRedundantGuards = hasBody f -- TODO not true when condition is a pattern
+  where f (GuardedBodies [
             GuardedBody _ x,
             GuardedBody (Variable "otherwise") y]) = all isBooleanLiteral [x, y]
         f _ = False

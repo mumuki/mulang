@@ -59,10 +59,10 @@ mu = compact . muNode . gc
 
     muWhile cond action  = While (mu cond) (mu action)
 
-    muVar (NT (JSIdentifier var) _ _) initial = (DeclarationExpression . VariableDeclaration var) (mus initial)
+    muVar (NT (JSIdentifier var) _ _) initial = VariableDeclaration var (mus initial)
 
     muFunction :: JSNode -> [JSNode] -> JSNode -> Expression
-    muFunction name params body = DeclarationExpression (FunctionDeclaration (muIdentifier name) [Equation (muParams params) (UnguardedBody (mu body))])
+    muFunction name params body =  FunctionDeclaration (muIdentifier name) [Equation (muParams params) (UnguardedBody (mu body))]
 
 
 {-JSRegEx String

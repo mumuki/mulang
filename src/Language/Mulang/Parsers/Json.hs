@@ -9,9 +9,6 @@ import qualified Data.ByteString.Lazy.Char8 as LBS (pack)
 parseJson :: String -> Maybe Expression
 parseJson  = decode . LBS.pack
 
-instance FromJSON Declaration
-instance ToJSON Declaration
-
 instance FromJSON Equation
 instance ToJSON Equation
 

@@ -17,17 +17,6 @@ import Data.List (nub)
 
 type Binding = String
 
-declaratioBinding :: Declaration -> Binding
-declaratioBinding (TypeSignature b ) = b
-declaratioBinding (TypeAlias b ) = b
-declaratioBinding (VariableDeclaration n _) = n
-declaratioBinding (FunctionDeclaration n _)  = n
-declaratioBinding (RecordDeclaration n)  = n
-declaratioBinding (ProcedureDeclaration n)  = n
-
-
-declarationsBindedTo :: Binding -> Expression -> [Declaration]
-declarationsBindedTo binding = filter (isBinding binding) . topLevelDeclarations
 
 rhssOf :: Binding -> Expression -> [EquationBody]
 rhssOf binding = concatMap rhsForBinding . declarationsBindedTo binding
@@ -46,18 +35,28 @@ bindingsOf binding code = nub $ do
 transitiveBindingsOf :: Binding -> Expression -> [Binding]
 transitiveBindingsOf binding code =  expand (`bindingsOf` code) binding
 
+
+declarationsBindedTo :: Binding -> Expression -> [Expression]
+declarationsBindedTo binding = map snd . filter ((==binding).fst) . topLevelDeclarations
+
+topLevelBindings :: Expression -> [Binding]
+topLevelBindings = map fst . topLevelDeclarations
+
+topLevelDeclarations :: Expression -> [(Binding, Expression)]
+topLevelDeclarations = concatMap (maybeToList.declarationBinding) . topLevelExpressions
+
+declarationBinding :: Expression -> Maybe (Binding, Expression)
+declarationBinding e@(TypeSignature n)         = Just (n, e)
+declarationBinding e@(TypeAliasDeclaration n ) = Just (n, e)
+declarationBinding e@(VariableDeclaration n _) = Just (n, e)
+declarationBinding e@(FunctionDeclaration n _) = Just (n, e)
+declarationBinding e@(RecordDeclaration n)     = Just (n, e)
+declarationBinding e@(ProcedureDeclaration n)  = Just (n, e)
+declarationBinding _                           = Nothing
+
 topLevelExpressions :: Expression -> [Expression]
 topLevelExpressions (Sequence es) = es
 topLevelExpressions e             = [e]
-
-topLevelBindings :: Expression -> [Binding]
-topLevelBindings = map declaratioBinding . topLevelDeclarations
-
-topLevelDeclarations :: Expression -> [Declaration]
-topLevelDeclarations = concatMap getDeclaration . topLevelExpressions
-        where
-          getDeclaration (DeclarationExpression d) = [d]
-          getDeclaration  _                        = []
 
 expressionToBinding :: Expression -> Maybe Binding
 expressionToBinding (Variable    q) = Just q
@@ -67,7 +66,7 @@ expressionToBinding _               = Nothing
 
 topExpressions :: EquationBody -> [Expression]
 topExpressions (UnguardedBody e) = [e]
-topExpressions (GuardedRhss rhss) = rhss >>= \(GuardedBody es1 es2) -> [es1, es2]
+topExpressions (GuardedBodies rhss) = rhss >>= \(GuardedBody es1 es2) -> [es1, es2]
 
 unfoldExpression :: Expression -> [Expression]
 unfoldExpression expr = expr : concatMap unfoldExpression (subExpressions expr)
@@ -82,10 +81,7 @@ subExpressions (MuTuple as)      = as
 subExpressions (If a b c)       = [a, b, c]
 subExpressions _ = []
 
-isBinding :: Binding -> Declaration -> Bool
-isBinding binding = (==binding).declaratioBinding
-
-rhsForBinding :: Declaration -> [EquationBody]
+rhsForBinding :: Expression -> [EquationBody]
 rhsForBinding (VariableDeclaration _ exp) = [UnguardedBody exp]
 rhsForBinding (FunctionDeclaration _ cases) = cases >>= \(Equation _ rhs) -> [rhs]
 rhsForBinding _ = []

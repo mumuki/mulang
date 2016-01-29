@@ -17,9 +17,9 @@ parseHaskell code | ParseOk ast <- parseModule code = Just (mu ast)
                   | otherwise = Nothing
 
 mu :: HsModule -> Expression
-mu (HsModule _ _ _ _ decls) = compact (map (DeclarationExpression) $ concatMap muDecls decls)
+mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
   where
-    muDecls (HsTypeDecl _ name _ _)      = [TypeAlias (muName name)]
+    muDecls (HsTypeDecl _ name _ _)      = [TypeAliasDeclaration (muName name)]
     muDecls (HsDataDecl _ _ name _ _ _ ) = [RecordDeclaration (muName name)]
     muDecls (HsTypeSig _ names _) = map (\name -> TypeSignature (muName name)) names
     muDecls (HsFunBind equations) | (HsMatch _ name _ _ _) <- head equations =
@@ -32,7 +32,7 @@ mu (HsModule _ _ _ _ decls) = compact (map (DeclarationExpression) $ concatMap m
          Equation (map muPat patterns) (muRhs rhs)
 
     muRhs (HsUnGuardedRhs exp)          = UnguardedBody (muExp exp)
-    muRhs (HsGuardedRhss  guards) = GuardedRhss (map muGuardedRhs guards)
+    muRhs (HsGuardedRhss  guards) = GuardedBodies (map muGuardedRhs guards)
 
     muGuardedRhs (HsGuardedRhs _ condition body) = (GuardedBody (muExp condition) (muExp body))
 
