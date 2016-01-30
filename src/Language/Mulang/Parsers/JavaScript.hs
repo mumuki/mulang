@@ -44,7 +44,12 @@ mu = compact . muNode . gc
 
     muNode e = error (show e)
 
-    muParams _ = [OtherPattern]
+    muParams :: [JSNode] -> [Pattern]
+    muParams params = concatMap (muPattern.gc) params
+
+    muPattern (JSLiteral _)    = []
+    muPattern (JSIdentifier i) = [VariablePattern i]
+    muPattern e                = error (show e)
 
     muIdentifier (JSIdentifier id) = id
 

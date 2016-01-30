@@ -45,6 +45,19 @@ spec = do
       it "is True when constant is declared with lambda of given arity" $ do
         hasArity 2 "f" (js "var f = function(x, y) { return x + y }") `shouldBe` True
 
+  describe "hasWhile" $ do
+    it "is True when present in function" $ do
+      hasWhile "f" (js "function f() { while(true) { console.log('foo') }  }")  `shouldBe` True
+
+    it "is True when present in lambda" $ do
+      hasWhile "f" (js "var f = function() { while(true) { console.log('foo') }  }")  `shouldBe` True
+
+    it "is True when present in object" $ do
+      hasWhile "x" (js "var x = {f: function() { while(true) { console.log('foo') } }}")  `shouldBe` True
+
+    it "is False when not present in function" $ do
+      hasWhile "f" (js "function f() {}")  `shouldBe` False
+
   describe "hasObject" $ do
     it "is True when present" $ do
       hasObject "f" (js "var f = {x: 6}")  `shouldBe` True
@@ -63,7 +76,7 @@ spec = do
       hasMethod "m" "f" (js "var f = {x: function(){}}")  `shouldBe` False
 
     it "is False when not a method" $ do
-      hasMethod "m" "f" (js "var f = {x: 6")  `shouldBe` False
+      hasMethod "m" "f" (js "var f = {x: 6}")  `shouldBe` False
 
     it "is False when object not present" $ do
       hasMethod "x" "p" (js "var f = {x: function(){}}")  `shouldBe` False

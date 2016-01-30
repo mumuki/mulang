@@ -81,6 +81,7 @@ subExpressions (MuList as)              = as
 subExpressions (MuObject es)            = [es]
 subExpressions (If a b c)               = [a, b, c]
 subExpressions (Sequence es)            = es
+subExpressions (VariableDeclaration _ v)= [v]
 subExpressions _                        = []
 
 rhsForBinding :: Expression -> [EquationBody]

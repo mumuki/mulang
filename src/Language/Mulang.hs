@@ -40,7 +40,7 @@ data Expression
         | InfixApplication Expression String Expression
         | Application Expression Expression
         | Lambda [Pattern] Expression
-        | Let [Expression] Expression
+        | Let [Expression] Expression   -- TODO overlapping with variable declaration
         | If Expression Expression Expression
         | While Expression Expression
         | Match Expression [Alternative]

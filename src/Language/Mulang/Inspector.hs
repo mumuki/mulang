@@ -5,6 +5,7 @@ module Language.Mulang.Inspector (
   hasComposition,
   hasGuards,
   hasIf,
+  hasWhile,
   hasConditional,
   hasLambda,
   hasDirectRecursion,
@@ -64,6 +65,13 @@ hasGuards = hasBody f
 hasIf :: Inspection
 hasIf = hasExpression f
   where f (If _ _ _) = True
+        f _ = False
+
+-- | Inspection that tells whether a binding uses while
+-- in its definition
+hasWhile :: Inspection
+hasWhile = hasExpression f
+  where f (While _ _) = True
         f _ = False
 
 -- | Inspection that tells whether a binding uses ifs or guards

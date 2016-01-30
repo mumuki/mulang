@@ -19,6 +19,8 @@ parseHaskell code | ParseOk ast <- parseModule code = Just (mu ast)
 mu :: HsModule -> Expression
 mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
   where
+    mergeDecls decls exp = compact (decls ++ [exp])
+
     muDecls (HsTypeDecl _ name _ _)      = [TypeAliasDeclaration (muName name)]
     muDecls (HsDataDecl _ _ name _ _ _ ) = [RecordDeclaration (muName name)]
     muDecls (HsTypeSig _ names _) = map (\name -> TypeSignature (muName name)) names
@@ -28,13 +30,13 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muDecls _ = []
 
     muEquation :: HsMatch -> Equation
-    muEquation (HsMatch _ _ patterns rhs _) =
-         Equation (map muPat patterns) (muRhs rhs)
+    muEquation (HsMatch _ _ patterns rhs decls) =
+         Equation (map muPat patterns) (muRhs (concatMap muDecls decls) rhs)
 
-    muRhs (HsUnGuardedRhs exp)          = UnguardedBody (muExp exp)
-    muRhs (HsGuardedRhss  guards) = GuardedBodies (map muGuardedRhs guards)
+    muRhs decls (HsUnGuardedRhs exp)        = UnguardedBody (mergeDecls decls (muExp exp))
+    muRhs decls (HsGuardedRhss  guards)     = GuardedBodies (map (muGuardedRhs decls) guards )
 
-    muGuardedRhs (HsGuardedRhs _ condition body) = (GuardedBody (muExp condition) (muExp body))
+    muGuardedRhs decls (HsGuardedRhs _ condition body) = (GuardedBody (mergeDecls decls (muExp condition)) (muExp body))
 
     muPat (HsPVar name) = VariablePattern (muName name)                 -- ^ variable
     muPat (HsPLit _) = LiteralPattern ""              -- ^ literal constant
