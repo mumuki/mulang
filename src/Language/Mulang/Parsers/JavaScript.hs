@@ -19,9 +19,6 @@ mu = compact . muNode . gc
     muNode (JSSourceElementsTop statements)                  = [compactMapMu statements]
     muNode (JSIdentifier n)                                  = [Variable n]
     muNode (JSDecimal val)                                   = [MuNumber (read val)]
-    muNode (JSExpression [x])                                = [mu x]
-    muNode (JSExpression [x, y])
-                        | (JSArguments _ args _) <- gc y     = [Application (mu x) (mapMu args)]
     muNode (JSExpression xs)                                 = [compactMapMu xs]
     muNode (JSLiteral "true")                                = [MuBool True]
     muNode (JSLiteral "false")                               = [MuBool False]
@@ -51,7 +48,10 @@ mu = compact . muNode . gc
     muNode (JSMemberDot receptor _ selector)                 = [Send (compactMapMu receptor) (mu selector) []]
     muNode e = error (show e)
 
-    mapMu = concatMap (muNode . gc)
+    mapMu :: [JSNode] -> [Expression]
+    mapMu [] = []
+    mapMu (x:y:xs) | (JSArguments _ args _) <- gc y =  [Application (mu x) (mapMu args)] ++ mapMu xs
+    mapMu (x:xs) = (muNode.gc) x ++ mapMu xs
 
     muParams :: [JSNode] -> [Pattern]
     muParams params = concatMap (muPattern.gc) params

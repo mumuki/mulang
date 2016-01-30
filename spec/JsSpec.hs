@@ -22,6 +22,9 @@ spec = do
     it "simple assignation 2" $ do
       parseJavaScript "x" `shouldBe` Just (Variable "x")
 
+    it "simple function application in var declaration" $ do
+      parseHaskell "x = m 1 2" `shouldBe` parseJavaScript "var x = m(1, 2)"
+
     it "simple function declaration" $ do
       parseHaskell "f x = 1" `shouldBe` parseJavaScript "function f(x) { return 1 }"
 

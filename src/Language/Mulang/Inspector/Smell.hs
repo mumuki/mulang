@@ -47,7 +47,9 @@ hasRedundantLambda = hasExpression f
 hasRedundantParameter :: Inspection
 hasRedundantParameter binding = any f . declarationsBindedTo binding
   where f (FunctionDeclaration _ [
-             Equation params (UnguardedBody (Application _ [Variable arg]))]) | (VariablePattern param) <- last params = param == arg
+             Equation params (UnguardedBody (Application _ args))])
+                          | (VariablePattern param) <- last params,
+                            (Variable arg) <- last args = param == arg
         f _ = False
 
 isBooleanLiteral (MuBool _) = True
