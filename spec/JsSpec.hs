@@ -11,37 +11,43 @@ spec :: Spec
 spec = do
   describe "foo" $ do
     it "simple assignation" $ do
-      parseHaskell "x = 1" `shouldBe` parseJavaScript "var x = 1"
+      js "var x = 1" `shouldBe` hs "x = 1"
 
     it "simple string assignment" $ do
-      parseHaskell "x = \"hello\"" `shouldBe` parseJavaScript "var x = 'hello'"
+      js "var x = 'hello'" `shouldBe` hs "x = \"hello\""
 
     it "string parsing" $ do
-      parseJavaScript "var x = \"hello\"" `shouldBe` parseJavaScript "var x = 'hello'"
+      js "var x = \"hello\"" `shouldBe` js "var x = 'hello'"
 
     it "simple assignation 2" $ do
-      parseJavaScript "x" `shouldBe` Just (Variable "x")
+      js "x" `shouldBe` Variable "x"
 
     it "simple function application in var declaration" $ do
-      parseHaskell "x = m 1 2" `shouldBe` parseJavaScript "var x = m(1, 2)"
+      hs "x = m 1 2" `shouldBe` js "var x = m(1, 2)"
+
+    it "differentiates procedures and functions" $ do
+      (js "function f() { return 1 }" /= js "function f() { 1 }") `shouldBe` True
+
+    it "handles lambdas likes haskell does" $ do
+      js "var m = function(x) { return 1 }" `shouldBe` hs "m = \\x -> 1"
 
     it "simple function declaration" $ do
-      parseHaskell "f x = 1" `shouldBe` parseJavaScript "function f(x) { return 1 }"
+      hs "f x = 1" `shouldBe` js "function f(x) { return 1 }"
 
     it "multiple params function declaration" $ do
-      parseHaskell "f x y = 1" `shouldBe` parseJavaScript "function f(x, y) { return 1 }"
+      hs "f x y = 1" `shouldBe` js "function f(x, y) { return 1 }"
 
     it "constant function declaration" $ do
-      parseHaskell "f = \\x -> x + 1" `shouldBe` parseJavaScript "var f = function(x) { return x + 1 }"
+      hs "f = \\x -> x + 1" `shouldBe` js "var f = function(x) { return x + 1 }"
 
     it "numeric top level expression" $ do
-      parseJavaScript "8" `shouldBe` Just (MuNumber 8)
+      js "8" `shouldBe` MuNumber 8
 
     it "list literal top level expression" $ do
-      parseJavaScript "[8, 7]" `shouldBe` Just (MuList [MuNumber 8, MuNumber 7])
+      js "[8, 7]" `shouldBe` MuList [MuNumber 8, MuNumber 7]
 
     it "compacts everything" $ do
-      parseJavaScript "8; 9" `shouldBe` Just (Sequence [MuNumber 8, MuNumber 9])
+      js "8; 9" `shouldBe`  Sequence [MuNumber 8, MuNumber 9]
 
     it "handles blocks as sequences" $ do
       js "8; 9" `shouldBe` js "{8; 9}"
@@ -65,7 +71,7 @@ spec = do
       js "if(x) y else z" `shouldBe` If (Variable "x") (Variable "y") (Variable "z")
 
     it "handles partial ifs" $ do
-      js "if(x) y" `shouldBe` If (Variable "x") (Variable "y") MuUnit
+      js "if(x) y" `shouldBe` If (Variable "x") (Variable "y") MuNull
 
     it "handles ternarys as ifs" $ do
       js "x ? y : z " `shouldBe` js "if (x) { y } else { z }"
@@ -77,6 +83,6 @@ spec = do
       js "({x: 6})" `shouldBe` MuObject (VariableDeclaration "x" (MuNumber 6))
 
     it "handles empty objects" $ do
-      js "({})" `shouldBe` MuObject MuUnit
+      js "({})" `shouldBe` MuObject MuNull
 
 

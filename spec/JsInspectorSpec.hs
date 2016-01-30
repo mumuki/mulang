@@ -30,6 +30,9 @@ spec = do
       it "is True when constant is declared with a variable literal" $ do
         hasFunctionDeclaration "f"  (js "var f = setTimeout") `shouldBe` True
 
+      it "is False when is a method" $ do
+        hasFunctionDeclaration "f"  (js "var o = {f: function(){}}") `shouldBe` False
+
   describe "hasArity" $ do
     describe "with function declarations" $ do
       it "is True when function is declared with the given arity" $ do

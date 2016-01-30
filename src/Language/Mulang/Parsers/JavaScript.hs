@@ -17,9 +17,11 @@ mu :: JSNode -> Expression
 mu = compact . muNode . gc
   where
     muNode (JSSourceElementsTop statements)                  = [compactMapMu statements]
+    muNode (JSIdentifier "undefined")                        = [MuNull]
     muNode (JSIdentifier n)                                  = [Variable n]
     muNode (JSDecimal val)                                   = [MuNumber (read val)]
     muNode (JSExpression xs)                                 = [compactMapMu xs]
+    muNode (JSLiteral "null")                                = [MuNull]
     muNode (JSLiteral "true")                                = [MuBool True]
     muNode (JSLiteral "false")                               = [MuBool False]
     muNode (JSLiteral _)                                     = []
@@ -37,7 +39,7 @@ mu = compact . muNode . gc
     muNode (JSBlock _ exps _)                                = [compactMapMu exps]
     muNode (JSFunctionExpression _ [] _ params _ body)       = [Lambda (muParams params) (mu body)]
     muNode (JSFunctionExpression _ [name] _ params _ body)   = [muFunction  name params body]
-    muNode (JSReturn _ e _)                                  = [compactMapMu e]
+    muNode (JSReturn _ e _)                                  = [Return (compactMapMu e)]
     muNode (JSExpressionParen _ e _)                         = [mu e]
     muNode (JSObjectLiteral _ es _)                          = [MuObject (compactMapMu es)]
     muNode (JSLabelled _ _ e)                                = [mu e]

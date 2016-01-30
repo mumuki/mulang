@@ -31,10 +31,12 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muEquation (HsMatch _ _ patterns rhs decls) =
          Equation (map muPat patterns) (muRhs (concatMap muDecls decls) rhs)
 
-    muRhs decls (HsUnGuardedRhs exp)        = UnguardedBody (mergeDecls decls (muExp exp))
+    muRhs decls (HsUnGuardedRhs body)        = UnguardedBody (mergeDecls decls (muBody body))
     muRhs decls (HsGuardedRhss  guards)     = GuardedBodies (map (muGuardedRhs decls) guards )
 
-    muGuardedRhs decls (HsGuardedRhs _ condition body) = (GuardedBody (mergeDecls decls (muExp condition)) (muExp body))
+    muGuardedRhs decls (HsGuardedRhs _ condition body) = (GuardedBody (mergeDecls decls (muExp condition)) (muBody body))
+
+    muBody = Return . muExp
 
     muPat (HsPVar name) = VariablePattern (muName name)                 -- ^ variable
     muPat (HsPLit _) = LiteralPattern ""              -- ^ literal constant
@@ -53,12 +55,12 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muExp (HsCon name)                       = Variable (muQName name)
     muExp (HsLit lit) = muLit lit
     muExp (HsInfixApp e1 op e2) = InfixApplication (muExp e1) (muQOp op) (muExp e2)  -- ^ infix application
-    muExp (HsApp (HsApp e1 e2) e3)                               = Application (muExp e1) [muExp e2, muExp e3]
-    muExp (HsApp (HsApp (HsApp e1 e2) e3) e4)                    = Application (muExp e1) [muExp e2, muExp e3, muExp e4]
     muExp (HsApp (HsApp (HsApp (HsApp e1 e2) e3) e4) e5)         = Application (muExp e1) [muExp e2, muExp e3, muExp e4, muExp e5]
+    muExp (HsApp (HsApp (HsApp e1 e2) e3) e4)                    = Application (muExp e1) [muExp e2, muExp e3, muExp e4]
+    muExp (HsApp (HsApp e1 e2) e3)                               = Application (muExp e1) [muExp e2, muExp e3]
     muExp (HsApp e1 e2)                                          = Application (muExp e1) [muExp e2]
     muExp (HsNegApp e) = Application (Variable "-") [muExp e]
-    muExp (HsLambda _ args exp) = Lambda (map muPat args) (muExp exp)
+    muExp (HsLambda _ args body) = Lambda (map muPat args) (muBody body)
     --muExp HsLet = Let [Declaration] Expression          -- ^ local declarations with @let@
     muExp (HsIf e1 e2 e3) = If (muExp e1) (muExp e2) (muExp e3)
     --muExp HsMatch = Match Expression [Alternative]          -- ^ @case@ /exp/ @of@ /alts/

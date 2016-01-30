@@ -43,12 +43,13 @@ data Expression
         | Lambda [Pattern] Expression
         | Let [Expression] Expression   -- TODO overlapping with variable RecordDeclaration
         | If Expression Expression Expression
+        | Return Expression
         | While Expression Expression
         | Match Expression [Alternative]
         | Comprehension Expression [ComprehensionStatement]
         | Sequence [Expression]
         | ExpressionOther
-        | MuUnit                                               -- nil, null, undefined or ()
+        | MuNull                                               -- nil, null, undefined or ()
         | MuObject Expression                                  -- literal, unnamed object
         | MuNumber Double                                      -- any number
         | MuBool Bool
