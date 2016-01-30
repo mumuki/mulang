@@ -4,6 +4,7 @@ module Language.Mulang.Explorer (
   topLevelBindings,
   declarationsBindedTo,
   rhssOf,
+  nameOf,
   bindingsOf,
   transitiveBindingsOf,
   expressionsOf,
@@ -44,6 +45,9 @@ topLevelBindings = map fst . topLevelDeclarations
 
 topLevelDeclarations :: Expression -> [(Binding, Expression)]
 topLevelDeclarations = concatMap (maybeToList.declarationBinding) . topLevelExpressions
+
+nameOf :: Expression -> Maybe Binding
+nameOf = fmap fst . declarationBinding
 
 declarationBinding :: Expression -> Maybe (Binding, Expression)
 declarationBinding e@(TypeSignature n)         = Just (n, e)

@@ -6,7 +6,6 @@ module Language.Mulang.Inspector (
   hasGuards,
   hasIf,
   hasWhile,
-  hasConditional,
   hasLambda,
   hasDirectRecursion,
   hasUsage,
@@ -74,10 +73,6 @@ hasWhile = hasExpression f
   where f (While _ _) = True
         f _ = False
 
--- | Inspection that tells whether a binding uses ifs or guards
--- in its definition
-hasConditional :: Inspection
-hasConditional target code = hasIf target code || hasGuards target code
 
 -- | Inspection that tells whether a binding uses a lambda expression
 -- in its definition
