@@ -15,23 +15,24 @@ import Language.Mulang.Inspector
 
 -- | Inspection that tells whether a binding has expressions like 'x == True'
 hasRedundantBooleanComparison :: Inspection
-hasRedundantBooleanComparison = hasExpression f
-  where f (InfixApplication x c y) = any isBooleanLiteral [x, y] && isComp c
-        f _ = False
+hasRedundantBooleanComparison = hasComparison isBooleanLiteral
 
 doesNullTest :: Inspection
-doesNullTest = hasExpression f
-  where f (InfixApplication _ c MuNull)  = isComp c
-        f (InfixApplication MuNull c _) = isComp c
-        f _ = False
+doesNullTest = hasComparison f
+  where f MuNull = True
+        f _      = False
 
 doesTypeTest :: Inspection
-doesTypeTest = hasExpression f
-  where f (InfixApplication _ c (MuString _))  = isComp c
-        f (InfixApplication (MuString _) c _) = isComp c
-        f _ = False
+doesTypeTest = hasComparison f
+  where f (MuString _) = True
+        f _            = False
 
-isComp c = c == "==" || c == "/="
+hasComparison :: (Expression -> Bool) -> Inspection
+hasComparison f = hasExpression (any f.comparisonOperands)
+
+comparisonOperands (Application Equal    args) = args
+comparisonOperands (Application NotEqual args) = args
+comparisonOperands _ = []
 
 -- | Inspection that tells whether a binding has an if expression where both branches return
 -- boolean literals

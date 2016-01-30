@@ -49,12 +49,12 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muPat HsPWildCard = WildcardPattern
     muPat _ = OtherPattern
 
-    muExp (HsVar name) = Variable (muQName name)
+    muExp (HsVar name) = muVar (muQName name)
     muExp (HsCon (UnQual (HsIdent "True")))  = MuBool True
     muExp (HsCon (UnQual (HsIdent "False"))) = MuBool False
     muExp (HsCon name)                       = Variable (muQName name)
     muExp (HsLit lit) = muLit lit
-    muExp (HsInfixApp e1 op e2) = InfixApplication (muExp e1) (muQOp op) (muExp e2)  -- ^ infix application
+    muExp (HsInfixApp e1 op e2)                                  = Application ((muVar.muQOp) op) [muExp e1, muExp e2]
     muExp (HsApp (HsApp (HsApp (HsApp e1 e2) e3) e4) e5)         = Application (muExp e1) [muExp e2, muExp e3, muExp e4, muExp e5]
     muExp (HsApp (HsApp (HsApp e1 e2) e3) e4)                    = Application (muExp e1) [muExp e2, muExp e3, muExp e4]
     muExp (HsApp (HsApp e1 e2) e3)                               = Application (muExp e1) [muExp e2, muExp e3]
@@ -84,6 +84,11 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muLit (HsFrac        v) = MuNumber . fromRational $ v
     muLit (HsFloatPrim   v) = MuNumber . fromRational $ v
     muLit (HsDoublePrim  v) = MuNumber . fromRational $ v
+
+    muVar :: String -> Expression
+    muVar "==" = Equal
+    muVar "/=" = NotEqual
+    muVar v = Variable v
 
     muName :: HsName -> String
     muName (HsSymbol n) = n

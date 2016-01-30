@@ -46,7 +46,7 @@ mu = compact . muNode . gc
     muNode (JSPropertyNameandValue var _ initial)            = [muVar var initial]
     muNode (JSFunction _ name _ params _ body)               = [muFunction name params body]
     muNode (JSFunction _ name _ params _ body)               = [muFunction name params body]
-    muNode (JSExpressionBinary op l _ r)                     = [InfixApplication (compactMapMu l) op (compactMapMu r)]
+    muNode (JSExpressionBinary op l _ r)                     = [Application (muOp op) [compactMapMu l, compactMapMu r]]
     muNode (JSMemberDot receptor _ selector)                 = [Send (compactMapMu receptor) (mu selector) []]
     muNode e = error (show e)
 
@@ -57,6 +57,13 @@ mu = compact . muNode . gc
 
     muParams :: [JSNode] -> [Pattern]
     muParams params = concatMap (muPattern.gc) params
+
+    muOp :: String -> Expression
+    muOp "=="  = Equal
+    muOp "===" = Equal
+    muOp "!="  = NotEqual
+    muOp "!==" = NotEqual
+    muOp v    = Variable v
 
     muPattern (JSLiteral _)    = []
     muPattern (JSIdentifier i) = [VariablePattern i]

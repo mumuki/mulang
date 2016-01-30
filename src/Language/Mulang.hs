@@ -37,7 +37,6 @@ data Expression
         | ProcedureDeclaration Identifier              -- classic imperative-style procedure
         | VariableDeclaration Identifier Expression
         | Variable Identifier
-        | InfixApplication Expression String Expression
         | Application Expression [Expression]
         | Send Expression Expression [Expression]
         | Lambda [Pattern] Expression
@@ -49,6 +48,8 @@ data Expression
         | Comprehension Expression [ComprehensionStatement]
         | Sequence [Expression]
         | ExpressionOther
+        | Equal
+        | NotEqual
         | MuNull                                               -- nil, null, undefined or ()
         | MuObject Expression                                  -- literal, unnamed object
         | MuNumber Double                                      -- any number
