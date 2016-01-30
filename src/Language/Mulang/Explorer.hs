@@ -21,6 +21,12 @@ type Binding = String
 
 rhssOf :: Binding -> Expression -> [EquationBody]
 rhssOf binding = concatMap rhsForBinding . declarationsBindedTo binding
+  where
+    rhsForBinding :: Expression -> [EquationBody]
+    rhsForBinding (VariableDeclaration _ exp) = [UnguardedBody exp]
+    rhsForBinding (FunctionDeclaration _ cases) = cases >>= \(Equation _ rhs) -> [rhs]
+    rhsForBinding _ = []
+
 
 expressionsOf :: Binding -> Expression -> [Expression]
 expressionsOf binding code = do
@@ -74,31 +80,26 @@ topExpressions (GuardedBodies rhss) = rhss >>= \(GuardedBody es1 es2) -> [es1, e
 
 unfoldExpression :: Expression -> [Expression]
 unfoldExpression expr = expr : concatMap unfoldExpression (subExpressions expr)
-
-subExpressions :: Expression -> [Expression]
-subExpressions (Application a bs)        = a:bs
-subExpressions (Lambda _ a)             = [a]
-subExpressions (Comprehension a _)      = [a] --TODO
-subExpressions (MuTuple as)             = as
-subExpressions (MuList as)              = as
-subExpressions (MuObject es)            = [es]
-subExpressions (If a b c)               = [a, b, c]
-subExpressions (Sequence es)            = es
-subExpressions (VariableDeclaration _ v)= [v]
-subExpressions (Return v)               = [v]
-subExpressions (While e1 e2)            = [e1, e2]
-subExpressions (Send e1 e2 e3)          = [e1, e2] ++ e3
-subExpressions _                        = []
-
-rhsForBinding :: Expression -> [EquationBody]
-rhsForBinding (VariableDeclaration _ exp) = [UnguardedBody exp]
-rhsForBinding (FunctionDeclaration _ cases) = cases >>= \(Equation _ rhs) -> [rhs]
-rhsForBinding _ = []
+  where
+    subExpressions :: Expression -> [Expression]
+    subExpressions (Application a bs)        = a:bs
+    subExpressions (Lambda _ a)             = [a]
+    subExpressions (Comprehension a _)      = [a] --TODO
+    subExpressions (MuTuple as)             = as
+    subExpressions (MuList as)              = as
+    subExpressions (MuObject es)            = [es]
+    subExpressions (If a b c)               = [a, b, c]
+    subExpressions (Sequence es)            = es
+    subExpressions (VariableDeclaration _ v)= [v]
+    subExpressions (Return v)               = [v]
+    subExpressions (While e1 e2)            = [e1, e2]
+    subExpressions (Send e1 e2 e3)          = [e1, e2] ++ e3
+    subExpressions _                        = []
 
 expand :: Eq a => (a-> [a]) -> a -> [a]
 expand f x = expand' [] f [x]
-
-expand' _ _ [] = []
-expand' ps f (x:xs) | elem x ps = expand' ps f xs
-                    | otherwise = [x] ++ expand' (x:ps) f (xs ++ f x)
+  where
+    expand' _ _ [] = []
+    expand' ps f (x:xs) | elem x ps = expand' ps f xs
+                        | otherwise = [x] ++ expand' (x:ps) f (xs ++ f x)
 
