@@ -2,6 +2,8 @@ module JsInspectorSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang.Inspector
+import           Language.Mulang.Inspector.Combiner
+import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 
 spec :: Spec
@@ -102,25 +104,25 @@ spec = do
       hasUsage "m" "f" (js "function f(x) { m }") `shouldBe` True
 
     it "is True through function application in function" $ do
-      hasUsage "m" "f" (js "function g() { m }; function f(x) { g() }") `shouldBe` True
+      (transitive $ hasUsage "m") "f" (js "function g() { m }; function f(x) { g() }") `shouldBe` True
 
     it "is True through function application in function" $ do
-      hasUsage "m" "f" (js "function g() { m }; function f(x) { g() }") `shouldBe` True
+      (transitive $ hasUsage "m") "f" (js "function g(p) { return m }; function f(x) { return g(2) }") `shouldBe` True
 
     it "is False through function application in function" $ do
-      hasUsage "m" "f" (js "function g() { m }; function f(x) { k() }") `shouldBe` False
+      (transitive $ hasUsage "m") "f" (js "function g() { m }; function f(x) { k() }") `shouldBe` False
 
     it "is True through message send in function" $ do
-      hasUsage "m" "f" (js "var o = {g: function(){ m }}; function f(x) { o.g() }") `shouldBe` True
+      (transitive $ hasUsage "m") "f" (js "var o = {g: function(){ m }}; function f(x) { o.g() }") `shouldBe` True
 
     it "is True through message send in objects" $ do
-      hasUsage "m" "p" (js "var o = {g: function(){ m }}; var p = {n: function() { o.g() }}") `shouldBe` True
+      (transitive $ hasUsage "m") "p" (js "var o = {g: function(){ m }}; var p = {n: function() { o.g() }}") `shouldBe` True
 
     it "is False through message send in objects" $ do
-      hasUsage "m" "p" (js "var o = {g: function(){ m }}; var y = {n: function() { o.g() }}") `shouldBe` False
+      (transitive $ hasUsage "m") "p" (js "var o = {g: function(){ m }}; var y = {n: function() { o.g() }}") `shouldBe` False
 
     it "is True through message send in objects, with nested binding" $ do
-      hasUsage "m" "p.n" (js "var o = {g: function(){ m }}; var p = {n: function() { o.g() }}") `shouldBe` True
+      (transitive $ hasUsage "m") "p.n" (js "var o = {g: function(){ m }}; var p = {n: function() { o.g() }}") `shouldBe` True
 
     it "is False through message send in objects, with nested binding" $ do
-      hasUsage "m" "p.w" (js "var o = {g: function(){ m }}; var p = {n: function() { o.g() }}") `shouldBe` False
+      (transitive $ hasUsage "m") "p.w" (js "var o = {g: function(){ m }}; var p = {n: function() { o.g() }}") `shouldBe` False

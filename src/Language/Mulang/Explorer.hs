@@ -82,6 +82,8 @@ subExpressions (If a b c)               = [a, b, c]
 subExpressions (Sequence es)            = es
 subExpressions (VariableDeclaration _ v)= [v]
 subExpressions (Return v)               = [v]
+subExpressions (While e1 e2)            = [e1, e2]
+subExpressions (Send e1 e2 e3)          = [e1, e2] ++ e3
 subExpressions _                        = []
 
 rhsForBinding :: Expression -> [EquationBody]
