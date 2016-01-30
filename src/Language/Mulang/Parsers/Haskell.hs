@@ -13,9 +13,6 @@ import Data.Maybe (fromJust)
 
 hs = fromJust . parseHaskell
 
-instance IsString Expression where
-  fromString = fromJust.parseHaskell
-
 parseHaskell :: String -> Maybe Expression
 parseHaskell code | ParseOk ast <- parseModule code = Just (mu ast)
                   | otherwise = Nothing
