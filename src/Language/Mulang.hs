@@ -39,8 +39,9 @@ data Expression
         | Variable Identifier
         | InfixApplication Expression String Expression
         | Application Expression Expression
+        | Send Expression Expression [Expression]
         | Lambda [Pattern] Expression
-        | Let [Expression] Expression   -- TODO overlapping with variable declaration
+        | Let [Expression] Expression   -- TODO overlapping with variable RecordDeclaration
         | If Expression Expression Expression
         | While Expression Expression
         | Match Expression [Alternative]

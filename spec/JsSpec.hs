@@ -41,24 +41,39 @@ spec = do
       parseJavaScript "8; 9" `shouldBe` Just (Sequence [MuNumber 8, MuNumber 9])
 
     it "handles blocks as sequences" $ do
-      parseJavaScript "8; 9" `shouldBe` parseJavaScript "{8; 9}"
+      js "8; 9" `shouldBe` js "{8; 9}"
+
+    it "handles booleans" $ do
+      js "true" `shouldBe` MuBool True
+
+    it "handles lambdas" $ do
+      js "(function(x, y) { 1 })" `shouldBe` (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1))
+
+    it "handles application" $ do
+      js "f(2)" `shouldBe` (Application (Variable "f") (MuNumber 2))
+
+    it "handles application with multiple args" $ do
+      js "f(2, 4)" `shouldBe` (Application (Variable "f") (MuNumber 4))
+
+    it "handles message send" $ do
+      js "o.f(2)" `shouldBe` (Send (Variable "o") (Variable "f") [(MuNumber 2)])
 
     it "handles ifs" $ do
-      parseJavaScript "if(x) y else z" `shouldBe` Just (If (Variable "x") (Variable "y") (Variable "z"))
+      js "if(x) y else z" `shouldBe` If (Variable "x") (Variable "y") (Variable "z")
 
     it "handles partial ifs" $ do
-      parseJavaScript "if(x) y" `shouldBe` Just (If (Variable "x") (Variable "y") MuUnit)
+      js "if(x) y" `shouldBe` If (Variable "x") (Variable "y") MuUnit
 
     it "handles ternarys as ifs" $ do
-      parseJavaScript "x ? y : z " `shouldBe` parseJavaScript "if (x) { y } else { z }"
+      js "x ? y : z " `shouldBe` js "if (x) { y } else { z }"
 
     it "handles whiles" $ do
-      parseJavaScript "while (x) { y }" `shouldBe` Just (While (Variable "x") (Variable "y"))
+      js "while (x) { y }" `shouldBe` While (Variable "x") (Variable "y")
 
     it "handles objects" $ do
-      parseJavaScript "({x: 6})" `shouldBe` Just (MuObject (VariableDeclaration "x" (MuNumber 6)))
+      js "({x: 6})" `shouldBe` MuObject (VariableDeclaration "x" (MuNumber 6))
 
     it "handles empty objects" $ do
-      parseJavaScript "({})" `shouldBe` Just (MuObject MuUnit)
+      js "({})" `shouldBe` MuObject MuUnit
 
 

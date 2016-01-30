@@ -1,4 +1,4 @@
-module Language.Mulang.Parsers.Haskell (parseHaskell) where
+module Language.Mulang.Parsers.Haskell (hs, parseHaskell) where
 
 import Language.Mulang
 import Language.Mulang.Builder
@@ -8,6 +8,10 @@ import Language.Haskell.Parser
 import Data.String (IsString(..))
 import Data.Maybe (fromJust)
 import Data.List (intercalate)
+
+import Data.Maybe (fromJust)
+
+hs = fromJust . parseHaskell
 
 instance IsString Expression where
   fromString = fromJust.parseHaskell

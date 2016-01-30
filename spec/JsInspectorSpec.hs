@@ -3,9 +3,6 @@ module JsInspectorSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Inspector
 import           Language.Mulang.Parsers.JavaScript
-import           Data.Maybe (fromJust)
-
-js = fromJust.parseJavaScript
 
 spec :: Spec
 spec = do
@@ -55,6 +52,9 @@ spec = do
     it "is True when present in object" $ do
       hasWhile "x" (js "var x = {f: function() { while(true) { console.log('foo') } }}")  `shouldBe` True
 
+    it "is True when present in method" $ do
+      hasWhile "o.f" (js "var o = {f: function() { while(true) { console.log('foo') }  }}")  `shouldBe` True
+
     it "is False when not present in function" $ do
       hasWhile "f" (js "function f() {}")  `shouldBe` False
 
@@ -94,3 +94,30 @@ spec = do
     it "is False when object not present" $ do
       hasAttribute "x" "p" (js "var f = {x: 6}")  `shouldBe` False
 
+  describe "hasUsage" $ do
+    it "is True on direct usage in function" $ do
+      hasUsage "m" "f" (js "function f(x) { m }") `shouldBe` True
+
+    it "is True through function application in function" $ do
+      hasUsage "m" "f" (js "function g() { m }; function f(x) { g() }") `shouldBe` True
+
+    it "is True through function application in function" $ do
+      hasUsage "m" "f" (js "function g() { m }; function f(x) { g() }") `shouldBe` True
+
+    it "is False through function application in function" $ do
+      hasUsage "m" "f" (js "function g() { m }; function f(x) { k() }") `shouldBe` False
+
+    it "is True through message send in function" $ do
+      hasUsage "m" "f" (js "var o = {g: function(){ m }}; function f(x) { o.g() }") `shouldBe` True
+
+    it "is True through message send in objects" $ do
+      hasUsage "m" "p" (js "var o = {g: function(){ m }}; var p = {n: function() { o.g() }}") `shouldBe` True
+
+    it "is False through message send in objects" $ do
+      hasUsage "m" "p" (js "var o = {g: function(){ m }}; var y = {n: function() { o.g() }}") `shouldBe` False
+
+    it "is True through message send in objects, with nested binding" $ do
+      hasUsage "m" "p.n" (js "var o = {g: function(){ m }}; var p = {n: function() { o.g() }}") `shouldBe` True
+
+    it "is False through message send in objects, with nested binding" $ do
+      hasUsage "m" "p.w" (js "var o = {g: function(){ m }}; var p = {n: function() { o.g() }}") `shouldBe` False

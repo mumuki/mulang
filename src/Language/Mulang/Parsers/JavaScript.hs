@@ -1,4 +1,4 @@
-module Language.Mulang.Parsers.JavaScript where
+module Language.Mulang.Parsers.JavaScript (js, parseJavaScript) where
 
 import Language.Mulang
 import Language.Mulang.Builder
@@ -8,41 +8,50 @@ import Language.JavaScript.Parser.AST
 
 import Data.Maybe (fromJust)
 
+js = fromJust.parseJavaScript
+
 parseJavaScript :: String -> Maybe Expression
 parseJavaScript code = Just . mu $ readJs code
 
 mu :: JSNode -> Expression
 mu = compact . muNode . gc
   where
-    muNode (JSSourceElementsTop statements)                  = [mus statements]
+    muNode (JSSourceElementsTop statements)                  = [compactMapMu statements]
     muNode (JSIdentifier n)                                  = [Variable n]
     muNode (JSDecimal val)                                   = [MuNumber (read val)]
-    muNode (JSExpression es)                                 = [mus es]
+    muNode (JSExpression [x])                                = [mu x]
+    muNode (JSExpression [x, y])
+                        | (JSArguments _ args _) <- gc y     = [Application (mu x) (mu.head$args)]
+    muNode (JSExpression xs)                                 = [compactMapMu xs]
+    muNode (JSLiteral "true")                                = [MuBool True]
+    muNode (JSLiteral "false")                               = [MuBool False]
     muNode (JSLiteral _)                                     = []
     muNode (JSElision _)                                     = []
     muNode (JSHexInteger v)                                  = muNode (JSStringLiteral '\'' v)
     muNode (JSOctal v)                                       = muNode (JSStringLiteral '"' v)
     muNode (JSStringLiteral _ v)                             = [MuString v]
-    muNode (JSVariables _ decls _)                           = map mu decls
-    muNode (JSArrayLiteral _ es _)                           = [MuList (concatMap (muNode . gc) es)]
+    muNode (JSVariables _ decls _)                           = mapMu decls
+    muNode (JSArrayLiteral _ es _)                           = [MuList (mapMu es)]
     muNode (JSVarDecl var initial)                           = [muVar var initial]
     muNode (JSWith _ _ _ _ _)                                = [ExpressionOther]
     muNode (JSExpressionTernary cond _ true _ false)         = [muIf (head cond) (head true) false]
     muNode (JSIf _ _ cond _ true false)                      = [muIf cond (head true) false]
     muNode (JSWhile _ _ cond _ action)                       = [muWhile cond action]
-    muNode (JSBlock _ exps _)                                = [mus exps]
+    muNode (JSBlock _ exps _)                                = [compactMapMu exps]
     muNode (JSFunctionExpression _ [] _ params _ body)       = [Lambda (muParams params) (mu body)]
     muNode (JSFunctionExpression _ name _ params _ body)     = [muFunction (head name) params body]
-    muNode (JSReturn _ e _)                                  = [mus e]
+    muNode (JSReturn _ e _)                                  = [compactMapMu e]
     muNode (JSExpressionParen _ e _)                         = [mu e]
-    muNode (JSObjectLiteral _ es _)                          = [MuObject (mus es)]
+    muNode (JSObjectLiteral _ es _)                          = [MuObject (compactMapMu es)]
     muNode (JSLabelled _ _ e)                                = [mu e]
     muNode (JSPropertyNameandValue var _ initial)            = [muVar var initial]
     muNode (JSFunction _ name _ params _ body)               = [muFunction name params body]
     muNode (JSFunction _ name _ params _ body)               = [muFunction name params body]
-    muNode (JSExpressionBinary op l _ r)                     = [InfixApplication (mus l) op (mus r)]
-
+    muNode (JSExpressionBinary op l _ r)                     = [InfixApplication (compactMapMu l) op (compactMapMu r)]
+    muNode (JSMemberDot receptor _ selector)                 = [Send (compactMapMu receptor) (mu selector) []]
     muNode e = error (show e)
+
+    mapMu = concatMap (muNode . gc)
 
     muParams :: [JSNode] -> [Pattern]
     muParams params = concatMap (muPattern.gc) params
@@ -56,24 +65,22 @@ mu = compact . muNode . gc
     gc (NN n) = n
     gc (NT n _ _) = n
 
-    mus :: [JSNode] -> Expression
-    mus  = compact . concatMap (muNode . gc)
+    compactMapMu :: [JSNode] -> Expression
+    compactMapMu  = compact . mapMu
 
     muIf :: JSNode -> JSNode -> [JSNode] -> Expression
     muIf cond true [] = If (mu cond) (mu true) MuUnit
-    muIf cond true false = If (mu cond) (mu true) (mus false)
+    muIf cond true false = If (mu cond) (mu true) (compactMapMu false)
 
     muWhile cond action  = While (mu cond) (mu action)
 
-    muVar (NT (JSIdentifier var) _ _) initial = VariableDeclaration var (mus initial)
+    muVar (NT (JSIdentifier var) _ _) initial = VariableDeclaration var (compactMapMu initial)
 
     muFunction :: JSNode -> [JSNode] -> JSNode -> Expression
     muFunction name params body =  FunctionDeclaration ((muIdentifier.gc) name) [Equation (muParams params) (UnguardedBody (mu body))]
 
 
 {-JSRegEx String
-JSArguments JSNode [JSNode] JSNode
-lb, args, rb
 optional lb,optional block statements,optional rb
 JSBreak JSNode [JSNode] JSNode
 break, optional identifier, autosemi
@@ -103,10 +110,6 @@ JSForVar JSNode JSNode JSNode [JSNode] JSNode [JSNode] JSNode [JSNode] JSNode JS
 for,lb,var,vardecl,semi,expr,semi,expr,rb,stmt
 JSForVarIn JSNode JSNode JSNode JSNode JSNode JSNode JSNode JSNode
 for,lb,var,vardecl,in,expr,rb,stmt
-
-
-JSMemberDot [JSNode] JSNode JSNode
-firstpart, dot, name
 JSMemberSquare [JSNode] JSNode JSNode JSNode
 firstpart, lb, expr, rb
 JSOperator JSNode
