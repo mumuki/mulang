@@ -5,11 +5,8 @@ import Language.Mulang.Builder
 import Language.Haskell.Syntax
 import Language.Haskell.Parser
 
-import Data.String (IsString(..))
 import Data.Maybe (fromJust)
 import Data.List (intercalate)
-
-import Data.Maybe (fromJust)
 
 hs = fromJust . parseHaskell
 
@@ -56,8 +53,12 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muExp (HsCon name)                       = Variable (muQName name)
     muExp (HsLit lit) = muLit lit
     muExp (HsInfixApp e1 op e2) = InfixApplication (muExp e1) (muQOp op) (muExp e2)  -- ^ infix application
-    muExp (HsApp e1 e2) = Application (muExp e1) (muExp e2)             -- ^ ordinary application
-    muExp (HsNegApp e) = Application (Variable "-") (muExp e)
+    muExp (HsApp (HsApp e1 e2) e3)                               = Application (muExp e1) [muExp e2, muExp e3]
+    muExp (HsApp (HsApp (HsApp e1 e2) e3) e4)                    = Application (muExp e1) [muExp e2, muExp e3, muExp e4]
+    muExp (HsApp (HsApp (HsApp (e1 e2) e3) e4) e5)               = Application (muExp e1) [muExp e2, muExp e3, muExp e4, muExp e5]
+    muExp (HsApp (HsApp (HsApp ((HsApp e1 e2) e3) e4) e5) e6)    = Application (muExp e1) [muExp e2, muExp e3, muExp e4, muExp e5, muExp e6]
+    muExp (HsApp e1 e2)                                          = Application (muExp e1) [muExp e2]
+    muExp (HsNegApp e) = Application (Variable "-") [muExp e]
     muExp (HsLambda _ args exp) = Lambda (map muPat args) (muExp exp)
     --muExp HsLet = Let [Declaration] Expression          -- ^ local declarations with @let@
     muExp (HsIf e1 e2 e3) = If (muExp e1) (muExp e2) (muExp e3)
@@ -65,10 +66,10 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muExp (HsTuple elements) = MuTuple (map muExp elements)               -- ^ tuple Expression
     muExp (HsList elements) = MuList (map muExp elements)
     muExp (HsParen e) = (muExp e)
-    muExp (HsEnumFrom from)              = Application (Variable "enumFrom") (muExp from)
-    muExp (HsEnumFromTo from to)         = Application (Application (Variable "enumFromTo") (muExp from)) (muExp to)
-    muExp (HsEnumFromThen from thn)      = Application (Application (Variable "enumFromThen") (muExp from)) (muExp thn)
-    muExp (HsEnumFromThenTo from thn to) = Application (Application (Application (Variable "enumFromThenTo") (muExp from)) (muExp thn)) (muExp to)
+    muExp (HsEnumFrom from)              = Application (Variable "enumFrom") [(muExp from)]
+    muExp (HsEnumFromTo from to)         = Application (Variable "enumFromTo") [(muExp from), (muExp to)]
+    muExp (HsEnumFromThen from thn)      = Application (Variable "enumFromThen") [(muExp from), (muExp thn)]
+    muExp (HsEnumFromThenTo from thn to) = Application (Variable "enumFromThenTo") [(muExp from), (muExp thn), (muExp to)]
     muExp (HsListComp exp stmts)         = Comprehension (muExp exp) (map muStmt stmts)
     muExp (HsDo stmts) | (HsQualifier exp) <- last stmts  = Comprehension (muExp exp) (map muStmt stmts)
     muExp _ = ExpressionOther

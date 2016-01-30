@@ -50,10 +50,10 @@ spec = do
       js "(function(x, y) { 1 })" `shouldBe` (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1))
 
     it "handles application" $ do
-      js "f(2)" `shouldBe` (Application (Variable "f") (MuNumber 2))
+      js "f(2)" `shouldBe` (Application (Variable "f") [MuNumber 2])
 
     it "handles application with multiple args" $ do
-      js "f(2, 4)" `shouldBe` (Application (Variable "f") (MuNumber 4))
+      js "f(2, 4)" `shouldBe` (Application (Variable "f") [MuNumber 2, MuNumber 4])
 
     it "handles message send" $ do
       js "o.f(2)" `shouldBe` (Send (Variable "o") (Variable "f") [(MuNumber 2)])

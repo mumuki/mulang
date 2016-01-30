@@ -33,10 +33,10 @@ spec = do
   describe "hasArity" $ do
     describe "with function declarations" $ do
       it "is True when function is declared with the given arity" $ do
-        hasArity 1 "f" (js "function(x) { return x + 1 }") `shouldBe` True
+        hasArity 1 "f" (js "function f(x) { return x + 1 }") `shouldBe` True
 
       it "is False when function is declared with another arity" $ do
-        hasArity 2 "f" (js "function(x) { x + 1}") `shouldBe` False
+        hasArity 2 "f" (js "function f(x) { x + 1}") `shouldBe` False
 
     describe "with constant declaration" $ do
       it "is True when constant is declared with lambda of given arity" $ do

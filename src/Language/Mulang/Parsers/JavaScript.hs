@@ -21,7 +21,7 @@ mu = compact . muNode . gc
     muNode (JSDecimal val)                                   = [MuNumber (read val)]
     muNode (JSExpression [x])                                = [mu x]
     muNode (JSExpression [x, y])
-                        | (JSArguments _ args _) <- gc y     = [Application (mu x) (mu.head$args)]
+                        | (JSArguments _ args _) <- gc y     = [Application (mu x) (mapMu args)]
     muNode (JSExpression xs)                                 = [compactMapMu xs]
     muNode (JSLiteral "true")                                = [MuBool True]
     muNode (JSLiteral "false")                               = [MuBool False]
@@ -34,12 +34,12 @@ mu = compact . muNode . gc
     muNode (JSArrayLiteral _ es _)                           = [MuList (mapMu es)]
     muNode (JSVarDecl var initial)                           = [muVar var initial]
     muNode (JSWith _ _ _ _ _)                                = [ExpressionOther]
-    muNode (JSExpressionTernary cond _ true _ false)         = [muIf (head cond) (head true) false]
-    muNode (JSIf _ _ cond _ true false)                      = [muIf cond (head true) false]
+    muNode (JSExpressionTernary cond _ true _ false)         = [muIf cond   true false]
+    muNode (JSIf _ _ cond _ true false)                      = [muIf [cond] true false]
     muNode (JSWhile _ _ cond _ action)                       = [muWhile cond action]
     muNode (JSBlock _ exps _)                                = [compactMapMu exps]
     muNode (JSFunctionExpression _ [] _ params _ body)       = [Lambda (muParams params) (mu body)]
-    muNode (JSFunctionExpression _ name _ params _ body)     = [muFunction (head name) params body]
+    muNode (JSFunctionExpression _ [name] _ params _ body)   = [muFunction  name params body]
     muNode (JSReturn _ e _)                                  = [compactMapMu e]
     muNode (JSExpressionParen _ e _)                         = [mu e]
     muNode (JSObjectLiteral _ es _)                          = [MuObject (compactMapMu es)]
@@ -68,9 +68,8 @@ mu = compact . muNode . gc
     compactMapMu :: [JSNode] -> Expression
     compactMapMu  = compact . mapMu
 
-    muIf :: JSNode -> JSNode -> [JSNode] -> Expression
-    muIf cond true [] = If (mu cond) (mu true) MuUnit
-    muIf cond true false = If (mu cond) (mu true) (compactMapMu false)
+    muIf :: [JSNode] -> [JSNode] -> [JSNode] -> Expression
+    muIf cond true false = If (compactMapMu cond) (compactMapMu true) (compactMapMu false)
 
     muWhile cond action  = While (mu cond) (mu action)
 

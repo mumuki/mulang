@@ -73,7 +73,7 @@ unfoldExpression expr = expr : concatMap unfoldExpression (subExpressions expr)
 
 subExpressions :: Expression -> [Expression]
 subExpressions (InfixApplication a b c) = [a, (Variable b), c]
-subExpressions (Application a b)        = [a, b]
+subExpressions (Application a bs)        = a:bs
 subExpressions (Lambda _ a)             = [a]
 subExpressions (Comprehension a _)      = [a] --TODO
 subExpressions (MuTuple as)             = as

@@ -38,7 +38,7 @@ data Expression
         | VariableDeclaration Identifier Expression
         | Variable Identifier
         | InfixApplication Expression String Expression
-        | Application Expression Expression
+        | Application Expression [Expression]
         | Send Expression Expression [Expression]
         | Lambda [Pattern] Expression
         | Let [Expression] Expression   -- TODO overlapping with variable RecordDeclaration

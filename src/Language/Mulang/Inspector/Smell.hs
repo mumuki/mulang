@@ -39,7 +39,7 @@ hasRedundantGuards = hasBody f -- TODO not true when condition is a pattern
 -- | Inspection that tells whether a binding has lambda expressions like '\x -> g x'
 hasRedundantLambda :: Inspection
 hasRedundantLambda = hasExpression f
-  where f (Lambda [VariablePattern (x)] (Application _ (Variable (y)))) = x == y
+  where f (Lambda [VariablePattern (x)] (Application _ [Variable (y)])) = x == y
         f _ = False -- TODO consider parenthesis and symbols
 
 -- | Inspection that tells whether a binding has parameters that
@@ -47,7 +47,7 @@ hasRedundantLambda = hasExpression f
 hasRedundantParameter :: Inspection
 hasRedundantParameter binding = any f . declarationsBindedTo binding
   where f (FunctionDeclaration _ [
-             Equation params (UnguardedBody (Application _ (Variable arg)))]) | (VariablePattern param) <- last params = param == arg
+             Equation params (UnguardedBody (Application _ [Variable arg]))]) | (VariablePattern param) <- last params = param == arg
         f _ = False
 
 isBooleanLiteral (MuBool _) = True
