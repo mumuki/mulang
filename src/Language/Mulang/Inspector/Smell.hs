@@ -15,59 +15,58 @@ import Language.Mulang.Inspector
 
 -- | Inspection that tells whether a binding has expressions like 'x == True'
 hasRedundantBooleanComparison :: Inspection
-hasRedundantBooleanComparison = hasComparison isBooleanLiteral
+hasRedundantBooleanComparison = compares isBooleanLiteral
 
 doesNullTest :: Inspection
-doesNullTest = hasComparison f
+doesNullTest = compares f
   where f MuNull = True
         f _      = False
 
 doesTypeTest :: Inspection
-doesTypeTest = hasComparison f
+doesTypeTest = compares f
   where f (MuString _) = True
         f _            = False
 
-hasComparison :: (Expression -> Bool) -> Inspection
-hasComparison f = hasExpression (any f.comparisonOperands)
+compares :: (Expression -> Bool) -> Inspection
+compares f = isOrContainsExpression (any f.comparisonOperands)
 
 comparisonOperands (Application Equal    args) = args
 comparisonOperands (Application NotEqual args) = args
 comparisonOperands _ = []
 
+returnsNull :: Inspection
+returnsNull = isOrContainsExpression f
+  where f (Return MuNull) = True
+        f _               = False
+
 -- | Inspection that tells whether a binding has an if expression where both branches return
 -- boolean literals
 hasRedundantIf :: Inspection
-hasRedundantIf = hasExpression f
+hasRedundantIf = isOrContainsExpression f
   where f (If _ (Return x) (Return y)) = all isBooleanLiteral [x, y]
         f (If _ x y)                   = all isBooleanLiteral [x, y]
         f _                            = False
 
-returnsNull :: Inspection
-returnsNull = hasExpression f
-  where f (Return MuNull) = True
-        f _               = False
-
-
 -- | Inspection that tells whether a binding has guards where both branches return
 -- boolean literals
 hasRedundantGuards :: Inspection
-hasRedundantGuards = hasBody f -- TODO not true when condition is a pattern
-  where f (GuardedBodies [
-            GuardedBody _ (Return x),
-            GuardedBody (Variable "otherwise") (Return y)]) = all isBooleanLiteral [x, y]
+hasRedundantGuards = containsBody f -- TODO not true when condition is a pattern
+  where f (GuardedBody [
+            (_, Return x),
+            (Variable "otherwise", Return y)]) = all isBooleanLiteral [x, y]
         f _ = False
 
 
 -- | Inspection that tells whether a binding has lambda expressions like '\x -> g x'
 hasRedundantLambda :: Inspection
-hasRedundantLambda = hasExpression f
+hasRedundantLambda = isOrContainsExpression f
   where f (Lambda [VariablePattern (x)] (Return (Application _ [Variable (y)]))) = x == y
         f _ = False -- TODO consider parenthesis and symbols
 
 -- | Inspection that tells whether a binding has parameters that
 -- can be avoided using point-free
 hasRedundantParameter :: Inspection
-hasRedundantParameter binding = any f . declarationsBindedTo binding
+hasRedundantParameter = isOrContainsExpression f
   where f (FunctionDeclaration _ [Equation params (UnguardedBody (Return (Application _ args)))])
                                                             | (VariablePattern param) <- last params,
                                                               (Variable arg) <- last args = param == arg

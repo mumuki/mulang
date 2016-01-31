@@ -15,9 +15,6 @@ instance ToJSON Equation
 instance FromJSON EquationBody
 instance ToJSON EquationBody
 
-instance FromJSON GuardedBody
-instance ToJSON GuardedBody
-
 instance FromJSON Expression
 instance ToJSON Expression
 
@@ -27,11 +24,3 @@ instance ToJSON Pattern
 instance FromJSON ComprehensionStatement
 instance ToJSON ComprehensionStatement
 
-instance FromJSON Alternative
-instance ToJSON Alternative
-
-instance FromJSON GuardedAlternatives
-instance ToJSON GuardedAlternatives
-
-instance FromJSON GuardedAlternative
-instance ToJSON GuardedAlternative

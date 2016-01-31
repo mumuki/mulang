@@ -6,15 +6,21 @@ import           Language.Mulang.Parsers.Haskell
 
 spec :: Spec
 spec = do
-  describe "bindingsOf" $ do
+  describe "declaredBindingsOf" $ do
+    it "answers bindings for binding" $ do
+      let code = hs "f x =  (:[]) . m x y . g h 2\n\
+                     \w k = p\n\
+                     \     where z = 2"
+      (declaredBindingsOf code) `shouldBe` ["f", "w", "z"]
+
+  describe "referencedBindingsOf" $ do
     it "answers bindings for binding" $ do
       let code = hs "f x =  (:[]) . m x y . g h 2"
-      (bindingsOf "f" code) `shouldBe` [".","m","x","y", "g","h"]
+      (referencedBindingsOf code) `shouldBe` [".","m","x","y", "g","h"]
 
-  describe "transitiveBindingsOf" $ do
+  describe "transitiveReferencedBindingsOf" $ do
     it "answers transitive bindings for binding" $ do
       let code = hs "f x = m x\n\
                  \m 0 = p 0\n\
                  \p x = g x"
-      (transitiveBindingsOf "f" code) `shouldBe` ["f","m","x","p","g"]
-
+      (transitiveReferencedBindingsOf "f" code) `shouldBe` ["f","m","x","p","g"]

@@ -11,7 +11,7 @@ import Data.Maybe (fromJust)
 js = fromJust.parseJavaScript
 
 parseJavaScript :: String -> Maybe Expression
-parseJavaScript code = Just . mu $ readJs code
+parseJavaScript = Just . normalize . mu . readJs
 
 mu :: JSNode -> Expression
 mu = compact . muNode . gc

@@ -11,7 +11,7 @@ import Data.List (intercalate)
 hs = fromJust . parseHaskell
 
 parseHaskell :: String -> Maybe Expression
-parseHaskell code | ParseOk ast <- parseModule code = Just (mu ast)
+parseHaskell code | ParseOk ast <- parseModule code = Just . normalize . mu $ ast
                   | otherwise = Nothing
 
 mu :: HsModule -> Expression
@@ -32,9 +32,9 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
          Equation (map muPat patterns) (muRhs (concatMap muDecls decls) rhs)
 
     muRhs decls (HsUnGuardedRhs body)        = UnguardedBody (mergeDecls decls (muBody body))
-    muRhs decls (HsGuardedRhss  guards)     = GuardedBodies (map (muGuardedRhs decls) guards )
+    muRhs decls (HsGuardedRhss  guards)      = GuardedBody (map (muGuardedRhs decls) guards )
 
-    muGuardedRhs decls (HsGuardedRhs _ condition body) = (GuardedBody (mergeDecls decls (muExp condition)) (muBody body))
+    muGuardedRhs decls (HsGuardedRhs _ condition body) = (mergeDecls decls (muExp condition), muBody body)
 
     muBody = Return . muExp
 

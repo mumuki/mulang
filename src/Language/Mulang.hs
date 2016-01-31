@@ -3,13 +3,10 @@
 module Language.Mulang (
     Equation(..),
     EquationBody(..),
-    GuardedBody(..),
     Expression(..),
     ComprehensionStatement(..),
-    Alternative(..),
-    GuardedAlternatives(..),
-    GuardedAlternative(..),
-    Pattern(..)
+    Pattern(..),
+    Identifier
   ) where
 
 import           GHC.Generics
@@ -20,10 +17,8 @@ data Equation = Equation [Pattern] EquationBody deriving (Eq, Show, Read, Generi
 
 data EquationBody
          = UnguardedBody Expression
-         | GuardedBodies  [GuardedBody]
+         | GuardedBody  [(Expression, Expression)]
   deriving (Eq, Show, Read, Generic)
-
-data GuardedBody = GuardedBody Expression Expression deriving (Eq, Show, Read, Generic)
 
 -- expression or statement
 -- may have effects
@@ -34,17 +29,19 @@ data Expression
         | FunctionDeclaration Identifier [Equation]    -- functional, maybe pure,
                                                         -- optionally guarded,
                                                         -- optionally pattern matched function
-        | ProcedureDeclaration Identifier              -- classic imperative-style procedure
+        | ProcedureDeclaration Identifier [Equation]    -- classic imperative-style procedure
+        | MethodDeclaration Identifier [Equation]
         | VariableDeclaration Identifier Expression
+        | AttributeDeclaration Identifier Expression
+        | ObjectDeclaration Identifier Expression
         | Variable Identifier
         | Application Expression [Expression]
         | Send Expression Expression [Expression]
         | Lambda [Pattern] Expression
-        | Let [Expression] Expression   -- TODO overlapping with variable RecordDeclaration
         | If Expression Expression Expression
         | Return Expression
         | While Expression Expression
-        | Match Expression [Alternative]
+        | Match Expression [Equation]
         | Comprehension Expression [ComprehensionStatement]
         | Sequence [Expression]
         | ExpressionOther
@@ -77,13 +74,3 @@ data ComprehensionStatement
         | LetStmt     Expression
   deriving (Eq, Show, Read, Generic)
 
-
-data Alternative = Alternative Pattern GuardedAlternatives deriving (Eq, Show, Read, Generic)
-
-data GuardedAlternatives
-        = UnguardedAlternative Expression          -- ^ @->@ /exp/
-        | GuardedAlternatives  [GuardedAlternative] -- ^ /gdpat/
-  deriving (Eq, Show, Read, Generic)
-
-
-data GuardedAlternative = GuardedAlternative Expression Expression deriving (Eq, Show, Read, Generic)
