@@ -1,4 +1,6 @@
 language: haskell
+before_install:
+  - cabal install alex
 install:
   - cabal install --only-dependencies --enable-tests --force-reinstalls
 script:
