@@ -78,7 +78,7 @@ spec = do
       scoped hasObject "f" (js "var g = {}")  `shouldBe` False
 
     it "is True when present, scoped" $ do
-      scoped hasObject "g" (js "var g = {}")  `shouldBe` False
+      scoped hasObject "g" (js "var g = {}")  `shouldBe` True
 
   describe "hasMethod" $ do
     it "is True when present" $ do

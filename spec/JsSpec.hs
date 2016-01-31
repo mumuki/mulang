@@ -4,6 +4,7 @@ module JsSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang
+import           Language.Mulang.Builder
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 
@@ -84,5 +85,16 @@ spec = do
 
     it "handles empty objects" $ do
       js "({})" `shouldBe` MuObject MuNull
+
+    it "handles object declarations" $ do
+      js "var x = {}" `shouldBe` (ObjectDeclaration "x" MuNull)
+
+    it "handles function declarations as vars" $ do
+      js "var x = function(){}" `shouldBe` (FunctionDeclaration "x" (unguardedBody [] MuNull))
+
+    it "handles attribute and method declarations" $ do
+      js "var x = {y: 2, z: function(){}}" `shouldBe` (ObjectDeclaration "x" (Sequence [
+                                                              AttributeDeclaration "y" (MuNumber 2.0),
+                                                              MethodDeclaration "z" (unguardedBody [] MuNull)]))
 
 

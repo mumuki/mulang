@@ -34,8 +34,8 @@ spec = do
       it "is False when constant is declared with a list literal" $ do
         hasFunctionDeclaration (hs "f = []") `shouldBe` False
 
-      it "is True when constant is declared with a variable literal" $ do
-        hasFunctionDeclaration (hs "f = snd") `shouldBe` True
+      it "is False when constant is declared with a variable literal" $ do
+        hasFunctionDeclaration (hs "f = snd") `shouldBe` False
 
   describe "hasArity" $ do
     describe "with function declarations" $ do

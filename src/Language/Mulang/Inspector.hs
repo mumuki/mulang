@@ -31,20 +31,18 @@ type Inspection = Expression  -> Bool
 
 hasObject :: Inspection
 hasObject =  isOrContainsExpression f
-  where f (VariableDeclaration _ (MuObject _)) = True
-        f _  = False
+  where f (ObjectDeclaration _ _) = True
+        f _                       = False
 
 hasAttribute :: ScopedInspection
-hasAttribute name =  isOrContainsExpression f
-  where f (VariableDeclaration _ (Lambda _ _)) = False
-        f (VariableDeclaration n _) = n == name
-        f _  = False
+hasAttribute =  isOrContainsDeclaration f
+  where f (AttributeDeclaration _ _) = True
+        f _                          = False
 
 hasMethod :: ScopedInspection
-hasMethod name =  isOrContainsExpression f
-  where f (FunctionDeclaration n _) = n == name
-        f (VariableDeclaration n (Lambda _ _)) = n == name
-        f _  = False
+hasMethod =  isOrContainsDeclaration f
+  where f (MethodDeclaration n _) = True
+        f _                       = False
 
 -- | Inspection that tells whether a binding uses the composition operator '.'
 -- in its definition
@@ -110,14 +108,14 @@ hasBinding = isOrContainsDeclaration (const True)
 hasFunctionDeclaration :: Inspection
 hasFunctionDeclaration = isOrContainsExpression f
   where f (FunctionDeclaration _ _) = True
-        f (VariableDeclaration _ (Lambda _ _)) = True
-        f (VariableDeclaration _ (Variable _)) = True -- not actually always true
         f _  = False
 
 hasArity :: Int -> Inspection
 hasArity arity = isOrContainsExpression f
-  where f (FunctionDeclaration _ equations) = any equationHasArity equations
-        f (VariableDeclaration _ (Lambda args _)) = argsHaveArity args
+  where f (FunctionDeclaration _ equations)  = any equationHasArity equations
+        f (ProcedureDeclaration _ equations) = any equationHasArity equations
+        f (MethodDeclaration _ equations)    = any equationHasArity equations
+        f (Lambda args _)                    = argsHaveArity args
         f _  = False
 
         equationHasArity = \(Equation args _) -> argsHaveArity args
@@ -136,8 +134,12 @@ hasTypeSignature = isOrContainsExpression f
 
 hasAnonymousVariable :: Inspection
 hasAnonymousVariable = isOrContainsExpression f
-  where f (FunctionDeclaration _ equations)    = any (any (== WildcardPattern) . p) equations
+  where f (FunctionDeclaration _ equations)    = containsWildcard equations
+        f (ProcedureDeclaration _ equations)   = containsWildcard equations
+        f (MethodDeclaration _ equations)      = containsWildcard equations
+--TODO        f (Lambda args _)                      = containsWildcard equations
         f _                                    = False
+        containsWildcard = any (any (== WildcardPattern) . p)
         p (Equation params _) = params
 
 isOrContainsExpression :: (Expression -> Bool) -> Inspection
