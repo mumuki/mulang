@@ -8,13 +8,13 @@ spec :: Spec
 spec = do
   describe "hasRedundantLambda" $ do
     it "is True whn η-conversion applies" $ do
-      hasRedundantLambda (hs "x = \\m -> f m") `shouldBe` True
+      hasRedundantLambda (hs "g = map (\\m -> f m)") `shouldBe` True
 
     it "is True whn η-conversion applies, whith composition " $ do
-      hasRedundantLambda (hs "x = \\m -> (f.g) m") `shouldBe` True
+      hasRedundantLambda (hs "g = map (\\m -> (f.h) m)") `shouldBe` True
 
     it "is False when it is an unavoidable lambda" $ do
-      hasRedundantLambda (hs "x = \\m -> m f") `shouldBe` False
+      hasRedundantLambda (hs "g = map (\\f -> f m)") `shouldBe` False
 
   describe "hasRedundantParameter" $ do
     it "is True on trivial application expressions" $ do

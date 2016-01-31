@@ -8,10 +8,10 @@ spec :: Spec
 spec = do
   describe "JS.hasRedundantLambda" $ do
     it "is True whn η-conversion applies" $ do
-      hasRedundantLambda (js "var x = function(m) { return f(m) }") `shouldBe` True
+      hasRedundantLambda (js "(function(m) { return f(m) })") `shouldBe` True
 
     it "is False when it is an unavoidable lambda" $ do
-      hasRedundantLambda (js "var x = function(m) { return m(f) }") `shouldBe` False
+      hasRedundantLambda (js "(function(m) { return m(f) })") `shouldBe` False
 
   describe "hasRedundantIf" $ do
     it "is True when both branches are boolean literal returns" $ do

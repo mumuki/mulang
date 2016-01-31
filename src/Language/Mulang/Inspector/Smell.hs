@@ -61,7 +61,8 @@ hasRedundantGuards = containsBody f -- TODO not true when condition is a pattern
 hasRedundantLambda :: Inspection
 hasRedundantLambda = isOrContainsExpression f
   where f (Lambda [VariablePattern (x)] (Return (Application _ [Variable (y)]))) = x == y
-        f _ = False -- TODO consider parenthesis and symbols
+        f _ = False
+
 
 -- | Inspection that tells whether a binding has parameters that
 -- can be avoided using point-free

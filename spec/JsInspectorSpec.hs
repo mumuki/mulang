@@ -1,10 +1,8 @@
 module JsInspectorSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Explorer
 import           Language.Mulang.Inspector
 import           Language.Mulang.Inspector.Combiner
-import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 
 spec :: Spec
@@ -32,9 +30,6 @@ spec = do
 
       it "is False when constant is declared with a list literal" $ do
         hasFunctionDeclaration (js "var f = []") `shouldBe` False
-
-      it "is True when constant is declared with a variable literal" $ do
-        hasFunctionDeclaration (js "var f = setTimeout") `shouldBe` True
 
       it "is False when is a method" $ do
         hasFunctionDeclaration (js "var o = {f: function(){}}") `shouldBe` False
@@ -116,6 +111,21 @@ spec = do
     it "is True on direct usage in function" $ do
       hasUsage "m" (js "function f(x) { m }") `shouldBe` True
 
+    it "is True on direct usage in method" $ do
+      hasUsage "m" (js "var o = {z: function(x) { m }}") `shouldBe` True
+
+    it "is True on direct usage in method, scoped" $ do
+      scoped (hasUsage "m") "o" (js "var o = {z: function(x) { m }}") `shouldBe` True
+
+    it "is False on missing usage in method, scoped" $ do
+      scoped (hasUsage "p") "o" (js "var o = {z: function(x) { m }}") `shouldBe` False
+
+    it "is True on usage in method, scoped twice" $ do
+      scoped (scoped (hasUsage "m") "z") "o" (js "var o = {z: function(x) { m }}") `shouldBe` True
+
+    it "is False on missing usage in method, scoped twice" $ do
+      scoped (scoped (hasUsage "p") "z") "o" (js "var o = {z: function(x) { m }}") `shouldBe` False
+
     it "is True through function application in function" $ do
       transitive (hasUsage "m") "f" (js "function g() { m }; function f(x) { g() }") `shouldBe` True
 
@@ -129,13 +139,6 @@ spec = do
       transitive (hasUsage "m") "f" (js "var o = {g: function(){ m }}; function f(x) { o.g() }") `shouldBe` True
 
     it "is True through message send in objects" $ do
-      transitive (hasUsage "m") "p" (js "var o = {g: function(){ m }}; var p = {n: function() { o.g() }}") `shouldBe` True
+      transitive (hasUsage "m") "p" (js "var o = {g: function(){ m }}\n\
+                                        \var p = {n: function() { o.g() }}") `shouldBe` True
 
-    it "is False through message send in objects" $ do
-      transitive (hasUsage "m") "p" (js "var o = {g: function(){ m }}; var y = {n: function() { o.g() }}") `shouldBe` False
-
-    it "is True through message send in objects, with nested binding" $ do
-      transitive (hasUsage "m") "p.n" (js "var o = {g: function(){ m }}; var p = {n: function() { o.g() }}") `shouldBe` True
-
-    it "is False through message send in objects, with nested binding" $ do
-      transitive (hasUsage "m") "p.w" (js "var o = {g: function(){ m }}; var p = {n: function() { o.g() }}") `shouldBe` False
