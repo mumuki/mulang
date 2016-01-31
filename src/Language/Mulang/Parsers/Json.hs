@@ -6,23 +6,14 @@ import Data.Aeson
 
 import qualified Data.ByteString.Lazy.Char8 as LBS (pack)
 
-parseJson :: String -> Maybe Program
+parseJson :: String -> Maybe Expression
 parseJson  = decode . LBS.pack
-
-instance FromJSON Program
-instance ToJSON Program
-
-instance FromJSON Declaration
-instance ToJSON Declaration
 
 instance FromJSON Equation
 instance ToJSON Equation
 
-instance FromJSON Rhs
-instance ToJSON Rhs
-
-instance FromJSON GuardedRhs
-instance ToJSON GuardedRhs
+instance FromJSON EquationBody
+instance ToJSON EquationBody
 
 instance FromJSON Expression
 instance ToJSON Expression
@@ -33,14 +24,3 @@ instance ToJSON Pattern
 instance FromJSON ComprehensionStatement
 instance ToJSON ComprehensionStatement
 
-instance FromJSON Alternative
-instance ToJSON Alternative
-
-instance FromJSON GuardedAlternatives
-instance ToJSON GuardedAlternatives
-
-instance FromJSON GuardedAlternative
-instance ToJSON GuardedAlternative
-
-instance FromJSON LiteralValue
-instance ToJSON LiteralValue

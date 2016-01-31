@@ -1,12 +1,16 @@
 module Language.Mulang.Explorer (
-  parseDecls,
-  parseBindings,
-  declsOf,
-  rhssOf,
-  bindingsOf,
-  transitiveBindingsOf,
+  (//),
   expressionsOf,
-  expressionToBinding,
+  equationBodiesOf,
+  referencesOf,
+  declarationsOf,
+  referencedBindingsOf,
+  declaredBindingsOf,
+  bindedDeclarationsOf,
+  transitiveReferencedBindingsOf,
+  nameOf,
+  extractDeclaration,
+  extractReference,
   Expression(..),
   Binding) where
 
@@ -16,77 +20,89 @@ import Data.List (nub)
 
 type Binding = String
 
-declName :: Declaration -> String
-declName (TypeSignature b ) = b
-declName (TypeAlias b ) = b
-declName (ConstantDeclaration n _ _) = n
-declName (FunctionDeclaration n _)  = n
-declName _                  = []
+(//)  :: Expression -> Binding -> [Expression]
+(//) = flip bindedDeclarationsOf
 
-declsOf :: Binding -> Program -> [Declaration]
-declsOf binding = filter (isBinding binding) . parseDecls
+expressionsOf :: Expression -> [Expression]
+expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
+  where
+    subExpressions :: Expression -> [Expression]
+    subExpressions (VariableDeclaration _ v)          = [v]
+    subExpressions (FunctionDeclaration _ equations)  = expressionsOfEquations equations
+    subExpressions (ProcedureDeclaration _ equations) = expressionsOfEquations equations
+    subExpressions (MethodDeclaration _ equations)    = expressionsOfEquations equations
+    subExpressions (AttributeDeclaration _ v)         = [v]
+    subExpressions (ObjectDeclaration _ v)            = [v]
+    subExpressions (Application a bs)                 = a:bs
+    subExpressions (Send e1 e2 e3)                    = [e1, e2] ++ e3
+    subExpressions (Lambda _ a)                       = [a]
+    subExpressions (If a b c)                         = [a, b, c]
+    subExpressions (While e1 e2)                      = [e1, e2]
+    subExpressions (Match e1 equations)               = e1:expressionsOfEquations equations
+    subExpressions (Comprehension a _)                = [a] --TODO
+    subExpressions (Return v)                         = [v]
+    subExpressions (Sequence es)                      = es
+    subExpressions (MuObject es)                      = [es]
+    subExpressions (MuTuple as)                       = as
+    subExpressions (MuList as)                        = as
+    subExpressions _                                  = []
 
-rhssOf :: Binding -> Program -> [Rhs]
-rhssOf binding = concatMap rhsForBinding . declsOf binding
+    expressionsOfEquations eqs = eqs >>= \(Equation _ body) -> topExpressionOfBody body
+    topExpressionOfBody (UnguardedBody e)      = [e]
+    topExpressionOfBody (GuardedBody b)        = b >>= \(es1, es2) -> [es1, es2]
 
-expressionsOf :: Binding -> Program -> [Expression]
-expressionsOf binding code = do
-  rhs <- rhssOf binding code
-  top <- topExpressions rhs
-  unfoldExpression top
+equationBodiesOf :: Expression -> [EquationBody]
+equationBodiesOf = concatMap bodiesOf . expressionsOf
+  where
+    bodiesOf :: Expression -> [EquationBody]
+    bodiesOf (FunctionDeclaration _ equations) = map (\(Equation _ body) -> body) equations
+    bodiesOf _ = []
 
-bindingsOf :: Binding -> Program -> [Binding]
-bindingsOf binding code = nub $ do
-          expr <- expressionsOf binding code
-          maybeToList . expressionToBinding $ expr
+referencesOf :: Expression -> [(Binding, Expression)]
+referencesOf = nub . concatMap (maybeToList . extractReference) . expressionsOf
 
-transitiveBindingsOf :: Binding -> Program -> [Binding]
-transitiveBindingsOf binding code =  expand (`bindingsOf` code) binding
+declarationsOf :: Expression -> [(Binding, Expression)]
+declarationsOf = concatMap (maybeToList . extractDeclaration) . expressionsOf
 
-parseDecls :: Program -> [Declaration]
-parseDecls (Program decls) = decls
+referencedBindingsOf :: Expression -> [Binding]
+referencedBindingsOf = map fst . referencesOf
 
-parseBindings :: Program -> [Binding]
-parseBindings = map declName . parseDecls
+declaredBindingsOf :: Expression -> [Binding]
+declaredBindingsOf = map fst . declarationsOf
 
-expressionToBinding :: Expression -> Maybe Binding
-expressionToBinding (Variable    q) = Just q
-expressionToBinding _                = Nothing
+bindedDeclarationsOf :: Binding -> Expression -> [Expression]
+bindedDeclarationsOf binding = map snd . filter ((==binding).fst) . declarationsOf
 
--- private
+transitiveReferencedBindingsOf :: Binding -> Expression -> [Binding]
+transitiveReferencedBindingsOf binding code =  expand (concatMap referencedBindingsOf . (`bindedDeclarationsOf` code)) binding
+  where
+    expand :: Eq a => (a-> [a]) -> a -> [a]
+    expand f x = expand' [] f [x]
 
-topExpressions :: Rhs -> [Expression]
-topExpressions (UnguardedRhs e) = [e]
-topExpressions (GuardedRhss rhss) = rhss >>= \(GuardedRhs es1 es2) -> [es1, es2]
-
-unfoldExpression :: Expression -> [Expression]
-unfoldExpression expr = expr : concatMap unfoldExpression (subExpressions expr)
-
-subExpressions :: Expression -> [Expression]
-subExpressions (InfixApplication a b c) = [a, (Variable b), c]
-subExpressions (Application a b)        = [a, b]
-subExpressions (Lambda _ a)   = [a]
-subExpressions (MuList as)      = as
-subExpressions (Comprehension a _)   = [a] --TODO
-subExpressions (MuTuple as)      = as
-subExpressions (If a b c)       = [a, b, c]
-subExpressions _ = []
-
-isBinding :: Binding -> Declaration -> Bool
-isBinding binding = (==binding).declName
-
-rhsForBinding :: Declaration -> [Rhs]
-rhsForBinding (ConstantDeclaration _ rhs localDecls) = concatRhs rhs localDecls
-rhsForBinding (FunctionDeclaration _ cases) = cases >>= \(Equation _ rhs localDecls) -> concatRhs rhs localDecls
-rhsForBinding _ = []
-
-concatRhs rhs l = [rhs] ++ concatMap rhsForBinding l
+    expand' _ _ [] = []
+    expand' ps f (x:xs) | elem x ps = expand' ps f xs
+                        | otherwise = [x] ++ expand' (x:ps) f (xs ++ f x)
 
 
-expand :: Eq a => (a-> [a]) -> a -> [a]
-expand f x = expand' [] f [x]
+nameOf :: Expression -> Maybe Binding
+nameOf = fmap fst . extractDeclaration
 
-expand' _ _ [] = []
-expand' ps f (x:xs) | elem x ps = expand' ps f xs
-                    | otherwise = [x] ++ expand' (x:ps) f (xs ++ f x)
+extractReference :: Expression -> Maybe (Binding, Expression)
+extractReference e@(Variable    q) = Just (q, e)
+extractReference _                 = Nothing
+
+extractDeclaration :: Expression -> Maybe (Binding, Expression)
+extractDeclaration e@(TypeSignature n)         = Just (n, e)
+extractDeclaration e@(TypeAliasDeclaration n ) = Just (n, e)
+extractDeclaration e@(VariableDeclaration n _) = Just (n, e)
+extractDeclaration e@(FunctionDeclaration n _) = Just (n, e)
+extractDeclaration e@(RecordDeclaration n)     = Just (n, e)
+extractDeclaration e@(ProcedureDeclaration n _)= Just (n, e)
+extractDeclaration e@(ObjectDeclaration n _)   = Just (n, e)
+extractDeclaration e@(MethodDeclaration n _)   = Just (n, e)
+extractDeclaration e@(AttributeDeclaration n _)= Just (n, e)
+extractDeclaration _                           = Nothing
+
+
+
 
