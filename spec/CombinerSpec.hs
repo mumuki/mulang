@@ -1,7 +1,6 @@
 module CombinerSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Explorer
 import           Language.Mulang.Inspector
 import           Language.Mulang.Inspector.Combiner
 import           Language.Mulang.Parsers.Haskell

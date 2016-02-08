@@ -3,7 +3,9 @@ module Language.Mulang.Inspector.Combiner (
   negative,
   alternative,
   scoped,
-  transitive) where
+  scopedList,
+  transitive,
+  transitiveList) where
 
 import Language.Mulang
 import Language.Mulang.Inspector
@@ -22,8 +24,12 @@ negative f = not . f
 scoped :: Inspection -> ScopedInspection
 scoped inspection scope expression =  any inspection (expression // scope)
 
+scopedList :: Inspection -> [Binding] -> Inspection
+scopedList i =  foldl scoped i . reverse
+
 transitive :: Inspection -> ScopedInspection
 transitive inspection binding code = any (`scopedInspection` code) . transitiveReferencedBindingsOf binding $ code
   where scopedInspection = scoped inspection
 
-
+transitiveList :: Inspection -> [Binding] -> Inspection
+transitiveList i bindings = transitive (scopedList i (init bindings)) (last bindings)
