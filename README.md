@@ -6,16 +6,16 @@ Mulang
 
 ## Getting Started
 
-Better than explaining what is Mulang, let's see what can do it for you.
+Better than explaining what Mulang is, let's see what can do it for you.
 
-Let's starts simple - we have the following JS expression:
+Let's start simple - we have the following JS expression:
 
 ```javascript
 var pepita = {lugar: bsAs1, peso: 20};
 var bsAs1 = bsAs
 ```
 
-We want to recognize some code patters of it, so we will first load the expression into Mulang:
+We want to recognize some code patterns on it, so we will first load the expression into Mulang:
 
 ```
 $ ghci
@@ -23,7 +23,7 @@ $ ghci
 > let e = js "var pepita = {lugar: bsAs1, peso: 20}; var bsAs1 = bsAs"
 ```
 
-Now magic begins. We want to know if the code expression uses a certain binding - that is a variable, function, or anything that has a name:
+Now the magic begins. We want to know if the code expression uses a certain binding - that could be a variable, function, or anything that has a name:
 
 ```haskell
 > hasUsage "bsAs" e
@@ -32,7 +32,7 @@ True
 False
 ```
 
-That was easy, but just in case you are wondering, no, Mulang didn't do a `string.contains` or so,mething like that :stuck_out_togue: :
+That _seems_ easy, but just in case you are wondering: no, Mulang doesn't perform a `string.contains` or something like that :stuck_out_tongue: :
 
 ```haskell
 > hasUsage "bs" e
@@ -69,7 +69,7 @@ Does `pepita` use `bsAs`?
 False
 ```
 
-Oh, wait there! We now, it is true that it does not use **exactly** that variable, but, come on, `bsAs1` does use `bsAs`! Wouldn't it be sweet to be transitive?
+Oh, wait there! We know, it is true that it does not use **exactly** that variable, but come on, `bsAs1` does use `bsAs`! Wouldn't it be sweet to be transitive?
 
 You ask for it, you get it:
 
@@ -88,7 +88,6 @@ False
 ```
 
 Nice, we know. But not very awesome, it only can tell you if you are using a _binding_, right? Eeer. Good news, it can tell you much much much more things:
-
 
 * `hasMethod`,
 * `hasAttribute`
@@ -112,13 +111,11 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 * `doesNullTest`
 * `returnsNull`
 
-
 And the really awesome is here: it works for every - yes, we said it - language on the world, because:
 
   * Mulang natively support JS (ES5), so if your language compiles to clean JS, you are ready
   * Mulang natively supports Haskell, so... the same as before
   * Mulang natively supports Json, so if you can generate a JSON AST for your language, you are done. And every language can :wink:
-
 
 And we are extending Mulang everyday, so more expectations - that is, the queries you can do against Mulang - are being frequently added. And more languages are going to be supported natively. The pipelines contains the following:
 
@@ -131,4 +128,4 @@ And we are extending Mulang everyday, so more expectations - that is, the querie
 
 Mulang is just a Haskell library. You can install it though cabal.
 
-But if you are not the Haskell inclined gal or guy - ok, I will try to forgive you - there is a command line too, (mulang-cli)[https://github.com/mumuki/mulang-cli]. So you don't even have to typecheck!
+But if you are not the Haskell inclined gal or guy - ok, I will try to forgive you - there is a command line too, [mulang-cli](https://github.com/mumuki/mulang-cli). So you don't even have to typecheck!
