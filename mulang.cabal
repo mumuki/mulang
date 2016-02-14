@@ -58,7 +58,9 @@ library
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Json
     Language.Mulang.Parsers.JavaScript
-    Language.Mulang.Cli.Evaluator
+    Language.Mulang.Cli.Main
+    Language.Mulang.Cli.Compiler
+    Language.Mulang.Cli.Interpreter
     Language.Mulang.Cli.Code
   build-depends:
     base                      >= 4     && < 5,

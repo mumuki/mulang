@@ -9,7 +9,6 @@ module Language.Mulang.Inspector.Smell (
   returnsNull) where
 
 import Language.Mulang
-import Language.Mulang.Explorer
 import Language.Mulang.Inspector
 
 
@@ -28,21 +27,21 @@ doesTypeTest = compares f
         f _            = False
 
 compares :: (Expression -> Bool) -> Inspection
-compares f = isOrContainsExpression (any f.comparisonOperands)
+compares f = containsExpression (any f.comparisonOperands)
 
 comparisonOperands (Application Equal    args) = args
 comparisonOperands (Application NotEqual args) = args
 comparisonOperands _ = []
 
 returnsNull :: Inspection
-returnsNull = isOrContainsExpression f
+returnsNull = containsExpression f
   where f (Return MuNull) = True
         f _               = False
 
 -- | Inspection that tells whether a binding has an if expression where both branches return
 -- boolean literals
 hasRedundantIf :: Inspection
-hasRedundantIf = isOrContainsExpression f
+hasRedundantIf = containsExpression f
   where f (If _ (Return x) (Return y)) = all isBooleanLiteral [x, y]
         f (If _ x y)                   = all isBooleanLiteral [x, y]
         f _                            = False
@@ -59,7 +58,7 @@ hasRedundantGuards = containsBody f -- TODO not true when condition is a pattern
 
 -- | Inspection that tells whether a binding has lambda expressions like '\x -> g x'
 hasRedundantLambda :: Inspection
-hasRedundantLambda = isOrContainsExpression f
+hasRedundantLambda = containsExpression f
   where f (Lambda [VariablePattern (x)] (Return (Application _ [Variable (y)]))) = x == y
         f _ = False
 
@@ -67,7 +66,7 @@ hasRedundantLambda = isOrContainsExpression f
 -- | Inspection that tells whether a binding has parameters that
 -- can be avoided using point-free
 hasRedundantParameter :: Inspection
-hasRedundantParameter = isOrContainsExpression f
+hasRedundantParameter = containsExpression f
   where f (FunctionDeclaration _ [Equation params (UnguardedBody (Return (Application _ args)))])
                                                             | (VariablePattern param) <- last params,
                                                               (Variable arg) <- last args = param == arg

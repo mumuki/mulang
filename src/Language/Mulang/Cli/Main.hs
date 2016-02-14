@@ -2,7 +2,7 @@
 
 module Language.Mulang.Cli.Main (main) where
 
-import Language.Mulang.Cli.Evaluator
+import Language.Mulang.Cli.Interpreter
 import Data.Aeson
 import System.Environment
 import Data.Maybe (fromJust)

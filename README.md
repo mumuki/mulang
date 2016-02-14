@@ -26,46 +26,46 @@ $ ghci
 Now the magic begins. We want to know if the code expression uses a certain binding - that could be a variable, function, or anything that has a name:
 
 ```haskell
-> hasUsage "bsAs" e
+> uses "bsAs" e
 True
-> hasUsage "rosario" e
+> uses "rosario" e
 False
 ```
 
 That _seems_ easy, but just in case you are wondering: no, Mulang doesn't perform a `string.contains` or something like that :stuck_out_tongue: :
 
 ```haskell
-> hasUsage "bs" e
+> uses "bs" e
 False
 ```
 
 So let's ask something more interesting - does `bsAs1` use the binding `bsAs`?
 
 ```haskell
-> scoped (hasUsage "bsAs") "bsAs1"  e
+> scoped (uses "bsAs") "bsAs1"  e
 True
 ```
 
 And does it use `rosario`?
 
 ```haskell
-> scoped (hasUsage "rosario") "bsAs1"  e
+> scoped (uses "rosario") "bsAs1"  e
 False
 ```
 
 What about the object `pepita`? Does it use `bsAs1` or `rosario`?
 
 ```haskell
-> scoped (hasUsage "bsAs1") "pepita"  e
+> scoped (uses "bsAs1") "pepita"  e
 True
-> scoped (hasUsage "rosario") "pepita"  e
+> scoped (uses "rosario") "pepita"  e
 False
 ```
 
 Does `pepita` use `bsAs`?
 
 ```haskell
-> scoped (hasUsage "bsAs") "pepita"  e
+> scoped (uses "bsAs") "pepita"  e
 False
 ```
 
@@ -74,35 +74,35 @@ Oh, wait there! We know, it is true that it does not use **exactly** that variab
 You ask for it, you get it:
 
 ```haskell
-> transitive (hasUsage "bsAs") "pepita"  e
+> transitive (uses "bsAs") "pepita"  e
 True
 ```
 
 I know what you are thinking:  now you wan't to be stricter, you want to know if `pepita.lugar` uses bsAs1 - ignoring that `peso` attribute. Piece of cake:
 
 ```haskell
-> scopedList (hasUsage "bsAs1") ["pepita", "lugar"]  e
+> scopedList (uses "bsAs1") ["pepita", "lugar"]  e
 True
-> scopedList (hasUsage "bsAs1") ["pepita", "peso"]  e
+> scopedList (uses "bsAs1") ["pepita", "peso"]  e
 False
 ```
 
 Nice, we know. But not very awesome, it only can tell you if you are using a _binding_, right? Eeer. Good news, it can tell you much much much more things:
 
-* `hasMethod`,
-* `hasAttribute`
+* `declaresMethod`,
+* `declaresAttribute`
 * `hasFunction`
-* `hasArity` - that is, does the given method, function, procedure, etc have the given amount of parameters?
-* `hasIf`
-* `hasWhile`
-* `hasLambda`
-* `hasDirectRecursion`
-* `hasGuards`
-* `hasComposition`
-* `hasComprehensions`
-* `hasTypeSignature`
+* `declaresWithArity` - that is, does the given method, function, procedure, etc have the given amount of parameters?
+* `usesIf`
+* `usesWhile`
+* `usesLambda`
+* `declaresRecursively`
+* `usesGuards`
+* `usesComposition`
+* `usesComprehensions`
+* `declaresTypeSignature`
 * `hasTypeAlias`
-* `hasAnonymousVariable`
+* `usesAnnonymousVariable`
 * `hasRedundantIf`
 * `hasRedundantGuards`
 * `hasRedundantParameter`

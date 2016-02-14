@@ -8,11 +8,10 @@ module Language.Mulang.Cli.Interpreter (
             ExpectationResult(..)) where
 
 import Language.Mulang.Cli.Code
+import Language.Mulang.Cli.Compiler
 
 import GHC.Generics
 import Data.Aeson
-
-import Data.List (isInfixOf)
 
 import Language.Mulang
 import Language.Mulang.Inspector
@@ -24,10 +23,6 @@ data Input = Input {
   expectations :: [Expectation]
 } deriving (Show, Eq, Generic)
 
-data Expectation = Expectation {
-  bindings :: [String],
-  inspection :: [String]
-} deriving (Show, Eq, Generic)
 
 data Output = Output {
   results :: [ExpectationResult],
@@ -40,10 +35,7 @@ data ExpectationResult = ExpectationResult {
 } deriving (Show, Eq, Generic)
 
 instance FromJSON Input
-instance FromJSON Expectation
-
 instance ToJSON Output
-instance ToJSON Expectation
 instance ToJSON ExpectationResult
 
 evaluate :: Input -> Output
@@ -55,7 +47,7 @@ evaluateExpectations :: [Expectation] ->  Expression -> [ExpectationResult]
 evaluateExpectations es content = map run es
   where
     run e = ExpectationResult e (compileAndEval e)
-    compileAndEval (Expectation bindings inspection) = (compileInspection inspection) content
+    compileAndEval e = (compile e) content
 
 
 
@@ -76,4 +68,6 @@ namedSmells = [
   ("HasRedundantGuards", hasRedundantGuards),
   ("HasRedundantParameter", hasRedundantParameter)]
 
-smellyBindingToResult smellName binding = Expectation binding ("Not:" ++ smellName)
+smellyBindingToResult smellName binding = Expectation [binding] smellName Nothing True False
+
+

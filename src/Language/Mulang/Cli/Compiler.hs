@@ -1,32 +1,39 @@
-module Compiler where (compileExpectation)
+{-# LANGUAGE DeriveGeneric #-}
 
-import Data.Char (isLower)
+module Language.Mulang.Cli.Compiler(
+    compile,
+    Expectation(..)) where
 
-compileExpectation (Expectation bindings inspection) = compile binding inspection
+import GHC.Generics
+import Data.Aeson
+import Language.Mulang.Inspector.Combiner
+import Language.Mulang.Inspector
 
-  compile :: [String] -> Inspection
-  compile scope ("Not":xs)                       = negative $ compile scope xs
-  compile scope ("not":xs)                       = negative $ compile scope xs
-  compile [binding] ["HasUsage", target]         = transitive (hasUsage target) binding
-  compile [binding] ["HasLambda"]                = transitive hasLambda binding
-  compile [binding] ["HasGuards"]                = transitive hasGuards binding
-  compile [binding] ["HasComposition"]           = transitive hasComposition binding
-  compile [binding] ["HasBinding"]               = transitive hasBinding binding
-  compile [binding] ["HasDirectRecursion"]       = transitive hasDirectRecursion binding
-  compile [binding] ["HasComprehension"]         = transitive hasComprehension binding
-  compile [binding] ["HasIf"]                    = transitive hasIf binding
-  compile [binding] ["HasConditional"]           = transitive hasConditional binding
-  compile [binding] ["HasTypeDeclaration"]       = hasTypeDeclaration
-  compile [binding] ["HasTypeSignature"]         = hasTypeSignature
-  compile scope ("transitive":inspection)        = (compileTransitiveScope scope) (compileAdvanced is)
-  compile scope is  | isLower.head $ is          = (compileScoped scope) (compileAdvanced is)
-  compile _ _                                    = \_-> True
+data Expectation = Expectation {
+  subject :: [String] ,
+  verb :: String,
+  object :: Maybe String,
+  negated :: Bool,
+  transitive :: Bool
+} deriving (Show, Eq, Generic)
 
-  compileScope scope = (`scopedList` scope)
-  compileTransitiveScope = (`transitiveList` scope)
+instance FromJSON Expectation
+instance ToJSON Expectation
 
-  compileAdvanced ["declaresObject", name]      = declaresObject name
-  compileAdvanced ["declaresAtribute", name]    = declaresAtribute name
-  compileAdvanced ["declaresMethod", name]      = declaresMethod name
+
+compile :: Expectation -> Inspection
+compile (Expectation s v o n t) = compileSubject s t . compileNegation n $ compileInspection v o
+
+compileNegation :: Bool -> Inspection -> Inspection
+compileNegation False i = i
+compileNegation _     i = negative i
+
+compileInspection :: String -> Maybe String -> Inspection
+compileInspection "declaresObject" (Just o) = declaresObject o
+
+compileSubject :: [String] -> Bool -> (Inspection -> Inspection)
+compileSubject s True          = (`transitiveList` s)
+compileSubject s _             = (`scopedList` s)
+
 
 

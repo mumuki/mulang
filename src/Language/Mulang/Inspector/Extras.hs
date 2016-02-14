@@ -4,4 +4,4 @@ import Language.Mulang.Inspector
 import Language.Mulang.Inspector.Combiner
 
 hasConditional :: Inspection
-hasConditional = alternative hasIf hasGuards
+hasConditional = alternative usesIf usesGuards
