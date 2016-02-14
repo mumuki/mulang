@@ -10,6 +10,34 @@ category:            Language
 build-type:          Simple
 cabal-version:       >=1.10
 
+
+executable mulang
+  hs-source-dirs:
+    src
+  main-is: Language/Mulang/Cli/Main.hs
+  default-language:    Haskell2010
+
+  build-depends:
+    base                      >= 4     && < 5,
+    bytestring                == 0.10.6.0,
+    haskell-src               >= 1       && < 1.1,
+    language-javascript       >= 0.5.14  && <= 0.5.15,
+    aeson                     == 0.8.1.1
+
+  build-tools:
+    happy,
+    alex
+
+  ghc-options:
+    -Wall
+    -fno-warn-missing-signatures
+    -fno-warn-orphans
+    -fno-warn-name-shadowing
+    -fwarn-tabs
+    -funbox-strict-fields
+    -threaded
+    -O2
+
 library
   build-depends:       base >=4.6 && <4.7
   default-language:    Haskell2010
@@ -30,6 +58,8 @@ library
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Json
     Language.Mulang.Parsers.JavaScript
+    Language.Mulang.Cli.Evaluator
+    Language.Mulang.Cli.Code
   build-depends:
     base                      >= 4     && < 5,
     bytestring                == 0.10.6.0,
