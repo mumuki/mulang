@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Language.Mulang.Cli.Main (main) where
+module Main (main) where
 
 import Language.Mulang.Cli.Interpreter
 import Data.Aeson

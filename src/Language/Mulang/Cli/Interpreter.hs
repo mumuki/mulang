@@ -35,7 +35,11 @@ data ExpectationResult = ExpectationResult {
 } deriving (Show, Eq, Generic)
 
 instance FromJSON Input
+instance FromJSON Output
+instance FromJSON ExpectationResult
+
 instance ToJSON Output
+instance ToJSON Input
 instance ToJSON ExpectationResult
 
 evaluate :: Input -> Output
