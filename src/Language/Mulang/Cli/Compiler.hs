@@ -6,8 +6,9 @@ module Language.Mulang.Cli.Compiler(
 
 import GHC.Generics
 import Data.Aeson
-import Language.Mulang.Inspector.Combiner
 import Language.Mulang.Inspector
+import Language.Mulang.Inspector.Combiner
+import Language.Mulang.Explorer (Binding, BindingPredicate)
 
 data Expectation = Expectation {
   subject :: [String] ,
@@ -22,34 +23,37 @@ instance ToJSON Expectation
 
 
 compile :: Expectation -> Inspection
-compile (Expectation s v o n t) = compileSubject s t . compileNegation n $ compileInspection v o
+compile (Expectation s v o n t) = compileSubject s t . compileNegation n $ compileInspection v (compilePattern o)
 
 compileNegation :: Bool -> Inspection -> Inspection
 compileNegation False i = i
 compileNegation _     i = negative i
 
-compileInspection :: String -> Maybe String -> Inspection
-compileInspection "declaresObject"        (Just o)  = declaresObject o
-compileInspection "declaresAttribute"     (Just o)  = declaresAttribute o
-compileInspection "declaresMethod"        (Just o)  = declaresMethod o
-compileInspection "declaresFunction"      (Just o)  = declaresFunction o
-compileInspection "declaresTypeAlias"     (Just o)  = declaresTypeAlias o
-compileInspection "declaresTypeSignature" (Just o)  = declaresTypeSignature o
-compileInspection "declares"              (Just o)  = declares o
-compileInspection "declaresRecursively"   (Just o)  = declares o
-compileInspection "declaresWithArity0"    (Just o)  = declaresWithArity 0 o
-compileInspection "declaresWithArity1"    (Just o)  = declaresWithArity 1 o
-compileInspection "declaresWithArity2"    (Just o)  = declaresWithArity 2 o
-compileInspection "declaresWithArity3"    (Just o)  = declaresWithArity 3 o
-compileInspection "declaresWithArity4"    (Just o)  = declaresWithArity 4 o
-compileInspection "uses"                  (Just o)  = uses o
-compileInspection "usesComposition"       Nothing   = usesComposition
-compileInspection "usesGuards"            Nothing   = usesGuards
-compileInspection "usesIf"                Nothing   = usesIf
-compileInspection "usesWhile"             Nothing   = usesWhile
-compileInspection "usesLambda"            Nothing   = usesLambda
-compileInspection "usesComprehension"     Nothing   = usesComprehension
-compileInspection "usesAnnonymousVariable"Nothing   = usesAnnonymousVariable
+compileInspection :: String -> BindingPredicate -> Inspection
+compileInspection "declaresObject"         pred = declaresObject pred
+compileInspection "declaresAttribute"      pred = declaresAttribute pred
+compileInspection "declaresMethod"         pred = declaresMethod pred
+compileInspection "declaresFunction"       pred = declaresFunction pred
+compileInspection "declaresTypeAlias"      pred = declaresTypeAlias pred
+compileInspection "declaresTypeSignature"  pred = declaresTypeSignature pred
+compileInspection "declares"               pred = declares pred
+compileInspection "declaresRecursively"    pred = declares pred
+compileInspection "declaresWithArity0"     pred = declaresWithArity 0 pred
+compileInspection "declaresWithArity1"     pred = declaresWithArity 1 pred
+compileInspection "declaresWithArity2"     pred = declaresWithArity 2 pred
+compileInspection "declaresWithArity3"     pred = declaresWithArity 3 pred
+compileInspection "declaresWithArity4"     pred = declaresWithArity 4 pred
+compileInspection "uses"                   pred = uses pred
+compileInspection "usesComposition"        _    = usesComposition
+compileInspection "usesGuards"             _    = usesGuards
+compileInspection "usesIf"                 _    = usesIf
+compileInspection "usesWhile"              _    = usesWhile
+compileInspection "usesLambda"             _    = usesLambda
+compileInspection "usesComprehension"      _    = usesComprehension
+compileInspection "usesAnnonymousVariable" _    = usesAnnonymousVariable
+
+compilePattern :: (Maybe Binding) -> BindingPredicate
+compilePattern (Just o) = (== o)
 
 compileSubject :: [String] -> Bool -> (Inspection -> Inspection)
 compileSubject s True          = (`transitiveList` s)

@@ -10,66 +10,66 @@ spec :: Spec
 spec = do
   describe "declaresTypeSignature" $ do
     it "is True whn type signature is present" $ do
-      declaresTypeSignature "x" (hs "x :: Int\n\
+      declaresTypeSignature (named "x") (hs "x :: Int\n\
                            \x = 3") `shouldBe` True
 
     it "is False whn type signature is absent " $ do
-      declaresTypeSignature "x" (hs "x = 2") `shouldBe` False
+      declaresTypeSignature (named "x") (hs "x = 2") `shouldBe` False
 
   describe "declaresFunction" $ do
     describe "with function declarations" $ do
       it "is True when functions is declared" $ do
-        declaresFunction "f" (hs "f x = 1") `shouldBe` True
+        declaresFunction (named "f") (hs "f x = 1") `shouldBe` True
 
     describe "with constants" $ do
       it "is False when constant is declared with a non lambda literal" $ do
-        declaresFunction "f" (hs "f = 2") `shouldBe` False
+        declaresFunction (named "f") (hs "f = 2") `shouldBe` False
 
       it "is True when constant is declared with a lambda literal" $ do
-        declaresFunction "f" (hs "f = \\x -> x + 1") `shouldBe` True
+        declaresFunction (named "f") (hs "f = \\x -> x + 1") `shouldBe` True
 
       it "is False when constant is declared with a number literal" $ do
-        declaresFunction "f" (hs "f = 3") `shouldBe` False
+        declaresFunction (named "f") (hs "f = 3") `shouldBe` False
 
       it "is False when constant is declared with a list literal" $ do
-        declaresFunction "f" (hs "f = []") `shouldBe` False
+        declaresFunction (named "f") (hs "f = []") `shouldBe` False
 
       it "is False when constant is declared with a variable literal" $ do
-        declaresFunction "f" (hs "f = snd") `shouldBe` False
+        declaresFunction (named "f") (hs "f = snd") `shouldBe` False
 
   describe "declaresWithArity" $ do
     describe "with function declarations" $ do
       it "is True when function is declared with the given arity" $ do
-        (declaresWithArity 1) "f" (hs "f x = x + 1") `shouldBe` True
+        (declaresWithArity 1) (named "f") (hs "f x = x + 1") `shouldBe` True
 
       it "is False when function is declared with another arity" $ do
-        (declaresWithArity 2) "f" (hs "f x = x + 1") `shouldBe` False
+        (declaresWithArity 2) (named "f") (hs "f x = x + 1") `shouldBe` False
 
     describe "with constant declaration" $ do
       it "is True when constant is declared with lambda of given arity" $ do
-        (declaresWithArity 2) "f" (hs "f = \\x y -> x + y") `shouldBe` True
+        (declaresWithArity 2) (named "f") (hs "f = \\x y -> x + y") `shouldBe` True
 
       it "is False when constant is declared with lambda of given arity" $ do
-        (declaresWithArity 3) "f" (hs "f = \\x y -> x + y") `shouldBe` False
+        (declaresWithArity 3) (named "f") (hs "f = \\x y -> x + y") `shouldBe` False
 
       it "is False if it is a variable" $ do
-        (declaresWithArity 1) "f" (hs "f = snd") `shouldBe` False
+        (declaresWithArity 1) (named "f") (hs "f = snd") `shouldBe` False
 
 
   describe "declares" $ do
     describe "with constants" $ do
       it "is True when binding exists" $ do
-        declares "x" (hs "x = 1") `shouldBe` True
+        declares (named "x") (hs "x = 1") `shouldBe` True
 
       it "is False when binding doesnt exists" $ do
-        declares "y" (hs "x = 1") `shouldBe` False
+        declares (named "y") (hs "x = 1") `shouldBe` False
 
     describe "with functions" $ do
       it "is True when binding exists" $ do
-        declares "x" (hs "x m = 1") `shouldBe` True
+        declares (named "x") (hs "x m = 1") `shouldBe` True
 
       it "is False when binding doesnt exists" $ do
-        declares "y" (hs "x m = 1") `shouldBe` False
+        declares (named "y") (hs "x m = 1") `shouldBe` False
 
   describe "usesComprehension" $ do
     it "is True when list comprehension exists" $ do
@@ -83,68 +83,71 @@ spec = do
 
   describe "uses" $ do
     it "is True when required function is used on application" $ do
-      uses "m" (hs "y x = m x") `shouldBe` True
+      uses (named "m") (hs "y x = m x") `shouldBe` True
 
     it "is True when required function is used as argument" $ do
-      uses "m" (hs "y x = x m") `shouldBe` True
+      uses (named "m") (hs "y x = x m") `shouldBe` True
 
     it "is True when required function is used as operator" $ do
-      uses "&&" (hs "y x = x && z") `shouldBe` True
+      uses (named "&&" )(hs "y x = x && z") `shouldBe` True
 
     it "is False when required function is not used in constant" $ do
-      uses "m" (hs "y = 3") `shouldBe` False
+      uses (named "m") (hs "y = 3") `shouldBe` False
 
     it "is False when required function is not used in function" $ do
-      uses "m" (hs "y = x 3") `shouldBe` False
+      uses (named "m") (hs "y = x 3") `shouldBe` False
 
     it "is False when binding is not present, scoped" $ do
-      scoped (uses "m") "p" (hs "z = m 3") `shouldBe` False
+      scoped (uses (named "m")) "p" (hs "z = m 3") `shouldBe` False
 
     it "is False when required function is blank" $ do
-      uses "" (hs "y = m 3") `shouldBe` False
+      uses (named "" )(hs "y = m 3") `shouldBe` False
 
     it "is False when not present in enum" $ do
-      uses "h" (hs "y = [a..b]") `shouldBe` False
+      uses (named "h") (hs "y = [a..b]") `shouldBe` False
 
     it "is True when is present in enum" $ do
-      uses "h" (hs "y = [a..h]") `shouldBe` True
+      uses (named "h") (hs "y = [a..h]") `shouldBe` True
 
     it "is True when required constructor is used on application" $ do
-      uses "Foo" (hs "y x = Foo x") `shouldBe` True
+      uses (named "Foo") (hs "y x = Foo x") `shouldBe` True
 
     it "is False when required constructor is not used on application" $ do
-      uses "Foo" (hs "y x = Bar x") `shouldBe` False
+      uses (named "Foo") (hs "y x = Bar x") `shouldBe` False
 
     it "is True when required function is used on list comprehension" $ do
-      uses "f" (hs "y x = [ f m | m <- ms  ]") `shouldBe` True
+      uses (named "f") (hs "y x = [ f m | m <- ms  ]") `shouldBe` True
 
     it "is False when required function is not used on list comprehension" $ do
-      uses "f" (hs "y x = [ g m | m <- ms  ]") `shouldBe` False
+      uses (named "f") (hs "y x = [ g m | m <- ms  ]") `shouldBe` False
 
     it "is False when there is variable hiding in list comprehension" $ do
-      --uses "m" "y x = [ g m | m <- ms  ]") `shouldBe` False
+      --uses (named "m") "y x = [ g m | m <- ms  ]") `shouldBe` False
       pending
 
     it "is False when there is variable hiding in list comprehension generator" $ do
-      uses "m" (hs "y x = [ g x | m <- ms, x <- f m]") `shouldBe` False
+      uses (named "m") (hs "y x = [ g x | m <- ms, x <- f m]") `shouldBe` False
 
 
   describe "declaresRecursively" $ do
     it "is True when has direct recursion in unguarded expresion" $ do
-      declaresRecursively "y" (hs "y x = y x") `shouldBe` True
+      declaresRecursively (named "y") (hs "y x = y x") `shouldBe` True
 
     it "is True when has direct recursion in guarded expresion" $ do
-      declaresRecursively "y" (hs "y x | c x = y m\n\
+      declaresRecursively (named "y") (hs "y x | c x = y m\n\
                               \    | otherwise = 0") `shouldBe` True
 
+    it "is False when there is no named recursion" $ do
+      declaresRecursively (named "y") (hs "y = 3") `shouldBe` False
+
+    it "is False when there is no named recursion, scoped" $ do
+      declaresRecursively (named "y") (hs "y = 3\nf x = f 4") `shouldBe` False
+
+    it "is True when there is any recursion" $ do
+      declaresRecursively anyone (hs "y x = y 3") `shouldBe` True
+
     it "is False when there is no recursion" $ do
-      declaresRecursively "y" (hs "y = 3") `shouldBe` False
-
-    it "is False when there is no recursion, scoped" $ do
-      declaresRecursively "y" (hs "y = 3\nf x = f 4") `shouldBe` False
-
-    it "is False when there is no recursion, scoped" $ do
-      declaresRecursively "y" (hs "y x = y 3") `shouldBe` True
+      declaresRecursively anyone (hs "y x = 3") `shouldBe` False
 
   describe "usesComposition" $ do
     describe "when constant assignment" $ do

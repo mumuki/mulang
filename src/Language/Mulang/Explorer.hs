@@ -7,18 +7,22 @@ module Language.Mulang.Explorer (
   referencedBindingsOf,
   declaredBindingsOf,
   bindedDeclarationsOf,
+  bindedDeclarationsOf',
   transitiveReferencedBindingsOf,
   nameOf,
   extractDeclaration,
   extractReference,
   Expression(..),
-  Binding) where
+  Binding,
+  BindingPredicate) where
 
 import Language.Mulang
 import Data.Maybe (maybeToList)
 import Data.List (nub)
 
 type Binding = String
+type BindingPredicate = Binding -> Bool
+
 
 (//)  :: Expression -> Binding -> [Expression]
 (//) = flip bindedDeclarationsOf
@@ -70,8 +74,11 @@ referencedBindingsOf = map fst . referencesOf
 declaredBindingsOf :: Expression -> [Binding]
 declaredBindingsOf = map fst . declarationsOf
 
+bindedDeclarationsOf' :: BindingPredicate -> Expression -> [Expression]
+bindedDeclarationsOf' f = map snd . filter (f.fst) . declarationsOf
+
 bindedDeclarationsOf :: Binding -> Expression -> [Expression]
-bindedDeclarationsOf binding = map snd . filter ((==binding).fst) . declarationsOf
+bindedDeclarationsOf b = bindedDeclarationsOf' (==b)
 
 transitiveReferencedBindingsOf :: Binding -> Expression -> [Binding]
 transitiveReferencedBindingsOf binding code =  expand (concatMap referencedBindingsOf . (`bindedDeclarationsOf` code)) binding

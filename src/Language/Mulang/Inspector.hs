@@ -19,27 +19,75 @@ module Language.Mulang.Inspector (
   containsExpression,
   containsDeclaration,
   containsBody,
+  named,
+  like,
+  anyone,
   Inspection) where
 
 import  Language.Mulang
 import  Language.Mulang.Explorer
-
+import  Data.List (isInfixOf)
 type Inspection = Expression  -> Bool
 
-declaresObject :: Binding -> Inspection
+named :: String -> BindingPredicate
+named = (==)
+
+like :: String -> BindingPredicate
+like = isInfixOf
+
+anyone :: BindingPredicate
+anyone = const True
+
+declaresObject :: BindingPredicate -> Inspection
 declaresObject =  containsDeclaration f
   where f (ObjectDeclaration _ _) = True
         f _                       = False
 
-declaresAttribute :: Binding -> Inspection
+declaresAttribute :: BindingPredicate -> Inspection
 declaresAttribute =  containsDeclaration f
   where f (AttributeDeclaration _ _) = True
         f _                          = False
 
-declaresMethod :: Binding -> Inspection
+declaresMethod :: BindingPredicate -> Inspection
 declaresMethod =  containsDeclaration f
   where f (MethodDeclaration _ _) = True
         f _                       = False
+
+-- | Inspection that tells whether a binding is direct recursive
+declaresRecursively :: BindingPredicate -> Inspection
+declaresRecursively = containsDeclaration f
+  where f e | (Just name) <- (nameOf e) = uses (named name) e
+            | otherwise = False
+
+-- | Inspection that tells whether a top level binding exists
+declares :: BindingPredicate -> Inspection
+declares = containsDeclaration (const True)
+
+declaresFunction :: BindingPredicate -> Inspection
+declaresFunction = containsDeclaration f
+  where f (FunctionDeclaration _ _) = True
+        f _  = False
+
+declaresWithArity :: Int -> BindingPredicate -> Inspection
+declaresWithArity arity = containsDeclaration f
+  where f (FunctionDeclaration _ equations)  = any equationArityIs equations
+        f (ProcedureDeclaration _ equations) = any equationArityIs equations
+        f (MethodDeclaration _ equations)    = any equationArityIs equations
+        f _  = False
+
+        equationArityIs = \(Equation args _) -> argsHaveArity args
+
+        argsHaveArity args = length args == arity
+
+declaresTypeAlias :: BindingPredicate -> Inspection
+declaresTypeAlias = containsDeclaration f
+  where f (TypeAliasDeclaration _) = True
+        f _             = False
+
+declaresTypeSignature :: BindingPredicate -> Inspection
+declaresTypeSignature = containsDeclaration f
+  where f (TypeSignature _)  = True
+        f _                  = False
 
 -- | Inspection that tells whether a binding uses the composition operator '.'
 -- in its definition
@@ -78,17 +126,11 @@ usesLambda = containsExpression f
         f _ = False
 
 
--- | Inspection that tells whether a binding is direct recursive
-declaresRecursively :: Binding -> Inspection
-declaresRecursively = containsDeclaration f
-  where f e | (Just name) <- (nameOf e) = uses name e
-            | otherwise = False
-
 -- | Inspection that tells whether a binding uses the the given target binding
 -- in its definition
-uses :: Binding -> Inspection
-uses target = containsExpression f
-  where f = elem target . map fst .  referencesOf
+uses :: BindingPredicate -> Inspection
+uses p = containsExpression f
+  where f = any p . map fst .  referencesOf
 
 -- | Inspection that tells whether a binding uses
 -- comprehensions - list comprehension, for comprehension, do-syntax, etc -
@@ -97,36 +139,6 @@ usesComprehension :: Inspection
 usesComprehension = containsExpression f
   where f (Comprehension _ _) = True
         f _ = False
-
--- | Inspection that tells whether a top level binding exists
-declares :: Binding -> Inspection
-declares = containsDeclaration (const True)
-
-declaresFunction :: Binding -> Inspection
-declaresFunction = containsDeclaration f
-  where f (FunctionDeclaration _ _) = True
-        f _  = False
-
-declaresWithArity :: Int -> Binding -> Inspection
-declaresWithArity arity = containsDeclaration f
-  where f (FunctionDeclaration _ equations)  = any equationArityIs equations
-        f (ProcedureDeclaration _ equations) = any equationArityIs equations
-        f (MethodDeclaration _ equations)    = any equationArityIs equations
-        f _  = False
-
-        equationArityIs = \(Equation args _) -> argsHaveArity args
-
-        argsHaveArity args = length args == arity
-
-declaresTypeAlias :: Binding -> Inspection
-declaresTypeAlias = containsDeclaration f
-  where f (TypeAliasDeclaration _) = True
-        f _             = False
-
-declaresTypeSignature :: Binding -> Inspection
-declaresTypeSignature = containsDeclaration f
-  where f (TypeSignature _)  = True
-        f _                  = False
 
 usesAnnonymousVariable :: Inspection
 usesAnnonymousVariable = containsExpression f
@@ -144,8 +156,8 @@ containsExpression f = has f expressionsOf
 containsBody :: (EquationBody -> Bool)-> Inspection
 containsBody f = has f equationBodiesOf
 
-containsDeclaration :: (Expression -> Bool) -> Binding -> Inspection
-containsDeclaration f b  = has f (bindedDeclarationsOf b)
+containsDeclaration :: (Expression -> Bool) -> BindingPredicate -> Inspection
+containsDeclaration f b  = has f (bindedDeclarationsOf' b)
 
 -- private
 
