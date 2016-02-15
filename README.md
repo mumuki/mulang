@@ -182,4 +182,4 @@ And we are extending Mulang everyday, so more expectations - that is, the querie
 
 Mulang is just a Haskell library. You can install it though cabal.
 
-But if you are not the Haskell inclined gal or guy - ok, I will try to forgive you - there is a command line too, [mulang-cli](https://github.com/mumuki/mulang-cli). So you don't even have to typecheck!
+But if you are not the Haskell inclined gal or guy - ok, I will try to forgive you - this code comes with a command line too. So you don't even have to typecheck!
