@@ -49,8 +49,6 @@ evaluateExpectations es content = map run es
     run e = ExpectationResult e (compileAndEval e)
     compileAndEval e = (compile e) content
 
-
-
 type NamedSmell = (String, Inspection)
 
 detectSmells :: Expression -> [Expectation]

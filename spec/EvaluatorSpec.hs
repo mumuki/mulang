@@ -9,7 +9,7 @@ spec = describe "Evaluator" $ do
     evaluate (Input (Code Haskell "x = 2") []) `shouldBe` (Output [] [])
 
   it "detects smells" $ do
-    evaluate (Input (Code Haskell "x = \\y -> f y") []) `shouldBe` (Output [] [(Expectation ["x"] "HasRedundantLambda" Nothing True False)])
+    evaluate (Input (Code Haskell "x = \\y -> f y") []) `shouldBe` (Output [] [(Expectation ["x"] "HasRedundantParameter" Nothing True False)])
 
   it "evaluates present expectations" $ do
     let ydeclares = (Expectation [] "declares" (Just "y") False False)
@@ -19,6 +19,6 @@ spec = describe "Evaluator" $ do
                                                                         ExpectationResult xdeclares True] [])
   it "works with plain mulang format" $ do
     let ydeclares = (Expectation [] "declares" (Just "y") False False)
-    let code = Code Mulang "Program []"
+    let code = Code Mulang "MuNull"
     evaluate (Input code [ydeclares]) `shouldBe` (Output [ExpectationResult ydeclares False] [])
 
