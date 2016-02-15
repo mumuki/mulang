@@ -26,46 +26,46 @@ $ ghci
 Now the magic begins. We want to know if the code expression uses a certain binding - that could be a variable, function, or anything that has a name:
 
 ```haskell
-> uses "bsAs" e
+> uses (named "bsAs") e
 True
-> uses "rosario" e
+> uses (named "rosario") e
 False
 ```
 
 That _seems_ easy, but just in case you are wondering: no, Mulang doesn't perform a `string.contains` or something like that :stuck_out_tongue: :
 
 ```haskell
-> uses "bs" e
+> uses (named "bs") e
 False
 ```
 
 So let's ask something more interesting - does `bsAs1` use the binding `bsAs`?
 
 ```haskell
-> scoped (uses "bsAs") "bsAs1"  e
+> scoped (uses (named "bsAs")) "bsAs1"  e
 True
 ```
 
 And does it use `rosario`?
 
 ```haskell
-> scoped (uses "rosario") "bsAs1"  e
+> scoped (uses (named "rosario")) "bsAs1"  e
 False
 ```
 
 What about the object `pepita`? Does it use `bsAs1` or `rosario`?
 
 ```haskell
-> scoped (uses "bsAs1") "pepita"  e
+> scoped (uses (named "bsAs1")) "pepita"  e
 True
-> scoped (uses "rosario") "pepita"  e
+> scoped (uses (named "rosario")) "pepita"  e
 False
 ```
 
 Does `pepita` use `bsAs`?
 
 ```haskell
-> scoped (uses "bsAs") "pepita"  e
+> scoped (uses (named "bsAs")) "pepita"  e
 False
 ```
 
@@ -74,16 +74,16 @@ Oh, wait there! We know, it is true that it does not use **exactly** that variab
 You ask for it, you get it:
 
 ```haskell
-> transitive (uses "bsAs") "pepita"  e
+> transitive (uses (named "bsAs")) "pepita"  e
 True
 ```
 
 I know what you are thinking:  now you wan't to be stricter, you want to know if `pepita.lugar` uses bsAs1 - ignoring that `peso` attribute. Piece of cake:
 
 ```haskell
-> scopedList (uses "bsAs1") ["pepita", "lugar"]  e
+> scopedList (uses (named "bsAs1")) ["pepita", "lugar"]  e
 True
-> scopedList (uses "bsAs1") ["pepita", "peso"]  e
+> scopedList (uses (named "bsAs1")) ["pepita", "peso"]  e
 False
 ```
 
@@ -91,17 +91,17 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 
 * `declaresMethod`,
 * `declaresAttribute`
-* `hasFunction`
+* `declaresFunction`
+* `declaresTypeSignature`
+* `declaresTypeAlias`
+* `declaresRecursively`
 * `declaresWithArity` - that is, does the given method, function, procedure, etc have the given amount of parameters?
 * `usesIf`
 * `usesWhile`
 * `usesLambda`
-* `declaresRecursively`
 * `usesGuards`
 * `usesComposition`
 * `usesComprehensions`
-* `declaresTypeSignature`
-* `hasTypeAlias`
 * `usesAnnonymousVariable`
 * `hasRedundantIf`
 * `hasRedundantGuards`
@@ -110,6 +110,60 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 * `doesTypeTest`
 * `doesNullTest`
 * `returnsNull`
+
+For example, let's go trickier:
+
+Does that piece of code declare any attribute?
+
+```haskell
+> declaresAttribute anyone e
+True
+```
+
+But does it declare an attribute like 'eso'?
+
+```haskell
+> declaresAttribute (like "eso") e
+True
+```
+
+And does `pepita` use any if within its definition?
+
+```haskell
+> scoped usesIf "pepita" e
+False
+```
+
+Does something in the following code...
+
+```haskell
+let e = js "var bar = {baz: function(){ return g }, foo: function(){ return null }}"
+```
+
+...return null?
+
+```haskell
+> returnsNull e
+True
+```
+
+is it the `foo` method in `bar`? or the `baz` method?
+
+```haskell
+> scopedList returnsNull ["bar", "foo"] e
+True
+> scopedList returnsNull ["bar", "baz"] e
+False
+```
+
+But instead of asking one by one, we could use `detect` :wink: :
+
+```haskell
+> detect returnsNull e
+["bar","foo"]
+```
+
+_Which means that there are null returns within  `bar` and also within `foo`_
 
 And the really awesome is here: it works for every - yes, we said it - language on the world, because:
 
