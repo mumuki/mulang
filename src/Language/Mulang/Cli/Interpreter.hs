@@ -66,6 +66,6 @@ namedSmells = [
   ("HasRedundantGuards", hasRedundantGuards),
   ("HasRedundantParameter", hasRedundantParameter)]
 
-smellyBindingToResult smellName binding = Expectation [binding] smellName Nothing True False
+smellyBindingToResult smellName binding = Expectation [binding] smellName Anyone True False
 
 

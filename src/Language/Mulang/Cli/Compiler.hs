@@ -2,7 +2,8 @@
 
 module Language.Mulang.Cli.Compiler(
     compile,
-    Expectation(..)) where
+    Expectation(..),
+    BindingPattern(..)) where
 
 import GHC.Generics
 import Data.Aeson
@@ -10,17 +11,21 @@ import Language.Mulang.Inspector
 import Language.Mulang.Inspector.Combiner
 import Language.Mulang.Explorer (Binding, BindingPredicate)
 
+data BindingPattern = Named String | Like String | Anyone deriving (Show, Eq, Generic)
+
 data Expectation = Expectation {
   subject :: [String] ,
   verb :: String,
-  object :: Maybe String,
+  object :: BindingPattern,
   negated :: Bool,
   transitive :: Bool
 } deriving (Show, Eq, Generic)
 
+instance FromJSON BindingPattern
 instance FromJSON Expectation
-instance ToJSON Expectation
 
+instance ToJSON BindingPattern
+instance ToJSON Expectation
 
 compile :: Expectation -> Inspection
 compile (Expectation s v o n t) = compileSubject s t . compileNegation n $ compileInspection v (compilePattern o)
@@ -52,8 +57,10 @@ compileInspection "usesLambda"             _    = usesLambda
 compileInspection "usesComprehension"      _    = usesComprehension
 compileInspection "usesAnnonymousVariable" _    = usesAnnonymousVariable
 
-compilePattern :: (Maybe Binding) -> BindingPredicate
-compilePattern (Just o) = (== o)
+compilePattern :: BindingPattern -> BindingPredicate
+compilePattern (Named o) = named o
+compilePattern (Like o)  = like o
+compilePattern _         = anyone
 
 compileSubject :: [String] -> Bool -> (Inspection -> Inspection)
 compileSubject s True          = (`transitiveList` s)
