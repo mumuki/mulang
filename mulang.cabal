@@ -50,6 +50,7 @@ library
       src
   exposed-modules:
     Language.Mulang
+    Language.Mulang.All
     Language.Mulang.Builder
     Language.Mulang.Explorer
     Language.Mulang.Inspector.Smell
