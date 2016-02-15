@@ -26,46 +26,46 @@ $ ghci
 Now the magic begins. We want to know if the code expression uses a certain binding - that could be a variable, function, or anything that has a name:
 
 ```haskell
-> hasUsage "bsAs" e
+> uses (named "bsAs") e
 True
-> hasUsage "rosario" e
+> uses (named "rosario") e
 False
 ```
 
 That _seems_ easy, but just in case you are wondering: no, Mulang doesn't perform a `string.contains` or something like that :stuck_out_tongue: :
 
 ```haskell
-> hasUsage "bs" e
+> uses (named "bs") e
 False
 ```
 
 So let's ask something more interesting - does `bsAs1` use the binding `bsAs`?
 
 ```haskell
-> scoped (hasUsage "bsAs") "bsAs1"  e
+> scoped (uses (named "bsAs")) "bsAs1"  e
 True
 ```
 
 And does it use `rosario`?
 
 ```haskell
-> scoped (hasUsage "rosario") "bsAs1"  e
+> scoped (uses (named "rosario")) "bsAs1"  e
 False
 ```
 
 What about the object `pepita`? Does it use `bsAs1` or `rosario`?
 
 ```haskell
-> scoped (hasUsage "bsAs1") "pepita"  e
+> scoped (uses (named "bsAs1")) "pepita"  e
 True
-> scoped (hasUsage "rosario") "pepita"  e
+> scoped (uses (named "rosario")) "pepita"  e
 False
 ```
 
 Does `pepita` use `bsAs`?
 
 ```haskell
-> scoped (hasUsage "bsAs") "pepita"  e
+> scoped (uses (named "bsAs")) "pepita"  e
 False
 ```
 
@@ -74,35 +74,35 @@ Oh, wait there! We know, it is true that it does not use **exactly** that variab
 You ask for it, you get it:
 
 ```haskell
-> transitive (hasUsage "bsAs") "pepita"  e
+> transitive (uses (named "bsAs")) "pepita"  e
 True
 ```
 
 I know what you are thinking:  now you wan't to be stricter, you want to know if `pepita.lugar` uses bsAs1 - ignoring that `peso` attribute. Piece of cake:
 
 ```haskell
-> scopedList (hasUsage "bsAs1") ["pepita", "lugar"]  e
+> scopedList (uses (named "bsAs1")) ["pepita", "lugar"]  e
 True
-> scopedList (hasUsage "bsAs1") ["pepita", "peso"]  e
+> scopedList (uses (named "bsAs1")) ["pepita", "peso"]  e
 False
 ```
 
 Nice, we know. But not very awesome, it only can tell you if you are using a _binding_, right? Eeer. Good news, it can tell you much much much more things:
 
-* `hasMethod`,
-* `hasAttribute`
-* `hasFunction`
-* `hasArity` - that is, does the given method, function, procedure, etc have the given amount of parameters?
-* `hasIf`
-* `hasWhile`
-* `hasLambda`
-* `hasDirectRecursion`
-* `hasGuards`
-* `hasComposition`
-* `hasComprehensions`
-* `hasTypeSignature`
-* `hasTypeAlias`
-* `hasAnonymousVariable`
+* `declaresMethod`,
+* `declaresAttribute`
+* `declaresFunction`
+* `declaresTypeSignature`
+* `declaresTypeAlias`
+* `declaresRecursively`
+* `declaresWithArity` - that is, does the given method, function, procedure, etc have the given amount of parameters?
+* `usesIf`
+* `usesWhile`
+* `usesLambda`
+* `usesGuards`
+* `usesComposition`
+* `usesComprehensions`
+* `usesAnnonymousVariable`
 * `hasRedundantIf`
 * `hasRedundantGuards`
 * `hasRedundantParameter`
@@ -110,6 +110,60 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 * `doesTypeTest`
 * `doesNullTest`
 * `returnsNull`
+
+For example, let's go trickier:
+
+Does that piece of code declare any attribute?
+
+```haskell
+> declaresAttribute anyone e
+True
+```
+
+But does it declare an attribute like 'eso'?
+
+```haskell
+> declaresAttribute (like "eso") e
+True
+```
+
+And does `pepita` use any if within its definition?
+
+```haskell
+> scoped usesIf "pepita" e
+False
+```
+
+Does something in the following code...
+
+```haskell
+let e = js "var bar = {baz: function(){ return g }, foo: function(){ return null }}"
+```
+
+...return null?
+
+```haskell
+> returnsNull e
+True
+```
+
+is it the `foo` method in `bar`? or the `baz` method?
+
+```haskell
+> scopedList returnsNull ["bar", "foo"] e
+True
+> scopedList returnsNull ["bar", "baz"] e
+False
+```
+
+But instead of asking one by one, we could use `detect` :wink: :
+
+```haskell
+> detect returnsNull e
+["bar","foo"]
+```
+
+_Which means that there are null returns within  `bar` and also within `foo`_
 
 And the really awesome is here: it works for every - yes, we said it - language on the world, because:
 
@@ -128,4 +182,11 @@ And we are extending Mulang everyday, so more expectations - that is, the querie
 
 Mulang is just a Haskell library. You can install it though cabal.
 
-But if you are not the Haskell inclined gal or guy - ok, I will try to forgive you - there is a command line too, [mulang-cli](https://github.com/mumuki/mulang-cli). So you don't even have to typecheck!
+But if you are not the Haskell inclined gal or guy - ok, I will try to forgive you - this code comes with a command line too. So you don't even have to typecheck!
+
+Sample CLI usage:
+
+```
+$ mulang '{"expectations":[{"subject":["x"],"transitive":false,"negated":false,"object":{"tag":"Anyone","contents":[]},"verb":"uses"}],"code":{"content":"x = 1","language":"Haskell"}} '
+{"results":[{"result":false,"expectation":{"subject":["x"],"transitive":false,"negated":false,"object":{"tag":"Anyone","contents":[]},"verb":"uses"}}],"smells":[]}
+```

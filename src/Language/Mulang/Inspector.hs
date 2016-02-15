@@ -1,139 +1,147 @@
 module Language.Mulang.Inspector (
-  hasObject,
-  hasAttribute,
-  hasMethod,
-  hasComposition,
-  hasGuards,
-  hasIf,
-  hasWhile,
-  hasLambda,
-  hasDirectRecursion,
-  hasUsage,
-  hasComprehension,
-  hasBinding,
-  hasFunctionDeclaration,
-  hasArity,
-  hasTypeDeclaration,
-  hasTypeSignature,
-  hasAnonymousVariable,
-  isOrContainsExpression,
-  isOrContainsDeclaration,
+  declaresObject,
+  declaresAttribute,
+  declaresMethod,
+  usesComposition,
+  usesGuards,
+  usesIf,
+  usesWhile,
+  usesLambda,
+  declaresRecursively,
+  uses,
+  usesComprehension,
+  declares,
+  declaresFunction,
+  declaresWithArity,
+  declaresTypeAlias,
+  declaresTypeSignature,
+  usesAnnonymousVariable,
+  containsExpression,
+  containsDeclaration,
   containsBody,
-  Inspection,
-  ScopedInspection
-  ) where
+  named,
+  like,
+  anyone,
+  Inspection) where
 
 import  Language.Mulang
 import  Language.Mulang.Explorer
-
-type ScopedInspection = Binding -> Inspection
+import  Data.List (isInfixOf)
 type Inspection = Expression  -> Bool
 
-hasObject :: Inspection
-hasObject =  isOrContainsExpression f
+named :: String -> BindingPredicate
+named = (==)
+
+like :: String -> BindingPredicate
+like = isInfixOf
+
+anyone :: BindingPredicate
+anyone = const True
+
+declaresObject :: BindingPredicate -> Inspection
+declaresObject =  containsDeclaration f
   where f (ObjectDeclaration _ _) = True
         f _                       = False
 
-hasAttribute :: ScopedInspection
-hasAttribute =  isOrContainsDeclaration f
+declaresAttribute :: BindingPredicate -> Inspection
+declaresAttribute =  containsDeclaration f
   where f (AttributeDeclaration _ _) = True
         f _                          = False
 
-hasMethod :: ScopedInspection
-hasMethod =  isOrContainsDeclaration f
-  where f (MethodDeclaration n _) = True
+declaresMethod :: BindingPredicate -> Inspection
+declaresMethod =  containsDeclaration f
+  where f (MethodDeclaration _ _) = True
         f _                       = False
+
+-- | Inspection that tells whether a binding is direct recursive
+declaresRecursively :: BindingPredicate -> Inspection
+declaresRecursively = containsDeclaration f
+  where f e | (Just name) <- (nameOf e) = uses (named name) e
+            | otherwise = False
+
+-- | Inspection that tells whether a top level binding exists
+declares :: BindingPredicate -> Inspection
+declares = containsDeclaration (const True)
+
+declaresFunction :: BindingPredicate -> Inspection
+declaresFunction = containsDeclaration f
+  where f (FunctionDeclaration _ _) = True
+        f _  = False
+
+declaresWithArity :: Int -> BindingPredicate -> Inspection
+declaresWithArity arity = containsDeclaration f
+  where f (FunctionDeclaration _ equations)  = any equationArityIs equations
+        f (ProcedureDeclaration _ equations) = any equationArityIs equations
+        f (MethodDeclaration _ equations)    = any equationArityIs equations
+        f _  = False
+
+        equationArityIs = \(Equation args _) -> argsHaveArity args
+
+        argsHaveArity args = length args == arity
+
+declaresTypeAlias :: BindingPredicate -> Inspection
+declaresTypeAlias = containsDeclaration f
+  where f (TypeAliasDeclaration _) = True
+        f _             = False
+
+declaresTypeSignature :: BindingPredicate -> Inspection
+declaresTypeSignature = containsDeclaration f
+  where f (TypeSignature _)  = True
+        f _                  = False
 
 -- | Inspection that tells whether a binding uses the composition operator '.'
 -- in its definition
-hasComposition :: Inspection
-hasComposition = isOrContainsExpression f
+usesComposition :: Inspection
+usesComposition = containsExpression f
   where f (Variable ".") = True
         f _ = False
 
 -- | Inspection that tells whether a binding uses guards
 -- in its definition
-hasGuards :: Inspection
-hasGuards = containsBody f
+usesGuards :: Inspection
+usesGuards = containsBody f
   where f (GuardedBody _) = True
         f _ = False
 
 -- | Inspection that tells whether a binding uses ifs
 -- in its definition
-hasIf :: Inspection
-hasIf = isOrContainsExpression f
+usesIf :: Inspection
+usesIf = containsExpression f
   where f (If _ _ _) = True
         f _ = False
 
 -- | Inspection that tells whether a binding uses while
 -- in its definition
-hasWhile :: Inspection
-hasWhile = isOrContainsExpression f
+usesWhile :: Inspection
+usesWhile = containsExpression f
   where f (While _ _) = True
         f _ = False
 
 
 -- | Inspection that tells whether a binding uses a lambda expression
 -- in its definition
-hasLambda :: Inspection
-hasLambda = isOrContainsExpression f
+usesLambda :: Inspection
+usesLambda = containsExpression f
   where f (Lambda _ _) = True
         f _ = False
 
 
--- | Inspection that tells whether a binding is direct recursive
-hasDirectRecursion :: Inspection
-hasDirectRecursion = isOrContainsExpression f
-  where f e | (Just name) <- (nameOf e) = hasUsage name e
-            | otherwise = False
-
 -- | Inspection that tells whether a binding uses the the given target binding
 -- in its definition
-hasUsage :: String -> Inspection
-hasUsage target = isOrContainsExpression f
-  where f = elem target . map fst .  referencesOf
+uses :: BindingPredicate -> Inspection
+uses p = containsExpression f
+  where f = any p . map fst .  referencesOf
 
 -- | Inspection that tells whether a binding uses
 -- comprehensions - list comprehension, for comprehension, do-syntax, etc -
 -- in its definitions
-hasComprehension :: Inspection
-hasComprehension = isOrContainsExpression f
+usesComprehension :: Inspection
+usesComprehension = containsExpression f
   where f (Comprehension _ _) = True
         f _ = False
 
--- | Inspection that tells whether a top level binding exists
-hasBinding :: ScopedInspection
-hasBinding = isOrContainsDeclaration (const True)
-
-hasFunctionDeclaration :: Inspection
-hasFunctionDeclaration = isOrContainsExpression f
-  where f (FunctionDeclaration _ _) = True
-        f _  = False
-
-hasArity :: Int -> Inspection
-hasArity arity = isOrContainsExpression f
-  where f (FunctionDeclaration _ equations)  = any equationHasArity equations
-        f (ProcedureDeclaration _ equations) = any equationHasArity equations
-        f (MethodDeclaration _ equations)    = any equationHasArity equations
-        f (Lambda args _)                    = argsHaveArity args
-        f _  = False
-
-        equationHasArity = \(Equation args _) -> argsHaveArity args
-
-        argsHaveArity args = length args == arity
-
-hasTypeDeclaration :: Inspection
-hasTypeDeclaration = isOrContainsExpression f
-  where f (TypeAliasDeclaration _) = True
-        f _             = False
-
-hasTypeSignature :: Inspection
-hasTypeSignature = isOrContainsExpression f
-  where f (TypeSignature _)  = True
-        f _                  = False
-
-hasAnonymousVariable :: Inspection
-hasAnonymousVariable = isOrContainsExpression f
+usesAnnonymousVariable :: Inspection
+usesAnnonymousVariable = containsExpression f
   where f (FunctionDeclaration _ equations)    = containsWildcard equations
         f (ProcedureDeclaration _ equations)   = containsWildcard equations
         f (MethodDeclaration _ equations)      = containsWildcard equations
@@ -142,14 +150,14 @@ hasAnonymousVariable = isOrContainsExpression f
         containsWildcard = any (any (== WildcardPattern) . p)
         p (Equation params _) = params
 
-isOrContainsExpression :: (Expression -> Bool) -> Inspection
-isOrContainsExpression f = has f expressionsOf
+containsExpression :: (Expression -> Bool) -> Inspection
+containsExpression f = has f expressionsOf
 
 containsBody :: (EquationBody -> Bool)-> Inspection
 containsBody f = has f equationBodiesOf
 
-isOrContainsDeclaration :: (Expression -> Bool) -> ScopedInspection
-isOrContainsDeclaration f name  = has f (bindedDeclarationsOf name)
+containsDeclaration :: (Expression -> Bool) -> BindingPredicate -> Inspection
+containsDeclaration f b  = has f (bindedDeclarationsOf' b)
 
 -- private
 

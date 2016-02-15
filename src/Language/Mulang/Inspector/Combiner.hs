@@ -12,8 +12,9 @@ import Language.Mulang.Inspector
 import Language.Mulang.Explorer
 
 
-detect :: ScopedInspection -> Expression -> [Binding]
-detect inspection expression = filter (`inspection` expression) $ declaredBindingsOf expression
+detect :: Inspection -> Expression -> [Binding]
+detect i expression = filter (`inspection` expression) $ declaredBindingsOf expression
+                  where inspection = scoped i
 
 alternative :: Inspection -> Inspection -> Inspection
 alternative i1 i2 expression = i1 expression || i2 expression
@@ -21,13 +22,13 @@ alternative i1 i2 expression = i1 expression || i2 expression
 negative :: Inspection -> Inspection
 negative f = not . f
 
-scoped :: Inspection -> ScopedInspection
+scoped :: Inspection -> Binding -> Inspection
 scoped inspection scope expression =  any inspection (expression // scope)
 
 scopedList :: Inspection -> [Binding] -> Inspection
 scopedList i =  foldl scoped i . reverse
 
-transitive :: Inspection -> ScopedInspection
+transitive :: Inspection -> Binding -> Inspection
 transitive inspection binding code = any (`scopedInspection` code) . transitiveReferencedBindingsOf binding $ code
   where scopedInspection = scoped inspection
 
