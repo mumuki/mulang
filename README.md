@@ -183,3 +183,10 @@ And we are extending Mulang everyday, so more expectations - that is, the querie
 Mulang is just a Haskell library. You can install it though cabal.
 
 But if you are not the Haskell inclined gal or guy - ok, I will try to forgive you - this code comes with a command line too. So you don't even have to typecheck!
+
+Sample CLI usage:
+
+```
+$ mulang '{"expectations":[{"subject":["x"],"transitive":false,"negated":false,"object":{"tag":"Anyone","contents":[]},"verb":"uses"}],"code":{"content":"x = 1","language":"Haskell"}} '
+{"results":[{"result":false,"expectation":{"subject":["x"],"transitive":false,"negated":false,"object":{"tag":"Anyone","contents":[]},"verb":"uses"}}],"smells":[]}
+```
