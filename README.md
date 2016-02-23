@@ -1,8 +1,8 @@
+[![Build Status](https://travis-ci.org/mumuki/mulang.svg)](https://travis-ci.org/mumuki/mulang)
+
 Mulang
 ======
 > The Universal, Multi Language, Multi Paradigm code analyzer
-
-[![Build Status](https://travis-ci.org/mumuki/mulang.svg)](https://travis-ci.org/mumuki/mulang)
 
 ## Getting Started
 
@@ -190,3 +190,21 @@ Sample CLI usage:
 $ mulang '{"expectations":[{"subject":["x"],"transitive":false,"negated":false,"object":{"tag":"Anyone","contents":[]},"verb":"uses"}],"code":{"content":"x = 1","language":"Haskell"}} '
 {"results":[{"result":false,"expectation":{"subject":["x"],"transitive":false,"negated":false,"object":{"tag":"Anyone","contents":[]},"verb":"uses"}}],"smells":[]}
 ```
+
+## Building mulang
+To generate `mulang` executable, you have to build the project using [cabal](https://www.haskell.org/cabal/).
+
+**The first time**, you need to install [alex](https://www.haskell.org/alex/) and [happy](https://www.haskell.org/happy/), two executables that Mulang uses:
+```
+cabal install alex
+cabal install happy
+```
+
+The following times, you just need to install project dependencies and build:
+
+```
+cabal install --only-dependencies --force-reinstalls
+cabal build
+```
+
+That will generate a `mulang` executable in the folder `dist/build/mulang`.
