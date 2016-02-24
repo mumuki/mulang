@@ -1,7 +1,11 @@
 language: haskell
 before_install:
-  - cabal install alex
+- openssl aes-256-cbc -K $encrypted_70aba0a032ac_key -iv $encrypted_70aba0a032ac_iv
+  -in escualo_rsa.enc -out escualo_rsa -d
+- cabal install alex
 install:
-  - cabal install --only-dependencies --enable-tests --force-reinstalls
+- cabal install --only-dependencies --enable-tests --force-reinstalls
 script:
-  - cabal configure --enable-tests && cabal build && ./dist/build/spec/spec
+- cabal configure --enable-tests && cabal build && ./dist/build/spec/spec
+after_success:
+- wget https://raw.githubusercontent.com/mumuki/mumuki-escualo/master/travis_deploy && chmod u+x travis_deploy && ./travis_deploy mulang runners.mumuki.io
