@@ -1,6 +1,5 @@
 #!/bin/bash
 
-cabal build
 cd dist/build/mulang
 git init
 git add mulang
