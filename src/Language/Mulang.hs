@@ -34,6 +34,8 @@ data Expression
         | VariableDeclaration Identifier Expression
         | AttributeDeclaration Identifier Expression
         | ObjectDeclaration Identifier Expression
+        | RuleDeclaration Identifier
+        | FactDeclaration Identifier
         | Variable Identifier
         | Application Expression [Expression]
         | Send Expression Expression [Expression]
