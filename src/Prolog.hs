@@ -27,14 +27,16 @@ rule = do
         return $ RuleDeclaration name
 
 functor = do
-          name <- atom
-          _ <- optionMaybe $ do
-                         char '('
-                         arg <- atom
-                         char ')'
-          return (name, [])
+            name <- atom
+            _ <- optionMaybe $ do
+                           char '('
+                           args <- sepBy1 atom comma
+                           char ')'
+            return (name, [])
 
-body = functor
+body = sepBy1 functor comma
+
+comma = char ','
 
 predicate :: Parsec String a Expression
 predicate = try fact <|> rule
