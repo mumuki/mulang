@@ -21,7 +21,7 @@ fact = do
 
 rule = do
         (name, args) <- functor
-        string ":-"
+        def
         _ <- body
         dot
         return $ RuleDeclaration name
@@ -36,7 +36,15 @@ functor = do
 
 body = sepBy1 functor comma
 
-comma = char ','
+def = do
+        spaces
+        string ":-"
+        spaces
+
+comma = do
+          spaces
+          char ','
+          spaces
 
 predicate :: Parsec String a Expression
 predicate = try fact <|> rule
