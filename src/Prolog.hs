@@ -21,14 +21,14 @@ atom = many letter
 fact = do
         (name, args) <- functor
         dot
-        return $ FactDeclaration name
+        return $ FactDeclaration name []
 
 rule = do
         (name, args) <- functor
         def
         _ <- body
         dot
-        return $ RuleDeclaration name
+        return $ RuleDeclaration name [] MuNull
 
 functor = do
             name <- atom

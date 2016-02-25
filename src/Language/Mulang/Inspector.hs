@@ -11,6 +11,8 @@ module Language.Mulang.Inspector (
   uses,
   usesComprehension,
   declares,
+  declaresRule,
+  declaresFact,
   declaresFunction,
   declaresWithArity,
   declaresTypeAlias,
@@ -37,6 +39,16 @@ like = isInfixOf
 
 anyone :: BindingPredicate
 anyone = const True
+
+declaresFact :: BindingPredicate -> Inspection
+declaresFact = containsDeclaration f
+  where f (FactDeclaration _ _) = True
+        f _                     = False
+
+declaresRule :: BindingPredicate -> Inspection
+declaresRule = containsDeclaration f
+  where f (RuleDeclaration _ _ _) = True
+        f _                       = False
 
 declaresObject :: BindingPredicate -> Inspection
 declaresObject =  containsDeclaration f
@@ -73,6 +85,8 @@ declaresWithArity arity = containsDeclaration f
   where f (FunctionDeclaration _ equations)  = any equationArityIs equations
         f (ProcedureDeclaration _ equations) = any equationArityIs equations
         f (MethodDeclaration _ equations)    = any equationArityIs equations
+        f (RuleDeclaration _ args _)         = argsHaveArity args
+        f (FactDeclaration _ args)           = argsHaveArity args
         f _  = False
 
         equationArityIs = \(Equation args _) -> argsHaveArity args
