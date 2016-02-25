@@ -2,10 +2,14 @@ module Prolog where
 
 import Text.Parsec
 import Language.Mulang
+import Language.Mulang.Builder
+import Data.Either
 
+pl :: String -> Expression
 pl string | (Right v) <- parseProlog string = v
 
-parseProlog = parse program ""
+parseProlog :: String -> Either ParseError Expression
+parseProlog = fmap compact . parse program ""
 
 program :: Parsec String a [Expression]
 program = many predicate
