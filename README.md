@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/mumuki/mulang.svg)](https://travis-ci.org/mumuki/mulang)
+[![Build Status](https://travis-ci.org/mumuki/mulang.svg?branch=master)](https://travis-ci.org/mumuki/mulang)
 
 Mulang
 ======
