@@ -7,7 +7,7 @@ import           Language.Mulang.Parsers.JavaScript
 spec :: Spec
 spec = do
   describe "JS.hasRedundantLambda" $ do
-    it "is True whn η-conversion applies" $ do
+    it "is True whn etha-conversion applies" $ do
       hasRedundantLambda (js "(function(m) { return f(m) })") `shouldBe` True
 
     it "is False when it is an unavoidable lambda" $ do
