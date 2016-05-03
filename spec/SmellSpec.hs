@@ -7,10 +7,10 @@ import           Language.Mulang.Parsers.Haskell (hs)
 spec :: Spec
 spec = do
   describe "hasRedundantLambda" $ do
-    it "is True whn η-conversion applies" $ do
+    it "is True whn etha-conversion applies" $ do
       hasRedundantLambda (hs "g = map (\\m -> f m)") `shouldBe` True
 
-    it "is True whn η-conversion applies, whith composition " $ do
+    it "is True whn etha-conversion applies, whith composition " $ do
       hasRedundantLambda (hs "g = map (\\m -> (f.h) m)") `shouldBe` True
 
     it "is False when it is an unavoidable lambda" $ do
