@@ -25,23 +25,22 @@ dot = char '.'
 
 identifier = many letter
 
-atom :: Parsec String a Pattern
-atom = fmap toPattern (many letter)
-    where toPattern r
-            | isUpper .head $ r = VariablePattern r
-            | otherwise = LiteralPattern r
-
-wildcard :: Parsec String a Pattern
-wildcard = string "_" >> return WildcardPattern
-
-integral :: Parsec String a Pattern
-integral = fmap (LiteralPattern . show) parseIntegral
-
-functor :: Parsec String a Pattern
-functor = fmap (\(name, args) -> FunctorPattern name args) phead
 
 pattern :: Parsec String a Pattern
-pattern = choice [try integral, wildcard, try atom, functor]
+pattern = choice [try integral, try wildcard, other]
+  where
+    wildcard :: Parsec String a Pattern
+    wildcard = string "_" >> return WildcardPattern
+
+    integral :: Parsec String a Pattern
+    integral = fmap (LiteralPattern . show) parseIntegral
+
+    other :: Parsec String a Pattern
+    other = fmap otherToPattern phead
+
+    otherToPattern (name, []) | isUpper .head $ name = VariablePattern name
+                              | otherwise = LiteralPattern name
+    otherToPattern (name, args) = FunctorPattern name args
 
 fact :: Parsec String a Expression
 fact = do

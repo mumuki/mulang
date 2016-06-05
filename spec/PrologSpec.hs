@@ -43,7 +43,7 @@ spec = do
       pl "foo(f(bar))." `shouldBe` FactDeclaration "foo" [FunctorPattern "f" [LiteralPattern "bar"]]
 
     it "fact with functor with variables" $ do
-      pl "foo(f(X))." `shouldBe` FactDeclaration "foo" [FunctorPattern "f" [VariablePattern "bar"]]
+      pl "foo(f(X))." `shouldBe` FactDeclaration "foo" [FunctorPattern "f" [VariablePattern "X"]]
 
     it "fact with multiple variables" $ do
       pl "foo(X, Y)." `shouldBe` FactDeclaration "foo" [VariablePattern "X", VariablePattern "Y"]
