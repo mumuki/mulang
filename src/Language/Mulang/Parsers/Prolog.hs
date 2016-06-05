@@ -1,4 +1,4 @@
-module Prolog  (pl, parseProlog) where
+module Language.Mulang.Parsers.Prolog  (pl, parseProlog) where
 
 import Text.Parsec
 import Text.Parsec.Numbers

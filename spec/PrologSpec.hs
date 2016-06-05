@@ -1,8 +1,8 @@
 module PrologSpec (spec) where
 
 import           Test.Hspec
-import           Prolog
 import           Language.Mulang
+import           Language.Mulang.Parsers.Prolog
 
 spec :: Spec
 spec = do
