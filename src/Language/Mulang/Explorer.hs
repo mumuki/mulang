@@ -96,8 +96,10 @@ nameOf :: Expression -> Maybe Binding
 nameOf = fmap fst . extractDeclaration
 
 extractReference :: Expression -> Maybe (Binding, Expression)
-extractReference e@(Variable    q) = Just (q, e)
-extractReference _                 = Nothing
+extractReference e@(Variable n)  = Just (n, e)
+extractReference e@(Consult n _) = Just (n, e)
+extractReference _               = Nothing
+
 
 extractDeclaration :: Expression -> Maybe (Binding, Expression)
 extractDeclaration e@(TypeSignature n)         = Just (n, e)
