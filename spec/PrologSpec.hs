@@ -14,7 +14,7 @@ spec = do
       pl "foo(bar)." `shouldBe` FactDeclaration "foo" [LiteralPattern "bar"]
 
     it "literal integer" $ do
-      pl "foo(3)." `shouldBe` FactDeclaration "foo" [LiteralPattern "3"]
+      pl "foo(3)." `shouldBe` FactDeclaration "foo" [LiteralPattern "3.0"]
 
     it "literal float" $ do
       pl "foo(3.4)." `shouldBe` FactDeclaration "foo" [LiteralPattern "3.4"]

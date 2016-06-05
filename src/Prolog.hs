@@ -27,13 +27,13 @@ identifier = many letter
 
 
 pattern :: Parsec String a Pattern
-pattern = choice [try integral, try wildcard, other]
+pattern = choice [try number, try wildcard, other]
   where
     wildcard :: Parsec String a Pattern
     wildcard = string "_" >> return WildcardPattern
 
-    integral :: Parsec String a Pattern
-    integral = fmap (LiteralPattern . show) parseIntegral
+    number :: Parsec String a Pattern
+    number = fmap (LiteralPattern . show) parseFloat
 
     other :: Parsec String a Pattern
     other = fmap otherToPattern phead
