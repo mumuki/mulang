@@ -37,25 +37,28 @@ wildcard = string "_" >> return WildcardPattern
 integral :: Parsec String a Pattern
 integral = fmap (LiteralPattern . show) parseIntegral
 
+functor :: Parsec String a Pattern
+functor = fmap (\(name, args) -> FunctorPattern name args) phead
+
 pattern :: Parsec String a Pattern
-pattern = choice [try integral, wildcard, atom]
+pattern = choice [try integral, wildcard, try atom, functor]
 
 fact :: Parsec String a Expression
 fact = do
-        (name, args) <- functor
+        (name, args) <- phead
         dot
         return $ FactDeclaration name args
 
 rule :: Parsec String a Expression
 rule = do
-        (name, args) <- functor
+        (name, args) <- phead
         def
-        _ <- body
+        b <- body
         dot
-        return $ RuleDeclaration name args []
+        return $ RuleDeclaration name args (map (\(name, args) -> Consult name args) b)
 
-functor :: Parsec String a (Identifier, [Pattern])
-functor = do
+phead :: Parsec String a (Identifier, [Pattern])
+phead = do
             name <- identifier
             args <- rawPatternsList
             return (name, concat.maybeToList $ args)
@@ -66,7 +69,7 @@ rawPatternsList = optionMaybe $ do
                  char ')'
                  return args
 
-body = sepBy1 functor comma
+body = sepBy1 phead comma
 
 def = do
         spaces
