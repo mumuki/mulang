@@ -31,8 +31,35 @@ spec = do
       it "is True when predicate is used" $ do
         (uses (named "bar") `scoped` "foo") (pl "foo(X) :- bar(X).") `shouldBe` True
 
+      it "is True when predicate is used in not, unscoped" $ do
+        uses (named "bar") (pl "foo(X) :- not(bar(X)).") `shouldBe` True
+
+      it "is True when predicate is used in forall, unscoped" $ do
+        uses (named "bar") (pl "foo(X) :- forall(bar(X), baz(X)).") `shouldBe` True
+        uses (named "baz") (pl "foo(X) :- forall(bar(X), baz(X)).") `shouldBe` True
+
       it "is False when predicate is not used" $ do
         (uses (named "bar") `scoped` "foo") (pl "foo(X) :- baz(X).") `shouldBe` False
+
+    describe "usesForall" $ do
+      it "is True when used, unscuped" $ do
+        usesForall (pl "foo(X) :- forall(f(x), y(X)).") `shouldBe` True
+
+      it "is True when used" $ do
+        (usesForall `scoped` "foo") (pl "foo(X) :- forall(bar(X), g(X)).") `shouldBe` True
+
+      it "is False when not used" $ do
+        usesForall (pl "foo(X) :- bar(X), baz(X).") `shouldBe` False
+
+    describe "usesNot" $ do
+      it "is True when used, unscoped" $ do
+        usesNot (pl "foo(X) :- not(f(x)).") `shouldBe` True
+
+      it "is True when used" $ do
+        (usesNot `scoped` "foo") (pl "foo(X) :- not(g(X)).") `shouldBe` True
+
+      it "is False when not used" $ do
+        usesNot (pl "foo(X) :- bar(X), baz(X).") `shouldBe` False
 
     describe "usesAnnonymousVariable" $ do
       it "is True when _ is used in rule" $ do

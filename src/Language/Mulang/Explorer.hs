@@ -45,6 +45,8 @@ expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
     subExpressions (While e1 e2)                      = [e1, e2]
     subExpressions (Match e1 equations)               = e1:expressionsOfEquations equations
     subExpressions (Comprehension a _)                = [a] --TODO
+    subExpressions (Not e)                 = [e]
+    subExpressions (Forall e1 e2)           = [e1, e2]
     subExpressions (Return v)                         = [v]
     subExpressions (Sequence es)                      = es
     subExpressions (MuObject es)                      = [es]
@@ -97,7 +99,7 @@ nameOf = fmap fst . extractDeclaration
 
 extractReference :: Expression -> Maybe (Binding, Expression)
 extractReference e@(Variable n)  = Just (n, e)
-extractReference e@(Consult n _) = Just (n, e)
+extractReference e@(Exist n _) = Just (n, e)
 extractReference _               = Nothing
 
 

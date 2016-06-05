@@ -52,9 +52,9 @@ rule :: Parsec String a Expression
 rule = do
         (name, args) <- phead
         def
-        b <- body
+        consults <- body
         dot
-        return $ RuleDeclaration name args (map (\(name, args) -> Consult name args) b)
+        return $ RuleDeclaration name args consults
 
 phead :: Parsec String a (Identifier, [Pattern])
 phead = do
@@ -62,19 +62,41 @@ phead = do
             args <- rawPatternsList
             return (name, concat.maybeToList $ args)
 
+forall = do
+          string "forall"
+          openParen
+          c1 <- consult
+          comma
+          c2 <- consult
+          closeParen
+          return $ Forall c1 c2
+pnot = do
+          string "not"
+          openParen
+          c <- consult
+          closeParen
+          return $ Not c
+
+exist = fmap (\(name, args) -> Exist name args) phead
+
+consult = choice [try forall, try pnot, exist]
+
 rawPatternsList = optionMaybe $ do
-                 char '('
+                 openParen
                  args <- sepBy1 pattern comma
-                 char ')'
+                 closeParen
                  return args
 
-body = sepBy1 phead comma
+body = sepBy1 consult comma
+
 
 def = do
         spaces
         string ":-"
         spaces
 
+openParen = char '('
+closeParen = char ')'
 comma = do
           spaces
           char ','

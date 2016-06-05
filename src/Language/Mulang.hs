@@ -37,7 +37,9 @@ data Expression
         | ObjectDeclaration Identifier Expression
         | RuleDeclaration Identifier [Pattern] [Expression]
         | FactDeclaration Identifier [Pattern]
-        | Consult Identifier [Pattern]
+        | Exist Identifier [Pattern]
+        | Not Expression
+        | Forall Expression Expression
         | Variable Identifier
         | Application Expression [Expression]
         | Send Expression Expression [Expression]

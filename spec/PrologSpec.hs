@@ -31,13 +31,13 @@ spec = do
       pl "foo(bar,baz)." `shouldBe` FactDeclaration "foo" [LiteralPattern "bar", LiteralPattern "baz"]
 
     it "simplest rule/1" $ do
-      pl "baz(bar):-foo." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Consult "foo" []]
+      pl "baz(bar):-foo." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" []]
 
     it "simplest rule/0" $ do
-      pl "baz:-foo." `shouldBe` RuleDeclaration "baz" [] [Consult "foo" []]
+      pl "baz:-foo." `shouldBe` RuleDeclaration "baz" [] [Exist "foo" []]
 
     it "simplest rule/1 with condition/1" $ do
-      pl "baz(bar):-foo(bar)." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Consult "foo" [LiteralPattern "bar"]]
+      pl "baz(bar):-foo(bar)." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"]]
 
     it "fact with functors" $ do
       pl "foo(f(bar))." `shouldBe` FactDeclaration "foo" [FunctorPattern "f" [LiteralPattern "bar"]]
@@ -50,26 +50,38 @@ spec = do
 
     it "multiple rules" $ do
       pl "baz(bar) :- foo(bar).foo(bar) :- bar(bar)." `shouldBe` Sequence [
-                                                                      RuleDeclaration "baz" [LiteralPattern "bar"] [Consult "foo" [LiteralPattern "bar"]],
-                                                                      RuleDeclaration "foo" [LiteralPattern "bar"] [Consult "bar" [LiteralPattern "bar"]]]
+                                                                      RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"]],
+                                                                      RuleDeclaration "foo" [LiteralPattern "bar"] [Exist "bar" [LiteralPattern "bar"]]]
 
     it "simplest rule/2 with condition/2" $ do
-      pl "baz(bar,fux):-foo(bar,goo)." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar", LiteralPattern "fux"] [Consult "foo" [LiteralPattern "bar", LiteralPattern "goo"]]
+      pl "baz(bar,fux):-foo(bar,goo)." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar", LiteralPattern "fux"] [Exist "foo" [LiteralPattern "bar", LiteralPattern "goo"]]
+
+    it "rule/1 with not" $ do
+      pl "baz(X):-not(bar(X))." `shouldBe` RuleDeclaration "baz" [VariablePattern "X"] [Not (Exist "bar" [VariablePattern "X"])]
+
+    it "rule/1 with forall" $ do
+      pl "baz(X):- forall(bar(X), bar(X))." `shouldBe` RuleDeclaration "baz" [VariablePattern "X"] [Forall (Exist "bar" [VariablePattern "X"]) (Exist "bar" [VariablePattern "X"])]
+
+    it "rule/1 with compare" $ do
+      pl "baz(X):- X > 4." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"]]
+
+    it "rule/1 with is" $ do
+      pl "baz(X):- X is 4 + mod(4)." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"]]
 
     it "rule/1 with multiple conditions" $ do
-      pl "baz(bar):-foo(bar),goo(bar)." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Consult "foo" [LiteralPattern "bar"],Consult "goo" [LiteralPattern "bar"]]
+      pl "baz(bar):-foo(bar),goo(bar)." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"]]
 
     it "rule/1 with multiple mixed conditions" $ do
-      pl "baz(bar):-foo(bar),goo(bar),baz." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Consult "foo" [LiteralPattern "bar"],Consult "goo" [LiteralPattern "bar"],Consult "baz" []]
+      pl "baz(bar):-foo(bar),goo(bar),baz." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"],Exist "baz" []]
 
     it "rule/1 with whitespeces among coditions" $ do
-      pl "baz(bar):-foo(bar) , goo(bar), baz." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Consult "foo" [LiteralPattern "bar"],Consult "goo" [LiteralPattern "bar"],Consult "baz" []]
+      pl "baz(bar):-foo(bar) , goo(bar), baz." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"],Exist "baz" []]
 
     it "rule/1 with whitespeces among individuals" $ do
-      pl "baz(bar):-foo(bar, baz) , goo(bar), baz." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Consult "foo" [LiteralPattern "bar",LiteralPattern "baz"],Consult "goo" [LiteralPattern "bar"],Consult "baz" []]
+      pl "baz(bar):-foo(bar, baz) , goo(bar), baz." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar",LiteralPattern "baz"],Exist "goo" [LiteralPattern "bar"],Exist "baz" []]
 
     it "rule/1 with multiple whitespaces" $ do
       pl "baz(bar) :-\n\
           \    foo(bar),\n\
           \    goo(bar),\n\
-          \    baz." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Consult "foo" [LiteralPattern "bar"],Consult "goo" [LiteralPattern "bar"],Consult "baz" []]
+          \    baz." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"],Exist "baz" []]
