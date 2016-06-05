@@ -84,6 +84,7 @@ declaresWithArity :: Int -> BindingPredicate -> Inspection
 declaresWithArity arity = containsDeclaration f
   where f (FunctionDeclaration _ equations)  = any equationArityIs equations
         f (ProcedureDeclaration _ equations) = any equationArityIs equations
+        f (ProcedureDeclaration _ equations) = any equationArityIs equations
         f (MethodDeclaration _ equations)    = any equationArityIs equations
         f (RuleDeclaration _ args _)         = argsHaveArity args
         f (FactDeclaration _ args)           = argsHaveArity args
@@ -156,12 +157,15 @@ usesComprehension = containsExpression f
 
 usesAnnonymousVariable :: Inspection
 usesAnnonymousVariable = containsExpression f
-  where f (FunctionDeclaration _ equations)    = containsWildcard equations
-        f (ProcedureDeclaration _ equations)   = containsWildcard equations
-        f (MethodDeclaration _ equations)      = containsWildcard equations
---TODO        f (Lambda args _)                      = containsWildcard equations
+  where f (FunctionDeclaration _ equations)    = equationContainsWildcard equations
+        f (ProcedureDeclaration _ equations)   = equationContainsWildcard equations
+        f (MethodDeclaration _ equations)      = equationContainsWildcard equations
+--TODO        f (Lambda args _)                      = equationContainsWildcard equations
+        f (FactDeclaration _ args)             = containsWildcard args
+        f (RuleDeclaration _ args _)           = containsWildcard args
         f _                                    = False
-        containsWildcard = any (any (== WildcardPattern) . p)
+        equationContainsWildcard = any (containsWildcard . p)
+        containsWildcard = any (== WildcardPattern)
         p (Equation params _) = params
 
 containsExpression :: (Expression -> Bool) -> Inspection

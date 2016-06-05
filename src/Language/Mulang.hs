@@ -20,6 +20,7 @@ data EquationBody
          | GuardedBody  [(Expression, Expression)]
   deriving (Eq, Show, Read, Generic)
 
+
 -- expression or statement
 -- may have effects
 data Expression
@@ -34,8 +35,9 @@ data Expression
         | VariableDeclaration Identifier Expression
         | AttributeDeclaration Identifier Expression
         | ObjectDeclaration Identifier Expression
-        | RuleDeclaration Identifier [Expression] Expression
-        | FactDeclaration Identifier [Expression]
+        | RuleDeclaration Identifier [Pattern] [Expression]
+        | FactDeclaration Identifier [Pattern]
+        | Consult Identifier [Pattern]
         | Variable Identifier
         | Application Expression [Expression]
         | Send Expression Expression [Expression]
@@ -54,6 +56,7 @@ data Expression
         | MuNumber Double                                      -- any number
         | MuBool Bool
         | MuString String
+        | MuSymbol String
         | MuTuple [Expression]
         | MuList [Expression]
   deriving (Eq, Show, Read, Generic)
@@ -65,6 +68,7 @@ data Pattern
         | ApplicationPattern String [Pattern]        -- ^ data constructor and argument
         | TuplePattern [Pattern]              -- ^ tuple pattern
         | ListPattern [Pattern]               -- ^ list pattern
+        | FunctorPattern String [Pattern]
         | AsPattern String Pattern         -- ^ @\@@-pattern
         | WildcardPattern                   -- ^ wildcard pattern (@_@)
         | OtherPattern

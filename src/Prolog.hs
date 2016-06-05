@@ -28,7 +28,7 @@ rule = do
         def
         _ <- body
         dot
-        return $ RuleDeclaration name [] MuNull
+        return $ RuleDeclaration name [] []
 
 functor = do
             name <- atom
