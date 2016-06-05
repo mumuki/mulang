@@ -36,6 +36,9 @@ spec = do
     it "simplest rule/0" $ do
       pl "baz:-foo." `shouldBe` RuleDeclaration "baz" [] [Exist "foo" []]
 
+    it "whitespaces are ignored/0" $ do
+      pl "baz:-foo(X), baz(X,Y)." `shouldBe` (pl "baz :- foo( X) ,baz( X , Y) .")
+
     it "simplest rule/1 with condition/1" $ do
       pl "baz(bar):-foo(bar)." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"]]
 
@@ -63,10 +66,13 @@ spec = do
       pl "baz(X):- forall(bar(X), bar(X))." `shouldBe` RuleDeclaration "baz" [VariablePattern "X"] [Forall (Exist "bar" [VariablePattern "X"]) (Exist "bar" [VariablePattern "X"])]
 
     it "rule/1 with compare" $ do
-      pl "baz(X):- X > 4." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"]]
+      pl "baz(X):- X > 4." `shouldBe`  RuleDeclaration "baz" [VariablePattern "X"] [Exist ">" [VariablePattern "X",LiteralPattern "4.0"]]
 
-    it "rule/1 with is" $ do
-      pl "baz(X):- X is 4 + mod(4)." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"]]
+    it "rule/1 with distinct" $ do
+      pl "baz(X):- X \\= 4." `shouldBe` RuleDeclaration "baz" [VariablePattern "X"] [Exist "\\=" [VariablePattern "X",LiteralPattern "4.0"]]
+
+    it "rule/1 with simple is" $ do
+      pl "baz(X):- X is 4." `shouldBe` RuleDeclaration "baz" [VariablePattern "X"] [Exist "is" [VariablePattern "X",LiteralPattern "4.0"]]
 
     it "rule/1 with multiple conditions" $ do
       pl "baz(bar):-foo(bar),goo(bar)." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"]]

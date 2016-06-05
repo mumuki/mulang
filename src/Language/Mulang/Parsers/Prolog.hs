@@ -79,7 +79,15 @@ pnot = do
 
 exist = fmap (\(name, args) -> Exist name args) phead
 
-consult = choice [try forall, try pnot, exist]
+pinfix = do
+            p1 <- pattern
+            spaces
+            operator <- choice . map string $ ["is", ">", "<", ">=", "=<", "\\="]
+            spaces
+            p2 <- pattern
+            return $ Exist operator [p1, p2]
+
+consult = choice [try forall, try pnot, try pinfix, exist]
 
 rawPatternsList = optionMaybe $ do
                  openParen
@@ -95,12 +103,9 @@ def = do
         string ":-"
         spaces
 
-openParen = char '('
-closeParen = char ')'
-comma = do
-          spaces
-          char ','
-          spaces
+openParen = char '(' >> spaces
+closeParen = char ')' >> spaces
+comma = spaces >> char ',' >> spaces
 
 predicate :: Parsec String a Expression
 predicate = try fact <|> rule
