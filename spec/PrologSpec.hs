@@ -13,6 +13,15 @@ spec = do
     it "simplest fact/1" $ do
       pl "foo(bar)." `shouldBe` FactDeclaration "foo" [LiteralPattern "bar"]
 
+    it "literal integer" $ do
+      pl "foo(3)." `shouldBe` FactDeclaration "foo" [LiteralPattern "3"]
+
+    it "literal float" $ do
+      pl "foo(3.4)." `shouldBe` FactDeclaration "foo" [LiteralPattern "3.4"]
+
+    it "wildcard" $ do
+      pl "foo(_)." `shouldBe` FactDeclaration "foo" [WildcardPattern]
+
     it "multiple facts" $ do
       pl "foo(bar).baz(bar)." `shouldBe` Sequence [
                                             FactDeclaration "foo" [LiteralPattern "bar"],

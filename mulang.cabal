@@ -23,7 +23,8 @@ executable mulang
     haskell-src               >= 1       && < 1.1,
     language-javascript       >= 0.5.14  && <= 0.5.15,
     aeson                     == 0.8.1.1,
-    parsec                    == 3.1.9
+    parsec                    == 3.1.9,
+    ParsecTools               >= 0.0.2.0
   build-tools:
     happy,
     alex
@@ -71,7 +72,8 @@ library
     haskell-src               >= 1       && < 1.1,
     language-javascript       >= 0.5.14  && <= 0.5.15,
     aeson                     == 0.8.1.1,
-    parsec                    == 3.1.9
+    parsec                    == 3.1.9,
+    ParsecTools               >= 0.0.2.0
 
   build-tools:
     happy,
@@ -97,6 +99,7 @@ test-suite spec
     haskell-src               >= 1     && < 1.1,
     language-javascript       >= 0.5.14  && <= 0.5.15,
     parsec                    == 3.1.9,
+    ParsecTools               >= 0.0.2.0,
     hspec                     >= 2     && < 3,
     mulang
   build-tools:

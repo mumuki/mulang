@@ -1,6 +1,9 @@
-module Prolog where
+module Prolog  (pl, parseProlog) where
 
 import Text.Parsec
+import Text.Parsec.Numbers
+import Text.ParserCombinators.Parsec.Prim (GenParser)
+
 import Language.Mulang
 import Language.Mulang.Builder
 import Data.Either
@@ -8,7 +11,9 @@ import Data.Maybe (maybeToList)
 import Data.Char (isUpper)
 
 pl :: String -> Expression
-pl string | (Right v) <- parseProlog string = v
+pl string = case parseProlog string  of
+          (Right v) -> v
+          (Left m)  -> error.show $ m
 
 parseProlog :: String -> Either ParseError Expression
 parseProlog = fmap compact . parse program ""
@@ -18,34 +23,48 @@ program = many predicate
 
 dot = char '.'
 
-atom = many letter
+identifier = many letter
 
+atom :: Parsec String a Pattern
+atom = fmap toPattern (many letter)
+    where toPattern r
+            | isUpper .head $ r = VariablePattern r
+            | otherwise = LiteralPattern r
+
+wildcard :: Parsec String a Pattern
+wildcard = string "_" >> return WildcardPattern
+
+integral :: Parsec String a Pattern
+integral = fmap (LiteralPattern . show) parseIntegral
+
+pattern :: Parsec String a Pattern
+pattern = choice [try integral, wildcard, atom]
+
+fact :: Parsec String a Expression
 fact = do
         (name, args) <- functor
         dot
-        return $ FactDeclaration name (map rawPatternToPattern args)
+        return $ FactDeclaration name args
 
+rule :: Parsec String a Expression
 rule = do
         (name, args) <- functor
         def
         _ <- body
         dot
-        return $ RuleDeclaration name (map rawPatternToPattern args) []
+        return $ RuleDeclaration name args []
 
+functor :: Parsec String a (Identifier, [Pattern])
 functor = do
-            name <- atom
+            name <- identifier
             args <- rawPatternsList
             return (name, concat.maybeToList $ args)
 
 rawPatternsList = optionMaybe $ do
                  char '('
-                 args <- sepBy1 atom comma
+                 args <- sepBy1 pattern comma
                  char ')'
                  return args
-
-rawPatternToPattern r
-        | isUpper .head $ r = VariablePattern r
-        | otherwise = LiteralPattern r
 
 body = sepBy1 functor comma
 

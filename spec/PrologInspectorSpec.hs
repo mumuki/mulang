@@ -11,11 +11,11 @@ spec = do
   describe "inspector" $ do
     describe "declaresFact" $ do
       it "is True when fact is declared" $ do
-        declaresFact (named "foo") (pl "foo(3).") `shouldBe` True
+        declaresFact (named "foo") (pl "foo(a).") `shouldBe` True
 
       it "is False when fact is not declared" $ do
-        declaresFact (named "baz") (pl "foo(5) :- bar(X).") `shouldBe` False
-        declaresFact (named "foo") (pl "foo(5).") `shouldBe` False
+        declaresFact (named "foo") (pl "foo(a) :- bar(X).") `shouldBe` False
+        declaresFact (named "baz") (pl "foo(a).") `shouldBe` False
 
     describe "declaresRule" $ do
       it "is True when rule is declared" $ do
@@ -32,7 +32,7 @@ spec = do
         usesAnnonymousVariable (pl "foo(_).") `shouldBe` True
 
       it "is False when _ is not used" $ do
-        usesAnnonymousVariable (pl "foo(4).") `shouldBe` False
+        usesAnnonymousVariable (pl "foo(a).") `shouldBe` False
 
     describe "declaresPredicate" $ do
       it "is True when rule is declared" $ do
