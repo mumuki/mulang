@@ -14,19 +14,21 @@ spec = do
       pl "foo(bar)." `shouldBe` FactDeclaration "foo" [LiteralPattern "bar"]
 
     it "multiple facts" $ do
-      pl "foo(bar).baz(bar)." `shouldBe` Sequence [FactDeclaration "foo" [],FactDeclaration "baz" []]
+      pl "foo(bar).baz(bar)." `shouldBe` Sequence [
+                                            FactDeclaration "foo" [LiteralPattern "bar"],
+                                            FactDeclaration "baz" [LiteralPattern "bar"]]
 
     it "simplest fact/2" $ do
-      pl "foo(bar,baz)." `shouldBe` FactDeclaration "foo" []
+      pl "foo(bar,baz)." `shouldBe` FactDeclaration "foo" [LiteralPattern "bar", LiteralPattern "baz"]
 
     it "simplest rule/1" $ do
-      pl "baz(bar):-foo." `shouldBe` RuleDeclaration "baz" [] []
+      pl "baz(bar):-foo." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] []
 
     it "simplest rule/0" $ do
       pl "baz:-foo." `shouldBe` RuleDeclaration "baz" [] []
 
     it "simplest rule/1 with condition/1" $ do
-      pl "baz(bar):-foo(bar)." `shouldBe` RuleDeclaration "baz" [] []
+      pl "baz(bar):-foo(bar)." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] []
 
     it "fact with functors" $ do
       pl "foo(f(bar))." `shouldBe` FactDeclaration "foo" [FunctorPattern "f" [LiteralPattern "bar"]]
@@ -39,26 +41,26 @@ spec = do
 
     it "multiple rules" $ do
       pl "baz(bar) :- foo(bar).foo(bar) :- bar(bar)." `shouldBe` Sequence [
-                                                                      RuleDeclaration "baz" [] [],
-                                                                      RuleDeclaration "foo" [] []]
+                                                                      RuleDeclaration "baz" [LiteralPattern "bar"] [],
+                                                                      RuleDeclaration "foo" [LiteralPattern "bar"] []]
 
     it "simplest rule/2 with condition/2" $ do
-      pl "baz(bar,fux):-foo(bar,goo)." `shouldBe` RuleDeclaration "baz" [] []
+      pl "baz(bar,fux):-foo(bar,goo)." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar", LiteralPattern "fux"] []
 
     it "rule/1 with multiple conditions" $ do
-      pl "baz(bar):-foo(bar),goo(bar)." `shouldBe` RuleDeclaration "baz" [] []
+      pl "baz(bar):-foo(bar),goo(bar)." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] []
 
     it "rule/1 with multiple mixed conditions" $ do
-      pl "baz(bar):-foo(bar),goo(bar),baz." `shouldBe` RuleDeclaration "baz" [] []
+      pl "baz(bar):-foo(bar),goo(bar),baz." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] []
 
     it "rule/1 with whitespeces among coditions" $ do
-      pl "baz(bar):-foo(bar) , goo(bar), baz." `shouldBe` RuleDeclaration "baz" [] []
+      pl "baz(bar):-foo(bar) , goo(bar), baz." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] []
 
     it "rule/1 with whitespeces among individuals" $ do
-      pl "baz(bar):-foo(bar, baz) , goo(bar), baz." `shouldBe` RuleDeclaration "baz" [] []
+      pl "baz(bar):-foo(bar, baz) , goo(bar), baz." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] []
 
     it "rule/1 with multiple whitespaces" $ do
       pl "baz(bar) :-\n\
           \    foo(bar),\n\
           \    goo(bar),\n\
-          \    baz." `shouldBe` RuleDeclaration "baz" [] []
+          \    baz." `shouldBe` RuleDeclaration "baz" [LiteralPattern "bar"] []

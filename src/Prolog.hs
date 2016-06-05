@@ -4,6 +4,8 @@ import Text.Parsec
 import Language.Mulang
 import Language.Mulang.Builder
 import Data.Either
+import Data.Maybe (maybeToList)
+import Data.Char (isUpper)
 
 pl :: String -> Expression
 pl string | (Right v) <- parseProlog string = v
@@ -21,22 +23,29 @@ atom = many letter
 fact = do
         (name, args) <- functor
         dot
-        return $ FactDeclaration name []
+        return $ FactDeclaration name (map rawPatternToPattern args)
 
 rule = do
         (name, args) <- functor
         def
         _ <- body
         dot
-        return $ RuleDeclaration name [] []
+        return $ RuleDeclaration name (map rawPatternToPattern args) []
 
 functor = do
             name <- atom
-            _ <- optionMaybe $ do
-                           char '('
-                           args <- sepBy1 atom comma
-                           char ')'
-            return (name, [])
+            args <- rawPatternsList
+            return (name, concat.maybeToList $ args)
+
+rawPatternsList = optionMaybe $ do
+                 char '('
+                 args <- sepBy1 atom comma
+                 char ')'
+                 return args
+
+rawPatternToPattern r
+        | isUpper .head $ r = VariablePattern r
+        | otherwise = LiteralPattern r
 
 body = sepBy1 functor comma
 
