@@ -34,6 +34,7 @@ expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
     subExpressions (VariableDeclaration _ v)          = [v]
     subExpressions (FunctionDeclaration _ equations)  = expressionsOfEquations equations
     subExpressions (ProcedureDeclaration _ equations) = expressionsOfEquations equations
+    subExpressions (RuleDeclaration _ _ es)           = es
     subExpressions (MethodDeclaration _ equations)    = expressionsOfEquations equations
     subExpressions (AttributeDeclaration _ v)         = [v]
     subExpressions (ObjectDeclaration _ v)            = [v]
@@ -44,6 +45,8 @@ expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
     subExpressions (While e1 e2)                      = [e1, e2]
     subExpressions (Match e1 equations)               = e1:expressionsOfEquations equations
     subExpressions (Comprehension a _)                = [a] --TODO
+    subExpressions (Not e)                 = [e]
+    subExpressions (Forall e1 e2)           = [e1, e2]
     subExpressions (Return v)                         = [v]
     subExpressions (Sequence es)                      = es
     subExpressions (MuObject es)                      = [es]
@@ -95,8 +98,10 @@ nameOf :: Expression -> Maybe Binding
 nameOf = fmap fst . extractDeclaration
 
 extractReference :: Expression -> Maybe (Binding, Expression)
-extractReference e@(Variable    q) = Just (q, e)
-extractReference _                 = Nothing
+extractReference e@(Variable n)  = Just (n, e)
+extractReference e@(Exist n _) = Just (n, e)
+extractReference _               = Nothing
+
 
 extractDeclaration :: Expression -> Maybe (Binding, Expression)
 extractDeclaration e@(TypeSignature n)         = Just (n, e)
@@ -104,6 +109,8 @@ extractDeclaration e@(TypeAliasDeclaration n ) = Just (n, e)
 extractDeclaration e@(VariableDeclaration n _) = Just (n, e)
 extractDeclaration e@(FunctionDeclaration n _) = Just (n, e)
 extractDeclaration e@(RecordDeclaration n)     = Just (n, e)
+extractDeclaration e@(FactDeclaration n _)     = Just (n, e)
+extractDeclaration e@(RuleDeclaration n _ _)   = Just (n, e)
 extractDeclaration e@(ProcedureDeclaration n _)= Just (n, e)
 extractDeclaration e@(ObjectDeclaration n _)   = Just (n, e)
 extractDeclaration e@(MethodDeclaration n _)   = Just (n, e)

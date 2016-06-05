@@ -22,8 +22,9 @@ executable mulang
     bytestring                == 0.10.6.0,
     haskell-src               >= 1       && < 1.1,
     language-javascript       >= 0.5.14  && <= 0.5.15,
-    aeson                     == 0.8.1.1
-
+    aeson                     == 0.8.1.1,
+    parsec                    == 3.1.9,
+    ParsecTools               >= 0.0.2.0
   build-tools:
     happy,
     alex
@@ -46,6 +47,7 @@ library
       -fno-warn-missing-signatures
       -fno-warn-orphans
       -fno-warn-name-shadowing
+      -fno-warn-unused-do-bind
   hs-source-dirs:
       src
   exposed-modules:
@@ -55,8 +57,10 @@ library
     Language.Mulang.Explorer
     Language.Mulang.Inspector.Smell
     Language.Mulang.Inspector.Combiner
+    Language.Mulang.Inspector.Extras
     Language.Mulang.Inspector
     Language.Mulang.Parsers.Haskell
+    Language.Mulang.Parsers.Prolog
     Language.Mulang.Parsers.Json
     Language.Mulang.Parsers.JavaScript
     Language.Mulang.Cli.Compiler
@@ -67,7 +71,10 @@ library
     bytestring                == 0.10.6.0,
     haskell-src               >= 1       && < 1.1,
     language-javascript       >= 0.5.14  && <= 0.5.15,
-    aeson                     == 0.8.1.1
+    aeson                     == 0.8.1.1,
+    parsec                    == 3.1.9,
+    ParsecTools               >= 0.0.2.0
+
   build-tools:
     happy,
     alex
@@ -80,6 +87,7 @@ test-suite spec
       -fno-warn-missing-signatures
       -fno-warn-orphans
       -fno-warn-name-shadowing
+      -fno-warn-unused-do-bind
   hs-source-dirs:
       spec
   main-is:
@@ -90,6 +98,8 @@ test-suite spec
     aeson                     == 0.8.1.1,
     haskell-src               >= 1     && < 1.1,
     language-javascript       >= 0.5.14  && <= 0.5.15,
+    parsec                    == 3.1.9,
+    ParsecTools               >= 0.0.2.0,
     hspec                     >= 2     && < 3,
     mulang
   build-tools:

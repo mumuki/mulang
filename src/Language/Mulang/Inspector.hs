@@ -7,10 +7,14 @@ module Language.Mulang.Inspector (
   usesIf,
   usesWhile,
   usesLambda,
+  usesNot,
+  usesForall,
   declaresRecursively,
   uses,
   usesComprehension,
   declares,
+  declaresRule,
+  declaresFact,
   declaresFunction,
   declaresWithArity,
   declaresTypeAlias,
@@ -37,6 +41,16 @@ like = isInfixOf
 
 anyone :: BindingPredicate
 anyone = const True
+
+declaresFact :: BindingPredicate -> Inspection
+declaresFact = containsDeclaration f
+  where f (FactDeclaration _ _) = True
+        f _                     = False
+
+declaresRule :: BindingPredicate -> Inspection
+declaresRule = containsDeclaration f
+  where f (RuleDeclaration _ _ _) = True
+        f _                       = False
 
 declaresObject :: BindingPredicate -> Inspection
 declaresObject =  containsDeclaration f
@@ -72,7 +86,10 @@ declaresWithArity :: Int -> BindingPredicate -> Inspection
 declaresWithArity arity = containsDeclaration f
   where f (FunctionDeclaration _ equations)  = any equationArityIs equations
         f (ProcedureDeclaration _ equations) = any equationArityIs equations
+        f (ProcedureDeclaration _ equations) = any equationArityIs equations
         f (MethodDeclaration _ equations)    = any equationArityIs equations
+        f (RuleDeclaration _ args _)         = argsHaveArity args
+        f (FactDeclaration _ args)           = argsHaveArity args
         f _  = False
 
         equationArityIs = \(Equation args _) -> argsHaveArity args
@@ -126,6 +143,17 @@ usesLambda = containsExpression f
         f _ = False
 
 
+usesNot :: Inspection
+usesNot = containsExpression f
+  where f (Not  _) = True
+        f _ = False
+
+usesForall :: Inspection
+usesForall = containsExpression f
+  where f (Forall  _ _) = True
+        f _ = False
+
+
 -- | Inspection that tells whether a binding uses the the given target binding
 -- in its definition
 uses :: BindingPredicate -> Inspection
@@ -142,12 +170,15 @@ usesComprehension = containsExpression f
 
 usesAnnonymousVariable :: Inspection
 usesAnnonymousVariable = containsExpression f
-  where f (FunctionDeclaration _ equations)    = containsWildcard equations
-        f (ProcedureDeclaration _ equations)   = containsWildcard equations
-        f (MethodDeclaration _ equations)      = containsWildcard equations
---TODO        f (Lambda args _)                      = containsWildcard equations
+  where f (FunctionDeclaration _ equations)    = equationContainsWildcard equations
+        f (ProcedureDeclaration _ equations)   = equationContainsWildcard equations
+        f (MethodDeclaration _ equations)      = equationContainsWildcard equations
+--TODO        f (Lambda args _)                      = equationContainsWildcard equations
+        f (FactDeclaration _ args)             = containsWildcard args
+        f (RuleDeclaration _ args _)           = containsWildcard args
         f _                                    = False
-        containsWildcard = any (any (== WildcardPattern) . p)
+        equationContainsWildcard = any (containsWildcard . p)
+        containsWildcard = any (== WildcardPattern)
         p (Equation params _) = params
 
 containsExpression :: (Expression -> Bool) -> Inspection
