@@ -3,6 +3,7 @@ module SmellSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Inspector.Smell
 import           Language.Mulang.Parsers.Haskell (hs)
+import           Language.Mulang.Parsers.Prolog (pl)
 
 spec :: Spec
 spec = do
@@ -62,3 +63,9 @@ spec = do
 
     it "is False when no comparison" $ do
       hasRedundantBooleanComparison (hs "f x = True") `shouldBe` False
+  describe "hasUnifyOperator" $ do
+    it "is True when equal" $ do
+      hasUnifyOperator (pl "baz(X):- X = 4.") `shouldBe` True
+
+    it "is False when no equal" $ do
+      hasUnifyOperator (pl "baz(X):- baz(X).") `shouldBe` False
