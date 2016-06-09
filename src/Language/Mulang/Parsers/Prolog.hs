@@ -82,7 +82,7 @@ exist = fmap (\(name, args) -> Exist name args) phead
 pinfix = do
             p1 <- pattern
             spaces
-            operator <- choice . map string $ ["is", ">", "<", ">=", "=<", "\\="]
+            operator <- choice . map try . map string $ ["is", ">=", "=<", "\\=", ">", "<", "="]
             spaces
             p2 <- pattern
             return $ Exist operator [p1, p2]

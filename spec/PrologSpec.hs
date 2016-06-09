@@ -65,11 +65,23 @@ spec = do
     it "rule/1 with forall" $ do
       pl "baz(X):- forall(bar(X), bar(X))." `shouldBe` RuleDeclaration "baz" [VariablePattern "X"] [Forall (Exist "bar" [VariablePattern "X"]) (Exist "bar" [VariablePattern "X"])]
 
-    it "rule/1 with compare" $ do
+    it "rule/1 with major" $ do
       pl "baz(X):- X > 4." `shouldBe`  RuleDeclaration "baz" [VariablePattern "X"] [Exist ">" [VariablePattern "X",LiteralPattern "4.0"]]
+
+    it "rule/1 with minor" $ do
+      pl "baz(X):- X < 4." `shouldBe`  RuleDeclaration "baz" [VariablePattern "X"] [Exist "<" [VariablePattern "X",LiteralPattern "4.0"]]
+
+    it "rule/1 with minor equal" $ do
+      pl "baz(X):- X =< 4." `shouldBe`  RuleDeclaration "baz" [VariablePattern "X"] [Exist "=<" [VariablePattern "X",LiteralPattern "4.0"]]
+
+    it "rule/1 with major equal" $ do
+      pl "baz(X):- X >= 4." `shouldBe`  RuleDeclaration "baz" [VariablePattern "X"] [Exist ">=" [VariablePattern "X",LiteralPattern "4.0"]]
 
     it "rule/1 with distinct" $ do
       pl "baz(X):- X \\= 4." `shouldBe` RuleDeclaration "baz" [VariablePattern "X"] [Exist "\\=" [VariablePattern "X",LiteralPattern "4.0"]]
+
+    it "rule/1 with unify operator" $ do
+      pl "baz(X):- X = 4." `shouldBe` RuleDeclaration "baz" [VariablePattern "X"] [Exist "=" [VariablePattern "X",LiteralPattern "4.0"]]
 
     it "rule/1 with simple is" $ do
       pl "baz(X):- X is 4." `shouldBe` RuleDeclaration "baz" [VariablePattern "X"] [Exist "is" [VariablePattern "X",LiteralPattern "4.0"]]
