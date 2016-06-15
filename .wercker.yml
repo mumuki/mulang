@@ -1,9 +1,0 @@
-box: mchakravarty/ghc-7.10.2
-build:
-  steps:
-  - script:
-    name: install
-    code: cabal update && cabal install && cabal install hspec
-  - script:
-      name: cabal
-      code: cabal test
