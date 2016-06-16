@@ -171,14 +171,13 @@ _Which means that there are null returns within  `bar` and also within `foo`_
 And the really awesome is here: it works for every - yes, we said it - language on the world, because:
 
   * Mulang natively support JS (ES5), so if your language compiles to clean JS, you are ready
-  * Mulang natively supports Haskell, so... the same as before
+  * Mulang natively supports Haskell and Prolog, so... the same as before
   * Mulang natively supports Json, so if you can generate a JSON AST for your language, you are done. And every language can :wink:
 
 And we are extending Mulang everyday, so more expectations - that is, the queries you can do against Mulang - are being frequently added. And more languages are going to be supported natively. The pipelines contains the following:
 
   * C
   * Java
-  * Prolog
   * Python
 
 ## Installing it
