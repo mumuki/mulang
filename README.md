@@ -89,13 +89,16 @@ False
 
 Nice, we know. But not very awesome, it only can tell you if you are using a _binding_, right? Eeer. Good news, it can tell you much much much more things:
 
-* `declaresMethod`,
-* `declaresAttribute`
-* `declaresFunction`
-* `declaresTypeSignature`
-* `declaresTypeAlias`
-* `declaresRecursively`
-* `declaresWithArity` - that is, does the given method, function, procedure, etc have the given amount of parameters?
+* `declaresMethod`: **objects paradigm** is a given method declared?
+* `declaresAttribute`: **objects paradigm** is a given attribute declared?
+* `declaresFunction`: **functional/imperative paradigm** is a given function declared?
+* `declaresTypeSignature`: **any paradigm** is a given computation type signature declared? 
+* `declaresTypeAlias`: **any paradigm** is a given type synonym declared?
+* `declaresRecursively`: **any paradigm** is a given computation declared using recusion?
+* `declaresWithArity`: **any paradigm** that is, does the given method, function, procedure, etc have the given amount of parameters?
+* `declaresRule`: **logic paradigm** is a given logic rule declared?
+* `declaresFact`: **logic paradigm** is a given logic fact declared?
+* `declaresPredicate`: **logic paradigm** is a given rule o fact declared?
 * `usesIf`
 * `usesWhile`
 * `usesLambda`
