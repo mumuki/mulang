@@ -81,6 +81,13 @@ spec = do
     it "is True when do syntax is used" $ do
       usesComprehension (hs "y = do { x <- xs; return x }") `shouldBe` True
 
+  describe "parses" $ do
+    it "is True when similar" $ do
+      parses hs "x = map f . map g" (hs "x = map f.map g") `shouldBe` True
+
+    it "is False when differ" $ do
+      parses hs "x = map g . map f" (hs "x = map f . map g") `shouldBe` False
+
   describe "uses" $ do
     it "is True when required function is used on application" $ do
       uses (named "m") (hs "y x = m x") `shouldBe` True
