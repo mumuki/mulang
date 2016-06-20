@@ -5,7 +5,6 @@ module Language.Mulang.Inspector.Smell (
   hasRedundantLambda,
   hasRedundantParameter,
   hasRedundantLocalVariableReturn,
-  hasUnifyOperator,
   doesNullTest,
   doesTypeTest,
   returnsNull) where
@@ -79,10 +78,5 @@ isBooleanLiteral _          = False
 
 hasRedundantLocalVariableReturn :: Inspection
 hasRedundantLocalVariableReturn _ = False
-
-hasUnifyOperator :: Inspection
-hasUnifyOperator = containsExpression f
-  where f (Exist "=" _) = True
-        f _ = False
 
 

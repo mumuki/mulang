@@ -9,6 +9,7 @@ module Language.Mulang.Inspector (
   usesLambda,
   usesNot,
   usesForall,
+  usesUnifyOperator,
   declaresRecursively,
   parses,
   uses,
@@ -152,6 +153,11 @@ usesNot = containsExpression f
 usesForall :: Inspection
 usesForall = containsExpression f
   where f (Forall  _ _) = True
+        f _ = False
+
+usesUnifyOperator :: Inspection
+usesUnifyOperator = containsExpression f
+  where f (Exist "=" _) = True
         f _ = False
 
 
