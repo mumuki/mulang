@@ -10,6 +10,7 @@ module Language.Mulang.Inspector (
   usesNot,
   usesForall,
   declaresRecursively,
+  parses,
   uses,
   usesComprehension,
   declares,
@@ -153,6 +154,10 @@ usesForall = containsExpression f
   where f (Forall  _ _) = True
         f _ = False
 
+
+-- | Inspection that tells whether an expression is equal to a given piece of code after being parsed
+parses :: (String -> Expression) -> String -> Inspection
+parses parser code = (== (parser code))
 
 -- | Inspection that tells whether an expression uses the the given target binding
 -- in its definition
