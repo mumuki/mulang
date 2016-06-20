@@ -59,6 +59,7 @@ library
     Language.Mulang.Inspector.Combiner
     Language.Mulang.Inspector.Extras
     Language.Mulang.Inspector
+    Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Prolog
     Language.Mulang.Parsers.Json

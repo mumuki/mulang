@@ -2,15 +2,17 @@ module Language.Mulang.Parsers.JavaScript (js, parseJavaScript) where
 
 import Language.Mulang
 import Language.Mulang.Builder
+import Language.Mulang.Parsers
 
 import Language.JavaScript.Parser.Parser
 import Language.JavaScript.Parser.AST
 
 import Data.Maybe (fromJust)
 
+js :: Parser
 js = fromJust.parseJavaScript
 
-parseJavaScript :: String -> Maybe Expression
+parseJavaScript :: MaybeParser
 parseJavaScript = Just . normalize . mu . readJs
 
 mu :: JSNode -> Expression

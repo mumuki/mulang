@@ -1,6 +1,7 @@
 module Language.Mulang.All(
   js,
   hs,
+  pl,
   module Language.Mulang.Inspector,
   module Language.Mulang.Inspector.Combiner,
   module Language.Mulang.Inspector.Smell) where
