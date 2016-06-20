@@ -5,6 +5,7 @@ module Language.Mulang.Inspector.Smell (
   hasRedundantLambda,
   hasRedundantParameter,
   hasRedundantLocalVariableReturn,
+  hasAssignmentReturn,
   doesNullTest,
   doesTypeTest,
   returnsNull) where
@@ -80,3 +81,5 @@ hasRedundantLocalVariableReturn :: Inspection
 hasRedundantLocalVariableReturn _ = False
 
 
+hasAssignmentReturn :: Inspection
+hasAssignmentReturn _ = False

@@ -59,6 +59,13 @@ spec = do
     it "is False when local variable is used as a cache" $ do
       hasRedundantLocalVariableReturn (js "function x(m) { var x = 5; var y = 1 + x; g(y); return x; }") `shouldBe` False
 
+  describe "hasAssignmentReturn" $ do
+    it "is True when return contains assignment" $ do
+      hasAssignmentReturn (js "function x(m) { return x = 4 }") `shouldBe` True
+
+    it "is False when return does not contain assignment" $ do
+      hasAssignmentReturn (js "function x(m) { return x == 4 }") `shouldBe` False
+
   describe "returnsNull" $ do
     it "is True when returns null" $ do
       returnsNull (js "function x(m) { return null }") `shouldBe` True
