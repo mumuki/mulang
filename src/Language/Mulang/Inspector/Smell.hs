@@ -78,8 +78,13 @@ isBooleanLiteral (MuBool _) = True
 isBooleanLiteral _          = False
 
 hasRedundantLocalVariableReturn :: Inspection
-hasRedundantLocalVariableReturn _ = False
+hasRedundantLocalVariableReturn = containsExpression f
+  where f (Sequence [ VariableDeclaration declaredVariable _,
+                      Return (Variable returnedVariable)]) = returnedVariable == declaredVariable
+        f _                                                = False
 
 
 hasAssignmentReturn :: Inspection
-hasAssignmentReturn _ = False
+hasAssignmentReturn = containsExpression f
+  where f (Return (VariableAssignment _ _)) = True
+        f _                                 = False
