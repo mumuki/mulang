@@ -6,16 +6,18 @@ import Text.ParserCombinators.Parsec.Prim (GenParser)
 
 import Language.Mulang
 import Language.Mulang.Builder
+import Language.Mulang.Parsers
+
 import Data.Either
 import Data.Maybe (maybeToList)
 import Data.Char (isUpper)
 
-pl :: String -> Expression
+pl :: Parser
 pl string = case parseProlog string  of
           (Right v) -> v
           (Left m)  -> error.show $ m
 
-parseProlog :: String -> Either ParseError Expression
+parseProlog :: EitherParser ParseError
 parseProlog = fmap compact . parse program ""
 
 program :: Parsec String a [Expression]

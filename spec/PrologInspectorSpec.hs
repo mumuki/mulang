@@ -90,3 +90,10 @@ spec = do
 
       it "is False when fact is declared with another arity" $ do
         declaresWithArity 2 (named "foo") (pl "foo(tom).") `shouldBe` False
+
+    describe "usesUnifyOperator" $ do
+      it "is True when equal" $ do
+        usesUnifyOperator (pl "baz(X):- X = 4.") `shouldBe` True
+
+      it "is False when no equal" $ do
+        usesUnifyOperator (pl "baz(X):- baz(X).") `shouldBe` False

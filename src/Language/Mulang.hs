@@ -33,6 +33,7 @@ data Expression
         | ProcedureDeclaration Identifier [Equation]    -- classic imperative-style procedure
         | MethodDeclaration Identifier [Equation]
         | VariableDeclaration Identifier Expression
+        | VariableAssignment Identifier Expression
         | AttributeDeclaration Identifier Expression
         | ObjectDeclaration Identifier Expression
         | RuleDeclaration Identifier [Pattern] [Expression]

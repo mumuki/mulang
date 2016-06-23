@@ -92,7 +92,7 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 * `declaresMethod`: **objects paradigm** is a given method declared?
 * `declaresAttribute`: **objects paradigm** is a given attribute declared?
 * `declaresFunction`: **functional/imperative paradigm** is a given function declared?
-* `declaresTypeSignature`: **any paradigm** is a given computation type signature declared? 
+* `declaresTypeSignature`: **any paradigm** is a given computation type signature declared?
 * `declaresTypeAlias`: **any paradigm** is a given type synonym declared?
 * `declaresRecursively`: **any paradigm** is a given computation declared using recusion?
 * `declaresWithArity`: **any paradigm** that is, does the given method, function, procedure, etc have the given amount of parameters?
@@ -106,10 +106,14 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 * `usesComposition`
 * `usesComprehensions`
 * `usesAnnonymousVariable`
+* `usesUnifyOperator`
 * `hasRedundantIf`
 * `hasRedundantGuards`
 * `hasRedundantParameter`
 * `hasRedundantLambda`
+* `hasRedundantBooleanComparison`
+* `hasRedundantLocalVariableReturn`
+* `hasAssignmentReturn`
 * `doesTypeTest`
 * `doesNullTest`
 * `returnsNull`

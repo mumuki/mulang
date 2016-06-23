@@ -2,15 +2,18 @@ module Language.Mulang.Parsers.Haskell (hs, parseHaskell) where
 
 import Language.Mulang
 import Language.Mulang.Builder
+import Language.Mulang.Parsers
+
 import Language.Haskell.Syntax
 import Language.Haskell.Parser
 
 import Data.Maybe (fromJust)
 import Data.List (intercalate)
 
+hs :: Parser
 hs = fromJust . parseHaskell
 
-parseHaskell :: String -> Maybe Expression
+parseHaskell :: MaybeParser
 parseHaskell code | ParseOk ast <- parseModule code = Just . normalize . mu $ ast
                   | otherwise = Nothing
 

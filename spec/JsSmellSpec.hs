@@ -34,11 +34,37 @@ spec = do
       hasRedundantIf (js "function x() { if(m) 2 else 4 }") `shouldBe` False
 
   describe "hasRedundantBooleanComparison" $ do
-    it "is True when comparing a literal in an if" $ do
+    it "is True when comparing a literal in a function" $ do
       hasRedundantBooleanComparison (js "function x(m) { return m == true }") `shouldBe` True
+
+    it "is True when comparing a literal, top level" $ do
+      hasRedundantBooleanComparison (js "m == true") `shouldBe` True
 
     it "is False when no comparison" $ do
       hasRedundantBooleanComparison (js "function x(m) { return m }") `shouldBe` False
+
+  describe "hasRedundantLocalVariableReturn" $ do
+    it "is True when local variable is not necessary" $ do
+      hasRedundantLocalVariableReturn (js "function x(m) { var x  = 5; return x; }") `shouldBe` True
+
+    it "is False when local variable is not necessary, but there are many variables" $ do
+      hasRedundantLocalVariableReturn (js "function x(m) { var x = 5; var y = 2; return x; }") `shouldBe` False
+
+    it "is False when local variable is necessary in return" $ do
+      hasRedundantLocalVariableReturn (js "function x(m) { var x = 5; return x + x; }") `shouldBe` False
+
+    it "is False when local variable is updated" $ do
+      hasRedundantLocalVariableReturn (js "function x(m) { var x = 5; x+= 1; return x; }") `shouldBe` False
+
+    it "is False when local variable is used as a cache" $ do
+      hasRedundantLocalVariableReturn (js "function x(m) { var x = 5; var y = 1 + x; g(y); return x; }") `shouldBe` False
+
+  describe "hasAssignmentReturn" $ do
+    it "is True when return contains assignment" $ do
+      hasAssignmentReturn (js "function x(m) { return x = 4 }") `shouldBe` True
+
+    it "is False when return does not contain assignment" $ do
+      hasAssignmentReturn (js "function x(m) { return x == 4 }") `shouldBe` False
 
   describe "returnsNull" $ do
     it "is True when returns null" $ do
