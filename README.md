@@ -205,6 +205,7 @@ cabal install happy
 The following times, you just need to install project dependencies and build:
 
 ```
+cabal sandbox init
 cabal install --only-dependencies --force-reinstalls
 cabal build
 ```
