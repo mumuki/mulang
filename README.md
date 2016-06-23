@@ -203,7 +203,7 @@ To generate `mulang` executable, you have to build the project using [cabal](htt
 cabal install alex
 cabal install happy
 ```
-## Installing and creating an execurable
+## Installing and creating an executable
 
 The following times, you just need to install project dependencies and build:
 
