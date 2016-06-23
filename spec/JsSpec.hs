@@ -44,6 +44,18 @@ spec = do
     it "numeric top level expression" $ do
       js "8" `shouldBe` MuNumber 8
 
+    it "assignment should be VariableAssignment" $ do
+      js "x = 8" `shouldBe` (VariableAssignment "x" (MuNumber 8))
+
+    it "update should be VariableAssignment" $ do
+      js "x += 8" `shouldBe` (VariableAssignment "x" (Application (Variable "+") [Variable "x",MuNumber 8.0]))
+
+    it "increment should be VariableAssignment" $ do
+      js "x++" `shouldBe` (VariableAssignment "x" (Application (Variable "+") [Variable "x", MuNumber 1]))
+
+    it "sum should be parseable" $ do
+      js "x + y" `shouldBe` (Application (Variable "+") [Variable "x",Variable "y"])
+
     it "list literal top level expression" $ do
       js "[8, 7]" `shouldBe` MuList [MuNumber 8, MuNumber 7]
 

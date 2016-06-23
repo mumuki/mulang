@@ -30,10 +30,11 @@ mu = compact . muNode . gc
     muNode (JSElision _)                                     = []
     muNode (JSHexInteger v)                                  = muNode (JSStringLiteral '\'' v)
     muNode (JSOctal v)                                       = muNode (JSStringLiteral '"' v)
+    muNode (JSExpressionPostfix "++" [var] _)                = [muVarAssignment var (muPlus var (MuNumber 1))]
     muNode (JSStringLiteral _ v)                             = [MuString v]
     muNode (JSVariables _ decls _)                           = mapMu decls
     muNode (JSArrayLiteral _ es _)                           = [MuList (mapMu es)]
-    muNode (JSVarDecl var initial)                           = [muVar var initial]
+    muNode (JSVarDecl var initial)                           = [muVarDeclaration var initial]
     muNode (JSWith _ _ _ _ _)                                = [ExpressionOther]
     muNode (JSExpressionTernary cond _ true _ false)         = [muIf cond   true false]
     muNode (JSIf _ _ cond _ true false)                      = [muIf [cond] true false]
@@ -45,15 +46,19 @@ mu = compact . muNode . gc
     muNode (JSExpressionParen _ e _)                         = [mu e]
     muNode (JSObjectLiteral _ es _)                          = [MuObject (compactMapMu es)]
     muNode (JSLabelled _ _ e)                                = [mu e]
-    muNode (JSPropertyNameandValue var _ initial)            = [muVar var initial]
+    muNode (JSPropertyNameandValue var _ initial)            = [muVarDeclaration var initial]
     muNode (JSFunction _ name _ params _ body)               = [muFunction name params body]
     muNode (JSExpressionBinary op l _ r)                     = [Application (muOp op) [compactMapMu l, compactMapMu r]]
     muNode (JSMemberDot receptor _ selector)                 = [Send (compactMapMu receptor) (mu selector) []]
     muNode e = error (show e)
 
+
+
     mapMu :: [JSNode] -> [Expression]
     mapMu [] = []
-    mapMu (x:y:xs) | (JSArguments _ args _) <- gc y =  [Application (mu x) (mapMu args)] ++ mapMu xs
+    mapMu (x:y:xs)   | (JSArguments _ args _) <- gc y =  [Application (mu x) (mapMu args)] ++ mapMu xs
+    mapMu (x:y:z:xs) | (JSOperator (NT (JSLiteral "=") _ _))  <- gc y =  [muVarAssignment x (mu z)] ++ mapMu xs
+                     | (JSOperator (NT (JSLiteral "+=") _ _))  <- gc y =  [muVarAssignment x (muPlus x (mu z))] ++ mapMu xs
     mapMu (x:xs) = (muNode.gc) x ++ mapMu xs
 
     muParams :: [JSNode] -> [Pattern]
@@ -70,10 +75,11 @@ mu = compact . muNode . gc
     muPattern (JSIdentifier i) = [VariablePattern i]
     muPattern e                = error (show e)
 
-    muIdentifier (JSIdentifier id) = id
-
     gc (NN n) = n
     gc (NT n _ _) = n
+
+    muId = f.gc
+           where f (JSIdentifier id) = id
 
     compactMapMu :: [JSNode] -> Expression
     compactMapMu  = compact . mapMu
@@ -83,10 +89,13 @@ mu = compact . muNode . gc
 
     muWhile cond action  = While (mu cond) (mu action)
 
-    muVar (NT (JSIdentifier var) _ _) initial = VariableDeclaration var (compactMapMu initial)
+    muVarDeclaration var initial = VariableDeclaration (muId var) (compactMapMu initial)
+    muVarAssignment  var value  = VariableAssignment (muId var)  value
+
+    muPlus var delta = (Application (Variable "+") [Variable (muId var), delta])
 
     muFunction :: JSNode -> [JSNode] -> JSNode -> Expression
-    muFunction name params body =  FunctionDeclaration ((muIdentifier.gc) name) [Equation (muParams params) (UnguardedBody (mu body))]
+    muFunction name params body =  FunctionDeclaration (muId name) [Equation (muParams params) (UnguardedBody (mu body))]
 
 
 {-JSRegEx String
@@ -121,8 +130,6 @@ JSForVarIn JSNode JSNode JSNode JSNode JSNode JSNode JSNode JSNode
 for,lb,var,vardecl,in,expr,rb,stmt
 JSMemberSquare [JSNode] JSNode JSNode JSNode
 firstpart, lb, expr, rb
-JSOperator JSNode
-opnode
 JSPropertyAccessor JSNode JSNode JSNode [JSNode] JSNode JSNode
 (get|set), name, lb, params, rb, block
 JSSwitch JSNode JSNode JSNode JSNode JSNode
