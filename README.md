@@ -206,7 +206,7 @@ The following times, you just need to install project dependencies and build:
 
 ```
 cabal sandbox init
-cabal install --only-dependencies --force-reinstalls
+cabal install --only-dependencies --enable-tests --force-reinstalls
 cabal build
 ```
 
