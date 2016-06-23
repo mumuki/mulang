@@ -193,14 +193,17 @@ $ mulang '{"expectations":[{"subject":["x"],"transitive":false,"negated":false,"
 {"results":[{"result":false,"expectation":{"subject":["x"],"transitive":false,"negated":false,"object":{"tag":"Anyone","contents":[]},"verb":"uses"}}],"smells":[]}
 ```
 
-## Building mulang
+## Building mulang from source
 To generate `mulang` executable, you have to build the project using [cabal](https://www.haskell.org/cabal/).
+
+### Before start
 
 **The first time**, you need to install [alex](https://www.haskell.org/alex/) and [happy](https://www.haskell.org/happy/), two executables that Mulang uses:
 ```
 cabal install alex
 cabal install happy
 ```
+## Installing and creating an execurable
 
 The following times, you just need to install project dependencies and build:
 
@@ -211,3 +214,21 @@ cabal build
 ```
 
 That will generate a `mulang` executable in the folder `dist/build/mulang`.
+
+### Running tests
+
+```
+cabal test
+```
+
+### Loading mulang in the REPL
+
+```
+cabal repl
+```
+
+And then, inside the REPL, do: 
+
+```
+:m Language.Mulang.All
+```
