@@ -31,18 +31,10 @@ module Language.Mulang.Inspector (
   Inspection) where
 
 import  Language.Mulang
+import  Language.Mulang.Binding
 import  Language.Mulang.Explorer
-import  Data.List (isInfixOf)
+
 type Inspection = Expression  -> Bool
-
-named :: String -> BindingPredicate
-named = (==)
-
-like :: String -> BindingPredicate
-like = isInfixOf
-
-anyone :: BindingPredicate
-anyone = const True
 
 declaresFact :: BindingPredicate -> Inspection
 declaresFact = containsDeclaration f

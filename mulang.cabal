@@ -53,12 +53,13 @@ library
   exposed-modules:
     Language.Mulang
     Language.Mulang.All
+    Language.Mulang.Binding
     Language.Mulang.Builder
     Language.Mulang.Explorer
+    Language.Mulang.Inspector
     Language.Mulang.Inspector.Smell
     Language.Mulang.Inspector.Combiner
     Language.Mulang.Inspector.Extras
-    Language.Mulang.Inspector
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Prolog
