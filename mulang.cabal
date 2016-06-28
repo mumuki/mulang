@@ -51,6 +51,9 @@ library
   hs-source-dirs:
       src
   exposed-modules:
+    Control.Fallible
+    Text.SimpleParser
+    Text.Inflections.Tokenizer
     Language.Mulang
     Language.Mulang.All
     Language.Mulang.Binding

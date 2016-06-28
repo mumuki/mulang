@@ -8,17 +8,18 @@ import Language.Mulang
 import Language.Mulang.Builder
 import Language.Mulang.Parsers
 
-import Data.Either
 import Data.Maybe (maybeToList)
 import Data.Char (isUpper)
 
-pl :: Parser
-pl string = case parseProlog string  of
-          (Right v) -> v
-          (Left m)  -> error.show $ m
+import Control.Fallible
 
-parseProlog :: EitherParser ParseError
-parseProlog = fmap compact . parse program ""
+pl :: Parser
+pl = orFail . parseProlog'
+
+parseProlog :: MaybeParser
+parseProlog = orNothing . parseProlog'
+
+parseProlog' = fmap compact . parse program ""
 
 program :: Parsec String a [Expression]
 program = many predicate

@@ -1,12 +1,18 @@
-module Language.Mulang.Parsers.Json (parseJson) where
+module Language.Mulang.Parsers.Json (json, parseJson) where
 
 import Language.Mulang
+import Language.Mulang.Parsers
 
-import Data.Aeson
+import Data.Aeson (decode, ToJSON, FromJSON)
+import Data.Maybe (fromJust)
 
 import qualified Data.ByteString.Lazy.Char8 as LBS (pack)
 
-parseJson :: String -> Maybe Expression
+
+json :: Parser
+json = fromJust . parseJson
+
+parseJson :: MaybeParser
 parseJson  = decode . LBS.pack
 
 instance FromJSON Equation

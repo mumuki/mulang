@@ -7,15 +7,22 @@ import Language.Mulang.Parsers
 import Language.Haskell.Syntax
 import Language.Haskell.Parser
 
-import Data.Maybe (fromJust)
 import Data.List (intercalate)
 
+import Control.Fallible
+
+instance Fallible ParseResult where
+  failure (ParseOk v)       = Left v
+  failure (ParseFailed _ m) = Right m
+
 hs :: Parser
-hs = fromJust . parseHaskell
+hs = orFail . parseHaskell'
 
 parseHaskell :: MaybeParser
-parseHaskell code | ParseOk ast <- parseModule code = Just . normalize . mu $ ast
-                  | otherwise = Nothing
+parseHaskell = orNothing . parseHaskell'
+
+parseHaskell' :: String -> ParseResult Expression
+parseHaskell' = fmap (normalize . mu) . parseModule
 
 mu :: HsModule -> Expression
 mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)

@@ -7,9 +7,6 @@ import           Language.Mulang.Parsers.Haskell (hs)
 spec :: Spec
 spec = do
   describe "isWellWritten" $ do
-    it "dsdsad" $ do
-      wordsOf (hs "todayIsAGreatDay = True") `shouldBe` ["today", "is", "a", "great", "day"]
-
     it "is True when it is a single, well written token" $ do
       isWellWritten english (hs "today = True") `shouldBe` True
 
@@ -23,3 +20,6 @@ spec = do
       isWellWritten english (hs "tudayIsAGreatDay = True") `shouldBe` False
       isWellWritten english (hs "todayIsAGraetDay = True") `shouldBe` False
 
+  describe "wordsOf" $ do
+    it "can tokenize camelCase words" $ do
+      wordsOf (hs "todayIsAGreatDay = True") `shouldBe` ["today", "is", "a", "great", "day"]
