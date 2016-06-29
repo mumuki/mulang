@@ -32,6 +32,13 @@ spec = describe "Evaluator" $ do
       evaluate (Input code [ydeclares]) `shouldBe` (Output [ExpectationResult ydeclares False] [])
 
   describe "Basic expectations" $ do
+    it "can be negated" $ do
+      let notDeclaresx = (Basic "x" "Not:HasBinding")
+      let notDeclaresy = (Basic "y" "Not:HasBinding")
+      evaluate (Input (Code Haskell "x = 2") [notDeclaresy, notDeclaresx]) `shouldBe` (Output [
+                                                                          ExpectationResult notDeclaresy True,
+                                                                          ExpectationResult notDeclaresx False] [])
+
     it "works with HasBinding" $ do
       let xdeclares = (Basic "x" "HasBinding")
       let ydeclares = (Basic "y" "HasBinding")

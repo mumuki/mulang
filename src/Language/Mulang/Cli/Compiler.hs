@@ -35,11 +35,19 @@ instance ToJSON Expectation
 
 compile :: Expectation -> Inspection
 compile (Advanced s v o n t) = compileSubject s t . compileNegation n $ compileInspection v (compilePattern o)
-compile (Basic b i)          = compile . toAdvanced b $ (splitOn ":" i)
+compile (Basic b i)          = compile . negateIfNeeded splitedInspection . toAdvanced b $ withoutNegation splitedInspection
+                               where splitedInspection = splitOn ":" i
+
+withoutNegation :: [String] -> [String]
+withoutNegation = filter (/= "Not")
+
+negateIfNeeded :: [String] -> Expectation -> Expectation
+negateIfNeeded ("Not":_) (Advanced s v o _ t) = Advanced s v o True t
+negateIfNeeded _ a                            = a
 
 toAdvanced :: String -> [String] -> Expectation
-toAdvanced b is | elem "HasBinding" is     = Advanced [] "declares" (Named b) False False
-toAdvanced b is | elem "HasUsage" is       = Advanced [b] "uses" (Named $ last is) False True
+toAdvanced b ["HasBinding"]    = Advanced [] "declares" (Named b) False False
+toAdvanced b ["HasUsage", x]   = Advanced [b] "uses" (Named x) False True
 
 compileNegation :: Bool -> Inspection -> Inspection
 compileNegation False i = i
