@@ -33,6 +33,10 @@ instance ToJSON Expectation
 
 compile :: Expectation -> Inspection
 compile (Advanced s v o n t) = compileSubject s t . compileNegation n $ compileInspection v (compilePattern o)
+compile basic                = compile . toAdvanced $ basic
+
+toAdvanced :: Expectation -> Expectation
+toAdvanced (Basic b "HasBinding" ) = Advanced [] "declares" (Named b) False False
 
 compileNegation :: Bool -> Inspection -> Inspection
 compileNegation False i = i
