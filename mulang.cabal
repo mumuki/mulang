@@ -80,7 +80,8 @@ library
     aeson                     >= 0.11.0.0 && < 1,
     inflections               > 0.2       && < 0.3,
     parsec                    == 3.1.9,
-    ParsecTools               >= 0.0.2.0
+    ParsecTools               >= 0.0.2.0,
+    split                     >= 0.2.3.1
 
   build-tools:
     happy,

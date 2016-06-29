@@ -11,6 +11,7 @@ import Language.Mulang.Inspector
 import Language.Mulang.Inspector.Combiner
 import Language.Mulang.Binding (Binding, BindingPredicate)
 import Data.List (isInfixOf)
+import Data.List.Split (splitOn)
 
 data BindingPattern = Named String | Like String | Anyone deriving (Show, Eq, Generic)
 
@@ -34,11 +35,11 @@ instance ToJSON Expectation
 
 compile :: Expectation -> Inspection
 compile (Advanced s v o n t) = compileSubject s t . compileNegation n $ compileInspection v (compilePattern o)
-compile basic                = compile . toAdvanced $ basic
+compile (Basic b i)          = compile . toAdvanced b $ (splitOn ":" i)
 
-toAdvanced :: Expectation -> Expectation
-toAdvanced (Basic b "HasBinding" )                     = Advanced [] "declares" (Named b) False False
-toAdvanced (Basic b i ) | isInfixOf "HasUsage" i       = Advanced [b] "uses" (Named $ drop (length "HasUsage:") i) False True
+toAdvanced :: String -> [String] -> Expectation
+toAdvanced b is | elem "HasBinding" is     = Advanced [] "declares" (Named b) False False
+toAdvanced b is | elem "HasUsage" is       = Advanced [b] "uses" (Named $ last is) False True
 
 compileNegation :: Bool -> Inspection -> Inspection
 compileNegation False i = i
