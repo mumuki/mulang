@@ -13,13 +13,17 @@ import Language.Mulang.Binding (Binding, BindingPredicate)
 
 data BindingPattern = Named String | Like String | Anyone deriving (Show, Eq, Generic)
 
-data Expectation = Expectation {
-  subject :: [String] ,
-  verb :: String,
-  object :: BindingPattern,
-  negated :: Bool,
-  transitive :: Bool
-} deriving (Show, Eq, Generic)
+data Expectation =  Advanced {
+                      subject :: [String] ,
+                      verb :: String,
+                      object :: BindingPattern,
+                      negated :: Bool,
+                      transitive :: Bool
+                    } 
+                    | Basic {
+                      binding :: String,
+                      inspection :: String
+                    } deriving (Show, Eq, Generic)
 
 instance FromJSON BindingPattern
 instance FromJSON Expectation
@@ -28,7 +32,7 @@ instance ToJSON BindingPattern
 instance ToJSON Expectation
 
 compile :: Expectation -> Inspection
-compile (Expectation s v o n t) = compileSubject s t . compileNegation n $ compileInspection v (compilePattern o)
+compile (Advanced s v o n t) = compileSubject s t . compileNegation n $ compileInspection v (compilePattern o)
 
 compileNegation :: Bool -> Inspection -> Inspection
 compileNegation False i = i
