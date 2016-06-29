@@ -24,7 +24,8 @@ executable mulang
     language-javascript       >= 0.5.14  && <= 0.5.15,
     aeson                     >= 0.11.0.0 && < 1,
     parsec                    == 3.1.9,
-    ParsecTools               >= 0.0.2.0
+    ParsecTools               >= 0.0.2.0,
+    split                     >= 0.2.3.1
   build-tools:
     happy,
     alex
