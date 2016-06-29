@@ -10,6 +10,7 @@ import Data.Aeson
 import Language.Mulang.Inspector
 import Language.Mulang.Inspector.Combiner
 import Language.Mulang.Binding (Binding, BindingPredicate)
+import Data.List (isInfixOf)
 
 data BindingPattern = Named String | Like String | Anyone deriving (Show, Eq, Generic)
 
@@ -36,7 +37,8 @@ compile (Advanced s v o n t) = compileSubject s t . compileNegation n $ compileI
 compile basic                = compile . toAdvanced $ basic
 
 toAdvanced :: Expectation -> Expectation
-toAdvanced (Basic b "HasBinding" ) = Advanced [] "declares" (Named b) False False
+toAdvanced (Basic b "HasBinding" )                     = Advanced [] "declares" (Named b) False False
+toAdvanced (Basic b i ) | isInfixOf "HasUsage" i       = Advanced [b] "uses" (Named $ drop (length "HasUsage:") i) False True
 
 compileNegation :: Bool -> Inspection -> Inspection
 compileNegation False i = i

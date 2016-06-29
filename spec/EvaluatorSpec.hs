@@ -35,3 +35,10 @@ spec = describe "Evaluator" $ do
     it "works with HasBinding" $ do
       let xdeclares = (Basic "x" "HasBinding")
       evaluate (Input (Code Haskell "x = 2") [xdeclares]) `shouldBe` (Output [ExpectationResult xdeclares True] [])
+    
+    it "works with HasUsage" $ do
+      let usesy = (Basic "x" "HasUsage:y")
+      let usesz = (Basic "x" "HasUsage:z")
+      evaluate (Input (Code Haskell "x = y * 10") [usesy, usesz]) `shouldBe` (Output [
+                                                                          ExpectationResult usesy True,
+                                                                          ExpectationResult usesz False] [])
