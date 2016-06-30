@@ -43,12 +43,14 @@ withoutNegation :: [String] -> [String]
 withoutNegation = filter (/= "Not")
 
 toAdvanced :: String -> [String] -> Bool -> Expectation
-toAdvanced b ["HasBinding"]          = Advanced [] "declares" (Named b) False
+toAdvanced b ["HasArity", n]         = nonTransitiveNamed b ("declaresWithArity" ++ n)
+toAdvanced b ["HasBinding"]          = nonTransitiveNamed b "declares"
+toAdvanced b ["HasIf"]               = nonTransitiveNamed b "usesIf"
+toAdvanced b ["HasTypeSignature"]    = nonTransitiveNamed b "declaresTypeSignature"
+toAdvanced b ["HasTypeDeclaration"]  = nonTransitiveNamed b "declaresTypeAlias"
 toAdvanced b ["HasUsage", x]         = Advanced [b] "uses" (Named x) True
-toAdvanced b ["HasArity", n]         = Advanced [] ("declaresWithArity" ++ n) (Named b) False
-toAdvanced b ["HasTypeSignature"]    = Advanced [] "declaresTypeSignature" (Named b) False
-toAdvanced b ["HasTypeDeclaration"]  = Advanced [] "declaresTypeAlias" (Named b) False
-toAdvanced b ["HasIf"]               = Advanced [] "usesIf" (Named b) False
+
+nonTransitiveNamed binding inspection = Advanced [] inspection (Named binding) False
 
 --"HasAnonymousVariable",
 --"HasComposition",
