@@ -204,8 +204,8 @@ To generate `mulang` executable, you have to build the project using [cabal](htt
 
 **The first time**, you need to install [alex](https://www.haskell.org/alex/) and [happy](https://www.haskell.org/happy/), two executables that Mulang uses:
 ```
-cabal install alex
-cabal install happy
+sudo apt-get install alex
+sudo apt-get install happy
 ```
 ## Installing and creating an executable
 
