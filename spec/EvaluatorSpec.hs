@@ -63,4 +63,9 @@ spec = describe "Evaluator" $ do
     it "works with HasTypeSignature" $ do
       let hasTypeSignature = (Basic "f" "HasTypeSignature")
       evaluate (Input (Code Haskell "f :: Int -> Int -> Int \nf x y = y + x") [hasTypeSignature]) `shouldBe` (Output [
-                                                                          ExpectationResult hasTypeSignature True] [])      
+                                                                          ExpectationResult hasTypeSignature True] [])
+
+    it "works with HasTypeDeclaration" $ do
+      let hasTypeDeclaration = (Basic "Words" "HasTypeDeclaration")
+      evaluate (Input (Code Haskell "type Words = [String]") [hasTypeDeclaration]) `shouldBe` (Output [
+                                                                          ExpectationResult hasTypeDeclaration True] [])      

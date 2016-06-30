@@ -50,6 +50,7 @@ toAdvanced b ["HasBinding"]          = Advanced [] "declares" (Named b) False Fa
 toAdvanced b ["HasUsage", x]         = Advanced [b] "uses" (Named x) False True
 toAdvanced b ["HasArity", n]         = Advanced [] ("declaresWithArity" ++ n) (Named b) False False
 toAdvanced b ["HasTypeSignature"]    = Advanced [] "declaresTypeSignature" (Named b) False False
+toAdvanced b ["HasTypeDeclaration"]  = Advanced [] "declaresTypeAlias" (Named b) False False
 
 --HasComposition  Haskell
 --HasComprehension  Haskell
@@ -64,8 +65,6 @@ toAdvanced b ["HasTypeSignature"]    = Advanced [] "declaresTypeSignature" (Name
 --HasRedundantLambda  Haskell
 --HasRedundantParameter Haskell
 --HasRepeatOf:target  Gobstones
---HasTypeDeclaration  Haskell
---HasTypeSignature  Haskell
 --HasForall Prolog
 --HasFindall  Prolog
 --HasNot  Prolog
