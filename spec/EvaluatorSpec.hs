@@ -52,3 +52,10 @@ spec = describe "Evaluator" $ do
       evaluate (Input (Code Haskell "x = y * 10") [usesy, usesz]) `shouldBe` (Output [
                                                                           ExpectationResult usesy True,
                                                                           ExpectationResult usesz False] [])
+
+    it "works with HasArity" $ do
+      let hasArity2 = (Basic "f" "HasArity:2")
+      let hasArity3 = (Basic "f" "HasArity:3")
+      evaluate (Input (Code Haskell "f x y = y + x") [hasArity2, hasArity3]) `shouldBe` (Output [
+                                                                          ExpectationResult hasArity2 True,
+                                                                          ExpectationResult hasArity3 False] [])

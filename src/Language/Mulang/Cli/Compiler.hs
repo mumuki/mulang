@@ -48,6 +48,27 @@ negateIfNeeded _ a                            = a
 toAdvanced :: String -> [String] -> Expectation
 toAdvanced b ["HasBinding"]    = Advanced [] "declares" (Named b) False False
 toAdvanced b ["HasUsage", x]   = Advanced [b] "uses" (Named x) False True
+toAdvanced b ["HasArity", n]   = Advanced [] ("declaresWithArity" ++ n) (Named b) False False
+
+--HasComposition  Haskell
+--HasComprehension  Haskell
+--HasConditional  Haskell
+--HasDirectRecursion  Haskell, Prolog
+--HasGuards Haskell
+--HasIf Haskell
+--HasLambda Haskell
+--HasRedundantBooleanComparison Haskell
+--HasRedundantGuards  Haskell
+--HasRedundantIf  Haskell
+--HasRedundantLambda  Haskell
+--HasRedundantParameter Haskell
+--HasRepeatOf:target  Gobstones
+--HasTypeDeclaration  Haskell
+--HasTypeSignature  Haskell
+--HasForall Prolog
+--HasFindall  Prolog
+--HasNot  Prolog
+--HasWhile  
 
 compileNegation :: Bool -> Inspection -> Inspection
 compileNegation False i = i
