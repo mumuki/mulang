@@ -45,6 +45,7 @@ withoutNegation = filter (/= "Not")
 toAdvanced :: String -> [String] -> Bool -> Expectation
 toAdvanced b ["HasArity", n]         = nonTransitiveNamed b ("declaresWithArity" ++ n)
 toAdvanced b ["HasBinding"]          = nonTransitiveNamed b "declares"
+toAdvanced b ["HasGuards"]           = nonTransitiveNamed b "usesGuards"
 toAdvanced b ["HasIf"]               = nonTransitiveNamed b "usesIf"
 toAdvanced b ["HasTypeSignature"]    = nonTransitiveNamed b "declaresTypeSignature"
 toAdvanced b ["HasTypeDeclaration"]  = nonTransitiveNamed b "declaresTypeAlias"
@@ -59,7 +60,6 @@ nonTransitiveNamed binding inspection = Advanced [] inspection (Named binding) F
 --"HasFindall",
 --"HasForall",
 --"HasForeach",
---"HasGuards",
 --"HasLambda",
 --"HasNot",
 --"HasPrefixApplication",

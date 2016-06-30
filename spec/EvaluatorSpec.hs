@@ -73,3 +73,7 @@ spec = describe "Evaluator" $ do
     it "works with HasIf" $ do
       let hasIf = (Basic "min" "HasIf")
       evaluate (Input (Code Haskell "min x y = if x < y then x else y") [hasIf]) `shouldBe` (Output [ExpectationResult hasIf True] [])
+
+    it "works with HasGuards" $ do
+      let hasGuards = (Basic "min" "HasGuards")
+      evaluate (Input (Code Haskell "min x y | x < y = x | otherwise = y") [hasGuards]) `shouldBe` (Output [ExpectationResult hasGuards True] [])
