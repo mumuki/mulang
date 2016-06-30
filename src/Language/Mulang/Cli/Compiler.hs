@@ -48,19 +48,23 @@ toAdvanced b ["HasUsage", x]         = Advanced [b] "uses" (Named x) True
 toAdvanced b ["HasArity", n]         = Advanced [] ("declaresWithArity" ++ n) (Named b) False
 toAdvanced b ["HasTypeSignature"]    = Advanced [] "declaresTypeSignature" (Named b) False
 toAdvanced b ["HasTypeDeclaration"]  = Advanced [] "declaresTypeAlias" (Named b) False
+toAdvanced b ["HasIf"]               = Advanced [] "usesIf" (Named b) False
 
---HasComposition  Haskell
---HasComprehension  Haskell
---HasConditional  Haskell
---HasDirectRecursion  Haskell, Prolog
---HasGuards Haskell
---HasIf Haskell
---HasLambda Haskell
---HasRepeatOf:target  Gobstones
---HasForall Prolog
---HasFindall  Prolog
---HasNot  Prolog
---HasWhile  
+--"HasAnonymousVariable",
+--"HasComposition",
+--"HasComprehension",
+--"HasDirectRecursion",
+--"HasFindall",
+--"HasForall",
+--"HasForeach",
+--"HasGuards",
+--"HasLambda",
+--"HasNot",
+--"HasPrefixApplication",
+--"HasRepeat",
+--"HasVariable",
+--"HasWhile",
+--"HasConditional",
 
 compileNegation :: Bool -> Inspection -> Inspection
 compileNegation False i = i

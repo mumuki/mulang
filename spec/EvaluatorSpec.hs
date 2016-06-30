@@ -68,4 +68,8 @@ spec = describe "Evaluator" $ do
     it "works with HasTypeDeclaration" $ do
       let hasTypeDeclaration = (Basic "Words" "HasTypeDeclaration")
       evaluate (Input (Code Haskell "type Words = [String]") [hasTypeDeclaration]) `shouldBe` (Output [
-                                                                          ExpectationResult hasTypeDeclaration True] [])      
+                                                                          ExpectationResult hasTypeDeclaration True] [])
+
+    it "works with HasIf" $ do
+      let hasIf = (Basic "min" "HasIf")
+      evaluate (Input (Code Haskell "min x y = if x < y then x else y") [hasIf]) `shouldBe` (Output [ExpectationResult hasIf True] [])
