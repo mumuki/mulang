@@ -19,8 +19,8 @@ data Expectation =  Advanced {
                       subject :: [String] ,
                       verb :: String,
                       object :: BindingPattern,
-                      negated :: Bool,
-                      transitive :: Bool
+                      transitive :: Bool,
+                      negated :: Bool
                     } 
                     | Basic {
                       binding :: String,
@@ -34,23 +34,20 @@ instance ToJSON BindingPattern
 instance ToJSON Expectation
 
 compile :: Expectation -> Inspection
-compile (Advanced s v o n t) = compileSubject s t . compileNegation n $ compileInspection v (compilePattern o)
-compile (Basic b i)          = compile . negateIfNeeded splitedInspection . toAdvanced b $ withoutNegation splitedInspection
+compile (Advanced s v o t n) = compileSubject s t . compileNegation n $ compileInspection v (compilePattern o)
+compile (Basic b i)          = (compile . toAdvanced b (withoutNegation splitedInspection)) isNegated
                                where splitedInspection = splitOn ":" i
+                                     isNegated = elem "Not" splitedInspection
 
 withoutNegation :: [String] -> [String]
 withoutNegation = filter (/= "Not")
 
-negateIfNeeded :: [String] -> Expectation -> Expectation
-negateIfNeeded ("Not":_) (Advanced s v o _ t) = Advanced s v o True t
-negateIfNeeded _ a                            = a
-
-toAdvanced :: String -> [String] -> Expectation
-toAdvanced b ["HasBinding"]          = Advanced [] "declares" (Named b) False False
-toAdvanced b ["HasUsage", x]         = Advanced [b] "uses" (Named x) False True
-toAdvanced b ["HasArity", n]         = Advanced [] ("declaresWithArity" ++ n) (Named b) False False
-toAdvanced b ["HasTypeSignature"]    = Advanced [] "declaresTypeSignature" (Named b) False False
-toAdvanced b ["HasTypeDeclaration"]  = Advanced [] "declaresTypeAlias" (Named b) False False
+toAdvanced :: String -> [String] -> Bool -> Expectation
+toAdvanced b ["HasBinding"]          = Advanced [] "declares" (Named b) False
+toAdvanced b ["HasUsage", x]         = Advanced [b] "uses" (Named x) True
+toAdvanced b ["HasArity", n]         = Advanced [] ("declaresWithArity" ++ n) (Named b) False
+toAdvanced b ["HasTypeSignature"]    = Advanced [] "declaresTypeSignature" (Named b) False
+toAdvanced b ["HasTypeDeclaration"]  = Advanced [] "declaresTypeAlias" (Named b) False
 
 --HasComposition  Haskell
 --HasComprehension  Haskell
