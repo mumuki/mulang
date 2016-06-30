@@ -46,9 +46,10 @@ negateIfNeeded ("Not":_) (Advanced s v o _ t) = Advanced s v o True t
 negateIfNeeded _ a                            = a
 
 toAdvanced :: String -> [String] -> Expectation
-toAdvanced b ["HasBinding"]    = Advanced [] "declares" (Named b) False False
-toAdvanced b ["HasUsage", x]   = Advanced [b] "uses" (Named x) False True
-toAdvanced b ["HasArity", n]   = Advanced [] ("declaresWithArity" ++ n) (Named b) False False
+toAdvanced b ["HasBinding"]          = Advanced [] "declares" (Named b) False False
+toAdvanced b ["HasUsage", x]         = Advanced [b] "uses" (Named x) False True
+toAdvanced b ["HasArity", n]         = Advanced [] ("declaresWithArity" ++ n) (Named b) False False
+toAdvanced b ["HasTypeSignature"]    = Advanced [] "declaresTypeSignature" (Named b) False False
 
 --HasComposition  Haskell
 --HasComprehension  Haskell

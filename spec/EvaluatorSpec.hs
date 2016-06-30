@@ -59,3 +59,8 @@ spec = describe "Evaluator" $ do
       evaluate (Input (Code Haskell "f x y = y + x") [hasArity2, hasArity3]) `shouldBe` (Output [
                                                                           ExpectationResult hasArity2 True,
                                                                           ExpectationResult hasArity3 False] [])
+
+    it "works with HasTypeSignature" $ do
+      let hasTypeSignature = (Basic "f" "HasTypeSignature")
+      evaluate (Input (Code Haskell "f :: Int -> Int -> Int \nf x y = y + x") [hasTypeSignature]) `shouldBe` (Output [
+                                                                          ExpectationResult hasTypeSignature True] [])      
