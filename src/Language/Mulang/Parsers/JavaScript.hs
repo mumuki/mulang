@@ -36,6 +36,7 @@ mu = compact . muNode . gc
     muNode (JSHexInteger v)                                  = muNode (JSStringLiteral '\'' v)
     muNode (JSOctal v)                                       = muNode (JSStringLiteral '"' v)
     muNode (JSExpressionPostfix "++" [var] _)                = [muVarAssignment var (muPlus var (MuNumber 1))]
+    muNode (JSExpressionPostfix "--" [var] _)                = [muVarAssignment var (muMinus var (MuNumber 1))]
     muNode (JSStringLiteral _ v)                             = [MuString v]
     muNode (JSVariables _ decls _)                           = mapMu decls
     muNode (JSArrayLiteral _ es _)                           = [MuList (mapMu es)]
@@ -98,6 +99,7 @@ mu = compact . muNode . gc
     muVarAssignment  var value  = VariableAssignment (muId var)  value
 
     muPlus var delta = (Application (Variable "+") [Variable (muId var), delta])
+    muMinus var delta = (Application (Variable "-") [Variable (muId var), delta])
 
     muFunction :: JSNode -> [JSNode] -> JSNode -> Expression
     muFunction name params body =  FunctionDeclaration (muId name) [Equation (muParams params) (UnguardedBody (mu body))]
