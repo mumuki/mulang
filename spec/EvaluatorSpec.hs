@@ -89,3 +89,7 @@ spec = describe "Evaluator" $ do
     it "works with HasComposition" $ do
       let hasComposition = (Basic "h" "HasComposition")
       evaluate (Input (Code Haskell "h = f . g") [hasComposition]) `shouldBe` (Output [ExpectationResult hasComposition True] [])
+
+    it "works with HasComprehension" $ do
+      let hasComprehension = (Basic "x" "HasComprehension")
+      evaluate (Input (Code Haskell "x = [m | m <- t]") [hasComprehension]) `shouldBe` (Output [ExpectationResult hasComprehension True] [])

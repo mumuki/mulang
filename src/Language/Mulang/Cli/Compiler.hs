@@ -46,7 +46,8 @@ toAdvanced :: String -> [String] -> Bool -> Expectation
 toAdvanced b ["HasAnonymousVariable"]      = nonTransitiveNamed b "usesAnonymousVariable"
 toAdvanced b ["HasArity", n]               = nonTransitiveNamed b ("declaresWithArity" ++ n)
 toAdvanced b ["HasBinding"]                = nonTransitiveNamed b "declares"
-toAdvanced b ["HasComposition"]            = Advanced [b] "usesComposition" Anyone True
+toAdvanced b ["HasComposition"]            = transitiveAnyone b "usesComposition"
+toAdvanced b ["HasComprehension"]          = transitiveAnyone b "usesComprehension"
 toAdvanced b ["HasGuards"]                 = nonTransitiveNamed b "usesGuards"
 toAdvanced b ["HasIf"]                     = nonTransitiveNamed b "usesIf"
 toAdvanced b ["HasRepeat"]                 = nonTransitiveNamed b "usesRepeat"
@@ -54,9 +55,9 @@ toAdvanced b ["HasTypeSignature"]          = nonTransitiveNamed b "declaresTypeS
 toAdvanced b ["HasTypeDeclaration"]        = nonTransitiveNamed b "declaresTypeAlias"
 toAdvanced b ["HasUsage", x]               = Advanced [b] "uses" (Named x) True
 
+transitiveAnyone   binding inspection = Advanced [binding] inspection Anyone True
 nonTransitiveNamed binding inspection = Advanced [] inspection (Named binding) False
 
---"HasComprehension",
 --"HasDirectRecursion",
 --"HasFindall",
 --"HasForall",
