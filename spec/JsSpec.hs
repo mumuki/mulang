@@ -53,6 +53,9 @@ spec = do
     it "increment should be VariableAssignment" $ do
       js "x++" `shouldBe` (VariableAssignment "x" (Application (Variable "+") [Variable "x", MuNumber 1]))
 
+    it "decrement should be VariableAssignment" $ do
+      js "x--" `shouldBe` (VariableAssignment "x" (Application (Variable "-") [Variable "x", MuNumber 1]))
+
     it "sum should be parseable" $ do
       js "x + y" `shouldBe` (Application (Variable "+") [Variable "x",Variable "y"])
 
