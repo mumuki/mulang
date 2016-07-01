@@ -83,8 +83,7 @@ spec = describe "Evaluator" $ do
       evaluate (Input (Code Haskell "c _ = 14") [hasAnonymousVariable]) `shouldBe` (Output [ExpectationResult hasAnonymousVariable True] [])
 
     it "works with HasRepeat" $ do
-      let hasRepeat = (Basic "c" "HasRepeat")
-      evaluate (Input (Code Mulang "Repeat (MuNumber 4) (Sequence [])") [hasRepeat]) `shouldBe` (Output [ExpectationResult hasRepeat True] [])
+      pendingWith "Should be implemented when Gobstones support is ready"
           
     it "works with HasComposition" $ do
       let hasComposition = (Basic "h" "HasComposition")

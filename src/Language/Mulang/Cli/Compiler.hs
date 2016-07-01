@@ -44,22 +44,22 @@ withoutNegation :: [String] -> [String]
 withoutNegation = filter (/= "Not")
 
 toAdvanced :: String -> [String] -> Bool -> Expectation
-toAdvanced b ["HasAnonymousVariable"]      = nonTransitiveNamed b "usesAnonymousVariable"
-toAdvanced b ["HasArity", n]               = nonTransitiveNamed b ("declaresWithArity" ++ n)
-toAdvanced b ["HasBinding"]                = nonTransitiveNamed b "declares"
-toAdvanced b ["HasComposition"]            = transitiveAnyone b "usesComposition"
-toAdvanced b ["HasComprehension"]          = transitiveAnyone b "usesComprehension"
-toAdvanced b ["HasConditional"]            = transitiveAnyone b "usesConditional"
-toAdvanced b ["HasGuards"]                 = transitiveAnyone b "usesGuards"
-toAdvanced b ["HasIf"]                     = nonTransitiveNamed b "usesIf"
-toAdvanced b ["HasRepeat"]                 = nonTransitiveNamed b "usesRepeat"
-toAdvanced b ["HasTypeSignature"]          = nonTransitiveNamed b "declaresTypeSignature"
-toAdvanced b ["HasTypeDeclaration"]        = nonTransitiveNamed b "declaresTypeAlias"
+toAdvanced b ["HasAnonymousVariable"]      = nonTransitiveAdv b "usesAnonymousVariable"
+toAdvanced b ["HasArity", n]               = nonTransitiveAdv b ("declaresWithArity" ++ n)
+toAdvanced b ["HasBinding"]                = Advanced [] "declares" (Named b) False
+toAdvanced b ["HasComposition"]            = transitiveAdv b "usesComposition"
+toAdvanced b ["HasComprehension"]          = transitiveAdv b "usesComprehension"
+toAdvanced b ["HasConditional"]            = transitiveAdv b "usesConditional"
+toAdvanced b ["HasGuards"]                 = transitiveAdv b "usesGuards"
+toAdvanced b ["HasIf"]                     = nonTransitiveAdv b "usesIf"
+toAdvanced b ["HasRepeat"]                 = nonTransitiveAdv b "usesRepeat"
+toAdvanced b ["HasTypeSignature"]          = nonTransitiveAdv b "declaresTypeSignature"
+toAdvanced b ["HasTypeDeclaration"]        = nonTransitiveAdv b "declaresTypeAlias"
 toAdvanced b ["HasUsage", x]               = Advanced [b] "uses" (Named x) True
-toAdvanced b ["HasWhile"]                  = nonTransitiveNamed b "usesWhile"
+toAdvanced b ["HasWhile"]                  = nonTransitiveAdv b "usesWhile"
 
-transitiveAnyone   binding inspection = Advanced [binding] inspection Anyone True
-nonTransitiveNamed binding inspection = Advanced [] inspection (Named binding) False
+transitiveAdv    binding inspection = Advanced [binding] inspection Anyone True
+nonTransitiveAdv binding inspection = Advanced [binding] inspection Anyone False
 
 --"HasDirectRecursion",
 --"HasFindall",
