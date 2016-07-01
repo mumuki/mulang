@@ -63,13 +63,14 @@ toAdvanced b ["HasTypeDeclaration"]        = nonTransitiveAdv b "declaresTypeAli
 toAdvanced b ["HasUsage", x]               = Advanced [b] "uses" (Named x) True
 toAdvanced b ["HasWhile"]                  = nonTransitiveAdv b "usesWhile"
 
+-- TODO:
+--"HasForeach",
+--"HasPrefixApplication",
+--"HasVariable"
+
 transitiveAdv     = adv True
 nonTransitiveAdv  = adv False
 adv negated binding inspection = Advanced [binding] inspection Anyone negated
-
---"HasForeach",
---"HasPrefixApplication",
---"HasVariable",
 
 compileNegation :: Bool -> Inspection -> Inspection
 compileNegation False i = i
