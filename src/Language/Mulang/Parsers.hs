@@ -1,10 +1,8 @@
-module Language.Mulang.Parsers (
-  Parser,
-  MaybeParser,
-  EitherParser) where
+module Language.Mulang.Parsers
+  (Parser, MaybeParser) where
 
-import Language.Mulang
+import           Language.Mulang
+import qualified Text.SimpleParser as S (SimpleParser, MaybeParser)
 
-type Parser = String -> Expression
-type MaybeParser = String -> Maybe Expression
-type EitherParser a = String -> Either a Expression
+type Parser = S.SimpleParser Expression
+type MaybeParser = S.MaybeParser Expression

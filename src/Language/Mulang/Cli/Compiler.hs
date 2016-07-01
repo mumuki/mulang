@@ -9,7 +9,7 @@ import GHC.Generics
 import Data.Aeson
 import Language.Mulang.Inspector
 import Language.Mulang.Inspector.Combiner
-import Language.Mulang.Explorer (Binding, BindingPredicate)
+import Language.Mulang.Binding (Binding, BindingPredicate)
 
 data BindingPattern = Named String | Like String | Anyone deriving (Show, Eq, Generic)
 

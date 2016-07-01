@@ -8,9 +8,9 @@ module Language.Mulang.Inspector.Combiner (
   transitiveList) where
 
 import Language.Mulang
+import Language.Mulang.Binding
 import Language.Mulang.Inspector
 import Language.Mulang.Explorer
-
 
 detect :: Inspection -> Expression -> [Binding]
 detect i expression = filter (`inspection` expression) $ declaredBindingsOf expression

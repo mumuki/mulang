@@ -2,7 +2,7 @@ module Language.Mulang.Inspector.Extras (
   usesConditional,
   declaresPredicate) where
 
-import Language.Mulang.Explorer
+import Language.Mulang.Binding
 import Language.Mulang.Inspector
 import Language.Mulang.Inspector.Combiner
 

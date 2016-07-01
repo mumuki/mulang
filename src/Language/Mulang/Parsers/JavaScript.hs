@@ -4,16 +4,21 @@ import Language.Mulang
 import Language.Mulang.Builder
 import Language.Mulang.Parsers
 
-import Language.JavaScript.Parser.Parser
+import Language.JavaScript.Parser.Parser (parse)
 import Language.JavaScript.Parser.AST
 
-import Data.Maybe (fromJust)
+import Data.Either ()
+
+import Control.Fallible
 
 js :: Parser
-js = fromJust.parseJavaScript
+js = orFail . parseJavaScript'
 
 parseJavaScript :: MaybeParser
-parseJavaScript = Just . normalize . mu . readJs
+parseJavaScript = orNothing . parseJavaScript'
+
+parseJavaScript' :: String -> Either String Expression
+parseJavaScript' = fmap (normalize . mu) . (`parse` "src")
 
 mu :: JSNode -> Expression
 mu = compact . muNode . gc

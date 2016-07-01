@@ -12,17 +12,13 @@ module Language.Mulang.Explorer (
   nameOf,
   extractDeclaration,
   extractReference,
-  Expression(..),
-  Binding,
-  BindingPredicate) where
+  Expression(..)) where
 
 import Language.Mulang
+import Language.Mulang.Binding
+
 import Data.Maybe (maybeToList)
 import Data.List (nub)
-
-type Binding = String
-type BindingPredicate = Binding -> Bool
-
 
 (//)  :: Expression -> Binding -> [Expression]
 (//) = flip bindedDeclarationsOf
