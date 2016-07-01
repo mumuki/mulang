@@ -50,9 +50,11 @@ toAdvanced b ["HasBinding"]                = Advanced [] "declares" (Named b) Fa
 toAdvanced b ["HasComposition"]            = transitiveAdv b "usesComposition"
 toAdvanced b ["HasComprehension"]          = transitiveAdv b "usesComprehension"
 toAdvanced b ["HasConditional"]            = transitiveAdv b "usesConditional"
+toAdvanced b ["HasFindall"]                = transitiveAdv b "usesFindall"
 toAdvanced b ["HasForall"]                 = transitiveAdv b "usesForall"
 toAdvanced b ["HasGuards"]                 = transitiveAdv b "usesGuards"
 toAdvanced b ["HasIf"]                     = nonTransitiveAdv b "usesIf"
+toAdvanced b ["HasLambda"]                 = transitiveAdv b "usesLambda"
 toAdvanced b ["HasRepeat"]                 = nonTransitiveAdv b "usesRepeat"
 toAdvanced b ["HasTypeSignature"]          = nonTransitiveAdv b "declaresTypeSignature"
 toAdvanced b ["HasTypeDeclaration"]        = nonTransitiveAdv b "declaresTypeAlias"
@@ -64,9 +66,7 @@ nonTransitiveAdv  = adv False
 adv negated binding inspection = Advanced [binding] inspection Anyone negated
 
 --"HasDirectRecursion",
---"HasFindall",
 --"HasForeach",
---"HasLambda",
 --"HasNot",
 --"HasPrefixApplication",
 --"HasVariable",
@@ -93,6 +93,7 @@ compileInspection "uses"                   pred = uses pred
 compileInspection "usesComposition"        _    = usesComposition
 compileInspection "usesConditional"        _    = usesConditional
 compileInspection "usesGuards"             _    = usesGuards
+compileInspection "usesFindall"            _    = usesFindall
 compileInspection "usesForall"             _    = usesForall
 compileInspection "usesIf"                 _    = usesIf
 compileInspection "usesRepeat"             _    = usesRepeat

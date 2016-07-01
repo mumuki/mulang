@@ -8,6 +8,7 @@ module Language.Mulang.Inspector (
   usesWhile,
   usesLambda,
   usesNot,
+  usesFindall,
   usesForall,
   usesRepeat,
   usesUnifyOperator,
@@ -147,6 +148,11 @@ usesLambda = containsExpression f
 usesNot :: Inspection
 usesNot = containsExpression f
   where f (Not  _) = True
+        f _ = False
+
+usesFindall :: Inspection
+usesFindall = containsExpression f
+  where f (Findall  _ _ _) = True
         f _ = False
 
 usesForall :: Inspection

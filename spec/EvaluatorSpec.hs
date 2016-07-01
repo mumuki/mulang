@@ -107,3 +107,11 @@ spec = describe "Evaluator" $ do
       let hasForall = (Basic "f" "HasForall")
       evaluate (Input (Code Prolog "f(X) :- isElement(Usuario), forall(isRelated(X, Y), complies(Y)).") [hasForall]) `shouldBe` (Output [
                                                                                                             ExpectationResult hasForall True] [])
+    
+    it "works with HasFindall" $ do
+      let hasFindall = (Basic "baz" "HasFindall")
+      evaluate (Input (Code Prolog "baz(X):- findall(Y, bar(X, Y), Z).") [hasFindall]) `shouldBe` (Output [ExpectationResult hasFindall True] [])
+
+    it "works with HasLambda" $ do
+      let hasLambda = (Basic "f" "HasLambda")
+      evaluate (Input (Code Haskell "f = map $ \\x -> x + 1") [hasLambda]) `shouldBe` (Output [ExpectationResult hasLambda True] [])
