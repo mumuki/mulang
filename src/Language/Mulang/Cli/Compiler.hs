@@ -9,6 +9,7 @@ import GHC.Generics
 import Data.Aeson
 import Language.Mulang.Inspector
 import Language.Mulang.Inspector.Combiner
+import Language.Mulang.Inspector.Extras (usesConditional)
 import Language.Mulang.Binding (Binding, BindingPredicate)
 import Data.List (isInfixOf)
 import Data.List.Split (splitOn)
@@ -48,7 +49,8 @@ toAdvanced b ["HasArity", n]               = nonTransitiveNamed b ("declaresWith
 toAdvanced b ["HasBinding"]                = nonTransitiveNamed b "declares"
 toAdvanced b ["HasComposition"]            = transitiveAnyone b "usesComposition"
 toAdvanced b ["HasComprehension"]          = transitiveAnyone b "usesComprehension"
-toAdvanced b ["HasGuards"]                 = nonTransitiveNamed b "usesGuards"
+toAdvanced b ["HasConditional"]            = transitiveAnyone b "usesConditional"
+toAdvanced b ["HasGuards"]                 = transitiveAnyone b "usesGuards"
 toAdvanced b ["HasIf"]                     = nonTransitiveNamed b "usesIf"
 toAdvanced b ["HasRepeat"]                 = nonTransitiveNamed b "usesRepeat"
 toAdvanced b ["HasTypeSignature"]          = nonTransitiveNamed b "declaresTypeSignature"
@@ -67,7 +69,6 @@ nonTransitiveNamed binding inspection = Advanced [] inspection (Named binding) F
 --"HasPrefixApplication",
 --"HasVariable",
 --"HasWhile",
---"HasConditional",
 
 compileNegation :: Bool -> Inspection -> Inspection
 compileNegation False i = i
@@ -89,6 +90,7 @@ compileInspection "declaresWithArity3"     pred = declaresWithArity 3 pred
 compileInspection "declaresWithArity4"     pred = declaresWithArity 4 pred
 compileInspection "uses"                   pred = uses pred
 compileInspection "usesComposition"        _    = usesComposition
+compileInspection "usesConditional"        _    = usesConditional
 compileInspection "usesGuards"             _    = usesGuards
 compileInspection "usesIf"                 _    = usesIf
 compileInspection "usesRepeat"             _    = usesRepeat

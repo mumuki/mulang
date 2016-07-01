@@ -93,3 +93,7 @@ spec = describe "Evaluator" $ do
     it "works with HasComprehension" $ do
       let hasComprehension = (Basic "x" "HasComprehension")
       evaluate (Input (Code Haskell "x = [m | m <- t]") [hasComprehension]) `shouldBe` (Output [ExpectationResult hasComprehension True] [])
+
+    it "works with HasConditional" $ do
+      let hasConditional = (Basic "min" "HasConditional")
+      evaluate (Input (Code Haskell "min x y = if x < y then x else y") [hasConditional]) `shouldBe` (Output [ExpectationResult hasConditional True] [])
