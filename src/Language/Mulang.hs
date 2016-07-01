@@ -40,6 +40,7 @@ data Expression
         | FactDeclaration Identifier [Pattern]
         | Exist Identifier [Pattern]
         | Not Expression
+        | Findall Expression Expression Expression
         | Forall Expression Expression
         | Variable Identifier
         | Application Expression [Expression]
