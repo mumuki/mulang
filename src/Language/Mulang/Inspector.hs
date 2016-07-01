@@ -9,6 +9,7 @@ module Language.Mulang.Inspector (
   usesLambda,
   usesNot,
   usesForall,
+  usesRepeat,
   usesUnifyOperator,
   declaresRecursively,
   parses,
@@ -128,6 +129,12 @@ usesWhile = containsExpression f
   where f (While _ _) = True
         f _ = False
 
+-- | Inspection that tells whether an expression uses reoeat
+-- in its definition
+usesRepeat :: Inspection
+usesRepeat = containsExpression f
+  where f (Repeat _ _) = True
+        f _ = False
 
 -- | Inspection that tells whether an expression uses a lambda expression
 -- in its definition

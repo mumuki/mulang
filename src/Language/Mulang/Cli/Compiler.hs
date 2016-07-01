@@ -90,6 +90,7 @@ compileInspection "uses"                   pred = uses pred
 compileInspection "usesComposition"        _    = usesComposition
 compileInspection "usesGuards"             _    = usesGuards
 compileInspection "usesIf"                 _    = usesIf
+compileInspection "usesRepeat"             _    = usesRepeat
 compileInspection "usesWhile"              _    = usesWhile
 compileInspection "usesLambda"             _    = usesLambda
 compileInspection "usesComprehension"      _    = usesComprehension

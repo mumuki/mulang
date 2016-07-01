@@ -48,6 +48,7 @@ data Expression
         | If Expression Expression Expression
         | Return Expression
         | While Expression Expression
+        | Repeat Expression Expression
         | Match Expression [Equation]
         | Comprehension Expression [ComprehensionStatement]
         | Sequence [Expression]
