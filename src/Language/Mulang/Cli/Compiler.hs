@@ -43,17 +43,17 @@ withoutNegation :: [String] -> [String]
 withoutNegation = filter (/= "Not")
 
 toAdvanced :: String -> [String] -> Bool -> Expectation
-toAdvanced b ["HasArity", n]         = nonTransitiveNamed b ("declaresWithArity" ++ n)
-toAdvanced b ["HasBinding"]          = nonTransitiveNamed b "declares"
-toAdvanced b ["HasGuards"]           = nonTransitiveNamed b "usesGuards"
-toAdvanced b ["HasIf"]               = nonTransitiveNamed b "usesIf"
-toAdvanced b ["HasTypeSignature"]    = nonTransitiveNamed b "declaresTypeSignature"
-toAdvanced b ["HasTypeDeclaration"]  = nonTransitiveNamed b "declaresTypeAlias"
-toAdvanced b ["HasUsage", x]         = Advanced [b] "uses" (Named x) True
+toAdvanced b ["HasAnonymousVariable"]      = nonTransitiveNamed b "usesAnonymousVariable"
+toAdvanced b ["HasArity", n]               = nonTransitiveNamed b ("declaresWithArity" ++ n)
+toAdvanced b ["HasBinding"]                = nonTransitiveNamed b "declares"
+toAdvanced b ["HasGuards"]                 = nonTransitiveNamed b "usesGuards"
+toAdvanced b ["HasIf"]                     = nonTransitiveNamed b "usesIf"
+toAdvanced b ["HasTypeSignature"]          = nonTransitiveNamed b "declaresTypeSignature"
+toAdvanced b ["HasTypeDeclaration"]        = nonTransitiveNamed b "declaresTypeAlias"
+toAdvanced b ["HasUsage", x]               = Advanced [b] "uses" (Named x) True
 
 nonTransitiveNamed binding inspection = Advanced [] inspection (Named binding) False
 
---"HasAnonymousVariable",
 --"HasComposition",
 --"HasComprehension",
 --"HasDirectRecursion",

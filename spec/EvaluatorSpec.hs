@@ -77,3 +77,7 @@ spec = describe "Evaluator" $ do
     it "works with HasGuards" $ do
       let hasGuards = (Basic "min" "HasGuards")
       evaluate (Input (Code Haskell "min x y | x < y = x | otherwise = y") [hasGuards]) `shouldBe` (Output [ExpectationResult hasGuards True] [])
+
+    it "works with HasAnonymousVariable" $ do
+      let hasAnonymousVariable = (Basic "c" "HasAnonymousVariable")
+      evaluate (Input (Code Haskell "c _ = 14") [hasAnonymousVariable]) `shouldBe` (Output [ExpectationResult hasAnonymousVariable True] [])      
