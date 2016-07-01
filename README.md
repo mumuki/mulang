@@ -105,7 +105,7 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 * `usesGuards`
 * `usesComposition`
 * `usesComprehensions`
-* `usesAnnonymousVariable`
+* `usesAnonymousVariable`
 * `usesUnifyOperator`
 * `hasRedundantIf`
 * `hasRedundantGuards`

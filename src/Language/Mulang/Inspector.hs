@@ -21,7 +21,7 @@ module Language.Mulang.Inspector (
   declaresWithArity,
   declaresTypeAlias,
   declaresTypeSignature,
-  usesAnnonymousVariable,
+  usesAnonymousVariable,
   containsExpression,
   containsDeclaration,
   containsBody,
@@ -171,8 +171,8 @@ usesComprehension = containsExpression f
   where f (Comprehension _ _) = True
         f _ = False
 
-usesAnnonymousVariable :: Inspection
-usesAnnonymousVariable = containsExpression f
+usesAnonymousVariable :: Inspection
+usesAnonymousVariable = containsExpression f
   where f (FunctionDeclaration _ equations)    = equationContainsWildcard equations
         f (ProcedureDeclaration _ equations)   = equationContainsWildcard equations
         f (MethodDeclaration _ equations)      = equationContainsWildcard equations

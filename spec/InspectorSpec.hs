@@ -229,14 +229,14 @@ spec = do
         usesLambda (hs "f x = 4") `shouldBe` False
 
 
-  describe "usesAnnonymousVariable" $ do
+  describe "usesAnonymousVariable" $ do
     it "is True if _ is present in paramenters" $ do
-      usesAnnonymousVariable (hs "foo _ = 1") `shouldBe` True
+      usesAnonymousVariable (hs "foo _ = 1") `shouldBe` True
 
     it "is False if _ is not present in parameters" $ do
-      usesAnnonymousVariable (hs "foo x = 1") `shouldBe` False
+      usesAnonymousVariable (hs "foo x = 1") `shouldBe` False
 
     it "is False if _ is present only in seccond equation" $ do
       let code = fromJust . parseHaskell . unlines $ ["foo False bool = bool", "foo True _ = True"]
-      usesAnnonymousVariable code `shouldBe` True
+      usesAnonymousVariable code `shouldBe` True
 

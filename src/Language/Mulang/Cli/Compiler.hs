@@ -93,7 +93,7 @@ compileInspection "usesIf"                 _    = usesIf
 compileInspection "usesWhile"              _    = usesWhile
 compileInspection "usesLambda"             _    = usesLambda
 compileInspection "usesComprehension"      _    = usesComprehension
-compileInspection "usesAnnonymousVariable" _    = usesAnnonymousVariable
+compileInspection "usesAnonymousVariable"  _    = usesAnonymousVariable
 
 compilePattern :: BindingPattern -> BindingPredicate
 compilePattern (Named o) = named o

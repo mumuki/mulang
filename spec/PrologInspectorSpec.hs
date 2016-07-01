@@ -61,15 +61,15 @@ spec = do
       it "is False when not used" $ do
         usesNot (pl "foo(X) :- bar(X), baz(X).") `shouldBe` False
 
-    describe "usesAnnonymousVariable" $ do
+    describe "usesAnonymousVariable" $ do
       it "is True when _ is used in rule" $ do
-        usesAnnonymousVariable (pl "foo(_) :- bar(X).") `shouldBe` True
+        usesAnonymousVariable (pl "foo(_) :- bar(X).") `shouldBe` True
 
       it "is True when _ is used in fact" $ do
-        usesAnnonymousVariable (pl "foo(_).") `shouldBe` True
+        usesAnonymousVariable (pl "foo(_).") `shouldBe` True
 
       it "is False when _ is not used" $ do
-        usesAnnonymousVariable (pl "foo(a).") `shouldBe` False
+        usesAnonymousVariable (pl "foo(a).") `shouldBe` False
 
     describe "declaresPredicate" $ do
       it "is True when rule is declared" $ do
