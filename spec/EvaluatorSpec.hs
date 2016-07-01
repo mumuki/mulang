@@ -98,3 +98,9 @@ spec = describe "Evaluator" $ do
       let hasConditional = (Basic "min" "HasConditional")
       evaluate (Input (Code JavaScript "function min(x, y) { if (x < y) { return x } else { return y } }") [hasConditional]) `shouldBe` (Output [
                                                                                                             ExpectationResult hasConditional True] [])
+
+    it "works with HasWhile" $ do
+      let hasWhile = (Basic "f" "HasWhile")
+      evaluate (Input (Code JavaScript "function f() { var x = 5; while (x < 10) { x++ } }") [hasWhile]) `shouldBe` (Output [
+                                                                                                            ExpectationResult hasWhile True] [])
+

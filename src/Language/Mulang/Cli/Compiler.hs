@@ -56,6 +56,7 @@ toAdvanced b ["HasRepeat"]                 = nonTransitiveNamed b "usesRepeat"
 toAdvanced b ["HasTypeSignature"]          = nonTransitiveNamed b "declaresTypeSignature"
 toAdvanced b ["HasTypeDeclaration"]        = nonTransitiveNamed b "declaresTypeAlias"
 toAdvanced b ["HasUsage", x]               = Advanced [b] "uses" (Named x) True
+toAdvanced b ["HasWhile"]                  = nonTransitiveNamed b "usesWhile"
 
 transitiveAnyone   binding inspection = Advanced [binding] inspection Anyone True
 nonTransitiveNamed binding inspection = Advanced [] inspection (Named binding) False
@@ -68,7 +69,6 @@ nonTransitiveNamed binding inspection = Advanced [] inspection (Named binding) F
 --"HasNot",
 --"HasPrefixApplication",
 --"HasVariable",
---"HasWhile",
 
 compileNegation :: Bool -> Inspection -> Inspection
 compileNegation False i = i
