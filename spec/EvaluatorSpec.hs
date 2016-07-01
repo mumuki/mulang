@@ -54,9 +54,9 @@ spec = describe "Evaluator" $ do
                                                                           ExpectationResult usesz False] [])
 
     it "works with HasArity" $ do
-      let hasArity2 = (Basic "f" "HasArity:2")
-      let hasArity3 = (Basic "f" "HasArity:3")
-      evaluate (Input (Code Haskell "f x y = y + x") [hasArity2, hasArity3]) `shouldBe` (Output [
+      let hasArity2 = (Basic "foo" "HasArity:2")
+      let hasArity3 = (Basic "foo" "HasArity:3")
+      evaluate (Input (Code Prolog "foo(x, y).") [hasArity2, hasArity3]) `shouldBe` (Output [
                                                                           ExpectationResult hasArity2 True,
                                                                           ExpectationResult hasArity3 False] [])
 
@@ -96,4 +96,5 @@ spec = describe "Evaluator" $ do
 
     it "works with HasConditional" $ do
       let hasConditional = (Basic "min" "HasConditional")
-      evaluate (Input (Code Haskell "min x y = if x < y then x else y") [hasConditional]) `shouldBe` (Output [ExpectationResult hasConditional True] [])
+      evaluate (Input (Code JavaScript "function min(x, y) { if (x < y) { return x } else { return y } }") [hasConditional]) `shouldBe` (Output [
+                                                                                                            ExpectationResult hasConditional True] [])
