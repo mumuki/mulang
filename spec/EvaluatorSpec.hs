@@ -80,4 +80,8 @@ spec = describe "Evaluator" $ do
 
     it "works with HasAnonymousVariable" $ do
       let hasAnonymousVariable = (Basic "c" "HasAnonymousVariable")
-      evaluate (Input (Code Haskell "c _ = 14") [hasAnonymousVariable]) `shouldBe` (Output [ExpectationResult hasAnonymousVariable True] [])      
+      evaluate (Input (Code Haskell "c _ = 14") [hasAnonymousVariable]) `shouldBe` (Output [ExpectationResult hasAnonymousVariable True] [])
+
+    it "works with HasRepeat" $ do
+      let hasRepeat = (Basic "c" "HasRepeat")
+      evaluate (Input (Code Mulang "Repeat (MuNumber 4) (Sequence [])") [hasRepeat]) `shouldBe` (Output [ExpectationResult hasRepeat True] [])

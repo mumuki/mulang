@@ -48,6 +48,7 @@ toAdvanced b ["HasArity", n]               = nonTransitiveNamed b ("declaresWith
 toAdvanced b ["HasBinding"]                = nonTransitiveNamed b "declares"
 toAdvanced b ["HasGuards"]                 = nonTransitiveNamed b "usesGuards"
 toAdvanced b ["HasIf"]                     = nonTransitiveNamed b "usesIf"
+toAdvanced b ["HasRepeat"]                 = nonTransitiveNamed b "usesRepeat"
 toAdvanced b ["HasTypeSignature"]          = nonTransitiveNamed b "declaresTypeSignature"
 toAdvanced b ["HasTypeDeclaration"]        = nonTransitiveNamed b "declaresTypeAlias"
 toAdvanced b ["HasUsage", x]               = Advanced [b] "uses" (Named x) True
@@ -63,7 +64,6 @@ nonTransitiveNamed binding inspection = Advanced [] inspection (Named binding) F
 --"HasLambda",
 --"HasNot",
 --"HasPrefixApplication",
---"HasRepeat",
 --"HasVariable",
 --"HasWhile",
 --"HasConditional",
