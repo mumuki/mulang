@@ -115,3 +115,7 @@ spec = describe "Evaluator" $ do
     it "works with HasLambda" $ do
       let hasLambda = (Basic "f" "HasLambda")
       evaluate (Input (Code Haskell "f = map $ \\x -> x + 1") [hasLambda]) `shouldBe` (Output [ExpectationResult hasLambda True] [])
+    
+    it "works with HasDirectRecursion" $ do
+      let hasDirectRecursion = (Basic "f" "HasDirectRecursion")
+      evaluate (Input (Code Haskell "f x = if x < 5 then f (x - 1) else 2") [hasDirectRecursion]) `shouldBe` (Output [ExpectationResult hasDirectRecursion True] [])

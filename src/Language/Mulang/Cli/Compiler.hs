@@ -50,6 +50,7 @@ toAdvanced b ["HasBinding"]                = Advanced [] "declares" (Named b) Fa
 toAdvanced b ["HasComposition"]            = transitiveAdv b "usesComposition"
 toAdvanced b ["HasComprehension"]          = transitiveAdv b "usesComprehension"
 toAdvanced b ["HasConditional"]            = transitiveAdv b "usesConditional"
+toAdvanced b ["HasDirectRecursion"]        = nonTransitiveAdv b "declaresRecursively"
 toAdvanced b ["HasFindall"]                = transitiveAdv b "usesFindall"
 toAdvanced b ["HasForall"]                 = transitiveAdv b "usesForall"
 toAdvanced b ["HasGuards"]                 = transitiveAdv b "usesGuards"
@@ -65,7 +66,6 @@ transitiveAdv     = adv True
 nonTransitiveAdv  = adv False
 adv negated binding inspection = Advanced [binding] inspection Anyone negated
 
---"HasDirectRecursion",
 --"HasForeach",
 --"HasNot",
 --"HasPrefixApplication",
