@@ -85,3 +85,7 @@ spec = describe "Evaluator" $ do
     it "works with HasRepeat" $ do
       let hasRepeat = (Basic "c" "HasRepeat")
       evaluate (Input (Code Mulang "Repeat (MuNumber 4) (Sequence [])") [hasRepeat]) `shouldBe` (Output [ExpectationResult hasRepeat True] [])
+          
+    it "works with HasComposition" $ do
+      let hasComposition = (Basic "h" "HasComposition")
+      evaluate (Input (Code Haskell "h = f . g") [hasComposition]) `shouldBe` (Output [ExpectationResult hasComposition True] [])
