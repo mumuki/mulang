@@ -56,6 +56,7 @@ toAdvanced b ["HasForall"]                 = transitiveAdv b "usesForall"
 toAdvanced b ["HasGuards"]                 = transitiveAdv b "usesGuards"
 toAdvanced b ["HasIf"]                     = nonTransitiveAdv b "usesIf"
 toAdvanced b ["HasLambda"]                 = transitiveAdv b "usesLambda"
+toAdvanced b ["HasNot"]                    = nonTransitiveAdv b "usesNot"
 toAdvanced b ["HasRepeat"]                 = nonTransitiveAdv b "usesRepeat"
 toAdvanced b ["HasTypeSignature"]          = nonTransitiveAdv b "declaresTypeSignature"
 toAdvanced b ["HasTypeDeclaration"]        = nonTransitiveAdv b "declaresTypeAlias"
@@ -67,7 +68,6 @@ nonTransitiveAdv  = adv False
 adv negated binding inspection = Advanced [binding] inspection Anyone negated
 
 --"HasForeach",
---"HasNot",
 --"HasPrefixApplication",
 --"HasVariable",
 
@@ -90,17 +90,18 @@ compileInspection "declaresWithArity2"     pred = declaresWithArity 2 pred
 compileInspection "declaresWithArity3"     pred = declaresWithArity 3 pred
 compileInspection "declaresWithArity4"     pred = declaresWithArity 4 pred
 compileInspection "uses"                   pred = uses pred
+compileInspection "usesAnonymousVariable"  _    = usesAnonymousVariable
 compileInspection "usesComposition"        _    = usesComposition
+compileInspection "usesComprehension"      _    = usesComprehension
 compileInspection "usesConditional"        _    = usesConditional
 compileInspection "usesGuards"             _    = usesGuards
 compileInspection "usesFindall"            _    = usesFindall
 compileInspection "usesForall"             _    = usesForall
 compileInspection "usesIf"                 _    = usesIf
+compileInspection "usesLambda"             _    = usesLambda
+compileInspection "usesNot"                _    = usesNot
 compileInspection "usesRepeat"             _    = usesRepeat
 compileInspection "usesWhile"              _    = usesWhile
-compileInspection "usesLambda"             _    = usesLambda
-compileInspection "usesComprehension"      _    = usesComprehension
-compileInspection "usesAnonymousVariable"  _    = usesAnonymousVariable
 
 compilePattern :: BindingPattern -> BindingPredicate
 compilePattern (Named o) = named o

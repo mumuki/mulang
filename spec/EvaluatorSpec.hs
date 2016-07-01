@@ -119,3 +119,7 @@ spec = describe "Evaluator" $ do
     it "works with HasDirectRecursion" $ do
       let hasDirectRecursion = (Basic "f" "HasDirectRecursion")
       evaluate (Input (Code Haskell "f x = if x < 5 then f (x - 1) else 2") [hasDirectRecursion]) `shouldBe` (Output [ExpectationResult hasDirectRecursion True] [])
+
+    it "works with HasNot" $ do
+      let hasNot = (Basic "foo" "HasNot")
+      evaluate (Input (Code Prolog "foo(X) :- not(bar(X)).") [hasNot]) `shouldBe` (Output [ExpectationResult hasNot True] [])      
