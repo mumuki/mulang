@@ -103,3 +103,7 @@ spec = describe "Evaluator" $ do
       evaluate (Input (Code JavaScript "function f() { var x = 5; while (x < 10) { x++ } }") [hasWhile]) `shouldBe` (Output [
                                                                                                             ExpectationResult hasWhile True] [])
 
+    it "works with HasForall" $ do
+      let hasForall = (Basic "f" "HasForall")
+      evaluate (Input (Code Prolog "f(X) :- isElement(Usuario), forall(isRelated(X, Y), complies(Y)).") [hasForall]) `shouldBe` (Output [
+                                                                                                            ExpectationResult hasForall True] [])

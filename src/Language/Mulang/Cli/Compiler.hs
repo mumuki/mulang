@@ -50,6 +50,7 @@ toAdvanced b ["HasBinding"]                = Advanced [] "declares" (Named b) Fa
 toAdvanced b ["HasComposition"]            = transitiveAdv b "usesComposition"
 toAdvanced b ["HasComprehension"]          = transitiveAdv b "usesComprehension"
 toAdvanced b ["HasConditional"]            = transitiveAdv b "usesConditional"
+toAdvanced b ["HasForall"]                 = transitiveAdv b "usesForall"
 toAdvanced b ["HasGuards"]                 = transitiveAdv b "usesGuards"
 toAdvanced b ["HasIf"]                     = nonTransitiveAdv b "usesIf"
 toAdvanced b ["HasRepeat"]                 = nonTransitiveAdv b "usesRepeat"
@@ -58,12 +59,12 @@ toAdvanced b ["HasTypeDeclaration"]        = nonTransitiveAdv b "declaresTypeAli
 toAdvanced b ["HasUsage", x]               = Advanced [b] "uses" (Named x) True
 toAdvanced b ["HasWhile"]                  = nonTransitiveAdv b "usesWhile"
 
-transitiveAdv    binding inspection = Advanced [binding] inspection Anyone True
-nonTransitiveAdv binding inspection = Advanced [binding] inspection Anyone False
+transitiveAdv     = adv True
+nonTransitiveAdv  = adv False
+adv negated binding inspection = Advanced [binding] inspection Anyone negated
 
 --"HasDirectRecursion",
 --"HasFindall",
---"HasForall",
 --"HasForeach",
 --"HasLambda",
 --"HasNot",
@@ -92,6 +93,7 @@ compileInspection "uses"                   pred = uses pred
 compileInspection "usesComposition"        _    = usesComposition
 compileInspection "usesConditional"        _    = usesConditional
 compileInspection "usesGuards"             _    = usesGuards
+compileInspection "usesForall"             _    = usesForall
 compileInspection "usesIf"                 _    = usesIf
 compileInspection "usesRepeat"             _    = usesRepeat
 compileInspection "usesWhile"              _    = usesWhile
