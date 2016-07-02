@@ -73,6 +73,18 @@ forall = do
           c2 <- consult
           closeParen
           return $ Forall c1 c2
+
+findall = do
+          string "findall"
+          openParen
+          c1 <- consult
+          comma
+          c2 <- consult
+          comma
+          c3 <- consult
+          closeParen
+          return $ Findall c1 c2 c3
+
 pnot = do
           string "not"
           openParen
@@ -90,7 +102,7 @@ pinfix = do
             p2 <- pattern
             return $ Exist operator [p1, p2]
 
-consult = choice [try forall, try pnot, try pinfix, exist]
+consult = choice [try findall, try forall, try pnot, try pinfix, exist]
 
 rawPatternsList = optionMaybe $ do
                  openParen

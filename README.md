@@ -105,7 +105,7 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 * `usesGuards`
 * `usesComposition`
 * `usesComprehensions`
-* `usesAnnonymousVariable`
+* `usesAnonymousVariable`
 * `usesUnifyOperator`
 * `hasRedundantIf`
 * `hasRedundantGuards`
@@ -190,11 +190,18 @@ Mulang is just a Haskell library. You can install it though cabal.
 
 But if you are not the Haskell inclined gal or guy - ok, I will try to forgive you - this code comes with a command line too. So you don't even have to typecheck!
 
-Sample CLI usage:
+Sample CLI usage...
 
+...with advanced expectations:
 ```
-$ mulang '{"expectations":[{"subject":["x"],"transitive":false,"negated":false,"object":{"tag":"Anyone","contents":[]},"verb":"uses"}],"code":{"content":"x = 1","language":"Haskell"}} '
-{"results":[{"result":false,"expectation":{"subject":["x"],"transitive":false,"negated":false,"object":{"tag":"Anyone","contents":[]},"verb":"uses"}}],"smells":[]}
+$ mulang '{"expectations":[{"tag":"Advanced","subject":["x"],"transitive":false,"negated":false,"object":{"tag":"Anyone","contents":[]},"verb":"uses"}],"code":{"content":"x = 1","language":"Haskell"}}'
+{"results":[{"result":false,"expectation":{"subject":["x"],"tag":"Advanced","transitive":false,"negated":false,"object":{"tag":"Anyone","contents":[]},"verb":"uses"}}],"smells":[]}
+```
+
+...and with basic expectations:
+```
+$ mulang '{"expectations":[{"tag":"Basic","binding":"x","inspection":""],"code":{"content":"x = 1","language":"Haskell"}}'
+{"results":[{"result":true,"expectation":{"tag":"Basic","inspection":"HasBinding","binding":"x"}}],"smells":[]}
 ```
 
 ## Building mulang from source

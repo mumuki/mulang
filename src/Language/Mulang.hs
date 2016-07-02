@@ -40,6 +40,7 @@ data Expression
         | FactDeclaration Identifier [Pattern]
         | Exist Identifier [Pattern]
         | Not Expression
+        | Findall Expression Expression Expression
         | Forall Expression Expression
         | Variable Identifier
         | Application Expression [Expression]
@@ -48,6 +49,7 @@ data Expression
         | If Expression Expression Expression
         | Return Expression
         | While Expression Expression
+        | Repeat Expression Expression
         | Match Expression [Equation]
         | Comprehension Expression [ComprehensionStatement]
         | Sequence [Expression]

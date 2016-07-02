@@ -8,7 +8,9 @@ module Language.Mulang.Inspector (
   usesWhile,
   usesLambda,
   usesNot,
+  usesFindall,
   usesForall,
+  usesRepeat,
   usesUnifyOperator,
   declaresRecursively,
   parses,
@@ -21,7 +23,7 @@ module Language.Mulang.Inspector (
   declaresWithArity,
   declaresTypeAlias,
   declaresTypeSignature,
-  usesAnnonymousVariable,
+  usesAnonymousVariable,
   containsExpression,
   containsDeclaration,
   containsBody,
@@ -128,6 +130,12 @@ usesWhile = containsExpression f
   where f (While _ _) = True
         f _ = False
 
+-- | Inspection that tells whether an expression uses reoeat
+-- in its definition
+usesRepeat :: Inspection
+usesRepeat = containsExpression f
+  where f (Repeat _ _) = True
+        f _ = False
 
 -- | Inspection that tells whether an expression uses a lambda expression
 -- in its definition
@@ -140,6 +148,11 @@ usesLambda = containsExpression f
 usesNot :: Inspection
 usesNot = containsExpression f
   where f (Not  _) = True
+        f _ = False
+
+usesFindall :: Inspection
+usesFindall = containsExpression f
+  where f (Findall  _ _ _) = True
         f _ = False
 
 usesForall :: Inspection
@@ -171,8 +184,8 @@ usesComprehension = containsExpression f
   where f (Comprehension _ _) = True
         f _ = False
 
-usesAnnonymousVariable :: Inspection
-usesAnnonymousVariable = containsExpression f
+usesAnonymousVariable :: Inspection
+usesAnonymousVariable = containsExpression f
   where f (FunctionDeclaration _ equations)    = equationContainsWildcard equations
         f (ProcedureDeclaration _ equations)   = equationContainsWildcard equations
         f (MethodDeclaration _ equations)      = equationContainsWildcard equations

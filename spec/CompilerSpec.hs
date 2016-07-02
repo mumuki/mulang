@@ -5,12 +5,23 @@ import           Data.Aeson
 import           Language.Mulang.Cli.Compiler as C
 import           Test.Hspec
 
-expectationJson = LBS.pack "{\"subject\":[\"x\"],\"transitive\":false,\"negated\":true,\"object\":{\"tag\":\"Anyone\",\"contents\":[]},\"verb\":\"uses\"}"
-expectation = C.Expectation ["x"] "uses" Anyone True False
-
 spec = describe "Compiler" $ do
-  it "can decode expectation JSON" $ do
-    (decode expectationJson :: Maybe C.Expectation) `shouldBe` Just expectation
+  describe "advanced expectations" $ do
+    let advancedExpJson = LBS.pack "{\"subject\":[\"x\"],\"tag\":\"Advanced\",\"transitive\":false,\"negated\":true,\"object\":{\"tag\":\"Anyone\",\"contents\":[]},\"verb\":\"uses\"}"
+    let advancedExp = C.Advanced ["x"] "uses" Anyone False True
 
-  it "can encode expectation JSON" $ do
-    encode expectation `shouldBe` expectationJson
+    it "can be decoded from JSON" $ do
+      (decode advancedExpJson :: Maybe C.Expectation) `shouldBe` Just advancedExp
+
+    it "can be encoded to JSON" $ do
+      encode advancedExp `shouldBe` advancedExpJson
+  
+  describe "basic expectations" $ do
+    let basicExpJson = LBS.pack "{\"tag\":\"Basic\",\"inspection\":\"HasBinding\",\"binding\":\"x\"}"
+    let basicExp = C.Basic "x" "HasBinding"
+
+    it "can be decoded from JSON" $ do
+      (decode basicExpJson :: Maybe C.Expectation) `shouldBe` Just basicExp
+
+    it "can be encoded to JSON" $ do
+      encode basicExp `shouldBe` basicExpJson

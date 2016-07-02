@@ -65,6 +65,9 @@ spec = do
     it "rule/1 with forall" $ do
       pl "baz(X):- forall(bar(X), bar(X))." `shouldBe` RuleDeclaration "baz" [VariablePattern "X"] [Forall (Exist "bar" [VariablePattern "X"]) (Exist "bar" [VariablePattern "X"])]
 
+    it "rule/1 with findall" $ do
+      pl "baz(X):- findall(Y, bar(X, Y), Z)." `shouldBe` RuleDeclaration "baz" [VariablePattern "X"] [Findall (Exist "Y" []) (Exist "bar" [VariablePattern "X", VariablePattern "Y"]) (Exist "Z" [])]
+
     it "rule/1 with major" $ do
       pl "baz(X):- X > 4." `shouldBe`  RuleDeclaration "baz" [VariablePattern "X"] [Exist ">" [VariablePattern "X",LiteralPattern "4.0"]]
 
