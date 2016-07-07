@@ -10,4 +10,11 @@ script:
 after_success:
 - wget https://raw.githubusercontent.com/mumuki/mumuki-escualo/master/travis_deploy
   && chmod u+x travis_deploy && ./travis_deploy mulang runners.mumuki.io
+deploy:
+  provider: releases
+  api_key:
+    secure: MQzUc43kSEXHf+CV1oqxky2QFd9MGnx1mIgtfR6xc9pCOSNHX9XXob9k7ki4Z8xJlIhvY3f+mnqADsniRg5OvQSbqxYbCF/lrLCXylgkOZXrN5k7O3thi4tZn5MwCJ66uFDGbUHvzH1T9hEoJ2L6D+YxKKUPOmJIBTdttbIBFm3zrIU6IlM
+  file: dist/build/mulang/mulang
+  on:
+    repo: mumuki/mulang
 
