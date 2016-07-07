@@ -2,7 +2,6 @@ module Language.Mulang.Parsers.Prolog  (pl, parseProlog) where
 
 import Text.Parsec
 import Text.Parsec.Numbers
-import Text.ParserCombinators.Parsec.Prim (GenParser)
 
 import Language.Mulang
 import Language.Mulang.Builder

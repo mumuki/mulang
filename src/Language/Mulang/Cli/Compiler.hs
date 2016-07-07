@@ -8,10 +8,9 @@ module Language.Mulang.Cli.Compiler(
 import GHC.Generics
 import Data.Aeson
 import Language.Mulang.Inspector
-import Language.Mulang.Inspector.Combiner
+import Language.Mulang.Inspector.Combiner (scopedList, transitiveList, negative)
 import Language.Mulang.Inspector.Extras (usesConditional)
-import Language.Mulang.Binding (Binding, BindingPredicate)
-import Data.List (isInfixOf)
+import Language.Mulang.Binding (BindingPredicate)
 import Data.List.Split (splitOn)
 
 data BindingPattern = Named String | Like String | Anyone deriving (Show, Eq, Generic)
@@ -22,7 +21,7 @@ data Expectation =  Advanced {
                       object :: BindingPattern,
                       transitive :: Bool,
                       negated :: Bool
-                    } 
+                    }
                     | Basic {
                       binding :: String,
                       inspection :: String
@@ -62,7 +61,7 @@ toAdvanced b ["HasTypeSignature"]          = nonTransitiveAdv b "declaresTypeSig
 toAdvanced b ["HasTypeDeclaration"]        = nonTransitiveAdv b "declaresTypeAlias"
 toAdvanced b ["HasUsage", x]               = Advanced [b] "uses" (Named x) True
 toAdvanced b ["HasWhile"]                  = nonTransitiveAdv b "usesWhile"
-
+toAdvanced _ inspection                    = error $ "Unsupported basic inspection " ++ show inspection
 -- TODO:
 --"HasForeach",
 --"HasPrefixApplication",
@@ -103,6 +102,7 @@ compileInspection "usesLambda"             _    = usesLambda
 compileInspection "usesNot"                _    = usesNot
 compileInspection "usesRepeat"             _    = usesRepeat
 compileInspection "usesWhile"              _    = usesWhile
+compileInspection inspection               _    = error $ "unsupported advanced inspection " ++ show inspection
 
 compilePattern :: BindingPattern -> BindingPredicate
 compilePattern (Named o) = named o

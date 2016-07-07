@@ -82,7 +82,6 @@ declaresWithArity :: Int -> BindingPredicate -> Inspection
 declaresWithArity arity = containsDeclaration f
   where f (FunctionDeclaration _ equations)  = any equationArityIs equations
         f (ProcedureDeclaration _ equations) = any equationArityIs equations
-        f (ProcedureDeclaration _ equations) = any equationArityIs equations
         f (MethodDeclaration _ equations)    = any equationArityIs equations
         f (RuleDeclaration _ args _)         = argsHaveArity args
         f (FactDeclaration _ args)           = argsHaveArity args
