@@ -11,7 +11,9 @@ import qualified Data.ByteString.Lazy.Char8 as LBS (pack, putStrLn)
 
 main :: IO ()
 main = do
-  body <- fmap parseArgs $ getArgs
+  argsBody <- fmap parseArgs $ getArgs
+  streamBody <- getContents
+  let body = if argsBody == "-s" then streamBody else argsBody
   LBS.putStrLn . encode . evaluate . decode . LBS.pack $ body
 
 parseArgs :: [String] -> String
