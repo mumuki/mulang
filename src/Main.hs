@@ -24,6 +24,10 @@ decode = orFail . eitherDecode
 
 usage = "Wrong usage.                                 \n\
         \                                             \n\
+        \  #read from STDIN                           \n\
+        \  $ mulang -s                                \n\
+        \                                             \n\
+        \  #read from argument                        \n\
         \  $ mulang '{                                \n\
         \      \"expectations\":[{                    \n\
         \                \"tag\":\"Basic\",           \n\
