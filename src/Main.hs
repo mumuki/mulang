@@ -7,14 +7,16 @@ import Data.Aeson (eitherDecode, encode)
 import System.Environment (getArgs)
 import Control.Fallible (orFail)
 
-import qualified Data.ByteString.Lazy.Char8 as LBS (pack, putStrLn)
+import           Data.Text.Lazy.Encoding (encodeUtf8)
+import qualified Data.ByteString.Lazy as LBS (pack, putStrLn)
+import qualified Data.Text.Lazy as T (pack)
 
 main :: IO ()
 main = do
   argsBody <- fmap parseArgs $ getArgs
   streamBody <- getContents
   let body = if argsBody == "-s" then streamBody else argsBody
-  LBS.putStrLn . encode . evaluate . decode . LBS.pack $ body
+  LBS.putStrLn . encode . evaluate . decode . encodeUtf8 . T.pack $ body
 
 parseArgs :: [String] -> String
 parseArgs [jsonBody] = jsonBody
