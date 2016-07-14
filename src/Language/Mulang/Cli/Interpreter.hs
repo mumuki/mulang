@@ -68,8 +68,13 @@ namedSmells = [
   ("HasRedundantLambda", hasRedundantLambda),
   ("HasRedundantBooleanComparison", hasRedundantBooleanComparison),
   ("HasRedundantGuards", hasRedundantGuards),
-  ("HasRedundantParameter", hasRedundantParameter)]
+  ("HasRedundantParameter", hasRedundantParameter),
+  ("HasRedundantLocalVariableReturn", hasRedundantLocalVariableReturn),
+  ("hasAssignmentReturn", hasAssignmentReturn),
+  ("DoesNullTest", doesNullTest),
+  ("DoesTypeTest", doesTypeTest),
+  ("ReturnsNull", returnsNull)]
 
-smellyBindingToResult smellName binding = Advanced [binding] smellName Anyone False True
+smellyBindingToResult smellName binding = Basic binding smellName
 
 

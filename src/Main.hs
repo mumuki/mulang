@@ -8,7 +8,7 @@ import System.Environment (getArgs)
 import Control.Fallible (orFail)
 
 import           Data.Text.Lazy.Encoding (encodeUtf8)
-import qualified Data.ByteString.Lazy as LBS (pack, putStrLn)
+import qualified Data.ByteString.Lazy as LBS (putStrLn)
 import qualified Data.Text.Lazy as T (pack)
 
 main :: IO ()

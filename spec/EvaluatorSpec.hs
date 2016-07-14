@@ -11,7 +11,7 @@ spec = describe "Evaluator" $ do
       evaluate (Input (Code Haskell "x = 2") []) `shouldBe` (Output [] [])
 
     it "detects smells" $ do
-      evaluate (Input (Code Haskell "x = \\y -> f y") []) `shouldBe` (Output [] [(Advanced ["x"] "HasRedundantParameter" Anyone False True)])
+      evaluate (Input (Code Haskell "x = \\y -> f y") []) `shouldBe` (Output [] [Basic "x" "HasRedundantParameter"])
 
     it "evaluates present named expectations" $ do
       let ydeclares = (Advanced [] "declares" (Named "y") False False)
@@ -35,7 +35,7 @@ spec = describe "Evaluator" $ do
     it "can be negated" $ do
       let notDeclaresx = (Basic "x" "Not:HasBinding")
       let notDeclaresy = (Basic "y" "Not:HasBinding")
-      evaluate (Input (Code Haskell "x = 2") [notDeclaresy, notDeclaresx]) `shouldBe` (Output [
+      evaluate (Input (Code Haskell "x = \"¡\"") [notDeclaresy, notDeclaresx]) `shouldBe` (Output [
                                                                           ExpectationResult notDeclaresy True,
                                                                           ExpectationResult notDeclaresx False] [])
 
