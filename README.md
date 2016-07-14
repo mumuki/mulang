@@ -95,7 +95,9 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 * `declaresTypeSignature`: **any paradigm** is a given computation type signature declared?
 * `declaresTypeAlias`: **any paradigm** is a given type synonym declared?
 * `declaresRecursively`: **any paradigm** is a given computation declared using recusion?
-* `declaresWithArity`: **any paradigm** that is, does the given method, function, procedure, etc have the given amount of parameters?
+* `declaresComputation`: **any paradigm** that is, does the given computation  - method, predicate, function, etc - exist?
+* `declaresComputationWithArity`: **any paradigm** that is, does the given computation arity match the given criteria
+* `declaresComputationWithExactArity`: **any paradigm** that is, does the given computation have the exact given arity?
 * `declaresRule`: **logic paradigm** is a given logic rule declared?
 * `declaresFact`: **logic paradigm** is a given logic fact declared?
 * `declaresPredicate`: **logic paradigm** is a given rule o fact declared?
@@ -238,7 +240,7 @@ cabal test
 cabal repl
 ```
 
-And then, inside the REPL, do: 
+And then, inside the REPL, do:
 
 ```
 :m Language.Mulang.All

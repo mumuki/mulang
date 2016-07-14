@@ -37,17 +37,17 @@ spec = do
       it "is False when is a method" $ do
         declaresFunction (named "f") (js "var o = {f: function(){}}") `shouldBe` False
 
-  describe "declaresWithArity" $ do
+  describe "declaresComputationWithExactArity" $ do
     describe "with function declarations" $ do
       it "is True when function is declared with the given arity" $ do
-        (declaresWithArity 1) (named "f") (js "function f(x) { return x + 1 }") `shouldBe` True
+        (declaresComputationWithExactArity 1) (named "f") (js "function f(x) { return x + 1 }") `shouldBe` True
 
       it "is False when function is declared with another arity" $ do
-        (declaresWithArity 2) (named "f") (js "function f(x) { x + 1}") `shouldBe` False
+        (declaresComputationWithExactArity 2) (named "f") (js "function f(x) { x + 1}") `shouldBe` False
 
     describe "with constant declaration" $ do
       it "is True when constant is declared with lambda of given arity" $ do
-        (declaresWithArity 2) (named "f") (js "var f = function(x, y) { return x + y }") `shouldBe` True
+        (declaresComputationWithExactArity 2) (named "f") (js "var f = function(x, y) { return x + y }") `shouldBe` True
 
   describe "usesWhile" $ do
     it "is True when present in function" $ do

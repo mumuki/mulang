@@ -20,7 +20,9 @@ module Language.Mulang.Inspector (
   declaresRule,
   declaresFact,
   declaresFunction,
-  declaresWithArity,
+  declaresComputationWithArity,
+  declaresComputationWithExactArity,
+  declaresComputation,
   declaresTypeAlias,
   declaresTypeSignature,
   usesAnonymousVariable,
@@ -75,8 +77,19 @@ declares = containsDeclaration f
   where f (TypeSignature _) = False
         f _                 = True
 
-declaresWithArity :: Int -> BindingPredicate -> Inspection
-declaresWithArity arity = containsDeclaration f
+declaresFunction :: BindingPredicate -> Inspection
+declaresFunction = containsDeclaration f
+  where f (FunctionDeclaration _ _) = True
+        f _  = False
+-- | Inspection that tells whether a top level computation binding exists
+declaresComputation :: BindingPredicate -> Inspection
+declaresComputation = declaresComputationWithArity (const True)
+
+declaresComputationWithExactArity :: Int -> BindingPredicate -> Inspection
+declaresComputationWithExactArity arity = declaresComputationWithArity (== arity)
+
+declaresComputationWithArity :: (Int -> Bool) -> BindingPredicate -> Inspection
+declaresComputationWithArity arityPredicate = containsDeclaration f
   where f (FunctionDeclaration _ equations)  = any equationArityIs equations
         f (ProcedureDeclaration _ equations) = any equationArityIs equations
         f (MethodDeclaration _ equations)    = any equationArityIs equations
@@ -86,7 +99,7 @@ declaresWithArity arity = containsDeclaration f
 
         equationArityIs = \(Equation args _) -> argsHaveArity args
 
-        argsHaveArity args = length args == arity
+        argsHaveArity = arityPredicate.length
 
 declaresTypeAlias :: BindingPredicate -> Inspection
 declaresTypeAlias = containsDeclaration f

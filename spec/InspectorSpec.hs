@@ -40,24 +40,36 @@ spec = do
       it "is False when constant is declared with a variable literal" $ do
         declaresFunction (named "f") (hs "f = snd") `shouldBe` False
 
-  describe "declaresWithArity" $ do
+  describe "declaresComputationWithExactArity" $ do
     describe "with function declarations" $ do
       it "is True when function is declared with the given arity" $ do
-        (declaresWithArity 1) (named "f") (hs "f x = x + 1") `shouldBe` True
+        (declaresComputationWithExactArity 1) (named "f") (hs "f x = x + 1") `shouldBe` True
 
       it "is False when function is declared with another arity" $ do
-        (declaresWithArity 2) (named "f") (hs "f x = x + 1") `shouldBe` False
+        (declaresComputationWithExactArity 2) (named "f") (hs "f x = x + 1") `shouldBe` False
 
     describe "with constant declaration" $ do
       it "is True when constant is declared with lambda of given arity" $ do
-        (declaresWithArity 2) (named "f") (hs "f = \\x y -> x + y") `shouldBe` True
+        (declaresComputationWithExactArity 2) (named "f") (hs "f = \\x y -> x + y") `shouldBe` True
 
       it "is False when constant is declared with lambda of given arity" $ do
-        (declaresWithArity 3) (named "f") (hs "f = \\x y -> x + y") `shouldBe` False
+        (declaresComputationWithExactArity 3) (named "f") (hs "f = \\x y -> x + y") `shouldBe` False
 
       it "is False if it is a variable" $ do
-        (declaresWithArity 1) (named "f") (hs "f = snd") `shouldBe` False
+        (declaresComputationWithExactArity 1) (named "f") (hs "f = snd") `shouldBe` False
 
+  describe "declaresComputation" $ do
+    describe "with constants" $ do
+      it "is False when binding exists" $ do
+        declaresComputation (named "x") (hs "x = 1") `shouldBe` False
+
+    describe "with type declarations" $ do
+      it "is False when binding exists" $ do
+        declaresComputation (named "x") (hs "x :: Int -> Int") `shouldBe` False
+
+    describe "with function declarations" $ do
+      it "is True when binding exists" $ do
+        declaresComputation (named "x") (hs "x _ = True") `shouldBe` True
 
   describe "declares" $ do
     describe "with constants" $ do
