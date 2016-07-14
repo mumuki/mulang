@@ -24,18 +24,18 @@ parseArgs _          = error usage
 
 decode = orFail . eitherDecode
 
-usage = "Wrong usage.                                 \n\
-        \                                             \n\
-        \  #read from STDIN                           \n\
-        \  $ mulang -s                                \n\
-        \                                             \n\
-        \  #read from argument                        \n\
-        \  $ mulang '{                                \n\
-        \      \"expectations\":[{                    \n\
-        \                \"tag\":\"Basic\",           \n\
-        \                \"binding\":\"x\",           \n\
-        \                \"inspection\":\"\"}],       \n\
-        \        \"code\": {                          \n\
-        \            \"content\":\"x = 1\",           \n\
-        \            \"language\":\"Haskell\"}        \n\
+usage = "Wrong usage.                                            \n\
+        \                                                        \n\
+        \  #read from STDIN                                      \n\
+        \  $ mulang -s                                           \n\
+        \                                                        \n\
+        \  #read from argument                                   \n\
+        \  $ mulang '{                                           \n\
+        \      \"expectations\":[{                               \n\
+        \                \"tag\":\"Basic\",                      \n\
+        \                \"binding\":\"x\",                      \n\
+        \                \"inspection\":\"HasBiniding\"}],       \n\
+        \        \"code\": {                                     \n\
+        \            \"content\":\"x = 1\",                      \n\
+        \            \"language\":\"Haskell\"}                   \n\
         \  }'"
