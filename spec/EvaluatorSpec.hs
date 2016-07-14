@@ -45,7 +45,7 @@ spec = describe "Evaluator" $ do
       evaluate (Input (Code Haskell "x = 2") [ydeclares, xdeclares]) `shouldBe` (Output [
                                                                           ExpectationResult ydeclares False,
                                                                           ExpectationResult xdeclares True] [])
-    
+
     it "works with HasUsage" $ do
       let usesy = (Basic "x" "HasUsage:y")
       let usesz = (Basic "x" "HasUsage:z")
@@ -62,31 +62,36 @@ spec = describe "Evaluator" $ do
 
     it "works with HasTypeSignature" $ do
       let hasTypeSignature = (Basic "f" "HasTypeSignature")
-      evaluate (Input (Code Haskell "f :: Int -> Int -> Int \nf x y = y + x") [hasTypeSignature]) `shouldBe` (Output [
-                                                                          ExpectationResult hasTypeSignature True] [])
+      evaluate (Input (Code Haskell "f x y = y + x") [hasTypeSignature]) `shouldBe` (Output [ExpectationResult hasTypeSignature False] [])
+      evaluate (Input (Code Haskell "f :: Int -> Int -> Int \nf x y = y + x") [hasTypeSignature]) `shouldBe` (Output [ExpectationResult hasTypeSignature True] [])
 
     it "works with HasTypeDeclaration" $ do
       let hasTypeDeclaration = (Basic "Words" "HasTypeDeclaration")
-      evaluate (Input (Code Haskell "type Words = [String]") [hasTypeDeclaration]) `shouldBe` (Output [
-                                                                          ExpectationResult hasTypeDeclaration True] [])
+      evaluate (Input (Code Haskell "type Works = [String]") [hasTypeDeclaration]) `shouldBe` (Output [ExpectationResult hasTypeDeclaration False] [])
+      evaluate (Input (Code Haskell "data Words = Words") [hasTypeDeclaration]) `shouldBe` (Output [ExpectationResult hasTypeDeclaration False] [])
+      evaluate (Input (Code Haskell "type Words = [String]") [hasTypeDeclaration]) `shouldBe` (Output [ExpectationResult hasTypeDeclaration True] [])
 
     it "works with HasIf" $ do
       let hasIf = (Basic "min" "HasIf")
+      evaluate (Input (Code Haskell "min x y = True") [hasIf]) `shouldBe` (Output [ExpectationResult hasIf False] [])
       evaluate (Input (Code Haskell "min x y = if x < y then x else y") [hasIf]) `shouldBe` (Output [ExpectationResult hasIf True] [])
 
     it "works with HasGuards" $ do
       let hasGuards = (Basic "min" "HasGuards")
+      evaluate (Input (Code Haskell "min x y = x") [hasGuards]) `shouldBe` (Output [ExpectationResult hasGuards False] [])
       evaluate (Input (Code Haskell "min x y | x < y = x | otherwise = y") [hasGuards]) `shouldBe` (Output [ExpectationResult hasGuards True] [])
 
     it "works with HasAnonymousVariable" $ do
       let hasAnonymousVariable = (Basic "c" "HasAnonymousVariable")
+      evaluate (Input (Code Haskell "c x = 14") [hasAnonymousVariable]) `shouldBe` (Output [ExpectationResult hasAnonymousVariable False] [])
       evaluate (Input (Code Haskell "c _ = 14") [hasAnonymousVariable]) `shouldBe` (Output [ExpectationResult hasAnonymousVariable True] [])
 
     it "works with HasRepeat" $ do
       pendingWith "Should be implemented when Gobstones support is ready"
-          
+
     it "works with HasComposition" $ do
       let hasComposition = (Basic "h" "HasComposition")
+      evaluate (Input (Code Haskell "h = f") [hasComposition]) `shouldBe` (Output [ExpectationResult hasComposition False] [])
       evaluate (Input (Code Haskell "h = f . g") [hasComposition]) `shouldBe` (Output [ExpectationResult hasComposition True] [])
 
     it "works with HasComprehension" $ do
@@ -107,19 +112,23 @@ spec = describe "Evaluator" $ do
       let hasForall = (Basic "f" "HasForall")
       evaluate (Input (Code Prolog "f(X) :- isElement(Usuario), forall(isRelated(X, Y), complies(Y)).") [hasForall]) `shouldBe` (Output [
                                                                                                             ExpectationResult hasForall True] [])
-    
+
     it "works with HasFindall" $ do
       let hasFindall = (Basic "baz" "HasFindall")
+      evaluate (Input (Code Prolog "baz(X):- bar(X, Y).") [hasFindall]) `shouldBe` (Output [ExpectationResult hasFindall False] [])
       evaluate (Input (Code Prolog "baz(X):- findall(Y, bar(X, Y), Z).") [hasFindall]) `shouldBe` (Output [ExpectationResult hasFindall True] [])
 
     it "works with HasLambda" $ do
       let hasLambda = (Basic "f" "HasLambda")
+      evaluate (Input (Code Haskell "f = map id") [hasLambda]) `shouldBe` (Output [ExpectationResult hasLambda False] [])
       evaluate (Input (Code Haskell "f = map $ \\x -> x + 1") [hasLambda]) `shouldBe` (Output [ExpectationResult hasLambda True] [])
-    
+
     it "works with HasDirectRecursion" $ do
       let hasDirectRecursion = (Basic "f" "HasDirectRecursion")
+      evaluate (Input (Code Haskell "f x = if x < 5 then g (x - 1) else 2") [hasDirectRecursion]) `shouldBe` (Output [ExpectationResult hasDirectRecursion False] [])
       evaluate (Input (Code Haskell "f x = if x < 5 then f (x - 1) else 2") [hasDirectRecursion]) `shouldBe` (Output [ExpectationResult hasDirectRecursion True] [])
 
     it "works with HasNot" $ do
       let hasNot = (Basic "foo" "HasNot")
-      evaluate (Input (Code Prolog "foo(X) :- not(bar(X)).") [hasNot]) `shouldBe` (Output [ExpectationResult hasNot True] [])      
+      evaluate (Input (Code Prolog "foo(X) :- bar(X).") [hasNot]) `shouldBe` (Output [ExpectationResult hasNot False] [])
+      evaluate (Input (Code Prolog "foo(X) :- not(bar(X)).") [hasNot]) `shouldBe` (Output [ExpectationResult hasNot True] [])
