@@ -71,12 +71,9 @@ declaresRecursively = containsDeclaration f
 
 -- | Inspection that tells whether a top level binding exists
 declares :: BindingPredicate -> Inspection
-declares = containsDeclaration (const True)
-
-declaresFunction :: BindingPredicate -> Inspection
-declaresFunction = containsDeclaration f
-  where f (FunctionDeclaration _ _) = True
-        f _  = False
+declares = containsDeclaration f
+  where f (TypeSignature _) = False
+        f _                 = True
 
 declaresWithArity :: Int -> BindingPredicate -> Inspection
 declaresWithArity arity = containsDeclaration f

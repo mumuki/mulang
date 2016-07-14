@@ -9,11 +9,14 @@ import           Data.Maybe (fromJust)
 spec :: Spec
 spec = do
   describe "declaresTypeSignature" $ do
-    it "is True whn type signature is present" $ do
+    it "is True when type signature is present" $ do
       declaresTypeSignature (named "x") (hs "x :: Int\n\
                            \x = 3") `shouldBe` True
 
-    it "is False whn type signature is absent " $ do
+    it "is True when type signature just signature is present" $ do
+      declaresTypeSignature (named "x") (hs "x :: Int") `shouldBe` True
+
+    it "is False when type signature is absent " $ do
       declaresTypeSignature (named "x") (hs "x = 2") `shouldBe` False
 
   describe "declaresFunction" $ do
@@ -63,6 +66,10 @@ spec = do
 
       it "is False when binding doesnt exists" $ do
         declares (named "y") (hs "x = 1") `shouldBe` False
+
+    describe "with types signatures" $ do
+      it "is False when just type signature exists" $ do
+        declares (named "x") (hs "x :: Int") `shouldBe` False
 
     describe "with functions" $ do
       it "is True when binding exists" $ do
