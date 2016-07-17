@@ -11,6 +11,7 @@ module Language.Mulang.Inspector (
   usesFindall,
   usesForall,
   usesRepeat,
+  usesPatternMatching,
   usesUnifyOperator,
   declaresRecursively,
   parses,
@@ -138,6 +139,21 @@ usesWhile :: Inspection
 usesWhile = containsExpression f
   where f (While _ _) = True
         f _ = False
+
+-- | Inspection that tells whether an expression uses pattern matching
+-- in its definition
+usesPatternMatching :: Inspection
+usesPatternMatching = containsExpression f
+  where f (FunctionDeclaration _ equations) = any nonVariablePattern (patterns equations)
+        f _ = False
+
+        patterns = concatMap (\Equation ps _) -> ps
+
+        nonVariablePattern :: Pattern -> Bool
+        nonVariablePattern (VariablePattern _) = False
+        nonVariablePattern _                   = True
+
+
 
 -- | Inspection that tells whether an expression uses reoeat
 -- in its definition
