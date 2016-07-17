@@ -207,7 +207,12 @@ $ mulang '{"expectations":[{"tag":"Basic","binding":"x","inspection":""],"code":
 ```
 
 ## Building mulang from source
+
 To generate `mulang` executable, you have to build the project using [cabal](https://www.haskell.org/cabal/).
+ 
+Make sure you have `cabal` command installed. You can install it by doing `sudo apt-get install cabal-install` or by downloading binaries from [here](https://www.haskell.org/cabal/download.html). 
+
+Important:  cabal version must be **higher than 1.18**. Otherwise, sandboxes won't work.
 
 ### Before start
 
