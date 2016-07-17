@@ -147,7 +147,7 @@ usesPatternMatching = containsExpression f
   where f (FunctionDeclaration _ equations) = any nonVariablePattern (patterns equations)
         f _ = False
 
-        patterns = concatMap (\Equation ps _) -> ps
+        patterns = concatMap (\(Equation ps _) -> ps)
 
         nonVariablePattern :: Pattern -> Bool
         nonVariablePattern (VariablePattern _) = False
