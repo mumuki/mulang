@@ -259,3 +259,18 @@ spec = do
       let code = fromJust . parseHaskell . unlines $ ["foo False bool = bool", "foo True _ = True"]
       usesAnonymousVariable code `shouldBe` True
 
+  describe "usesPatternMatching" $ do
+    it "is True when there Pattern Matching on List" $ do
+      usesPatternMatching (hs "foo [] = 0\nfoo (x:xs) = 1 + foo xs") `shouldBe` True
+
+    it "is False when there not Pattern Matching" $ do
+      usesPatternMatching (hs "foo x = 2") `shouldBe` False
+
+    it "is True when there Pattern Matching on Maybe" $ do
+      usesPatternMatching (hs "foo Nothing = 0\nfoo (Just x) = 1") `shouldBe` True
+
+    it "is True when there there Pattern Matching on anonima variable" $ do
+      usesPatternMatching (hs "baz _ = 5 + 8") `shouldBe` True
+
+      
+
