@@ -44,6 +44,7 @@ data EquationBody
 data Expression
         = TypeAliasDeclaration Identifier                    -- ^ Functional programming type alias. Only the type alias identifier is parsed 
         | RecordDeclaration Identifier                       -- ^ Imperative / Functional programming struct declaration. Only the record name is parsed
+        | Program [Expression]
         | TypeSignature Identifier                           -- ^ Generic type signature for a computation. Only the target name of the computation is parsed
         | FunctionDeclaration Identifier [Equation]          -- ^ Functional / Imperative programming function declaration. It is is composed by an identifier and one or more equations
         | ProcedureDeclaration Identifier [Equation]         -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
