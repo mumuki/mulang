@@ -68,6 +68,7 @@ library
     Language.Mulang.Inspector.Extras
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
+    Language.Mulang.Parsers.Gobstones
     Language.Mulang.Parsers.Prolog
     Language.Mulang.Parsers.Json
     Language.Mulang.Parsers.JavaScript
