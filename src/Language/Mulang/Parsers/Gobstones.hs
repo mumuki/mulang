@@ -1,35 +1,46 @@
+{-# LANGUAGE OverloadedStrings #-}
+--{-# LANGUAGE DeriveGeneric #-}
 module Language.Mulang.Parsers.Gobstones (translateGobstonesAst,GobstonesAst) where 
 
-import  Language.Mulang
+import Language.Mulang
+import Data.Aeson
+import Data.Traversable (traverse)
+import Data.Foldable (toList)
+import Control.Applicative
 
-{-
-instance FromJSON NodeAst where
-  parseJSON (Object v) =
-    Node <$>
-    (v .: "Alias")                  <*>
-    (v .: "Body")	                <*>
-    (v .: "From")
+import GHC.Generics
+import Data.Text (Text)
 
+data GobstonesAst = AST [NodeAst] deriving (Show)
 
-instance FromJSON GobstonesAst where
-	parseJSON (Object list) = (map parseJSON list)  --no se si esto funciona, tal ves asuma recursion.
-    parseJSON 		_       = empty
--}
+data NodeAst = Node { alias :: Alias   
+                     , body :: Body 
+                     , from :: From 
+                     } deriving (Show)
 
-type GobstonesAst = [NodeAst]
+data Alias = ProgramGobstones deriving (Show)
 
-data NodeAst = Node Alias Body From 
-
-data Alias = ProgramGobstones
-
-data Body = Null 
+data Body = NullP deriving (Show)
 
 type From = Int
 
+instance FromJSON GobstonesAst  where
+	parseJSON (Array list) =  (\a -> AST . toList <$> traverse parseJSON a) list
+
+instance FromJSON NodeAst where
+	parseJSON (Object v) = Node <$> v .: "alias" <*> 
+                                    v .: "body" <*> 
+                                    v .: "from"
+
+instance FromJSON Alias  where
+	parseJSON (String "program") = pure ProgramGobstones
+
+instance FromJSON Body  where
+	parseJSON Null = pure NullP
 
 
 translateGobstonesAst :: GobstonesAst -> Expression
-translateGobstonesAst  ast = Program (map translateNodeAst ast) --TODO : no estoy seguro si deberia ser asi o como abajo 
+translateGobstonesAst  (AST ast) = Program (map translateNodeAst ast) --TODO : no estoy seguro si deberia ser asi o como abajo 
 
 translateNodeAst :: NodeAst -> Expression
-translateNodeAst (Node ProgramGobstones Null _) = Program []
+translateNodeAst (Node ProgramGobstones NullP _) = Program []
