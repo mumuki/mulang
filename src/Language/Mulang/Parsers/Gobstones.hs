@@ -1,12 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 --{-# LANGUAGE DeriveGeneric #-}
-module Language.Mulang.Parsers.Gobstones (translateGobstonesAst,GobstonesAst) where 
+module Language.Mulang.Parsers.Gobstones (parseGobstones,GobstonesAst) where 
 
 import Language.Mulang
 import Data.Aeson
 import Data.Traversable (traverse)
 import Data.Foldable (toList)
 import Control.Applicative
+import Data.Maybe (fromJust)
+import qualified Data.ByteString.Lazy.Char8 as LBS (pack)
 
 import GHC.Generics
 import Data.Text (Text)
@@ -38,9 +40,14 @@ instance FromJSON Alias  where
 instance FromJSON Body  where
 	parseJSON Null = pure NullP
 
+parseGobstones :: String -> Expression
+parseGobstones  = translateGobstonesAst . fromJust . parseGobstonesAst
+
+parseGobstonesAst :: String -> Maybe GobstonesAst
+parseGobstonesAst = decode . LBS.pack
 
 translateGobstonesAst :: GobstonesAst -> Expression
-translateGobstonesAst  (AST ast) = Program (map translateNodeAst ast) --TODO : no estoy seguro si deberia ser asi o como abajo 
+translateGobstonesAst  (AST ast) = Program []--(map translateNodeAst ast) --TODO : no estoy seguro si deberia ser asi o como abajo 
 
 translateNodeAst :: NodeAst -> Expression
 translateNodeAst (Node ProgramGobstones NullP _) = Program []
