@@ -9,6 +9,13 @@ spec = do
 
 describe "translateProgramGobstonesToMulangExpression" $ do
     it "translate simple program Gobstones" $ do
-      let gobstonesAst =  parseGobstones "[{\"alias\": \"program\",\"body\": \"null\",\"from\": \"0\"}]"
+      let gobstonesAst =  parseGobstones "[{\"alias\": \"program\",\"body\": null,\"from\": 0}]"
 
-      gobstonesAst `shouldBe` Program []
+      gobstonesAst `shouldBe` Program [Program []]
+
+    it "translate null program Gobstones" $ do
+      let gobstonesAst =  parseGobstones "null"
+
+      gobstonesAst `shouldBe` MuNull
+
+
