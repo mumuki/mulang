@@ -11,11 +11,29 @@ describe "translateProgramGobstonesToMulangExpression" $ do
     it "translate simple program Gobstones" $ do
       let gobstonesAst =  parseGobstones "[{\"alias\": \"program\",\"body\": null,\"from\": 0}]"
 
-      gobstonesAst `shouldBe` Program [Program []]
+      gobstonesAst `shouldBe` Sequence [MuNull]
 
     it "translate null program Gobstones" $ do
       let gobstonesAst =  parseGobstones "null"
 
       gobstonesAst `shouldBe` MuNull
+
+     {-
+    it "translate simple procedure declaration " $ do
+      let gobstonesAst =  parseGobstones  "[{\"alias\": \"procedureDeclaration\",\"body\": null,\"from\": 1,\"row\": 1,\"to\": 12,\"value\": \"F\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"F\",\"parameters\": []}]"
+
+      gobstonesAst `shouldBe` Sequence [ProcedureDeclaration "F" []]
+
+	it "translate simple procedure Call " $ do
+      let gobstonesAst =  parseGobstones  "[{\"alias\": \"program\",\"body\": [{\"alias\": \"ProcedureCall\",\"from\": 14,\"to\": 18,\"arity\": \"routine\",\"name\": \"F\",\"parameters\": []}],\"from\": 0}]"
+
+      gobstonesAst `shouldBe` Sequence [Application (ProcedureDeclaration "F" []) []]
+
+    it "translate simple procedure Application " $ do
+      let gobstonesAst =  parseGobstones  "[{\"alias\": \"program\",\"body\": [{\"alias\": \"ProcedureCall\",\"from\": 14,\"to\": 18,\"arity\": \"routine\",\"name\": \"F\",\"parameters\": []}],\"from\": 0},{\"alias\": \"procedureDeclaration\",\"body\": null,\"from\": 1,\"row\": 1,\"to\": 12,\"value\": \"F\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"F\",\"parameters\": []}]"
+
+      gobstonesAst `shouldBe` Sequence [Application (ProcedureDeclaration "F" []) [],ProcedureDeclaration "F" []]
+	-}
+
 
 
