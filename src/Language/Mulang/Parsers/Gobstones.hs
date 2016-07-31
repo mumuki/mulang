@@ -4,7 +4,7 @@ module Language.Mulang.Parsers.Gobstones (parseGobstones,GobstonesAst) where
 
 import Language.Mulang
 import Data.Aeson
-import Data.HashMap.Lazy (member)
+import Data.HashMap.Lazy as  HashMap (HashMap, lookup, member)
 import Data.Traversable (traverse)
 import Data.Foldable (toList)
 import Control.Applicative
@@ -68,16 +68,15 @@ instance FromJSON GobstonesAst where
 	parseJSON Null = pure NullProgram
 	parseJSON _ = fail "Failed to parse GobstonesAst!"
 
-parseNodeAst isProgramDeclaration isProcedureDeclaration value
-  | isProgramDeclaration = ProgramDeclaration <$> v .: "alias" <*> v .: "body" <*> v .: "from"
-  | isProcedureDeclaration = ProcedureDeclarationG <$> v .: "alias" <*> v .: "body" <*> v .: "from" <*> v .: "row" <*> v .: "to" <*> v .: "value" <*> v .: "arity" <*> v .: "reserved" <*> v .: "led" <*> v .: "lbp" <*> v .: "name" <*> v .: "parameters"
-  --| otherwise  = UmeUser     <$> parseUser value
+parseNodeAst (Just "program") value = ProgramDeclaration <$> value .: "alias" <*> value .: "body" <*> value .: "from"
+parseNodeAst (Just "procedureDeclaration") value = ProcedureDeclarationG <$> value .: "alias" <*> value .: "body" <*> value .: "from" <*> value .: "row" <*> value .: "to" <*> value .: "value" <*> value .: "arity" <*> value .: "reserved" <*> value .: "led" <*> value .: "lbp" <*> value .: "name" <*> value .: "parameters"
+parseNodeAst Nothing value = fail "Failed to parse NodeAst!"
 
 instance FromJSON NodeAst where
 	parseJSON (Object v) = nodeAst
-		where isProgramDeclaration = member "program" v
-			  isProcedureDeclaration = member "procedureDeclaration" v
-			  nodeAst = parseNodeAst isProgramDeclaration isProcedureDeclaration v
+		where
+				alias = HashMap.lookup "alias" v
+		  	 	nodeAst = parseNodeAst alias v
 	parseJSON _ = fail "Failed to parse NodeAst!"
 
 instance FromJSON Alias  where
@@ -115,12 +114,15 @@ convertToExpression n@(ProgramDeclaration _ _ _) = convertProgramToExpression n
 convertToExpression n@(ProcedureDeclarationG _ _ _ _ _ _ _ _ _ _ _ _) = convertProcedureToExpression n
 
 convertProgramToExpression :: NodeAst -> Expression
-convertProgramToExpression (ProgramDeclaration _ NullP _) = MuNull
+convertProgramToExpression (ProgramDeclaration _ body _) = convertBody body
 
 convertProcedureToExpression :: NodeAst -> Expression
 convertProcedureToExpression 
-			(ProcedureDeclarationG _ body _ _ _ _ arity _ _ _ name parameters) = ProcedureDeclaration name (convertParameters parameters)
+			(ProcedureDeclarationG _ body _ _ _ _ arity _ _ _ name parameters) = ProcedureDeclaration name [Equation (convertParameters parameters)  (UnguardedBody (convertBody body))]
 
-convertParameters :: [Parameter] -> [Expression]
+convertParameters :: [Parameter] -> [Pattern]
 convertParameters [] = []
+
+convertBody :: Body -> Expression
+convertBody NullP = MuNull
 
