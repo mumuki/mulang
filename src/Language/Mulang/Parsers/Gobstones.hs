@@ -35,9 +35,17 @@ data NodeAst = ProgramDeclaration  --TODO : falta refactor
 					 , lbp :: Lbp 
 					 , name :: Name 
 					 , parameters :: [Parameter]
-                     } deriving (Show)
+                     }
+              | ProcedureCall
+              		 { alias :: Alias
+              		 , name :: Name
+              		 , arity :: ArityP
+              		 , from :: From
+              		 , to :: To
+              		 , parameters :: [Parameter]
+              		 } deriving (Show)
 
-data Alias = ProgramGobstones | ProcedureDeclarationA deriving (Show)
+data Alias = ProgramGobstones | ProcedureDeclarationA | ProcedureCallA deriving (Show)
 
 data Body = NullP | Body { nodes :: [NodeAst]} deriving (Show)
 
@@ -59,7 +67,7 @@ type Reserved = Bool
 
 type Name = String
 
-data Parameter = P deriving (Show)
+data Parameter = P deriving (Show) --Tal ves convenga tener Argument y Parameter
 
 ------------------------------------------------------
 
@@ -70,6 +78,7 @@ instance FromJSON GobstonesAst where
 
 parseNodeAst (Just "program") value = ProgramDeclaration <$> value .: "alias" <*> value .: "body" <*> value .: "from"
 parseNodeAst (Just "procedureDeclaration") value = ProcedureDeclarationG <$> value .: "alias" <*> value .: "body" <*> value .: "from" <*> value .: "row" <*> value .: "to" <*> value .: "value" <*> value .: "arity" <*> value .: "reserved" <*> value .: "led" <*> value .: "lbp" <*> value .: "name" <*> value .: "parameters"
+parseNodeAst (Just "ProcedureCall") value = ProcedureCall <$> value .: "alias" <*> value .: "name" <*> value .: "arity" <*> value .: "from" <*> value .: "to" <*> value .: "parameters"
 parseNodeAst Nothing value = fail "Failed to parse NodeAst!"
 
 instance FromJSON NodeAst where
@@ -82,10 +91,12 @@ instance FromJSON NodeAst where
 instance FromJSON Alias  where
 	parseJSON (String "program") = pure ProgramGobstones
 	parseJSON (String "procedureDeclaration") = pure ProcedureDeclarationA
+	parseJSON (String "ProcedureCall") = pure ProcedureCallA
 	parseJSON _ = fail "Failed to parse Alias!"
 
 instance FromJSON Body  where
-	parseJSON (Object v) = Body <$> v.: "nodes" 
+	parseJSON (Array list) =  (\a -> Body . toList <$> traverse parseJSON a) list
+	--parseJSON (Object v) = Body <$> v.: "nodes" --TODO : esto esta mal, creo
 	parseJSON Null = pure NullP
 	parseJSON _ = fail "Failed to parse Body!"
 
@@ -112,17 +123,29 @@ translateGobstonesAst  (AST ast) = Sequence $ map convertToExpression ast
 convertToExpression :: NodeAst -> Expression
 convertToExpression n@(ProgramDeclaration _ _ _) = convertProgramToExpression n
 convertToExpression n@(ProcedureDeclarationG _ _ _ _ _ _ _ _ _ _ _ _) = convertProcedureToExpression n
+convertToExpression n@(ProcedureCall _ name _ _ _ parameters) = convertProcedureCallToExpression n
+
 
 convertProgramToExpression :: NodeAst -> Expression
 convertProgramToExpression (ProgramDeclaration _ body _) = convertBody body
 
+convertProcedureCallToExpression :: NodeAst -> Expression
+convertProcedureCallToExpression  (ProcedureCall _ name _ _ _ parameters) = Application (Variable name) (convertParametersToExpressions parameters)
+
 convertProcedureToExpression :: NodeAst -> Expression
 convertProcedureToExpression 
-			(ProcedureDeclarationG _ body _ _ _ _ arity _ _ _ name parameters) = ProcedureDeclaration name [Equation (convertParameters parameters)  (UnguardedBody (convertBody body))]
+			(ProcedureDeclarationG _ body _ _ _ _ arity _ _ _ name parameters) = ProcedureDeclaration name [Equation (convertParametersToPatterns parameters)  (UnguardedBody (convertBody body))]
 
-convertParameters :: [Parameter] -> [Pattern]
-convertParameters [] = []
+convertParametersToExpressions :: [Parameter] -> [Expression]
+convertParametersToExpressions [] = []
+
+convertParametersToPatterns :: [Parameter] -> [Pattern]
+convertParametersToPatterns [] = []
 
 convertBody :: Body -> Expression
 convertBody NullP = MuNull
+convertBody (Body nodes) = Sequence (map convertToExpression nodes)
+
+
+
 
