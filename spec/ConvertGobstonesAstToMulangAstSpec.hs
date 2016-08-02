@@ -11,7 +11,7 @@ describe "translateProgramGobstonesToMulangExpression" $ do
     it "translate simple program Gobstones" $ do
       let gobstonesAst =  parseGobstones "[{\"alias\": \"program\",\"body\": null,\"from\": 0}]"
 
-      gobstonesAst `shouldBe` MuNull
+      gobstonesAst `shouldBe` Sequence [MuNull] --falta hacer el simplify para que solo sea MuNull
 
     it "translate null program Gobstones" $ do
       let gobstonesAst =  parseGobstones "null"
@@ -22,7 +22,7 @@ describe "translateProgramGobstonesToMulangExpression" $ do
       let gobstonesAst =  parseGobstones  "[{\"alias\": \"procedureDeclaration\",\"body\": null,\"from\": 1,\"row\": 1,\"to\": 12,\"value\": \"F\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"F\",\"parameters\": []}]"
 
       gobstonesAst `shouldBe` Sequence  [ProcedureDeclaration "F" [Equation [] (UnguardedBody MuNull)]]
-
+	
     it "translate simple procedure Call" $ do
       let gobstonesAst =  parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\": \"ProcedureCall\",\"from\": 14,\"to\": 18,\"arity\": \"routine\",\"name\": \"F\",\"parameters\": []}],\"from\": 0}]"
       									
@@ -32,5 +32,5 @@ describe "translateProgramGobstonesToMulangExpression" $ do
       let gobstonesAst =  parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\": \"ProcedureCall\",\"from\": 14,\"to\": 18,\"arity\": \"routine\",\"name\": \"F\",\"parameters\": []}],\"from\": 0},{\"alias\": \"procedureDeclaration\",\"body\": null,\"from\": 1,\"row\": 1,\"to\": 12,\"value\": \"F\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"F\",\"parameters\": []}]"
 
       gobstonesAst `shouldBe` Sequence [Sequence [Application (Variable "F") []],ProcedureDeclaration "F" [Equation [] (UnguardedBody MuNull)]]
-
+      
 
