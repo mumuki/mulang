@@ -2,14 +2,14 @@
 --{-# LANGUAGE DeriveGeneric #-}
 module Language.Mulang.Parsers.Gobstones (parseGobstones,GobstonesAst) where 
 
-import Language.Mulang
-import Data.Aeson
-import Data.HashMap.Lazy as  HashMap (HashMap, lookup, member)
-import Data.Traversable (traverse)
-import Data.Foldable (toList)
-import Control.Applicative
-import Data.Maybe (fromJust)
-import qualified Data.ByteString.Lazy.Char8 as LBS (pack)
+import	Language.Mulang
+import	Data.Aeson
+import	Data.HashMap.Lazy as  HashMap (HashMap, lookup, member)
+import	Data.Traversable (traverse)
+import	Data.Foldable (toList)
+import	Control.Applicative
+import	Data.Maybe (fromJust)
+import	qualified Data.ByteString.Lazy.Char8 as LBS (pack)
 
 
 import GHC.Generics
@@ -96,7 +96,6 @@ instance FromJSON Alias  where
 
 instance FromJSON Body  where
 	parseJSON (Array list) =  (\a -> Body . toList <$> traverse parseJSON a) list
-	--parseJSON (Object v) = Body <$> v.: "nodes" --TODO : esto esta mal, creo
 	parseJSON Null = pure NullP
 	parseJSON _ = fail "Failed to parse Body!"
 
@@ -118,6 +117,7 @@ parseGobstonesAst = decode . LBS.pack
 
 translateGobstonesAst :: GobstonesAst -> Expression
 translateGobstonesAst NullProgram = MuNull
+translateGobstonesAst  (AST [ProgramDeclaration _ NullP _]) = MuNull
 translateGobstonesAst  (AST ast) = Sequence $ map convertToExpression ast 
 
 convertToExpression :: NodeAst -> Expression
