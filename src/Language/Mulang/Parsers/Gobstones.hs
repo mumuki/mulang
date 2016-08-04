@@ -13,6 +13,8 @@ import	qualified Data.ByteString.Lazy.Char8 as LBS (pack)
 import	qualified Data.Text as T
 import	GHC.Generics
 import	Data.Text (Text)
+import	Language.Mulang.Builder
+import	qualified Data.Vector as V
 
 
 instance FromJSON Expression where
@@ -27,16 +29,21 @@ parseNodes (Object v) = nodeAst
 
 parseBodyExpression (Array list) = (\a -> Sequence . toList <$> traverse parseNodes a) list
 parseBodyExpression Null = pure MuNull
-parseBodyExpression' Null =  MuNull --TODO : no me termina de cerrar porque no me deja usar la funcion de arriba. 
-									-- se que tiene que ver con pure y el tipo que devuelve esa funcion.
+
+parseBodyExpression' Null =  MuNull 
 
 parseParametersPatterns :: Value -> [Pattern]
-parseParametersPatterns (Array list) = if(null list) then []
-										 else []--(\a ->  toList <$> traverse parseParameterPatterns a) list
+parseParametersPatterns (Array list) 
+									| (V.null list) = []
+									| otherwise = []--(\a -> toList <$> parseParameterPatterns a) list
+
+parseParameterPatterns :: Value -> Pattern
+parseParameterPatterns (Object value) = VariablePattern (lookupAndParseExpression parseNameExpression "name" value)
 
 parseParametersExpression :: Value -> [Expression]
-parseParametersExpression (Array list) = if(null list) then []
-										 else []--(\a ->  toList <$> traverse parseParameterExpression a) list
+parseParametersExpression (Array list) 
+									| (V.null list) = []
+									| otherwise = []--(\a ->  toList <$> parseParameterExpression a) list
 
 parseNameExpression :: Value -> String
 parseNameExpression (String n) = T.unpack n 
@@ -44,9 +51,10 @@ parseNameExpression (String n) = T.unpack n
 lookupAndParseExpression :: (Value -> b) -> Text -> Object -> b
 lookupAndParseExpression parseFunction string value= parseFunction ( fromJust (HashMap.lookup string value))
 
-parseNodeAst (Just "program") value =  lookupAndParseExpression parseBodyExpression "body" value
-parseNodeAst (Just "procedureDeclaration") value = pure  $ ProcedureDeclaration (lookupAndParseExpression parseNameExpression "name" value)  [Equation (lookupAndParseExpression parseParametersPatterns "parameters" value) (UnguardedBody (lookupAndParseExpression parseBodyExpression' "body" value))]
-parseNodeAst (Just "ProcedureCall") value = pure $ Application (Variable (lookupAndParseExpression parseNameExpression "name" value)) (lookupAndParseExpression parseParametersExpression "parameters" value)
+ 
+parseNodeAst (Just "program") value = lookupAndParseExpression parseBodyExpression "body" value                                                                                                                                                                --cambiar parseBodyExpression' por parseBodyExpression
+parseNodeAst (Just "procedureDeclaration") value = pure $ normalize $ ProcedureDeclaration (lookupAndParseExpression parseNameExpression "name" value)  [Equation (lookupAndParseExpression parseParametersPatterns "parameters" value) (UnguardedBody (lookupAndParseExpression  parseBodyExpression' "body" value))]
+parseNodeAst (Just "ProcedureCall") value = pure $ normalize $ Application (Variable (lookupAndParseExpression parseNameExpression "name" value)) (lookupAndParseExpression parseParametersExpression "parameters" value)
 parseNodeAst Nothing value = fail "Failed to parse NodeAst!"
 
 
