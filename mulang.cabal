@@ -22,6 +22,7 @@ executable mulang
     bytestring                == 0.10.6.0,
     text                      >= 1.2.2.0,
     unordered-containers      == 0.2.7.1,
+    vector                    == 0.11.0.0,
     haskell-src               >= 1       && < 1.1,
     language-javascript       >= 0.5.14  && <= 0.5.15,
     aeson                     >= 0.11.0.0 && < 1,
@@ -81,6 +82,7 @@ library
     bytestring                == 0.10.6.0,
     text                      >= 1.2.2.0,
     unordered-containers      == 0.2.7.1,
+    vector                    == 0.11.0.0,
     haskell-src               >= 1       && < 1.1,
     language-javascript       >= 0.5.14  && <= 0.5.15,
     aeson                     >= 0.11.0.0 && < 1,
@@ -109,6 +111,7 @@ test-suite spec
   build-depends:
     base                      >= 4     && < 5,
     unordered-containers      == 0.2.7.1,
+    vector                    == 0.11.0.0,
     bytestring                == 0.10.6.0,
     text                      >= 1.2.2.0,
     aeson                     >= 0.11.0.0 && < 1,
