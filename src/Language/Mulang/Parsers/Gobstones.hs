@@ -18,43 +18,37 @@ import	qualified Data.Vector as V
 
 
 instance FromJSON Expression where
-	parseJSON (Array list) =  (\a -> Sequence . toList <$> traverse parseNodes a) list
-	parseJSON Null = pure MuNull
-	parseJSON _ = fail "Failed to parse Expression!"
+	  parseJSON  =  parseBodyExpression 
+
+parseBodyExpression (Array list) = (\a -> Sequence . toList <$> traverse parseNodes a) list
+parseBodyExpression Null = pure MuNull
+parseBodyExpression _ = fail "Failed to parse Expression!"
 
 parseNodes (Object v) = nodeAst
 		where
 				alias = HashMap.lookup "alias" v
 		  	 	nodeAst = parseNodeAst alias v
 
-parseBodyExpression (Array list) = (\a -> Sequence . toList <$> traverse parseNodes a) list
-parseBodyExpression Null = pure MuNull
-
-parseBodyExpression' Null =  MuNull 
-
-parseParametersPatterns :: Value -> [Pattern]
 parseParametersPatterns (Array list) 
-									| (V.null list) = []
-									| otherwise = []--(\a -> toList <$> parseParameterPatterns a) list
+									| (V.null list) = pure []
+									| otherwise = pure []--(\a -> toList <$> parseParameterPatterns a) list
 
-parseParameterPatterns :: Value -> Pattern
-parseParameterPatterns (Object value) = VariablePattern (lookupAndParseExpression parseNameExpression "name" value)
 
-parseParametersExpression :: Value -> [Expression]
+parseParameterPatterns (Object value) = VariablePattern <$> (lookupAndParseExpression parseNameExpression "name" value)
+
+
 parseParametersExpression (Array list) 
-									| (V.null list) = []
-									| otherwise = []--(\a ->  toList <$> parseParameterExpression a) list
+									| (V.null list) = pure []
+									| otherwise = pure []--(\a ->  toList <$> parseParameterExpression a) list
 
-parseNameExpression :: Value -> String
-parseNameExpression (String n) = T.unpack n 
+parseNameExpression (String n) = pure (T.unpack n) 
 
 lookupAndParseExpression :: (Value -> b) -> Text -> Object -> b
 lookupAndParseExpression parseFunction string value= parseFunction ( fromJust (HashMap.lookup string value))
-
  
-parseNodeAst (Just "program") value = lookupAndParseExpression parseBodyExpression "body" value                                                                                                                                                                --cambiar parseBodyExpression' por parseBodyExpression
-parseNodeAst (Just "procedureDeclaration") value = pure $ normalize $ ProcedureDeclaration (lookupAndParseExpression parseNameExpression "name" value)  [Equation (lookupAndParseExpression parseParametersPatterns "parameters" value) (UnguardedBody (lookupAndParseExpression  parseBodyExpression' "body" value))]
-parseNodeAst (Just "ProcedureCall") value = pure $ normalize $ Application (Variable (lookupAndParseExpression parseNameExpression "name" value)) (lookupAndParseExpression parseParametersExpression "parameters" value)
+parseNodeAst (Just "program") value = lookupAndParseExpression parseBodyExpression "body" value
+parseNodeAst (Just "procedureDeclaration") value = ProcedureDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression parseParametersPatterns "parameters" value) <*> (UnguardedBody <$> (lookupAndParseExpression  parseBodyExpression "body" value))))
+parseNodeAst (Just "ProcedureCall") value = Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
 parseNodeAst Nothing value = fail "Failed to parse NodeAst!"
 
 
