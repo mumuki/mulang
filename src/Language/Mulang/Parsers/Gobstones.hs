@@ -48,12 +48,16 @@ parseParameterValue n@(Number number) Nothing = MuNumber <$> (parseJSON n)
 parseParameterValue b@(Bool bool) _ = MuBool <$> (parseJSON b)
 parseParameterValue (Array direction) _ = MuSymbol <$> (parseListToDirection direction)--(\a -> MuSymbol . toList <$> traverse parseJSON a) direction--
 parseParameterValue (Number number) _ = MuSymbol <$> (parseToColour number)
+parseParameterValue s@(String text) _ = MuString <$> (parseNameExpression s)
+
 
 parseToColour number = case (Scientific.floatingOrInteger number) 
-						of 	(Right 1) -> parseJSON "Rojo"
+						of 	(Right 0) -> parseJSON "Azul"
+							(Right 1) -> parseJSON "Rojo"
 							(Right 2) -> parseJSON "Negro"
-							(Right 3) -> parseJSON "Azul"
-							(Right 4) -> parseJSON "Verde"
+							(Right 3) -> parseJSON "Verde"
+
+
 
 parseListToDirection direction = let (Number n1,Number n2) = (V.head direction,V.last direction) 
 								 in parseToDirection n1 n2
@@ -71,10 +75,17 @@ lookUpValue string value = fromJust (HashMap.lookup string value)
 
 lookupAndParseExpression :: (Value -> b) -> Text -> Object -> b
 lookupAndParseExpression parseFunction string value= parseFunction (lookUpValue string value)
+
+parseVariableName (Object value) =  parseNameExpression (lookUpValue "value" value) 
+
+variableName value = lookupAndParseExpression parseVariableName "variable" value
+
+variableValue value = lookupAndParseExpression  parseParameterExpression "expression" value
  
 parseNodeAst (Just "program") value = lookupAndParseExpression parseBodyExpression "body" value
 parseNodeAst (Just "procedureDeclaration") value = ProcedureDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression parseParametersPatterns "parameters" value) <*> (UnguardedBody <$> (lookupAndParseExpression  parseBodyExpression "body" value))))
 parseNodeAst (Just "ProcedureCall") value = Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
+parseNodeAst (Just ":=") value = VariableAssignment <$> (variableName value) <*> (variableValue value) 
 parseNodeAst Nothing value = fail "Failed to parse NodeAst!"
 
 
