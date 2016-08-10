@@ -8,7 +8,7 @@ import	Data.HashMap.Lazy as  HashMap (HashMap, lookup, member)
 import	Data.Traversable (traverse)
 import	Data.Foldable (toList)
 import	Control.Applicative
-import	Data.Maybe (fromJust)
+import	Data.Maybe (fromJust,isJust)
 import	qualified Data.ByteString.Lazy.Char8 as LBS (pack)
 import	qualified Data.Text as T
 import	GHC.Generics
@@ -42,6 +42,8 @@ parseParametersExpression (Array list)
 									| (V.null list) = pure []
 									| otherwise = (\a -> toList <$> traverse parseParameterExpression a) list
 
+parseFunctionCall (Object value) = parseNodeAst (Just "ProcedureCall") value--Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
+
 parseParameterExpression (Object value) = parseParameterValue (lookUpValue "value" value) (HashMap.lookup "reserved" value)
 
 parseParameterValue n@(Number number) Nothing = MuNumber <$> (parseJSON n)
@@ -50,14 +52,11 @@ parseParameterValue (Array direction) _ = MuSymbol <$> (parseListToDirection dir
 parseParameterValue (Number number) _ = MuSymbol <$> (parseToColour number)
 parseParameterValue s@(String text) _ = MuString <$> (parseNameExpression s)
 
-
 parseToColour number = case (Scientific.floatingOrInteger number) 
 						of 	(Right 0) -> parseJSON "Azul"
 							(Right 1) -> parseJSON "Rojo"
 							(Right 2) -> parseJSON "Negro"
 							(Right 3) -> parseJSON "Verde"
-
-
 
 parseListToDirection direction = let (Number n1,Number n2) = (V.head direction,V.last direction) 
 								 in parseToDirection n1 n2
@@ -80,12 +79,25 @@ parseVariableName (Object value) =  parseNameExpression (lookUpValue "value" val
 
 variableName value = lookupAndParseExpression parseVariableName "variable" value
 
-variableValue value = lookupAndParseExpression  parseParameterExpression "expression" value
- 
+variableValue value | isFunctionCall = lookupAndParseExpression  parseFunctionCall "expression" value
+					| otherwise = lookupAndParseExpression  parseParameterExpression "expression" value
+	where
+		maybeName = let (Object  v) = lookUpValue "expression" value
+							in HashMap.lookup "name" v
+		isFunctionCall = isJust maybeName
+
+returnValue value = lookupAndParseExpression  parseParameterExpression "return" value
+
+addReturn (Sequence xs) e 
+						|	(null xs) = Return e
+						|	otherwise = Sequence (xs ++ [Return e]) 
+
+
 parseNodeAst (Just "program") value = lookupAndParseExpression parseBodyExpression "body" value
 parseNodeAst (Just "procedureDeclaration") value = ProcedureDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression parseParametersPatterns "parameters" value) <*> (UnguardedBody <$> (lookupAndParseExpression  parseBodyExpression "body" value))))
 parseNodeAst (Just "ProcedureCall") value = Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
 parseNodeAst (Just ":=") value = VariableAssignment <$> (variableName value) <*> (variableValue value) 
+parseNodeAst (Just "functionDeclaration") value = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression parseParametersPatterns "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (returnValue value)))))
 parseNodeAst Nothing value = fail "Failed to parse NodeAst!"
 
 
