@@ -57,7 +57,9 @@ describe "translateProgramGobstonesToMulangExpression" $ do
 
       let gobstonesAstVariable = parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \":=\",\"arity\" : \"binary\", \"variable\" : {\"from\" : 13, \"row\" : 1,\"to\" : 14, \"value\" : \"x\", \"arity\" : \"name\"}, \"expression\" : {\"from\" : 18, \"row\" : 1,\"to\" : 19, \"value\" : \"y\" , \"arity\" : \"literal\", \"reserved\" : true}, \"assignment\" : true, \"from\" : 13,\"to\" : 20 }],\"from\": 0}]"
 
-      let gobstonesAstFunctionCall = parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \":=\",\"arity\" : \"binary\", \"variable\" : {\"from\" : 13, \"row\" : 1,\"to\" : 14, \"value\" : \"x\", \"arity\" : \"name\"}, \"expression\" : {\"alias\" : \"functionCall\" , \"name\" : \"f\" , \"parameters\" : []}, \"assignment\" : true, \"from\" : 13,\"to\" : 20 }],\"from\": 0}]"      
+      let gobstonesAstFunctionCall = parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \":=\",\"arity\" : \"binary\", \"variable\" : {\"from\" : 13, \"row\" : 1,\"to\" : 14, \"value\" : \"x\", \"arity\" : \"name\"}, \"expression\" : {\"alias\" : \"functionCall\" , \"name\" : \"f\" , \"parameters\" : [{\"value\" : 2, \"arity\" : \"literal\"}]}, \"assignment\" : true, \"from\" : 13,\"to\" : 20 }],\"from\": 0}]"      
+
+      --let gobstonesAstSimpleExpression = parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \":=\",\"arity\" : \"binary\", \"variable\" : {\"from\" : 13, \"row\" : 1,\"to\" : 14, \"value\" : \"x\", \"arity\" : \"name\"}, \"expression\" : {\"value\" : \"==\" , \"arity\" : \"binary\" , \"left\" : {\"value\" : true , \"arity\" : \"literal\" , \"reserved\" : true} , \"right\" : {\"value\" : true , \"arity\" : literal}} , \"assignment\" : true, \"from\" : 13,\"to\" : 20 }],\"from\": 0}]"      
 
       gobstonesAstNumber `shouldBe` Sequence [Sequence [VariableAssignment "x" (MuNumber 1.0)]]
 
@@ -69,7 +71,9 @@ describe "translateProgramGobstonesToMulangExpression" $ do
 
       gobstonesAstVariable `shouldBe` Sequence [Sequence [VariableAssignment "x" (MuString "y")]]
 
-      gobstonesAstFunctionCall `shouldBe` Sequence [Sequence [VariableAssignment "x" (Application (Variable "f") [])]]
+      gobstonesAstFunctionCall `shouldBe` Sequence [Sequence [VariableAssignment "x" (Application (Variable "f") [MuNumber 2.0])]]
+
+      --gobstonesAstSimpleExpression `shouldBe` Sequence [Sequence [VariableAssignment "x" (MuBool True)]]--falta todo lo que son expressiones
 
      
     it "translate simple procedure declaration and application  with a parameter" $ do
@@ -89,4 +93,16 @@ describe "translateProgramGobstonesToMulangExpression" $ do
 
       gobstonesAstDirection `shouldBe` Sequence [Sequence [Application (Variable "F") [MuSymbol "Este"]],ProcedureDeclaration "F" [Equation [VariablePattern "parameter"] (UnguardedBody MuNull)]]
  	
+    it "translate conditional declaration" $ do
+      let gobstonesAst =  parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"conditional\", \"condition\" : {\"value\" : true, \"arity\" : \"literal\" , \"reserved\" : true}, \"left\" : null, \"right\" : null}],\"from\": 0}]"
+
+      let gobstonesAstIfWithBody =  parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"conditional\", \"condition\" : {\"value\" : true, \"arity\" : \"literal\" , \"reserved\" : true}, \"left\" : [{\"alias\" : \":=\",\"arity\" : \"binary\", \"variable\" : {\"from\" : 13, \"row\" : 1,\"to\" : 14, \"value\" : \"x\", \"arity\" : \"name\"}, \"expression\" : {\"from\" : 18, \"row\" : 1,\"to\" : 19, \"value\" : 1, \"arity\" : \"literal\"}, \"assignment\" : true, \"from\" : 13,\"to\" : 20 }], \"right\" : null}],\"from\": 0}]"
+
+      gobstonesAst `shouldBe` Sequence [Sequence [If (MuBool True) MuNull MuNull]]
+
+
+      gobstonesAstIfWithBody `shouldBe` Sequence [Sequence [If (MuBool True) (Sequence [VariableAssignment "x" (MuNumber 1.0)]) MuNull]]
+
+      
+
 
