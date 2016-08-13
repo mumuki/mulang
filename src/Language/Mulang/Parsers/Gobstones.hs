@@ -103,6 +103,7 @@ parseNodeAst (Just "ProcedureCall") value = Application <$> (Variable <$> (looku
 parseNodeAst (Just ":=") value = VariableAssignment <$> (variableName value) <*> (expressionValue value "expression") 
 parseNodeAst (Just "functionDeclaration") value = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression parseParametersPatterns "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (expressionValue value "return")))))
 parseNodeAst (Just "conditional") value = If <$> (expressionValue value "condition") <*> (lookupAndParseExpression parseBodyExpression "left" value) <*> (lookupAndParseExpression parseBodyExpression "right" value)
+parseNodeAst (Just "while") value = While <$> (expressionValue value "expression") <*> (lookupAndParseExpression parseBodyExpression "body" value)
 parseNodeAst Nothing value = fail "Failed to parse NodeAst!"
 
 

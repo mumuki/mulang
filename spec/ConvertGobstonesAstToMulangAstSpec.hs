@@ -100,8 +100,17 @@ describe "translateProgramGobstonesToMulangExpression" $ do
 
       gobstonesAst `shouldBe` Sequence [Sequence [If (MuBool True) MuNull MuNull]]
 
-
       gobstonesAstIfWithBody `shouldBe` Sequence [Sequence [If (MuBool True) (Sequence [VariableAssignment "x" (MuNumber 1.0)]) MuNull]]
+
+
+    it "translate while declaration" $ do
+      let gobstonesAst =  parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"while\", \"expression\" : {\"value\" : true, \"arity\" : \"literal\" , \"reserved\" : true}, \"body\" : null}],\"from\": 0}]"
+
+      let gobstonesAstWhileWithBody =  parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"while\", \"expression\" : {\"value\" : true, \"arity\" : \"literal\" , \"reserved\" : true}, \"body\" : [{\"alias\" : \":=\",\"arity\" : \"binary\", \"variable\" : {\"from\" : 13, \"row\" : 1,\"to\" : 14, \"value\" : \"x\", \"arity\" : \"name\"}, \"expression\" : {\"from\" : 18, \"row\" : 1,\"to\" : 19, \"value\" : 1, \"arity\" : \"literal\"}, \"assignment\" : true, \"from\" : 13,\"to\" : 20 }]}],\"from\": 0}]"
+
+      gobstonesAst `shouldBe` Sequence [Sequence [While (MuBool True) MuNull]]
+
+      gobstonesAstWhileWithBody `shouldBe` Sequence [Sequence [While (MuBool True) (Sequence [VariableAssignment "x" (MuNumber 1.0)])]]
 
       
 
