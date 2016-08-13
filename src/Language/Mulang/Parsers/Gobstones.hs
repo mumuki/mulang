@@ -40,17 +40,20 @@ parseParameterPatterns (Object value) = VariablePattern <$> (lookupAndParseExpre
 
 parseParametersExpression (Array list) 
 									| (V.null list) = pure []
-									| otherwise = (\a -> toList <$> traverse parseParameterExpression a) list
+									| otherwise = (\a -> toList <$> traverse parseSimpleValue a) list
 
 parseFunctionCall (Object value) = parseNodeAst (Just "ProcedureCall") value--Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
 
-parseParameterExpression (Object value) = parseParameterValue (lookUpValue "value" value) (HashMap.lookup "reserved" value)
+parseSimpleValue (Object value) = parseSimpleExpressionValue (lookUpValue "value" value) (HashMap.lookup "reserved" value)
 
-parseParameterValue n@(Number number) Nothing = MuNumber <$> (parseJSON n)
-parseParameterValue b@(Bool bool) _ = MuBool <$> (parseJSON b)
-parseParameterValue (Array direction) _ = MuSymbol <$> (parseListToDirection direction)--(\a -> MuSymbol . toList <$> traverse parseJSON a) direction--
-parseParameterValue (Number number) _ = MuSymbol <$> (parseToColour number)
-parseParameterValue s@(String text) _ = MuString <$> (parseNameExpression s)
+parseBinaryValue = parseSimpleValue -- aca va implementacion del parseo de todas las expressiones 
+
+parseSimpleExpressionValue n@(Number number) Nothing = MuNumber <$> (parseJSON n)
+parseSimpleExpressionValue b@(Bool bool) _ = MuBool <$> (parseJSON b)
+parseSimpleExpressionValue (Array direction) _ = MuSymbol <$> (parseListToDirection direction)
+parseSimpleExpressionValue (Number number) _ = MuSymbol <$> (parseToColour number)
+parseSimpleExpressionValue s@(String text) _ = MuString <$> (parseNameExpression s)
+
 
 parseToColour number = case (Scientific.floatingOrInteger number) 
 						of 	(Right 0) -> parseJSON "Azul"
@@ -79,25 +82,27 @@ parseVariableName (Object value) =  parseNameExpression (lookUpValue "value" val
 
 variableName value = lookupAndParseExpression parseVariableName "variable" value
 
-variableValue value | isFunctionCall = lookupAndParseExpression  parseFunctionCall "expression" value
-					| otherwise = lookupAndParseExpression  parseParameterExpression "expression" value
+expressionValue value text | isFunctionCall = lookupAndParseExpression  parseFunctionCall text value
+					| isBinary = lookupAndParseExpression  parseBinaryValue text value  
+					| otherwise = lookupAndParseExpression  parseSimpleValue text value
 	where
-		maybeName = let (Object  v) = lookUpValue "expression" value
-							in HashMap.lookup "name" v
+		expression = let (Object  v) = lookUpValue text value
+							in v
+		maybeName = HashMap.lookup "name" expression
+		arity = HashMap.lookup "arity" expression
 		isFunctionCall = isJust maybeName
-
-returnValue value = lookupAndParseExpression  parseParameterExpression "return" value
+		isBinary = (fromJust arity) == (String "binary")
 
 addReturn (Sequence xs) e 
 						|	(null xs) = Return e
 						|	otherwise = Sequence (xs ++ [Return e]) 
 
-
 parseNodeAst (Just "program") value = lookupAndParseExpression parseBodyExpression "body" value
 parseNodeAst (Just "procedureDeclaration") value = ProcedureDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression parseParametersPatterns "parameters" value) <*> (UnguardedBody <$> (lookupAndParseExpression  parseBodyExpression "body" value))))
 parseNodeAst (Just "ProcedureCall") value = Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
-parseNodeAst (Just ":=") value = VariableAssignment <$> (variableName value) <*> (variableValue value) 
-parseNodeAst (Just "functionDeclaration") value = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression parseParametersPatterns "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (returnValue value)))))
+parseNodeAst (Just ":=") value = VariableAssignment <$> (variableName value) <*> (expressionValue value "expression") 
+parseNodeAst (Just "functionDeclaration") value = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression parseParametersPatterns "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (expressionValue value "return")))))
+parseNodeAst (Just "conditional") value = If <$> (expressionValue value "condition") <*> (lookupAndParseExpression parseBodyExpression "left" value) <*> (lookupAndParseExpression parseBodyExpression "right" value)
 parseNodeAst Nothing value = fail "Failed to parse NodeAst!"
 
 
