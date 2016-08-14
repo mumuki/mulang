@@ -67,6 +67,7 @@ data Expression
         | While Expression Expression                         -- ^ Imperative programming conditional repetition control structure, composed by a condition and a body 
         | Repeat Expression Expression                        -- ^ Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
         | Match Expression [Equation]
+        | Switch Expression [(Expression,Expression)]
         | Comprehension Expression [ComprehensionStatement]
         | Sequence [Expression]                                -- ^ Generic sequence of statements
         | ExpressionOther
