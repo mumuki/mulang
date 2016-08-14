@@ -35,8 +35,20 @@ describe "translateProgramGobstonesToMulangExpression" $ do
     it "translate simple procedure Application " $ do
       let gobstonesAst =  parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\": \"ProcedureCall\",\"from\": 14,\"to\": 18,\"arity\": \"routine\",\"name\": \"F\",\"parameters\": []}],\"from\": 0},{\"alias\": \"procedureDeclaration\",\"body\": null,\"from\": 1,\"row\": 1,\"to\": 12,\"value\": \"F\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"F\",\"parameters\": []}]"
 
+      let gobstonesAstWithPoner =  parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"PutStone\" , \"parameters\" : [{\"value\" : 3, \"arity\" : \"literal\" , \"reserved\" : true}] }],\"from\": 0}]"
+
+      let gobstonesAstWithSacar =  parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"RemoveStone\" , \"parameters\" : [{\"value\" : 3, \"arity\" : \"literal\" , \"reserved\" : true}] }],\"from\": 0}]"
+
+      let gobstonesAstWithMover =  parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"MoveClaw\" , \"parameters\" : [{\"value\" : [1,0], \"arity\" : \"literal\" , \"reserved\" : true}] }],\"from\": 0}]"
+
       gobstonesAst `shouldBe` Sequence [Sequence [Application (Variable "F") []],ProcedureDeclaration "F" [Equation [] (UnguardedBody MuNull)]]
-      
+
+      gobstonesAstWithPoner `shouldBe` Sequence [Sequence [Application (Variable "Poner") [MuSymbol "Verde"]]]
+
+      gobstonesAstWithSacar `shouldBe` Sequence [Sequence [Application (Variable "Sacar") [MuSymbol "Verde"]]]
+
+      gobstonesAstWithMover `shouldBe` Sequence [Sequence [Application (Variable "Mover") [MuSymbol "Este"]]]
+
     it "translate simple function declaration" $ do
       let gobstonesAst =  parseGobstones "[{\"alias\": \"functionDeclaration\",\"body\": [],\"from\": 1,\"row\": 1,\"to\": 12,\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"parameters\": [],\"return\" : {\"from\" : 21, \"row\" : 1,\"to\" : 22, \"value\" : 2, \"arity\" : \"literal\"}}]"
 
