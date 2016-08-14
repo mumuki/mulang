@@ -48,7 +48,7 @@ parseCaseValue (Object value) = (\x y -> (x,y)) <$> (expressionValue value "case
 
 parseParameterPatterns (Object value) = VariablePattern <$> (lookupAndParseExpression parseNameExpression "value" value)
 
-parseFunctionCall (Object value) = parseNodeAst (Just "ProcedureCall") value--Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
+parseFunctionCall (Object value) = parseNodeAst (Just "ProcedureCall") value
 
 parseSimpleValue (Object value) = parseSimpleExpressionValue (lookUpValue "value" value) (HashMap.lookup "reserved" value)
 
@@ -111,6 +111,9 @@ parseNodeAst (Just "functionDeclaration") value = FunctionDeclaration <$> (looku
 parseNodeAst (Just "conditional") value = If <$> (expressionValue value "condition") <*> (lookupAndParseExpression parseBodyExpression "left" value) <*> (lookupAndParseExpression parseBodyExpression "right" value)
 parseNodeAst (Just "while") value = While <$> (expressionValue value "expression") <*> (lookupAndParseExpression parseBodyExpression "body" value)
 parseNodeAst (Just "switch") value = Switch <$> (expressionValue value "value") <*> (lookupAndParseExpression parseCasesExpression "cases" value)
+parseNodeAst (Just "PutStone") value = Application <$> (Variable <$> (pure "Poner")) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
+parseNodeAst (Just "RemoveStone") value = Application <$> (Variable <$> (pure "Sacar")) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
+parseNodeAst (Just "MoveClaw") value = Application <$> (Variable <$> (pure "Mover")) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
 parseNodeAst Nothing value = fail "Failed to parse NodeAst!"
 
 
