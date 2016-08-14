@@ -112,6 +112,12 @@ describe "translateProgramGobstonesToMulangExpression" $ do
 
       gobstonesAstWhileWithBody `shouldBe` Sequence [Sequence [While (MuBool True) (Sequence [VariableAssignment "x" (MuNumber 1.0)])]]
 
-      
+    it "translate switch declaration" $ do
+      let gobstonesAst =  parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"switch\",\"value\" : {\"value\" : 2 , \"arity\" : \"literal\"} ,\"cases\" : [{\"case\" : {\"value\" : 2 , \"arity\" : \"literal\"} , \"body\" : [{\"alias\" : \":=\" , \"arity\" : \"binary\" , \"variable\" : {\"value\" : \"x\" , \"arity\" : \"name\"}, \"expression\" :{\"value\" : 2, \"arity\" : \"literal\"} }] }]}],\"from\": 0}]"
 
+      gobstonesAst `shouldBe`  Sequence [Sequence [Switch (MuNumber 2.0) [(MuNumber 2.0,Sequence [VariableAssignment "x" (MuNumber 2.0)])]]]
+
+   
+
+    
 

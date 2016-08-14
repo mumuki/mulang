@@ -35,12 +35,18 @@ parseParametersPatterns (Array list)
 									| (V.null list) = pure []
 									| otherwise = (\a -> toList <$> traverse parseParameterPatterns a) list
 
-parseParameterPatterns (Object value) = VariablePattern <$> (lookupAndParseExpression parseNameExpression "value" value)
-
-
 parseParametersExpression (Array list) 
 									| (V.null list) = pure []
 									| otherwise = (\a -> toList <$> traverse parseSimpleValue a) list
+
+parseCasesExpression (Array list) 
+									| (V.null list) = pure []
+									| otherwise = (\a -> toList <$> traverse parseCaseValue a) list
+
+
+parseCaseValue (Object value) = (\x y -> (x,y)) <$> (expressionValue value "case") <*> (lookupAndParseExpression parseBodyExpression "body" value)
+
+parseParameterPatterns (Object value) = VariablePattern <$> (lookupAndParseExpression parseNameExpression "value" value)
 
 parseFunctionCall (Object value) = parseNodeAst (Just "ProcedureCall") value--Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
 
@@ -104,6 +110,7 @@ parseNodeAst (Just ":=") value = VariableAssignment <$> (variableName value) <*>
 parseNodeAst (Just "functionDeclaration") value = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression parseParametersPatterns "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (expressionValue value "return")))))
 parseNodeAst (Just "conditional") value = If <$> (expressionValue value "condition") <*> (lookupAndParseExpression parseBodyExpression "left" value) <*> (lookupAndParseExpression parseBodyExpression "right" value)
 parseNodeAst (Just "while") value = While <$> (expressionValue value "expression") <*> (lookupAndParseExpression parseBodyExpression "body" value)
+parseNodeAst (Just "switch") value = Switch <$> (expressionValue value "value") <*> (lookupAndParseExpression parseCasesExpression "cases" value)
 parseNodeAst Nothing value = fail "Failed to parse NodeAst!"
 
 
