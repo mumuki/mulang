@@ -11,7 +11,7 @@ spec = describe "Evaluator" $ do
       evaluate (Input (Code Haskell "x = 2") []) `shouldBe` (Output [] [])
 
     it "detects smells" $ do
-      evaluate (Input (Code Haskell "x = \\y -> f y") []) `shouldBe` (Output [] [Basic "x" "HasRedundantParameter"])
+      evaluate (Input (Code Haskell "f x = if x then True else False") []) `shouldBe` (Output [] [Basic "f" "HasRedundantIf"])
 
     it "evaluates present named expectations" $ do
       let ydeclares = (Advanced [] "declares" (Named "y") False False)

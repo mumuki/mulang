@@ -68,7 +68,6 @@ namedSmells = [
   ("HasRedundantLambda", hasRedundantLambda),
   ("HasRedundantBooleanComparison", hasRedundantBooleanComparison),
   ("HasRedundantGuards", hasRedundantGuards),
-  ("HasRedundantParameter", hasRedundantParameter),
   ("HasRedundantLocalVariableReturn", hasRedundantLocalVariableReturn),
   ("hasAssignmentReturn", hasAssignmentReturn),
   ("DoesNullTest", doesNullTest),
