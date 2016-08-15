@@ -52,7 +52,7 @@ parseFunctionCall (Object value) = parseNodeAst (Just "ProcedureCall") value
 
 parseSimpleValue (Object value) = parseSimpleExpressionValue (lookUpValue "value" value) (HashMap.lookup "reserved" value)
 
-parseBinaryValue = parseSimpleValue -- aca va implementacion del parseo de todas las expressiones 
+parseBinaryValue (Object value) = Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "value" value)) <*> ((\x y -> [x,y]) <$> (expressionValue value "left") <*> (expressionValue value "right"))
 
 parseSimpleExpressionValue n@(Number number) Nothing = MuNumber <$> (parseJSON n)
 parseSimpleExpressionValue b@(Bool bool) _ = MuBool <$> (parseJSON b)
@@ -97,7 +97,9 @@ expressionValue value text | isFunctionCall = lookupAndParseExpression  parseFun
 		maybeName = HashMap.lookup "name" expression
 		arity = HashMap.lookup "arity" expression
 		isFunctionCall = isJust maybeName
-		isBinary = (fromJust arity) == (String "binary")
+		isBinary = case (fromJust arity) 
+					of	(String "binary") -> True
+						_ -> False
 
 addReturn (Sequence xs) e 
 						|	(null xs) = Return e
