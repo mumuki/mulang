@@ -71,7 +71,9 @@ describe "translateProgramGobstonesToMulangExpression" $ do
 
       let gobstonesAstFunctionCall = parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \":=\",\"arity\" : \"binary\", \"variable\" : {\"from\" : 13, \"row\" : 1,\"to\" : 14, \"value\" : \"x\", \"arity\" : \"name\"}, \"expression\" : {\"alias\" : \"functionCall\" , \"name\" : \"f\" , \"parameters\" : [{\"value\" : 2, \"arity\" : \"literal\"}]}, \"assignment\" : true, \"from\" : 13,\"to\" : 20 }],\"from\": 0}]"      
 
-      --let gobstonesAstSimpleExpression = parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \":=\",\"arity\" : \"binary\", \"variable\" : {\"from\" : 13, \"row\" : 1,\"to\" : 14, \"value\" : \"x\", \"arity\" : \"name\"}, \"expression\" : {\"value\" : \"==\" , \"arity\" : \"binary\" , \"left\" : {\"value\" : true , \"arity\" : \"literal\" , \"reserved\" : true} , \"right\" : {\"value\" : true , \"arity\" : literal}} , \"assignment\" : true, \"from\" : 13,\"to\" : 20 }],\"from\": 0}]"      
+      let gobstonesAstSimpleExpression = parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \":=\",\"arity\" : \"binary\", \"variable\" : {\"from\" : 13, \"row\" : 1,\"to\" : 14, \"value\" : \"x\", \"arity\" : \"name\"}, \"expression\" : {\"from\" : 18, \"row\" : 1,\"to\" : 19, \"value\" : \"&&\" , \"arity\" : \"binary\",\"left\" : {\"value\" : \"z\" , \"arity\" : \"name\"} , \"right\" : {\"value\" : \"y\" , \"arity\" : \"name\"}}, \"assignment\" : true, \"from\" : 13,\"to\" : 20 }],\"from\": 0}]"
+
+      let gobstonesAstComposeExpression = parseGobstones "[{\"alias\": \"program\",\"body\": [{\"alias\" : \":=\",\"arity\" : \"binary\", \"variable\" : {\"from\" : 13, \"row\" : 1,\"to\" : 14, \"value\" : \"x\", \"arity\" : \"name\"}, \"expression\" : {\"from\" : 18, \"row\" : 1,\"to\" : 19, \"value\" : \"&&\" , \"arity\" : \"binary\",\"left\" : {\"value\" : \"==\" , \"arity\" : \"binary\", \"left\" : {\"value\" : true , \"arity\" : \"literal\" , \"reserved\" : true } , \"right\" : {\"value\" : 2 , \"arity\" : \"literal\"} } , \"right\" : {\"value\" : \"!=\" , \"arity\" : \"binary\" , \"left\" : {\"value\" : \"x\" , \"arity\" : \"name\"},\"right\" : {\"value\" : \"t\" , \"arity\" : \"name\"} }}, \"assignment\" : true, \"from\" : 13,\"to\" : 20 }],\"from\": 0}]"
 
       gobstonesAstNumber `shouldBe` Sequence [Sequence [VariableAssignment "x" (MuNumber 1.0)]]
 
@@ -85,7 +87,9 @@ describe "translateProgramGobstonesToMulangExpression" $ do
 
       gobstonesAstFunctionCall `shouldBe` Sequence [Sequence [VariableAssignment "x" (Application (Variable "f") [MuNumber 2.0])]]
 
-      --gobstonesAstSimpleExpression `shouldBe` Sequence [Sequence [VariableAssignment "x" (MuBool True)]]--falta todo lo que son expressiones
+      gobstonesAstSimpleExpression `shouldBe` Sequence [Sequence [VariableAssignment "x" (Application (Variable "&&") [MuString "z",MuString "y"])]]
+
+      gobstonesAstComposeExpression `shouldBe` Sequence [Sequence [VariableAssignment "x" (Application (Variable "&&") [Application (Variable "==") [MuBool True,MuNumber 2.0],Application (Variable "!=") [MuString "x",MuString "t"]])]]
 
      
     it "translate simple procedure declaration and application  with a parameter" $ do
