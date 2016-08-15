@@ -110,6 +110,7 @@ parseNodeAst (Just ":=") value = VariableAssignment <$> (variableName value) <*>
 parseNodeAst (Just "functionDeclaration") value = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression parseParametersPatterns "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (expressionValue value "return")))))
 parseNodeAst (Just "conditional") value = If <$> (expressionValue value "condition") <*> (lookupAndParseExpression parseBodyExpression "left" value) <*> (lookupAndParseExpression parseBodyExpression "right" value)
 parseNodeAst (Just "while") value = While <$> (expressionValue value "expression") <*> (lookupAndParseExpression parseBodyExpression "body" value)
+parseNodeAst (Just "repeat") value = Repeat <$> (expressionValue value "expression") <*> (lookupAndParseExpression parseBodyExpression "body" value)
 parseNodeAst (Just "switch") value = Switch <$> (expressionValue value "value") <*> (lookupAndParseExpression parseCasesExpression "cases" value)
 parseNodeAst (Just "PutStone") value = Application <$> (Variable <$> (pure "Poner")) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
 parseNodeAst (Just "RemoveStone") value = Application <$> (Variable <$> (pure "Sacar")) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
