@@ -22,7 +22,7 @@ import	Data.Scientific as Scientific
 instance FromJSON Expression where
 	  parseJSON  =  parseBodyExpression 
 
-parseBodyExpression (Array list) = Builder.normalize <$> (\a -> Sequence . toList <$> traverse parseNodes a) list
+parseBodyExpression (Array list) = Builder.normalize <$> simplify <$> (\a -> Sequence . toList <$> traverse parseNodes a) list
 parseBodyExpression Null = pure MuNull
 parseBodyExpression _ = fail "Failed to parse Expression!"
 
@@ -119,6 +119,12 @@ parseNodeAst (Just "RemoveStone") value = Application <$> (Variable <$> (pure "S
 parseNodeAst (Just "MoveClaw") value = Application <$> (Variable <$> (pure "Mover")) <*> (lookupAndParseExpression parseParametersExpression "parameters" value)
 parseNodeAst Nothing value = fail "Failed to parse NodeAst!"
 
+------------------------------------------------
+
+simplify :: Expression -> Expression
+simplify (Sequence [MuNull]) = MuNull
+simplify (Sequence ((Sequence xs):es) ) = Sequence $ (map simplify xs) ++ (map simplify es) 
+simplify  n = n
 
 ------------------------------------------------
 
