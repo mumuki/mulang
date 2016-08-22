@@ -21,6 +21,9 @@ executable mulang
     base                      >= 4     && < 5,
     bytestring                == 0.10.6.0,
     text                      >= 1.2.2.0,
+    unordered-containers      == 0.2.7.1,
+    scientific                == 0.3.4.9,
+    vector                    == 0.11.0.0,
     haskell-src               >= 1       && < 1.1,
     language-javascript       >= 0.5.14  && <= 0.5.15,
     aeson                     >= 0.11.0.0 && < 1,
@@ -68,6 +71,7 @@ library
     Language.Mulang.Inspector.Extras
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
+    Language.Mulang.Parsers.Gobstones
     Language.Mulang.Parsers.Prolog
     Language.Mulang.Parsers.Json
     Language.Mulang.Parsers.JavaScript
@@ -78,6 +82,9 @@ library
     base                      >= 4     && < 5,
     bytestring                == 0.10.6.0,
     text                      >= 1.2.2.0,
+    unordered-containers      == 0.2.7.1,
+    scientific                == 0.3.4.9,
+    vector                    == 0.11.0.0,
     haskell-src               >= 1       && < 1.1,
     language-javascript       >= 0.5.14  && <= 0.5.15,
     aeson                     >= 0.11.0.0 && < 1,
@@ -105,6 +112,9 @@ test-suite spec
       Spec.hs
   build-depends:
     base                      >= 4     && < 5,
+    unordered-containers      == 0.2.7.1,
+    scientific                == 0.3.4.9, 
+    vector                    == 0.11.0.0,
     bytestring                == 0.10.6.0,
     text                      >= 1.2.2.0,
     aeson                     >= 0.11.0.0 && < 1,
