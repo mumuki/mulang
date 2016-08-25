@@ -1,39 +1,41 @@
 {-# LANGUAGE OverloadedStrings #-}
---{-# LANGUAGE DeriveGeneric #-}
-module Language.Mulang.Parsers.Gobstones (parseGobstones, parseMaybeGobstones) where 
 
-import	Language.Mulang
-import	Data.Aeson
-import	Data.HashMap.Lazy as  HashMap (HashMap, lookup, member)
-import	Data.Traversable (traverse)
-import	Data.Foldable (toList)
-import	Control.Applicative
-import	Data.Maybe (fromJust,isJust)
-import	qualified Data.ByteString.Lazy.Char8 as LBS (pack)
-import	qualified Data.Text as T
-import	GHC.Generics
-import	Data.Text (Text)
-import	Language.Mulang.Builder as Builder
-import	qualified Data.Vector as V
-import	Data.Scientific as Scientific
+module Language.Mulang.Parsers.Gobstones (gbs, parseGobstones) where 
+
+import            Language.Mulang
+import            Language.Mulang.Builder as Builder
+import            Language.Mulang.Parsers
 
 
+import            Data.Aeson
+import            Data.HashMap.Lazy as  HashMap (HashMap, lookup, member)
+import            Data.Traversable (traverse)
+import            Data.Foldable (toList)
+import            Data.Maybe (fromJust, isJust)
+import            Data.Text (Text)
+import            Data.Scientific as Scientific
+import  qualified Data.ByteString.Lazy.Char8 as LBS (pack)
+import  qualified Data.Text as T
+import  qualified Data.Vector as V
+
+import            Control.Applicative
+import            GHC.Generics
 
 instance FromJSON Expression where
-	  parseJSON  =  parseBodyExpression 
+    parseJSON  =  parseBodyExpression 
 
 parseBodyExpression (Array list) = Builder.normalize <$> simplify <$> (\a -> Sequence . toList <$> traverse parseNodes a) list
-parseBodyExpression Null = pure MuNull
+parseBodyExpression Null         = pure MuNull
 parseBodyExpression _ = fail "Failed to parse Expression!"
 
 parseNodes (Object v) = nodeAst
-		where
-				alias = HashMap.lookup "alias" v
-		  	 	nodeAst = parseNodeAst alias v
+    where
+        alias = HashMap.lookup "alias" v
+        nodeAst = parseNodeAst alias v
 
 mapObjectArray f (Array list) 
-							| (V.null list) = pure []
-							| otherwise = (\a -> toList <$> traverse f a) list
+              | (V.null list) = pure []
+              | otherwise = (\a -> toList <$> traverse f a) list
 
 parseCaseValue (Object value) = (\x y -> (x,y)) <$> (expressionValue value "case") <*> (lookupAndParseExpression parseBodyExpression "body" value)
 
@@ -53,19 +55,19 @@ parseSimpleExpressionValue s@(String text) _ = MuString <$> (parseNameExpression
 
 
 parseToColour number = case (Scientific.floatingOrInteger number) 
-						of 	(Right 0) -> parseJSON "Azul"
-							(Right 1) -> parseJSON "Rojo"
-							(Right 2) -> parseJSON "Negro"
-							(Right 3) -> parseJSON "Verde"
+            of  (Right 0) -> parseJSON "Azul"
+                (Right 1) -> parseJSON "Rojo"
+                (Right 2) -> parseJSON "Negro"
+                (Right 3) -> parseJSON "Verde"
 
 parseListToDirection direction = let (Number n1,Number n2) = (V.head direction,V.last direction) 
-								 in parseToDirection n1 n2
-	where 
-		parseToDirection number1 number2 = case ((Scientific.floatingOrInteger number1),(Scientific.floatingOrInteger number2))
-											of	((Right 1),(Right 0)) -> parseJSON "Este"
-												((Right 0),(Right 1)) -> parseJSON "Norte"
-												((Right (-1)),(Right 0)) -> parseJSON "Oeste"
-												((Right 0),(Right (-1))) -> parseJSON "Sur"
+                                 in parseToDirection n1 n2
+  where 
+    parseToDirection number1 number2 = case ((Scientific.floatingOrInteger number1),(Scientific.floatingOrInteger number2))
+                      of  ((Right 1),(Right 0)) -> parseJSON "Este"
+                          ((Right 0),(Right 1)) -> parseJSON "Norte"
+                          ((Right (-1)),(Right 0)) -> parseJSON "Oeste"
+                          ((Right 0),(Right (-1))) -> parseJSON "Sur"
 
 parseNameExpression (String n) = pure (T.unpack n) 
 
@@ -79,22 +81,22 @@ parseVariableName (Object value) =  parseNameExpression (lookUpValue "value" val
 
 variableName value = lookupAndParseExpression parseVariableName "variable" value
 
-expressionValue value text | isFunctionCall = lookupAndParseExpression  parseFunctionCall text value
-					| isBinary = lookupAndParseExpression  parseBinaryValue text value  
-					| otherwise = lookupAndParseExpression  parseSimpleValue text value
-	where
-		expression = let (Object  v) = lookUpValue text value
-							in v
-		maybeName = HashMap.lookup "name" expression
-		arity = HashMap.lookup "arity" expression
-		isFunctionCall = isJust maybeName
-		isBinary = case (fromJust arity) 
-					of	(String "binary") -> True
-						_ -> False
+expressionValue value text | isFunctionCall = lookupAndParseExpression parseFunctionCall text value
+                           | isBinary       = lookupAndParseExpression parseBinaryValue text value  
+                           | otherwise      = lookupAndParseExpression parseSimpleValue text value
+  where
+    expression = let (Object  v) = lookUpValue text value
+                 in v
+    maybeName = HashMap.lookup "name" expression
+    arity = HashMap.lookup "arity" expression
+    isFunctionCall = isJust maybeName
+    isBinary = case (fromJust arity) 
+          of  (String "binary") -> True
+              _                 -> False
 
 addReturn (Sequence xs) e 
-						|	(null xs) = Return e
-						|	otherwise = Sequence (xs ++ [Return e]) 
+            | (null xs) = Return e
+            | otherwise = Sequence (xs ++ [Return e]) 
 
 parseNodeAst (Just "program") value = lookupAndParseExpression parseBodyExpression "body" value
 parseNodeAst (Just "procedureDeclaration") value = ProcedureDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (lookupAndParseExpression  parseBodyExpression "body" value))))
