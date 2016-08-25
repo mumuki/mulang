@@ -118,7 +118,7 @@ addReturn (Sequence xs) e = Sequence (xs ++ [Return e])
 
 
 simplify :: Expression -> Expression
-simplify (Sequence [MuNull]) = MuNull
+simplify (Sequence [x]) = x
 simplify (Sequence ((Sequence xs):es) ) = Sequence $ (map simplify xs) ++ (map simplify es) 
 simplify  n = n
 

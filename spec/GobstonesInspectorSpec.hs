@@ -65,4 +65,4 @@ spec = do
 
 
     
-    
+  -- que ande el usesIf, el usesWhile, usesRepeat, usesSwitch, uses (retornos, parametro, program,function, procedure), declaresProgram, declaresProcedure, declaresVariable? y probar transitividad para algun caso 
