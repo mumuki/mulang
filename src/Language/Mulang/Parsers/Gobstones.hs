@@ -24,9 +24,9 @@ import            GHC.Generics
 instance FromJSON Expression where
     parseJSON  =  parseBodyExpression 
 
-parseBodyExpression (Array list) = Builder.normalize <$> simplify <$> (\a -> Sequence . toList <$> traverse parseNodes a) list
+parseBodyExpression (Array list) = Builder.normalize . simplify . Sequence . toList <$> traverse parseNodes list
 parseBodyExpression Null         = pure MuNull
-parseBodyExpression _ = fail "Failed to parse Expression!"
+parseBodyExpression _            = fail "Failed to parse Expression!"
 
 parseNodes (Object v) = nodeAst
     where
