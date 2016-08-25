@@ -45,11 +45,14 @@ spec = do
       usesWhile (gbs "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [\r\n      {\r\n        \"value\": \"x\",\r\n        \"arity\": \"name\"\r\n      }\r\n    ],\r\n    \"body\": [],\r\n    \"return\": {\r\n      \"value\": 1,\r\n      \"arity\": \"literal\"\r\n    }\r\n  }\r\n]")  `shouldBe` False
 
   describe "uses" $ do
-    it "is True on direct usage in function" $ do
-      uses (named "m") (gbs "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [\r\n      {\r\n        \"value\": \"x\",\r\n        \"arity\": \"name\"\r\n      }\r\n    ],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \":=\",\r\n        \"arity\": \"binary\",\r\n        \"variable\": {\r\n          \"value\": \"m\",\r\n          \"arity\": \"name\"\r\n        },\r\n        \"expression\": {\r\n          \"value\": 2,\r\n          \"arity\": \"literal\"\r\n        }\r\n      }\r\n    ],\r\n    \"return\": {\r\n      \"value\": \"m\",\r\n      \"arity\": \"name\"\r\n    }\r\n  }\r\n]") `shouldBe` True
-    
-    --it "is True on direct usage of something like it in function" $ do
-      --uses (like "m") (gbs "function f(x) { m2 }") `shouldBe` True
+    it "is True when function application is used within function" $ do
+      --  code = "function f() { return (m()) }"
+      let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [],\r\n    \"return\": {\r\n      \"alias\": \"functionCall\",\r\n      \"name\": \"m\",\r\n      \"parameters\": []\r\n    }\r\n  }\r\n]"
+      uses (named "m")  (gbs code)  `shouldBe` True
+
+      --  code = "procedure F() { M() }"
+      let code = "[\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"arity\": \"routine\",\r\n        \"alias\": \"ProcedureCall\",\r\n        \"name\": \"M\",\r\n        \"parameters\": []\r\n      }\r\n    ]\r\n  }\r\n]\r\n\r\n"
+      uses (named "M")  (gbs code)  `shouldBe` True
 
     --it "is True through function application in function" $ do
       --transitive (uses (named "m")) "f" (gbs "function g() { m }; function f(x) { g() }") `shouldBe` True
