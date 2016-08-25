@@ -119,8 +119,8 @@ simplify  n = n
 
 ------------------------------------------------
 
-parseGobstones :: String -> Expression
-parseGobstones  = fromJust . parseMaybeGobstones
+gbs :: Parser
+gbs  = fromJust . parseGobstones
 
-parseMaybeGobstones :: String -> Maybe Expression
-parseMaybeGobstones = decode . LBS.pack
+parseGobstones :: MaybeParser
+parseGobstones = decode . LBS.pack
