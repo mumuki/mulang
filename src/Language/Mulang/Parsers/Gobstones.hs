@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 --{-# LANGUAGE DeriveGeneric #-}
-module Language.Mulang.Parsers.Gobstones (parseGobstones) where 
+module Language.Mulang.Parsers.Gobstones (parseGobstones, parseMaybeGobstones) where 
 
 import	Language.Mulang
 import	Data.Aeson
@@ -120,7 +120,7 @@ simplify  n = n
 ------------------------------------------------
 
 parseGobstones :: String -> Expression
-parseGobstones  = fromJust . parseExpressions
+parseGobstones  = fromJust . parseMaybeGobstones
 
-parseExpressions :: String -> Maybe Expression
-parseExpressions = decode . LBS.pack
+parseMaybeGobstones :: String -> Maybe Expression
+parseMaybeGobstones = decode . LBS.pack
