@@ -35,9 +35,9 @@ parseNodes (Object v) = nodeAst
 
 mapObjectArray f (Array list) 
               | (V.null list) = pure []
-              | otherwise = (\a -> toList <$> traverse f a) list
+              | otherwise = toList <$> traverse f list
 
-parseCaseValue (Object value) = (\x y -> (x,y)) <$> (expressionValue value "case") <*> (lookupAndParseExpression parseBodyExpression "body" value)
+parseCaseValue (Object value) = (\x y -> (x, y)) <$> (expressionValue value "case") <*> (lookupAndParseExpression parseBodyExpression "body" value)
 
 parseParameterPatterns (Object value) = VariablePattern <$> (lookupAndParseExpression parseNameExpression "value" value)
 
@@ -54,11 +54,14 @@ parseSimpleExpressionValue (Number number) _ = MuSymbol <$> (parseToColour numbe
 parseSimpleExpressionValue s@(String text) _ = MuString <$> (parseNameExpression s)
 
 
-parseToColour number = case (Scientific.floatingOrInteger number) 
-            of  (Right 0) -> parseJSON "Azul"
-                (Right 1) -> parseJSON "Rojo"
-                (Right 2) -> parseJSON "Negro"
-                (Right 3) -> parseJSON "Verde"
+parseToColour = parseColour . Scientific.floatingOrInteger
+                where parseColour (Right n) =  parseJSON . numberToColour $ n
+
+                      numberToColour 0 = "Azul"
+                      numberToColour 1 = "Rojo"
+                      numberToColour 2 = "Negro"
+                      numberToColour 3 = "Verde"
+
 
 parseListToDirection direction = let (Number n1,Number n2) = (V.head direction,V.last direction) 
                                  in parseToDirection n1 n2
@@ -72,47 +75,47 @@ parseListToDirection direction = let (Number n1,Number n2) = (V.head direction,V
 parseNameExpression (String n) = pure (T.unpack n) 
 
 lookUpValue :: Text -> Object -> Value
-lookUpValue string value = fromJust (HashMap.lookup string value)
+lookUpValue string = fromJust .  HashMap.lookup string
 
 lookupAndParseExpression :: (Value -> b) -> Text -> Object -> b
-lookupAndParseExpression parseFunction string value= parseFunction (lookUpValue string value)
+lookupAndParseExpression parseFunction string = parseFunction . lookUpValue string 
 
-parseVariableName (Object value) =  parseNameExpression (lookUpValue "value" value) 
+parseVariableName (Object value) =  parseNameExpression . lookUpValue "value" $ value 
 
-variableName value = lookupAndParseExpression parseVariableName "variable" value
+variableName = lookupAndParseExpression parseVariableName "variable"
 
 expressionValue value text | isFunctionCall = lookupAndParseExpression parseFunctionCall text value
                            | isBinary       = lookupAndParseExpression parseBinaryValue text value  
                            | otherwise      = lookupAndParseExpression parseSimpleValue text value
   where
-    expression = let (Object  v) = lookUpValue text value
-                 in v
-    maybeName = HashMap.lookup "name" expression
-    arity = HashMap.lookup "arity" expression
-    isFunctionCall = isJust maybeName
-    isBinary = case (fromJust arity) 
-          of  (String "binary") -> True
-              _                 -> False
+    expression | (Object  v) <- lookUpValue text value = v
+    maybeName      = HashMap.lookup "name" expression
+    arity          = HashMap.lookup "arity" expression
+    isFunctionCall = isJust maybeName    
+    isBinary | String "binary"  <- fromJust arity = True
+             | otherwise = False
 
-addReturn (Sequence xs) e 
-            | (null xs) = Return e
-            | otherwise = Sequence (xs ++ [Return e]) 
+parseToken "program" value              = lookupAndParseExpression parseBodyExpression "body" value
+parseToken "procedureDeclaration" value = ProcedureDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (lookupAndParseExpression  parseBodyExpression "body" value))))
+parseToken "ProcedureCall" value        = Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
+parseToken ":=" value                   = VariableAssignment <$> (variableName value) <*> (expressionValue value "expression") 
+parseToken "functionDeclaration" value  = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (expressionValue value "return")))))
+parseToken "conditional" value          = If <$> (expressionValue value "condition") <*> (lookupAndParseExpression parseBodyExpression "left" value) <*> (lookupAndParseExpression parseBodyExpression "right" value)
+parseToken "while" value                = While <$> (expressionValue value "expression") <*> (lookupAndParseExpression parseBodyExpression "body" value)
+parseToken "repeat" value               = Repeat <$> (expressionValue value "expression") <*> (lookupAndParseExpression parseBodyExpression "body" value)
+parseToken "switch" value               = Switch <$> (expressionValue value "value") <*> (lookupAndParseExpression (mapObjectArray parseCaseValue) "cases" value)
+parseToken "PutStone" value             = Application <$> (Variable <$> (pure "Poner")) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
+parseToken "RemoveStone" value          = Application <$> (Variable <$> (pure "Sacar")) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
+parseToken "MoveClaw" value             = Application <$> (Variable <$> (pure "Mover")) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
 
-parseNodeAst (Just "program") value = lookupAndParseExpression parseBodyExpression "body" value
-parseNodeAst (Just "procedureDeclaration") value = ProcedureDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (lookupAndParseExpression  parseBodyExpression "body" value))))
-parseNodeAst (Just "ProcedureCall") value = Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
-parseNodeAst (Just ":=") value = VariableAssignment <$> (variableName value) <*> (expressionValue value "expression") 
-parseNodeAst (Just "functionDeclaration") value = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (expressionValue value "return")))))
-parseNodeAst (Just "conditional") value = If <$> (expressionValue value "condition") <*> (lookupAndParseExpression parseBodyExpression "left" value) <*> (lookupAndParseExpression parseBodyExpression "right" value)
-parseNodeAst (Just "while") value = While <$> (expressionValue value "expression") <*> (lookupAndParseExpression parseBodyExpression "body" value)
-parseNodeAst (Just "repeat") value = Repeat <$> (expressionValue value "expression") <*> (lookupAndParseExpression parseBodyExpression "body" value)
-parseNodeAst (Just "switch") value = Switch <$> (expressionValue value "value") <*> (lookupAndParseExpression (mapObjectArray parseCaseValue) "cases" value)
-parseNodeAst (Just "PutStone") value = Application <$> (Variable <$> (pure "Poner")) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
-parseNodeAst (Just "RemoveStone") value = Application <$> (Variable <$> (pure "Sacar")) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
-parseNodeAst (Just "MoveClaw") value = Application <$> (Variable <$> (pure "Mover")) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
-parseNodeAst Nothing value = fail "Failed to parse NodeAst!"
+parseNodeAst (Just token)  = parseToken token
+parseNodeAst Nothing       = fail "Failed to parse NodeAst!"
 
 ------------------------------------------------
+
+addReturn (Sequence []) e = Return e
+addReturn (Sequence xs) e = Sequence (xs ++ [Return e]) 
+
 
 simplify :: Expression -> Expression
 simplify (Sequence [MuNull]) = MuNull
