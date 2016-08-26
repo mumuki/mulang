@@ -47,11 +47,11 @@ parseSimpleValue (Object value) = parseSimpleExpressionValue (lookUpValue "value
 
 parseBinaryValue (Object value) = Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "value" value)) <*> ((\x y -> [x,y]) <$> (expressionValue value "left") <*> (expressionValue value "right"))
 
-parseSimpleExpressionValue n@(Number number) Nothing = MuNumber <$> (parseJSON n)
-parseSimpleExpressionValue b@(Bool bool) _ = MuBool <$> (parseJSON b)
+parseSimpleExpressionValue n@(Number _) Nothing = MuNumber <$> (parseJSON n)
+parseSimpleExpressionValue b@(Bool _) _ = MuBool <$> (parseJSON b)
 parseSimpleExpressionValue (Array direction) _ = MuSymbol <$> (parseListToDirection direction)
 parseSimpleExpressionValue (Number number) _ = MuSymbol <$> (parseToColour number)
-parseSimpleExpressionValue s@(String text) _ = MuString <$> (parseNameExpression s)
+parseSimpleExpressionValue s@(String _) _ = MuString <$> (parseNameExpression s)
 
 
 parseToColour = parseColour . Scientific.floatingOrInteger
@@ -66,11 +66,16 @@ parseToColour = parseColour . Scientific.floatingOrInteger
 parseListToDirection direction = let (Number n1,Number n2) = (V.head direction,V.last direction) 
                                  in parseToDirection n1 n2
   where 
-    parseToDirection number1 number2 = case ((Scientific.floatingOrInteger number1),(Scientific.floatingOrInteger number2))
-                      of  ((Right 1),(Right 0)) -> parseJSON "Este"
-                          ((Right 0),(Right 1)) -> parseJSON "Norte"
-                          ((Right (-1)),(Right 0)) -> parseJSON "Oeste"
-                          ((Right 0),(Right (-1))) -> parseJSON "Sur"
+    parseToDirection number1 number2 = parseDirection  ((Scientific.floatingOrInteger number1),(Scientific.floatingOrInteger number2))
+                where parseDirection ((Right n1),(Right n2)) = parseJSON . numbersToDirection $ (n1,n2)
+                      
+                      numbersToDirection (1, 0)  = "Este"
+                      numbersToDirection (0, 1)  = "Norte"
+                      numbersToDirection (-1, 0) = "Oeste"
+                      numbersToDirection (0, -1) = "Sur"
+
+
+
 
 parseNameExpression (String n) = pure (T.unpack n) 
 
@@ -95,21 +100,29 @@ expressionValue value text | isFunctionCall = lookupAndParseExpression parseFunc
     isBinary | String "binary"  <- fromJust arity = True
              | otherwise = False
 
-parseToken "program" value              = lookupAndParseExpression parseBodyExpression "body" value
-parseToken "procedureDeclaration" value = ProcedureDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (lookupAndParseExpression  parseBodyExpression "body" value))))
-parseToken "ProcedureCall" value        = Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
-parseToken ":=" value                   = VariableAssignment <$> (variableName value) <*> (expressionValue value "expression") 
-parseToken "functionDeclaration" value  = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (expressionValue value "return")))))
-parseToken "conditional" value          = If <$> (expressionValue value "condition") <*> (lookupAndParseExpression parseBodyExpression "left" value) <*> (lookupAndParseExpression parseBodyExpression "right" value)
-parseToken "while" value                = While <$> (expressionValue value "expression") <*> (lookupAndParseExpression parseBodyExpression "body" value)
-parseToken "repeat" value               = Repeat <$> (expressionValue value "expression") <*> (lookupAndParseExpression parseBodyExpression "body" value)
-parseToken "switch" value               = Switch <$> (expressionValue value "value") <*> (lookupAndParseExpression (mapObjectArray parseCaseValue) "cases" value)
-parseToken "PutStone" value             = Application <$> (Variable <$> (pure "Poner")) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
-parseToken "RemoveStone" value          = Application <$> (Variable <$> (pure "Sacar")) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
-parseToken "MoveClaw" value             = Application <$> (Variable <$> (pure "Mover")) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
+parseToken "program" value                = lookupAndParseExpression parseBodyExpression "body" value
+parseToken "procedureDeclaration" value   = ProcedureDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (lookupAndParseExpression  parseBodyExpression "body" value))))
+parseToken "ProcedureCall" value          = Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
+parseToken ":=" value                     = VariableAssignment <$> (variableName value) <*> (expressionValue value "expression") 
+parseToken "functionDeclaration" value    = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (expressionValue value "return")))))
+parseToken "conditional" value            = If <$> (expressionValue value "condition") <*> (lookupAndParseExpression parseBodyExpression "left" value) <*> (lookupAndParseExpression parseBodyExpression "right" value)
+parseToken "while" value                  = parseRepetitionFunction While value
+parseToken "repeat" value                 = parseRepetitionFunction Repeat value
+parseToken "switch" value                 = Switch <$> (expressionValue value "value") <*> (lookupAndParseExpression (mapObjectArray parseCaseValue) "cases" value)
+parseToken "PutStone" value               = parsePrimitive "Poner" value
+parseToken "RemoveStone" value            = parsePrimitive "Sacar" value
+parseToken "MoveClaw" value               = parsePrimitive "Mover" value
+parseToken "hasStones" value              = parsePrimitive "hayBolitas" value
+parseToken "canMove" value                = parsePrimitive "puedeMover" value
+
+
+parsePrimitive primitiveName value = Application <$> (Variable <$> (pure primitiveName)) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
+
+parseRepetitionFunction f value = f <$> (expressionValue value "expression") <*> (lookupAndParseExpression parseBodyExpression "body" value)
 
 parseNodeAst (Just token)  = parseToken token
 parseNodeAst Nothing       = fail "Failed to parse NodeAst!"
+
 
 ------------------------------------------------
 
