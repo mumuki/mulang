@@ -8,6 +8,7 @@ import            Language.Mulang.Parsers
 
 
 import            Data.Aeson
+import  qualified Data.Map.Lazy as Map
 import            Data.HashMap.Lazy as  HashMap (HashMap, lookup, member)
 import            Data.Traversable (traverse)
 import            Data.Foldable (toList)
@@ -128,12 +129,26 @@ parseNodeAst Nothing       = fail "Failed to parse NodeAst!"
 
 addReturn (Sequence []) e = Return e
 addReturn (Sequence xs) e = Sequence (xs ++ [Return e]) 
+addReturn x e = Sequence [x,(Return e)]
 
 
 simplify :: Expression -> Expression
-simplify (Sequence [x]) = x
+simplify (Sequence [x]) = simplify x
 simplify (Sequence ((Sequence xs):es) ) = Sequence $ (map simplify xs) ++ (map simplify es) 
 simplify  n = n
+
+
+
+-- TODO : aun funciona mal. falta revisar.
+convertVariableAssignmentToDeclaration :: Expression ->Expression
+convertVariableAssignmentToDeclaration (Sequence xs) = Sequence (convertListWithMap xs Map.empty)
+convertVariableAssignmentToDeclaration x = x
+
+convertListWithMap [] hashMap = [] 
+convertListWithMap ((VariableAssignment identifier body):xs) hashMap | Map.notMember identifier hashMap =  (VariableDeclaration identifier body) : (convertListWithMap xs (Map.insert identifier 1 hashMap))
+                                                                     | otherwise                        =  (VariableAssignment identifier body) : (convertListWithMap xs hashMap)
+convertListWithMap (x:xs) hashMap = x : (convertListWithMap xs hashMap)  
+
 
 ------------------------------------------------
 
