@@ -25,7 +25,7 @@ import            GHC.Generics
 instance FromJSON Expression where
     parseJSON  =  parseBodyExpression 
 
-parseBodyExpression (Array list) = Builder.normalize . simplify . Sequence . toList <$> traverse parseNodes list
+parseBodyExpression (Array list) = Builder.normalize . convertVariableAssignmentToDeclaration . simplify . Sequence . toList <$> traverse parseNodes list
 parseBodyExpression Null         = pure MuNull
 parseBodyExpression _            = fail "Failed to parse Expression!"
 
@@ -139,16 +139,25 @@ simplify  n = n
 
 
 
--- TODO : aun funciona mal. falta revisar.
+-- TODO : no entiendo porque no esta funcionando
 convertVariableAssignmentToDeclaration :: Expression ->Expression
 convertVariableAssignmentToDeclaration (Sequence xs) = Sequence (convertListWithMap xs Map.empty)
 convertVariableAssignmentToDeclaration x = x
 
 convertListWithMap [] hashMap = [] 
-convertListWithMap ((VariableAssignment identifier body):xs) hashMap | Map.notMember identifier hashMap =  (VariableDeclaration identifier body) : (convertListWithMap xs (Map.insert identifier 1 hashMap))
-                                                                     | otherwise                        =  (VariableAssignment identifier body) : (convertListWithMap xs hashMap)
-convertListWithMap (x:xs) hashMap = x : (convertListWithMap xs hashMap)  
+convertListWithMap (a@(VariableAssignment _ _):xs) hashMap = let (v,map) =  convertVariable a hashMap in  v : (convertListWithMap xs map)
+convertListWithMap (f@(FunctionDeclaration _ _):xs) hashMap              =  (convertVariablesInFunction f Map.empty) : (convertListWithMap xs hashMap)
+convertListWithMap (p@(ProcedureDeclaration _ _):xs) hashMap             =  (convertVariablesInProcedure p Map.empty) : (convertListWithMap xs hashMap)
+convertListWithMap (x:xs) hashMap = x : (convertListWithMap xs hashMap)
 
+
+convertVariable v@(VariableAssignment identifier body) map | Map.member identifier map = (v,map)
+                                                           | otherwise                 = (VariableDeclaration identifier body,Map.insert identifier identifier map)
+convertVariablesInFunction  (FunctionDeclaration name [eq]) map = FunctionDeclaration name [(convertVariablesInEquation eq)]
+convertVariablesInProcedure (ProcedureDeclaration name [eq] ) map = ProcedureDeclaration name [(convertVariablesInEquation eq)]
+
+
+convertVariablesInEquation (Equation xs (UnguardedBody e)) = Equation xs (UnguardedBody (convertVariableAssignmentToDeclaration e) )
 
 ------------------------------------------------
 
