@@ -8,8 +8,7 @@ import            Language.Mulang.Parsers
 
 
 import            Data.Aeson
-import  qualified Data.Map.Lazy as Map
-import            Data.HashMap.Lazy as  HashMap (HashMap, lookup, member)
+import            Data.HashMap.Lazy as  HashMap (HashMap, lookup, member,insert,empty)
 import            Data.Traversable (traverse)
 import            Data.Foldable (toList)
 import            Data.Maybe (fromJust, isJust)
@@ -141,18 +140,18 @@ simplify  n = n
 
 -- TODO : no entiendo porque no esta funcionando
 convertVariableAssignmentToDeclaration :: Expression ->Expression
-convertVariableAssignmentToDeclaration (Sequence xs) = Sequence (convertListWithMap xs Map.empty)
+convertVariableAssignmentToDeclaration (Sequence xs) = Sequence (convertListWithMap xs HashMap.empty)
 convertVariableAssignmentToDeclaration x = x
 
 convertListWithMap [] hashMap = [] 
 convertListWithMap (a@(VariableAssignment _ _):xs) hashMap = let (v,map) =  convertVariable a hashMap in  v : (convertListWithMap xs map)
-convertListWithMap (f@(FunctionDeclaration _ _):xs) hashMap              =  (convertVariablesInFunction f Map.empty) : (convertListWithMap xs hashMap)
-convertListWithMap (p@(ProcedureDeclaration _ _):xs) hashMap             =  (convertVariablesInProcedure p Map.empty) : (convertListWithMap xs hashMap)
+convertListWithMap (f@(FunctionDeclaration _ _):xs) hashMap              =  (convertVariablesInFunction f HashMap.empty) : (convertListWithMap xs hashMap)
+convertListWithMap (p@(ProcedureDeclaration _ _):xs) hashMap             =  (convertVariablesInProcedure p HashMap.empty) : (convertListWithMap xs hashMap)
 convertListWithMap (x:xs) hashMap = x : (convertListWithMap xs hashMap)
 
 
-convertVariable v@(VariableAssignment identifier body) map | Map.member identifier map = (v,map)
-                                                           | otherwise                 = (VariableDeclaration identifier body,Map.insert identifier identifier map)
+convertVariable v@(VariableAssignment identifier body) map | HashMap.member identifier map = (v,map)
+                                                           | otherwise                     = (VariableDeclaration identifier body,HashMap.insert identifier identifier map)
 convertVariablesInFunction  (FunctionDeclaration name [eq]) map = FunctionDeclaration name [(convertVariablesInEquation eq)]
 convertVariablesInProcedure (ProcedureDeclaration name [eq] ) map = ProcedureDeclaration name [(convertVariablesInEquation eq)]
 
