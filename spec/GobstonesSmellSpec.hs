@@ -7,7 +7,6 @@ import           Language.Mulang.Parsers.Gobstones
 spec :: Spec
 spec = do
   describe "hasRedundantIf" $ do
-
     it "is False when there is no if" $ do
       --  code = "program{x := False}"
       let code = "[\r\n  {\r\n    \"alias\": \"program\",\r\n    \"body\": [\r\n      {\r\n        \"alias\": \":=\",\r\n        \"arity\": \"binary\",\r\n        \"variable\": {\r\n          \"value\": \"x\",\r\n          \"arity\": \"name\"\r\n        },\r\n        \"expression\": {\r\n          \"value\": false,\r\n          \"arity\": \"literal\",\r\n          \"reserved\": true\r\n        }\r\n      }\r\n    ]\r\n  }\r\n]"
@@ -19,19 +18,16 @@ spec = do
       hasRedundantIf (gbs code) `shouldBe` False
    
   describe "hasRedundantBooleanComparison" $ do
-  	{-
-    it "is True when comparing a literal in a function" $ do
+    --it "is True when comparing a literal in a function" $ do
       -- code = "function x(m){return (m == True)}"
-      let code = ""
-      hasRedundantBooleanComparison (gbs "function x(m) { return m == true }") `shouldBe` True
-	-}
+      --let code = "[\r\n  {\r\n    \"value\": \"x\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"x\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [\r\n      {\r\n        \"value\": \"m\",\r\n        \"arity\": \"name\"\r\n      }\r\n    ],\r\n    \"body\": [],\r\n    \"return\": {\r\n      \"value\": \"==\",\r\n      \"arity\": \"binary\",\r\n      \"left\": {\r\n        \"value\": \"m\",\r\n        \"arity\": \"name\"\r\n      },\r\n      \"right\": {\r\n        \"value\": true,\r\n        \"arity\": \"literal\",\r\n        \"reserved\": true\r\n      }\r\n    }\r\n  }\r\n]"
+      --hasRedundantBooleanComparison (gbs code) `shouldBe` True
+
     it "is False when no comparison" $ do
       --  code = "function x(m){return (m)}"
       let code = "[\r\n  {\r\n    \"value\": \"x\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"x\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [\r\n      {\r\n        \"value\": \"m\",\r\n        \"arity\": \"name\"\r\n      }\r\n    ],\r\n    \"body\": [],\r\n    \"return\": {\r\n      \"value\": \"m\",\r\n      \"arity\": \"name\"\r\n    }\r\n  }\r\n]"
       hasRedundantBooleanComparison (gbs code) `shouldBe` False
    
-
-  
   describe "hasRedundantLocalVariableReturn" $ do
     --  code = "function x(m) { x  := 5 return (x) }"
     -- cambiar todos los primerros assign _ por declare.. _ 
