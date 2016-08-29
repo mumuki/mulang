@@ -8,7 +8,7 @@ import            Language.Mulang.Parsers
 
 
 import            Data.Aeson
-import            Data.HashMap.Lazy as  HashMap (HashMap, lookup, member,insert,empty)
+import            Data.HashMap.Lazy as  HashMap (HashMap, lookup, member,insert,empty,fromList)
 import            Data.Traversable (traverse)
 import            Data.Foldable (toList)
 import            Data.Maybe (fromJust, isJust)
@@ -24,7 +24,7 @@ import            GHC.Generics
 instance FromJSON Expression where
     parseJSON  =  parseBodyExpression 
 
-parseBodyExpression (Array list) = Builder.normalize . convertVariableAssignmentToDeclaration . simplify . Sequence . toList <$> traverse parseNodes list
+parseBodyExpression (Array list) = Builder.normalize . simplify . Sequence . toList <$> traverse parseNodes list
 parseBodyExpression Null         = pure MuNull
 parseBodyExpression _            = fail "Failed to parse Expression!"
 
@@ -130,30 +130,32 @@ addReturn (Sequence []) e = Return e
 addReturn (Sequence xs) e = Sequence (xs ++ [Return e]) 
 addReturn x e = Sequence [x,(Return e)]
 
-
+-- TODO : por alguna razon si se compone en parseJson , la funcion conver .. no funciona bien.. lo cual es raro.  
 simplify :: Expression -> Expression
 simplify (Sequence [x]) = simplify x
-simplify (Sequence ((Sequence xs):es) ) = Sequence $ (map simplify xs) ++ (map simplify es) 
+simplify (Sequence ((Sequence xs):es) ) = convertVariableAssignmentToDeclaration $ Sequence $ (map simplify xs) ++ (map simplify es) 
 simplify  n = n
 
 
 
--- TODO : no entiendo porque no esta funcionando
+
 convertVariableAssignmentToDeclaration :: Expression ->Expression
 convertVariableAssignmentToDeclaration (Sequence xs) = Sequence (convertListWithMap xs HashMap.empty)
 convertVariableAssignmentToDeclaration x = x
 
-convertListWithMap [] hashMap = [] 
-convertListWithMap (a@(VariableAssignment _ _):xs) hashMap = let (v,map) =  convertVariable a hashMap in  v : (convertListWithMap xs map)
-convertListWithMap (f@(FunctionDeclaration _ _):xs) hashMap              =  (convertVariablesInFunction f HashMap.empty) : (convertListWithMap xs hashMap)
-convertListWithMap (p@(ProcedureDeclaration _ _):xs) hashMap             =  (convertVariablesInProcedure p HashMap.empty) : (convertListWithMap xs hashMap)
-convertListWithMap (x:xs) hashMap = x : (convertListWithMap xs hashMap)
+convertListWithMap [] hashMap = []
+convertListWithMap (a@(VariableAssignment _ _):xs) hashMap = let (v,newMap) =  convertVariable a hashMap in  v : (convertListWithMap xs newMap)
+convertListWithMap (f@(FunctionDeclaration _ _):xs) hashMap                 =  (convertVariablesInFunctionOrProcedure f HashMap.empty) : (convertListWithMap xs hashMap)
+convertListWithMap (p@(ProcedureDeclaration _ _):xs) hashMap                =  (convertVariablesInFunctionOrProcedure p HashMap.empty) : (convertListWithMap xs hashMap)
+convertListWithMap (x:xs) hashMap                                           =  x : (convertListWithMap xs hashMap)
 
 
 convertVariable v@(VariableAssignment identifier body) map | HashMap.member identifier map = (v,map)
                                                            | otherwise                     = (VariableDeclaration identifier body,HashMap.insert identifier identifier map)
-convertVariablesInFunction  (FunctionDeclaration name [eq]) map = FunctionDeclaration name [(convertVariablesInEquation eq)]
-convertVariablesInProcedure (ProcedureDeclaration name [eq] ) map = ProcedureDeclaration name [(convertVariablesInEquation eq)]
+
+
+convertVariablesInFunctionOrProcedure  (FunctionDeclaration name [eq]) map                 = FunctionDeclaration name [(convertVariablesInEquation eq)]
+convertVariablesInFunctionOrProcedure  (ProcedureDeclaration name [eq] ) map               = ProcedureDeclaration name [(convertVariablesInEquation eq)]
 
 
 convertVariablesInEquation (Equation xs (UnguardedBody e)) = Equation xs (UnguardedBody (convertVariableAssignmentToDeclaration e) )
