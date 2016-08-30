@@ -270,6 +270,12 @@ spec = do
     it "is False if _ is not present in parameters" $ do
       usesAnonymousVariable (hs "foo x = 1") `shouldBe` False
 
+    it "is False if _ there is no anonymous var but acomment" $ do
+      usesAnonymousVariable (hs "foo x = 1\n--") `shouldBe` False
+
+    it "is False if _ there is only a comment" $ do
+      usesAnonymousVariable (hs "--") `shouldBe` False
+
     it "is False if _ is present only in seccond equation" $ do
       let code = fromJust . parseHaskell . unlines $ ["foo False bool = bool", "foo True _ = True"]
       usesAnonymousVariable code `shouldBe` True
