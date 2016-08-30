@@ -270,15 +270,15 @@ spec = do
     it "is False if _ is not present in parameters" $ do
       usesAnonymousVariable (hs "foo x = 1") `shouldBe` False
 
-    it "is False if _ there is no anonymous var but acomment" $ do
-      usesAnonymousVariable (hs "foo x = 1\n--") `shouldBe` False
-
-    it "is False if _ there is only a comment" $ do
-      usesAnonymousVariable (hs "--") `shouldBe` False
-
     it "is False if _ is present only in seccond equation" $ do
       let code = fromJust . parseHaskell . unlines $ ["foo False bool = bool", "foo True _ = True"]
       usesAnonymousVariable code `shouldBe` True
+
+    it "is False if there is no _ but a comment" $ do
+      usesAnonymousVariable (hs "foo x = 1\n--") `shouldBe` False
+
+    it "is False if there is only a comment" $ do
+      usesAnonymousVariable (hs "--") `shouldBe` False
 
   describe "usesPatternMatching" $ do
     it "is True when there Pattern Matching on List" $ do
