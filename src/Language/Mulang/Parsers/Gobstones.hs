@@ -147,9 +147,10 @@ convertListWithMap [] hashMap = []
 convertListWithMap (a@(VariableAssignment _ _):xs) hashMap = let (v,newMap) =  convertVariable a hashMap in  v : (convertListWithMap xs newMap)
 convertListWithMap (f@(FunctionDeclaration _ _):xs) hashMap                 =  (convertVariablesInFunctionOrProcedure f HashMap.empty) : (convertListWithMap xs hashMap)
 convertListWithMap (p@(ProcedureDeclaration _ _):xs) hashMap                =  (convertVariablesInFunctionOrProcedure p HashMap.empty) : (convertListWithMap xs hashMap)
-convertListWithMap (x:xs) hashMap                                           =  x : (convertListWithMap xs hashMap)
+convertListWithMap (x:xs) hashMap                                           =  (convertVariablesInConditionals x hashMap) : (convertListWithMap xs hashMap)
 
 
+--  TODO : de aca para abajo falta refactor.
 convertVariable v@(VariableAssignment identifier body) map | HashMap.member identifier map = (v,map)
                                                            | otherwise                     = (VariableDeclaration identifier body,HashMap.insert identifier identifier map)
 
@@ -158,7 +159,23 @@ convertVariablesInFunctionOrProcedure  (FunctionDeclaration name [eq]) map      
 convertVariablesInFunctionOrProcedure  (ProcedureDeclaration name [eq] ) map               = ProcedureDeclaration name [(convertVariablesInEquation eq)]
 
 
+convertVariablesInConditionals c@(If e bodyL bodyR) hashMap               = If e (convertBody bodyL hashMap) (convertBody bodyR hashMap)
+convertVariablesInConditionals w@(While e body) hashMap                   = While e (convertBody body hashMap)
+convertVariablesInConditionals r@(Repeat e body) hashMap                  = Repeat e (convertBody body hashMap)
+convertVariablesInConditionals s@(Switch e cases) hashMap                 = Switch e (convertCases cases hashMap)  
+convertVariablesInConditionals x _                                        = x
+
+
+convertBody (Sequence xs) hashMap              = (Sequence $ convertListWithMap xs hashMap)
+convertBody a@(VariableAssignment _ _) hashMap =  let (v,newMap) =  convertVariable a hashMap in  v
+convertBody a _ = a
+
+
+convertCases [] hashMap              = []
+convertCases ((e1,b1):cases) hashMap = (e1,convertBody b1 hashMap):convertCases cases hashMap
+
 convertVariablesInEquation (Equation xs (UnguardedBody e)) = Equation xs (UnguardedBody (convertVariableAssignmentToDeclaration e) )
+
 
 ------------------------------------------------
 
