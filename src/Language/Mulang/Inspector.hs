@@ -215,12 +215,24 @@ usesAnonymousVariable = containsExpression f
         f (ProcedureDeclaration _ equations)   = equationContainsWildcard equations
         f (MethodDeclaration _ equations)      = equationContainsWildcard equations
 --TODO        f (Lambda args _)                      = equationContainsWildcard equations
-        f (FactDeclaration _ args)             = containsWildcard args
-        f (RuleDeclaration _ args _)           = containsWildcard args
+        f (FactDeclaration _ params)             = paramsContainsWildcard params
+        f (RuleDeclaration _ params _)           = paramsContainsWildcard params
         f _                                    = False
-        equationContainsWildcard = any (containsWildcard . p)
-        containsWildcard = any (== WildcardPattern)
-        p (Equation params _) = params
+
+        equationContainsWildcard = any (paramsContainsWildcard . equationParams)
+        paramsContainsWildcard = any isOrContainsWildcard
+
+        equationParams (Equation p _) = p
+
+        isOrContainsWildcard (InfixApplicationPattern p1 _ p2) = any isOrContainsWildcard [p1, p2]
+        isOrContainsWildcard (ApplicationPattern _ ps)         = any isOrContainsWildcard ps
+        isOrContainsWildcard (TuplePattern ps)                 = any isOrContainsWildcard ps
+        isOrContainsWildcard (ListPattern ps)                  = any isOrContainsWildcard ps
+        isOrContainsWildcard (FunctorPattern _ ps)             = any isOrContainsWildcard ps
+        isOrContainsWildcard (AsPattern _ p)                   = isOrContainsWildcard p
+        isOrContainsWildcard WildcardPattern                   = True
+        isOrContainsWildcard _                                 = False
+
 
 containsExpression :: (Expression -> Bool) -> Inspection
 containsExpression f = has f expressionsOf

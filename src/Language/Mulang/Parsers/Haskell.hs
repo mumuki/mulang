@@ -48,14 +48,14 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
 
     muBody = Return . muExp
 
-    muPat (HsPVar name) = VariablePattern (muName name)                 -- ^ variable
-    muPat (HsPLit _) = LiteralPattern ""              -- ^ literal constant
-    --Pattern HsPInfixApp = InfixApplicationPattern Pattern MuQName Pattern
-    --Pattern HsPApp = ApplicationPattern MuQName [Pattern]        -- ^ data constructor and argument
+    muPat (HsPVar name) = VariablePattern (muName name)
+    muPat (HsPLit _) = LiteralPattern ""
+    muPat (HsPInfixApp e1 name e2) = InfixApplicationPattern (muPat e1) (muQName name) (muPat e2)
+    muPat (HsPApp name elements) = ApplicationPattern (muQName name) (map muPat elements)
     muPat (HsPTuple elements) = TuplePattern (map muPat elements)
     muPat (HsPList elements) = ListPattern (map muPat elements)
     muPat (HsPParen pattern) = muPat pattern
-    --Pattern HsPAsPat = AsPattern String Pattern
+    muPat (HsPAsPat name pattern) = AsPattern (muName name) (muPat pattern)
     muPat HsPWildCard = WildcardPattern
     muPat _ = OtherPattern
 
