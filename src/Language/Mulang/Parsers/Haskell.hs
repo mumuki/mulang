@@ -22,7 +22,7 @@ parseHaskell :: MaybeParser
 parseHaskell = orNothing . parseHaskell'
 
 parseHaskell' :: String -> ParseResult Expression
-parseHaskell' = fmap (normalize . mu) . parseModule
+parseHaskell' = fmap (normalize . mu) . parseModule . (++"\n")
 
 mu :: HsModule -> Expression
 mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
