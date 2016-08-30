@@ -252,6 +252,21 @@ spec = do
     it "is True if _ is present in paramenters" $ do
       usesAnonymousVariable (hs "foo _ = 1") `shouldBe` True
 
+    it "is True if _ is present in nested list patterns" $ do
+      usesAnonymousVariable (hs "foo [3, _] = 1") `shouldBe` True
+
+    it "is True if _ is present in nested infix application patterns" $ do
+      usesAnonymousVariable (hs "foo (x:_) = 1") `shouldBe` True
+
+    it "is True if _ is present in nested application patterns" $ do
+      usesAnonymousVariable (hs "foo (F _ 1) = 1") `shouldBe` True
+
+    it "is True if _ is present in nested tuple patterns" $ do
+      usesAnonymousVariable (hs "foo (_, 1) = 1") `shouldBe` True
+
+    it "is True if _ is present in nested at patterns" $ do
+      usesAnonymousVariable (hs "foo x@(_, 1) = 1") `shouldBe` True
+
     it "is False if _ is not present in parameters" $ do
       usesAnonymousVariable (hs "foo x = 1") `shouldBe` False
 
