@@ -45,13 +45,13 @@ parseFunctionCall (Object value) = parseNodeAst (Just "ProcedureCall") value
 
 parseSimpleValue (Object value) = parseSimpleExpressionValue (lookUpValue "value" value) (HashMap.lookup "reserved" value)
 
-parseBinaryValue (Object value) = Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "value" value)) <*> ((\x y -> [x,y]) <$> (expressionValue value "left") <*> (expressionValue value "right"))
+parseBinaryValue (Object value) = Application <$> (evaluatedFunction <$> (lookupAndParseExpression parseNameExpression "value" value)) <*> ((\x y -> [x,y]) <$> (expressionValue value "left") <*> (expressionValue value "right"))
 
 parseSimpleExpressionValue n@(Number _) Nothing = MuNumber <$> (parseJSON n)
 parseSimpleExpressionValue b@(Bool _) _ = MuBool <$> (parseJSON b)
 parseSimpleExpressionValue (Array direction) _ = MuSymbol <$> (parseListToDirection direction)
 parseSimpleExpressionValue (Number number) _ = MuSymbol <$> (parseToColour number)
-parseSimpleExpressionValue s@(String _) _ = MuString <$> (parseNameExpression s)
+parseSimpleExpressionValue s@(String _) _ = Variable <$> (parseNameExpression s)
 
 
 parseToColour = parseColour . Scientific.floatingOrInteger
@@ -89,6 +89,10 @@ parseVariableName (Object value) =  parseNameExpression . lookUpValue "value" $ 
 
 variableName = lookupAndParseExpression parseVariableName "variable"
 
+evaluatedFunction "==" = Equal
+evaluatedFunction "!=" = NotEqual
+evaluatedFunction  fun = Variable fun 
+
 expressionValue value text | isFunctionCall = lookupAndParseExpression parseFunctionCall text value
                            | isBinary       = lookupAndParseExpression parseBinaryValue text value  
                            | otherwise      = lookupAndParseExpression parseSimpleValue text value
@@ -102,7 +106,7 @@ expressionValue value text | isFunctionCall = lookupAndParseExpression parseFunc
 
 parseToken "program" value                = lookupAndParseExpression parseBodyExpression "body" value
 parseToken "procedureDeclaration" value   = ProcedureDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (lookupAndParseExpression  parseBodyExpression "body" value))))
-parseToken "ProcedureCall" value          = Application <$> (Variable <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
+parseToken "ProcedureCall" value          = Application <$> (evaluatedFunction <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
 parseToken ":=" value                     = VariableAssignment <$> (variableName value) <*> (expressionValue value "expression") 
 parseToken "functionDeclaration" value    = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> ((\x -> [x]) <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (expressionValue value "return")))))
 parseToken "conditional" value            = If <$> (expressionValue value "condition") <*> (lookupAndParseExpression parseBodyExpression "left" value) <*> (lookupAndParseExpression parseBodyExpression "right" value)
@@ -116,7 +120,7 @@ parseToken "hasStones" value              = parsePrimitive "hayBolitas" value
 parseToken "canMove" value                = parsePrimitive "puedeMover" value
 
 
-parsePrimitive primitiveName value = Application <$> (Variable <$> (pure primitiveName)) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
+parsePrimitive primitiveName value = Application <$> (evaluatedFunction <$> (pure primitiveName)) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
 
 parseRepetitionFunction f value = f <$> (expressionValue value "expression") <*> (lookupAndParseExpression parseBodyExpression "body" value)
 
@@ -132,8 +136,8 @@ addReturn x e = Sequence [x,(Return e)]
 
 -- TODO : por alguna razon si se compone en parseJson , la funcion conver .. no funciona bien.. lo cual es raro.  
 simplify :: Expression -> Expression
-simplify (Sequence [x]) = simplify x
 simplify (Sequence ((Sequence xs):es) ) = convertVariableAssignmentToDeclaration $ Sequence $ (map simplify xs) ++ (map simplify es) 
+simplify (Sequence [x]) = convertVariableAssignmentToDeclaration $ simplify x
 simplify  n = n
 
 
@@ -141,7 +145,8 @@ simplify  n = n
 
 convertVariableAssignmentToDeclaration :: Expression ->Expression
 convertVariableAssignmentToDeclaration (Sequence xs) = Sequence (convertListWithMap xs HashMap.empty)
-convertVariableAssignmentToDeclaration x = x
+convertVariableAssignmentToDeclaration x = head (convertListWithMap [x] HashMap.empty)
+
 
 convertListWithMap [] hashMap = []
 convertListWithMap (a@(VariableAssignment _ _):xs) hashMap = let (v,newMap) =  convertVariable a hashMap in  v : (convertListWithMap xs newMap)
