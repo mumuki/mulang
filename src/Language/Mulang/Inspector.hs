@@ -26,6 +26,7 @@ module Language.Mulang.Inspector (
   declaresComputationWithArity,
   declaresComputationWithExactArity,
   declaresComputation,
+  declaresVariable,
   declaresTypeAlias,
   declaresTypeSignature,
   usesAnonymousVariable,
@@ -88,6 +89,11 @@ declaresFunction = containsDeclaration f
 declaresProcedure :: BindingPredicate -> Inspection
 declaresProcedure = containsDeclaration f
   where f (ProcedureDeclaration _ _) = True
+        f _                          = False
+
+declaresVariable :: BindingPredicate -> Inspection
+declaresVariable = containsDeclaration f
+  where f (VariableDeclaration _ _)  = True
         f _                          = False
 
 -- | Inspection that tells whether a top level computation binding exists
