@@ -7,6 +7,23 @@ import           Language.Mulang.Parsers.Gobstones
 
 spec :: Spec
 spec = do
+  describe "declaresProcedure" $ do
+    describe "with procedure declarations" $ do
+      it "is True when procedure is declared" $ do
+        --  code = "procedure F(){}"
+        let code = "[\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": null\r\n  }\r\n]"
+        declaresProcedure (named "F") (gbs code) `shouldBe` True
+
+      it "is True when any procedures is declared" $ do
+        --  code = "procedure F(){}"
+        let code = "[\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": null\r\n  }\r\n]"
+        declaresProcedure anyone (gbs code) `shouldBe` True
+
+      it "is False when procedures is not declared" $ do
+        --  code = "procedure F(){}"
+        let code = "[\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": null\r\n  }\r\n]"
+        declaresProcedure (named "G") (gbs code) `shouldBe` False
+
   describe "declaresFunction" $ do
     describe "with function declarations" $ do
       it "is True when functions is declared" $ do
@@ -113,4 +130,4 @@ spec = do
   
 
     
-  -- que ande el , usesSwitch, uses (retornos, parametro, program,function, procedure), declaresProgram, declaresProcedure, declaresVariable? y probar transitividad para algun caso 
+  -- que ande el , usesSwitch, uses (retornos, parametro, program,function, procedure), declaresProgram, declaresVariable? y probar transitividad para algun caso 
