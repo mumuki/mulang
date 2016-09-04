@@ -6,6 +6,7 @@ module Language.Mulang.Inspector (
   usesGuards,
   usesIf,
   usesWhile,
+  usesSwitch,
   usesLambda,
   usesNot,
   usesFindall,
@@ -145,6 +146,11 @@ usesIf = containsExpression f
 usesWhile :: Inspection
 usesWhile = containsExpression f
   where f (While _ _) = True
+        f _ = False
+
+usesSwitch :: Inspection
+usesSwitch = containsExpression f
+  where f (Switch _ _) = True
         f _ = False
 
 -- | Inspection that tells whether an expression uses pattern matching

@@ -88,9 +88,20 @@ spec = do
       usesIf (gbs code)  `shouldBe` True
   
     it "is False when not present in function" $ do
-      -- code = "function f(x){return (1)}"
+      --  code = "function f(x){return (1)}"
       let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": 1,  \"arity\": \"literal\"}}\r\n]"
       usesIf (gbs code)  `shouldBe` False
+
+  describe "usesSwitch" $ do
+    it "is True when present in function" $ do
+      --  code = "program {switch (2) to { 2 -> {x := 2}} }"
+      let code = "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"switch\",\"value\" : {\"value\" : 2 , \"arity\" : \"literal\"} ,\"cases\" : [{\"case\" : {\"value\" : 2 , \"arity\" : \"literal\"} , \"body\" : [{\"alias\" : \":=\" , \"arity\" : \"binary\" , \"variable\" : {\"value\" : \"x\" , \"arity\" : \"name\"}, \"expression\" :{\"value\" : 2, \"arity\" : \"literal\"} }] }]}],\"from\": 0}]"
+      usesSwitch (gbs code)  `shouldBe` True
+  
+    it "is False when not present in function" $ do
+      --  code = "function f(x){return (1)}"
+      let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": 1,  \"arity\": \"literal\"}}\r\n]"
+      usesSwitch (gbs code)  `shouldBe` False
 
   describe "usesRepeat" $ do
     it "is True when present in function" $ do
@@ -130,4 +141,4 @@ spec = do
   
 
     
-  -- que ande el , usesSwitch, uses (retornos, parametro, program,function, procedure), declaresProgram, declaresVariable? y probar transitividad para algun caso 
+  -- que ande el , uses (retornos, parametro, program,function, procedure), declaresProgram, declaresVariable? y probar transitividad para algun caso 
