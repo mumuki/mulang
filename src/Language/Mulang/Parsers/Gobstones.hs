@@ -32,6 +32,7 @@ parseBodyExpression (Array list) = Builder.normalize . simplify . Sequence . toL
 parseBodyExpression Null         = pure MuNull
 parseBodyExpression _            = fail "Failed to parse Expression!"
 
+parseNodes :: JsonParser Expression
 parseNodes (Object v) = nodeAst
     where
         alias = HashMap.lookup "alias" v
@@ -94,6 +95,7 @@ lookUpValue string = fromJust .  HashMap.lookup string
 lookupAndParseExpression :: (Value -> b) -> Text -> Object -> b
 lookupAndParseExpression parseFunction string = parseFunction . lookUpValue string 
 
+
 parseVariableName (Object value) =  parseNameExpression . lookUpValue "value" $ value 
 
 variableName = lookupAndParseExpression parseVariableName "variable"
@@ -101,9 +103,6 @@ variableName = lookupAndParseExpression parseVariableName "variable"
 evaluatedFunction "==" = Equal
 evaluatedFunction "!=" = NotEqual
 evaluatedFunction  fun = Variable fun 
-
-parseParameters value | (Object value1) <- value = expressionValue "value" value1
-                      | otherwise                = parseSimpleValue value
 
 parseExpression :: JsonParser Expression
 parseExpression value = switchParser $ value

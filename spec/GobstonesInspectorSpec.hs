@@ -161,4 +161,4 @@ spec = do
   
 
     
-  -- uses (retornos, parametro, program), declaresProgram
+  -- uses (retornos, parametro, program), declaresMainStatement
