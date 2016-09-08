@@ -8,6 +8,7 @@ import            Language.Mulang.Parsers
 
 
 import            Data.Aeson
+import  qualified Data.Aeson.Types (Parser)  
 import            Data.HashMap.Lazy as  HashMap (HashMap, lookup, member,insert,empty,fromList)
 import            Data.Traversable (traverse)
 import            Data.Foldable (toList)
@@ -21,9 +22,12 @@ import  qualified Data.Vector as V
 import            Control.Applicative
 import            GHC.Generics
 
+type JsonParser a = Value ->  Data.Aeson.Types.Parser a
+
 instance FromJSON Expression where
     parseJSON  =  parseBodyExpression 
 
+parseBodyExpression :: JsonParser Expression
 parseBodyExpression (Array list) = Builder.normalize . simplify . Sequence . toList <$> traverse parseNodes list
 parseBodyExpression Null         = pure MuNull
 parseBodyExpression _            = fail "Failed to parse Expression!"
@@ -39,41 +43,46 @@ mapObjectArray f (Array list)
 
 parseCaseValue (Object value) = (\x y -> (x, y)) <$> (expressionValue "case" value) <*> (lookupAndParseExpression parseBodyExpression "body" value)
 
+parseParameterPatterns :: JsonParser Pattern
 parseParameterPatterns (Object value) = VariablePattern <$> (lookupAndParseExpression parseNameExpression "value" value)
 
+parseFunctionCall :: JsonParser Expression
 parseFunctionCall (Object value) = parseNodeAst (Just "ProcedureCall") value
 
-parseSimpleValue (Object value) = parseSimpleExpressionValue (lookUpValue "value" value) (HashMap.lookup "reserved" value)
+parseSimpleValue :: JsonParser Expression
+parseSimpleValue (Object value) = parseSimpleExpressionValue (HashMap.lookup "reserved" value) (lookUpValue "value" value)
+    where 
+          parseSimpleExpressionValue Nothing n@(Number _) = MuNumber <$> (parseJSON n)
+          parseSimpleExpressionValue _ b@(Bool _) = MuBool <$> (parseJSON b)
+          parseSimpleExpressionValue _ (Array direction) = MuSymbol <$> (parseListToDirection direction)
+          parseSimpleExpressionValue _ (Number number) = MuSymbol <$> (parseToColour number)
+          parseSimpleExpressionValue _ s@(String _) = Variable <$> (parseNameExpression s)
 
-parseBinaryValue (Object value) = Application <$> (evaluatedFunction <$> (lookupAndParseExpression parseNameExpression "value" value)) <*> ((\x y -> [x,y]) <$> (expressionValue  "left" value) <*> (expressionValue "right" value))
+          parseToColour = parseColour . Scientific.floatingOrInteger
 
-parseSimpleExpressionValue n@(Number _) Nothing = MuNumber <$> (parseJSON n)
-parseSimpleExpressionValue b@(Bool _) _ = MuBool <$> (parseJSON b)
-parseSimpleExpressionValue (Array direction) _ = MuSymbol <$> (parseListToDirection direction)
-parseSimpleExpressionValue (Number number) _ = MuSymbol <$> (parseToColour number)
-parseSimpleExpressionValue s@(String _) _ = Variable <$> (parseNameExpression s)
+          parseColour (Right n) =  parseJSON . numberToColour $ n
 
+          numberToColour 0 = "Azul"
+          numberToColour 1 = "Rojo"
+          numberToColour 2 = "Negro"
+          numberToColour 3 = "Verde"
 
-parseToColour = parseColour . Scientific.floatingOrInteger
-                where parseColour (Right n) =  parseJSON . numberToColour $ n
-
-                      numberToColour 0 = "Azul"
-                      numberToColour 1 = "Rojo"
-                      numberToColour 2 = "Negro"
-                      numberToColour 3 = "Verde"
-
-
-parseListToDirection direction = let (Number n1,Number n2) = (V.head direction,V.last direction) 
-                                 in parseToDirection n1 n2
-  where 
-    parseToDirection number1 number2 = parseDirection  ((Scientific.floatingOrInteger number1),(Scientific.floatingOrInteger number2))
-                where parseDirection ((Right n1),(Right n2)) = parseJSON . numbersToDirection $ (n1,n2)
+          parseListToDirection direction = let (Number n1, Number n2) = (V.head direction,V.last direction) 
+                                           in parseToDirection n1 n2
+ 
+          parseToDirection number1 number2 = parseDirection  ((Scientific.floatingOrInteger number1),(Scientific.floatingOrInteger number2))
+          
+          parseDirection ((Right n1),(Right n2)) = parseJSON . numbersToDirection $ (n1,n2)
                       
-                      numbersToDirection (1, 0)  = "Este"
-                      numbersToDirection (0, 1)  = "Norte"
-                      numbersToDirection (-1, 0) = "Oeste"
-                      numbersToDirection (0, -1) = "Sur"
+          numbersToDirection (1, 0)  = "Este"
+          numbersToDirection (0, 1)  = "Norte"
+          numbersToDirection (-1, 0) = "Oeste"
+          numbersToDirection (0, -1) = "Sur"
 
+
+
+parseBinaryValue :: JsonParser Expression
+parseBinaryValue (Object value) = Application <$> (evaluatedFunction <$> (lookupAndParseExpression parseNameExpression "value" value)) <*> ((\x y -> [x,y]) <$> (expressionValue  "left" value) <*> (expressionValue "right" value))
 
 
 
@@ -92,6 +101,9 @@ variableName = lookupAndParseExpression parseVariableName "variable"
 evaluatedFunction "==" = Equal
 evaluatedFunction "!=" = NotEqual
 evaluatedFunction  fun = Variable fun 
+
+parseParameters value | (Object value1) <- value = expressionValue "value" value1
+                      | otherwise                = parseSimpleValue value
 
 expressionValue text value | isFunctionCall = lookupAndParseExpression parseFunctionCall text value
                            | isBinary       = lookupAndParseExpression parseBinaryValue text value  

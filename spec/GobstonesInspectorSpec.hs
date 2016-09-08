@@ -125,8 +125,8 @@ spec = do
       uses (named "M")  (gbs code)  `shouldBe` True
 
       -- code = "function f(){ return (m(x()))}"
-      --let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [],\r\n    \"return\": {\r\n      \"alias\": \"functionCall\",\r\n      \"name\": \"m\",\r\n      \"parameters\": [\r\n        {\r\n          \"alias\": \"functionCall\",\r\n          \"name\": \"x\",\r\n          \"parameters\": []\r\n        }\r\n      ]\r\n    }\r\n  }\r\n]"
-      --uses (named "x") (gbs code)  `shouldBe` True
+      let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [],\r\n    \"return\": {\r\n      \"alias\": \"functionCall\",\r\n      \"name\": \"m\",\r\n      \"parameters\": [\r\n        {\r\n          \"alias\": \"functionCall\",\r\n          \"name\": \"x\",\r\n          \"parameters\": []\r\n        }\r\n      ]\r\n    }\r\n  }\r\n]"
+      uses (named "x") (gbs code)  `shouldBe` True
 
     it "is True through function application in function" $ do 
       --  code = "procedure G(){ M()} procedure F(x){ G() }"
