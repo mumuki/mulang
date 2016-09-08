@@ -84,7 +84,7 @@ declares = containsDeclaration f
 declaresFunction :: BindingPredicate -> Inspection
 declaresFunction = containsDeclaration f
   where f (FunctionDeclaration _ _) = True
-        f _  = False
+        f _                         = False
 
 declaresProcedure :: BindingPredicate -> Inspection
 declaresProcedure = containsDeclaration f

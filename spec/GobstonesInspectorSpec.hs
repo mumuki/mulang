@@ -124,6 +124,10 @@ spec = do
       let code = "[{\"value\": \"F\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"F\",\"alias\": \"procedureDeclaration\",\"parameters\": [],\"body\": [  {    \"arity\": \"routine\",\"alias\": \"ProcedureCall\",\"name\": \"M\",\"parameters\": []  }]}\r\n]\r\n\r\n"
       uses (named "M")  (gbs code)  `shouldBe` True
 
+      -- code = "function f(){ return (m(x()))}"
+      --let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [],\r\n    \"return\": {\r\n      \"alias\": \"functionCall\",\r\n      \"name\": \"m\",\r\n      \"parameters\": [\r\n        {\r\n          \"alias\": \"functionCall\",\r\n          \"name\": \"x\",\r\n          \"parameters\": []\r\n        }\r\n      ]\r\n    }\r\n  }\r\n]"
+      --uses (named "x") (gbs code)  `shouldBe` True
+
     it "is True through function application in function" $ do 
       --  code = "procedure G(){ M()} procedure F(x){ G() }"
       let code = "[\r\n  {\r\n    \"value\": \"G\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"G\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"arity\": \"routine\",\r\n        \"alias\": \"ProcedureCall\",\r\n        \"name\": \"M\",\r\n        \"parameters\": []\r\n      }\r\n    ]\r\n  },\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [\r\n      {\r\n        \"value\": \"x\",\r\n        \"arity\": \"name\"\r\n      }\r\n    ],\r\n    \"body\": [\r\n      {\r\n        \"arity\": \"routine\",\r\n        \"alias\": \"ProcedureCall\",\r\n        \"name\": \"G\",\r\n        \"parameters\": []\r\n      }\r\n    ]\r\n  }\r\n]"
@@ -157,4 +161,4 @@ spec = do
   
 
     
-  -- uses (retornos, parametro, program,function, procedure), declaresProgram
+  -- uses (retornos, parametro, program), declaresProgram
