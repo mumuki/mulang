@@ -105,20 +105,26 @@ evaluatedFunction  fun = Variable fun
 parseParameters value | (Object value1) <- value = expressionValue "value" value1
                       | otherwise                = parseSimpleValue value
 
-expressionValue text value | isFunctionCall = lookupAndParseExpression parseFunctionCall text value
-                           | isBinary       = lookupAndParseExpression parseBinaryValue text value  
-                           | otherwise      = lookupAndParseExpression parseSimpleValue text value
-  where
-    expression | (Object  v) <- lookUpValue text value = v
-    maybeName      = HashMap.lookup "name" expression
-    arity          = HashMap.lookup "arity" expression
-    isFunctionCall = isJust maybeName    
-    isBinary | String "binary"  <- fromJust arity = True
-             | otherwise = False
+parseExpression :: JsonParser Expression
+parseExpression value = switchParser $ value
+      where switchParser | isJust maybeName = parseFunctionCall
+                         | isBinary         = parseBinaryValue
+                         | otherwise        = parseSimpleValue 
+
+            expression | (Object  v) <- value = v
+
+            maybeName      = HashMap.lookup "name" expression
+            arity          = HashMap.lookup "arity" expression
+            
+            isBinary | String "binary"  <- fromJust arity = True
+                     | otherwise = False
+
+expressionValue text = parseExpression . lookUpValue text 
+ 
 
 parseToken "program" value                = lookupAndParseExpression parseBodyExpression "body" value
 parseToken "procedureDeclaration" value   = ProcedureDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> (return <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (lookupAndParseExpression  parseBodyExpression "body" value))))
-parseToken "ProcedureCall" value          = Application <$> (evaluatedFunction <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
+parseToken "ProcedureCall" value          = Application <$> (evaluatedFunction <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression (mapObjectArray parseExpression) "parameters" value)
 parseToken ":=" value                     = VariableAssignment <$> (variableName value) <*> (expressionValue "expression" value) 
 parseToken "functionDeclaration" value    = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> (return <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (expressionValue "return" value)))))
 parseToken "conditional" value            = If <$> (expressionValue "condition" value) <*> (lookupAndParseExpression parseBodyExpression "left" value) <*> (lookupAndParseExpression parseBodyExpression "right" value)
@@ -133,7 +139,7 @@ parseToken "hasStones" value              = parsePrimitive "hayBolitas" value
 parseToken "canMove" value                = parsePrimitive "puedeMover" value
 
 
-parsePrimitive primitiveName value = Application <$> (evaluatedFunction <$> (pure primitiveName)) <*> (lookupAndParseExpression (mapObjectArray parseSimpleValue) "parameters" value)
+parsePrimitive primitiveName value = Application <$> (evaluatedFunction <$> (pure primitiveName)) <*> (lookupAndParseExpression (mapObjectArray parseExpression) "parameters" value)
 
 parseRepetitionFunction f value = f <$> (expressionValue "expression" value) <*> (lookupAndParseExpression parseBodyExpression "body" value)
 
