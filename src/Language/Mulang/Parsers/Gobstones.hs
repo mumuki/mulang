@@ -121,7 +121,7 @@ parseExpression value = switchParser $ value
 expressionValue text = parseExpression . lookUpValue text 
  
 
-parseToken "program" value                = lookupAndParseExpression parseBodyExpression "body" value
+parseToken "program" value                = Program <$> lookupAndParseExpression parseBodyExpression "body" value
 parseToken "procedureDeclaration" value   = ProcedureDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> (return <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (lookupAndParseExpression  parseBodyExpression "body" value))))
 parseToken "ProcedureCall" value          = Application <$> (evaluatedFunction <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression (mapObjectArray parseExpression) "parameters" value)
 parseToken ":=" value                     = VariableAssignment <$> (variableName value) <*> (expressionValue "expression" value) 
@@ -147,24 +147,19 @@ parseNodeAst Nothing       = fail "Failed to parse NodeAst!"
 
 
 ------------------------------------------------
-
+addReturn :: Expression -> Expression -> Expression
 addReturn (Sequence []) e = Return e
 addReturn (Sequence xs) e = Sequence (xs ++ [Return e]) 
 addReturn x e = Sequence [x,(Return e)]
 
--- TODO : por alguna razon si se compone en parseJson , la funcion conver .. no funciona bien.. lo cual es raro.  
 simplify :: Expression -> Expression
 simplify (Sequence ((Sequence xs):es) ) = convertVariableAssignmentToDeclaration $ Sequence $ (map simplify xs) ++ (map simplify es) 
 simplify (Sequence [x]) = convertVariableAssignmentToDeclaration $ simplify x
 simplify  n = n
 
-
-
-
 convertVariableAssignmentToDeclaration :: Expression ->Expression
 convertVariableAssignmentToDeclaration (Sequence xs) = Sequence (convertListWithMap xs HashMap.empty)
 convertVariableAssignmentToDeclaration x = head (convertListWithMap [x] HashMap.empty)
-
 
 convertListWithMap [] hashMap = []
 convertListWithMap (a@(VariableAssignment _ _):xs) hashMap = let (v,newMap) =  convertVariable a hashMap in  v : (convertListWithMap xs newMap)
@@ -176,6 +171,7 @@ convertListWithMap (x:xs) hashMap                                           =  (
 --  TODO : de aca para abajo falta refactor.
 convertVariable v@(VariableAssignment identifier body) map | HashMap.member identifier map = (v,map)
                                                            | otherwise                     = (VariableDeclaration identifier body,HashMap.insert identifier identifier map)
+
 
 
 convertVariablesInFunctionOrProcedure  (FunctionDeclaration name [eq]) map                 = FunctionDeclaration name [(convertVariablesInEquation eq)]

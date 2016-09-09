@@ -94,8 +94,8 @@ spec = do
 
   describe "usesSwitch" $ do
     it "is True when present in function" $ do
-      --  code = "program {switch (2) to { 2 -> {x := 2}} }"
-      let code = "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"switch\",\"value\" : {\"value\" : 2 , \"arity\" : \"literal\"} ,\"cases\" : [{\"case\" : {\"value\" : 2 , \"arity\" : \"literal\"} , \"body\" : [{\"alias\" : \":=\" , \"arity\" : \"binary\" , \"variable\" : {\"value\" : \"x\" , \"arity\" : \"name\"}, \"expression\" :{\"value\" : 2, \"arity\" : \"literal\"} }] }]}],\"from\": 0}]"
+      --  code = "function f(x) {switch (2) to { 2 -> {x := 2}} return (x)}"
+      let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [\r\n      {\r\n        \"value\": \"x\",\r\n        \"arity\": \"name\"\r\n      }\r\n    ],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \"switch\",\r\n        \"value\": {\r\n          \"value\": 2,\r\n          \"arity\": \"literal\"\r\n        },\r\n        \"cases\": [\r\n          {\r\n            \"case\": {\r\n              \"value\": 2,\r\n              \"arity\": \"literal\"\r\n            },\r\n            \"body\": [\r\n              {\r\n                \"alias\": \":=\",\r\n                \"arity\": \"binary\",\r\n                \"variable\": {\r\n                  \"value\": \"x\",\r\n                  \"arity\": \"name\"\r\n                },\r\n                \"expression\": {\r\n                  \"value\": 2,\r\n                  \"arity\": \"literal\"\r\n                }\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      }\r\n    ],\r\n    \"return\": {\r\n      \"value\": \"x\",\r\n      \"arity\": \"name\"\r\n    }\r\n  }\r\n]"
       usesSwitch (gbs code)  `shouldBe` True
   
     it "is False when not present in function" $ do
