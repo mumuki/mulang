@@ -111,6 +111,7 @@ extractDeclaration e@(ProcedureDeclaration n _)= Just (n, e)
 extractDeclaration e@(ObjectDeclaration n _)   = Just (n, e)
 extractDeclaration e@(MethodDeclaration n _)   = Just (n, e)
 extractDeclaration e@(AttributeDeclaration n _)= Just (n, e)
+extractDeclaration e@(Program _)               = Just ("anonymous", e)
 extractDeclaration _                           = Nothing
 
 

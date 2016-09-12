@@ -23,6 +23,7 @@ module Language.Mulang.Inspector (
   declaresFact,
   declaresFunction,
   declaresProcedure,
+  declaresProgram,
   declaresComputationWithArity,
   declaresComputationWithExactArity,
   declaresComputation,
@@ -96,6 +97,11 @@ declaresVariable = containsDeclaration f
   where f (VariableDeclaration _ _)  = True
         f _                          = False
 
+declaresProgram :: BindingPredicate -> Inspection
+declaresProgram = containsDeclaration f
+  where f (Program _)  = True
+        f _            = False
+
 -- | Inspection that tells whether a top level computation binding exists
 declaresComputation :: BindingPredicate -> Inspection
 declaresComputation = declaresComputationWithArity (const True)
@@ -153,7 +159,8 @@ usesWhile :: Inspection
 usesWhile = containsExpression f
   where f (While _ _) = True
         f _ = False
-
+-- | Inspection that tells whether an expression uses Switch
+-- in its definition
 usesSwitch :: Inspection
 usesSwitch = containsExpression f
   where f (Switch _ _) = True
