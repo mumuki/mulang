@@ -202,15 +202,15 @@ $ mulang '{"expectations":[{"tag":"Advanced","subject":["x"],"transitive":false,
 
 ...and with basic expectations:
 ```
-$ mulang '{"expectations":[{"tag":"Basic","binding":"x","inspection":""],"code":{"content":"x = 1","language":"Haskell"}}'
+$ mulang '{"expectations":[{"tag":"Basic","binding":"x","inspection":"HasBinding"}],"code":{"content":"x = 1","language":"Haskell"}}'
 {"results":[{"result":true,"expectation":{"tag":"Basic","inspection":"HasBinding","binding":"x"}}],"smells":[]}
 ```
 
 ## Building mulang from source
 
 To generate `mulang` executable, you have to build the project using [cabal](https://www.haskell.org/cabal/).
- 
-Make sure you have `cabal` command installed. You can install it by doing `sudo apt-get install cabal-install` or by downloading binaries from [here](https://www.haskell.org/cabal/download.html). 
+
+Make sure you have `cabal` command installed. You can install it by doing `sudo apt-get install cabal-install` or by downloading binaries from [here](https://www.haskell.org/cabal/download.html).
 
 Important:  cabal version must be **higher than 1.18**. Otherwise, sandboxes won't work.
 
