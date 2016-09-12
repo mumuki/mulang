@@ -7,6 +7,17 @@ import           Test.Hspec
 
 spec = describe "Evaluator" $ do
   describe "Advanced expectations" $ do
+    it "evaluates unknown basic expectations" $ do
+      let hasTurtle = Basic "x" "HasTurtle"
+      evaluate (Input (Code Haskell "x = 2") [hasTurtle]) `shouldBe` (Output [
+                                                                        ExpectationResult hasTurtle True] [])
+
+    it "evaluates unknown basic negated expectations" $ do
+      let notHasTurtle = Basic "x" "Not:HasTurtle"
+      evaluate (Input (Code Haskell "x = 2") [notHasTurtle]) `shouldBe` (Output [
+                                                                        ExpectationResult notHasTurtle True] [])
+
+
     it "evaluates empty expectations" $ do
       evaluate (Input (Code Haskell "x = 2") []) `shouldBe` (Output [] [])
 

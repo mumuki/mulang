@@ -11,6 +11,7 @@ import Language.Mulang.Inspector
 import Language.Mulang.Inspector.Combiner (scopedList, transitiveList, negative)
 import Language.Mulang.Inspector.Extras (usesConditional)
 import Language.Mulang.Binding (BindingPredicate)
+import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
 data BindingPattern = Named String | Like String | Anyone deriving (Show, Eq, Generic)
@@ -34,34 +35,42 @@ instance ToJSON BindingPattern
 instance ToJSON Expectation
 
 compile :: Expectation -> Inspection
-compile (Advanced s v o t n) = compileSubject s t . compileNegation n $ compileInspection v (compilePattern o)
-compile (Basic b i)          = (compile . toAdvanced b (withoutNegation splitedInspection)) isNegated
-                               where splitedInspection = splitOn ":" i
-                                     isNegated = elem "Not" splitedInspection
+compile = fromMaybe (\_ -> True) . compileMaybe
+
+compileMaybe :: Expectation -> Maybe Inspection
+compileMaybe (Advanced s v o t n) = do
+                                inspection <- compileInspection v (compilePattern o)
+                                return . compileSubject s t . compileNegation n $ inspection
+compileMaybe (Basic b i) = do
+                        let splitedInspection = splitOn ":" i
+                        let isNegated = elem "Not" splitedInspection
+                        expectation <- toAdvanced b (withoutNegation splitedInspection) isNegated
+                        return $ compile expectation
+
 
 withoutNegation :: [String] -> [String]
 withoutNegation = filter (/= "Not")
 
-toAdvanced :: String -> [String] -> Bool -> Expectation
-toAdvanced b ["HasAnonymousVariable"]      = nonTransitiveAdv b "usesAnonymousVariable"
-toAdvanced b ["HasArity", n]               = nonTransitiveAdv b ("declaresComputationWithArity" ++ n)
-toAdvanced b ["HasBinding"]                = Advanced [] "declares" (Named b) False
-toAdvanced b ["HasComposition"]            = transitiveAdv b "usesComposition"
-toAdvanced b ["HasComprehension"]          = transitiveAdv b "usesComprehension"
-toAdvanced b ["HasConditional"]            = transitiveAdv b "usesConditional"
-toAdvanced b ["HasDirectRecursion"]        = Advanced [] "declaresRecursively" (Named b) False
-toAdvanced b ["HasFindall"]                = transitiveAdv b "usesFindall"
-toAdvanced b ["HasForall"]                 = transitiveAdv b "usesForall"
-toAdvanced b ["HasGuards"]                 = transitiveAdv b "usesGuards"
-toAdvanced b ["HasIf"]                     = nonTransitiveAdv b "usesIf"
-toAdvanced b ["HasLambda"]                 = transitiveAdv b "usesLambda"
-toAdvanced b ["HasNot"]                    = nonTransitiveAdv b "usesNot"
-toAdvanced b ["HasRepeat"]                 = nonTransitiveAdv b "usesRepeat"
-toAdvanced b ["HasTypeSignature"]          = Advanced [] "declaresTypeSignature" (Named b) False
-toAdvanced b ["HasTypeDeclaration"]        = nonTransitiveAdv b "declaresTypeAlias"
-toAdvanced b ["HasUsage", x]               = Advanced [b] "uses" (Named x) True
-toAdvanced b ["HasWhile"]                  = nonTransitiveAdv b "usesWhile"
-toAdvanced _ inspection                    = error $ "Unsupported basic inspection " ++ show inspection
+toAdvanced :: String -> [String] -> Bool -> Maybe Expectation
+toAdvanced b ["HasAnonymousVariable"] = Just . nonTransitiveAdv b "usesAnonymousVariable"
+toAdvanced b ["HasArity", n]          = Just . nonTransitiveAdv b ("declaresComputationWithArity" ++ n)
+toAdvanced b ["HasBinding"]           = Just . Advanced [] "declares" (Named b) False
+toAdvanced b ["HasComposition"]       = Just . transitiveAdv b "usesComposition"
+toAdvanced b ["HasComprehension"]     = Just . transitiveAdv b "usesComprehension"
+toAdvanced b ["HasConditional"]       = Just . transitiveAdv b "usesConditional"
+toAdvanced b ["HasDirectRecursion"]   = Just . Advanced [] "declaresRecursively" (Named b) False
+toAdvanced b ["HasFindall"]           = Just . transitiveAdv b "usesFindall"
+toAdvanced b ["HasForall"]            = Just . transitiveAdv b "usesForall"
+toAdvanced b ["HasGuards"]            = Just . transitiveAdv b "usesGuards"
+toAdvanced b ["HasIf"]                = Just . nonTransitiveAdv b "usesIf"
+toAdvanced b ["HasLambda"]            = Just . transitiveAdv b "usesLambda"
+toAdvanced b ["HasNot"]               = Just . nonTransitiveAdv b "usesNot"
+toAdvanced b ["HasRepeat"]            = Just . nonTransitiveAdv b "usesRepeat"
+toAdvanced b ["HasTypeSignature"]     = Just . Advanced [] "declaresTypeSignature" (Named b) False
+toAdvanced b ["HasTypeDeclaration"]   = Just . nonTransitiveAdv b "declaresTypeAlias"
+toAdvanced b ["HasUsage", x]          = Just . Advanced [b] "uses" (Named x) True
+toAdvanced b ["HasWhile"]             = Just . nonTransitiveAdv b "usesWhile"
+toAdvanced _ _                        = const Nothing
 -- TODO:
 --"HasForeach",
 --"HasPrefixApplication",
@@ -75,35 +84,36 @@ compileNegation :: Bool -> Inspection -> Inspection
 compileNegation False i = i
 compileNegation _     i = negative i
 
-compileInspection :: String -> BindingPredicate -> Inspection
-compileInspection "declaresObject"                 pred = declaresObject pred
-compileInspection "declaresAttribute"              pred = declaresAttribute pred
-compileInspection "declaresMethod"                 pred = declaresMethod pred
-compileInspection "declaresFunction"               pred = declaresFunction pred
-compileInspection "declaresTypeAlias"              pred = declaresTypeAlias pred
-compileInspection "declaresTypeSignature"          pred = declaresTypeSignature pred
-compileInspection "declares"                       pred = declares pred
-compileInspection "declaresRecursively"            pred = declaresRecursively pred
-compileInspection "declaresComputation"            pred = declaresComputation pred
-compileInspection "declaresComputationWithArity0"  pred = declaresComputationWithExactArity 0 pred
-compileInspection "declaresComputationWithArity1"  pred = declaresComputationWithExactArity 1 pred
-compileInspection "declaresComputationWithArity2"  pred = declaresComputationWithExactArity 2 pred
-compileInspection "declaresComputationWithArity3"  pred = declaresComputationWithExactArity 3 pred
-compileInspection "declaresComputationWithArity4"  pred = declaresComputationWithExactArity 4 pred
-compileInspection "uses"                           pred = uses pred
-compileInspection "usesAnonymousVariable"          _    = usesAnonymousVariable
-compileInspection "usesComposition"                _    = usesComposition
-compileInspection "usesComprehension"              _    = usesComprehension
-compileInspection "usesConditional"                _    = usesConditional
-compileInspection "usesGuards"                     _    = usesGuards
-compileInspection "usesFindall"                    _    = usesFindall
-compileInspection "usesForall"                     _    = usesForall
-compileInspection "usesIf"                         _    = usesIf
-compileInspection "usesLambda"                     _    = usesLambda
-compileInspection "usesNot"                        _    = usesNot
-compileInspection "usesRepeat"                     _    = usesRepeat
-compileInspection "usesWhile"                      _    = usesWhile
-compileInspection inspection                       _    = error $ "unsupported advanced inspection " ++ show inspection
+compileInspection :: String -> BindingPredicate -> Maybe Inspection
+compileInspection "declaresObject"                 pred = Just $ declaresObject pred
+compileInspection "declaresAttribute"              pred = Just $ declaresAttribute pred
+compileInspection "declaresMethod"                 pred = Just $ declaresMethod pred
+compileInspection "declaresFunction"               pred = Just $ declaresFunction pred
+compileInspection "declaresTypeAlias"              pred = Just $ declaresTypeAlias pred
+compileInspection "declaresTypeSignature"          pred = Just $ declaresTypeSignature pred
+compileInspection "declares"                       pred = Just $ declares pred
+compileInspection "declaresRecursively"            pred = Just $ declaresRecursively pred
+compileInspection "declaresComputation"            pred = Just $ declaresComputation pred
+compileInspection "declaresComputationWithArity0"  pred = Just $ declaresComputationWithExactArity 0 pred
+compileInspection "declaresComputationWithArity1"  pred = Just $ declaresComputationWithExactArity 1 pred
+compileInspection "declaresComputationWithArity2"  pred = Just $ declaresComputationWithExactArity 2 pred
+compileInspection "declaresComputationWithArity3"  pred = Just $ declaresComputationWithExactArity 3 pred
+compileInspection "declaresComputationWithArity4"  pred = Just $ declaresComputationWithExactArity 4 pred
+compileInspection "uses"                           pred = Just $ uses pred
+compileInspection "usesAnonymousVariable"          _    = Just $ usesAnonymousVariable
+compileInspection "usesComposition"                _    = Just $ usesComposition
+compileInspection "usesComprehension"              _    = Just $ usesComprehension
+compileInspection "usesConditional"                _    = Just $ usesConditional
+compileInspection "usesGuards"                     _    = Just $ usesGuards
+compileInspection "usesFindall"                    _    = Just $ usesFindall
+compileInspection "usesForall"                     _    = Just $ usesForall
+compileInspection "usesIf"                         _    = Just $ usesIf
+compileInspection "usesLambda"                     _    = Just $ usesLambda
+compileInspection "usesNot"                        _    = Just $ usesNot
+compileInspection "usesRepeat"                     _    = Just $ usesRepeat
+compileInspection "usesWhile"                      _    = Just $ usesWhile
+compileInspection _                                _    = Nothing
+
 
 compilePattern :: BindingPattern -> BindingPredicate
 compilePattern (Named o) = named o
