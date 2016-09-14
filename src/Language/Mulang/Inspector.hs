@@ -23,7 +23,7 @@ module Language.Mulang.Inspector (
   declaresFact,
   declaresFunction,
   declaresProcedure,
-  declaresProgram,
+  declaresEntryPoint,
   declaresComputationWithArity,
   declaresComputationWithExactArity,
   declaresComputation,
@@ -97,10 +97,10 @@ declaresVariable = containsDeclaration f
   where f (VariableDeclaration _ _)  = True
         f _                          = False
 
-declaresProgram :: BindingPredicate -> Inspection
-declaresProgram = containsDeclaration f
-  where f (Program _)  = True
-        f _            = False
+declaresEntryPoint :: BindingPredicate -> Inspection
+declaresEntryPoint = containsDeclaration f
+  where f (EntryPoint _)  = True
+        f _               = False
 
 -- | Inspection that tells whether a top level computation binding exists
 declaresComputation :: BindingPredicate -> Inspection

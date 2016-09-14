@@ -47,6 +47,7 @@ expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
     subExpressions (Sequence es)                      = es
     subExpressions (MuObject es)                      = [es]
     subExpressions (MuTuple as)                       = as
+    subExpressions (EntryPoint e)                     = [e]
     subExpressions (MuList as)                        = as
     subExpressions _                                  = []
 
@@ -111,7 +112,7 @@ extractDeclaration e@(ProcedureDeclaration n _)= Just (n, e)
 extractDeclaration e@(ObjectDeclaration n _)   = Just (n, e)
 extractDeclaration e@(MethodDeclaration n _)   = Just (n, e)
 extractDeclaration e@(AttributeDeclaration n _)= Just (n, e)
-extractDeclaration e@(Program _)               = Just ("anonymous", e)
+extractDeclaration e@(EntryPoint _)            = Just ("anonymous", e)
 extractDeclaration _                           = Nothing
 
 
