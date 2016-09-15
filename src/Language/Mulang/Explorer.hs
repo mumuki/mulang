@@ -39,6 +39,8 @@ expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
     subExpressions (Lambda _ a)                       = [a]
     subExpressions (If a b c)                         = [a, b, c]
     subExpressions (While e1 e2)                      = [e1, e2]
+    subExpressions (Repeat e1 e2)                     = [e1, e2]
+    subExpressions (Switch e1 list)                   = e1 : concatMap (\(x,y) -> [x,y]) list
     subExpressions (Match e1 equations)               = e1:expressionsOfEquations equations
     subExpressions (Comprehension a _)                = [a] --TODO
     subExpressions (Not e)                            = [e]
@@ -54,6 +56,7 @@ expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
     expressionsOfEquations eqs = eqs >>= \(Equation _ body) -> topExpressionOfBody body
     topExpressionOfBody (UnguardedBody e)      = [e]
     topExpressionOfBody (GuardedBody b)        = b >>= \(es1, es2) -> [es1, es2]
+
 
 equationBodiesOf :: Expression -> [EquationBody]
 equationBodiesOf = concatMap bodiesOf . expressionsOf
