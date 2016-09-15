@@ -34,6 +34,7 @@ expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
     subExpressions (MethodDeclaration _ equations)    = expressionsOfEquations equations
     subExpressions (AttributeDeclaration _ v)         = [v]
     subExpressions (ObjectDeclaration _ v)            = [v]
+    subExpressions (EntryPoint e)                     = [e]
     subExpressions (Application a bs)                 = a:bs
     subExpressions (Send e1 e2 e3)                    = [e1, e2] ++ e3
     subExpressions (Lambda _ a)                       = [a]
@@ -49,7 +50,6 @@ expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
     subExpressions (Sequence es)                      = es
     subExpressions (MuObject es)                      = [es]
     subExpressions (MuTuple as)                       = as
-    subExpressions (EntryPoint e)                     = [e]
     subExpressions (MuList as)                        = as
     subExpressions _                                  = []
 
@@ -99,7 +99,7 @@ nameOf = fmap fst . extractDeclaration
 
 extractReference :: Expression -> Maybe (Binding, Expression)
 extractReference e@(Variable n)  = Just (n, e)
-extractReference e@(Exist n _) = Just (n, e)
+extractReference e@(Exist n _)   = Just (n, e)
 extractReference _               = Nothing
 
 

@@ -11,7 +11,7 @@ spec = do
     describe "with program declarations" $ do
       it "is True when program is declared" $ do
         --  code = "program{ Poner(Verde) }"
-        let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [\r\n      {\r\n        \"value\": \"x\",\r\n        \"arity\": \"name\"\r\n      }\r\n    ],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \"switch\",\r\n        \"value\": {\r\n          \"value\": 2,\r\n          \"arity\": \"literal\"\r\n        },\r\n        \"cases\": [\r\n          {\r\n            \"case\": {\r\n              \"value\": 2,\r\n              \"arity\": \"literal\"\r\n            },\r\n            \"body\": [\r\n              {\r\n                \"alias\": \":=\",\r\n                \"arity\": \"binary\",\r\n                \"variable\": {\r\n                  \"value\": \"x\",\r\n                  \"arity\": \"name\"\r\n                },\r\n                \"expression\": {\r\n                  \"value\": 2,\r\n                  \"arity\": \"literal\"\r\n                }\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      }\r\n    ],\r\n    \"return\": {\r\n      \"value\": \"x\",\r\n      \"arity\": \"name\"\r\n    }\r\n  }\r\n]"
+        let code = "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"PutStone\" , \"parameters\" : [{\"value\" : 3, \"arity\" : \"literal\" , \"reserved\" : true}] }],\"from\": 0}]"
         declaresEntryPoint anyone (gbs code) `shouldBe` True
 
       it "is False when program is not declared" $ do
