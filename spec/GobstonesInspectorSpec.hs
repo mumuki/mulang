@@ -60,7 +60,7 @@ spec = do
         declaresFunction (named "f") (gbs code) `shouldBe` False
 
       it "is False when constant is declared with a number literal" $ do
-        --  code = "orogram {f := 3}"
+        --  code = "program {f := 3}"
         let code = "[{\"alias\": \"program\",\"body\": [  {    \"alias\": \":=\",\"arity\": \"binary\",\"variable\": {      \"value\": \"f\",      \"arity\": \"name\"    },\"expression\": {      \"value\": 3,      \"arity\": \"literal\"    }  }]}\r\n]"
         declaresFunction  (named "f") (gbs code) `shouldBe` False
 

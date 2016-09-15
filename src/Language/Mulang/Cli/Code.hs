@@ -36,9 +36,9 @@ instance ToJSON Language
 
 
 parseCode :: Code -> Maybe Expression
-parseCode (Code Mulang content)      = readMaybe content
-parseCode (Code Json content)        = parseJson content
-parseCode (Code Haskell content)     = parseHaskell content
-parseCode (Code JavaScript content)  = parseJavaScript content
-parseCode (Code Prolog content)      = parseProlog content
+parseCode (Code Mulang content)         = readMaybe content
+parseCode (Code Json content)           = parseJson content
+parseCode (Code Haskell content)        = parseHaskell content
+parseCode (Code JavaScript content)     = parseJavaScript content
+parseCode (Code Prolog content)         = parseProlog content
 parseCode (Code GobstonesAst content)   = parseGobstones content
