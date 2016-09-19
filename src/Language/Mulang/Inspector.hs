@@ -6,6 +6,7 @@ module Language.Mulang.Inspector (
   usesGuards,
   usesIf,
   usesWhile,
+  usesSwitch,
   usesLambda,
   usesNot,
   usesFindall,
@@ -21,9 +22,12 @@ module Language.Mulang.Inspector (
   declaresRule,
   declaresFact,
   declaresFunction,
+  declaresProcedure,
+  declaresEntryPoint,
   declaresComputationWithArity,
   declaresComputationWithExactArity,
   declaresComputation,
+  declaresVariable,
   declaresTypeAlias,
   declaresTypeSignature,
   usesAnonymousVariable,
@@ -81,7 +85,23 @@ declares = containsDeclaration f
 declaresFunction :: BindingPredicate -> Inspection
 declaresFunction = containsDeclaration f
   where f (FunctionDeclaration _ _) = True
-        f _  = False
+        f _                         = False
+
+declaresProcedure :: BindingPredicate -> Inspection
+declaresProcedure = containsDeclaration f
+  where f (ProcedureDeclaration _ _) = True
+        f _                          = False
+
+declaresVariable :: BindingPredicate -> Inspection
+declaresVariable = containsDeclaration f
+  where f (VariableDeclaration _ _)  = True
+        f _                          = False
+
+declaresEntryPoint :: BindingPredicate -> Inspection
+declaresEntryPoint = containsDeclaration f
+  where f (EntryPoint _)  = True
+        f _               = False
+
 -- | Inspection that tells whether a top level computation binding exists
 declaresComputation :: BindingPredicate -> Inspection
 declaresComputation = declaresComputationWithArity (const True)
@@ -138,6 +158,12 @@ usesIf = containsExpression f
 usesWhile :: Inspection
 usesWhile = containsExpression f
   where f (While _ _) = True
+        f _ = False
+-- | Inspection that tells whether an expression uses Switch
+-- in its definition
+usesSwitch :: Inspection
+usesSwitch = containsExpression f
+  where f (Switch _ _) = True
         f _ = False
 
 -- | Inspection that tells whether an expression uses pattern matching
