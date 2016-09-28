@@ -4,6 +4,7 @@ import           Test.Hspec
 import           Language.Mulang.Inspector
 import           Language.Mulang.Inspector.Combiner
 import           Language.Mulang.Parsers.Gobstones
+import           Language.Mulang.DuplicateCode
 
 spec :: Spec
 spec = do
@@ -170,3 +171,21 @@ spec = do
         --  code = "procedure F(){ x := 2}"
         let code = "[\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \":=\",\r\n        \"arity\": \"binary\",\r\n        \"variable\": {\r\n          \"value\": \"x\",\r\n          \"arity\": \"name\"\r\n        },\r\n        \"expression\": {\r\n          \"value\": 2,\r\n          \"arity\": \"literal\"\r\n        }\r\n      }\r\n    ]\r\n  }\r\n]"
         declaresVariable (named "y") (gbs code) `shouldBe` False
+
+  describe "hasDuplicateCode" $ do
+    describe "with bodys Exactly equals" $ do
+      it "is True when two empty procedures are equals" $ do
+        --  code = "procedure F(){} procedure G(){}"
+        let code = "[\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": null\r\n  },\r\n  {\r\n    \"value\": \"G\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"G\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": null\r\n  }\r\n]"
+        hasDuplicateCode (gbs code) `shouldBe` True
+
+      it "is True when two functions are equals" $ do
+        --  code = "function f(){if(True){}else{} return (x)} function g(){if(True){}else{} return (x)}"
+        let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \"conditional\",\r\n        \"condition\": {\r\n          \"value\": true,\r\n          \"arity\": \"literal\",\r\n          \"reserved\": true\r\n        },\r\n        \"left\": null,\r\n        \"right\": null\r\n      }\r\n    ],\r\n    \"return\": {\r\n      \"value\": \"x\",\r\n      \"arity\": \"name\"\r\n    }\r\n  },\r\n  {\r\n    \"value\": \"g\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"g\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \"conditional\",\r\n        \"condition\": {\r\n          \"value\": true,\r\n          \"arity\": \"literal\"\r\n        },\r\n        \"left\": null,\r\n        \"right\": null\r\n      }\r\n    ],\r\n    \"return\": {\r\n      \"value\": \"x\",\r\n      \"arity\": \"name\"\r\n    }\r\n  }\r\n]"
+        hasDuplicateCode (gbs code) `shouldBe` True
+
+      it "is True when a function and a procedure have same body" $ do
+        --  code = "procedure G(){if(True){}else{} } function f(){if(True){}else{} return (x)}"
+        let code = "[\r\n  {\r\n    \"value\": \"G\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"G\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \"conditional\",\r\n        \"condition\": {\r\n          \"value\": true,\r\n          \"arity\": \"literal\",\r\n          \"reserved\": true\r\n        },\r\n        \"left\": null,\r\n        \"right\": null\r\n      }\r\n    ]\r\n  },\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \"conditional\",\r\n        \"condition\": {\r\n          \"value\": true,\r\n          \"arity\": \"literal\"\r\n        },\r\n        \"left\": null,\r\n        \"right\": null\r\n      }\r\n    ],\r\n    \"return\": {\r\n      \"value\": \"x\",\r\n      \"arity\": \"name\"\r\n    }\r\n  }\r\n]"
+        hasDuplicateCode (gbs code) `shouldBe` True
+

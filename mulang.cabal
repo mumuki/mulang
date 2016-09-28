@@ -66,6 +66,7 @@ library
     Language.Mulang.Builder
     Language.Mulang.Explorer
     Language.Mulang.Inspector
+    Language.Mulang.DuplicateCode
     Language.Mulang.Inspector.Smell
     Language.Mulang.Inspector.Combiner
     Language.Mulang.Inspector.Expressiveness
