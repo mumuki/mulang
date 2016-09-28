@@ -10,7 +10,7 @@ hasDuplicateCode :: Expression -> Bool
 hasDuplicateCode (Sequence xs) = hasDuplicateInList xs []
 hasDuplicateCode x = hasDuplicateInList [x] []
 
-
+--Temporalmente solo para ser usado en Gobstones
 hasDuplicateInList :: [Expression] -> [[Equation]] -> Bool
 hasDuplicateInList [] bodyL                                              = False
 hasDuplicateInList ((ProcedureDeclaration _ eq):xs) bodyL                = (elem eq bodyL) || hasDuplicateInList xs (eq : bodyL)
