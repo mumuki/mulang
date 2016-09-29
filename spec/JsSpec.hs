@@ -37,7 +37,7 @@ spec = do
 
     it "simple procedure declaration" $ do
       js "function f(x) { console.log('fruit') }" `shouldBe` (
-                ProcedureDeclaration|
+                ProcedureDeclaration
                     "f"
                     [Equation [VariablePattern "x"] (UnguardedBody (Send (Variable "console") (Variable "log") [MuString "fruit"]))])
 
