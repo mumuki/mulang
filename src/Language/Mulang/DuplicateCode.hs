@@ -45,5 +45,6 @@ getExpressions ((While  e b):xs)              = e : getExpressions xs ++ getExpr
 getExpressions ((Repeat  e b):xs)             = e : getExpressions xs ++ getExpressions [b]
 getExpressions ((VariableDeclaration i e):xs) = e : getExpressions xs
 getExpressions ((VariableAssignment i e):xs)  = e : getExpressions xs
+getExpressions ((Switch e cases):xs)          = e : getExpressions xs
 getExpressions (x:xs)                         = getExpressions xs
 
