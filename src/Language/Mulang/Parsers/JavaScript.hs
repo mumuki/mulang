@@ -87,6 +87,9 @@ mu = compact . muNode . gc
     muId = f.gc
            where f (JSIdentifier id) = id
 
+
+    muEquation params body = [Equation params (UnguardedBody body)]
+
     compactMapMu :: [JSNode] -> Expression
     compactMapMu  = compact . mapMu
 
@@ -102,8 +105,18 @@ mu = compact . muNode . gc
     muMinus var delta = (Application (Variable "-") [Variable (muId var), delta])
 
     muFunction :: JSNode -> [JSNode] -> JSNode -> Expression
-    muFunction name params body =  FunctionDeclaration (muId name) [Equation (muParams params) (UnguardedBody (mu body))]
+    muFunction name params body = muComputation (muId name) (muParams params) (mu body)
+                            where
+                                muComputation name params body = (computationFor body) name (muEquation params body)
 
+                                computationFor :: Expression -> Identifier -> [Equation] -> Expression
+                                computationFor body | containsReturn body = FunctionDeclaration
+                                                    | otherwise = ProcedureDeclaration
+
+                                containsReturn :: Expression -> Bool
+                                containsReturn (Return _)    = True
+                                containsReturn (Sequence xs) = any containsReturn xs
+                                containsReturn _             = False
 
 {-JSRegEx String
 optional lb,optional block statements,optional rb
