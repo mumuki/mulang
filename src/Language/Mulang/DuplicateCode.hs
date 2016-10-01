@@ -18,7 +18,7 @@ hasDuplicateInList [] bodyL expL                                             = F
 hasDuplicateInList ((ProcedureDeclaration _ eq):xs) bodyL expL               = let exps = (getExpressionsInEquation eq) in 
                                                                                           (elem eq bodyL) || (not (null (intersect exps expL))) || hasDuplicateInList xs (addEqsInBodyL (removeInEquation removeSentencesInEqBody eq) bodyL) (exps ++ expL)
 hasDuplicateInList ((FunctionDeclaration _ eq):xs) bodyL expL                = let exps = (getExpressionsInEquation eq) in
-                                                                                          (elem (removeInEquation removeReturnInEqBody eq) bodyL) || (not (null (intersect exps expL))) || hasDuplicateInList xs ( addEqsInBodyL (removeInEquation removeSentencesInEqBody $ removeInEquation removeReturnInEqBody eq) bodyL) (exps ++ expL)
+                                                                                          (elem (removeInEquation removeReturnInEqBody eq) bodyL) || (not (null (intersect exps expL))) || hasDuplicateInList xs (addEqsInBodyL (removeInEquation (removeSentencesInEqBody . removeReturnInEqBody) eq) bodyL) (exps ++ expL)
 hasDuplicateInList (x:xs) bodyL expL                                         = hasDuplicateInList xs bodyL expL
 
 addEqsInBodyL :: [Equation] -> [[Equation]] -> [[Equation]]
