@@ -9,10 +9,6 @@ spec :: Spec
 spec = do
   describe "hasDuplicateCode" $ do
     describe "with bodys Exactly equals" $ do
-      it "is True when two empty procedures are equals" $ do
-        let code = "function F(){} function G(){}"
-        hasDuplicateCode (js code) `shouldBe` True
-
       it "is False when two procedures are not equals" $ do
         let code = "function F(){} function G(){Sacar(Verde)}"
         hasDuplicateCode (js code) `shouldBe` False
@@ -30,7 +26,7 @@ spec = do
           hasDuplicateCode (js "function F(){return x + 1 } function G(){ return x - 1  }") `shouldBe` False
 
         it "only similar increments in body" $ do 
-          hasDuplicateCode (js "function F(){ x = x  + 1 ;  return x + 1 } function G(){ x = x  + 1 ; return x - 1  }") `shouldBe` False
+          hasDuplicateCode (js "function F(){ x = x + 1 ;  return x + 1 } function G(){ x = x  + 1 ; return x - 1  }") `shouldBe` False
 
         it "only similar procedure calls in body" $ do 
           hasDuplicateCode (js "function F(){ Mover(Sur) ; Poner(Rojo) ; Mover(Norte) }\
