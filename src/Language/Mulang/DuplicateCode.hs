@@ -16,24 +16,24 @@ hasDuplicateCode x             = hasDuplicateInList [x] [] []
 hasDuplicateInList :: [Expression] -> [[Equation]] -> [Expression] -> Bool
 hasDuplicateInList [] bodyL expL                                             = False
 hasDuplicateInList ((ProcedureDeclaration _ eq):xs) bodyL expL               = let exps = (getExpressionsInEquation eq) in 
-                                                                                          (elem eq bodyL) || (not (null (intersect exps expL))) || hasDuplicateInList xs (addEqsInBodyL (removeInEquation removeSentencesInEqBody eq) bodyL) (exps ++ expL)
+                                                                                          (elem eq bodyL) || (not (null (intersect exps expL))) || hasDuplicateInList xs (addIfNotEmpty (removeExpressionsInEquations removeSentencesInEqBody eq) bodyL) (exps ++ expL)
 hasDuplicateInList ((FunctionDeclaration _ eq):xs) bodyL expL                = let exps = (getExpressionsInEquation eq) in
-                                                                                          (elem (removeInEquation removeReturnInEqBody eq) bodyL) || (not (null (intersect exps expL))) || hasDuplicateInList xs (addEqsInBodyL (removeInEquation (removeSentencesInEqBody . removeReturnInEqBody) eq) bodyL) (exps ++ expL)
+                                                                                          (elem (removeExpressionsInEquations removeReturnInEqBody eq) bodyL) || (not (null (intersect exps expL))) || hasDuplicateInList xs (addIfNotEmpty (removeExpressionsInEquations (removeSentencesInEqBody . removeReturnInEqBody) eq) bodyL) (exps ++ expL)
 hasDuplicateInList (x:xs) bodyL expL                                         = hasDuplicateInList xs bodyL expL
 
-addEqsInBodyL :: [Equation] -> [[Equation]] -> [[Equation]]
-addEqsInBodyL [] ys = ys
-addEqsInBodyL l@(x:xs) ys = l : ys
+addIfNotEmpty :: [Equation] -> [[Equation]] -> [[Equation]]
+addIfNotEmpty xs ys | [] <- xs  = ys
+                    | otherwise = xs : ys
 
-removeInEquation :: (EquationBody -> EquationBody) -> [Equation] -> [Equation]
-removeInEquation f []                           = []
-removeInEquation f ((Equation patterns eqB):xs) | UnguardedBody MuNull <- f eqB = removeInEquation f xs
-                                                     | otherwise = (Equation patterns (f eqB)) : removeInEquation f xs
+removeExpressionsInEquations :: (EquationBody -> EquationBody) -> [Equation] -> [Equation]
+removeExpressionsInEquations f []                           = []
+removeExpressionsInEquations f ((Equation patterns eqB):xs) | UnguardedBody MuNull <- f eqB = removeExpressionsInEquations f xs
+                                                 | otherwise = (Equation patterns (f eqB)) : removeExpressionsInEquations f xs
                                       
 removeSentencesInEqBody :: EquationBody -> EquationBody
-removeSentencesInEqBody (UnguardedBody (Sequence xs))                        = UnguardedBody $ simplify (Sequence $ filter notIsWorstSentence xs)
-removeSentencesInEqBody (UnguardedBody (Application (Variable "+") exps))    = UnguardedBody MuNull
-removeSentencesInEqBody x                                                    = x
+removeSentencesInEqBody (UnguardedBody (Sequence xs))                                                  = UnguardedBody $ simplify (Sequence $ filter notIsWorstSentence xs)
+removeSentencesInEqBody (UnguardedBody e)  | [] <- filter notIsWorstSentence [e]                       = UnguardedBody MuNull
+                                           | otherwise                                                 = UnguardedBody e
 
 removeReturnInEqBody :: EquationBody -> EquationBody
 removeReturnInEqBody (UnguardedBody (Sequence xs)) = UnguardedBody $ simplify (Sequence $ init xs) -- el return es el ultimo elemento en Gobstones
@@ -42,22 +42,24 @@ removeReturnInEqBody x                             = x
 
 getExpressionsInEquation :: [Equation] -> [Expression]
 getExpressionsInEquation []                           = []
-getExpressionsInEquation ((Equation patterns eqB):xs) = getExpressionsEqBody eqB ++ getExpressionsInEquation xs
-
-getExpressionsEqBody :: EquationBody -> [Expression]
-getExpressionsEqBody (UnguardedBody (Sequence xs)) = filter notIsLiteral $ getExpressions xs  
-getExpressionsEqBody (UnguardedBody e)             = filter notIsLiteral $ getExpressions [e]
+getExpressionsInEquation ((Equation patterns eqB):xs) = filter notIsLiteral $ getExpressionsEqBody eqB ++ getExpressionsInEquation xs
 
 notIsLiteral :: Expression -> Bool
-notIsLiteral (MuSymbol _)            = False
-notIsLiteral (MuNumber _)            = False
-notIsLiteral (MuBool _)              = False
-notIsLiteral (Variable _)            = False
-notIsLiteral _                       = True
+notIsLiteral (MuSymbol _)                      = False
+notIsLiteral (MuNumber _)                      = False
+notIsLiteral (MuBool _)                        = False
+notIsLiteral (Variable _)                      = False
+notIsLiteral (Application (Variable "+") exps) = False
+notIsLiteral _                                 = True
 
 notIsWorstSentence :: Expression -> Bool
-notIsWorstSentence (Application (Variable "+") exp)  = False
-notIsWorstSentence _                                 = True
+notIsWorstSentence (VariableAssignment var (Application (Variable "+") exps))   = False
+notIsWorstSentence (VariableDeclaration var (Application (Variable "+") exps))  = False
+notIsWorstSentence _                                                            = True
+
+getExpressionsEqBody :: EquationBody -> [Expression]
+getExpressionsEqBody (UnguardedBody (Sequence xs)) = getExpressions xs  
+getExpressionsEqBody (UnguardedBody e)             = getExpressions [e]
 
 getExpressions :: [Expression] -> [Expression]  
 getExpressions []                                 = []
