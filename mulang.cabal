@@ -30,7 +30,8 @@ executable mulang
     aeson                     >= 0.11.0.0 && < 1,
     parsec                    == 3.1.9,
     ParsecTools               >= 0.0.2.0,
-    split                     >= 0.2.3.1
+    split                     >= 0.2.3.1,
+    hashable                  >= 1.2.4.0  && < 1.3
   build-tools:
     happy,
     alex
@@ -94,8 +95,8 @@ library
     inflections               > 0.2       && < 0.3,
     parsec                    == 3.1.9,
     ParsecTools               >= 0.0.2.0,
-    split                     >= 0.2.3.1
-
+    split                     >= 0.2.3.1,
+    hashable                  >= 1.2.4.0  && < 1.3
   build-tools:
     happy,
     alex
