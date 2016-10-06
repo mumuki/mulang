@@ -21,10 +21,9 @@ spec = do
         let code = "function f(){ Sacar(Verde) return 2 } function g(){return 2 }"
         hasDuplicateCode (js code) `shouldBe` False
 
-      it "is True when two functions have same expressions" $ do
+      it "is False when two functions have same expressions" $ do
         let code = "function f(){ Sacar(Verde) return x == y } function g(){ while(x==y){} return 2 }"
         hasDuplicateCode (js code) `shouldBe` False
-
 
       describe "is False when two computations have marginal similities" $ do
         it "different operations on same variable in return" $ do 

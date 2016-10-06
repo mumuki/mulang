@@ -2,6 +2,7 @@ module Language.Mulang.DuplicateCode (hasDuplicateCode) where
 
 
 import Language.Mulang
+import Language.Mulang.Explorer (expressionsOf)
 import qualified Data.Hashable as H (hash)
 import Data.List (nub)
 
@@ -9,7 +10,22 @@ import Data.List (nub)
 
 
 hasDuplicateCode :: Expression -> Bool
-hasDuplicateCode (Sequence xs) =  hasDuplicates (map hash xs)
+hasDuplicateCode (Sequence xs) =  hasDuplicates (map hash (filter (not . isLightweight) (concatMap expressionsOf xs)))
+
+isLightweight :: Expression -> Bool
+isLightweight (MuNumber e)              = True
+isLightweight (MuString e)              = True
+isLightweight (MuBool e)                = True
+isLightweight (Variable i)              = True
+isLightweight (Application i es)        = not $ any isApplication es
+--isLightweight (Application i es)        = all isLightweight es
+isLightweight (Return e)                = isLightweight e
+isLightweight (VariableAssignment i e)  = isLightweight e
+isLightweight (VariableDeclaration i e) = isLightweight e
+isLightweight _                         = False
+
+isApplication (Application i es) = True
+isApplication _                  = False
 
 
 
