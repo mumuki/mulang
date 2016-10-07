@@ -1,4 +1,4 @@
-module Language.Mulang.DuplicateCode (hasDuplicateCode) where
+module Language.Mulang.DuplicateCode (hasDuplicateCode,f) where
 
 
 import Language.Mulang
@@ -12,11 +12,15 @@ import Data.List (nub)
 hasDuplicateCode :: Expression -> Bool
 hasDuplicateCode (Sequence xs) =  hasDuplicates (map hash (filter (not . isLightweight) (concatMap expressionsOf xs)))
 
+f (Sequence xs) =  filter (not . isLightweight) (concatMap expressionsOf xs)
+
 isLightweight :: Expression -> Bool
 isLightweight (MuNumber e)              = True
 isLightweight (MuString e)              = True
 isLightweight (MuBool e)                = True
 isLightweight (Variable i)              = True
+isLightweight MuNull                    = True
+isLightweight Equal                     = True
 isLightweight (Application i es)        = not $ any isApplication es
 --isLightweight (Application i es)        = all isLightweight es
 isLightweight (Return e)                = isLightweight e
