@@ -4,15 +4,15 @@ module Language.Mulang.DuplicateCode (hasDuplicateCode,f) where
 import Language.Mulang
 import Language.Mulang.Explorer (expressionsOf)
 import qualified Data.Hashable as H (hash)
-import Data.List (nub)
+import Data.List (nub, subsequences)
 
 
 
 
 hasDuplicateCode :: Expression -> Bool
-hasDuplicateCode (Sequence xs) =  hasDuplicates (map hash (filter (not . isLightweight) (concatMap expressionsOf xs)))
+hasDuplicateCode e =  hasDuplicates (map hash (filter (not . isLightweight) (concat $ stripesOf 2 e)))
 
-f (Sequence xs) =  filter (not . isLightweight) (concatMap expressionsOf xs)
+f e = map hash (filter (not . isLightweight) (concat $ stripesOf 0 e))
 
 isLightweight :: Expression -> Bool
 isLightweight (MuNumber e)              = True
@@ -22,7 +22,6 @@ isLightweight (Variable i)              = True
 isLightweight MuNull                    = True
 isLightweight Equal                     = True
 isLightweight (Application i es)        = not $ any isApplication es
---isLightweight (Application i es)        = all isLightweight es
 isLightweight (Return e)                = isLightweight e
 isLightweight (VariableAssignment i e)  = isLightweight e
 isLightweight (VariableDeclaration i e) = isLightweight e
@@ -32,11 +31,8 @@ isApplication (Application i es) = True
 isApplication _                  = False
 
 
-
-
 hasDuplicates ::Eq a => [a] -> Bool
 hasDuplicates xs = nub xs /= xs
-
 
 
 hash :: Expression -> Int
@@ -61,3 +57,15 @@ equationUnguardedBody (Equation _ (UnguardedBody body)) = body
 
 positionalHash :: [Expression] -> Int
 positionalHash = sum . zipWith (\index expression -> (31^index) * hash expression) [1..] . reverse 
+
+
+stripesOf :: Int -> Expression -> [[Expression]]
+stripesOf n = concatMap (makeStripes n) . expressionsOf
+
+makeStripes :: Int -> Expression -> [[Expression]]
+makeStripes n (Sequence xs) = stripes n xs
+makeStripes _ e             = [[e]]
+
+stripes :: Int -> [a] -> [[a]]
+stripes n = filter ( (>n) . length) . subsequences
+
