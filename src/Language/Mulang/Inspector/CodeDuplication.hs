@@ -1,4 +1,4 @@
-module Language.Mulang.DuplicateCode (hasDuplicateCode,f) where
+module Language.Mulang.Inspector.CodeDuplication (hasCodeDuplication,f) where
 
 
 import Language.Mulang
@@ -9,8 +9,8 @@ import Data.List (nub, subsequences)
 
 
 
-hasDuplicateCode :: Expression -> Bool
-hasDuplicateCode e =  hasDuplicates (map hash (filter (not . isLightweight) (concat $ stripesOf 2 e)))
+hasCodeDuplication :: Expression -> Bool
+hasCodeDuplication e =  hasDuplicates (map hash (filter (not . isLightweight) (concat $ stripesOf 2 e)))
 
 f e = map hash (filter (not . isLightweight) (concat $ stripesOf 0 e))
 
@@ -48,15 +48,15 @@ hash (Sequence es)                 = 19 * (37 + positionalHash es)
 hash _                             = 1
 
 simpleProcedureBody :: Expression -> Expression
-simpleProcedureBody (ProcedureDeclaration _ [equation]) = equationUnguardedBody equation  
+simpleProcedureBody (ProcedureDeclaration _ [equation]) = equationUnguardedBody equation
 
 simpleFunctionBody :: Expression -> Expression
-simpleFunctionBody (FunctionDeclaration _ [equation]) = equationUnguardedBody equation  
+simpleFunctionBody (FunctionDeclaration _ [equation]) = equationUnguardedBody equation
 equationUnguardedBody (Equation _ (UnguardedBody body)) = body
 
 
 positionalHash :: [Expression] -> Int
-positionalHash = sum . zipWith (\index expression -> (31^index) * hash expression) [1..] . reverse 
+positionalHash = sum . zipWith (\index expression -> (31^index) * hash expression) [1..] . reverse
 
 
 stripesOf :: Int -> Expression -> [[Expression]]
