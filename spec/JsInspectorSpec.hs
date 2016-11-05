@@ -66,10 +66,10 @@ spec = do
       usesWhile (js "function f() {}")  `shouldBe` False
 
   describe "isLongCode" $ do
-    it "is False when the program no contain 16 o more nodes" $ do
+    it "is False when the program has less than 16 nodes" $ do
       isLongCode (js "function f() { while(true) { console.log('foo') }  }")  `shouldBe` False
 
-    it "is True when the program contain 16 o more nodes" $ do
+    it "is True when the program contains 16 or more nodes" $ do
       isLongCode (js "function f(){Poner(Verde) Mover(Norte) Poner(Verde)Mover(Norte) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) Poner(Verde) Mover(Norte) Poner(Verde)Mover(Norte) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde)}")  `shouldBe` True
 
   describe "declaresObject" $ do
