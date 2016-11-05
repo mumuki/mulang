@@ -1,20 +1,20 @@
 module Language.Mulang.Inspector.CodeDuplication (hasCodeDuplication,f) where
 
 
-import Language.Mulang
-import Language.Mulang.Explorer (expressionsOf)
+import           Language.Mulang
+import           Language.Mulang.Inspector
+import           Language.Mulang.Explorer (expressionsOf)
 import qualified Data.Hashable as H (hash)
-import Data.List (nub, subsequences)
+import           Data.List (nub, subsequences)
 
 
 
-
-hasCodeDuplication :: Expression -> Bool
+hasCodeDuplication :: Inspection
 hasCodeDuplication e =  hasDuplicates (map hash (filter (not . isLightweight) (concat $ stripesOf 2 e)))
 
 f e = map hash (filter (not . isLightweight) (concat $ stripesOf 0 e))
 
-isLightweight :: Expression -> Bool
+isLightweight :: Inspection
 isLightweight (MuNumber e)              = True
 isLightweight (MuString e)              = True
 isLightweight (MuBool e)                = True
