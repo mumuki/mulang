@@ -13,6 +13,7 @@ module Language.Mulang.Inspector (
   usesForall,
   usesRepeat,
   usesPatternMatching,
+  isLongCode,
   usesUnifyOperator,
   declaresRecursively,
   parses,
@@ -165,6 +166,11 @@ usesSwitch :: Inspection
 usesSwitch = containsExpression f
   where f (Switch _ _) = True
         f _ = False
+
+isLongCode :: Inspection
+isLongCode = containsExpression f
+  where f (Sequence xs)  = (length xs) >= 16
+        f  _             = False
 
 -- | Inspection that tells whether an expression uses pattern matching
 -- in its definition
