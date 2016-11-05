@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Language.Mulang.Parsers.Gobstones (gbs, parseGobstones) where 
+module Language.Mulang.Parsers.Gobstones (gbs, parseGobstones) where
 
 import            Language.Mulang
 import            Language.Mulang.Builder as Builder
@@ -8,8 +8,8 @@ import            Language.Mulang.Parsers
 
 
 import            Data.Aeson
-import  qualified Data.Aeson.Types (Parser)  
-import            Data.HashMap.Lazy as  HashMap (HashMap, lookup, member,insert,empty,fromList)
+import  qualified Data.Aeson.Types (Parser)
+import            Data.HashMap.Lazy as  HashMap (HashMap, lookup, member, insert, empty)
 import            Data.Traversable (traverse)
 import            Data.Foldable (toList)
 import            Data.Maybe (fromJust, isJust)
@@ -20,12 +20,12 @@ import  qualified Data.Text as T
 import  qualified Data.Vector as V
 
 import            Control.Applicative
-import            GHC.Generics
+import            GHC.Generics ()
 
 type JsonParser a = Value ->  Data.Aeson.Types.Parser a
 
 instance FromJSON Expression where
-    parseJSON  =  parseBodyExpression 
+    parseJSON  =  parseBodyExpression
 
 parseBodyExpression :: JsonParser Expression
 parseBodyExpression (Array list) = Builder.normalize . simplify . Sequence . toList <$> traverse parseNodes list
@@ -38,7 +38,7 @@ parseNodes (Object v) = nodeAst
         alias = HashMap.lookup "alias" v
         nodeAst = parseNodeAst alias v
 
-mapObjectArray f (Array list) 
+mapObjectArray f (Array list)
               | (V.null list) = pure []
               | otherwise = toList <$> traverse f list
 
@@ -52,29 +52,30 @@ parseFunctionCall (Object value) = parseNodeAst (Just "ProcedureCall") value
 
 parseSimpleValue :: JsonParser Expression
 parseSimpleValue (Object value) = parseSimpleExpressionValue (HashMap.lookup "reserved" value) (lookUpValue "value" value)
-    where 
+    where
           parseSimpleExpressionValue Nothing n@(Number _) = MuNumber <$> (parseJSON n)
           parseSimpleExpressionValue _ b@(Bool _) = MuBool <$> (parseJSON b)
           parseSimpleExpressionValue _ (Array direction) = MuSymbol <$> (parseListToDirection direction)
-          parseSimpleExpressionValue _ (Number number) = MuSymbol <$> (parseToColour number)
+          parseSimpleExpressionValue _ (Number number) = MuSymbol <$> (parseToColor number)
           parseSimpleExpressionValue _ s@(String _) = Variable <$> (parseNameExpression s)
 
-          parseToColour = parseColour . Scientific.floatingOrInteger
+          parseToColor = parseColor . Scientific.floatingOrInteger
 
-          parseColour (Right n) =  parseJSON . numberToColour $ n
+          parseColor (Right n) =  parseJSON . numberToColor $ n
 
-          numberToColour 0 = "Azul"
-          numberToColour 1 = "Rojo"
-          numberToColour 2 = "Negro"
-          numberToColour 3 = "Verde"
+          numberToColor :: Integer -> Value
+          numberToColor 0 = "Azul"
+          numberToColor 1 = "Rojo"
+          numberToColor 2 = "Negro"
+          numberToColor 3 = "Verde"
 
-          parseListToDirection direction = let (Number n1, Number n2) = (V.head direction,V.last direction) 
+          parseListToDirection direction = let (Number n1, Number n2) = (V.head direction,V.last direction)
                                            in parseToDirection n1 n2
- 
+
           parseToDirection number1 number2 = parseDirection  ((Scientific.floatingOrInteger number1),(Scientific.floatingOrInteger number2))
-          
+
           parseDirection ((Right n1),(Right n2)) = parseJSON . numbersToDirection $ (n1,n2)
-                      
+
           numbersToDirection (1, 0)  = "Este"
           numbersToDirection (0, 1)  = "Norte"
           numbersToDirection (-1, 0) = "Oeste"
@@ -87,50 +88,50 @@ parseBinaryValue (Object value) = Application <$> (evaluatedFunction <$> (lookup
 
 
 
-parseNameExpression (String n) = pure (T.unpack n) 
+parseNameExpression (String n) = pure (T.unpack n)
 
 lookUpValue :: Text -> Object -> Value
 lookUpValue string = fromJust .  HashMap.lookup string
 
 lookupAndParseExpression :: (Value -> b) -> Text -> Object -> b
-lookupAndParseExpression parseFunction string = parseFunction . lookUpValue string 
+lookupAndParseExpression parseFunction string = parseFunction . lookUpValue string
 
 
-parseVariableName (Object value) =  parseNameExpression . lookUpValue "value" $ value 
+parseVariableName (Object value) =  parseNameExpression . lookUpValue "value" $ value
 
 variableName = lookupAndParseExpression parseVariableName "variable"
 
 evaluatedFunction "==" = Equal
 evaluatedFunction "!=" = NotEqual
-evaluatedFunction  fun = Variable fun 
+evaluatedFunction  fun = Variable fun
 
 parseExpression :: JsonParser Expression
 parseExpression value = switchParser $ value
       where switchParser | isJust maybeName = parseFunctionCall
                          | isBinary         = parseBinaryValue
-                         | otherwise        = parseSimpleValue 
+                         | otherwise        = parseSimpleValue
 
             expression | (Object  v) <- value = v
 
             maybeName      = HashMap.lookup "name" expression
             arity          = HashMap.lookup "arity" expression
-            
+
             isBinary | String "binary"  <- fromJust arity = True
                      | otherwise = False
 
-expressionValue text = parseExpression . lookUpValue text 
- 
+expressionValue text = parseExpression . lookUpValue text
+
 
 parseToken "program" value                = EntryPoint <$> lookupAndParseExpression parseBodyExpression "body" value
 parseToken "procedureDeclaration" value   = ProcedureDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> (return <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (lookupAndParseExpression  parseBodyExpression "body" value))))
 parseToken "ProcedureCall" value          = Application <$> (evaluatedFunction <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression (mapObjectArray parseExpression) "parameters" value)
-parseToken ":=" value                     = VariableAssignment <$> (variableName value) <*> (expressionValue "expression" value) 
+parseToken ":=" value                     = VariableAssignment <$> (variableName value) <*> (expressionValue "expression" value)
 parseToken "functionDeclaration" value    = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> (return <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (expressionValue "return" value)))))
 parseToken "conditional" value            = If <$> (expressionValue "condition" value) <*> (lookupAndParseExpression parseBodyExpression "left" value) <*> (lookupAndParseExpression parseBodyExpression "right" value)
 parseToken "while" value                  = parseRepetitionFunction While value
 parseToken "repeat" value                 = parseRepetitionFunction Repeat value
 parseToken "switch" value                 = Switch <$> (expressionValue "value" value) <*> (lookupAndParseExpression (mapObjectArray parseCaseValue) "cases" value)
-parseToken "return" value                 = Return <$> (expressionValue "expression" value) 
+parseToken "return" value                 = Return <$> (expressionValue "expression" value)
 parseToken "PutStone" value               = parsePrimitive "Poner" value
 parseToken "RemoveStone" value            = parsePrimitive "Sacar" value
 parseToken "MoveClaw" value               = parsePrimitive "Mover" value
@@ -149,11 +150,11 @@ parseNodeAst Nothing       = fail "Failed to parse NodeAst!"
 ------------------------------------------------
 addReturn :: Expression -> Expression -> Expression
 addReturn (Sequence []) e = Return e
-addReturn (Sequence xs) e = Sequence (xs ++ [Return e]) 
+addReturn (Sequence xs) e = Sequence (xs ++ [Return e])
 addReturn x e = Sequence [x,(Return e)]
 
 simplify :: Expression -> Expression
-simplify (Sequence ((Sequence xs):es) ) = convertVariableAssignmentToDeclaration $ Sequence $ (map simplify xs) ++ (map simplify es) 
+simplify (Sequence ((Sequence xs):es) ) = convertVariableAssignmentToDeclaration $ Sequence $ (map simplify xs) ++ (map simplify es)
 simplify (Sequence [x]) = convertVariableAssignmentToDeclaration $ simplify x
 simplify  n = n
 
@@ -161,7 +162,7 @@ convertVariableAssignmentToDeclaration :: Expression ->Expression
 convertVariableAssignmentToDeclaration (Sequence xs) = Sequence (convertListWithMap xs HashMap.empty)
 convertVariableAssignmentToDeclaration x = head (convertListWithMap [x] HashMap.empty)
 
-convertListWithMap [] hashMap = []
+convertListWithMap [] _ = []
 convertListWithMap (a@(VariableAssignment _ _):xs) hashMap = let (v,newMap) =  convertVariable a hashMap in  v : (convertListWithMap xs newMap)
 convertListWithMap (f@(FunctionDeclaration _ _):xs) hashMap                 =  (convertVariablesInFunctionOrProcedure f HashMap.empty) : (convertListWithMap xs hashMap)
 convertListWithMap (p@(ProcedureDeclaration _ _):xs) hashMap                =  (convertVariablesInFunctionOrProcedure p HashMap.empty) : (convertListWithMap xs hashMap)
@@ -174,23 +175,23 @@ convertVariable v@(VariableAssignment identifier body) map | HashMap.member iden
 
 
 
-convertVariablesInFunctionOrProcedure  (FunctionDeclaration name [eq]) map                 = FunctionDeclaration name [(convertVariablesInEquation eq)]
-convertVariablesInFunctionOrProcedure  (ProcedureDeclaration name [eq] ) map               = ProcedureDeclaration name [(convertVariablesInEquation eq)]
+convertVariablesInFunctionOrProcedure  (FunctionDeclaration name [eq]) _                 = FunctionDeclaration name [(convertVariablesInEquation eq)]
+convertVariablesInFunctionOrProcedure  (ProcedureDeclaration name [eq] ) _               = ProcedureDeclaration name [(convertVariablesInEquation eq)]
 
 
-convertVariablesInConditionals c@(If e bodyL bodyR) hashMap               = If e (convertBody bodyL hashMap) (convertBody bodyR hashMap)
-convertVariablesInConditionals w@(While e body) hashMap                   = While e (convertBody body hashMap)
-convertVariablesInConditionals r@(Repeat e body) hashMap                  = Repeat e (convertBody body hashMap)
-convertVariablesInConditionals s@(Switch e cases) hashMap                 = Switch e (convertCases cases hashMap)  
-convertVariablesInConditionals x _                                        = x
+convertVariablesInConditionals (If e bodyL bodyR) hashMap               = If e (convertBody bodyL hashMap) (convertBody bodyR hashMap)
+convertVariablesInConditionals (While e body) hashMap                   = While e (convertBody body hashMap)
+convertVariablesInConditionals (Repeat e body) hashMap                  = Repeat e (convertBody body hashMap)
+convertVariablesInConditionals (Switch e cases) hashMap                 = Switch e (convertCases cases hashMap)
+convertVariablesInConditionals x _                                      = x
 
 
 convertBody (Sequence xs) hashMap              = (Sequence $ convertListWithMap xs hashMap)
-convertBody a@(VariableAssignment _ _) hashMap =  let (v,newMap) =  convertVariable a hashMap in  v
+convertBody a@(VariableAssignment _ _) hashMap =  let (v,_) =  convertVariable a hashMap in  v
 convertBody a _ = a
 
 
-convertCases [] hashMap              = []
+convertCases [] _                    = []
 convertCases ((e1,b1):cases) hashMap = (e1,convertBody b1 hashMap):convertCases cases hashMap
 
 convertVariablesInEquation (Equation xs (UnguardedBody e)) = Equation xs (UnguardedBody (convertVariableAssignmentToDeclaration e) )
