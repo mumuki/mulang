@@ -1,5 +1,4 @@
-module Language.Mulang.Inspector.CodeDuplication (hasCodeDuplication,f) where
-
+module Language.Mulang.Inspector.CodeDuplication (hasCodeDuplication) where
 
 import           Language.Mulang
 import           Language.Mulang.Inspector
@@ -7,12 +6,8 @@ import           Language.Mulang.Explorer (expressionsOf)
 import qualified Data.Hashable as H (hash)
 import           Data.List (nub, subsequences)
 
-
-
 hasCodeDuplication :: Inspection
 hasCodeDuplication e =  hasDuplicates (map hash (filter (not . isLightweight) (concat $ stripesOf 2 e)))
-
-f e = map hash (filter (not . isLightweight) (concat $ stripesOf 0 e))
 
 isLightweight :: Inspection
 isLightweight (MuNumber e)              = True
