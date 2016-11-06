@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Language.Mulang.Parsers.Gobstones (gbs, simplify, parseGobstones) where
+module Language.Mulang.Parsers.Gobstones (gbs, parseGobstones) where
 
 import            Language.Mulang
 import            Language.Mulang.Builder as Builder
