@@ -55,17 +55,3 @@ spec = do
       it "is True when two functions have same expressions" $ do
         let code = "function f(){ Sacar(Verde) return (x * 2) == y } function g(){ while((x * 2) == y){} return 2 }"
         hasCodeDuplication (js code) `shouldBe` True
-
-      --it "is True when a function repeat code" $ do
-        --let code = "function f(){Poner(Verde) Mover(Norte) Poner(Verde)Mover(Norte) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) }"
-        --f (js code) `shouldBe` []
-
-
-
-
-
-
-
-
-
-
