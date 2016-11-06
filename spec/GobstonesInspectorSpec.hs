@@ -4,6 +4,7 @@ import           Test.Hspec
 import           Language.Mulang.Inspector
 import           Language.Mulang.Inspector.Combiner
 import           Language.Mulang.Parsers.Gobstones
+import           Language.Mulang.Inspector.CodeDuplication
 
 spec :: Spec
 spec = do
@@ -87,7 +88,7 @@ spec = do
       -- code = "function f(){while(True){} return (x)}"
       let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [],\"body\": [  {    \"alias\": \"while\",\"expression\": {      \"value\": true,      \"arity\": \"literal\",      \"reserved\": true    },\"body\": null  }],\"return\": {  \"value\": \"x\",  \"arity\": \"name\"}}\r\n]"
       usesWhile (gbs code)  `shouldBe` True
-  
+
     it "is False when not present in function" $ do
       -- code = "function f(x){return (1)}"
       let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": 1,  \"arity\": \"literal\"}}\r\n]"
@@ -98,7 +99,7 @@ spec = do
       -- code = "function f(){if(True){}else{} return (x)}"
       let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \"conditional\",\r\n        \"condition\": {\r\n          \"value\": true,\r\n          \"arity\": \"literal\",\r\n          \"reserved\": true\r\n        },\r\n        \"left\": null,\r\n        \"right\": null\r\n      }\r\n    ],\r\n    \"return\": {\r\n      \"value\": \"x\",\r\n      \"arity\": \"name\"\r\n    }\r\n  }\r\n]"
       usesIf (gbs code)  `shouldBe` True
-  
+
     it "is False when not present in function" $ do
       --  code = "function f(x){return (1)}"
       let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": 1,  \"arity\": \"literal\"}}\r\n]"
@@ -109,7 +110,7 @@ spec = do
       --  code = "function f(x) {switch (2) to { 2 -> {x := 2}} return (x)}"
       let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [\r\n      {\r\n        \"value\": \"x\",\r\n        \"arity\": \"name\"\r\n      }\r\n    ],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \"switch\",\r\n        \"value\": {\r\n          \"value\": 2,\r\n          \"arity\": \"literal\"\r\n        },\r\n        \"cases\": [\r\n          {\r\n            \"case\": {\r\n              \"value\": 2,\r\n              \"arity\": \"literal\"\r\n            },\r\n            \"body\": [\r\n              {\r\n                \"alias\": \":=\",\r\n                \"arity\": \"binary\",\r\n                \"variable\": {\r\n                  \"value\": \"x\",\r\n                  \"arity\": \"name\"\r\n                },\r\n                \"expression\": {\r\n                  \"value\": 2,\r\n                  \"arity\": \"literal\"\r\n                }\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      }\r\n    ],\r\n    \"return\": {\r\n      \"value\": \"x\",\r\n      \"arity\": \"name\"\r\n    }\r\n  }\r\n]"
       usesSwitch (gbs code)  `shouldBe` True
-  
+
     it "is False when not present in function" $ do
       --  code = "function f(x){return (1)}"
       let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": 1,  \"arity\": \"literal\"}}\r\n]"
@@ -120,7 +121,7 @@ spec = do
       -- code = "function f(){repeat(2){} return (x)}"
       let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \"repeat\",\r\n        \"expression\": {\r\n          \"value\": 2,\r\n          \"arity\": \"literal\"\r\n        },\r\n        \"body\": null\r\n      }\r\n    ],\r\n    \"return\": {\r\n      \"value\": \"x\",\r\n      \"arity\": \"name\"\r\n    }\r\n  }\r\n]"
       usesRepeat (gbs code)  `shouldBe` True
-  
+
     it "is False when not present in function" $ do
       -- code = "function f(x){return (1)}"
       let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": 1,  \"arity\": \"literal\"}}\r\n]"
@@ -140,7 +141,7 @@ spec = do
       let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [],\r\n    \"return\": {\r\n      \"alias\": \"functionCall\",\r\n      \"name\": \"m\",\r\n      \"parameters\": [\r\n        {\r\n          \"alias\": \"functionCall\",\r\n          \"name\": \"x\",\r\n          \"parameters\": []\r\n        }\r\n      ]\r\n    }\r\n  }\r\n]"
       uses (named "x") (gbs code)  `shouldBe` True
 
-    it "is True through function application in function" $ do 
+    it "is True through function application in function" $ do
       --  code = "procedure G(){ M()} procedure F(x){ G() }"
       let code = "[\r\n  {\r\n    \"value\": \"G\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"G\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"arity\": \"routine\",\r\n        \"alias\": \"ProcedureCall\",\r\n        \"name\": \"M\",\r\n        \"parameters\": []\r\n      }\r\n    ]\r\n  },\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [\r\n      {\r\n        \"value\": \"x\",\r\n        \"arity\": \"name\"\r\n      }\r\n    ],\r\n    \"body\": [\r\n      {\r\n        \"arity\": \"routine\",\r\n        \"alias\": \"ProcedureCall\",\r\n        \"name\": \"G\",\r\n        \"parameters\": []\r\n      }\r\n    ]\r\n  }\r\n]"
       transitive (uses (named "M")) "F" (gbs code) `shouldBe` True

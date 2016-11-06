@@ -162,6 +162,7 @@ convertVariableAssignmentToDeclaration :: Expression ->Expression
 convertVariableAssignmentToDeclaration (Sequence xs) = Sequence (convertListWithMap xs HashMap.empty)
 convertVariableAssignmentToDeclaration x = head (convertListWithMap [x] HashMap.empty)
 
+convertListWithMap :: [Expression] -> HashMap Identifier Identifier-> [Expression]
 convertListWithMap [] _ = []
 convertListWithMap (a@(VariableAssignment _ _):xs) hashMap = let (v,newMap) =  convertVariable a hashMap in  v : (convertListWithMap xs newMap)
 convertListWithMap (f@(FunctionDeclaration _ _):xs) hashMap                 =  (convertVariablesInFunctionOrProcedure f HashMap.empty) : (convertListWithMap xs hashMap)

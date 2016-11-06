@@ -35,6 +35,12 @@ spec = do
     it "simple function declaration" $ do
       hs "f x = 1" `shouldBe` js "function f(x) { return 1 }"
 
+    it "simple procedure declaration" $ do
+      js "function f(x) { console.log('fruit') }" `shouldBe` (
+                ProcedureDeclaration
+                    "f"
+                    [Equation [VariablePattern "x"] (UnguardedBody (Send (Variable "console") (Variable "log") [MuString "fruit"]))])
+
     it "multiple params function declaration" $ do
       hs "f x y = 1" `shouldBe` js "function f(x, y) { return 1 }"
 
