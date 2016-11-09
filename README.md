@@ -216,7 +216,16 @@ Important:  cabal version must be **higher than 1.18**. Otherwise, sandboxes won
 
 ### Before start
 
-**The first time**, you need to install [ghc 7.10.3](https://www.haskell.org/ghc/), [alex](https://www.haskell.org/alex/) and [happy](https://www.haskell.org/happy/), two executables that Mulang uses:
+## Installing Haskell
+
+```bash
+sudo apt-get install ghc cabal-install
+cabal update
+cabal install hspec
+```
+
+You will need to install [ghc 7.10.3](https://www.haskell.org/ghc/), [alex](https://www.haskell.org/alex/) and [happy](https://www.haskell.org/happy/), two executables that Mulang uses:
+
 ```
 sudo apt-get install alex
 sudo apt-get install happy
