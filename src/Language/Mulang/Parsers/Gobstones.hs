@@ -1,6 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Language.Mulang.Parsers.Gobstones (gbs, parseGobstones) where
+module Language.Mulang.Parsers.Gobstones (
+    gbs,
+    gba,
+    parseGobstones,
+    parseGobstonesAst) where
 
 import            Language.Mulang
 import            Language.Mulang.Builder as Builder
@@ -21,6 +25,9 @@ import  qualified Data.Vector as V
 
 import            Control.Applicative
 import            GHC.Generics ()
+
+import            System.Process (readProcessWithExitCode)
+import            System.IO.Unsafe (unsafePerformIO)
 
 type JsonParser a = Value ->  Data.Aeson.Types.Parser a
 
@@ -200,8 +207,18 @@ convertVariablesInEquation (Equation xs (UnguardedBody e)) = Equation xs (Unguar
 
 ------------------------------------------------
 
+gba :: Parser
+gba  = fromJust . parseGobstonesAst
+
+parseGobstonesAst :: MaybeParser
+parseGobstonesAst = decode . LBS.pack
+
 gbs :: Parser
 gbs  = fromJust . parseGobstones
 
 parseGobstones :: MaybeParser
-parseGobstones = decode . LBS.pack
+parseGobstones = parseGobstonesAst . gobstonesToAst
+
+gobstonesToAst :: String -> String
+gobstonesToAst = result . unsafePerformIO . readProcessWithExitCode "node" ["gobstones-parser.js"]
+                where result (_, out, _) = out
