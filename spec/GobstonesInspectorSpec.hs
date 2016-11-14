@@ -4,7 +4,6 @@ import           Test.Hspec
 import           Language.Mulang.Inspector
 import           Language.Mulang.Inspector.Combiner
 import           Language.Mulang.Parsers.Gobstones
-import           Language.Mulang.Inspector.CodeDuplication
 
 spec :: Spec
 spec = do
