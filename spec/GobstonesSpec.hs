@@ -9,24 +9,16 @@ spec = do
 
 describe "gobstones" $ do
     it "translates simple Gobstones program" $ do
-      let code = gbs "program {}"
-
-      code `shouldBe` EntryPoint MuNull
+      (gbs "program {}") `shouldBe` EntryPoint MuNull
 
     it "translates null Gobstones program" $ do
-      let code =  gba "null"
-
-      code `shouldBe` MuNull
+      (gba "null") `shouldBe` MuNull
 
     it "translates simple procedure Call" $ do
-      let code = gbs "program{F()}"
-
-      code `shouldBe` EntryPoint (Application (Variable "F") [])
+      (gbs "program{F()}") `shouldBe` EntryPoint (Application (Variable "F") [])
 
     it "translates simple procedure declaration " $ do
-      let code = gbs "procedure F(){}"
-
-      code `shouldBe` ProcedureDeclaration "F" [Equation [] (UnguardedBody MuNull)]
+      (gbs "procedure F(){}") `shouldBe` ProcedureDeclaration "F" [Equation [] (UnguardedBody MuNull)]
 
     it "translates simple procedure declaration with a param" $ do
       let code = gbs "program{F()} procedure F(parameter){}"

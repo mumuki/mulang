@@ -22,19 +22,19 @@ spec = do
   describe "declaresProcedure" $ do
     describe "with procedure declarations" $ do
       it "is True when procedure is declared" $ do
-        --  code = "procedure F(){}"
-        let code = "[\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": null\r\n  }\r\n]"
-        declaresProcedure (named "F") (gba code) `shouldBe` True
+        let code = "procedure F(){}"
+
+        declaresProcedure (named "F") (gbs code) `shouldBe` True
 
       it "is True when any procedures is declared" $ do
-        --  code = "procedure F(){}"
-        let code = "[\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": null\r\n  }\r\n]"
-        declaresProcedure anyone (gba code) `shouldBe` True
+        let code = "procedure F(){}"
+
+        declaresProcedure anyone (gbs code) `shouldBe` True
 
       it "is False when procedures is not declared" $ do
-        --  code = "procedure F(){}"
-        let code = "[\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": null\r\n  }\r\n]"
-        declaresProcedure (named "G") (gba code) `shouldBe` False
+        let code = "procedure F(){}"
+
+        declaresProcedure (named "G") (gbs code) `shouldBe` False
 
   describe "declaresFunction" $ do
     describe "with function declarations" $ do
