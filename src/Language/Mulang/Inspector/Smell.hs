@@ -8,6 +8,7 @@ module Language.Mulang.Inspector.Smell (
   hasAssignmentReturn,
   doesNullTest,
   doesTypeTest,
+  isLongCode,
   returnsNull) where
 
 import Language.Mulang
@@ -27,6 +28,11 @@ doesTypeTest :: Inspection
 doesTypeTest = compares f
   where f (MuString _) = True
         f _            = False
+
+isLongCode :: Inspection
+isLongCode = containsExpression f
+  where f (Sequence xs)  = (length xs) >= 16
+        f  _             = False
 
 compares :: (Expression -> Bool) -> Inspection
 compares f = containsExpression (any f.comparisonOperands)
