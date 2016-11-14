@@ -1,7 +1,16 @@
 var gbs = require('gs-weblang-core/umd/index.umd.min');
 
+function replacer(key,value) {
+  if (key == "scope") return undefined;
+  else if (key == "token") return undefined;
+  else if (key == "interpret") return undefined;
+  else if (key == "range") return undefined;
+  else if (key == "eval") return undefined;
+  else return value;
+}
+
 function parse(sourceCode) {
-    return gbs.parseProgram(sourceCode);
+  return gbs.parseProgram(sourceCode);
 }
 
 function withCode(action) {
@@ -19,5 +28,5 @@ function withCode(action) {
 }
 
 withCode(code => {
-  console.log(JSON.stringify(parse(code)))
+  console.log(JSON.stringify(parse(code), replacer))
 })
