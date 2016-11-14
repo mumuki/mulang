@@ -35,6 +35,7 @@ instance FromJSON Expression where
     parseJSON  =  parseBodyExpression
 
 parseBodyExpression :: JsonParser Expression
+parseBodyExpression (Array list) | (V.null list) = pure MuNull
 parseBodyExpression (Array list) = Builder.normalize . simplify . Sequence . toList <$> traverse parseNodes list
 parseBodyExpression Null         = pure MuNull
 parseBodyExpression _            = fail "Failed to parse Expression!"
