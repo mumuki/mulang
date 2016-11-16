@@ -10,7 +10,7 @@ function replacer(key,value) {
 }
 
 function parse(sourceCode) {
-  return gbs.parseProgram(sourceCode);
+  return gbs.getParser().parseProgram(sourceCode);
 }
 
 function withCode(action) {
