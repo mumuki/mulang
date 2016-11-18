@@ -92,7 +92,7 @@ parseSimpleValue (Object value) = parseSimpleExpressionValue (HashMap.lookup "al
 
 
 parseBinaryValue :: JsonParser Expression
-parseBinaryValue (Object value) = Application <$> (evaluatedFunction <$> (lookupAndParseExpression parseNameExpression "value" value)) <*> ((\x y -> [x,y]) <$> (expressionValue  "left" value) <*> (expressionValue "right" value))
+parseBinaryValue (Object value) = Application <$> (evaluatedFunction <$> (lookupAndParseExpression parseNameExpression "alias" value)) <*> ((\x y -> [x,y]) <$> (expressionValue  "left" value) <*> (expressionValue "right" value))
 
 
 
@@ -106,14 +106,15 @@ lookupAndParseExpression parseFunction string = parseFunction . lookUpValue stri
 
 
 parseVariableName :: JsonParser String
-parseVariableName (Object value) =  parseNameExpression . lookUpValue "id" $ value
+parseVariableName (Object value) =  parseNameExpression . lookUpValue "value" $ value
 
 
 variableName = lookupAndParseExpression parseVariableName "left"
 
-evaluatedFunction "==" = Equal
-evaluatedFunction "!=" = NotEqual
-evaluatedFunction  fun = Variable fun
+evaluatedFunction "EqOperation"       = Equal
+evaluatedFunction "NotEqualOperation" = NotEqual
+evaluatedFunction "AndOperation"      = Variable "&&"
+evaluatedFunction  fun                = Variable fun
 
 parseExpression :: JsonParser Expression
 parseExpression value = switchParser $ value
@@ -137,10 +138,10 @@ parseToken "procedureDeclaration" value   = ProcedureDeclaration <$> (lookupAndP
 parseToken "ProcedureCall" value          = Application <$> (evaluatedFunction <$> (lookupAndParseExpression parseNameExpression "name" value)) <*> (lookupAndParseExpression (mapObjectArray parseExpression) "parameters" value)
 parseToken ":=" value                     = VariableAssignment <$> (variableName value) <*> (expressionValue "right" value)
 parseToken "functionDeclaration" value    = FunctionDeclaration <$> (lookupAndParseExpression parseNameExpression "name" value) <*> (return <$> (Equation <$> (lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value) <*> (UnguardedBody <$> (addReturn <$> (lookupAndParseExpression  parseBodyExpression "body" value) <*> (expressionValue "return" value)))))
-parseToken "conditional" value            = If <$> (expressionValue "condition" value) <*> (lookupAndParseExpression parseBodyExpression "left" value) <*> (lookupAndParseExpression parseBodyExpression "right" value)
+parseToken "if" value                     = If <$> (expressionValue "condition" value) <*> (lookupAndParseExpression parseBodyExpression "trueBranch" value) <*> (lookupAndParseExpression parseBodyExpression "falseBranch" value)
 parseToken "while" value                  = parseRepetitionFunction While value
 parseToken "repeat" value                 = parseRepetitionFunction Repeat value
-parseToken "switch" value                 = Switch <$> (expressionValue "value" value) <*> (lookupAndParseExpression (mapObjectArray parseCaseValue) "cases" value)
+parseToken "switch" value                 = Switch <$> (expressionValue "expression" value) <*> (lookupAndParseExpression (mapObjectArray parseCaseValue) "cases" value)
 parseToken "return" value                 = Return <$> (expressionValue "expression" value)
 parseToken "Drop" value                   = parsePrimitive "Poner" value
 parseToken "Grab" value                   = parsePrimitive "Sacar" value
