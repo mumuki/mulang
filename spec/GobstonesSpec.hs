@@ -40,24 +40,22 @@ describe "gobstones" $ do
 
       code `shouldBe` EntryPoint (Application (Variable "Sacar") [MuSymbol "Verde"])
 
-{--
-
     it "translates simple procedure Application " $ do
       let code = gbs "program{Mover(Este)}"
       -- code =  gba "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"MoveClaw\" , \"parameters\" : [{\"value\" : [1,0], \"arity\" : \"literal\" , \"reserved\" : true}] }],\"from\": 0}]"
 
       code `shouldBe` EntryPoint (Application (Variable "Mover") [MuSymbol "Este"])
-
+      
     it "translates simple function declaration" $ do
-      let code = gbs "function f(){return (2)}"
+      let code = gbs "function f(){return (Verde)}"
 
-      code `shouldBe` FunctionDeclaration "f" [Equation [] (UnguardedBody (Return (MuNumber 2.0)))]
+      code `shouldBe` FunctionDeclaration "f" [Equation [] (UnguardedBody (Sequence [MuNull,Return (MuSymbol "Verde")]))]
 
     it "translates simple function declaration" $ do
       let  code = gbs "function f(parameter){return (2)}"
 
-      code `shouldBe` FunctionDeclaration "f" [Equation [VariablePattern "parameter"] (UnguardedBody (Return (MuNumber 2.0)))]
---}
+      code `shouldBe` FunctionDeclaration "f" [Equation [VariablePattern "parameter"] (UnguardedBody (Sequence [MuNull,Return (MuNumber 2.0)]))]
+
     it "translates simple variable assignment" $ do
       let code = gbs "program{x:= 1}"
 
@@ -96,8 +94,12 @@ describe "gobstones" $ do
       code `shouldBe` EntryPoint (VariableDeclaration "x" (Application (Variable "&&") [Variable "z",Variable "y"]))
 
     it "translates simple variable assignment" $ do
+      let code = gbs "program{x:= not z}"
+
+      code `shouldBe` EntryPoint (VariableDeclaration "x" (Application (Variable "not") [Variable "z"]))
+
+    it "translates simple variable assignment" $ do
       let code = gbs "program{x := True == 2 && x /= t}"
-      --let code = gba "[{\"alias\": \"program\",\"body\": [{\"alias\" : \":=\",\"arity\" : \"binary\", \"variable\" : {\"from\" : 13, \"row\" : 1,\"to\" : 14, \"value\" : \"x\", \"arity\" : \"name\"}, \"expression\" : {\"from\" : 18, \"row\" : 1,\"to\" : 19, \"value\" : \"&&\" , \"arity\" : \"binary\",\"left\" : {\"value\" : \"==\" , \"arity\" : \"binary\", \"left\" : {\"value\" : true , \"arity\" : \"literal\" , \"reserved\" : true } , \"right\" : {\"value\" : 2 , \"arity\" : \"literal\"} } , \"right\" : {\"value\" : \"!=\" , \"arity\" : \"binary\" , \"left\" : {\"value\" : \"x\" , \"arity\" : \"name\"},\"right\" : {\"value\" : \"t\" , \"arity\" : \"name\"} }}, \"assignment\" : true, \"from\" : 13,\"to\" : 20 }],\"from\": 0}]"
 
       code `shouldBe`  EntryPoint (VariableDeclaration "x" (Application (Variable "&&") [Application Equal [MuBool True,MuNumber 2.0],Application NotEqual [Variable "x",Variable "t"]]))
 
@@ -120,7 +122,6 @@ describe "gobstones" $ do
       let code = gbs "program{F(Verde)} procedure F(parameter){}"
 
       code `shouldBe` Sequence [EntryPoint (Application (Variable "F") [MuSymbol "Verde"]),ProcedureDeclaration "F" [Equation [VariablePattern "parameter"] (UnguardedBody MuNull)]]
-
 
     it "translates conditional declaration" $ do
       let code = gbs "program{if(True){}}"
@@ -149,7 +150,6 @@ describe "gobstones" $ do
 
     it "translates repeat declaration" $ do
       let code = gbs "program{repeat(2){x := 2}}"
-      --let code =  gba "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"repeat\",\"expression\" : {\"value\" : 2,\"arity\" : \"literal\"}, \"body\" : [{ \"alias\" : \":=\",\"arity\" : \"binary\",\"variable\" : {\"value\" : \"x\", \"arity\" : \"name\"},\"expression\" : {\"value\" : 2 ,\"arity\" : \"literal\" } }] }],\"from\": 0}]"
 
       code `shouldBe`  EntryPoint (Repeat (MuNumber 2.0) (VariableDeclaration "x" (MuNumber 2.0)))
 {--
