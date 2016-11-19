@@ -6,6 +6,7 @@ function replacer(key,value) {
   else if (key == "interpret") return undefined;
   else if (key == "range") return undefined;
   else if (key == "eval") return undefined;
+  else if (key == "type") return undefined;
   else return value;
 }
 
