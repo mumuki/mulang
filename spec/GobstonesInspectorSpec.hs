@@ -141,17 +141,17 @@ spec = do
       uses (named "x") code  `shouldBe` True
 
     it "is True through function application in function" $ do
-      let code = gbs "procedure G(){ M()} procedure F(x){ G() }"
+      let code = gbs "procedure F(x){ G() } procedure G(){ M()} "
       
       transitive (uses (named "M")) "F" code `shouldBe` True
 
     it "is True through function application in function" $ do
-      let code = gbs "procedure G(p) { M() } procedure F(x) { G(2) }"
+      let code = gbs "procedure F(x) { G(2) } procedure G(p) { M() }"
       
       transitive (uses (named "M")) "F" code `shouldBe` True
 
     it "is False through function application in function" $ do
-      let code = gbs "procedure G(){} procedure F(x){ G() }"
+      let code = gbs "procedure F(x){ G() } procedure G(){}"
       
       transitive (uses (named "M")) "F" code `shouldBe` False
 
