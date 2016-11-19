@@ -10,163 +10,163 @@ spec = do
   describe "declaresEntryPoint" $ do
     describe "with program declarations" $ do
       it "is True when program is declared" $ do
-        --  code = "program{ Poner(Verde) }"
-        let code = "[{\"alias\": \"program\",\"body\": [{\"alias\" : \"PutStone\" , \"parameters\" : [{\"value\" : 3, \"arity\" : \"literal\" , \"reserved\" : true}] }],\"from\": 0}]"
-        declaresEntryPoint anyone (gba code) `shouldBe` True
+        let code = gbs "program{ Poner(Verde) }"
+      
+        declaresEntryPoint anyone code `shouldBe` True
 
       it "is False when program is not declared" $ do
-        --  code = "procedure F(){}"
-        let code = "[\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": null\r\n  }\r\n]"
-        declaresEntryPoint anyone (gba code) `shouldBe` False
+        let code = gbs "procedure F(){}"
+      
+        declaresEntryPoint anyone code `shouldBe` False
 
   describe "declaresProcedure" $ do
     describe "with procedure declarations" $ do
       it "is True when procedure is declared" $ do
-        let code = "procedure F(){}"
+        let code =  gbs "procedure F(){}"
 
-        declaresProcedure (named "F") (gbs code) `shouldBe` True
+        declaresProcedure (named "F") code `shouldBe` True
 
       it "is True when any procedures is declared" $ do
-        let code = "procedure F(){}"
+        let code = gbs "procedure F(){}"
 
-        declaresProcedure anyone (gbs code) `shouldBe` True
+        declaresProcedure anyone code `shouldBe` True
 
       it "is False when procedures is not declared" $ do
-        let code = "procedure F(){}"
+        let code = gbs "procedure F(){}"
 
-        declaresProcedure (named "G") (gbs code) `shouldBe` False
+        declaresProcedure (named "G") code `shouldBe` False
 
   describe "declaresFunction" $ do
     describe "with function declarations" $ do
       it "is True when functions is declared" $ do
-        --  code = "function f(){return (1)}"
-        let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": 1,  \"arity\": \"literal\"}}\r\n]"
-        declaresFunction (named "f") (gba code) `shouldBe` True
+        let code = gbs "function f(){return (1)}"
+        
+        declaresFunction (named "f") code `shouldBe` True
 
       it "is True when any functions is declared" $ do
-        --  code = "function f(){return (1)}"
-        let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": 1,  \"arity\": \"literal\"}}\r\n]"
-        declaresFunction anyone (gba code) `shouldBe` True
+        let code = gbs "function f(){return (1)}"
+        
+        declaresFunction anyone code `shouldBe` True
 
       it "is False when functions is not declared" $ do
-        --  code = "function f(){return (1)}"
-        let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": 1,  \"arity\": \"literal\"}}\r\n]"
-        declaresFunction (named "g") (gba code) `shouldBe` False
+        let code = gbs "function f(){return (1)}"
+        
+        declaresFunction (named "g") code `shouldBe` False
 
     describe "with variables" $ do
       it "is False when constant is declared with a non lambda literal" $ do
-        --  code = "program { f := 2}"
-        let code = "[{\"alias\": \"program\",\"body\": [  {    \"alias\": \":=\",\"arity\": \"binary\",\"variable\": {      \"value\": \"f\",      \"arity\": \"name\"    },\"expression\": {      \"value\": 2,      \"arity\": \"literal\"    }  }]}\r\n]"
-        declaresFunction (named "f") (gba code) `shouldBe` False
+        let code = gbs "program { f := 2}"
+        
+        declaresFunction (named "f") code `shouldBe` False
 
       it "is False when constant is declared with a number literal" $ do
-        --  code = "program {f := 3}"
-        let code = "[{\"alias\": \"program\",\"body\": [  {    \"alias\": \":=\",\"arity\": \"binary\",\"variable\": {      \"value\": \"f\",      \"arity\": \"name\"    },\"expression\": {      \"value\": 3,      \"arity\": \"literal\"    }  }]}\r\n]"
-        declaresFunction  (named "f") (gba code) `shouldBe` False
+        let code = gbs "program {f := 3}"
+        
+        declaresFunction  (named "f") code `shouldBe` False
 
   describe "declaresComputationWithExactArity" $ do
     describe "with function declarations" $ do
       it "is True when function is declared with the given arity" $ do
-        --  code = "function f(x){return (x+1)}"
-        let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": \"+\",  \"arity\": \"binary\",  \"left\": {    \"value\": \"x\",\"arity\": \"name\"  },  \"right\": {    \"value\": 1,\"arity\": \"literal\"  }}}\r\n]"
-        (declaresComputationWithExactArity 1) (named "f") (gba code) `shouldBe` True
+        let code = gbs "function f(x){return (x+1)}"
+        
+        (declaresComputationWithExactArity 1) (named "f") code `shouldBe` True
 
       it "is False when function is declared with another arity" $ do
-        --  code = "function f(x){return (x+1)}"
-        let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": \"+\",  \"arity\": \"binary\",  \"left\": {    \"value\": \"x\",\"arity\": \"name\"  },  \"right\": {    \"value\": 1,\"arity\": \"literal\"  }}}\r\n]"
-        (declaresComputationWithExactArity 2) (named "f") (gba code) `shouldBe` False
+        let code = gbs "function f(x){return (x+1)}"
+        
+        (declaresComputationWithExactArity 2) (named "f") code `shouldBe` False
 
     describe "with constant declaration" $ do
       it "is True when constant is declared with lambda of given arity" $ do
-        --  code = "function f(x,y){return (x+y)}"
-        let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  },  {    \"value\": \"y\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": \"+\",  \"arity\": \"binary\",  \"left\": {    \"value\": \"x\",\"arity\": \"name\"  },  \"right\": {    \"value\": \"y\",\"arity\": \"name\"  }}}\r\n]"
-        (declaresComputationWithExactArity 2) (named "f") (gba code) `shouldBe` True
+        let code = gbs "function f(x,y){return (x+y)}"
+        
+        (declaresComputationWithExactArity 2) (named "f") code `shouldBe` True
 
   describe "usesWhile" $ do
     it "is True when present in function" $ do
-      -- code = "function f(){while(True){} return (x)}"
-      let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [],\"body\": [  {    \"alias\": \"while\",\"expression\": {      \"value\": true,      \"arity\": \"literal\",      \"reserved\": true    },\"body\": null  }],\"return\": {  \"value\": \"x\",  \"arity\": \"name\"}}\r\n]"
-      usesWhile (gba code)  `shouldBe` True
+      let code = gbs "function f(){while(True){} return (x)}"
+      
+      usesWhile code  `shouldBe` True
 
     it "is False when not present in function" $ do
-      -- code = "function f(x){return (1)}"
-      let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": 1,  \"arity\": \"literal\"}}\r\n]"
-      usesWhile (gba code)  `shouldBe` False
+      let code = gbs "function f(x){return (1)}"
+    
+      usesWhile code  `shouldBe` False
 
   describe "usesIf" $ do
     it "is True when present in function" $ do
-      -- code = "function f(){if(True){}else{} return (x)}"
-      let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \"conditional\",\r\n        \"condition\": {\r\n          \"value\": true,\r\n          \"arity\": \"literal\",\r\n          \"reserved\": true\r\n        },\r\n        \"left\": null,\r\n        \"right\": null\r\n      }\r\n    ],\r\n    \"return\": {\r\n      \"value\": \"x\",\r\n      \"arity\": \"name\"\r\n    }\r\n  }\r\n]"
-      usesIf (gba code)  `shouldBe` True
+      let code = gbs "function f(){if(True){}else{} return (x)}"
+      
+      usesIf code  `shouldBe` True
 
     it "is False when not present in function" $ do
-      --  code = "function f(x){return (1)}"
-      let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": 1,  \"arity\": \"literal\"}}\r\n]"
-      usesIf (gba code)  `shouldBe` False
+      let code = gbs "function f(x){return (1)}"
+      
+      usesIf code  `shouldBe` False
 
   describe "usesSwitch" $ do
     it "is True when present in function" $ do
-      --  code = "function f(x) {switch (2) to { 2 -> {x := 2}} return (x)}"
-      let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [\r\n      {\r\n        \"value\": \"x\",\r\n        \"arity\": \"name\"\r\n      }\r\n    ],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \"switch\",\r\n        \"value\": {\r\n          \"value\": 2,\r\n          \"arity\": \"literal\"\r\n        },\r\n        \"cases\": [\r\n          {\r\n            \"case\": {\r\n              \"value\": 2,\r\n              \"arity\": \"literal\"\r\n            },\r\n            \"body\": [\r\n              {\r\n                \"alias\": \":=\",\r\n                \"arity\": \"binary\",\r\n                \"variable\": {\r\n                  \"value\": \"x\",\r\n                  \"arity\": \"name\"\r\n                },\r\n                \"expression\": {\r\n                  \"value\": 2,\r\n                  \"arity\": \"literal\"\r\n                }\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      }\r\n    ],\r\n    \"return\": {\r\n      \"value\": \"x\",\r\n      \"arity\": \"name\"\r\n    }\r\n  }\r\n]"
-      usesSwitch (gba code)  `shouldBe` True
+      let code = gbs "function f(x) {switch (2) to { 2 -> {x := 2}} return (x)}"
+      
+      usesSwitch code  `shouldBe` True
 
     it "is False when not present in function" $ do
-      --  code = "function f(x){return (1)}"
-      let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": 1,  \"arity\": \"literal\"}}\r\n]"
-      usesSwitch (gba code)  `shouldBe` False
+      let code = gbs "function f(x){return (1)}"
+      
+      usesSwitch code  `shouldBe` False
 
   describe "usesRepeat" $ do
     it "is True when present in function" $ do
-      -- code = "function f(){repeat(2){} return (x)}"
-      let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \"repeat\",\r\n        \"expression\": {\r\n          \"value\": 2,\r\n          \"arity\": \"literal\"\r\n        },\r\n        \"body\": null\r\n      }\r\n    ],\r\n    \"return\": {\r\n      \"value\": \"x\",\r\n      \"arity\": \"name\"\r\n    }\r\n  }\r\n]"
-      usesRepeat (gba code)  `shouldBe` True
+      let code = gbs "function f(){repeat(2){} return (x)}"
+      
+      usesRepeat code  `shouldBe` True
 
     it "is False when not present in function" $ do
-      -- code = "function f(x){return (1)}"
-      let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [],\"return\": {  \"value\": 1,  \"arity\": \"literal\"}}\r\n]"
-      usesRepeat (gba code)  `shouldBe` False
+      let code = gbs "function f(x){return (1)}"
+      
+      usesRepeat code  `shouldBe` False
 
   describe "uses" $ do
     it "is True when function application is used within function" $ do
-      --  code = "function f() { return (m()) }"
-      let code = "[{\"value\": \"f\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"f\",\"alias\": \"functionDeclaration\",\"parameters\": [],\"body\": [],\"return\": {  \"alias\": \"functionCall\",  \"name\": \"m\",  \"parameters\": []}}\r\n]"
-      uses (named "m")  (gba code)  `shouldBe` True
+      let code = gbs "function f() { return (m()) }"
+      
+      uses (named "m") code  `shouldBe` True
 
-      --  code = "procedure F() { M() }"
-      let code = "[{\"value\": \"F\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"F\",\"alias\": \"procedureDeclaration\",\"parameters\": [],\"body\": [  {    \"arity\": \"routine\",\"alias\": \"ProcedureCall\",\"name\": \"M\",\"parameters\": []  }]}\r\n]\r\n\r\n"
-      uses (named "M")  (gba code)  `shouldBe` True
+      let code = gbs "procedure F() { M() }"
+      
+      uses (named "M")  code  `shouldBe` True
 
-      -- code = "function f(){ return (m(x()))}"
-      let code = "[\r\n  {\r\n    \"value\": \"f\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"f\",\r\n    \"alias\": \"functionDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [],\r\n    \"return\": {\r\n      \"alias\": \"functionCall\",\r\n      \"name\": \"m\",\r\n      \"parameters\": [\r\n        {\r\n          \"alias\": \"functionCall\",\r\n          \"name\": \"x\",\r\n          \"parameters\": []\r\n        }\r\n      ]\r\n    }\r\n  }\r\n]"
-      uses (named "x") (gba code)  `shouldBe` True
-
-    it "is True through function application in function" $ do
-      --  code = "procedure G(){ M()} procedure F(x){ G() }"
-      let code = "[\r\n  {\r\n    \"value\": \"G\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"G\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"arity\": \"routine\",\r\n        \"alias\": \"ProcedureCall\",\r\n        \"name\": \"M\",\r\n        \"parameters\": []\r\n      }\r\n    ]\r\n  },\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [\r\n      {\r\n        \"value\": \"x\",\r\n        \"arity\": \"name\"\r\n      }\r\n    ],\r\n    \"body\": [\r\n      {\r\n        \"arity\": \"routine\",\r\n        \"alias\": \"ProcedureCall\",\r\n        \"name\": \"G\",\r\n        \"parameters\": []\r\n      }\r\n    ]\r\n  }\r\n]"
-      transitive (uses (named "M")) "F" (gba code) `shouldBe` True
+      let code = gbs "function f(){ return (m(x()))}"
+      
+      uses (named "x") code  `shouldBe` True
 
     it "is True through function application in function" $ do
-      --  code = "procedure G(p) { M() } procedure F(x) { G(2) }"
-      let code = "[\r\n  {\r\n    \"value\": \"G\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"G\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [\r\n      {\r\n        \"value\": \"p\",\r\n        \"arity\": \"name\"\r\n      }\r\n    ],\r\n    \"body\": [\r\n      {\r\n        \"arity\": \"routine\",\r\n        \"alias\": \"ProcedureCall\",\r\n        \"name\": \"M\",\r\n        \"parameters\": []\r\n      }\r\n    ]\r\n  },\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [\r\n      {\r\n        \"value\": \"x\",\r\n        \"arity\": \"name\"\r\n      }\r\n    ],\r\n    \"body\": [\r\n      {\r\n        \"arity\": \"routine\",\r\n        \"alias\": \"ProcedureCall\",\r\n        \"name\": \"G\",\r\n        \"parameters\": [\r\n          {\r\n            \"value\": 2,\r\n            \"arity\": \"literal\"\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n]"
-      transitive (uses (named "M")) "F" (gba code) `shouldBe` True
+      let code = gbs "procedure G(){ M()} procedure F(x){ G() }"
+      
+      transitive (uses (named "M")) "F" code `shouldBe` True
+
+    it "is True through function application in function" $ do
+      let code = gbs "procedure G(p) { M() } procedure F(x) { G(2) }"
+      
+      transitive (uses (named "M")) "F" code `shouldBe` True
 
     it "is False through function application in function" $ do
-      --  code = "procedure G(){} procedure F(x){ G() }"
-      let code = "[{\"value\": \"G\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"G\",\"alias\": \"procedureDeclaration\",\"parameters\": [],\"body\": null},{\"value\": \"F\",\"arity\": \"routine\",\"reserved\": false,\"led\": null,\"lbp\": 0,\"name\": \"F\",\"alias\": \"procedureDeclaration\",\"parameters\": [  {    \"value\": \"x\",\"arity\": \"name\"  }],\"body\": [  {    \"arity\": \"routine\",\"alias\": \"ProcedureCall\",\"name\": \"G\",\"parameters\": []  }]}\r\n]"
-      transitive (uses (named "M")) "F" (gba code) `shouldBe` False
+      let code = gbs "procedure G(){} procedure F(x){ G() }"
+      
+      transitive (uses (named "M")) "F" code `shouldBe` False
 
   describe "declaresVariable" $ do
       it "is True when declare a variable" $ do
-        --  code = "procedure F(){ x := 2}"
-        let code = "[\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \":=\",\r\n        \"arity\": \"binary\",\r\n        \"variable\": {\r\n          \"value\": \"x\",\r\n          \"arity\": \"name\"\r\n        },\r\n        \"expression\": {\r\n          \"value\": 2,\r\n          \"arity\": \"literal\"\r\n        }\r\n      }\r\n    ]\r\n  }\r\n]"
-        declaresVariable (named "x") (gba code) `shouldBe` True
+        let code = gbs "procedure F(){ x := 2}"
+        
+        declaresVariable (named "x") code `shouldBe` True
 
       it "is True when any variable is declared" $ do
-        --  code = "procedure F(){ x := 2}"
-        let code = "[\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \":=\",\r\n        \"arity\": \"binary\",\r\n        \"variable\": {\r\n          \"value\": \"x\",\r\n          \"arity\": \"name\"\r\n        },\r\n        \"expression\": {\r\n          \"value\": 2,\r\n          \"arity\": \"literal\"\r\n        }\r\n      }\r\n    ]\r\n  }\r\n]"
-        declaresVariable anyone (gba code) `shouldBe` True
+        let code = gbs "procedure F(){ x := 2}"
+        
+        declaresVariable anyone code `shouldBe` True
 
       it "is False when variable is not declared" $ do
-        --  code = "procedure F(){ x := 2}"
-        let code = "[\r\n  {\r\n    \"value\": \"F\",\r\n    \"arity\": \"routine\",\r\n    \"reserved\": false,\r\n    \"led\": null,\r\n    \"lbp\": 0,\r\n    \"name\": \"F\",\r\n    \"alias\": \"procedureDeclaration\",\r\n    \"parameters\": [],\r\n    \"body\": [\r\n      {\r\n        \"alias\": \":=\",\r\n        \"arity\": \"binary\",\r\n        \"variable\": {\r\n          \"value\": \"x\",\r\n          \"arity\": \"name\"\r\n        },\r\n        \"expression\": {\r\n          \"value\": 2,\r\n          \"arity\": \"literal\"\r\n        }\r\n      }\r\n    ]\r\n  }\r\n]"
-        declaresVariable (named "y") (gba code) `shouldBe` False
+        let code = gbs "procedure F(){ x := 2}"
+        
+        declaresVariable (named "y") code `shouldBe` False
