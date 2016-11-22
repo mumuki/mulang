@@ -7,7 +7,7 @@ import qualified Data.Hashable as H (hash)
 import           Data.List (nub, subsequences)
 
 hasCodeDuplication :: Inspection
-hasCodeDuplication e =  hasDuplicates (map hash (filter (not . isLightweight) (concat $ stripesOf 2 e)))
+hasCodeDuplication e =  hasDuplicates $ map hash $ filter (not . isLightweight) $ concat $ stripesOf 2 e
 
 isLightweight :: Inspection
 isLightweight (MuNumber e)              = True
