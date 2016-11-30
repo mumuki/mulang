@@ -191,7 +191,7 @@ So in order to use it with a particular language, you have to:
 * either add explicit support in this repo, or
 * translate your language into one of the natively supported ones, or
 * translate your language to the Mulang JSON AST
-  
+
 ## Installing it
 
 Mulang is just a Haskell library. You can install it though cabal.
@@ -211,6 +211,21 @@ $ mulang '{"expectations":[{"tag":"Advanced","subject":["x"],"transitive":false,
 $ mulang '{"expectations":[{"tag":"Basic","binding":"x","inspection":"HasBinding"}],"code":{"content":"x = 1","language":"Haskell"}}'
 {"results":[{"result":true,"expectation":{"tag":"Basic","inspection":"HasBinding","binding":"x"}}],"smells":[]}
 ```
+
+  
+## Expectations and Smells  
+
+Mulang CLI can do two different kinds of analysis: 
+
+* **Expectation analysis**: you can provide an expression - called `inspection` - that will be tested against the provied program. Expectations answer questions like: _does the function X call the function Y?_ or _does the program use if's?_. It comes in two flavors: 
+     * **basic expectations**: are composed by a binding and an inspection 
+     * **advanced expectations**: are composed by
+       * subject
+       * verb
+       * object
+       * flags
+* **Smell analysis**: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched. 
+
 
 ## Building mulang from source
 
