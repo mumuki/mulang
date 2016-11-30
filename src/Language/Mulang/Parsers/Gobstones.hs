@@ -127,7 +127,7 @@ parseExpression value = switchParser $ value
       where switchParser | isJust maybeName = parseFunctionCall
                          | isBinary         = parseBinaryValue
                          | isNot            = parseNotValue
-                         | otherwise        = parseSimpleValue 
+                         | otherwise        = parseSimpleValue
 
             expression | (Object  v) <- value = v
 
@@ -220,7 +220,7 @@ convertBody a _ = a
 convertCases [] _                    = []
 convertCases ((e1,b1):cases) hashMap = (e1,convertBody b1 hashMap):convertCases cases hashMap
 
-convertVariablesInEquation (Equation xs (UnguardedBody e)) = Equation xs $ UnguardedBody (convertVariableAssignmentToDeclaration e) 
+convertVariablesInEquation (Equation xs (UnguardedBody e)) = Equation xs $ UnguardedBody (convertVariableAssignmentToDeclaration e)
 
 
 ------------------------------------------------
@@ -238,5 +238,5 @@ parseGobstones :: MaybeParser
 parseGobstones = parseGobstonesAst . gobstonesToAst
 
 gobstonesToAst :: String -> String
-gobstonesToAst = result . unsafePerformIO . readProcessWithExitCode "node" ["gobstones-parser.js"]
+gobstonesToAst = result . unsafePerformIO . readProcessWithExitCode "rungs" []
                 where result (_, out, _) = out
