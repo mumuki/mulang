@@ -176,18 +176,22 @@ But instead of asking one by one, we could use `detect` :wink: :
 
 _Which means that there are null returns within  `bar` and also within `foo`_
 
-And the really awesome is here: it works for every - yes, we said it - language on the world, because:
+## An universal tool
 
-  * Mulang natively support JS (ES5), so if your language compiles to clean JS, you are ready
-  * Mulang natively supports Haskell and Prolog, so... the same as before
-  * Mulang natively supports Json, so if you can generate a JSON AST for your language, you are done. And every language can :wink:
+The really awesome is here: it is an universal tool which can _potentially_ work with every programming language. it natively supports: 
 
-And we are extending Mulang everyday, so more expectations - that is, the queries you can do against Mulang - are being frequently added. And more languages are going to be supported natively. The pipelines contains the following:
+  * JS (ES5)
+  * Haskell
+  * Prolog
+  * Gobstones
+  * Mulang itself, expressed as a JSON AST. 
 
-  * C
-  * Java
-  * Python
+So in order to use it with a particular language, you have to:
 
+* either add explicit support in this repo, or
+* translate your language into one of the natively supported ones, or
+* translate your language to the Mulang JSON AST
+  
 ## Installing it
 
 Mulang is just a Haskell library. You can install it though cabal.
