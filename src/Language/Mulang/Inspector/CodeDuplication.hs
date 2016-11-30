@@ -51,8 +51,10 @@ equationUnguardedBody (Equation _ (UnguardedBody body)) = body
 
 
 positionalHash :: [Expression] -> Int
-positionalHash = sum . zipWith (\index expression -> (31^index) * hash expression) [1..] . reverse
-
+positionalHash = sum . zipWith hashElement [1..] . reverse
+        where
+          hashElement :: Int -> Expression -> Int
+          hashElement index expression = (31^index) * hash expression
 
 stripesOf :: Int -> Expression -> [[Expression]]
 stripesOf n = concatMap (makeStripes n) . expressionsOf

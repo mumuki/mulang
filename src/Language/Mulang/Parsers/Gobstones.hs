@@ -67,9 +67,11 @@ parseSimpleValue (Object value) = parseSimpleExpressionValue (HashMap.lookup "al
           parseSimpleExpressionValue _ s@(String _) = Variable <$> parseNameExpression s
           parseSimpleExpressionValue _ (Array direction) = MuSymbol <$> parseListToDirection direction
 
-          parseToColor = parseColor . Scientific.floatingOrInteger
+          parseToColor :: Scientific -> Data.Aeson.Types.Parser String
+          parseToColor = parseColor . scientificToInteger
 
-          parseColor (Right n) =  parseJSON . numberToColor $ n
+          parseColor :: Integer -> Data.Aeson.Types.Parser String
+          parseColor n =  parseJSON . numberToColor $ n
 
           numberToColor :: Integer -> Value
           numberToColor 0 = "Azul"
@@ -80,16 +82,21 @@ parseSimpleValue (Object value) = parseSimpleExpressionValue (HashMap.lookup "al
           parseListToDirection direction = let (Number n1, Number n2) = (V.head direction , V.last direction)
                                            in parseToDirection n1 n2
 
-          parseToDirection number1 number2 = parseDirection  (Scientific.floatingOrInteger number1 , Scientific.floatingOrInteger number2)
+          parseToDirection :: Scientific -> Scientific -> Data.Aeson.Types.Parser String
+          parseToDirection number1 number2 = parseDirection  (scientificToInteger number1 , scientificToInteger number2)
 
-          parseDirection ((Right n1),(Right n2)) = parseJSON . numbersToDirection $ (n1,n2)
+          parseDirection (n1 , n2) = parseJSON . numbersToDirection $ (n1,n2)
 
           numbersToDirection (1, 0)  = "Este"
           numbersToDirection (0, 1)  = "Norte"
           numbersToDirection (-1, 0) = "Oeste"
           numbersToDirection (0, -1) = "Sur"
 
-
+scientificToInteger :: Scientific -> Integer
+scientificToInteger = extractInteger . Scientific.floatingOrInteger
+          where extractInteger :: Either Double Integer -> Integer
+                extractInteger (Right i) = i
+                extractInteger (Left d)  = error $ "Tried to parse an integer, but a floting " ++ show d ++" was found"
 
 parseBinaryValue :: JsonParser Expression
 parseBinaryValue (Object value) = Application <$> evaluatedFunction <$> lookupAndParseExpression parseNameExpression "alias" value <*> ((\x y -> [x,y]) <$> expressionValue  "left" value <*> expressionValue "right" value)
@@ -147,6 +154,7 @@ convertReturn :: JsonParser Expression
 convertReturn (Object value) = expressionValue "expression" value
 
 
+parseToken :: Value -> Object -> Data.Aeson.Types.Parser Expression
 parseToken "program" value                = EntryPoint <$> lookupAndParseExpression parseBodyExpression "body" value
 parseToken "procedureDeclaration" value   = ProcedureDeclaration <$> lookupAndParseExpression parseNameExpression "name" value <*> return <$> (Equation <$> lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value <*> (UnguardedBody <$> lookupAndParseExpression  parseBodyExpression "body" value))
 parseToken "ProcedureCall" value          = Application <$> evaluatedFunction <$> lookupAndParseExpression parseNameExpression "name" value <*> lookupAndParseExpression (mapObjectArray parseExpression) "parameters" value
