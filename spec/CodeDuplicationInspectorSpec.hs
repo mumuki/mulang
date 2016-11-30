@@ -1,7 +1,6 @@
 module CodeDuplicationInspectorSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Inspector
 import           Language.Mulang.Inspector.CodeDuplication
 import           Language.Mulang.Parsers.JavaScript
 

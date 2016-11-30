@@ -1,10 +1,21 @@
 language: haskell
 before_install:
+- wget https://github.com/mumuki/rungs/releases/download/v0.0.1/rungs-ubuntu64 -O rungs
+- chmod u+x rungs
+- sudo mv rungs /usr/bin/rungs
 - cabal install alex
 install:
 - cabal install --only-dependencies --enable-tests --force-reinstalls
 script:
 - cabal configure --enable-tests && cabal build && ./dist/build/spec/spec
+env:
+  - CXX=g++-4.8
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
 deploy:
   provider: releases
   api_key:
