@@ -227,6 +227,7 @@ Mulang uses the `rungs` command to parse the Gobstones language - if you don't i
 
 ```
 wget https://github.com/mumuki/rungs/releases/download/v0.0.1/rungs-ubuntu64 -O rungs
+chmod u+x rungs
 sudo mv rungs /usr/bin/rungs
 ```
 
