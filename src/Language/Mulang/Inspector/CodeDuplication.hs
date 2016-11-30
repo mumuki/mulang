@@ -10,20 +10,20 @@ hasCodeDuplication :: Inspection
 hasCodeDuplication e =  hasDuplicates $ map hash $ filter (not . isLightweight) $ concat $ stripesOf 2 e
 
 isLightweight :: Inspection
-isLightweight (MuNumber e)              = True
-isLightweight (MuString e)              = True
-isLightweight (MuBool e)                = True
-isLightweight (Variable i)              = True
+isLightweight (MuNumber _)              = True
+isLightweight (MuString _)              = True
+isLightweight (MuBool _)                = True
+isLightweight (Variable _)              = True
 isLightweight MuNull                    = True
 isLightweight Equal                     = True
-isLightweight (Application i es)        = not $ any isApplication es
+isLightweight (Application _ es)        = not $ any isApplication es
 isLightweight (Return e)                = isLightweight e
-isLightweight (VariableAssignment i e)  = isLightweight e
-isLightweight (VariableDeclaration i e) = isLightweight e
+isLightweight (VariableAssignment _ e)  = isLightweight e
+isLightweight (VariableDeclaration _ e) = isLightweight e
 isLightweight _                         = False
 
-isApplication (Application i es) = True
-isApplication _                  = False
+isApplication (Application _ _) = True
+isApplication _                 = False
 
 
 hasDuplicates ::Eq a => [a] -> Bool
