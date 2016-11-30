@@ -40,8 +40,10 @@ executable mulang
   ghc-options:
     -Wall
     -fno-warn-missing-signatures
+    -fno-warn-unused-do-bind
     -fno-warn-orphans
     -fno-warn-name-shadowing
+    -fno-warn-incomplete-patterns
     -fwarn-tabs
     -funbox-strict-fields
     -threaded
@@ -51,11 +53,17 @@ library
   build-depends:       base >=4.6 && <=5
   default-language:    Haskell2010
   ghc-options:
-      -Wall
-      -fno-warn-missing-signatures
-      -fno-warn-orphans
-      -fno-warn-name-shadowing
-      -fno-warn-unused-do-bind
+    -Wall
+    -fno-warn-missing-signatures
+    -fno-warn-unused-do-bind
+    -fno-warn-orphans
+    -fno-warn-name-shadowing
+    -fno-warn-incomplete-patterns
+    -fwarn-tabs
+    -funbox-strict-fields
+    -threaded
+    -O2
+
   hs-source-dirs:
       src
   exposed-modules:
@@ -107,11 +115,16 @@ test-suite spec
   type:
       exitcode-stdio-1.0
   ghc-options:
-      -Wall
-      -fno-warn-missing-signatures
-      -fno-warn-orphans
-      -fno-warn-name-shadowing
-      -fno-warn-unused-do-bind
+    -Wall
+    -fno-warn-missing-signatures
+    -fno-warn-unused-do-bind
+    -fno-warn-orphans
+    -fno-warn-name-shadowing
+    -fno-warn-incomplete-patterns
+    -fwarn-tabs
+    -funbox-strict-fields
+    -threaded
+    -O2
   hs-source-dirs:
       spec
   main-is:
