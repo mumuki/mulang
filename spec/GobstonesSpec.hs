@@ -1,8 +1,8 @@
 module GobstonesSpec (spec) where
 
-import	Test.Hspec
-import	Language.Mulang
-import	Language.Mulang.Parsers.Gobstones
+import  Test.Hspec
+import  Language.Mulang
+import  Language.Mulang.Parsers.Gobstones
 
 spec :: Spec
 spec = do
@@ -159,8 +159,4 @@ describe "gobstones" $ do
       let code =  gbs "program{ x := 2 y := 3 x := 1 } function f () { x := 4 y := 6 z := 9 y := True return (x) } procedure P(){ x := 4 y := 6 z := 9 y := True }"
 
       code `shouldBe`  Sequence [EntryPoint (Sequence [VariableAssignment "x" (MuNumber 2.0),VariableAssignment "y" (MuNumber 3.0),VariableAssignment "x" (MuNumber 1.0)]),FunctionDeclaration "f" [Equation [] (UnguardedBody (Sequence [VariableAssignment "x" (MuNumber 4.0),VariableAssignment "y" (MuNumber 6.0),VariableAssignment "z" (MuNumber 9.0),VariableAssignment "y" (MuBool True),Return (Variable "x")]))],ProcedureDeclaration "P" [Equation [] (UnguardedBody (Sequence [VariableAssignment "x" (MuNumber 4.0),VariableAssignment "y" (MuNumber 6.0),VariableAssignment "z" (MuNumber 9.0),VariableAssignment "y" (MuBool True)]))]]
-
-
-
-
 
