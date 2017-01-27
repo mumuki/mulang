@@ -1,6 +1,6 @@
 language: haskell
 before_install:
-- wget https://github.com/mumuki/rungs/releases/download/v0.0.1/rungs-ubuntu64 -O gs-weblang-cli
+- wget https://github.com/gobstones/gs-weblang-cli/releases/download/v1.4.0/gs-weblang-cli-ubuntu64 -O gs-weblang-cli
 - chmod u+x gs-weblang-cli
 - sudo mv gs-weblang-cli /usr/bin/gs-weblang-cli
 - cabal install alex

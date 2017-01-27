@@ -245,7 +245,9 @@ sudo apt-get install happy
 Mulang uses the `gs-weblang-cli` command to parse the Gobstones language - if you don't install it, Gobstones tests will fail:
 
 ```
-sudo npm install -g gs-weblang-cli
+wget https://github.com/gobstones/gs-weblang-cli/releases/download/v1.4.0/gs-weblang-cli-ubuntu64 -O gs-weblang-cli
+chmod u+x gs-weblang-cli
+sudo mv rungs /usr/bin/gs-weblang-cli
 ```
 
 ### Before start
