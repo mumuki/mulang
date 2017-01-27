@@ -246,5 +246,5 @@ parseGobstones :: MaybeParser
 parseGobstones = parseGobstonesAst . gobstonesToAst
 
 gobstonesToAst :: String -> String
-gobstonesToAst = result . unsafePerformIO . readProcessWithExitCode "rungs" []
+gobstonesToAst = result . unsafePerformIO . readProcessWithExitCode "gs-weblang-cli" ["--ast", "--from_stdin"]
                 where result (_, out, _) = out
