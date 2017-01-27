@@ -1,6 +1,6 @@
 language: haskell
 before_install:
-- wget https://github.com/mumuki/rungs/releases/download/v0.0.1/rungs-ubuntu64 -O rungs
+- wget https://github.com/gobstones/gs-weblang-cli/releases/download/v1.3.3/rungs-ubuntu64 -O rungs
 - chmod u+x rungs
 - sudo mv rungs /usr/bin/rungs
 - cabal install alex
