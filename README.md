@@ -242,10 +242,10 @@ sudo apt-get install alex
 sudo apt-get install happy
 ```
 
-Mulang uses the `rungs` command to parse the Gobstones language - if you don't install it, Gobstones tests will fail:
+Mulang uses the rungs` command to parse the Gobstones language - if you don't install it, Gobstones tests will fail:
 
 ```
-wget https://github.com/mumuki/rungs/releases/download/v0.0.1/rungs-ubuntu64 -O rungs
+wget https://github.com/gobstones/gs-weblang-cli/releases/download/v1.3.3/rungs-ubuntu64 -O rungs
 chmod u+x rungs
 sudo mv rungs /usr/bin/rungs
 ```
