@@ -1,6 +1,7 @@
 module InspectorSpec (spec) where
 
 import           Test.Hspec
+import           Language.Mulang.Binding
 import           Language.Mulang.Inspector
 import           Language.Mulang.Inspector.Combiner
 import           Language.Mulang.Parsers.Haskell
@@ -293,5 +294,5 @@ spec = do
     it "is True when there there Pattern Matching on anonima variable" $ do
       usesPatternMatching (hs "baz _ = 5 + 8") `shouldBe` True
 
-      
+
 

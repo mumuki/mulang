@@ -2,9 +2,9 @@ module PrologInspectorSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang.Parsers.Prolog
+import           Language.Mulang.Binding
 import           Language.Mulang.Inspector
 import           Language.Mulang.Inspector.Combiner
-import           Language.Mulang.Inspector.Extras
 
 spec :: Spec
 spec = do

@@ -9,7 +9,7 @@ module Language.Mulang.Inspector.Combiner (
 
 import Language.Mulang
 import Language.Mulang.Binding
-import Language.Mulang.Inspector
+import Language.Mulang.Inspector.Generic
 import Language.Mulang.Explorer
 
 detect :: Inspection -> Expression -> [Binding]

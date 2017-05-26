@@ -10,7 +10,6 @@ import Data.Aeson
 import Language.Mulang.Binding
 import Language.Mulang.Inspector
 import Language.Mulang.Inspector.Combiner (scopedList, transitiveList, negative)
-import Language.Mulang.Inspector.Extras (usesConditional)
 import Language.Mulang.Binding (BindingPredicate)
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
