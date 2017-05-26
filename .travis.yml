@@ -1,4 +1,5 @@
 language: haskell
+ghc: 7.6
 before_install:
 - wget https://github.com/mumuki/rungs/releases/download/v0.0.1/rungs-ubuntu64 -O rungs
 - chmod u+x rungs
