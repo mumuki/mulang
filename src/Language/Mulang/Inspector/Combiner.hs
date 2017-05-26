@@ -7,7 +7,7 @@ module Language.Mulang.Inspector.Combiner (
   transitive,
   transitiveList) where
 
-import Language.Mulang
+import Language.Mulang.Ast
 import Language.Mulang.Binding
 import Language.Mulang.Inspector.Generic
 import Language.Mulang.Explorer

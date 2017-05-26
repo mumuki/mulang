@@ -14,7 +14,7 @@ module Language.Mulang.Explorer (
   extractReference,
   Expression(..)) where
 
-import Language.Mulang
+import Language.Mulang.Ast
 import Language.Mulang.Binding
 
 import Data.Maybe (maybeToList)

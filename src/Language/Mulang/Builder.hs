@@ -1,6 +1,6 @@
 module Language.Mulang.Builder (compact, unguardedBody, normalize) where
 
-import Language.Mulang
+import Language.Mulang.Ast
 
 compact :: [Expression] -> Expression
 compact []  = MuNull

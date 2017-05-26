@@ -6,7 +6,7 @@ module Language.Mulang.Inspector.Functional (
   usesComprehension,
   usesConditional) where
 
-import Language.Mulang
+import Language.Mulang.Ast
 import Language.Mulang.Binding
 import Language.Mulang.Inspector.Generic
 import Language.Mulang.Inspector.Combiner

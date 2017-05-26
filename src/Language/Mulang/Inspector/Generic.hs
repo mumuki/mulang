@@ -18,7 +18,7 @@ module Language.Mulang.Inspector.Generic (
   containsBody,
   Inspection) where
 
-import Language.Mulang
+import Language.Mulang.Ast
 import Language.Mulang.Binding
 import Language.Mulang.Explorer
 

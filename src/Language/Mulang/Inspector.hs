@@ -12,7 +12,7 @@ module Language.Mulang.Inspector (
   declaresProcedure) where
 
 
-import Language.Mulang
+import Language.Mulang.Ast
 import Language.Mulang.Binding
 import Language.Mulang.Inspector.Generic
 import Language.Mulang.Inspector.ObjectOriented

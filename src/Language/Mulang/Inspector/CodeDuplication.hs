@@ -1,6 +1,6 @@
 module Language.Mulang.Inspector.CodeDuplication (hasCodeDuplication) where
 
-import           Language.Mulang
+import           Language.Mulang.Ast
 import           Language.Mulang.Inspector
 import           Language.Mulang.Explorer (expressionsOf)
 import qualified Data.Hashable as H (hash)

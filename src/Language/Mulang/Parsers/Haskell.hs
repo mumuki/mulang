@@ -1,6 +1,6 @@
 module Language.Mulang.Parsers.Haskell (hs, parseHaskell) where
 
-import Language.Mulang
+import Language.Mulang.Ast
 import Language.Mulang.Builder
 import Language.Mulang.Parsers
 

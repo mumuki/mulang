@@ -1,6 +1,6 @@
 module Language.Mulang.Parsers.Json (json, parseJson) where
 
-import Language.Mulang
+import Language.Mulang.Ast
 import Language.Mulang.Parsers
 
 import Data.Aeson (decode, ToJSON, FromJSON)

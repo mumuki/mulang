@@ -11,7 +11,7 @@ module Language.Mulang.Inspector.Smell (
   isLongCode,
   returnsNull) where
 
-import Language.Mulang
+import Language.Mulang.Ast
 import Language.Mulang.Inspector
 
 

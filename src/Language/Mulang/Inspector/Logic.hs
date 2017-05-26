@@ -7,7 +7,7 @@ module Language.Mulang.Inspector.Logic (
   declaresRule,
   declaresPredicate) where
 
-import Language.Mulang
+import Language.Mulang.Ast
 import Language.Mulang.Binding
 import Language.Mulang.Inspector.Generic
 import Language.Mulang.Inspector.Combiner

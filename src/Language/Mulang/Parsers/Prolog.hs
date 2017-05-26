@@ -3,7 +3,7 @@ module Language.Mulang.Parsers.Prolog  (pl, parseProlog) where
 import Text.Parsec
 import Text.Parsec.Numbers
 
-import Language.Mulang
+import Language.Mulang.Ast
 import Language.Mulang.Builder
 import Language.Mulang.Parsers
 

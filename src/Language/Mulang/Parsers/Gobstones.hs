@@ -6,7 +6,7 @@ module Language.Mulang.Parsers.Gobstones (
     parseGobstones,
     parseGobstonesAst) where
 
-import            Language.Mulang
+import            Language.Mulang.Ast
 import            Language.Mulang.Builder as Builder
 import            Language.Mulang.Parsers
 

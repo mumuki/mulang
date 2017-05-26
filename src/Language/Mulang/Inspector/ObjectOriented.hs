@@ -3,7 +3,7 @@ module Language.Mulang.Inspector.ObjectOriented (
   declaresAttribute,
   declaresMethod)  where
 
-import Language.Mulang
+import Language.Mulang.Ast
 import Language.Mulang.Binding
 import Language.Mulang.Inspector.Generic
 
