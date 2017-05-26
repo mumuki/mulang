@@ -1,42 +1,64 @@
 module Language.Mulang.Inspector (
+-- oop
   declaresObject,
   declaresAttribute,
   declaresMethod,
+
+
+-- functional
   usesComposition,
   usesGuards,
   usesIf,
   usesWhile,
   usesSwitch,
   usesLambda,
-  usesNot,
-  usesFindall,
-  usesForall,
-  usesRepeat,
+
   usesPatternMatching,
-  usesUnifyOperator,
-  declaresRecursively,
-  parses,
-  uses,
   usesComprehension,
+
+
+-- general
+  parses,
+
+  uses,
+
   declares,
-  declaresRule,
-  declaresFact,
-  declaresFunction,
-  declaresProcedure,
+  declaresVariable,
+  declaresRecursively,
   declaresEntryPoint,
+  declaresFunction,
+
+  declaresComputation,
   declaresComputationWithArity,
   declaresComputationWithExactArity,
-  declaresComputation,
-  declaresVariable,
+
   declaresTypeAlias,
   declaresTypeSignature,
+
   usesAnonymousVariable,
+
   containsExpression,
   containsDeclaration,
   containsBody,
+
   named,
   like,
   anyone,
+
+-- logic
+  usesNot,
+  usesFindall,
+  usesForall,
+  usesUnifyOperator,
+
+  declaresFact,
+  declaresRule,
+
+-- imperative
+  usesRepeat,
+  declaresProcedure,
+
+
   Inspection) where
 
 import  Language.Mulang
