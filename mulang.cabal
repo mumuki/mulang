@@ -2,8 +2,8 @@ name:                mulang
 version:             0.2.8.0
 synopsis:            The Mu Language, a non-computable extended Lambda Calculus
 -- description:
-license:             MIT
-license-file:        LICENSE
+license:             GPL
+license-file:        LICENSE.txt
 author:              Franco Leonardo Bulgarelli
 maintainer:          franco@mumuki.org
 category:            Language
