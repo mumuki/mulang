@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module JsSpec (spec) where
+module JavaScriptSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang

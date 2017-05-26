@@ -1,4 +1,4 @@
-module PrologInspectorSpec (spec) where
+module LogicSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang

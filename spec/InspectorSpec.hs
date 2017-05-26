@@ -3,27 +3,168 @@ module InspectorSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang
 import           Language.Mulang.Parsers.Haskell
+import           Language.Mulang.Parsers.JavaScript
+import           Language.Mulang.Parsers.Gobstones
+import           Language.Mulang.Inspector.Generic.Smell
 import           Data.Maybe (fromJust)
 
 spec :: Spec
 spec = do
-  describe "declaresTypeSignature" $ do
-    it "is True when type signature is present" $ do
-      declaresTypeSignature (named "x") (hs "x :: Int\n\
-                           \x = 3") `shouldBe` True
+  describe "declaresEntryPoint" $ do
+    describe "with program declarations" $ do
+      it "is True when program is declared" $ do
+        let code = gbs "program{ Poner(Verde) }"
 
-    it "is True when type signature just signature is present" $ do
-      declaresTypeSignature (named "x") (hs "x :: Int") `shouldBe` True
+        declaresEntryPoint anyone code `shouldBe` True
 
-    it "is False when type signature is absent " $ do
-      declaresTypeSignature (named "x") (hs "x = 2") `shouldBe` False
+      it "is False when program is not declared" $ do
+        let code = gbs "procedure F(){}"
+
+        declaresEntryPoint anyone code `shouldBe` False
+
+  describe "declaresProcedure" $ do
+    describe "with procedure declarations" $ do
+      it "is True when procedure is declared" $ do
+        let code =  gbs "procedure F(){}"
+
+        declaresProcedure (named "F") code `shouldBe` True
+
+      it "is True when any procedures is declared" $ do
+        let code = gbs "procedure F(){}"
+
+        declaresProcedure anyone code `shouldBe` True
+
+      it "is False when procedures is not declared" $ do
+        let code = gbs "procedure F(){}"
+
+        declaresProcedure (named "G") code `shouldBe` False
+
+  describe "usesWhile, gbs" $ do
+    it "is True when present in function" $ do
+      let code = gbs "function f(){while(True){} return (x)}"
+      usesWhile code  `shouldBe` True
+
+    it "is False when not present in function" $ do
+      let code = gbs "function f(x){return (1)}"
+      usesWhile code  `shouldBe` False
+
+  describe "usesWhile, js" $ do
+    it "is True when present in function" $ do
+      usesWhile (js "function f() { while(true) { console.log('foo') }  }")  `shouldBe` True
+
+    it "is True when present in lambda" $ do
+      usesWhile (js "var f = function() { while(true) { console.log('foo') }  }")  `shouldBe` True
+
+    it "is True when present in object" $ do
+      usesWhile (js "var x = {f: function() { while(true) { console.log('foo') } }}")  `shouldBe` True
+
+    it "is True when present in method" $ do
+      usesWhile (js "var o = {f: function() { while(true) { console.log('foo') }  }}")  `shouldBe` True
+
+    it "is False when not present in function" $ do
+      usesWhile (js "function f() {}")  `shouldBe` False
+
+  describe "usesSwitch" $ do
+    it "is True when present in function" $ do
+      let code = gbs "function f(x) {switch (2) to { 2 -> {x := 2}} return (x)}"
+
+      usesSwitch code  `shouldBe` True
+
+    it "is False when not present in function" $ do
+      let code = gbs "function f(x){return (1)}"
+
+      usesSwitch code  `shouldBe` False
+
+  describe "usesRepeat" $ do
+    it "is True when present in function" $ do
+      let code = gbs "function f(){repeat(2){} return (x)}"
+
+      usesRepeat code  `shouldBe` True
+
+    it "is False when not present in function" $ do
+      let code = gbs "function f(x){return (1)}"
+
+      usesRepeat code  `shouldBe` False
+
+  describe "uses" $ do
+    it "is True when function application is used within function" $ do
+      let code = gbs "function f() { return (m()) }"
+
+      uses (named "m") code  `shouldBe` True
+
+      let code = gbs "procedure F() { M() }"
+
+      uses (named "M")  code  `shouldBe` True
+
+      let code = gbs "function f(){ return (m(x()))}"
+
+      uses (named "x") code  `shouldBe` True
+
+    it "is True through function application in function" $ do
+      let code = gbs "procedure F(x){ G() } procedure G(){ M()} "
+
+      transitive (uses (named "M")) "F" code `shouldBe` True
+
+    it "is True through function application in function" $ do
+      let code = gbs "procedure F(x) { G(2) } procedure G(p) { M() }"
+
+      transitive (uses (named "M")) "F" code `shouldBe` True
+
+    it "is False through function application in function" $ do
+      let code = gbs "procedure F(x){ G() } procedure G(){}"
+
+      transitive (uses (named "M")) "F" code `shouldBe` False
+
+  describe "declaresVariable" $ do
+      it "is True when declare a variable" $ do
+        let code = gbs "procedure F(){ x := 2}"
+
+        declaresVariable (named "x") code `shouldBe` True
+
+      it "is True when any variable is declared" $ do
+        let code = gbs "procedure F(){ x := 2}"
+
+        declaresVariable anyone code `shouldBe` True
+
+      it "is False when variable is not declared" $ do
+        let code = gbs "procedure F(){ x := 2}"
+
+        declaresVariable (named "y") code `shouldBe` False
+
 
   describe "declaresFunction" $ do
-    describe "with function declarations" $ do
+    describe "with function declarations, gobstones" $ do
+      it "is True when functions is declared" $ do
+        let code = gbs "function f(){return (1)}"
+
+        declaresFunction (named "f") code `shouldBe` True
+
+      it "is True when any functions is declared" $ do
+        let code = gbs "function f(){return (1)}"
+
+        declaresFunction anyone code `shouldBe` True
+
+      it "is False when functions is not declared" $ do
+        let code = gbs "function f(){return (1)}"
+
+        declaresFunction (named "g") code `shouldBe` False
+
+    describe "with variables, gobstones" $ do
+      it "is False when constant is declared with a non lambda literal" $ do
+        let code = gbs "program { f := 2}"
+
+        declaresFunction (named "f") code `shouldBe` False
+
+      it "is False when constant is declared with a number literal" $ do
+        let code = gbs "program {f := 3}"
+
+        declaresFunction  (named "f") code `shouldBe` False
+
+    describe "with function declarations, hs" $ do
       it "is True when functions is declared" $ do
         declaresFunction (named "f") (hs "f x = 1") `shouldBe` True
 
-    describe "with constants" $ do
+    describe "with constants, hs" $ do
       it "is False when constant is declared with a non lambda literal" $ do
         declaresFunction (named "f") (hs "f = 2") `shouldBe` False
 
@@ -39,15 +180,61 @@ spec = do
       it "is False when constant is declared with a variable literal" $ do
         declaresFunction (named "f") (hs "f = snd") `shouldBe` False
 
+    describe "with function declarations, js" $ do
+      it "is True when functions is declared" $ do
+        declaresFunction (named "f") (js "function f(x) {return 1}") `shouldBe` True
+
+      it "is True when functions is declared" $ do
+        declaresFunction (named "f") (js "function f(x) {return 1}") `shouldBe` True
+
+      it "is True when any functions is declared" $ do
+        declaresFunction anyone (js "function f(x) {return 1}") `shouldBe` True
+
+      it "is False when functions is not declared" $ do
+        declaresFunction (named "g") (js "function f(x) {return 1}") `shouldBe` False
+
+    describe "with variables, js" $ do
+      it "is False when constant is declared with a non lambda literal" $ do
+        declaresFunction (named "f") (js "var f = 2") `shouldBe` False
+
+      it "is True when constant is declared with a lambda literal" $ do
+        declaresFunction (named "f") (js "var f = function(x) {}") `shouldBe` True
+
+      it "is False when constant is declared with a number literal" $ do
+        declaresFunction  (named "f") (js "var f = 3") `shouldBe` False
+
+      it "is False when constant is declared with a list literal" $ do
+        declaresFunction (named "f") (js "var f = []") `shouldBe` False
+
+      it "is False when is a method" $ do
+        declaresFunction (named "f") (js "var o = {f: function(){}}") `shouldBe` False
+
   describe "declaresComputationWithExactArity" $ do
-    describe "with function declarations" $ do
+    describe "with function declarations, gbs" $ do
+      it "is True when function is declared with the given arity" $ do
+        let code = gbs "function f(x){return (x+1)}"
+
+        (declaresComputationWithExactArity 1) (named "f") code `shouldBe` True
+
+      it "is False when function is declared with another arity," $ do
+        let code = gbs "function f(x){return (x+1)}"
+
+        (declaresComputationWithExactArity 2) (named "f") code `shouldBe` False
+
+    describe "with constant declaration, gbs" $ do
+      it "is True when constant is declared with lambda of given arity" $ do
+        let code = gbs "function f(x,y){return (x+y)}"
+
+        (declaresComputationWithExactArity 2) (named "f") code `shouldBe` True
+
+    describe "with function declarations, hs" $ do
       it "is True when function is declared with the given arity" $ do
         (declaresComputationWithExactArity 1) (named "f") (hs "f x = x + 1") `shouldBe` True
 
       it "is False when function is declared with another arity" $ do
         (declaresComputationWithExactArity 2) (named "f") (hs "f x = x + 1") `shouldBe` False
 
-    describe "with constant declaration" $ do
+    describe "with constant declaration, hs" $ do
       it "is True when constant is declared with lambda of given arity" $ do
         (declaresComputationWithExactArity 2) (named "f") (hs "f = \\x y -> x + y") `shouldBe` True
 
@@ -56,6 +243,179 @@ spec = do
 
       it "is False if it is a variable" $ do
         (declaresComputationWithExactArity 1) (named "f") (hs "f = snd") `shouldBe` False
+
+    describe "with function declarations, js" $ do
+      it "is True when function is declared with the given arity" $ do
+        (declaresComputationWithExactArity 1) (named "f") (js "function f(x) { return x + 1 }") `shouldBe` True
+
+      it "is False when function is declared with another arity" $ do
+        (declaresComputationWithExactArity 2) (named "f") (js "function f(x) { x + 1}") `shouldBe` False
+
+    describe "with constant declaration, js" $ do
+      it "is True when constant is declared with lambda of given arity" $ do
+        (declaresComputationWithExactArity 2) (named "f") (js "var f = function(x, y) { return x + y }") `shouldBe` True
+
+  describe "isLongCode" $ do
+    it "is False when the program has less than 16 nodes" $ do
+      isLongCode (js "function f() { while(true) { console.log('foo') }  }")  `shouldBe` False
+
+    it "is True when the program contains 16 or more nodes" $ do
+      isLongCode (js "function f(){Poner(Verde) Mover(Norte) Poner(Verde)Mover(Norte) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) Poner(Verde) Mover(Norte) Poner(Verde)Mover(Norte) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde)}")  `shouldBe` True
+
+  describe "declaresObject" $ do
+    it "is True when present" $ do
+      declaresObject (named "f")  (js "var f = {x: 6}")  `shouldBe` True
+
+    it "is False when not present" $ do
+      declaresObject (named "f") (js "var f = 6")  `shouldBe` False
+
+    it "is False when not present, scoped" $ do
+      declaresObject (named "f") (js "var g = {}")  `shouldBe` False
+
+    it "is True when present, scoped" $ do
+      declaresObject (named "g") (js "var g = {}")  `shouldBe` True
+
+    it "is True when anyone present, scoped" $ do
+      declaresObject anyone (js "var g = {}")  `shouldBe` True
+
+  describe "declaresMethod" $ do
+    it "is True when present" $ do
+      declaresMethod (named "x") (js "var f = {x: function(){}}")  `shouldBe` True
+
+    it "is True when any present" $ do
+      declaresMethod anyone (js "var f = {x: function(){}}")  `shouldBe` True
+
+    it "is False when not present" $ do
+      declaresMethod (named "m") (js "var f = {x: function(){}}")  `shouldBe` False
+
+    it "is False when not a method" $ do
+      declaresMethod (named "m") (js "var f = {x: 6}")  `shouldBe` False
+
+    it "is True when object present, scoped" $ do
+      scoped (declaresMethod (named "x")) "f"  (js "var f = {x: function(){}}")  `shouldBe` True
+
+    it "is False when object not present, scoped" $ do
+      scoped (declaresMethod (named "x")) "p"  (js "var f = {x: function(){}}")  `shouldBe` False
+
+  describe "declaresAttribute" $ do
+    it "is True when present" $ do
+      declaresAttribute (named "x") (js "var f = {x: 6}")  `shouldBe` True
+
+    it "is True when present and there are many" $ do
+      declaresAttribute (named "x") (js "var f = {j: 20, x: 6}")  `shouldBe` True
+
+    it "is False when not present" $ do
+      declaresAttribute (named "m") (js "var f = {x: 6}")  `shouldBe` False
+
+    it "is True when attribute present, scoped" $ do
+      scoped (declaresAttribute (named "x")) "f"  (js "var f = {x: 6}")  `shouldBe` True
+
+    it "is True when any attribute present, scoped" $ do
+      scoped (declaresAttribute anyone) "f"  (js "var f = {x: 6}")  `shouldBe` True
+
+    it "is False when attribute not present, scoped" $ do
+      scoped (declaresAttribute (named "x")) "g" (js "var f = {x: 6}")  `shouldBe` False
+
+  describe "uses, hs" $ do
+    it "is True when required function is used on application" $ do
+      uses (named "m") (hs "y x = m x") `shouldBe` True
+
+    it "is True when required function is used as argument" $ do
+      uses (named "m") (hs "y x = x m") `shouldBe` True
+
+    it "is True when required function is used as operator" $ do
+      uses (named "&&" )(hs "y x = x && z") `shouldBe` True
+
+    it "is False when required function is not used in constant" $ do
+      uses (named "m") (hs "y = 3") `shouldBe` False
+
+    it "is False when required function is not used in function" $ do
+      uses (named "m") (hs "y = x 3") `shouldBe` False
+
+    it "is False when binding is not present, scoped" $ do
+      scoped (uses (named "m")) "p" (hs "z = m 3") `shouldBe` False
+
+    it "is False when required function is blank" $ do
+      uses (named "" )(hs "y = m 3") `shouldBe` False
+
+    it "is False when not present in enum" $ do
+      uses (named "h") (hs "y = [a..b]") `shouldBe` False
+
+    it "is True when is present in enum" $ do
+      uses (named "h") (hs "y = [a..h]") `shouldBe` True
+
+    it "is True when required constructor is used on application" $ do
+      uses (named "Foo") (hs "y x = Foo x") `shouldBe` True
+
+    it "is False when required constructor is not used on application" $ do
+      uses (named "Foo") (hs "y x = Bar x") `shouldBe` False
+
+    it "is True when required function is used on list comprehension" $ do
+      uses (named "f") (hs "y x = [ f m | m <- ms  ]") `shouldBe` True
+
+    it "is False when required function is not used on list comprehension" $ do
+      uses (named "f") (hs "y x = [ g m | m <- ms  ]") `shouldBe` False
+
+    it "is False when there is variable hiding in list comprehension" $ do
+      --uses (named "m") "y x = [ g m | m <- ms  ]") `shouldBe` False
+      pending
+
+    it "is False when there is variable hiding in list comprehension generator" $ do
+      uses (named "m") (hs "y x = [ g x | m <- ms, x <- f m]") `shouldBe` False
+
+  describe "uses, js" $ do
+
+    it "is True on direct usage in function" $ do
+      uses (named "m") (js "function f(x) { m }") `shouldBe` True
+
+    it "is True on direct usage of something like it in function" $ do
+      uses (like "m") (js "function f(x) { m2 }") `shouldBe` True
+
+    it "is True on direct usage in method" $ do
+      uses (named "m") (js "var o = {z: function(x) { m }}") `shouldBe` True
+
+    it "is True on direct usage in method, scoped" $ do
+      scoped (uses (named "m")) "o" (js "var o = {z: function(x) { m }}") `shouldBe` True
+
+    it "is False on missing usage in method, scoped" $ do
+      scoped (uses (named "p")) "o" (js "var o = {z: function(x) { m }}") `shouldBe` False
+
+    it "is True on usage in method, scoped twice" $ do
+      scopedList (uses (named "m")) ["o", "z"] (js "var o = {z: function(x) { m }}") `shouldBe` True
+
+    it "is False on missing usage in method, scoped twice" $ do
+      scopedList (uses (named "p")) ["o", "z"] (js "var o = {z: function(x) { m }}") `shouldBe` False
+
+    it "is False on usage in wrong method, scoped twice" $ do
+      scopedList (uses (named "m")) ["o", "z"] (js "var o = {p: function(x) { m }}") `shouldBe` False
+
+    it "is True through function application in function" $ do
+      transitive (uses (named "m")) "f" (js "function g() { m }; function f(x) { g() }") `shouldBe` True
+
+    it "is True through function application in function" $ do
+      transitive (uses (named "m")) "f" (js "function g(p) { return m }; function f(x) { return g(2) }") `shouldBe` True
+
+    it "is False through function application in function" $ do
+      transitive (uses (named "m")) "f" (js "function g() { m }; function f(x) { k() }") `shouldBe` False
+
+    it "is True through message send in function" $ do
+      transitive (uses (named "m")) "f" (js "var o = {g: function(){ m }}; function f(x) { o.g() }") `shouldBe` True
+
+    it "is True through message send in objects" $ do
+      transitive (uses (named "m")) "p" (js "var o = {g: function(){ m }}\n\
+                                        \var p = {n: function() { o.g() }}") `shouldBe` True
+
+
+  describe "declaresTypeSignature" $ do
+    it "is True when type signature is present" $ do
+      declaresTypeSignature (named "x") (hs "x :: Int\n\
+                           \x = 3") `shouldBe` True
+
+    it "is True when type signature just signature is present" $ do
+      declaresTypeSignature (named "x") (hs "x :: Int") `shouldBe` True
+
+    it "is False when type signature is absent " $ do
+      declaresTypeSignature (named "x") (hs "x = 2") `shouldBe` False
 
   describe "declaresComputation" $ do
     describe "with constants" $ do
@@ -105,54 +465,6 @@ spec = do
 
     it "is False when differ" $ do
       parses hs "x = map g . map f" (hs "x = map f . map g") `shouldBe` False
-
-  describe "uses" $ do
-    it "is True when required function is used on application" $ do
-      uses (named "m") (hs "y x = m x") `shouldBe` True
-
-    it "is True when required function is used as argument" $ do
-      uses (named "m") (hs "y x = x m") `shouldBe` True
-
-    it "is True when required function is used as operator" $ do
-      uses (named "&&" )(hs "y x = x && z") `shouldBe` True
-
-    it "is False when required function is not used in constant" $ do
-      uses (named "m") (hs "y = 3") `shouldBe` False
-
-    it "is False when required function is not used in function" $ do
-      uses (named "m") (hs "y = x 3") `shouldBe` False
-
-    it "is False when binding is not present, scoped" $ do
-      scoped (uses (named "m")) "p" (hs "z = m 3") `shouldBe` False
-
-    it "is False when required function is blank" $ do
-      uses (named "" )(hs "y = m 3") `shouldBe` False
-
-    it "is False when not present in enum" $ do
-      uses (named "h") (hs "y = [a..b]") `shouldBe` False
-
-    it "is True when is present in enum" $ do
-      uses (named "h") (hs "y = [a..h]") `shouldBe` True
-
-    it "is True when required constructor is used on application" $ do
-      uses (named "Foo") (hs "y x = Foo x") `shouldBe` True
-
-    it "is False when required constructor is not used on application" $ do
-      uses (named "Foo") (hs "y x = Bar x") `shouldBe` False
-
-    it "is True when required function is used on list comprehension" $ do
-      uses (named "f") (hs "y x = [ f m | m <- ms  ]") `shouldBe` True
-
-    it "is False when required function is not used on list comprehension" $ do
-      uses (named "f") (hs "y x = [ g m | m <- ms  ]") `shouldBe` False
-
-    it "is False when there is variable hiding in list comprehension" $ do
-      --uses (named "m") "y x = [ g m | m <- ms  ]") `shouldBe` False
-      pending
-
-    it "is False when there is variable hiding in list comprehension generator" $ do
-      uses (named "m") (hs "y x = [ g x | m <- ms, x <- f m]") `shouldBe` False
-
 
   describe "declaresRecursively" $ do
     it "is True when has direct recursion in unguarded expresion" $ do
@@ -230,12 +542,23 @@ spec = do
       it "is present" $ do
         usesGuards (hs "f x = c x == 2") `shouldBe` False
 
-  describe "usesIf" $ do
+  describe "usesIf, hs" $ do
     it "is True when present" $ do
       usesIf (hs "f x = if c x then 2 else 3") `shouldBe` True
 
     it "is False when not present" $ do
       usesIf (hs "f x = x") `shouldBe` False
+
+  describe "usesIf, gbs" $ do
+    it "is True when present in function" $ do
+      let code = gbs "function f(){if(True){}else{} return (x)}"
+
+      usesIf code  `shouldBe` True
+
+    it "is False when not present in function" $ do
+      let code = gbs "function f(x){return (1)}"
+
+      usesIf code  `shouldBe` False
 
 
   describe "lambda analyzer" $ do

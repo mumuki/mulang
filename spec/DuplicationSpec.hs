@@ -1,4 +1,4 @@
-module DuplicationInspectorSpec (spec) where
+module DuplicationSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang.Inspector.Generic.Duplication
