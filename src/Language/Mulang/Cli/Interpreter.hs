@@ -14,8 +14,6 @@ import GHC.Generics
 import Data.Aeson
 
 import Language.Mulang
-import Language.Mulang.Inspector
-import Language.Mulang.Inspector.Combiner
 import Language.Mulang.Inspector.Smell
 
 data Input = Input {

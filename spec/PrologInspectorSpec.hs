@@ -1,10 +1,8 @@
 module PrologInspectorSpec (spec) where
 
 import           Test.Hspec
+import           Language.Mulang
 import           Language.Mulang.Parsers.Prolog
-import           Language.Mulang.Binding
-import           Language.Mulang.Inspector
-import           Language.Mulang.Inspector.Combiner
 
 spec :: Spec
 spec = do
