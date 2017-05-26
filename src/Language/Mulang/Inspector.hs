@@ -1,49 +1,15 @@
 module Language.Mulang.Inspector (
--- oop
-  declaresObject,
-  declaresAttribute,
-  declaresMethod,
-
+  module Language.Mulang.Inspector.ObjectOriented,
+  module Language.Mulang.Inspector.Generic,
 
 -- functional
   usesComposition,
   usesGuards,
-  usesIf,
-  usesWhile,
-  usesSwitch,
   usesLambda,
 
   usesPatternMatching,
   usesComprehension,
 
-
--- general
-  parses,
-
-  uses,
-
-  declares,
-  declaresVariable,
-  declaresRecursively,
-  declaresEntryPoint,
-  declaresFunction,
-
-  declaresComputation,
-  declaresComputationWithArity,
-  declaresComputationWithExactArity,
-
-  declaresTypeAlias,
-  declaresTypeSignature,
-
-  usesAnonymousVariable,
-
-  containsExpression,
-  containsDeclaration,
-  containsBody,
-
-  named,
-  like,
-  anyone,
 
 -- logic
   usesNot,
@@ -56,16 +22,17 @@ module Language.Mulang.Inspector (
 
 -- imperative
   usesRepeat,
-  declaresProcedure,
+  usesWhile,
+  usesSwitch,
+
+  declaresProcedure) where
 
 
-  Inspection) where
+import Language.Mulang
+import Language.Mulang.Binding
+import Language.Mulang.Inspector.ObjectOriented
+import Language.Mulang.Inspector.Generic
 
-import  Language.Mulang
-import  Language.Mulang.Binding
-import  Language.Mulang.Explorer
-
-type Inspection = Expression  -> Bool
 
 declaresFact :: BindingPredicate -> Inspection
 declaresFact = containsDeclaration f
@@ -77,82 +44,12 @@ declaresRule = containsDeclaration f
   where f (RuleDeclaration _ _ _) = True
         f _                       = False
 
-declaresObject :: BindingPredicate -> Inspection
-declaresObject =  containsDeclaration f
-  where f (ObjectDeclaration _ _) = True
-        f _                       = False
-
-declaresAttribute :: BindingPredicate -> Inspection
-declaresAttribute =  containsDeclaration f
-  where f (AttributeDeclaration _ _) = True
-        f _                          = False
-
-declaresMethod :: BindingPredicate -> Inspection
-declaresMethod =  containsDeclaration f
-  where f (MethodDeclaration _ _) = True
-        f _                       = False
-
--- | Inspection that tells whether an expression is direct recursive
-declaresRecursively :: BindingPredicate -> Inspection
-declaresRecursively = containsDeclaration f
-  where f e | (Just name) <- (nameOf e) = uses (named name) e
-            | otherwise = False
-
--- | Inspection that tells whether a top level binding exists
-declares :: BindingPredicate -> Inspection
-declares = containsDeclaration f
-  where f (TypeSignature _) = False
-        f _                 = True
-
-declaresFunction :: BindingPredicate -> Inspection
-declaresFunction = containsDeclaration f
-  where f (FunctionDeclaration _ _) = True
-        f _                         = False
 
 declaresProcedure :: BindingPredicate -> Inspection
 declaresProcedure = containsDeclaration f
   where f (ProcedureDeclaration _ _) = True
         f _                          = False
 
-declaresVariable :: BindingPredicate -> Inspection
-declaresVariable = containsDeclaration f
-  where f (VariableDeclaration _ _)  = True
-        f _                          = False
-
-declaresEntryPoint :: BindingPredicate -> Inspection
-declaresEntryPoint = containsDeclaration f
-  where f (EntryPoint _)  = True
-        f _               = False
-
--- | Inspection that tells whether a top level computation binding exists
-declaresComputation :: BindingPredicate -> Inspection
-declaresComputation = declaresComputationWithArity (const True)
-
-declaresComputationWithExactArity :: Int -> BindingPredicate -> Inspection
-declaresComputationWithExactArity arity = declaresComputationWithArity (== arity)
-
-declaresComputationWithArity :: (Int -> Bool) -> BindingPredicate -> Inspection
-declaresComputationWithArity arityPredicate = containsDeclaration f
-  where f (FunctionDeclaration _ equations)  = any equationArityIs equations
-        f (ProcedureDeclaration _ equations) = any equationArityIs equations
-        f (MethodDeclaration _ equations)    = any equationArityIs equations
-        f (RuleDeclaration _ args _)         = argsHaveArity args
-        f (FactDeclaration _ args)           = argsHaveArity args
-        f _  = False
-
-        equationArityIs = \(Equation args _) -> argsHaveArity args
-
-        argsHaveArity = arityPredicate.length
-
-declaresTypeAlias :: BindingPredicate -> Inspection
-declaresTypeAlias = containsDeclaration f
-  where f (TypeAliasDeclaration _) = True
-        f _             = False
-
-declaresTypeSignature :: BindingPredicate -> Inspection
-declaresTypeSignature = containsDeclaration f
-  where f (TypeSignature _)  = True
-        f _                  = False
 
 -- | Inspection that tells whether an expression uses the composition operator '.'
 -- in its definition
@@ -168,12 +65,7 @@ usesGuards = containsBody f
   where f (GuardedBody _) = True
         f _ = False
 
--- | Inspection that tells whether an expression uses ifs
--- in its definition
-usesIf :: Inspection
-usesIf = containsExpression f
-  where f (If _ _ _) = True
-        f _ = False
+
 
 -- | Inspection that tells whether an expression uses while
 -- in its definition
@@ -239,15 +131,7 @@ usesUnifyOperator = containsExpression f
         f _ = False
 
 
--- | Inspection that tells whether an expression is equal to a given piece of code after being parsed
-parses :: (String -> Expression) -> String -> Inspection
-parses parser code = (== (parser code))
 
--- | Inspection that tells whether an expression uses the the given target binding
--- in its definition
-uses :: BindingPredicate -> Inspection
-uses p = containsExpression f
-  where f = any p . map fst .  referencesOf
 
 -- | Inspection that tells whether an expression uses
 -- comprehensions - list comprehension, for comprehension, do-syntax, etc -
@@ -256,44 +140,3 @@ usesComprehension :: Inspection
 usesComprehension = containsExpression f
   where f (Comprehension _ _) = True
         f _ = False
-
-usesAnonymousVariable :: Inspection
-usesAnonymousVariable = containsExpression f
-  where f (FunctionDeclaration _ equations)    = equationContainsWildcard equations
-        f (ProcedureDeclaration _ equations)   = equationContainsWildcard equations
-        f (MethodDeclaration _ equations)      = equationContainsWildcard equations
---TODO        f (Lambda args _)                      = equationContainsWildcard equations
-        f (FactDeclaration _ params)             = paramsContainsWildcard params
-        f (RuleDeclaration _ params _)           = paramsContainsWildcard params
-        f _                                    = False
-
-        equationContainsWildcard = any (paramsContainsWildcard . equationParams)
-        paramsContainsWildcard = any isOrContainsWildcard
-
-        equationParams (Equation p _) = p
-
-        isOrContainsWildcard (InfixApplicationPattern p1 _ p2) = any isOrContainsWildcard [p1, p2]
-        isOrContainsWildcard (ApplicationPattern _ ps)         = any isOrContainsWildcard ps
-        isOrContainsWildcard (TuplePattern ps)                 = any isOrContainsWildcard ps
-        isOrContainsWildcard (ListPattern ps)                  = any isOrContainsWildcard ps
-        isOrContainsWildcard (FunctorPattern _ ps)             = any isOrContainsWildcard ps
-        isOrContainsWildcard (AsPattern _ p)                   = isOrContainsWildcard p
-        isOrContainsWildcard WildcardPattern                   = True
-        isOrContainsWildcard _                                 = False
-
-
-containsExpression :: (Expression -> Bool) -> Inspection
-containsExpression f = has f expressionsOf
-
-containsBody :: (EquationBody -> Bool)-> Inspection
-containsBody f = has f equationBodiesOf
-
-containsDeclaration :: (Expression -> Bool) -> BindingPredicate -> Inspection
-containsDeclaration f b  = has f (bindedDeclarationsOf' b)
-
--- private
-
-has f g = any f . g
-
-
-

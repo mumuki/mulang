@@ -7,6 +7,7 @@ module Language.Mulang.Cli.Compiler(
 
 import GHC.Generics
 import Data.Aeson
+import Language.Mulang.Binding
 import Language.Mulang.Inspector
 import Language.Mulang.Inspector.Combiner (scopedList, transitiveList, negative)
 import Language.Mulang.Inspector.Extras (usesConditional)

@@ -75,6 +75,8 @@ library
     Language.Mulang.Builder
     Language.Mulang.Explorer
     Language.Mulang.Inspector
+    Language.Mulang.Inspector.Generic
+    Language.Mulang.Inspector.ObjectOriented
     Language.Mulang.Inspector.CodeDuplication
     Language.Mulang.Inspector.Smell
     Language.Mulang.Inspector.Combiner
