@@ -71,7 +71,6 @@ library
     Text.SimpleParser
     Text.Inflections.Tokenizer
     Language.Mulang
-    Language.Mulang.All
     Language.Mulang.Binding
     Language.Mulang.Builder
     Language.Mulang.Explorer
