@@ -1,4 +1,4 @@
-module Language.Mulang.Inspector.CodeDuplication (hasCodeDuplication) where
+module Language.Mulang.Inspector.Generic.Duplication (hasCodeDuplication) where
 
 import           Language.Mulang.Ast
 import           Language.Mulang.Inspector

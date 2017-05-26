@@ -3,7 +3,7 @@ module JsInspectorSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang
 import           Language.Mulang.Parsers.JavaScript
-import           Language.Mulang.Inspector.Smell
+import           Language.Mulang.Inspector.Generic.Smell
 
 spec :: Spec
 spec = do

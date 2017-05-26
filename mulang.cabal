@@ -80,10 +80,10 @@ library
     Language.Mulang.Inspector.ObjectOriented
     Language.Mulang.Inspector.Functional
     Language.Mulang.Inspector.Logic
-    Language.Mulang.Inspector.CodeDuplication
-    Language.Mulang.Inspector.Smell
     Language.Mulang.Inspector.Combiner
-    Language.Mulang.Inspector.Expressiveness
+    Language.Mulang.Inspector.Generic.Duplication
+    Language.Mulang.Inspector.Generic.Smell
+    Language.Mulang.Inspector.Generic.Expressiveness
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Gobstones

@@ -1,7 +1,7 @@
 module JsSmellSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Inspector.Smell
+import           Language.Mulang.Inspector.Generic.Smell
 import           Language.Mulang.Parsers.JavaScript
 
 spec :: Spec

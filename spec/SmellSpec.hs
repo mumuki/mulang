@@ -1,7 +1,7 @@
 module SmellSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Inspector.Smell
+import           Language.Mulang.Inspector.Generic.Smell
 import           Language.Mulang.Parsers.Haskell (hs)
 
 spec :: Spec

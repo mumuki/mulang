@@ -1,7 +1,7 @@
-module CodeDuplicationInspectorSpec (spec) where
+module DuplicationInspectorSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Inspector.CodeDuplication
+import           Language.Mulang.Inspector.Generic.Duplication
 import           Language.Mulang.Parsers.JavaScript
 
 spec :: Spec

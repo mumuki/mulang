@@ -1,7 +1,7 @@
 module ExpressivenessSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Inspector.Expressiveness
+import           Language.Mulang.Inspector.Generic.Expressiveness
 import           Language.Mulang.Parsers.Haskell (hs)
 
 spec :: Spec

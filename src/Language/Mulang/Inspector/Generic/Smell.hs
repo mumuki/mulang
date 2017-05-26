@@ -1,4 +1,4 @@
-module Language.Mulang.Inspector.Smell (
+module Language.Mulang.Inspector.Generic.Smell (
   hasRedundantBooleanComparison,
   hasRedundantIf,
   hasRedundantGuards,

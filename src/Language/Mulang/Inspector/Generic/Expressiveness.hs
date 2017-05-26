@@ -1,4 +1,4 @@
-module Language.Mulang.Inspector.Expressiveness (
+module Language.Mulang.Inspector.Generic.Expressiveness (
   wordsOf,
   isWellWritten,
   english,

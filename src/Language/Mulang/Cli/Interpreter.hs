@@ -14,7 +14,7 @@ import GHC.Generics
 import Data.Aeson
 
 import Language.Mulang
-import Language.Mulang.Inspector.Smell
+import Language.Mulang.Inspector.Generic.Smell
 
 data Input = Input {
   code :: Code,
