@@ -12,6 +12,10 @@
 -- |    * logic programing
 -- |
 module Language.Mulang.Ast (
+    equationParams,
+    unguardedEquationBody,
+    simpleProcedureBody,
+    simpleFunctionBody,
     Equation(..),
     EquationBody(..),
     Expression(..),
@@ -104,4 +108,17 @@ data ComprehensionStatement
         | MuQualifier Expression
         | LetStmt     Expression
   deriving (Eq, Show, Read, Generic)
+
+
+equationParams :: Equation -> [Pattern]
+equationParams (Equation p _) = p
+
+unguardedEquationBody :: Equation -> Expression
+unguardedEquationBody (Equation _ (UnguardedBody body)) = body
+
+simpleProcedureBody :: Expression -> Expression
+simpleProcedureBody (ProcedureDeclaration _ [equation]) = unguardedEquationBody equation
+
+simpleFunctionBody :: Expression -> Expression
+simpleFunctionBody (FunctionDeclaration _ [equation]) = unguardedEquationBody equation
 

@@ -20,7 +20,8 @@ signatureOf (RuleDeclaration name args _)         = AritySignature name (length 
 signatureOf (FactDeclaration name args)           = AritySignature name (length args)
 
 parameterNamesOf :: [Equation] -> [Maybe Binding]
-parameterNamesOf ((Equation parameters _):_) = map parameterNameOf parameters
+parameterNamesOf = compact . map (map parameterNameOf.equationParams)
+    where compact = head
 
 parameterNameOf :: Pattern -> Maybe Binding
 parameterNameOf (VariablePattern v) = Just v

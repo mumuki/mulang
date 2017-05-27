@@ -113,8 +113,6 @@ usesAnonymousVariable = containsExpression f
         equationContainsWildcard = any (paramsContainsWildcard . equationParams)
         paramsContainsWildcard = any isOrContainsWildcard
 
-        equationParams (Equation p _) = p
-
         isOrContainsWildcard (InfixApplicationPattern p1 _ p2) = any isOrContainsWildcard [p1, p2]
         isOrContainsWildcard (ApplicationPattern _ ps)         = any isOrContainsWildcard ps
         isOrContainsWildcard (TuplePattern ps)                 = any isOrContainsWildcard ps
