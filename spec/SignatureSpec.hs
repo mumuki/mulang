@@ -44,6 +44,9 @@ spec = do
     it "simple function type declaration" $ do
       signaturesOf (hs "foo :: Int -> Int") `shouldBe` [TypedSignature "foo" ["Int", "Int"]]
 
+    it "simple function tuple declaration" $ do
+      signaturesOf (hs "foo :: b -> (Int, [a])") `shouldBe` [TypedSignature "foo" ["b", "(Int, [a])"]]
+
   describe "NamedSignature" $ do
     it "empty expression" $ do
       signaturesOf (js "") `shouldBe` []
