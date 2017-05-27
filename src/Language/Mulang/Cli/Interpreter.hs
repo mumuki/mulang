@@ -1,9 +1,12 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Language.Mulang.Cli.Interpreter (
+            newSample,
+            expectationsSample,
             evaluate,
             Input(..),
             Output(..),
+            SignatureGeneration,
             Expectation(..),
             ExpectationResult(..)) where
 
@@ -16,16 +19,21 @@ import Data.Aeson
 import Language.Mulang
 import Language.Mulang.Inspector.Generic.Smell
 
+
 data Input = Input {
   code :: Code,
-  expectations :: [Expectation]
+  expectations :: [Expectation],
+  signatureGeneration :: SignatureGeneration
 } deriving (Show, Eq, Generic)
-
 
 data Output = Output {
   results :: [ExpectationResult],
   smells :: [Expectation]
 }  deriving (Show, Eq, Generic)
+
+data SignatureGeneration = NoSignatureGeneration
+                         | StructuredSignatureGeneration
+                         | CodeSignatureGeneration deriving (Show, Eq, Generic)
 
 data ExpectationResult = ExpectationResult {
   expectation :: Expectation,
@@ -35,13 +43,21 @@ data ExpectationResult = ExpectationResult {
 instance FromJSON Input
 instance FromJSON Output
 instance FromJSON ExpectationResult
+instance FromJSON SignatureGeneration
 
 instance ToJSON Output
 instance ToJSON Input
 instance ToJSON ExpectationResult
+instance ToJSON SignatureGeneration
+
+newSample :: Code -> Input
+newSample code = Input code [] NoSignatureGeneration
+
+expectationsSample :: Code -> [Expectation] -> Input
+expectationsSample code es = (newSample code) { expectations = es }
 
 evaluate :: Input -> Output
-evaluate (Input code expectations)
+evaluate (Input code expectations _)
       | Just ast <- parseCode code = Output (evaluateExpectations expectations ast) (detectSmells ast)
       | otherwise = Output [] []
 
