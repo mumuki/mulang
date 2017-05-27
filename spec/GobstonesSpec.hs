@@ -20,27 +20,27 @@ describe "gobstones" $ do
     it "translates simple procedure declaration " $ do
       (gbs "procedure F(){}") `shouldBe` ProcedureDeclaration "F" [Equation [] (UnguardedBody MuNull)]
 
-    it "translates simple procedure declaration with a param" $ do
-      let code = gbs "program{F()} procedure F(parameter){}"
+    it "translates simple procedure declaration and application  with a parameter" $ do
+      let code = gbs "program{F(2)} procedure F(parameter){}"
 
-      code `shouldBe` Sequence [EntryPoint (Application (Variable "F") []),ProcedureDeclaration "F" [Equation [VariablePattern "parameter"] (UnguardedBody MuNull)]]
+      code `shouldBe` Sequence [EntryPoint (Application (Variable "F") [MuNumber 2.0]),ProcedureDeclaration "F" [Equation [VariablePattern "parameter"] (UnguardedBody MuNull)]]
 
     it "translates simple procedure Application " $ do
       let code = gbs "program{F()} procedure F(){}"
 
       code `shouldBe` Sequence [EntryPoint (Application (Variable "F") []),ProcedureDeclaration "F" [Equation [] (UnguardedBody MuNull)]]
 
-    it "translates simple procedure Application " $ do
+    it "translates Poner" $ do
       let code = gbs "program{Poner(Verde)}"
 
       code `shouldBe` EntryPoint (Application (Variable "Poner") [MuSymbol "Verde"])
 
-    it "translates simple procedure Application " $ do
+    it "translates Sacar" $ do
       let code =  gbs "program{Sacar(Verde)}"
 
       code `shouldBe` EntryPoint (Application (Variable "Sacar") [MuSymbol "Verde"])
 
-    it "translates simple procedure Application " $ do
+    it "translates Mover" $ do
       let code = gbs "program{Mover(Este)}"
 
       code `shouldBe` EntryPoint (Application (Variable "Mover") [MuSymbol "Este"])
@@ -101,11 +101,6 @@ describe "gobstones" $ do
       code `shouldBe`  EntryPoint (VariableDeclaration "x" (Application (Variable "&&") [Application Equal [MuBool True,MuNumber 2.0],Application NotEqual [Variable "x",Variable "t"]]))
 
     it "translates simple procedure declaration and application  with a parameter" $ do
-      let code = gbs "program{F(2)} procedure F(parameter){}"
-
-      code `shouldBe` Sequence [EntryPoint (Application (Variable "F") [MuNumber 2.0]),ProcedureDeclaration "F" [Equation [VariablePattern "parameter"] (UnguardedBody MuNull)]]
-
-    it "translates simple procedure declaration and application  with a parameter" $ do
       let code = gbs "program{F(Negro)} procedure F(parameter){}"
 
       code `shouldBe` Sequence [EntryPoint (Application (Variable "F") [MuSymbol "Negro"]),ProcedureDeclaration "F" [Equation [VariablePattern "parameter"] (UnguardedBody MuNull)]]
@@ -114,11 +109,6 @@ describe "gobstones" $ do
       let code = gbs "program{F(True)} procedure F(parameter){}"
 
       code `shouldBe` Sequence [EntryPoint (Application (Variable "F") [MuBool True]),ProcedureDeclaration "F" [Equation [VariablePattern "parameter"] (UnguardedBody MuNull)]]
-
-    it "translates simple procedure declaration and application  with a parameter" $ do
-      let code = gbs "program{F(Verde)} procedure F(parameter){}"
-
-      code `shouldBe` Sequence [EntryPoint (Application (Variable "F") [MuSymbol "Verde"]),ProcedureDeclaration "F" [Equation [VariablePattern "parameter"] (UnguardedBody MuNull)]]
 
     it "translates conditional declaration" $ do
       let code = gbs "program{if(True){}}"

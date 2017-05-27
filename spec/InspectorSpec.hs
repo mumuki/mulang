@@ -29,11 +29,6 @@ spec = do
 
         declaresProcedure (named "F") code `shouldBe` True
 
-      it "is True when any procedures is declared" $ do
-        let code = gbs "procedure F(){}"
-
-        declaresProcedure anyone code `shouldBe` True
-
       it "is False when procedures is not declared" $ do
         let code = gbs "procedure F(){}"
 
@@ -86,45 +81,11 @@ spec = do
 
       usesRepeat code  `shouldBe` False
 
-  describe "uses" $ do
-    it "is True when function application is used within function" $ do
-      let code = gbs "function f() { return (m()) }"
-
-      uses (named "m") code  `shouldBe` True
-
-      let code = gbs "procedure F() { M() }"
-
-      uses (named "M")  code  `shouldBe` True
-
-      let code = gbs "function f(){ return (m(x()))}"
-
-      uses (named "x") code  `shouldBe` True
-
-    it "is True through function application in function" $ do
-      let code = gbs "procedure F(x){ G() } procedure G(){ M()} "
-
-      transitive (uses (named "M")) "F" code `shouldBe` True
-
-    it "is True through function application in function" $ do
-      let code = gbs "procedure F(x) { G(2) } procedure G(p) { M() }"
-
-      transitive (uses (named "M")) "F" code `shouldBe` True
-
-    it "is False through function application in function" $ do
-      let code = gbs "procedure F(x){ G() } procedure G(){}"
-
-      transitive (uses (named "M")) "F" code `shouldBe` False
-
   describe "declaresVariable" $ do
       it "is True when declare a variable" $ do
         let code = gbs "procedure F(){ x := 2}"
 
         declaresVariable (named "x") code `shouldBe` True
-
-      it "is True when any variable is declared" $ do
-        let code = gbs "procedure F(){ x := 2}"
-
-        declaresVariable anyone code `shouldBe` True
 
       it "is False when variable is not declared" $ do
         let code = gbs "procedure F(){ x := 2}"
@@ -139,26 +100,10 @@ spec = do
 
         declaresFunction (named "f") code `shouldBe` True
 
-      it "is True when any functions is declared" $ do
-        let code = gbs "function f(){return (1)}"
-
-        declaresFunction anyone code `shouldBe` True
-
       it "is False when functions is not declared" $ do
         let code = gbs "function f(){return (1)}"
 
         declaresFunction (named "g") code `shouldBe` False
-
-    describe "with variables, gobstones" $ do
-      it "is False when constant is declared with a non lambda literal" $ do
-        let code = gbs "program { f := 2}"
-
-        declaresFunction (named "f") code `shouldBe` False
-
-      it "is False when constant is declared with a number literal" $ do
-        let code = gbs "program {f := 3}"
-
-        declaresFunction  (named "f") code `shouldBe` False
 
     describe "with function declarations, hs" $ do
       it "is True when functions is declared" $ do
@@ -220,12 +165,6 @@ spec = do
         let code = gbs "function f(x){return (x+1)}"
 
         (declaresComputationWithExactArity 2) (named "f") code `shouldBe` False
-
-    describe "with constant declaration, gbs" $ do
-      it "is True when constant is declared with lambda of given arity" $ do
-        let code = gbs "function f(x,y){return (x+y)}"
-
-        (declaresComputationWithExactArity 2) (named "f") code `shouldBe` True
 
     describe "with function declarations, hs" $ do
       it "is True when function is declared with the given arity" $ do
