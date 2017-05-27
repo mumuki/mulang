@@ -31,7 +31,7 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
 
     muDecls (HsTypeDecl _ name _ _)      = [TypeAliasDeclaration (muName name)]
     muDecls (HsDataDecl _ _ name _ _ _ ) = [RecordDeclaration (muName name)]
-    muDecls (HsTypeSig _ names _) = map (\name -> TypeSignature (muName name)) names
+    muDecls (HsTypeSig _ names (HsQualType _ t)) = map (\name -> TypeSignature (muName name) (muType t)) names
     muDecls (HsFunBind equations) | (HsMatch _ name _ _ _) <- head equations =
                                         [FunctionDeclaration (muName name) (map muEquation equations)]
     muDecls (HsPatBind _ (HsPVar name) (HsUnGuardedRhs exp) _) = [VariableDeclaration (muName name) (muExp exp)]
@@ -117,3 +117,7 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
 
     muStmt (HsGenerator _ pat exp) = MuGenerator (muPat pat) (muExp exp)
     muStmt (HsQualifier exp) = MuQualifier (muExp exp)
+
+    muType (HsTyFun i o)  = muType i ++ muType o
+    muType (HsTyCon name) = [muQName name]
+    muType t              = [show t]

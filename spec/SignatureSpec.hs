@@ -9,17 +9,20 @@ import           Language.Mulang.Parsers.Prolog
 import           Language.Mulang.Explorer
 
 import           Data.List (transpose, nub)
+import           Data.Maybe (mapMaybe)
 import           Control.Monad (msum)
 
 signaturesOf :: Expression -> [Signature]
-signaturesOf = nub . map (signatureOf.snd) . declarationsOf
+signaturesOf = nub . mapMaybe (signatureOf.snd) . declarationsOf
 
-signatureOf :: Expression -> Signature
-signatureOf (FunctionDeclaration name equations)  = NamedSignature name (parameterNamesOf equations)
-signatureOf (ProcedureDeclaration name equations) = NamedSignature name (parameterNamesOf equations)
-signatureOf (MethodDeclaration name equations)    = NamedSignature name (parameterNamesOf equations)
-signatureOf (RuleDeclaration name args _)         = AritySignature name (length args)
-signatureOf (FactDeclaration name args)           = AritySignature name (length args)
+signatureOf :: Expression -> Maybe Signature
+signatureOf (FunctionDeclaration name equations)  = Just $ NamedSignature name (parameterNamesOf equations)
+signatureOf (ProcedureDeclaration name equations) = Just $ NamedSignature name (parameterNamesOf equations)
+signatureOf (RuleDeclaration name args _)         = Just $ AritySignature name (length args)
+signatureOf (FactDeclaration name args)           = Just $ AritySignature name (length args)
+signatureOf (TypeSignature name args)             = Just $ TypedSignature name args
+signatureOf (VariableDeclaration name _)          = Just $ AritySignature name 0
+signatureOf _                                     = Nothing
 
 parameterNamesOf :: [Equation] -> [Maybe Binding]
 parameterNamesOf = map msum . transpose . map (map parameterNameOf . equationParams)
@@ -30,9 +33,25 @@ parameterNameOf _                   = Nothing
 
 spec :: Spec
 spec = do
+  describe "unhandled declaration" $ do
+    it "object declaration" $ do
+      signaturesOf (js "var x = {}") `shouldBe` []
+
+  describe "TypedSignature" $ do
+    it "simple variable type declaration" $ do
+      signaturesOf (hs "foo :: Int") `shouldBe` [TypedSignature "foo" ["Int"]]
+
+    it "simple function type declaration" $ do
+      signaturesOf (hs "foo :: Int -> Int") `shouldBe` [TypedSignature "foo" ["Int", "Int"]]
+
   describe "NamedSignature" $ do
     it "empty expression" $ do
       signaturesOf (js "") `shouldBe` []
+
+    it "variable" $ do
+      signaturesOf (js "var x = 3; var z = 2;") `shouldBe` [
+                                                    AritySignature "x" 0,
+                                                    AritySignature "z" 0]
 
     it "nullary function" $ do
       signaturesOf (js "function foo() {}") `shouldBe` [NamedSignature "foo" []]

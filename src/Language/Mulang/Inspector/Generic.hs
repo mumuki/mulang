@@ -44,8 +44,8 @@ usesIf = containsExpression f
 -- | Inspection that tells whether a top level binding exists
 declares :: BindingPredicate -> Inspection
 declares = containsDeclaration f
-  where f (TypeSignature _) = False
-        f _                 = True
+  where f (TypeSignature _ _) = False
+        f _                   = True
 
 -- | Inspection that tells whether an expression is direct recursive
 declaresRecursively :: BindingPredicate -> Inspection
@@ -96,8 +96,8 @@ declaresTypeAlias = containsDeclaration f
 
 declaresTypeSignature :: BindingPredicate -> Inspection
 declaresTypeSignature = containsDeclaration f
-  where f (TypeSignature _)  = True
-        f _                  = False
+  where f (TypeSignature _ _)  = True
+        f _                    = False
 
 
 usesAnonymousVariable :: Inspection
