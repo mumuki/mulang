@@ -1,13 +1,15 @@
 module SignatureSpec (spec) where
 
 import           Test.Hspec
-import           Data.List
 import           Language.Mulang
 import           Language.Mulang.Signature
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Prolog
 import           Language.Mulang.Explorer
+
+import           Data.List (transpose, nub)
+import           Control.Monad (msum)
 
 signaturesOf :: Expression -> [Signature]
 signaturesOf = nub . map (signatureOf.snd) . declarationsOf
@@ -20,8 +22,7 @@ signatureOf (RuleDeclaration name args _)         = AritySignature name (length 
 signatureOf (FactDeclaration name args)           = AritySignature name (length args)
 
 parameterNamesOf :: [Equation] -> [Maybe Binding]
-parameterNamesOf = compact . map (map parameterNameOf.equationParams)
-    where compact = head
+parameterNamesOf = map msum . transpose . map (map parameterNameOf . equationParams)
 
 parameterNameOf :: Pattern -> Maybe Binding
 parameterNameOf (VariablePattern v) = Just v
@@ -45,8 +46,13 @@ spec = do
     it "binary function with non variable pattern" $ do
       signaturesOf (hs "foo x _ = x") `shouldBe` [NamedSignature "foo" [Just "x", Nothing]]
 
-    it "binary function with multiple equations" $ do
-      signaturesOf (hs "foo x 1 = x\nfoo _ y = y") `shouldBe` [NamedSignature "foo" [Just "x", Just "y"]]
+    it "binary function with multiple complmentary equations" $ do
+      signaturesOf (hs "foo x 1 = x\nfoo _ y = y") `shouldBe` [
+                                                      NamedSignature "foo" [Just "x", Just "y"]]
+
+    it "binary function with multiple non-complementary equations" $ do
+      signaturesOf (hs "foo x 1 _ = x\nfoo p 2 z = z\nfoo _ 3 _= 3") `shouldBe` [
+                                                      NamedSignature "foo" [Just "x", Nothing, Just "z"]]
 
   describe "AritySignature" $ do
     it "empty expression" $ do
