@@ -61,7 +61,7 @@ codeSignaturesOf = map code . signaturesOf
 code :: Signature -> String
 code (AritySignature name arity) = name ++ "/" ++ show arity
 code (NamedSignature name names) = name ++ "(" ++ (intercalate ", " . zipWith makeName [1..] $ names) ++ ")"
-code (TypedSignature name types) = name ++ "::" ++ (intercalate " -> " types)
+code (TypedSignature name types) = name ++ " :: " ++ (intercalate " -> " types)
 
 makeName :: Int -> Maybe Binding -> String
 makeName _        (Just name) = name

@@ -6,10 +6,19 @@ import           Language.Mulang.Signature
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Prolog
-import           Language.Mulang.Explorer
 
 spec :: Spec
 spec = do
+  describe "codeSignatures" $ do
+    it "works with named signatures" $ do
+      codeSignaturesOf (js "function x(y, z) {}") `shouldBe` ["x(y, z)"]
+
+    it "works with types signatures" $ do
+      codeSignaturesOf (hs "x :: Int -> Int") `shouldBe` ["x :: Int -> Int"]
+
+    it "works with arity signatures" $ do
+      codeSignaturesOf (pl "x(Y, Z) :- g(Z), f(z).") `shouldBe` ["x/2"]
+
   describe "unhandled declaration" $ do
     it "object declaration" $ do
       signaturesOf (js "var x = {}") `shouldBe` []
