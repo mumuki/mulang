@@ -35,7 +35,6 @@ instance FromJSON Language
 instance ToJSON Code
 instance ToJSON Language
 
-
 parseCode :: Code -> Maybe Expression
 parseCode (Code Mulang content)         = readMaybe content
 parseCode (Code Json content)           = parseJson content

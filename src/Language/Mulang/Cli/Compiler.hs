@@ -11,7 +11,9 @@ import Language.Mulang
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
-data BindingPattern = Named String | Like String | Anyone deriving (Show, Eq, Generic)
+data BindingPattern = Named String
+                    | Like String
+                    | Anyone deriving (Show, Eq, Generic)
 
 data Expectation =  Advanced {
                       subject :: [String] ,

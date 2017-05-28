@@ -8,29 +8,6 @@ import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Prolog
 import           Language.Mulang.Explorer
 
-import           Data.List (transpose, nub)
-import           Data.Maybe (mapMaybe)
-import           Control.Monad (msum)
-
-signaturesOf :: Expression -> [Signature]
-signaturesOf = nub . mapMaybe (signatureOf.snd) . declarationsOf
-
-signatureOf :: Expression -> Maybe Signature
-signatureOf (FunctionDeclaration name equations)  = Just $ NamedSignature name (parameterNamesOf equations)
-signatureOf (ProcedureDeclaration name equations) = Just $ NamedSignature name (parameterNamesOf equations)
-signatureOf (RuleDeclaration name args _)         = Just $ AritySignature name (length args)
-signatureOf (FactDeclaration name args)           = Just $ AritySignature name (length args)
-signatureOf (TypeSignature name args)             = Just $ TypedSignature name args
-signatureOf (VariableDeclaration name _)          = Just $ AritySignature name 0
-signatureOf _                                     = Nothing
-
-parameterNamesOf :: [Equation] -> [Maybe Binding]
-parameterNamesOf = map msum . transpose . map (map parameterNameOf . equationParams)
-
-parameterNameOf :: Pattern -> Maybe Binding
-parameterNameOf (VariablePattern v) = Just v
-parameterNameOf _                   = Nothing
-
 spec :: Spec
 spec = do
   describe "unhandled declaration" $ do

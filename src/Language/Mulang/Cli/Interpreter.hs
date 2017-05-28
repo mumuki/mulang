@@ -6,10 +6,11 @@ module Language.Mulang.Cli.Interpreter (
   evaluate,
   Input(..),
   Output(..),
-  SignatureGeneration,
   Expectation(..),
   ExpectationResult(..)) where
 
+import Control.Monad
+import Language.Mulang.Signature
 import Language.Mulang.Cli.Code
 import Language.Mulang.Cli.Compiler
 
@@ -22,17 +23,18 @@ import Language.Mulang.Inspector.Generic.Smell
 data Input = Input {
   code :: Code,
   expectations :: [Expectation],
-  signatureGeneration :: SignatureGeneration
+  analyseSignatures :: Bool
 } deriving (Show, Eq, Generic)
 
 data Output = Output {
-  results :: [ExpectationResult],
-  smells :: [Expectation]
+  results :: ExpectationAnalysysResult,
+  smells :: SmellAnalysysResult,
+  signatures :: SignatureAnalysysResult
 }  deriving (Show, Eq, Generic)
 
-data SignatureGeneration = NoSignatureGeneration
-                         | StructuredSignatureGeneration
-                         | CodeSignatureGeneration deriving (Show, Eq, Generic)
+type ExpectationAnalysysResult = [ExpectationResult]
+type SmellAnalysysResult = [Expectation]
+type SignatureAnalysysResult = [String]
 
 data ExpectationResult = ExpectationResult {
   expectation :: Expectation,
@@ -42,23 +44,29 @@ data ExpectationResult = ExpectationResult {
 instance FromJSON Input
 instance FromJSON Output
 instance FromJSON ExpectationResult
-instance FromJSON SignatureGeneration
 
 instance ToJSON Output
 instance ToJSON Input
 instance ToJSON ExpectationResult
-instance ToJSON SignatureGeneration
 
 newSample :: Code -> Input
-newSample code = Input code [] NoSignatureGeneration
+newSample code = Input code [] False
 
 expectationsSample :: Code -> [Expectation] -> Input
 expectationsSample code es = (newSample code) { expectations = es }
 
 evaluate :: Input -> Output
-evaluate (Input code expectations _)
-      | Just ast <- parseCode code = Output (evaluateExpectations expectations ast) (detectSmells ast)
-      | otherwise = Output [] []
+evaluate (Input code expectations analyseSignatures)
+      | Just ast <- parseCode code = evaluateAst ast expectations analyseSignatures
+      | otherwise = Output [] [] []
+
+evaluateAst ast expectations analyseSignatures =
+    Output (evaluateExpectations expectations ast)
+           (detectSmells ast)
+           (generateSignatures analyseSignatures ast)
+
+generateSignatures :: Bool -> Expression -> SignatureAnalysysResult
+generateSignatures analyseSignatures e = onlyIf' analyseSignatures (codeSignaturesOf e)
 
 evaluateExpectations :: [Expectation] ->  Expression -> [ExpectationResult]
 evaluateExpectations es content = map run es
@@ -72,8 +80,8 @@ detectSmells :: Expression -> [Expectation]
 detectSmells code = concatMap (`runSingleSmellDetection` code) namedSmells
 
 runSingleSmellDetection :: NamedSmell -> Expression -> [Expectation]
-runSingleSmellDetection (name, inspection) code =
-  map (smellyBindingToResult name) $ detect inspection code
+runSingleSmellDetection (name, inspection) =
+  map (smellyBindingToResult name) . detect inspection
 
 namedSmells :: [NamedSmell]
 namedSmells = [
@@ -89,4 +97,9 @@ namedSmells = [
 
 smellyBindingToResult smellName binding = Basic binding smellName
 
+onlyIf' :: MonadPlus m => Bool -> m a -> m a
+onlyIf' True x = x
+onlyIf' _    _ = mzero
 
+onlyIf :: MonadPlus m => Bool -> a -> m a
+onlyIf condition = onlyIf' condition . return
