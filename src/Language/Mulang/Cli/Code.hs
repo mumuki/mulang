@@ -1,6 +1,9 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module        Language.Mulang.Cli.Code where
+module        Language.Mulang.Cli.Code (
+  parseCode,
+  Code(..),
+  Language(..)) where
 
 import        GHC.Generics
 
@@ -14,19 +17,17 @@ import        Language.Mulang.Parsers.Prolog (parseProlog)
 import        Language.Mulang.Parsers.Gobstones (parseGobstones)
 import        Text.Read
 
-
 data Code = Code {
-    language :: Language,
-    content :: String
+  language :: Language,
+  content :: String
 } deriving (Show, Eq, Generic)
 
-data Language
-      =  Mulang
-      |  Json
-      |  JavaScript
-      |  Prolog
-      |  GobstonesAst
-      |  Haskell deriving (Show, Eq, Generic)
+data Language =  Mulang
+              |  Json
+              |  JavaScript
+              |  Prolog
+              |  GobstonesAst
+              |  Haskell deriving (Show, Eq, Generic)
 
 instance FromJSON Code
 instance FromJSON Language

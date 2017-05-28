@@ -17,7 +17,6 @@ spec = describe "Evaluator" $ do
       evaluate (expectationsSample (Code Haskell "x = 2") [notHasTurtle]) `shouldBe` (Output [
                                                                         ExpectationResult notHasTurtle True] [])
 
-
     it "evaluates empty expectations" $ do
       evaluate (expectationsSample (Code Haskell "x = 2") []) `shouldBe` (Output [] [])
 

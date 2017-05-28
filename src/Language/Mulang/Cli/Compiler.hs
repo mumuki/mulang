@@ -1,9 +1,9 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Language.Mulang.Cli.Compiler(
-    compile,
-    Expectation(..),
-    BindingPattern(..)) where
+  compile,
+  Expectation(..),
+  BindingPattern(..)) where
 
 import GHC.Generics
 import Data.Aeson

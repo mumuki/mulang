@@ -1,14 +1,14 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Language.Mulang.Cli.Interpreter (
-            newSample,
-            expectationsSample,
-            evaluate,
-            Input(..),
-            Output(..),
-            SignatureGeneration,
-            Expectation(..),
-            ExpectationResult(..)) where
+  newSample,
+  expectationsSample,
+  evaluate,
+  Input(..),
+  Output(..),
+  SignatureGeneration,
+  Expectation(..),
+  ExpectationResult(..)) where
 
 import Language.Mulang.Cli.Code
 import Language.Mulang.Cli.Compiler
@@ -18,7 +18,6 @@ import Data.Aeson
 
 import Language.Mulang
 import Language.Mulang.Inspector.Generic.Smell
-
 
 data Input = Input {
   code :: Code,
