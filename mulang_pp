@@ -1,0 +1,4 @@
+#!/bin/bash
+
+mulang "$1" | json_pp 
+
