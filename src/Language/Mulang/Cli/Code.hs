@@ -14,7 +14,7 @@ import        Language.Mulang.Parsers.Json
 import        Language.Mulang.Parsers.Haskell
 import        Language.Mulang.Parsers.JavaScript (parseJavaScript)
 import        Language.Mulang.Parsers.Prolog (parseProlog)
-import        Language.Mulang.Parsers.Gobstones (parseGobstones)
+import        Language.Mulang.Parsers.Gobstones (parseGobstones, parseGobstonesAst)
 import        Text.Read
 
 data Code = Code {
@@ -27,6 +27,7 @@ data Language =  Mulang
               |  JavaScript
               |  Prolog
               |  GobstonesAst
+              |  Gobstones
               |  Haskell deriving (Show, Eq, Generic)
 
 instance FromJSON Code
@@ -41,4 +42,5 @@ parseCode (Code Json content)           = parseJson content
 parseCode (Code Haskell content)        = parseHaskell content
 parseCode (Code JavaScript content)     = parseJavaScript content
 parseCode (Code Prolog content)         = parseProlog content
-parseCode (Code GobstonesAst content)   = parseGobstones content
+parseCode (Code Gobstones content)   = parseGobstones content
+parseCode (Code GobstonesAst content)   = parseGobstonesAst content
