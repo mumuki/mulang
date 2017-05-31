@@ -7,17 +7,38 @@ import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Prolog
 
+
 spec :: Spec
 spec = do
   describe "codeSignatures" $ do
-    it "works with named signatures" $ do
-      codeSignaturesOf (js "function x(y, z) {}") `shouldBe` ["x(y, z)"]
+    it "works with named signatures in untyped-c" $ do
+      styledCodeSignaturesOf untypedCStyle (js "function x(y, z) {}") `shouldBe` ["// x(y, z)"]
 
-    it "works with types signatures" $ do
-      codeSignaturesOf (hs "x :: Int -> Int") `shouldBe` ["x :: Int -> Int"]
+    it "works with variable signatures in untyped-c" $ do
+      styledCodeSignaturesOf untypedCStyle (js "var x = 2") `shouldBe` ["// x"]
 
-    it "works with arity signatures" $ do
-      codeSignaturesOf (pl "x(Y, Z) :- g(Z), f(z).") `shouldBe` ["x/2"]
+    it "works with no-args function signatures in untyped-c" $ do
+      styledCodeSignaturesOf untypedCStyle (js "function x() { return 2 }") `shouldBe` ["// x()"]
+
+    it "works with arity signatures in prolog" $ do
+      styledCodeSignaturesOf prologStyle (pl "x(Y, Z) :- g(Z), f(z).") `shouldBe` ["%% x/2"]
+
+    it "works with different arity signatures in prolog" $ do
+      styledCodeSignaturesOf prologStyle (pl "x(Y, Z) :- g(Z), f(z).x(Y) :- g(z).x(2).") `shouldBe` [
+                                                                                      "%% x/2",
+                                                                                      "%% x/1"]
+
+    it "works with types signatures in haskell" $ do
+      styledCodeSignaturesOf haskellStyle (hs "x :: Int -> Int") `shouldBe` ["-- x :: Int -> Int"]
+
+    it "works with mixed typed signatures in hasell" $ do
+      styledCodeSignaturesOf haskellStyle (hs "x :: Int -> Int\nx y = y") `shouldBe` ["-- x :: Int -> Int\n-- x y"]
+
+    it "works with variable signatures in haskell" $ do
+      styledCodeSignaturesOf haskellStyle (hs "x :: Int\nx = 1") `shouldBe` ["-- x :: Int\n-- x"]
+
+    it "works with untyped variable signatures in haskell" $ do
+      styledCodeSignaturesOf haskellStyle (hs "x = 1") `shouldBe` ["-- x"]
 
   describe "unhandled declaration" $ do
     it "object declaration" $ do
