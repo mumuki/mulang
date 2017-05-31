@@ -2,7 +2,7 @@ module Language.Mulang.Signature (
   arity,
   name,
   code,
-  paramterNames,
+  parameterNames,
   signatureOf,
   signaturesOf,
   codeSignaturesOf,
@@ -31,10 +31,10 @@ name (AritySignature n _) = n
 name (TypedSignature n _) = n
 name (NamedSignature n _) = n
 
-paramterNames :: Signature -> [Maybe Binding]
-paramterNames (AritySignature _ arity) = replicate arity Nothing
-paramterNames (TypedSignature _ types) = map (const Nothing) types
-paramterNames (NamedSignature _ names) = names
+parameterNames :: Signature -> [Maybe Binding]
+parameterNames (AritySignature _ arity) = replicate arity Nothing
+parameterNames (TypedSignature _ types) = map (const Nothing) types
+parameterNames (NamedSignature _ names) = names
 
 signaturesOf :: Expression -> [Signature]
 signaturesOf = nub . mapMaybe (signatureOf.snd) . declarationsOf

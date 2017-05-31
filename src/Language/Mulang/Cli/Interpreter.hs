@@ -27,12 +27,12 @@ data Input = Input {
 } deriving (Show, Eq, Generic)
 
 data Output = Output {
-  results :: ExpectationAnalysysResult,
+  results :: ExpectationAnalysisResult,
   smells :: SmellAnalysysResult,
   signatures :: SignatureAnalysysResult
 }  deriving (Show, Eq, Generic)
 
-type ExpectationAnalysysResult = [ExpectationResult]
+type ExpectationAnalysisResult = [ExpectationResult]
 type SmellAnalysysResult = [Expectation]
 type SignatureAnalysysResult = [String]
 

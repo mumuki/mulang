@@ -54,7 +54,7 @@ spec = do
     it "binary function with non variable pattern" $ do
       signaturesOf (hs "foo x _ = x") `shouldBe` [NamedSignature "foo" [Just "x", Nothing]]
 
-    it "binary function with multiple complmentary equations" $ do
+    it "binary function with multiple complementary equations" $ do
       signaturesOf (hs "foo x 1 = x\nfoo _ y = y") `shouldBe` [
                                                       NamedSignature "foo" [Just "x", Just "y"]]
 
