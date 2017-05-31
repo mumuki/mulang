@@ -178,13 +178,13 @@ _Which means that there are null returns within  `bar` and also within `foo`_
 
 ## An universal tool
 
-The really awesome is here: it is an universal tool which can _potentially_ work with every programming language. it natively supports: 
+The really awesome is here: it is an universal tool which can _potentially_ work with every programming language. it natively supports:
 
   * JS (ES5)
   * Haskell
   * Prolog
   * Gobstones
-  * Mulang itself, expressed as a JSON AST. 
+  * Mulang itself, expressed as a JSON AST.
 
 So in order to use it with a particular language, you have to:
 
@@ -201,31 +201,126 @@ But if you are not the Haskell inclined gal or guy - ok, I will try to forgive y
 Sample CLI usage...
 
 ...with advanced expectations:
-```
-$ mulang '{"expectations":[{"tag":"Advanced","subject":["x"],"transitive":false,"negated":false,"object":{"tag":"Anyone","contents":[]},"verb":"uses"}],"code":{"content":"x = 1","language":"Haskell"}}'
-{"results":[{"result":false,"expectation":{"subject":["x"],"tag":"Advanced","transitive":false,"negated":false,"object":{"tag":"Anyone","contents":[]},"verb":"uses"}}],"smells":[]}
+
+```bash
+$ mulang '
+{
+   "expectations" : [
+      {
+         "negated" : false,
+         "subject" : [
+            "x"
+         ],
+         "transitive" : false,
+         "object" : {
+            "tag" : "Anyone",
+            "contents" : []
+         },
+         "tag" : "Advanced",
+         "verb" : "uses"
+      }
+   ],
+   "code" : {
+      "content" : "x = 1",
+      "language" : "Haskell"
+   },
+   "analyseSignatures" : false
+}' | json_pp
+{
+   "results" : [
+      {
+         "expectation" : {
+            "tag" : "Advanced",
+            "object" : {
+               "tag" : "Anyone",
+               "contents" : []
+            },
+            "verb" : "uses",
+            "transitive" : false,
+            "negated" : false,
+            "subject" : [
+               "x"
+            ]
+         },
+         "result" : false
+      }
+   ],
+   "smells" : [],
+   "signatures" : []
+}
 ```
 
-...and with basic expectations:
+...with basic expectations:
+
+```bash
+$ mulang '
+{
+   "code" : {
+      "content" : "x = 1",
+      "language" : "Haskell"
+   },
+   "analyseSignatures" : false,
+   "expectations" : [
+      {
+         "tag" : "Basic",
+         "inspection" : "HasBinding",
+         "binding" : "x"
+      }
+   ]
+}' | json_pp
+{
+   "signatures" : [],
+   "smells" : [],
+   "results" : [
+      {
+         "result" : true,
+         "expectation" : {
+            "inspection" : "HasBinding",
+            "binding" : "x",
+            "tag" : "Basic"
+         }
+      }
+   ]
+}
+
 ```
-$ mulang '{"expectations":[{"tag":"Basic","binding":"x","inspection":"HasBinding"}],"code":{"content":"x = 1","language":"Haskell"}}'
-{"results":[{"result":true,"expectation":{"tag":"Basic","inspection":"HasBinding","binding":"x"}}],"smells":[]}
+
+...and with signature analysis:
+
+```bash
+$ mulang '
+{
+   "code" : {
+      "content" : "function foo(x, y) { return x + y; }",
+      "language" : "JavaScript"
+   },
+   "expectations" : [],
+   "analyseSignatures" : true
+}' | json_pp
+{
+   "results" : [],
+   "smells" : [],
+   "signatures" : [
+      "foo(x, y)"
+   ]
+}
 ```
 
-  
-## Expectations and Smells  
 
-Mulang CLI can do two different kinds of analysis: 
 
-* **Expectation analysis**: you can provide an expression - called `inspection` - that will be tested against the provied program. Expectations answer questions like: _does the function X call the function Y?_ or _does the program use if's?_. It comes in two flavors: 
-     * **basic expectations**: are composed by a binding and an inspection 
+## Expectations, Signatures and Smells
+
+Mulang CLI can do three different kinds of analysis:
+
+* **Expectation analysis**: you can provide an expression - called `inspection` - that will be tested against the provied program. Expectations answer questions like: _does the function X call the function Y?_ or _does the program use if's?_. It comes in two flavors:
+     * **basic expectations**: are composed by a binding and an inspection
      * **advanced expectations**: are composed by
        * subject
        * verb
        * object
        * flags
-* **Smell analysis**: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched. 
-
+* **Smell analysis**: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched.
+* **Signature analysis**: report the signatures of the computations present in source code.
 
 ## Building mulang from source
 
@@ -279,5 +374,5 @@ cabal repl
 And then, inside the REPL, do:
 
 ```
-:m Language.Mulang.All
+:m Language.Mulang
 ```

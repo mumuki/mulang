@@ -42,14 +42,6 @@ hash f@(ProcedureDeclaration _ _)  = 17 * (37 + hash (simpleProcedureBody f))
 hash (Sequence es)                 = 19 * (37 + positionalHash es)
 hash _                             = 1
 
-simpleProcedureBody :: Expression -> Expression
-simpleProcedureBody (ProcedureDeclaration _ [equation]) = equationUnguardedBody equation
-
-simpleFunctionBody :: Expression -> Expression
-simpleFunctionBody (FunctionDeclaration _ [equation]) = equationUnguardedBody equation
-equationUnguardedBody (Equation _ (UnguardedBody body)) = body
-
-
 positionalHash :: [Expression] -> Int
 positionalHash = sum . zipWith hashElement [1..] . reverse
         where

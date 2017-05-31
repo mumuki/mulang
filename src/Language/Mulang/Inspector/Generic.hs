@@ -44,8 +44,8 @@ usesIf = containsExpression f
 -- | Inspection that tells whether a top level binding exists
 declares :: BindingPredicate -> Inspection
 declares = containsDeclaration f
-  where f (TypeSignature _) = False
-        f _                 = True
+  where f (TypeSignature _ _) = False
+        f _                   = True
 
 -- | Inspection that tells whether an expression is direct recursive
 declaresRecursively :: BindingPredicate -> Inspection
@@ -96,8 +96,8 @@ declaresTypeAlias = containsDeclaration f
 
 declaresTypeSignature :: BindingPredicate -> Inspection
 declaresTypeSignature = containsDeclaration f
-  where f (TypeSignature _)  = True
-        f _                  = False
+  where f (TypeSignature _ _)  = True
+        f _                    = False
 
 
 usesAnonymousVariable :: Inspection
@@ -112,8 +112,6 @@ usesAnonymousVariable = containsExpression f
 
         equationContainsWildcard = any (paramsContainsWildcard . equationParams)
         paramsContainsWildcard = any isOrContainsWildcard
-
-        equationParams (Equation p _) = p
 
         isOrContainsWildcard (InfixApplicationPattern p1 _ p2) = any isOrContainsWildcard [p1, p2]
         isOrContainsWildcard (ApplicationPattern _ ps)         = any isOrContainsWildcard ps

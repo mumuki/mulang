@@ -75,6 +75,7 @@ library
     Language.Mulang.Binding
     Language.Mulang.Builder
     Language.Mulang.Explorer
+    Language.Mulang.Signature
     Language.Mulang.Inspector
     Language.Mulang.Inspector.Generic
     Language.Mulang.Inspector.ObjectOriented
