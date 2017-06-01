@@ -144,3 +144,7 @@ spec = describe "Evaluator" $ do
       let hasNot = (Basic "foo" "HasNot")
       evaluate (expectationsSample (Code Prolog "foo(X) :- bar(X).") [hasNot]) `shouldBe` (expectationsAnalysysResult [ExpectationResult hasNot False] [])
       evaluate (expectationsSample (Code Prolog "foo(X) :- not(bar(X)).") [hasNot]) `shouldBe` (expectationsAnalysysResult [ExpectationResult hasNot True] [])
+
+    it "proerly reports parsing errors" $ do
+      let hasNot = (Basic "foo" "HasNot")
+      evaluate (expectationsSample (Code Haskell " foo ") [hasNot]) `shouldBe` (InvalidSample "Parsing error")

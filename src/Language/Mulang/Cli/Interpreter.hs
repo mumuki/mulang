@@ -27,10 +27,11 @@ data Input = Input {
 } deriving (Show, Eq, Generic)
 
 data Output = Output {
-  results :: ExpectationAnalysisResult,
-  smells :: SmellAnalysysResult,
-  signatures :: SignatureAnalysysResult
-}  deriving (Show, Eq, Generic)
+                results :: ExpectationAnalysisResult,
+                smells :: SmellAnalysysResult,
+                signatures :: SignatureAnalysysResult
+              }
+              | InvalidSample { reason :: String} deriving (Show, Eq, Generic)
 
 type ExpectationAnalysisResult = [ExpectationResult]
 type SmellAnalysysResult = [Expectation]
@@ -58,7 +59,7 @@ expectationsSample code es = (newSample code) { expectations = es }
 evaluate :: Input -> Output
 evaluate (Input code expectations analyseSignatures)
       | Just ast <- parseCode code = evaluateAst ast expectations analyseSignatures
-      | otherwise = Output [] [] []
+      | otherwise = InvalidSample "Parsing error"
 
 evaluateAst ast expectations analyseSignatures =
     Output (evaluateExpectations expectations ast)
