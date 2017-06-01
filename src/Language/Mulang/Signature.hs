@@ -100,8 +100,17 @@ prologStyle = groupAndMakeLinesOn "%%" nameAndArity s
 
 --Style helper functions
 
+makeParamNames :: [Maybe String] -> [String]
 makeParamNames = map (fromMaybe "?")
-makeLines comment f = prefixSignaturesWithComment comment . mapMaybe f
-groupAndMakeLinesOn comment f s = map (intercalate "\n" . makeLines comment s) . groupSignaturesOn f
-prefixSignaturesWithComment comment = map (\s -> comment ++ " " ++ s)
+
+makeLines :: String -> (Signature -> Maybe String) -> [Signature] -> [String]
+makeLines comment f = prefixCodeSignaturesWithComment comment . mapMaybe f
+
+groupAndMakeLinesOn :: Eq a => String -> (Signature -> a) -> (Signature -> Maybe String) -> [Signature] -> [String]
+groupAndMakeLinesOn comment groupFunction s = map (intercalate "\n" . makeLines comment s) . groupSignaturesOn groupFunction
+
+prefixCodeSignaturesWithComment :: String -> [String] -> [String]
+prefixCodeSignaturesWithComment comment = map (\s -> comment ++ " " ++ s)
+
+groupSignaturesOn :: Eq a => (Signature -> a) -> [Signature] -> [[Signature]]
 groupSignaturesOn f = groupBy ((==) `on` f)
