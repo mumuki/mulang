@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Language.Mulang.Cli.Compiler(
+module Language.Mulang.Analyzer.Compiler(
   compile,
   Expectation(..),
   BindingPattern(..)) where

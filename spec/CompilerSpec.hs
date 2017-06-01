@@ -2,7 +2,7 @@ module CompilerSpec(spec) where
 
 import qualified Data.ByteString.Lazy.Char8 as LBS (pack)
 import           Data.Aeson
-import           Language.Mulang.Cli.Compiler as C
+import           Language.Mulang.Analyzer.Compiler as C
 import           Test.Hspec
 
 spec = describe "Compiler" $ do
@@ -15,7 +15,7 @@ spec = describe "Compiler" $ do
 
     it "can be encoded to JSON" $ do
       encode advancedExp `shouldBe` advancedExpJson
-  
+
   describe "basic expectations" $ do
     let basicExpJson = LBS.pack "{\"tag\":\"Basic\",\"inspection\":\"HasBinding\",\"binding\":\"x\"}"
     let basicExp = C.Basic "x" "HasBinding"

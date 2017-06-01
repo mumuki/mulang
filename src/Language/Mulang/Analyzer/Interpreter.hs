@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Language.Mulang.Cli.Interpreter (
+module Language.Mulang.Analyzer.Interpreter (
   newSample,
   expectationsSample,
   evaluate,
@@ -11,8 +11,8 @@ module Language.Mulang.Cli.Interpreter (
 
 import Control.Monad
 import Language.Mulang.Signature
-import Language.Mulang.Cli.Code
-import Language.Mulang.Cli.Compiler
+import Language.Mulang.Analyzer.Code
+import Language.Mulang.Analyzer.Compiler
 
 import GHC.Generics
 import Data.Aeson

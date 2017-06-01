@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module        Language.Mulang.Cli.Code (
+module        Language.Mulang.Analyzer.Code (
   parseCode,
   Code(..),
   Language(..)) where
@@ -42,5 +42,5 @@ parseCode (Code Json content)           = parseJson content
 parseCode (Code Haskell content)        = parseHaskell content
 parseCode (Code JavaScript content)     = parseJavaScript content
 parseCode (Code Prolog content)         = parseProlog content
-parseCode (Code Gobstones content)   = parseGobstones content
+parseCode (Code Gobstones content)      = parseGobstones content
 parseCode (Code GobstonesAst content)   = parseGobstonesAst content

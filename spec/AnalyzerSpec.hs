@@ -1,11 +1,12 @@
-module CliSpec(spec) where
+module AnalyzerSpec(spec) where
 
-import           Language.Mulang.Cli.Interpreter
-import           Language.Mulang.Cli.Code
-import           Language.Mulang.Cli.Compiler
+import           Language.Mulang.Analyzer.Interpreter
+import           Language.Mulang.Analyzer.Code
+import           Language.Mulang.Analyzer.Compiler
 import           Test.Hspec
 
 expectationsAnalysysResult expectationsResults smellResults = Output expectationsResults smellResults []
+
 
 spec = describe "Evaluator" $ do
   describe "Advanced expectations" $ do

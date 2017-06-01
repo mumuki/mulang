@@ -2,7 +2,7 @@
 
 module Main (main) where
 
-import Language.Mulang.Cli.Interpreter
+import Language.Mulang.Analyzer.Interpreter
 import Data.Aeson (eitherDecode, encode)
 import System.Environment (getArgs)
 import Control.Fallible (orFail)
