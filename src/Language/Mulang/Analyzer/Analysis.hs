@@ -67,7 +67,7 @@ data SignatureAnalysisType
 
 data SignatureStyle
   = MulangStyle
-  | UnTypedCStyle
+  | UntypedCStyle
   | HaskellStyle
   | PrologStyle deriving (Show, Eq, Generic)
 

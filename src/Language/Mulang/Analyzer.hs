@@ -2,6 +2,7 @@ module Language.Mulang.Analyzer (
   emptyAnalysis,
   emptyAnalysisSpec,
   expectationsAnalysis,
+  signaturesAnalysis,
 
   analyse,
 
@@ -26,6 +27,9 @@ emptyAnalysis code = Analysis code emptyAnalysisSpec
 
 expectationsAnalysis :: CodeSample -> [Expectation] -> Analysis
 expectationsAnalysis code es = Analysis code (emptyAnalysisSpec { expectations = es })
+
+signaturesAnalysis :: CodeSample -> SignatureStyle -> Analysis
+signaturesAnalysis code style = Analysis code (emptyAnalysisSpec { signatureAnalysisType = StyledSignatures style })
 
 --
 -- Analysis running
