@@ -1,4 +1,4 @@
-module AnalyzerSpec(spec) where
+module ExpectationsAnalyzerSpec(spec) where
 
 import           Language.Mulang.Analyzer hiding (result, spec)
 import           Test.Hspec
@@ -22,9 +22,6 @@ spec = describe "Evaluator" $ do
 
     it "evaluates empty expectations" $ do
       (run Haskell "x = 2" []) `shouldBe` (result [] [])
-
-    it "detects smells" $ do
-      (run Haskell "f x = if x then True else False" []) `shouldBe` (result [] [Basic "f" "HasRedundantIf"])
 
     it "evaluates present named expectations" $ do
       let ydeclares = (Advanced [] "declares" (Named "y") False False)
