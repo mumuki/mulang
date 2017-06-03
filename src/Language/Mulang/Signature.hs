@@ -65,10 +65,10 @@ parameterNameOf :: Pattern -> Maybe Binding
 parameterNameOf (VariablePattern v) = Just v
 parameterNameOf _                   = Nothing
 
-codeSignaturesOf :: Expression -> [String]
+codeSignaturesOf :: Expression -> [Code]
 codeSignaturesOf = styledCodeSignaturesOf mulangStyle
 
-styledCodeSignaturesOf :: SignatureStyle -> Expression -> [String]
+styledCodeSignaturesOf :: SignatureStyle -> Expression -> [Code]
 styledCodeSignaturesOf style = style . signaturesOf
 
 -- Styles

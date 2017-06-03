@@ -1,7 +1,6 @@
 module SignatureSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang
 import           Language.Mulang.Signature
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript

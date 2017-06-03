@@ -1,40 +1,14 @@
-{-# LANGUAGE DeriveGeneric #-}
+module Language.Mulang.Analyzer.ExpectationsCompiler(
+  compileExpectation) where
 
-module Language.Mulang.Analyzer.Compiler(
-  compile,
-  Expectation(..),
-  BindingPattern(..)) where
-
-import GHC.Generics
-import Data.Aeson
 import Language.Mulang
+import Language.Mulang.Analyzer.Analysis (Expectation(..), BindingPattern(..))
+
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
-data BindingPattern = Named String
-                    | Like String
-                    | Anyone deriving (Show, Eq, Generic)
-
-data Expectation =  Advanced {
-                      subject :: [String] ,
-                      verb :: String,
-                      object :: BindingPattern,
-                      transitive :: Bool,
-                      negated :: Bool
-                    }
-                    | Basic {
-                      binding :: String,
-                      inspection :: String
-                    } deriving (Show, Eq, Generic)
-
-instance FromJSON BindingPattern
-instance FromJSON Expectation
-
-instance ToJSON BindingPattern
-instance ToJSON Expectation
-
-compile :: Expectation -> Inspection
-compile = fromMaybe (\_ -> True) . compileMaybe
+compileExpectation :: Expectation -> Inspection
+compileExpectation = fromMaybe (\_ -> True) . compileMaybe
 
 compileMaybe :: Expectation -> Maybe Inspection
 compileMaybe (Advanced s v o t n) = do
@@ -44,7 +18,7 @@ compileMaybe (Basic b i) = do
                         let splitedInspection = splitOn ":" i
                         let isNegated = elem "Not" splitedInspection
                         expectation <- toAdvanced b (withoutNegation splitedInspection) isNegated
-                        return $ compile expectation
+                        return $ compileExpectation expectation
 
 
 withoutNegation :: [String] -> [String]
