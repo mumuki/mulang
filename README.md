@@ -225,7 +225,10 @@ $ mulang '
             "tag" : "Advanced"
          }
       ],
-      "analyseSignatures" : false
+      "signatureAnalysisType" : {
+        "tag" : "NoSignatures",
+        "contents" : []
+      }
    }
 }
 ' | json_pp
@@ -264,7 +267,10 @@ $ mulang '
       "content" : "x = 1"
    },
    "spec" : {
-      "analyseSignatures" : false,
+      "signatureAnalysisType" : {
+        "tag" : "NoSignatures",
+        "contents" : []
+      },
       "expectations" : [
          {
             "binding" : "x",
@@ -304,7 +310,10 @@ $ mulang '
    },
    "spec" : {
       "expectations" : [],
-      "analyseSignatures" : true
+      "signatureAnalysisType" : {
+        "tag" : "StyledSignatures",
+        "contents":"HaskellStyle"
+      }
    }
 }' | json_pp
 {
@@ -324,11 +333,14 @@ $ mulang '
 {
    "sample" : {
       "language" : "JavaScript",
-      "content" : "function foo(x, y) { return x + y; }"
+      "content" : "function foo(x, y { return x + y; }"
    },
    "spec" : {
       "expectations" : [],
-      "analyseSignatures" : true
+      "signatureAnalysisType" : {
+        "tag" : "StyledSignatures",
+        "contents":"HaskellStyle"
+      }
    }
 }' | json_pp
 {
