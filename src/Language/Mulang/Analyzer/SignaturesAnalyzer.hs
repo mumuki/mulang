@@ -3,12 +3,10 @@ module Language.Mulang.Analyzer.SignaturesAnalyzer (
 
 import Language.Mulang
 import Language.Mulang.Signature
-import Control.Monad (MonadPlus (..), mzero)
+import Language.Mulang.Analyzer.Analysis (SignatureAnalysisType(..))
+import Language.Mulang.Analyzer.SignatureStyleCompiler (compileSignatureStyle)
 
-analyseSignatures :: Expression -> Bool -> [Code]
-analyseSignatures e flag = onlyIf flag (codeSignaturesOf e)
-
-onlyIf :: MonadPlus m => Bool -> m a -> m a
-onlyIf True x = x
-onlyIf _    _ = mzero
-
+analyseSignatures :: Expression -> SignatureAnalysisType -> [Code]
+analyseSignatures _ NoSignatures = []
+analyseSignatures e DefaultSignatures = codeSignaturesOf e
+analyseSignatures e (StyledSignatures style) = styledCodeSignaturesOf (compileSignatureStyle style) e

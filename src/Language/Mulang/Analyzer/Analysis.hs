@@ -6,6 +6,8 @@ module Language.Mulang.Analyzer.Analysis (
 
   Analysis(..),
   AnalysisSpec(..),
+  SignatureAnalysisType(..),
+  SignatureStyle(..),
   CodeSample(..),
   Language(..),
 
@@ -55,8 +57,19 @@ data Analysis = Analysis {
 
 data AnalysisSpec = AnalysisSpec {
   expectations :: [Expectation],
-  analyseSignatures :: Bool
+  signatureAnalysisType :: SignatureAnalysisType
 } deriving (Show, Eq, Generic)
+
+data SignatureAnalysisType
+  = NoSignatures
+  | DefaultSignatures
+  | StyledSignatures SignatureStyle deriving (Show, Eq, Generic)
+
+data SignatureStyle
+  = MulangStyle
+  | UnTypedCStyle
+  | HaskellStyle
+  | PrologStyle deriving (Show, Eq, Generic)
 
 data CodeSample = CodeSample {
   language :: Language,
@@ -73,6 +86,8 @@ data Language =  Mulang
 
 instance FromJSON Analysis
 instance FromJSON AnalysisSpec
+instance FromJSON SignatureAnalysisType
+instance FromJSON SignatureStyle
 instance FromJSON CodeSample
 instance FromJSON Language
 

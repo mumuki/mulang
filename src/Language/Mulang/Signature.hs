@@ -7,10 +7,12 @@ module Language.Mulang.Signature (
   signaturesOf,
   codeSignaturesOf,
   styledCodeSignaturesOf,
+  mulangStyle,
   haskellStyle,
   prologStyle,
   untypedCStyle,
-  Signature(..)) where
+  Signature(..),
+  SignatureStyle) where
 
 import Language.Mulang.Binding
 import Language.Mulang.Ast

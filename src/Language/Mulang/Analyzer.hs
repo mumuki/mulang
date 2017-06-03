@@ -7,19 +7,19 @@ module Language.Mulang.Analyzer (
 
   module Language.Mulang.Analyzer.Analysis) where
 
-import           Language.Mulang
-import           Language.Mulang.Analyzer.Analysis
-import           Language.Mulang.Analyzer.CodeSampleParser (parseCodeSample)
-import qualified Language.Mulang.Analyzer.SignaturesAnalyzer as SA (analyseSignatures)
-import           Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
-import           Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
+import Language.Mulang
+import Language.Mulang.Analyzer.Analysis
+import Language.Mulang.Analyzer.CodeSampleParser (parseCodeSample)
+import Language.Mulang.Analyzer.SignaturesAnalyzer  (analyseSignatures)
+import Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
+import Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
 
 --
 -- Builder functions
 --
 
 emptyAnalysisSpec :: AnalysisSpec
-emptyAnalysisSpec = AnalysisSpec [] False
+emptyAnalysisSpec = AnalysisSpec [] NoSignatures
 
 emptyAnalysis :: CodeSample -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec
@@ -40,4 +40,4 @@ analyseAst :: Expression -> AnalysisSpec -> AnalysisResult
 analyseAst ast spec =
   AnalysisCompleted (analyseExpectations ast (expectations spec))
                     (analyseSmells ast)
-                    (SA.analyseSignatures ast (analyseSignatures spec))
+                    (analyseSignatures ast (signatureAnalysisType spec))
