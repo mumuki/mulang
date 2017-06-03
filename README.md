@@ -198,114 +198,144 @@ Mulang is just a Haskell library. You can install it though cabal.
 
 But if you are not the Haskell inclined gal or guy - ok, I will try to forgive you - this code comes with a command line too. So you don't even have to typecheck!
 
-Sample CLI usage...
+## Sample CLI usage
 
-...with advanced expectations:
+### With advanced expectations:
 
 ```bash
 $ mulang '
 {
-   "expectations" : [
-      {
-         "negated" : false,
-         "subject" : [
-            "x"
-         ],
-         "transitive" : false,
-         "object" : {
-            "tag" : "Anyone",
-            "contents" : []
-         },
-         "tag" : "Advanced",
-         "verb" : "uses"
-      }
-   ],
-   "code" : {
-      "content" : "x = 1",
-      "language" : "Haskell"
+   "sample" : {
+      "language" : "Haskell",
+      "content" : "x = 1"
    },
-   "analyseSignatures" : false
-}' | json_pp
+   "spec" : {
+      "expectations" : [
+         {
+            "subject" : [
+               "x"
+            ],
+            "object" : {
+               "contents" : [],
+               "tag" : "Anyone"
+            },
+            "negated" : false,
+            "verb" : "uses",
+            "transitive" : false,
+            "tag" : "Advanced"
+         }
+      ],
+      "analyseSignatures" : false
+   }
+}
+' | json_pp
 {
-   "results" : [
+   "signatures" : [],
+   "tag" : "AnalysisCompleted",
+   "smells" : [],
+   "expectationResults" : [
       {
          "expectation" : {
-            "tag" : "Advanced",
             "object" : {
                "tag" : "Anyone",
                "contents" : []
             },
-            "verb" : "uses",
             "transitive" : false,
             "negated" : false,
             "subject" : [
                "x"
-            ]
+            ],
+            "verb" : "uses",
+            "tag" : "Advanced"
          },
          "result" : false
       }
-   ],
-   "smells" : [],
-   "signatures" : []
+   ]
 }
 ```
 
-...with basic expectations:
+### With basic expectations
 
 ```bash
 $ mulang '
 {
-   "code" : {
-      "content" : "x = 1",
-      "language" : "Haskell"
+   "sample" : {
+      "language" : "Haskell",
+      "content" : "x = 1"
    },
-   "analyseSignatures" : false,
-   "expectations" : [
-      {
-         "tag" : "Basic",
-         "inspection" : "HasBinding",
-         "binding" : "x"
-      }
-   ]
-}' | json_pp
+   "spec" : {
+      "analyseSignatures" : false,
+      "expectations" : [
+         {
+            "binding" : "x",
+            "tag" : "Basic",
+            "inspection" : "HasBinding"
+         }
+      ]
+   }
+}
+' | json_pp
 {
+   "tag" : "AnalysisCompleted",
    "signatures" : [],
    "smells" : [],
-   "results" : [
+   "expectationResults" : [
       {
-         "result" : true,
          "expectation" : {
+            "tag" : "Basic",
             "inspection" : "HasBinding",
-            "binding" : "x",
-            "tag" : "Basic"
-         }
+            "binding" : "x"
+         },
+         "result" : true
       }
    ]
 }
 
 ```
 
-...and with signature analysis:
+### With signature analysis
 
 ```bash
 $ mulang '
 {
-   "code" : {
-      "content" : "function foo(x, y) { return x + y; }",
-      "language" : "JavaScript"
+   "sample" : {
+      "language" : "JavaScript",
+      "content" : "function foo(x, y) { return x + y; }"
    },
-   "expectations" : [],
-   "analyseSignatures" : true
+   "spec" : {
+      "expectations" : [],
+      "analyseSignatures" : true
+   }
 }' | json_pp
 {
-   "results" : [],
-   "smells" : [],
+   "expectationResults" : [],
    "signatures" : [
-      "foo(x, y)"
-   ]
+      "-- foo(x, y)"
+   ],
+   "smells" : [],
+   "tag" : "AnalysisCompleted"
 }
 ```
 
+### With broken input
+
+```bash
+$ mulang '
+{
+   "sample" : {
+      "language" : "JavaScript",
+      "content" : "function foo(x, y) { return x + y; }"
+   },
+   "spec" : {
+      "expectations" : [],
+      "analyseSignatures" : true
+   }
+}' | json_pp
+{
+   "tag" : "AnalysisFailed",
+   "reason" : "Sample code parsing error"
+}
+```
 
 
 ## Expectations, Signatures and Smells
