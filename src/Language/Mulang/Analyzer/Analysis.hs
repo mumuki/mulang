@@ -100,12 +100,9 @@ instance FromJSON ComprehensionStatement
 -- Analysis Output structures
 --
 
-data AnalysisResult = AnalysisCompleted {
-                        expectationResults :: [ExpectationResult],
-                        smells :: [Expectation],
-                        signatures :: [Code]
-                      }
-                    | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
+data AnalysisResult
+  = AnalysisCompleted { expectationResults :: [ExpectationResult], smells :: [Expectation], signatures :: [Code] }
+  | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
 data ExpectationResult = ExpectationResult {
   expectation :: Expectation,
