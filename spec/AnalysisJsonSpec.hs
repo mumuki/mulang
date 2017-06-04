@@ -83,7 +83,7 @@ spec = describe "AnalisisJson" $ do
 
     run json `shouldBe` analysis
 
-  it "works with signture analysis" $ do
+  it "works with signature analysis" $ do
     let json = LBS.pack [string|
 {
    "sample" : {
