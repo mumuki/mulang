@@ -57,5 +57,5 @@ analyse (Analysis sample spec)
 analyseAst :: Expression -> AnalysisSpec -> AnalysisResult
 analyseAst ast spec =
   AnalysisCompleted (analyseExpectations ast (expectations spec))
-                    (analyseSmells ast)
+                    (analyseSmells ast (smellsSet spec))
                     (analyseSignatures ast (signatureAnalysisType spec))

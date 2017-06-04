@@ -4,26 +4,35 @@ module Language.Mulang.Analyzer.SmellsAnalyzer (
 import Language.Mulang
 import Language.Mulang.Inspector.Generic.Smell
 import Language.Mulang.Analyzer.Analysis
+import Data.List
 
-type NamedSmell = (String, Inspection)
+analyseSmells :: Expression -> SmellsSet -> [Expectation]
+analyseSmells code set = concatMap (`detectSmell` code) (smellsFor set)
 
-analyseSmells :: Expression -> [Expectation]
-analyseSmells code = concatMap (`runSingleSmellDetection` code) namedSmells
+detectSmell :: Smell -> Expression -> [Expectation]
+detectSmell smell =  map (exectationFor smell) . detect (inspectionFor smell)
 
-runSingleSmellDetection :: NamedSmell -> Expression -> [Expectation]
-runSingleSmellDetection (name, inspection) =
-  map (smellyBindingToResult name) . detect inspection
+smellsFor :: SmellsSet -> [Smell]
+smellsFor (NoSmells included)  = included
+smellsFor (AllSmells excluded) = allSmells \\ excluded
 
-namedSmells :: [NamedSmell]
-namedSmells = [
-  ("HasRedundantIf", hasRedundantIf),
-  ("HasRedundantLambda", hasRedundantLambda),
-  ("HasRedundantBooleanComparison", hasRedundantBooleanComparison),
-  ("HasRedundantGuards", hasRedundantGuards),
-  ("HasRedundantLocalVariableReturn", hasRedundantLocalVariableReturn),
-  ("hasAssignmentReturn", hasAssignmentReturn),
-  ("DoesNullTest", doesNullTest),
-  ("DoesTypeTest", doesTypeTest),
-  ("ReturnsNull", returnsNull)]
+allSmells :: [Smell]
+allSmells = enumFrom minBound
 
-smellyBindingToResult smellName binding = Basic binding smellName
+inspectionFor :: Smell -> Inspection
+inspectionFor HasRedundantIf                  = hasRedundantIf
+inspectionFor HasRedundantLambda              = hasRedundantLambda
+inspectionFor HasRedundantBooleanComparison   = hasRedundantBooleanComparison
+inspectionFor HasRedundantGuards              = hasRedundantGuards
+inspectionFor HasRedundantLocalVariableReturn = hasRedundantLocalVariableReturn
+inspectionFor HasAssignmentReturn             = hasAssignmentReturn
+inspectionFor HasRedundantParameter           = hasRedundantParameter
+inspectionFor DoesNullTest                    = doesNullTest
+inspectionFor DoesTypeTest                    = doesTypeTest
+inspectionFor ReturnsNull                     = returnsNull
+inspectionFor IsLongCode                      = const False
+inspectionFor HasBadNames                     = const False
+inspectionFor HasCodeDuplication              = const False
+
+exectationFor :: Smell -> Binding -> Expectation
+exectationFor smell binding = Basic binding (show smell)

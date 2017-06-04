@@ -7,6 +7,7 @@ module Language.Mulang.Analyzer.Analysis (
   Analysis(..),
   AnalysisSpec(..),
   SmellsSet(..),
+  Smell(..),
   SignatureAnalysisType(..),
   SignatureStyle(..),
   Sample(..),
@@ -22,13 +23,12 @@ import Data.Aeson
 import Language.Mulang.Ast
 import Language.Mulang.Binding (Binding)
 
-type BasicInspection = String
-type Inspection = String
-type Smell = String
-
---
+---
 -- Common structures
 --
+
+type BasicInspection = String
+type Inspection = String
 
 data Expectation =  Advanced {
                       subject :: [Binding] ,
@@ -71,6 +71,21 @@ data SmellsSet
   = NoSmells { include :: [Smell] }
   | AllSmells { exclude :: [Smell] } deriving (Show, Eq, Generic)
 
+data Smell
+  = HasRedundantIf
+  | HasRedundantLambda
+  | HasRedundantBooleanComparison
+  | HasRedundantGuards
+  | HasRedundantLocalVariableReturn
+  | HasAssignmentReturn
+  | DoesNullTest
+  | DoesTypeTest
+  | IsLongCode
+  | ReturnsNull
+  | HasRedundantParameter
+  | HasBadNames
+  | HasCodeDuplication deriving (Show, Eq, Enum, Bounded, Generic)
+
 data SignatureAnalysisType
   = NoSignatures
   | DefaultSignatures
@@ -97,6 +112,7 @@ data Language
 instance FromJSON Analysis
 instance FromJSON AnalysisSpec
 instance FromJSON SmellsSet
+instance FromJSON Smell
 instance FromJSON SignatureAnalysisType
 instance FromJSON SignatureStyle
 instance FromJSON Sample
