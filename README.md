@@ -206,6 +206,7 @@ But if you are not the Haskell inclined gal or guy - ok, I will try to forgive y
 $ mulang '
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "Haskell",
       "content" : "x = 1"
    },
@@ -263,6 +264,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "Haskell",
       "content" : "x = 1"
    },
@@ -305,6 +307,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return x + y; }"
    },
@@ -312,7 +315,7 @@ $ mulang '
       "expectations" : [],
       "signatureAnalysisType" : {
         "tag" : "StyledSignatures",
-        "contents":"HaskellStyle"
+        "style":"HaskellStyle"
       }
    }
 }' | json_pp
@@ -332,6 +335,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y { return x + y; }"
    },
@@ -339,7 +343,7 @@ $ mulang '
       "expectations" : [],
       "signatureAnalysisType" : {
         "tag" : "StyledSignatures",
-        "contents":"HaskellStyle"
+        "style":"HaskellStyle"
       }
    }
 }' | json_pp
@@ -349,6 +353,55 @@ $ mulang '
 }
 ```
 
+### With AST as input
+
+```bash
+$ mulang '
+{
+   "sample" : {
+      "ast" : {
+         "sequenceElements" : [
+            {
+               "variableInitializer" : {
+                  "tag" : "MuNumber",
+                  "numberValue" : 1
+               },
+               "variableId" : "x",
+               "tag" : "Variable"
+            },
+            {
+               "tag" : "Variable",
+               "variableId" : "y",
+               "variableInitializer" : {
+                  "tag" : "MuNumber",
+                  "numberValue" : 2
+               }
+            }
+         ],
+         "tag" : "Sequence"
+      },
+      "tag" : "MulangSample"
+   },
+   "spec" : {
+      "signatureAnalysisType" : {
+         "tag" : "StyledSignatures",
+         "style" : "HaskellStyle"
+      },
+      "expectations" : []
+   }
+}
+' | json_pp
+{
+   "smells" : [],
+   "expectationResults" : [],
+   "tag" : "AnalysisCompleted",
+   "signatures" : [
+      "-- x",
+      "-- y"
+   ]
+}
+
+```
 
 ## Expectations, Signatures and Smells
 

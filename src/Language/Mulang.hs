@@ -4,7 +4,6 @@ module Language.Mulang (
   module Language.Mulang.Inspector
 ) where
 
-
 import Language.Mulang.Ast
 import Language.Mulang.Binding
 import Language.Mulang.Inspector

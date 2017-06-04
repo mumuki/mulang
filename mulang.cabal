@@ -90,11 +90,10 @@ library
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Gobstones
     Language.Mulang.Parsers.Prolog
-    Language.Mulang.Parsers.Json
     Language.Mulang.Parsers.JavaScript
     Language.Mulang.Analyzer
     Language.Mulang.Analyzer.Analysis
-    Language.Mulang.Analyzer.CodeSampleParser
+    Language.Mulang.Analyzer.SampleParser
     Language.Mulang.Analyzer.ExpectationsAnalyzer
     Language.Mulang.Analyzer.ExpectationsCompiler
     Language.Mulang.Analyzer.SignaturesAnalyzer
