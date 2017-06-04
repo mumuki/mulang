@@ -152,6 +152,7 @@ test-suite spec
     parsec                    == 3.1.9,
     ParsecTools               >= 0.0.2.0,
     hspec                     >= 2     && < 3,
+    neat-interpolation        == 0.2.0,
     process                   >= 1.1 && < 2,
     mulang
   build-tools:

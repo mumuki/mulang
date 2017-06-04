@@ -6,6 +6,7 @@ module Language.Mulang.Analyzer.Analysis (
 
   Analysis(..),
   AnalysisSpec(..),
+  SmellsSet(..),
   SignatureAnalysisType(..),
   SignatureStyle(..),
   Sample(..),
@@ -19,25 +20,30 @@ import GHC.Generics
 import Data.Aeson
 
 import Language.Mulang.Ast
+import Language.Mulang.Binding (Binding)
+
+type BasicInspection = String
+type Inspection = String
+type Smell = String
 
 --
 -- Common structures
 --
 
 data Expectation =  Advanced {
-                      subject :: [String] ,
-                      verb :: String,
+                      subject :: [Binding] ,
+                      verb :: Inspection,
                       object :: BindingPattern,
                       transitive :: Bool,
                       negated :: Bool
                     }
                   | Basic {
                     binding :: String,
-                    inspection :: String
+                    inspection :: BasicInspection
                   } deriving (Show, Eq, Generic)
 
-data BindingPattern = Named { exactName :: String }
-                    | Like { similarName :: String }
+data BindingPattern = Named { exactName :: Binding }
+                    | Like { similarName :: Binding }
                     | Anyone deriving (Show, Eq, Generic)
 
 instance FromJSON Expectation
@@ -57,8 +63,13 @@ data Analysis = Analysis {
 
 data AnalysisSpec = AnalysisSpec {
   expectations :: [Expectation],
+  smellsSet :: SmellsSet,
   signatureAnalysisType :: SignatureAnalysisType
 } deriving (Show, Eq, Generic)
+
+data SmellsSet
+  = NoSmells { include :: [Smell] }
+  | AllSmells { exclude :: [Smell] } deriving (Show, Eq, Generic)
 
 data SignatureAnalysisType
   = NoSignatures
@@ -85,6 +96,7 @@ data Language
 
 instance FromJSON Analysis
 instance FromJSON AnalysisSpec
+instance FromJSON SmellsSet
 instance FromJSON SignatureAnalysisType
 instance FromJSON SignatureStyle
 instance FromJSON Sample

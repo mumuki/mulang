@@ -16,7 +16,9 @@ main = do
   argsBody <- fmap parseArgs $ getArgs
   streamBody <- getContents
   let body = if argsBody == "-s" then streamBody else argsBody
-  LBS.putStrLn . encode . analyse . decode . encodeUtf8 . T.pack $ body
+  LBS.putStrLn . analyseJson $ body
+
+analyseJson = encode . analyse . decode . encodeUtf8 . T.pack
 
 parseArgs :: [String] -> String
 parseArgs [jsonBody] = jsonBody

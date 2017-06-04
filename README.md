@@ -226,6 +226,10 @@ $ mulang '
             "tag" : "Advanced"
          }
       ],
+      "smellsSet" : {
+         "tag" : "NoSmells",
+         "include" : []
+      },
       "signatureAnalysisType" : {
         "tag" : "NoSignatures",
         "contents" : []
@@ -273,6 +277,10 @@ $ mulang '
         "tag" : "NoSignatures",
         "contents" : []
       },
+      "smellsSet" : {
+         "tag" : "NoSmells",
+         "include" : []
+      },
       "expectations" : [
          {
             "binding" : "x",
@@ -313,6 +321,10 @@ $ mulang '
    },
    "spec" : {
       "expectations" : [],
+      "smellsSet" : {
+         "tag" : "NoSmells",
+         "include" : []
+      },
       "signatureAnalysisType" : {
         "tag" : "StyledSignatures",
         "style":"HaskellStyle"
@@ -340,6 +352,10 @@ $ mulang '
       "content" : "function foo(x, y { return x + y; }"
    },
    "spec" : {
+      "smellsSet" : {
+         "tag" : "NoSmells",
+         "include" : []
+      },
       "expectations" : [],
       "signatureAnalysisType" : {
         "tag" : "StyledSignatures",
@@ -383,6 +399,10 @@ $ mulang '
       "tag" : "MulangSample"
    },
    "spec" : {
+      "smellsSet" : {
+         "tag" : "NoSmells",
+         "include" : []
+      },
       "signatureAnalysisType" : {
          "tag" : "StyledSignatures",
          "style" : "HaskellStyle"

@@ -5,7 +5,7 @@ import           Test.Hspec
 
 result expectationsResults smellResults = AnalysisCompleted expectationsResults smellResults []
 
-run language content = analyse (expectationsAnalysis (CodeSample language content) [])
+run language content = analyse (smellsAnalysis (CodeSample language content) allSmells)
 
 spec = describe "SmellsAnalyzer" $ do
   it "detects HasRedundantIf" $ do
