@@ -36,8 +36,8 @@ data Expectation =  Advanced {
                     inspection :: String
                   } deriving (Show, Eq, Generic)
 
-data BindingPattern = Named String
-                    | Like String
+data BindingPattern = Named { exactName :: String }
+                    | Like { similarName :: String }
                     | Anyone deriving (Show, Eq, Generic)
 
 instance FromJSON Expectation
@@ -63,7 +63,7 @@ data AnalysisSpec = AnalysisSpec {
 data SignatureAnalysisType
   = NoSignatures
   | DefaultSignatures
-  | StyledSignatures SignatureStyle deriving (Show, Eq, Generic)
+  | StyledSignatures { style :: SignatureStyle } deriving (Show, Eq, Generic)
 
 data SignatureStyle
   = MulangStyle
