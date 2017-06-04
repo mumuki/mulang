@@ -53,33 +53,33 @@ data Expression
     -- ^ Functional programming type alias. Only the type alias identifier is parsed
     | Record { recordId :: Identifier }
     -- ^ Imperative / Functional programming struct declaration. Only the record name is parsed
-    | TypeSignature { typeSignatureId :: Identifier,  typeSignatureArguments :: [Identifier] }
+    | TypeSignature { typeSignatureId :: Identifier,  typeSignatureParameters :: [Identifier] }
     -- ^ Generic type signature for a computation. Only the target name of the computation is parsed
     | EntryPoint { entryPointBody :: Expression }
     | Function { functionId :: Identifier, functionEquations :: [Equation] }
     -- ^ Functional / Imperative programming function declaration. It is is composed by an identifier and one or more equations
     | Procedure { procedureId :: Identifier, procedureEquations :: [Equation] }
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
-    | Method Identifier [Equation]
-    | Variable Identifier Expression
-    | Assignment Identifier Expression
-    | Attribute Identifier Expression
+    | Method { methodId :: Identifier, methodEquations :: [Equation] }
+    | Variable { variableId :: Identifier, variableInitializer :: Expression }
+    | Assignment { assignmentId :: Identifier, assignmentExpression :: Expression }
+    | Attribute { attributeId :: Identifier, attributeInitializer :: Expression}
     -- ^ Object oriented programming attribute declaration, composed by an identifier and an initializer
-    | Object Identifier Expression
+    | Object { objectId :: Identifier, objectBody :: Expression}
     -- ^ Object oriented programming named object declaration, composed by a name and a body
-    | Rule Identifier [Pattern] [Expression]
+    | Rule { ruleId :: Identifier, ruleParameters :: [Pattern], ruleBody :: [Expression]}
     -- ^ Logic programming declaration of a fact, composed by the rue name, rule arguments, and rule body
-    | Fact Identifier [Pattern]
+    | Fact { factId :: Identifier, factParameters :: [Pattern] }
     -- ^ Logic programming declaration of a fact , composed by the fact name and fact arguments
     | Exist Identifier [Pattern]
     -- ^ Logic programming existential cuantification / consult
-    | Not Expression
+    | Not { notBody :: Expression }
     -- ^ Logic programming negation
-    | Findall Expression Expression Expression
+    | Findall { findallTemplate :: Expression, findallGenerator :: Expression, findallResult :: Expression }
     -- ^ Logic programming findall
     | Forall Expression Expression
     -- ^ Logic programming universal cuantification
-    | Reference Identifier
+    | Reference { referenceId :: Identifier }
     -- ^ Generic variable
     | Application Expression [Expression]
     -- ^ Generic, non-curried application of a function or procedure, composed by the applied element itself, and the application arguments
