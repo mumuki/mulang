@@ -13,13 +13,13 @@ isLightweight :: Inspection
 isLightweight (MuNumber _)              = True
 isLightweight (MuString _)              = True
 isLightweight (MuBool _)                = True
-isLightweight (Variable _)              = True
+isLightweight (Reference _)             = True
 isLightweight MuNull                    = True
 isLightweight Equal                     = True
 isLightweight (Application _ es)        = not $ any isApplication es
 isLightweight (Return e)                = isLightweight e
-isLightweight (VariableAssignment _ e)  = isLightweight e
-isLightweight (VariableDeclaration _ e) = isLightweight e
+isLightweight (Assignment _ e)  = isLightweight e
+isLightweight (Variable _ e) = isLightweight e
 isLightweight _                         = False
 
 isApplication (Application _ _) = True
@@ -34,11 +34,11 @@ hash :: Expression -> Int
 hash (Return e)                    = 1 * (37 + hash e)
 hash (MuNumber e)                  = 2 * H.hash e
 hash (MuString e)                  = 3 * H.hash e
-hash (Variable i)                  = 5 * H.hash i
+hash (Reference i)                 = 5 * H.hash i
 hash (MuBool e)                    = 7 * H.hash e
 hash (Application i es)            = 11 * (37 + hash i) * (positionalHash es)
-hash f@(FunctionDeclaration _ _)   = 13 * (37 + hash (simpleFunctionBody f))
-hash f@(ProcedureDeclaration _ _)  = 17 * (37 + hash (simpleProcedureBody f))
+hash f@(Function _ _)   = 13 * (37 + hash (simpleFunctionBody f))
+hash f@(Procedure _ _)  = 17 * (37 + hash (simpleProcedureBody f))
 hash (Sequence es)                 = 19 * (37 + positionalHash es)
 hash _                             = 1
 

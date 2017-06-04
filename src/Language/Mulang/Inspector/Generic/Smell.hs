@@ -60,14 +60,14 @@ hasRedundantGuards :: Inspection
 hasRedundantGuards = containsBody f -- TODO not true when condition is a pattern
   where f (GuardedBody [
             (_, Return x),
-            (Variable "otherwise", Return y)]) = all isBooleanLiteral [x, y]
+            (Reference "otherwise", Return y)]) = all isBooleanLiteral [x, y]
         f _ = False
 
 
 -- | Inspection that tells whether a binding has lambda expressions like '\x -> g x'
 hasRedundantLambda :: Inspection
 hasRedundantLambda = containsExpression f
-  where f (Lambda [VariablePattern (x)] (Return (Application _ [Variable (y)]))) = x == y
+  where f (Lambda [VariablePattern (x)] (Return (Application _ [Reference (y)]))) = x == y
         f _ = False
 
 
@@ -75,9 +75,9 @@ hasRedundantLambda = containsExpression f
 -- can be avoided using point-free
 hasRedundantParameter :: Inspection
 hasRedundantParameter = containsExpression f
-  where f (FunctionDeclaration _ [Equation params (UnguardedBody (Return (Application _ args)))])
+  where f (Function _ [Equation params (UnguardedBody (Return (Application _ args)))])
                                                             | (VariablePattern param) <- last params,
-                                                              (Variable arg) <- last args = param == arg
+                                                              (Reference arg) <- last args = param == arg
         f _ = False
 
 isBooleanLiteral (MuBool _) = True
@@ -85,12 +85,12 @@ isBooleanLiteral _          = False
 
 hasRedundantLocalVariableReturn :: Inspection
 hasRedundantLocalVariableReturn = containsExpression f
-  where f (Sequence [ VariableDeclaration declaredVariable _,
-                      Return (Variable returnedVariable)]) = returnedVariable == declaredVariable
-        f _                                                = False
+  where f (Sequence [ Variable declaredVariable _,
+                      Return (Reference returnedVariable)]) = returnedVariable == declaredVariable
+        f _                                                 = False
 
 
 hasAssignmentReturn :: Inspection
 hasAssignmentReturn = containsExpression f
-  where f (Return (VariableAssignment _ _)) = True
-        f _                                 = False
+  where f (Return (Assignment _ _)) = True
+        f _                         = False

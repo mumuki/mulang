@@ -33,7 +33,7 @@ type Code = String
 -- | Mulang does not assume any special naming convention or format
 type Identifier = String
 
--- | An equation. See @FunctionDeclaration@ and @ProcedureDeclaration@ above
+-- | An equation. See @Function@ and @Procedure@ above
 data Equation = Equation [Pattern] EquationBody deriving (Eq, Show, Read, Generic)
 
 data EquationBody
@@ -49,27 +49,27 @@ data EquationBody
 -- | However, although all those elements can be used as subexpressions and have an dohave an associated value,
 -- | Mulang does not state WHICH is that value.
 data Expression
-    = TypeAliasDeclaration { typeAliasId :: Identifier}
+    = TypeAlias { typeAliasId :: Identifier}
     -- ^ Functional programming type alias. Only the type alias identifier is parsed
-    | RecordDeclaration { recordId :: Identifier }
+    | Record { recordId :: Identifier }
     -- ^ Imperative / Functional programming struct declaration. Only the record name is parsed
     | TypeSignature { typeSignatureId :: Identifier,  typeSignatureArguments :: [Identifier] }
     -- ^ Generic type signature for a computation. Only the target name of the computation is parsed
     | EntryPoint { entryPointBody :: Expression }
-    | FunctionDeclaration { functionId :: Identifier, functionEquations :: [Equation] }
+    | Function { functionId :: Identifier, functionEquations :: [Equation] }
     -- ^ Functional / Imperative programming function declaration. It is is composed by an identifier and one or more equations
-    | ProcedureDeclaration { procedureId :: Identifier, procedureEquations :: [Equation] }
+    | Procedure { procedureId :: Identifier, procedureEquations :: [Equation] }
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
-    | MethodDeclaration Identifier [Equation]
-    | VariableDeclaration Identifier Expression
-    | VariableAssignment Identifier Expression
-    | AttributeDeclaration Identifier Expression
+    | Method Identifier [Equation]
+    | Variable Identifier Expression
+    | Assignment Identifier Expression
+    | Attribute Identifier Expression
     -- ^ Object oriented programming attribute declaration, composed by an identifier and an initializer
-    | ObjectDeclaration Identifier Expression
+    | Object Identifier Expression
     -- ^ Object oriented programming named object declaration, composed by a name and a body
-    | RuleDeclaration Identifier [Pattern] [Expression]
+    | Rule Identifier [Pattern] [Expression]
     -- ^ Logic programming declaration of a fact, composed by the rue name, rule arguments, and rule body
-    | FactDeclaration Identifier [Pattern]
+    | Fact Identifier [Pattern]
     -- ^ Logic programming declaration of a fact , composed by the fact name and fact arguments
     | Exist Identifier [Pattern]
     -- ^ Logic programming existential cuantification / consult
@@ -79,7 +79,7 @@ data Expression
     -- ^ Logic programming findall
     | Forall Expression Expression
     -- ^ Logic programming universal cuantification
-    | Variable Identifier
+    | Reference Identifier
     -- ^ Generic variable
     | Application Expression [Expression]
     -- ^ Generic, non-curried application of a function or procedure, composed by the applied element itself, and the application arguments
@@ -119,26 +119,26 @@ data Expression
 -- | Mulang Patterns are not expressions, but are aimed to match them.
 -- | They are modeled after Haskell, Prolog, Elixir, Scala and Erlang patterns
 data Pattern
-        = VariablePattern String
-        -- ^ variable pattern like @X@
-        | LiteralPattern String
-        -- ^ literal constant pattern like @4@
-        | InfixApplicationPattern Pattern String Pattern
-        -- ^ infix application pattern like @4:X@
-        | ApplicationPattern String [Pattern]
-        -- ^ prefix application pattern like @f _@
-        | TuplePattern [Pattern]
-        -- ^ tuple pattern like @(3, _)@
-        | ListPattern [Pattern]
-        -- ^ list pattern like @[x, y, _]@
-        | FunctorPattern String [Pattern]
-        -- ^ prolog-like functor pattern, like @f(X, 6)@
-        | AsPattern String Pattern
-        -- ^ @\@@-pattern
-        | WildcardPattern
-        -- ^ wildcard pattern @_@
-        | OtherPattern
-        -- ^ Other unrecognized pattern
+    = VariablePattern String
+    -- ^ variable pattern like @X@
+    | LiteralPattern String
+    -- ^ literal constant pattern like @4@
+    | InfixApplicationPattern Pattern String Pattern
+    -- ^ infix application pattern like @4:X@
+    | ApplicationPattern String [Pattern]
+    -- ^ prefix application pattern like @f _@
+    | TuplePattern [Pattern]
+    -- ^ tuple pattern like @(3, _)@
+    | ListPattern [Pattern]
+    -- ^ list pattern like @[x, y, _]@
+    | FunctorPattern String [Pattern]
+    -- ^ prolog-like functor pattern, like @f(X, 6)@
+    | AsPattern String Pattern
+    -- ^ @\@@-pattern
+    | WildcardPattern
+    -- ^ wildcard pattern @_@
+    | OtherPattern
+    -- ^ Other unrecognized pattern
   deriving (Eq, Show, Read, Generic)
 
 data ComprehensionStatement
@@ -155,8 +155,8 @@ unguardedEquationBody :: Equation -> Expression
 unguardedEquationBody (Equation _ (UnguardedBody body)) = body
 
 simpleProcedureBody :: Expression -> Expression
-simpleProcedureBody (ProcedureDeclaration _ [equation]) = unguardedEquationBody equation
+simpleProcedureBody (Procedure _ [equation]) = unguardedEquationBody equation
 
 simpleFunctionBody :: Expression -> Expression
-simpleFunctionBody (FunctionDeclaration _ [equation]) = unguardedEquationBody equation
+simpleFunctionBody (Function _ [equation]) = unguardedEquationBody equation
 

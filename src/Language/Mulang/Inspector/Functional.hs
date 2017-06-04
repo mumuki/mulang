@@ -18,14 +18,14 @@ usesConditional = alternative usesIf usesGuards
 -- in its definition
 usesComposition :: Inspection
 usesComposition = containsExpression f
-  where f (Variable ".") = True
+  where f (Reference ".") = True
         f _ = False
 
 -- | Inspection that tells whether an expression uses pattern matching
 -- in its definition
 usesPatternMatching :: Inspection
 usesPatternMatching = containsExpression f
-  where f (FunctionDeclaration _ equations) = any nonVariablePattern (patterns equations)
+  where f (Function _ equations) = any nonVariablePattern (patterns equations)
         f _ = False
 
         patterns = concatMap (\(Equation ps _) -> ps)

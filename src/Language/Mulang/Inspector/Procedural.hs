@@ -10,7 +10,7 @@ import Language.Mulang.Inspector.Generic
 
 declaresProcedure :: BindingPredicate -> Inspection
 declaresProcedure = containsDeclaration f
-  where f (ProcedureDeclaration _ _) = True
+  where f (Procedure _ _) = True
         f _                          = False
 
 

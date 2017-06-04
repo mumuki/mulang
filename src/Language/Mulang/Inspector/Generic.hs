@@ -56,12 +56,12 @@ declaresRecursively = containsDeclaration f
 
 declaresFunction :: BindingPredicate -> Inspection
 declaresFunction = containsDeclaration f
-  where f (FunctionDeclaration _ _) = True
+  where f (Function _ _) = True
         f _                         = False
 
 declaresVariable :: BindingPredicate -> Inspection
 declaresVariable = containsDeclaration f
-  where f (VariableDeclaration _ _)  = True
+  where f (Variable _ _)  = True
         f _                          = False
 
 declaresEntryPoint :: BindingPredicate -> Inspection
@@ -78,11 +78,11 @@ declaresComputationWithExactArity arity = declaresComputationWithArity (== arity
 
 declaresComputationWithArity :: (Int -> Bool) -> BindingPredicate -> Inspection
 declaresComputationWithArity arityPredicate = containsDeclaration f
-  where f (FunctionDeclaration _ equations)  = any equationArityIs equations
-        f (ProcedureDeclaration _ equations) = any equationArityIs equations
-        f (MethodDeclaration _ equations)    = any equationArityIs equations
-        f (RuleDeclaration _ args _)         = argsHaveArity args
-        f (FactDeclaration _ args)           = argsHaveArity args
+  where f (Function _ equations)  = any equationArityIs equations
+        f (Procedure _ equations) = any equationArityIs equations
+        f (Method _ equations)    = any equationArityIs equations
+        f (Rule _ args _)         = argsHaveArity args
+        f (Fact _ args)           = argsHaveArity args
         f _  = False
 
         equationArityIs = \(Equation args _) -> argsHaveArity args
@@ -91,7 +91,7 @@ declaresComputationWithArity arityPredicate = containsDeclaration f
 
 declaresTypeAlias :: BindingPredicate -> Inspection
 declaresTypeAlias = containsDeclaration f
-  where f (TypeAliasDeclaration _) = True
+  where f (TypeAlias _) = True
         f _             = False
 
 declaresTypeSignature :: BindingPredicate -> Inspection
@@ -102,12 +102,12 @@ declaresTypeSignature = containsDeclaration f
 
 usesAnonymousVariable :: Inspection
 usesAnonymousVariable = containsExpression f
-  where f (FunctionDeclaration _ equations)    = equationContainsWildcard equations
-        f (ProcedureDeclaration _ equations)   = equationContainsWildcard equations
-        f (MethodDeclaration _ equations)      = equationContainsWildcard equations
+  where f (Function _ equations)    = equationContainsWildcard equations
+        f (Procedure _ equations)   = equationContainsWildcard equations
+        f (Method _ equations)      = equationContainsWildcard equations
 --TODO        f (Lambda args _)                      = equationContainsWildcard equations
-        f (FactDeclaration _ params)             = paramsContainsWildcard params
-        f (RuleDeclaration _ params _)           = paramsContainsWildcard params
+        f (Fact _ params)             = paramsContainsWildcard params
+        f (Rule _ params _)           = paramsContainsWildcard params
         f _                                    = False
 
         equationContainsWildcard = any (paramsContainsWildcard . equationParams)
