@@ -48,7 +48,7 @@ fact :: Parsec String a Expression
 fact = do
         (name, args) <- phead
         dot
-        return $ FactDeclaration name args
+        return $ Fact name args
 
 rule :: Parsec String a Expression
 rule = do
@@ -56,7 +56,7 @@ rule = do
         def
         consults <- body
         dot
-        return $ RuleDeclaration name args consults
+        return $ Rule name args consults
 
 phead :: Parsec String a (Identifier, [Pattern])
 phead = do

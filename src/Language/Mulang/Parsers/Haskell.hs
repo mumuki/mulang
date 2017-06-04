@@ -29,12 +29,12 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
   where
     mergeDecls decls exp = compact (decls ++ [exp])
 
-    muDecls (HsTypeDecl _ name _ _)      = [TypeAliasDeclaration (muName name)]
-    muDecls (HsDataDecl _ _ name _ _ _ ) = [RecordDeclaration (muName name)]
+    muDecls (HsTypeDecl _ name _ _)      = [TypeAlias (muName name)]
+    muDecls (HsDataDecl _ _ name _ _ _ ) = [Record (muName name)]
     muDecls (HsTypeSig _ names (HsQualType _ t)) = map (\name -> TypeSignature (muName name) (muTopType t)) names
     muDecls (HsFunBind equations) | (HsMatch _ name _ _ _) <- head equations =
-                                        [FunctionDeclaration (muName name) (map muEquation equations)]
-    muDecls (HsPatBind _ (HsPVar name) (HsUnGuardedRhs exp) _) = [VariableDeclaration (muName name) (muExp exp)]
+                                        [Function (muName name) (map muEquation equations)]
+    muDecls (HsPatBind _ (HsPVar name) (HsUnGuardedRhs exp) _) = [Variable (muName name) (muExp exp)]
     muDecls _ = []
 
     muEquation :: HsMatch -> Equation
@@ -62,14 +62,14 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muExp (HsVar name) = muVar (muQName name)
     muExp (HsCon (UnQual (HsIdent "True")))  = MuBool True
     muExp (HsCon (UnQual (HsIdent "False"))) = MuBool False
-    muExp (HsCon name)                       = Variable (muQName name)
+    muExp (HsCon name)                       = Reference (muQName name)
     muExp (HsLit lit) = muLit lit
     muExp (HsInfixApp e1 op e2)                                  = Application ((muVar.muQOp) op) [muExp e1, muExp e2]
     muExp (HsApp (HsApp (HsApp (HsApp e1 e2) e3) e4) e5)         = Application (muExp e1) [muExp e2, muExp e3, muExp e4, muExp e5]
     muExp (HsApp (HsApp (HsApp e1 e2) e3) e4)                    = Application (muExp e1) [muExp e2, muExp e3, muExp e4]
     muExp (HsApp (HsApp e1 e2) e3)                               = Application (muExp e1) [muExp e2, muExp e3]
     muExp (HsApp e1 e2)                                          = Application (muExp e1) [muExp e2]
-    muExp (HsNegApp e) = Application (Variable "-") [muExp e]
+    muExp (HsNegApp e) = Application (Reference "-") [muExp e]
     muExp (HsLambda _ args body) = Lambda (map muPat args) (muBody body)
     --muExp HsLet = Let [Declaration] Expression          -- ^ local declarations with @let@
     muExp (HsIf e1 e2 e3) = If (muExp e1) (muExp e2) (muExp e3)
@@ -77,10 +77,10 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muExp (HsTuple elements) = MuTuple (map muExp elements)               -- ^ tuple Expression
     muExp (HsList elements) = MuList (map muExp elements)
     muExp (HsParen e) = (muExp e)
-    muExp (HsEnumFrom from)              = Application (Variable "enumFrom") [(muExp from)]
-    muExp (HsEnumFromTo from to)         = Application (Variable "enumFromTo") [(muExp from), (muExp to)]
-    muExp (HsEnumFromThen from thn)      = Application (Variable "enumFromThen") [(muExp from), (muExp thn)]
-    muExp (HsEnumFromThenTo from thn to) = Application (Variable "enumFromThenTo") [(muExp from), (muExp thn), (muExp to)]
+    muExp (HsEnumFrom from)              = Application (Reference "enumFrom") [(muExp from)]
+    muExp (HsEnumFromTo from to)         = Application (Reference "enumFromTo") [(muExp from), (muExp to)]
+    muExp (HsEnumFromThen from thn)      = Application (Reference "enumFromThen") [(muExp from), (muExp thn)]
+    muExp (HsEnumFromThenTo from thn to) = Application (Reference "enumFromThenTo") [(muExp from), (muExp thn), (muExp to)]
     muExp (HsListComp exp stmts)         = Comprehension (muExp exp) (map muStmt stmts)
     muExp (HsDo stmts) | (HsQualifier exp) <- last stmts  = Comprehension (muExp exp) (map muStmt stmts)
     muExp _ = ExpressionOther
@@ -98,7 +98,7 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muVar :: String -> Expression
     muVar "==" = Equal
     muVar "/=" = NotEqual
-    muVar v = Variable v
+    muVar v = Reference v
 
     muName :: HsName -> String
     muName (HsSymbol n) = n

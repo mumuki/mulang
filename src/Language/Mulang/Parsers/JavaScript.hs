@@ -25,7 +25,7 @@ mu = compact . muNode . gc
   where
     muNode (JSSourceElementsTop statements)                  = [compactMapMu statements]
     muNode (JSIdentifier "undefined")                        = [MuNull]
-    muNode (JSIdentifier n)                                  = [Variable n]
+    muNode (JSIdentifier n)                                  = [Reference n]
     muNode (JSDecimal val)                                   = [MuNumber (read val)]
     muNode (JSExpression xs)                                 = [compactMapMu xs]
     muNode (JSLiteral "null")                                = [MuNull]
@@ -75,7 +75,7 @@ mu = compact . muNode . gc
     muOp "===" = Equal
     muOp "!="  = NotEqual
     muOp "!==" = NotEqual
-    muOp v    = Variable v
+    muOp v    = Reference v
 
     muPattern (JSLiteral _)    = []
     muPattern (JSIdentifier i) = [VariablePattern i]
@@ -98,11 +98,11 @@ mu = compact . muNode . gc
 
     muWhile cond action  = While (mu cond) (mu action)
 
-    muVarDeclaration var initial = VariableDeclaration (muId var) (compactMapMu initial)
-    muVarAssignment  var value  = VariableAssignment (muId var)  value
+    muVarDeclaration var initial = Variable (muId var) (compactMapMu initial)
+    muVarAssignment  var value  = Assignment (muId var)  value
 
-    muPlus var delta = (Application (Variable "+") [Variable (muId var), delta])
-    muMinus var delta = (Application (Variable "-") [Variable (muId var), delta])
+    muPlus var delta = (Application (Reference "+") [Reference (muId var), delta])
+    muMinus var delta = (Application (Reference "-") [Reference (muId var), delta])
 
     muFunction :: JSNode -> [JSNode] -> JSNode -> Expression
     muFunction name params body = muComputation (muId name) (muParams params) (mu body)
@@ -110,8 +110,8 @@ mu = compact . muNode . gc
                                 muComputation name params body = (computationFor body) name (muEquation params body)
 
                                 computationFor :: Expression -> Identifier -> [Equation] -> Expression
-                                computationFor body | containsReturn body = FunctionDeclaration
-                                                    | otherwise = ProcedureDeclaration
+                                computationFor body | containsReturn body = Function
+                                                    | otherwise = Procedure
 
                                 containsReturn :: Expression -> Bool
                                 containsReturn (Return _)    = True
