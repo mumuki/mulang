@@ -18,9 +18,6 @@ module Language.Mulang.Analyzer.Analysis (
 
 import GHC.Generics
 
-import Data.Aeson
-import Data.Aeson.TH
-
 import Language.Mulang.Ast
 import Language.Mulang.Binding (Binding)
 
@@ -46,19 +43,6 @@ data Expectation =  Advanced {
 data BindingPattern = Named { exactName :: Binding }
                     | Like { similarName :: Binding }
                     | Anyone deriving (Show, Eq, Generic)
-
-instance FromJSON Expectation where
-    parseJSON = genericParseJSON mixedConstructorsJsonOptions
-
-instance FromJSON BindingPattern where
-    parseJSON = genericParseJSON mixedConstructorsJsonOptions
-
-instance ToJSON Expectation where
-    toEncoding = genericToEncoding mixedConstructorsJsonOptions
-
-instance ToJSON BindingPattern where
-    toEncoding = genericToEncoding mixedConstructorsJsonOptions
-
 
 --
 -- Analysis input structures
@@ -99,9 +83,6 @@ data SignatureAnalysisType
   | DefaultSignatures
   | StyledSignatures { style :: SignatureStyle } deriving (Show, Eq, Generic)
 
-mixedConstructorsJsonOptions :: Options
-mixedConstructorsJsonOptions = defaultOptions { sumEncoding = UntaggedValue }
-
 data SignatureStyle
   = MulangStyle
   | UntypedCStyle
@@ -120,30 +101,6 @@ data Language
   |  Gobstones
   |  Haskell deriving (Show, Eq, Generic)
 
-instance FromJSON Analysis
-instance FromJSON AnalysisSpec
-
-instance FromJSON SmellsSet where
-    parseJSON = genericParseJSON mixedConstructorsJsonOptions
-
-instance FromJSON Smell
-
-instance FromJSON SignatureAnalysisType where
-    parseJSON = genericParseJSON mixedConstructorsJsonOptions
-
-instance FromJSON SignatureStyle
-
-instance FromJSON Sample where
-    parseJSON = genericParseJSON mixedConstructorsJsonOptions
-
-instance FromJSON Language
-
-instance FromJSON Equation
-instance FromJSON EquationBody
-instance FromJSON Expression
-instance FromJSON Pattern
-instance FromJSON ComprehensionStatement
-
 --
 -- Analysis Output structures
 --
@@ -157,5 +114,3 @@ data ExpectationResult = ExpectationResult {
   result :: Bool
 } deriving (Show, Eq, Generic)
 
-instance ToJSON AnalysisResult
-instance ToJSON ExpectationResult

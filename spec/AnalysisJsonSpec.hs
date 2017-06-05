@@ -4,6 +4,7 @@ module AnalysisJsonSpec(spec) where
 
 import qualified Data.ByteString.Lazy.Char8 as LBS (pack)
 import           Language.Mulang.Analyzer.Analysis hiding (spec)
+import           Language.Mulang.Analyzer.Analysis.Json ()
 import           Language.Mulang.Analyzer (noSmells, allSmells)
 import           Language.Mulang.Ast
 import           Data.Maybe (fromJust)

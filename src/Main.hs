@@ -3,6 +3,7 @@
 module Main (main) where
 
 import Language.Mulang.Analyzer (analyse)
+import Language.Mulang.Analyzer.Analysis.Json ()
 import Data.Aeson (eitherDecode, encode)
 import System.Environment (getArgs)
 import Control.Fallible (orFail)
