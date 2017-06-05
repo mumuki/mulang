@@ -19,6 +19,7 @@ module Language.Mulang.Analyzer.Analysis (
 import GHC.Generics
 
 import Data.Aeson
+import Data.Aeson.TH
 
 import Language.Mulang.Ast
 import Language.Mulang.Binding (Binding)
@@ -46,11 +47,18 @@ data BindingPattern = Named { exactName :: Binding }
                     | Like { similarName :: Binding }
                     | Anyone deriving (Show, Eq, Generic)
 
-instance FromJSON Expectation
-instance FromJSON BindingPattern
+instance FromJSON Expectation where
+    parseJSON = genericParseJSON mixedConstructorsJsonOptions
 
-instance ToJSON Expectation
-instance ToJSON BindingPattern
+instance FromJSON BindingPattern where
+    parseJSON = genericParseJSON mixedConstructorsJsonOptions
+
+instance ToJSON Expectation where
+    toEncoding = genericToEncoding mixedConstructorsJsonOptions
+
+instance ToJSON BindingPattern where
+    toEncoding = genericToEncoding mixedConstructorsJsonOptions
+
 
 --
 -- Analysis input structures
@@ -91,6 +99,9 @@ data SignatureAnalysisType
   | DefaultSignatures
   | StyledSignatures { style :: SignatureStyle } deriving (Show, Eq, Generic)
 
+mixedConstructorsJsonOptions :: Options
+mixedConstructorsJsonOptions = defaultOptions { sumEncoding = UntaggedValue }
+
 data SignatureStyle
   = MulangStyle
   | UntypedCStyle
@@ -111,11 +122,20 @@ data Language
 
 instance FromJSON Analysis
 instance FromJSON AnalysisSpec
-instance FromJSON SmellsSet
+
+instance FromJSON SmellsSet where
+    parseJSON = genericParseJSON mixedConstructorsJsonOptions
+
 instance FromJSON Smell
-instance FromJSON SignatureAnalysisType
+
+instance FromJSON SignatureAnalysisType where
+    parseJSON = genericParseJSON mixedConstructorsJsonOptions
+
 instance FromJSON SignatureStyle
-instance FromJSON Sample
+
+instance FromJSON Sample where
+    parseJSON = genericParseJSON mixedConstructorsJsonOptions
+
 instance FromJSON Language
 
 instance FromJSON Equation
