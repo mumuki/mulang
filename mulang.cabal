@@ -92,9 +92,13 @@ library
     Language.Mulang.Parsers.Prolog
     Language.Mulang.Parsers.Json
     Language.Mulang.Parsers.JavaScript
-    Language.Mulang.Cli.Compiler
-    Language.Mulang.Cli.Interpreter
-    Language.Mulang.Cli.Code
+    Language.Mulang.Analyzer
+    Language.Mulang.Analyzer.Analysis
+    Language.Mulang.Analyzer.CodeSampleParser
+    Language.Mulang.Analyzer.ExpectationsAnalyzer
+    Language.Mulang.Analyzer.ExpectationsCompiler
+    Language.Mulang.Analyzer.SignaturesAnalyzer
+    Language.Mulang.Analyzer.SmellsAnalyzer
   build-depends:
     base                      >= 4.6     && < 4.7,
     bytestring                == 0.10.6.0,

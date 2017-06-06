@@ -3,7 +3,7 @@
 -- | The Ast module describes a generic, abstract language AST.
 -- |
 -- | Since it only describes the AST, but not many aspects of its semantics, Mulang is non-computable, but just a target
--- | for code analysys.
+-- | for code analysis.
 -- |
 -- | Mulang AST itself is the combination of other abstract, paradigmatic languages that express the structures of:
 -- |    * imperative programing
@@ -16,6 +16,7 @@ module Language.Mulang.Ast (
     unguardedEquationBody,
     simpleProcedureBody,
     simpleFunctionBody,
+    Code,
     Equation(..),
     EquationBody(..),
     Expression(..),
@@ -25,6 +26,8 @@ module Language.Mulang.Ast (
   ) where
 
 import           GHC.Generics
+
+type Code = String
 
 -- | An identifier
 -- | Mulang does not assume any special naming convention or format
