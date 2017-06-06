@@ -30,7 +30,7 @@ spec = do
     it "works with types signatures in haskell" $ do
       styledCodeSignaturesOf haskellStyle (hs "x :: Int -> Int") `shouldBe` ["-- x :: Int -> Int"]
 
-    it "works with mixed typed signatures in hasell" $ do
+    it "works with mixed typed signatures in haskell" $ do
       styledCodeSignaturesOf haskellStyle (hs "x :: Int -> Int\nx y = y") `shouldBe` ["-- x :: Int -> Int\n-- x y"]
 
     it "works with variable signatures in haskell" $ do
