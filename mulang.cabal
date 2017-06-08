@@ -27,7 +27,7 @@ executable mulang
     vector                    == 0.11.0.0,
     haskell-src               >= 1       && < 1.1,
     language-javascript       >= 0.5.14  && <= 0.5.15,
-    aeson                     >= 0.11.0.0 && < 1,
+    aeson                     >= 1.2.0,
     parsec                    == 3.1.9,
     ParsecTools               >= 0.0.2.0,
     split                     >= 0.2.3.1,
@@ -90,11 +90,10 @@ library
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Gobstones
     Language.Mulang.Parsers.Prolog
-    Language.Mulang.Parsers.Json
     Language.Mulang.Parsers.JavaScript
     Language.Mulang.Analyzer
     Language.Mulang.Analyzer.Analysis
-    Language.Mulang.Analyzer.CodeSampleParser
+    Language.Mulang.Analyzer.SampleParser
     Language.Mulang.Analyzer.ExpectationsAnalyzer
     Language.Mulang.Analyzer.ExpectationsCompiler
     Language.Mulang.Analyzer.SignaturesAnalyzer
@@ -109,7 +108,7 @@ library
     vector                    == 0.11.0.0,
     haskell-src               >= 1       && < 1.1,
     language-javascript       >= 0.5.14  && <= 0.5.15,
-    aeson                     >= 0.11.0.0 && < 1,
+    aeson                     >= 1.2.0,
     inflections               > 0.2       && < 0.3,
     parsec                    == 3.1.9,
     ParsecTools               >= 0.0.2.0,
@@ -146,7 +145,7 @@ test-suite spec
     vector                    == 0.11.0.0,
     bytestring                == 0.10.6.0,
     text                      == 1.2.2.1,
-    aeson                     >= 0.11.0.0 && < 1,
+    aeson                     >= 1.2.0,
     haskell-src               >= 1     && < 1.1,
     language-javascript       >= 0.5.14  && <= 0.5.15,
     inflections               > 0.2      && < 0.3,

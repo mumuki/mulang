@@ -27,31 +27,31 @@ expressionsOf :: Expression -> [Expression]
 expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
   where
     subExpressions :: Expression -> [Expression]
-    subExpressions (VariableDeclaration _ v)          = [v]
-    subExpressions (FunctionDeclaration _ equations)  = expressionsOfEquations equations
-    subExpressions (ProcedureDeclaration _ equations) = expressionsOfEquations equations
-    subExpressions (RuleDeclaration _ _ es)           = es
-    subExpressions (MethodDeclaration _ equations)    = expressionsOfEquations equations
-    subExpressions (AttributeDeclaration _ v)         = [v]
-    subExpressions (ObjectDeclaration _ v)            = [v]
-    subExpressions (EntryPoint e)                     = [e]
-    subExpressions (Application a bs)                 = a:bs
-    subExpressions (Send e1 e2 e3)                    = [e1, e2] ++ e3
-    subExpressions (Lambda _ a)                       = [a]
-    subExpressions (If a b c)                         = [a, b, c]
-    subExpressions (While e1 e2)                      = [e1, e2]
-    subExpressions (Repeat e1 e2)                     = [e1, e2]
-    subExpressions (Switch e1 list)                   = e1 : concatMap (\(x,y) -> [x,y]) list
-    subExpressions (Match e1 equations)               = e1:expressionsOfEquations equations
-    subExpressions (Comprehension a _)                = [a] --TODO
-    subExpressions (Not e)                            = [e]
-    subExpressions (Forall e1 e2)                     = [e1, e2]
-    subExpressions (Return v)                         = [v]
-    subExpressions (Sequence es)                      = es
-    subExpressions (MuObject es)                      = [es]
-    subExpressions (MuTuple as)                       = as
-    subExpressions (MuList as)                        = as
-    subExpressions _                                  = []
+    subExpressions (Variable _ v)          = [v]
+    subExpressions (Function _ equations)  = expressionsOfEquations equations
+    subExpressions (Procedure _ equations) = expressionsOfEquations equations
+    subExpressions (Rule _ _ es)           = es
+    subExpressions (Method _ equations)    = expressionsOfEquations equations
+    subExpressions (Attribute _ v)         = [v]
+    subExpressions (Object _ v)            = [v]
+    subExpressions (EntryPoint e)          = [e]
+    subExpressions (Application a bs)      = a:bs
+    subExpressions (Send e1 e2 e3)         = [e1, e2] ++ e3
+    subExpressions (Lambda _ a)            = [a]
+    subExpressions (If a b c)              = [a, b, c]
+    subExpressions (While e1 e2)           = [e1, e2]
+    subExpressions (Repeat e1 e2)          = [e1, e2]
+    subExpressions (Switch e1 list)        = e1 : concatMap (\(x,y) -> [x,y]) list
+    subExpressions (Match e1 equations)    = e1:expressionsOfEquations equations
+    subExpressions (Comprehension a _)     = [a] --TODO
+    subExpressions (Not e)                 = [e]
+    subExpressions (Forall e1 e2)          = [e1, e2]
+    subExpressions (Return v)              = [v]
+    subExpressions (Sequence es)           = es
+    subExpressions (MuObject es)           = [es]
+    subExpressions (MuTuple as)            = as
+    subExpressions (MuList as)             = as
+    subExpressions _                       = []
 
     expressionsOfEquations eqs = eqs >>= \(Equation _ body) -> topExpressionOfBody body
     topExpressionOfBody (UnguardedBody e)      = [e]
@@ -62,7 +62,7 @@ equationBodiesOf :: Expression -> [EquationBody]
 equationBodiesOf = concatMap bodiesOf . expressionsOf
   where
     bodiesOf :: Expression -> [EquationBody]
-    bodiesOf (FunctionDeclaration _ equations) = map (\(Equation _ body) -> body) equations
+    bodiesOf (Function _ equations) = map (\(Equation _ body) -> body) equations
     bodiesOf _ = []
 
 referencesOf :: Expression -> [(Binding, Expression)]
@@ -98,26 +98,23 @@ nameOf :: Expression -> Maybe Binding
 nameOf = fmap fst . extractDeclaration
 
 extractReference :: Expression -> Maybe (Binding, Expression)
-extractReference e@(Variable n)  = Just (n, e)
+extractReference e@(Reference n)  = Just (n, e)
 extractReference e@(Exist n _)   = Just (n, e)
 extractReference _               = Nothing
 
 
 extractDeclaration :: Expression -> Maybe (Binding, Expression)
-extractDeclaration e@(TypeSignature n _)       = Just (n, e)
-extractDeclaration e@(TypeAliasDeclaration n ) = Just (n, e)
-extractDeclaration e@(VariableDeclaration n _) = Just (n, e)
-extractDeclaration e@(FunctionDeclaration n _) = Just (n, e)
-extractDeclaration e@(RecordDeclaration n)     = Just (n, e)
-extractDeclaration e@(FactDeclaration n _)     = Just (n, e)
-extractDeclaration e@(RuleDeclaration n _ _)   = Just (n, e)
-extractDeclaration e@(ProcedureDeclaration n _)= Just (n, e)
-extractDeclaration e@(ObjectDeclaration n _)   = Just (n, e)
-extractDeclaration e@(MethodDeclaration n _)   = Just (n, e)
-extractDeclaration e@(AttributeDeclaration n _)= Just (n, e)
-extractDeclaration e@(EntryPoint _)            = Just ("anonymous", e)
-extractDeclaration _                           = Nothing
-
-
-
+extractDeclaration e@(TypeSignature n _)  = Just (n, e)
+extractDeclaration e@(TypeAlias n )       = Just (n, e)
+extractDeclaration e@(Variable n _)       = Just (n, e)
+extractDeclaration e@(Function n _)       = Just (n, e)
+extractDeclaration e@(Record n)           = Just (n, e)
+extractDeclaration e@(Fact n _)           = Just (n, e)
+extractDeclaration e@(Rule n _ _)         = Just (n, e)
+extractDeclaration e@(Procedure n _)      = Just (n, e)
+extractDeclaration e@(Object n _)         = Just (n, e)
+extractDeclaration e@(Method n _)         = Just (n, e)
+extractDeclaration e@(Attribute n _)      = Just (n, e)
+extractDeclaration e@(EntryPoint _)       = Just ("anonymous", e)
+extractDeclaration _                      = Nothing
 

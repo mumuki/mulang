@@ -21,7 +21,7 @@ spec = do
       js "var x = \"hello\"" `shouldBe` js "var x = 'hello'"
 
     it "simple assignation 2" $ do
-      js "x" `shouldBe` Variable "x"
+      js "x" `shouldBe` Reference "x"
 
     it "simple function application in var declaration" $ do
       hs "x = m 1 2" `shouldBe` js "var x = m(1, 2)"
@@ -37,9 +37,9 @@ spec = do
 
     it "simple procedure declaration" $ do
       js "function f(x) { console.log('fruit') }" `shouldBe` (
-                ProcedureDeclaration
+                Procedure
                     "f"
-                    [Equation [VariablePattern "x"] (UnguardedBody (Send (Variable "console") (Variable "log") [MuString "fruit"]))])
+                    [Equation [VariablePattern "x"] (UnguardedBody (Send (Reference "console") (Reference "log") [MuString "fruit"]))])
 
     it "multiple params function declaration" $ do
       hs "f x y = 1" `shouldBe` js "function f(x, y) { return 1 }"
@@ -50,20 +50,20 @@ spec = do
     it "numeric top level expression" $ do
       js "8" `shouldBe` MuNumber 8
 
-    it "assignment should be VariableAssignment" $ do
-      js "x = 8" `shouldBe` (VariableAssignment "x" (MuNumber 8))
+    it "assignment should be Assignment" $ do
+      js "x = 8" `shouldBe` (Assignment "x" (MuNumber 8))
 
-    it "update should be VariableAssignment" $ do
-      js "x += 8" `shouldBe` (VariableAssignment "x" (Application (Variable "+") [Variable "x",MuNumber 8.0]))
+    it "update should be Assignment" $ do
+      js "x += 8" `shouldBe` (Assignment "x" (Application (Reference "+") [Reference "x",MuNumber 8.0]))
 
-    it "increment should be VariableAssignment" $ do
-      js "x++" `shouldBe` (VariableAssignment "x" (Application (Variable "+") [Variable "x", MuNumber 1]))
+    it "increment should be Assignment" $ do
+      js "x++" `shouldBe` (Assignment "x" (Application (Reference "+") [Reference "x", MuNumber 1]))
 
-    it "decrement should be VariableAssignment" $ do
-      js "x--" `shouldBe` (VariableAssignment "x" (Application (Variable "-") [Variable "x", MuNumber 1]))
+    it "decrement should be Assignment" $ do
+      js "x--" `shouldBe` (Assignment "x" (Application (Reference "-") [Reference "x", MuNumber 1]))
 
     it "sum should be parseable" $ do
-      js "x + y" `shouldBe` (Application (Variable "+") [Variable "x",Variable "y"])
+      js "x + y" `shouldBe` (Application (Reference "+") [Reference "x",Reference "y"])
 
     it "list literal top level expression" $ do
       js "[8, 7]" `shouldBe` MuList [MuNumber 8, MuNumber 7]
@@ -81,42 +81,42 @@ spec = do
       js "(function(x, y) { 1 })" `shouldBe` (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1))
 
     it "handles application" $ do
-      js "f(2)" `shouldBe` (Application (Variable "f") [MuNumber 2])
+      js "f(2)" `shouldBe` (Application (Reference "f") [MuNumber 2])
 
     it "handles application with multiple args" $ do
-      js "f(2, 4)" `shouldBe` (Application (Variable "f") [MuNumber 2, MuNumber 4])
+      js "f(2, 4)" `shouldBe` (Application (Reference "f") [MuNumber 2, MuNumber 4])
 
     it "handles message send" $ do
-      js "o.f(2)" `shouldBe` (Send (Variable "o") (Variable "f") [(MuNumber 2)])
+      js "o.f(2)" `shouldBe` (Send (Reference "o") (Reference "f") [(MuNumber 2)])
 
     it "handles ifs" $ do
-      js "if(x) y else z" `shouldBe` If (Variable "x") (Variable "y") (Variable "z")
+      js "if(x) y else z" `shouldBe` If (Reference "x") (Reference "y") (Reference "z")
 
     it "handles partial ifs" $ do
-      js "if(x) y" `shouldBe` If (Variable "x") (Variable "y") MuNull
+      js "if(x) y" `shouldBe` If (Reference "x") (Reference "y") MuNull
 
     it "handles ternarys as ifs" $ do
       js "x ? y : z " `shouldBe` js "if (x) { y } else { z }"
 
     it "handles whiles" $ do
-      js "while (x) { y }" `shouldBe` While (Variable "x") (Variable "y")
+      js "while (x) { y }" `shouldBe` While (Reference "x") (Reference "y")
 
     it "handles objects" $ do
-      js "({x: 6})" `shouldBe` MuObject (VariableDeclaration "x" (MuNumber 6))
+      js "({x: 6})" `shouldBe` MuObject (Variable "x" (MuNumber 6))
 
     it "handles empty objects" $ do
       js "({})" `shouldBe` MuObject MuNull
 
     it "handles object declarations" $ do
-      js "var x = {}" `shouldBe` (ObjectDeclaration "x" MuNull)
+      js "var x = {}" `shouldBe` (Object "x" MuNull)
 
     it "handles function declarations as vars" $ do
-      js "var x = function(){}" `shouldBe` (FunctionDeclaration "x" (unguardedBody [] MuNull))
+      js "var x = function(){}" `shouldBe` (Function "x" (unguardedBody [] MuNull))
 
     it "handles attribute and method declarations" $ do
-      js "var x = {y: 2, z: function(){}}" `shouldBe` (ObjectDeclaration "x" (Sequence [
-                                                              AttributeDeclaration "y" (MuNumber 2.0),
-                                                              MethodDeclaration "z" (unguardedBody [] MuNull)]))
+      js "var x = {y: 2, z: function(){}}" `shouldBe` (Object "x" (Sequence [
+                                                              Attribute "y" (MuNumber 2.0),
+                                                              Method "z" (unguardedBody [] MuNull)]))
 
 
 

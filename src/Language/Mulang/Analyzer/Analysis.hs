@@ -8,7 +8,7 @@ module Language.Mulang.Analyzer.Analysis (
   AnalysisSpec(..),
   SignatureAnalysisType(..),
   SignatureStyle(..),
-  CodeSample(..),
+  Sample(..),
   Language(..),
 
   AnalysisResult(..),
@@ -18,7 +18,7 @@ import GHC.Generics
 
 import Data.Aeson
 
-import Language.Mulang (Code)
+import Language.Mulang.Ast
 
 --
 -- Common structures
@@ -36,8 +36,8 @@ data Expectation =  Advanced {
                     inspection :: String
                   } deriving (Show, Eq, Generic)
 
-data BindingPattern = Named String
-                    | Like String
+data BindingPattern = Named { exactName :: String }
+                    | Like { similarName :: String }
                     | Anyone deriving (Show, Eq, Generic)
 
 instance FromJSON Expectation
@@ -51,7 +51,7 @@ instance ToJSON BindingPattern
 --
 
 data Analysis = Analysis {
-  sample :: CodeSample,
+  sample :: Sample,
   spec :: AnalysisSpec
 } deriving (Show, Eq, Generic)
 
@@ -63,7 +63,7 @@ data AnalysisSpec = AnalysisSpec {
 data SignatureAnalysisType
   = NoSignatures
   | DefaultSignatures
-  | StyledSignatures SignatureStyle deriving (Show, Eq, Generic)
+  | StyledSignatures { style :: SignatureStyle } deriving (Show, Eq, Generic)
 
 data SignatureStyle
   = MulangStyle
@@ -71,36 +71,38 @@ data SignatureStyle
   | HaskellStyle
   | PrologStyle deriving (Show, Eq, Generic)
 
-data CodeSample = CodeSample {
-  language :: Language,
-  content :: Code
-} deriving (Show, Eq, Generic)
+data Sample
+  = MulangSample { ast :: Expression }
+  | CodeSample { language :: Language, content :: Code } deriving (Show, Eq, Generic)
 
-data Language =  Mulang
-              |  Json
-              |  JavaScript
-              |  Prolog
-              |  GobstonesAst
-              |  Gobstones
-              |  Haskell deriving (Show, Eq, Generic)
+data Language
+  =  Json
+  |  JavaScript
+  |  Prolog
+  |  GobstonesAst
+  |  Gobstones
+  |  Haskell deriving (Show, Eq, Generic)
 
 instance FromJSON Analysis
 instance FromJSON AnalysisSpec
 instance FromJSON SignatureAnalysisType
 instance FromJSON SignatureStyle
-instance FromJSON CodeSample
+instance FromJSON Sample
 instance FromJSON Language
+
+instance FromJSON Equation
+instance FromJSON EquationBody
+instance FromJSON Expression
+instance FromJSON Pattern
+instance FromJSON ComprehensionStatement
 
 --
 -- Analysis Output structures
 --
 
-data AnalysisResult = AnalysisCompleted {
-                        expectationResults :: [ExpectationResult],
-                        smells :: [Expectation],
-                        signatures :: [Code]
-                      }
-                    | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
+data AnalysisResult
+  = AnalysisCompleted { expectationResults :: [ExpectationResult], smells :: [Expectation], signatures :: [Code] }
+  | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
 data ExpectationResult = ExpectationResult {
   expectation :: Expectation,

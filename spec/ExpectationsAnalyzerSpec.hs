@@ -1,16 +1,22 @@
 module ExpectationsAnalyzerSpec(spec) where
 
+import           Language.Mulang
 import           Language.Mulang.Analyzer hiding (result, spec)
 import           Test.Hspec
 
 result expectationsResults smellResults = AnalysisCompleted expectationsResults smellResults []
 
 run language content expectations = analyse (expectationsAnalysis (CodeSample language content) expectations)
+runAst ast expectations = analyse (expectationsAnalysis (MulangSample ast) expectations)
 
 passed e = ExpectationResult e True
 failed e = ExpectationResult e False
 
-spec = describe "Evaluator" $ do
+spec = describe "ExpectationsAnalyzer" $ do
+  it "works with Mulang input" $ do
+    let ydeclares = (Advanced [] "declares" (Named "y") False False)
+    (runAst MuNull [ydeclares]) `shouldBe` (result [failed ydeclares] [])
+
   describe "Advanced expectations" $ do
     it "evaluates unknown basic expectations" $ do
       let hasTurtle = Basic "x" "HasTurtle"
@@ -32,10 +38,6 @@ spec = describe "Evaluator" $ do
       let declaresF = (Advanced [] "declaresFunction" Anyone False False)
       let declaresT = (Advanced [] "declaresTypeAlias" Anyone False False)
       (run Haskell "f x = 2" [declaresF, declaresT]) `shouldBe` (result [passed declaresF, failed declaresT] [])
-
-    it "works with plain mulang format" $ do
-      let ydeclares = (Advanced [] "declares" (Named "y") False False)
-      (run Mulang "MuNull" [ydeclares]) `shouldBe` (result [failed ydeclares] [])
 
   describe "Basic expectations" $ do
     it "can be negated" $ do

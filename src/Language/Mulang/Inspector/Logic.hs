@@ -14,13 +14,13 @@ import Language.Mulang.Inspector.Combiner
 
 declaresFact :: BindingPredicate -> Inspection
 declaresFact = containsDeclaration f
-  where f (FactDeclaration _ _) = True
-        f _                     = False
+  where f (Fact _ _) = True
+        f _          = False
 
 declaresRule :: BindingPredicate -> Inspection
 declaresRule = containsDeclaration f
-  where f (RuleDeclaration _ _ _) = True
-        f _                       = False
+  where f (Rule _ _ _) = True
+        f _            = False
 
 usesNot :: Inspection
 usesNot = containsExpression f
