@@ -1,5 +1,6 @@
 module Language.Mulang.Analyzer (
   noSmells,
+  onlySmells,
   allSmells,
 
   emptyAnalysisSpec,
@@ -24,7 +25,10 @@ import Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
 -- Builder functions
 --
 noSmells :: SmellsSet
-noSmells = NoSmells []
+noSmells = NoSmells
+
+onlySmells :: SmellsSet
+onlySmells = OnlySmells []
 
 allSmells :: SmellsSet
 allSmells = AllSmells []

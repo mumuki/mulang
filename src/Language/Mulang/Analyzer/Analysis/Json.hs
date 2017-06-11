@@ -1,42 +1,22 @@
 module Language.Mulang.Analyzer.Analysis.Json () where
 
 import Data.Aeson
-import Data.Aeson.TH
-
 import Language.Mulang
 import Language.Mulang.Analyzer.Analysis
-
-untaggedJsonOptions :: Options
-untaggedJsonOptions = defaultOptions { sumEncoding = UntaggedValue }
-
-instance FromJSON Expectation where
-    parseJSON = genericParseJSON untaggedJsonOptions
-
-instance FromJSON BindingPattern where
-    parseJSON = genericParseJSON untaggedJsonOptions
-
-instance ToJSON Expectation where
-    toEncoding = genericToEncoding untaggedJsonOptions
-
-instance ToJSON BindingPattern where
-    toEncoding = genericToEncoding untaggedJsonOptions
 
 instance FromJSON Analysis
 instance FromJSON AnalysisSpec
 
-instance FromJSON SmellsSet where
-    parseJSON = genericParseJSON untaggedJsonOptions
+instance FromJSON Expectation
+instance FromJSON BindingPattern
 
+instance FromJSON SmellsSet
 instance FromJSON Smell
 
-instance FromJSON SignatureAnalysisType where
-    parseJSON = genericParseJSON untaggedJsonOptions
-
+instance FromJSON SignatureAnalysisType
 instance FromJSON SignatureStyle
 
-instance FromJSON Sample where
-    parseJSON = genericParseJSON untaggedJsonOptions
-
+instance FromJSON Sample
 instance FromJSON Language
 
 instance FromJSON Equation
@@ -45,11 +25,15 @@ instance FromJSON Expression
 instance FromJSON Pattern
 instance FromJSON ComprehensionStatement
 
+instance ToJSON AnalysisResult
+instance ToJSON ExpectationResult
+
+instance ToJSON Expectation
+instance ToJSON BindingPattern
+
 instance ToJSON Equation
 instance ToJSON EquationBody
 instance ToJSON Expression
 instance ToJSON Pattern
 instance ToJSON ComprehensionStatement
 
-instance ToJSON AnalysisResult
-instance ToJSON ExpectationResult

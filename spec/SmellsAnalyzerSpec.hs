@@ -6,7 +6,7 @@ import           Test.Hspec
 result smellResults = AnalysisCompleted [] smellResults []
 
 runExcept language content smells = analyse (smellsAnalysis (CodeSample language content) allSmells { exclude = smells })
-runOnly language content smells = analyse (smellsAnalysis (CodeSample language content) noSmells { include = smells })
+runOnly language content smells = analyse (smellsAnalysis (CodeSample language content) onlySmells { include = smells })
 
 spec = describe "SmellsAnalyzer" $ do
   describe "Using exclusion" $ do

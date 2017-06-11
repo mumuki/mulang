@@ -13,8 +13,9 @@ detectSmell :: Smell -> Expression -> [Expectation]
 detectSmell smell =  map (exectationFor smell) . detect (inspectionFor smell)
 
 smellsFor :: SmellsSet -> [Smell]
-smellsFor (NoSmells included)  = included
-smellsFor (AllSmells excluded) = allSmells \\ excluded
+smellsFor (NoSmells)             = []
+smellsFor (OnlySmells included)  = included
+smellsFor (AllSmells excluded)   = allSmells \\ excluded
 
 allSmells :: [Smell]
 allSmells = enumFrom minBound

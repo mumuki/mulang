@@ -206,25 +206,23 @@ But if you are not the Haskell inclined gal or guy - ok, I will try to forgive y
 $ mulang '
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "Haskell",
       "content" : "x = 1"
    },
    "spec" : {
       "expectations" : [
          {
-            "subject" : [
-               "x"
-            ],
-            "object" : "Anyone",
+            "tag" : "Advanced",
+            "subject" : [ "x" ],
+            "object" : { "tag" : "Anyone" },
             "negated" : false,
             "verb" : "uses",
             "transitive" : false
          }
       ],
-      "smellsSet" : {
-        "include" : []
-      },
-      "signatureAnalysisType" : "NoSignatures"
+      "smellsSet" : { "tag" : "NoSmells" },
+      "signatureAnalysisType" : { "tag" : "NoSignatures" }
    }
 }
 ' | json_pp
@@ -258,16 +256,16 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "Haskell",
       "content" : "x = 1"
    },
    "spec" : {
-      "signatureAnalysisType" : "NoSignatures",
-      "smellsSet" : {
-        "include" : []
-      },
+      "signatureAnalysisType" : { "tag" : "NoSignatures" },
+      "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
+            "tag" : "Basic",
             "binding" : "x",
             "inspection" : "HasBinding"
          }
@@ -298,15 +296,15 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return x + y; }"
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : {
-        "include" : []
-      },
+      "smellsSet" : { "tag" : "NoSmells" },
       "signatureAnalysisType" : {
+        "tag" : "StyledSignatures",
         "style" : "HaskellStyle"
       }
    }
@@ -328,15 +326,15 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y { return x + y; }"
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : {
-        "include" : []
-      },
+      "smellsSet" : { "tag" : "NoSmells" },
       "signatureAnalysisType" : {
+        "tag" : "StyledSignatures",
         "style" : "HaskellStyle"
       }
    }
@@ -353,7 +351,9 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
+      "tag" : "MulangSample",
       "ast" : {
+         "tag" : "Sequence",
          "sequenceElements" : [
             {
                "variableInitializer" : {
@@ -371,15 +371,15 @@ $ mulang '
                   "numberValue" : 2
                }
             }
-         ],
-         "tag" : "Sequence"
+         ]
       }
    },
    "spec" : {
       "smellsSet" : {
-        "include" : []
+        "tag" : "NoSmells"
       },
       "signatureAnalysisType" : {
+         "tag" : "StyledSignatures",
          "style" : "HaskellStyle"
       },
       "expectations" : []
@@ -403,18 +403,21 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
       "expectations" : [],
       "smellsSet" : {
+        "tag" : "OnlySmells",
         "include" : [
           "ReturnsNull",
           "DoesNullTest"
         ]
       },
       "signatureAnalysisType" : {
+        "tag" : "StyledSignatures",
         "style" : "HaskellStyle"
       }
    }
@@ -442,17 +445,20 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
       "expectations" : [],
       "smellsSet" : {
+        "tag" : "AllSmells",
         "exclude" : [
           "ReturnsNull"
         ]
       },
       "signatureAnalysisType" : {
+        "tag" : "StyledSignatures",
         "style" : "HaskellStyle"
       }
    }

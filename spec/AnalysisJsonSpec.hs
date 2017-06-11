@@ -5,7 +5,7 @@ module AnalysisJsonSpec(spec) where
 import qualified Data.ByteString.Lazy.Char8 as LBS (pack)
 import           Language.Mulang.Analyzer.Analysis hiding (spec)
 import           Language.Mulang.Analyzer.Analysis.Json ()
-import           Language.Mulang.Analyzer (noSmells, allSmells)
+import           Language.Mulang.Analyzer (noSmells, onlySmells, allSmells)
 import           Language.Mulang.Ast
 import           Data.Maybe (fromJust)
 import           Data.Aeson
@@ -14,32 +14,30 @@ import           NeatInterpolation
 
 run json = fromJust . decode $ json
 
-spec = describe "AnalisisJson" $ do
+spec = describe "AnalysisJson" $ do
   it "works with advanced expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
                             (AnalysisSpec [Advanced ["x"] "uses" Anyone False False] noSmells NoSignatures)
     let json = LBS.pack [string|
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "Haskell",
       "content" : "x = 1"
    },
    "spec" : {
       "expectations" : [
          {
-            "subject" : [
-               "x"
-            ],
-            "object" : "Anyone",
+            "tag" : "Advanced",
+            "subject" : [ "x" ],
+            "object" : { "tag" : "Anyone" },
             "negated" : false,
             "verb" : "uses",
             "transitive" : false
          }
       ],
-      "smellsSet" : {
-        "include" : []
-      },
-      "signatureAnalysisType" : "NoSignatures"
+      "smellsSet" : { "tag" : "NoSmells" },
+      "signatureAnalysisType" : { "tag" : "NoSignatures" }
    }
 } |]
     run json `shouldBe` analysis
@@ -50,16 +48,16 @@ spec = describe "AnalisisJson" $ do
     let json = LBS.pack [string|
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "Haskell",
       "content" : "x = 1"
    },
    "spec" : {
-      "signatureAnalysisType" : "NoSignatures",
-      "smellsSet" : {
-        "include" : []
-      },
+      "signatureAnalysisType" : { "tag" : "NoSignatures" },
+      "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
+            "tag" : "Basic",
             "binding" : "x",
             "inspection" : "HasBinding"
          }
@@ -73,15 +71,15 @@ spec = describe "AnalisisJson" $ do
     let json = LBS.pack [string|
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return x + y; }"
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : {
-        "include" : []
-      },
+      "smellsSet" : { "tag" : "NoSmells" },
       "signatureAnalysisType" : {
+        "tag" : "StyledSignatures",
         "style" : "HaskellStyle"
       }
    }
@@ -95,7 +93,9 @@ spec = describe "AnalisisJson" $ do
     let json = LBS.pack [string|
 {
    "sample" : {
+      "tag" : "MulangSample",
       "ast" : {
+         "tag" : "Sequence",
          "sequenceElements" : [
             {
                "variableInitializer" : {
@@ -113,15 +113,15 @@ spec = describe "AnalisisJson" $ do
                   "numberValue" : 2
                }
             }
-         ],
-         "tag" : "Sequence"
+         ]
       }
    },
    "spec" : {
       "smellsSet" : {
-        "include" : []
+        "tag" : "NoSmells"
       },
       "signatureAnalysisType" : {
+         "tag" : "StyledSignatures",
          "style" : "HaskellStyle"
       },
       "expectations" : []
@@ -136,24 +136,27 @@ spec = describe "AnalisisJson" $ do
     let json = LBS.pack [string|
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
       "expectations" : [],
       "smellsSet" : {
+        "tag" : "OnlySmells",
         "include" : [
           "ReturnsNull",
           "DoesNullTest"
         ]
       },
       "signatureAnalysisType" : {
+        "tag" : "StyledSignatures",
         "style" : "HaskellStyle"
       }
    }
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
-                            (AnalysisSpec [] noSmells { include = [ReturnsNull, DoesNullTest]} (StyledSignatures HaskellStyle))
+                            (AnalysisSpec [] onlySmells { include = [ReturnsNull, DoesNullTest]} (StyledSignatures HaskellStyle))
 
     run json `shouldBe` analysis
 
@@ -161,17 +164,20 @@ spec = describe "AnalisisJson" $ do
     let json = LBS.pack [string|
 {
    "sample" : {
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
       "expectations" : [],
       "smellsSet" : {
+        "tag" : "AllSmells",
         "exclude" : [
           "ReturnsNull"
         ]
       },
       "signatureAnalysisType" : {
+        "tag" : "StyledSignatures",
         "style" : "HaskellStyle"
       }
    }

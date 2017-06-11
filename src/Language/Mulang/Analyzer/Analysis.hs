@@ -60,7 +60,8 @@ data AnalysisSpec = AnalysisSpec {
 } deriving (Show, Eq, Generic)
 
 data SmellsSet
-  = NoSmells { include :: [Smell] }
+  = NoSmells
+  | OnlySmells { include :: [Smell] }
   | AllSmells { exclude :: [Smell] } deriving (Show, Eq, Generic)
 
 data Smell
