@@ -1,7 +1,12 @@
 module Language.Mulang.Analyzer (
-  emptyAnalysis,
+  noSmells,
+  allSmells,
+
   emptyAnalysisSpec,
+
+  emptyAnalysis,
   expectationsAnalysis,
+  smellsAnalysis,
   signaturesAnalysis,
 
   analyse,
@@ -18,9 +23,14 @@ import Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
 --
 -- Builder functions
 --
+noSmells :: SmellsSet
+noSmells = NoSmells []
+
+allSmells :: SmellsSet
+allSmells = AllSmells []
 
 emptyAnalysisSpec :: AnalysisSpec
-emptyAnalysisSpec = AnalysisSpec [] NoSignatures
+emptyAnalysisSpec = AnalysisSpec [] noSmells NoSignatures
 
 emptyAnalysis :: Sample -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec
@@ -28,8 +38,12 @@ emptyAnalysis code = Analysis code emptyAnalysisSpec
 expectationsAnalysis :: Sample -> [Expectation] -> Analysis
 expectationsAnalysis code es = Analysis code (emptyAnalysisSpec { expectations = es })
 
+smellsAnalysis :: Sample -> SmellsSet -> Analysis
+smellsAnalysis code set = Analysis code (emptyAnalysisSpec { smellsSet = set })
+
 signaturesAnalysis :: Sample -> SignatureStyle -> Analysis
 signaturesAnalysis code style = Analysis code (emptyAnalysisSpec { signatureAnalysisType = StyledSignatures style })
+
 
 --
 -- Analysis running
@@ -43,5 +57,5 @@ analyse (Analysis sample spec)
 analyseAst :: Expression -> AnalysisSpec -> AnalysisResult
 analyseAst ast spec =
   AnalysisCompleted (analyseExpectations ast (expectations spec))
-                    (analyseSmells ast)
+                    (analyseSmells ast (smellsSet spec))
                     (analyseSignatures ast (signatureAnalysisType spec))

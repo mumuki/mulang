@@ -6,6 +6,8 @@ module Language.Mulang.Analyzer.Analysis (
 
   Analysis(..),
   AnalysisSpec(..),
+  SmellsSet(..),
+  Smell(..),
   SignatureAnalysisType(..),
   SignatureStyle(..),
   Sample(..),
@@ -16,35 +18,31 @@ module Language.Mulang.Analyzer.Analysis (
 
 import GHC.Generics
 
-import Data.Aeson
-
 import Language.Mulang.Ast
+import Language.Mulang.Binding (Binding)
 
---
+---
 -- Common structures
 --
 
+type BasicInspection = String
+type Inspection = String
+
 data Expectation =  Advanced {
-                      subject :: [String] ,
-                      verb :: String,
+                      subject :: [Binding] ,
+                      verb :: Inspection,
                       object :: BindingPattern,
                       transitive :: Bool,
                       negated :: Bool
                     }
                   | Basic {
                     binding :: String,
-                    inspection :: String
+                    inspection :: BasicInspection
                   } deriving (Show, Eq, Generic)
 
-data BindingPattern = Named { exactName :: String }
-                    | Like { similarName :: String }
+data BindingPattern = Named { exactName :: Binding }
+                    | Like { similarName :: Binding }
                     | Anyone deriving (Show, Eq, Generic)
-
-instance FromJSON Expectation
-instance FromJSON BindingPattern
-
-instance ToJSON Expectation
-instance ToJSON BindingPattern
 
 --
 -- Analysis input structures
@@ -57,8 +55,28 @@ data Analysis = Analysis {
 
 data AnalysisSpec = AnalysisSpec {
   expectations :: [Expectation],
+  smellsSet :: SmellsSet,
   signatureAnalysisType :: SignatureAnalysisType
 } deriving (Show, Eq, Generic)
+
+data SmellsSet
+  = NoSmells { include :: [Smell] }
+  | AllSmells { exclude :: [Smell] } deriving (Show, Eq, Generic)
+
+data Smell
+  = HasRedundantIf
+  | HasRedundantLambda
+  | HasRedundantBooleanComparison
+  | HasRedundantGuards
+  | HasRedundantLocalVariableReturn
+  | HasAssignmentReturn
+  | DoesNullTest
+  | DoesTypeTest
+  | IsLongCode
+  | ReturnsNull
+  | HasRedundantParameter
+  | HasBadNames
+  | HasCodeDuplication deriving (Show, Eq, Enum, Bounded, Generic)
 
 data SignatureAnalysisType
   = NoSignatures
@@ -83,19 +101,6 @@ data Language
   |  Gobstones
   |  Haskell deriving (Show, Eq, Generic)
 
-instance FromJSON Analysis
-instance FromJSON AnalysisSpec
-instance FromJSON SignatureAnalysisType
-instance FromJSON SignatureStyle
-instance FromJSON Sample
-instance FromJSON Language
-
-instance FromJSON Equation
-instance FromJSON EquationBody
-instance FromJSON Expression
-instance FromJSON Pattern
-instance FromJSON ComprehensionStatement
-
 --
 -- Analysis Output structures
 --
@@ -109,5 +114,3 @@ data ExpectationResult = ExpectationResult {
   result :: Bool
 } deriving (Show, Eq, Generic)
 
-instance ToJSON AnalysisResult
-instance ToJSON ExpectationResult

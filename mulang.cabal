@@ -93,6 +93,7 @@ library
     Language.Mulang.Parsers.JavaScript
     Language.Mulang.Analyzer
     Language.Mulang.Analyzer.Analysis
+    Language.Mulang.Analyzer.Analysis.Json
     Language.Mulang.Analyzer.SampleParser
     Language.Mulang.Analyzer.ExpectationsAnalyzer
     Language.Mulang.Analyzer.ExpectationsCompiler
@@ -152,6 +153,7 @@ test-suite spec
     parsec                    == 3.1.9,
     ParsecTools               >= 0.0.2.0,
     hspec                     >= 2     && < 3,
+    neat-interpolation        == 0.2.0,
     process                   >= 1.1 && < 2,
     mulang
   build-tools:
