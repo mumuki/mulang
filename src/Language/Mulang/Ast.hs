@@ -102,7 +102,7 @@ data Expression
     | Comprehension Expression [ComprehensionStatement]
     | Sequence [Expression]
     -- ^ Generic sequence of statements
-    | ExpressionOther
+    | Other
     | Equal
     | NotEqual
     | Self
