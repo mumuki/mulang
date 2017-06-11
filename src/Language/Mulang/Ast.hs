@@ -49,71 +49,77 @@ data EquationBody
 -- | However, although all those elements can be used as subexpressions and have an dohave an associated value,
 -- | Mulang does not state WHICH is that value.
 data Expression
-    = TypeAlias { typeAliasId :: Identifier}
-    -- ^ Functional programming type alias. Only the type alias identifier is parsed
-    | Record { recordId :: Identifier }
-    -- ^ Imperative / Functional programming struct declaration. Only the record name is parsed
-    | TypeSignature { typeSignatureId :: Identifier,  typeSignatureParameters :: [Identifier] }
-    -- ^ Generic type signature for a computation. Only the target name of the computation is parsed
-    | EntryPoint { entryPointBody :: Expression }
-    | Function { functionId :: Identifier, functionEquations :: [Equation] }
-    -- ^ Functional / Imperative programming function declaration. It is is composed by an identifier and one or more equations
-    | Procedure { procedureId :: Identifier, procedureEquations :: [Equation] }
+    = TypeAlias Identifier
+    -- ^ Functional programming type alias.
+    --   Only the type alias identifier is parsed
+    | Record Identifier
+    -- ^ Imperative / Functional programming struct declaration.
+    --   Only the record name is parsed
+    | TypeSignature Identifier [Identifier]
+    -- ^ Generic type signature for a computation.
+    --   Only the target name of the computation is parsed
+    | EntryPoint Expression
+    -- ^ Entry point with its body
+    | Function Identifier [Equation]
+    -- ^ Functional / Imperative programming function declaration.
+    --   It is is composed by an identifier and one or more equations
+    | Procedure Identifier [Equation]
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
-    | Method { methodId :: Identifier, methodEquations :: [Equation] }
-    | Variable { variableId :: Identifier, variableInitializer :: Expression }
-    | Assignment { assignmentId :: Identifier, assignmentExpression :: Expression }
-    | Attribute { attributeId :: Identifier, attributeInitializer :: Expression}
+    | Method Identifier [Equation]
+    | Variable Identifier Expression
+    | Assignment Identifier Expression
+    | Attribute Identifier Expression
     -- ^ Object oriented programming attribute declaration, composed by an identifier and an initializer
-    | Object { objectId :: Identifier, objectBody :: Expression}
+    | Object Identifier Expression
     -- ^ Object oriented programming named object declaration, composed by a name and a body
-    | Rule { ruleId :: Identifier, ruleParameters :: [Pattern], ruleBody :: [Expression]}
+    | Rule Identifier [Pattern] [Expression]
     -- ^ Logic programming declaration of a fact, composed by the rue name, rule arguments, and rule body
-    | Fact { factId :: Identifier, factParameters :: [Pattern] }
+    | Fact Identifier [Pattern]
     -- ^ Logic programming declaration of a fact , composed by the fact name and fact arguments
     | Exist Identifier [Pattern]
     -- ^ Logic programming existential cuantification / consult
-    | Not { notBody :: Expression }
+    | Not Expression
     -- ^ Logic programming negation
-    | Findall { findallTemplate :: Expression, findallGenerator :: Expression, findallResult :: Expression }
+    | Findall Expression Expression Expression
     -- ^ Logic programming findall
     | Forall Expression Expression
     -- ^ Logic programming universal cuantification
-    | Reference { referenceId :: Identifier }
+    | Reference Identifier
     -- ^ Generic variable
     | Application Expression [Expression]
     -- ^ Generic, non-curried application of a function or procedure, composed by the applied element itself, and the application arguments
     | Send Expression Expression [Expression]
     -- ^ Object oriented programming message send, composed by the reciever, selector and arguments
     | Lambda [Pattern] Expression
-    | If { ifCondition :: Expression, ifTrue :: Expression, ifFalse :: Expression}
-    | Return { returnExpression :: Expression }
-    | While { whileCondition :: Expression, whileBody :: Expression }
+    | If Expression Expression Expression
+    | Return Expression
+    | While Expression Expression
     -- ^ Imperative programming conditional repetition control structure, composed by a condition and a body
-    | Repeat { repeatCount :: Expression,  repeatBody :: Expression}
+    | Repeat Expression Expression
     -- ^ Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
     | Match Expression [Equation]
     | Switch Expression [(Expression,Expression)]
     | Comprehension Expression [ComprehensionStatement]
-    | Sequence { sequenceElements :: [Expression] }
+    | Sequence [Expression]
     -- ^ Generic sequence of statements
     | ExpressionOther
     | Equal
     | NotEqual
+    | Self
     | MuNull
     -- ^ Generic nothing value literal - nil, null, undefined or unit
-    | MuObject { objectBody :: Expression }
+    | MuObject Expression
     -- ^ Object oriented unnamed object literal
-    | MuNumber { numberValue :: Double }
+    | MuNumber Double
     -- ^ Generic number literal
-    | MuBool { boolValue :: Bool }
+    | MuBool Bool
     -- ^ Generic boolean literal
-    | MuString { stringValue :: String }
+    | MuString String
     -- ^ Generic string literal
-    | MuSymbol { symbolValue :: String }
+    | MuSymbol String
     -- ^ Generic symbol/atom literal
-    | MuTuple { tupleComponents :: [Expression] }
-    | MuList { listElements :: [Expression] }
+    | MuTuple [Expression]
+    | MuList [Expression]
   deriving (Eq, Show, Read, Generic)
 
 -- | Mulang Patterns are not expressions, but are aimed to match them.

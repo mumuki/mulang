@@ -96,22 +96,20 @@ spec = describe "AnalysisJson" $ do
       "tag" : "MulangSample",
       "ast" : {
          "tag" : "Sequence",
-         "sequenceElements" : [
+         "contents" : [
             {
-               "variableInitializer" : {
-                  "tag" : "MuNumber",
-                  "numberValue" : 1
-               },
-               "variableId" : "x",
-               "tag" : "Variable"
+              "tag" : "Variable",
+              "contents" : [
+                "x",
+                { "tag" : "MuNumber", "contents" : 1 }
+              ]
             },
             {
-               "tag" : "Variable",
-               "variableId" : "y",
-               "variableInitializer" : {
-                  "tag" : "MuNumber",
-                  "numberValue" : 2
-               }
+              "tag" : "Variable",
+              "contents" : [
+                "y",
+                { "tag" : "MuNumber", "contents" : 2 }
+              ]
             }
          ]
       }
