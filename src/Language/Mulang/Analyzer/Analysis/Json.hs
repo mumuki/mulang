@@ -45,5 +45,11 @@ instance FromJSON Expression
 instance FromJSON Pattern
 instance FromJSON ComprehensionStatement
 
+instance ToJSON Equation
+instance ToJSON EquationBody
+instance ToJSON Expression
+instance ToJSON Pattern
+instance ToJSON ComprehensionStatement
+
 instance ToJSON AnalysisResult
 instance ToJSON ExpectationResult
