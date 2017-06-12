@@ -71,7 +71,11 @@ data Expression
     | Attribute Identifier Expression
     -- ^ Object oriented programming attribute declaration, composed by an identifier and an initializer
     | Object Identifier Expression
-    -- ^ Object oriented programming named object declaration, composed by a name and a body
+    -- ^ Object oriented programming global, named object declaration,
+    --   composed by a name and a body
+    | Class Identifier Expression
+    -- ^ Object oriented programming global, class declaration,
+    --   composed by a name and a body
     | Rule Identifier [Pattern] [Expression]
     -- ^ Logic programming declaration of a fact, composed by the rue name, rule arguments, and rule body
     | Fact Identifier [Pattern]

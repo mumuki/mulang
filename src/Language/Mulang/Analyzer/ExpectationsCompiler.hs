@@ -28,6 +28,8 @@ toAdvanced :: String -> [String] -> Bool -> Maybe Expectation
 toAdvanced b ["HasAnonymousVariable"] = Just . nonTransitiveAdv b "usesAnonymousVariable"
 toAdvanced b ["HasArity", n]          = Just . nonTransitiveAdv b ("declaresComputationWithArity" ++ n)
 toAdvanced b ["HasBinding"]           = Just . Advanced [] "declares" (Named b) False
+toAdvanced b ["HasClass"]             = Just . Advanced [] "declaresClass" (Named b) False
+toAdvanced b ["HasObject"]            = Just . Advanced [] "declaresObject" (Named b) False
 toAdvanced b ["HasComposition"]       = Just . transitiveAdv b "usesComposition"
 toAdvanced b ["HasComprehension"]     = Just . transitiveAdv b "usesComprehension"
 toAdvanced b ["HasConditional"]       = Just . transitiveAdv b "usesConditional"
@@ -59,6 +61,7 @@ compileNegation _     i = negative i
 
 compileInspection :: String -> BindingPredicate -> Maybe Inspection
 compileInspection "declaresObject"                 pred = Just $ declaresObject pred
+compileInspection "declaresClass"                  pred = Just $ declaresClass pred
 compileInspection "declaresAttribute"              pred = Just $ declaresAttribute pred
 compileInspection "declaresMethod"                 pred = Just $ declaresMethod pred
 compileInspection "declaresFunction"               pred = Just $ declaresFunction pred

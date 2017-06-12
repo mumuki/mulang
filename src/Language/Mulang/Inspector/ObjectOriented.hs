@@ -1,5 +1,6 @@
 module Language.Mulang.Inspector.ObjectOriented (
   declaresObject,
+  declaresClass,
   declaresAttribute,
   declaresMethod)  where
 
@@ -11,6 +12,11 @@ declaresObject :: BindingPredicate -> Inspection
 declaresObject =  containsDeclaration f
   where f (Object _ _) = True
         f _            = False
+
+declaresClass :: BindingPredicate -> Inspection
+declaresClass =  containsDeclaration f
+  where f (Class _ _) = True
+        f _           = False
 
 declaresAttribute :: BindingPredicate -> Inspection
 declaresAttribute =  containsDeclaration f
