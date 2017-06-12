@@ -15,8 +15,8 @@ declaresObject =  containsDeclaration f
 
 declaresClass :: BindingPredicate -> Inspection
 declaresClass =  containsDeclaration f
-  where f (Class _ _) = True
-        f _           = False
+  where f (Class _ _ _) = True
+        f _             = False
 
 declaresAttribute :: BindingPredicate -> Inspection
 declaresAttribute =  containsDeclaration f

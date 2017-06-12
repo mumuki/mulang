@@ -73,9 +73,9 @@ data Expression
     | Object Identifier Expression
     -- ^ Object oriented programming global, named object declaration,
     --   composed by a name and a body
-    | Class Identifier Expression
+    | Class Identifier Identifier Expression
     -- ^ Object oriented programming global, class declaration,
-    --   composed by a name and a body
+    --   composed by a name, superclass and a body
     | Rule Identifier [Pattern] [Expression]
     -- ^ Logic programming declaration of a fact, composed by the rue name, rule arguments, and rule body
     | Fact Identifier [Pattern]
