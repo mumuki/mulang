@@ -37,9 +37,11 @@ isLongCode = containsExpression f
 compares :: (Expression -> Bool) -> Inspection
 compares f = containsExpression (any f.comparisonOperands)
 
+comparisonOperands (Send a1 Equal    [a2])     = [a1, a2]
+comparisonOperands (Send a1 NotEqual [a2])     = [a1, a2]
 comparisonOperands (Application Equal    args) = args
 comparisonOperands (Application NotEqual args) = args
-comparisonOperands _ = []
+comparisonOperands _                           = []
 
 returnsNull :: Inspection
 returnsNull = containsExpression f
