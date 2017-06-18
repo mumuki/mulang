@@ -3,5 +3,6 @@ packages:
 - '.'
 extra-deps:
 - ParsecTools-0.0.2.0
+- neat-interpolation-0.2.3
 flags: {}
 extra-package-dbs: []

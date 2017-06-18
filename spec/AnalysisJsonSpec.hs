@@ -10,7 +10,7 @@ import           Language.Mulang.Ast
 import           Data.Maybe (fromJust)
 import           Data.Aeson
 import           Test.Hspec
-import           NeatInterpolation
+import           NeatInterpolation (string)
 
 run json = fromJust . decode $ json
 

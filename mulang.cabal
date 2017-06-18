@@ -154,6 +154,7 @@ test-suite spec
     ParsecTools               ,
     hspec                     ,
     process                   ,
+    neat-interpolation        ,
     mulang
   build-tools:
     happy,
