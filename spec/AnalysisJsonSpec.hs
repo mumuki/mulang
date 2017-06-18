@@ -2,23 +2,31 @@
 
 module AnalysisJsonSpec(spec) where
 
-import qualified Data.ByteString.Lazy.Char8 as LBS (pack)
+import           Test.Hspec
+
+import           Data.Text (unpack, Text)
+import           Data.ByteString.Lazy.Char8 (pack, ByteString)
+
 import           Language.Mulang.Analyzer.Analysis hiding (spec)
 import           Language.Mulang.Analyzer.Analysis.Json ()
 import           Language.Mulang.Analyzer (noSmells, onlySmells, allSmells)
 import           Language.Mulang.Ast
-import           Data.Maybe (fromJust)
-import           Data.Aeson
-import           Test.Hspec
-import           NeatInterpolation (string)
 
-run json = fromJust . decode $ json
+import           Data.Maybe (fromJust)
+import           Data.Aeson (decode)
+import           NeatInterpolation (text)
+
+run :: Text -> Analysis
+run = fromJust . decode . textToLazyByteString
+
+textToLazyByteString :: Text -> ByteString
+textToLazyByteString = pack . unpack
 
 spec = describe "AnalysisJson" $ do
   it "works with advanced expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
                             (AnalysisSpec [Advanced ["x"] "uses" Anyone False False] noSmells NoSignatures)
-    let json = LBS.pack [string|
+    let json = [text|
 {
    "sample" : {
       "tag" : "CodeSample",
@@ -45,7 +53,7 @@ spec = describe "AnalysisJson" $ do
   it "works with basic expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
                             (AnalysisSpec [Basic "x" "HasBinding"] noSmells NoSignatures)
-    let json = LBS.pack [string|
+    let json = [text|
 {
    "sample" : {
       "tag" : "CodeSample",
@@ -68,7 +76,7 @@ spec = describe "AnalysisJson" $ do
     run json `shouldBe` analysis
 
   it "works with signature analysis" $ do
-    let json = LBS.pack [string|
+    let json = [text|
 {
    "sample" : {
       "tag" : "CodeSample",
@@ -90,7 +98,7 @@ spec = describe "AnalysisJson" $ do
     run json `shouldBe` analysis
 
   it "works with mulang code" $ do
-    let json = LBS.pack [string|
+    let json = [text|
 {
    "sample" : {
       "tag" : "MulangSample",
@@ -131,7 +139,7 @@ spec = describe "AnalysisJson" $ do
     run json `shouldBe` analysis
 
   it "works with inclusion smells analysis" $ do
-    let json = LBS.pack [string|
+    let json = [text|
 {
    "sample" : {
       "tag" : "CodeSample",
@@ -159,7 +167,7 @@ spec = describe "AnalysisJson" $ do
     run json `shouldBe` analysis
 
   it "works with exclusion smells analysis" $ do
-    let json = LBS.pack [string|
+    let json = [text|
 {
    "sample" : {
       "tag" : "CodeSample",

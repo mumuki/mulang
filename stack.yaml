@@ -1,8 +1,12 @@
-resolver: lts-5.18
+resolver: lts-7.24
 packages:
 - '.'
 extra-deps:
-- ParsecTools-0.0.2.0
-- neat-interpolation-0.2.3
+# Using newest aeson, with no contents in tagged
+# unions with nullary constructors
+- aeson-1.2.1.0
+# Using older javascript dep, compatible with
+# current AST
+- language-javascript-0.5.14.7
 flags: {}
 extra-package-dbs: []
