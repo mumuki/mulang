@@ -47,7 +47,7 @@ executable mulang
     -fwarn-tabs
     -funbox-strict-fields
     -threaded
-    -O2
+    -O
 
 library
   build-depends:       base >=4.6
@@ -62,7 +62,7 @@ library
     -fwarn-tabs
     -funbox-strict-fields
     -threaded
-    -O2
+    -O
 
   hs-source-dirs:
       src
@@ -134,7 +134,7 @@ test-suite spec
     -fwarn-tabs
     -funbox-strict-fields
     -threaded
-    -O2
+    -O
   hs-source-dirs:
       spec
   main-is:
