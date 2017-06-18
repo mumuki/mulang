@@ -28,6 +28,7 @@ library
 
   exposed-modules:
     Control.Fallible
+    Text.Dictionary
     Text.SimpleParser
     Text.Inflections.Tokenizer
     Language.Mulang

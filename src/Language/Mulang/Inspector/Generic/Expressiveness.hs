@@ -1,20 +1,19 @@
 module Language.Mulang.Inspector.Generic.Expressiveness (
   wordsOf,
-  isWellWritten,
-  english,
-  Dictionary) where
+  isWellWritten) where
 
-import Language.Mulang.Inspector
+import Language.Mulang.Inspector (Inspection)
+import Language.Mulang.Ast (Expression)
 import Language.Mulang.Explorer (declaredBindingsOf)
 
-import Text.Inflections.Tokenizer
+import Text.Dictionary (Dictionary, exists)
 
-type Dictionary = [String]
+import Text.Inflections.Tokenizer (CaseStyle, tokenize)
 
-english :: Dictionary
-english = ["today", "is", "a", "great", "day"]
+isWellWritten :: CaseStyle -> Dictionary -> Inspection
+isWellWritten style dictionary = all (`exists` dictionary)  . wordsOf style
 
-isWellWritten :: Dictionary -> Inspection
-isWellWritten dictionary = all (`elem` dictionary)  . wordsOf
+wordsOf :: CaseStyle -> Expression -> [String]
+wordsOf style = concatMap (tokenize style) . declaredBindingsOf
 
-wordsOf = concatMap (tokenize camelCase) . declaredBindingsOf
+
