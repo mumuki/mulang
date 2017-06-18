@@ -98,6 +98,7 @@ library
     Language.Mulang.Analyzer.ExpectationsAnalyzer
     Language.Mulang.Analyzer.ExpectationsCompiler
     Language.Mulang.Analyzer.SignaturesAnalyzer
+    Language.Mulang.Analyzer.SignatureStyleCompiler
     Language.Mulang.Analyzer.SmellsAnalyzer
   build-depends:
     base                      ,
