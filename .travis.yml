@@ -1,14 +1,8 @@
-language: haskell
-ghc: 7.6
-before_install:
-- wget https://github.com/gobstones/gs-weblang-cli/releases/download/v1.3.3/rungs-ubuntu64 -O rungs
-- chmod u+x rungs
-- sudo mv rungs /usr/bin/rungs
-- cabal install alex
-install:
-- cabal install --only-dependencies --enable-tests --force-reinstalls
-script:
-- cabal configure --enable-tests && cabal build && ./dist/build/spec/spec
+sudo: false
+language: generic
+cache:
+  directories:
+  - $HOME/.stack
 env:
   - CXX=g++-4.8
 addons:
@@ -16,7 +10,22 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
+      - libgmp-dev
       - g++-4.8
+before_install:
+# Install Stack
+- mkdir -p ~/.local/bin
+- export PATH=$HOME/.local/bin:$PATH
+- travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+# Install Rungs
+- wget https://github.com/gobstones/gs-weblang-cli/releases/download/v1.3.3/rungs-ubuntu64 -O rungs
+- chmod u+x rungs
+- sudo mv rungs ~/.local/bin/rungs
+install:
+- stack --no-terminal --install-ghc test --only-dependencies
+script:
+# Build the package, its tests, and its docs and run the tests
+- stack --no-terminal test --haddock --no-haddock-deps
 deploy:
   provider: releases
   api_key:
