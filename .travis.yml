@@ -20,7 +20,7 @@ before_install:
 # Install Rungs
 - wget https://github.com/gobstones/gs-weblang-cli/releases/download/v1.3.3/rungs-ubuntu64 -O rungs
 - chmod u+x rungs
-- sudo mv rungs ~/.local/bin/rungs
+- mv rungs ~/.local/bin/rungs
 install:
 - stack --no-terminal --install-ghc test --only-dependencies
 script:
