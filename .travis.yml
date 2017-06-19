@@ -24,7 +24,7 @@ before_install:
 install:
 - stack --no-terminal --install-ghc test --only-dependencies
 script:
-- stack --no-terminal test
+- stack --no-terminal --skip-ghc-check test
 deploy:
   provider: releases
   api_key:
