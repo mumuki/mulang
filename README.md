@@ -488,55 +488,49 @@ Mulang CLI can do three different kinds of analysis:
 
 ## Building mulang from source
 
-To generate `mulang` executable, you have to build the project using [cabal](https://www.haskell.org/cabal/).
+### Setup
 
-Make sure you have `cabal` command installed. You can install it by doing `sudo apt-get install cabal-install` or by downloading binaries from [here](https://www.haskell.org/cabal/download.html).
+To generate `mulang` executable, you have to build the project using [stack](https://haskellstack.org):
 
-Important:  cabal version must be **higher than 1.18**. Otherwise, sandboxes won't work.
+1. Install stack: `wget -qO- https://get.haskellstack.org/ | sh`
+2. Go to the mulang project directory and setup it: `stack setup`
+3. Build the project: `stack build`
 
-You will need to install [ghc 7.10.3](https://www.haskell.org/ghc/), [alex](https://www.haskell.org/alex/) and [happy](https://www.haskell.org/happy/), two executables that Mulang uses:
+### Rungs
 
-```
-sudo apt-get install alex
-sudo apt-get install happy
-```
-
-Mulang uses the rungs` command to parse the Gobstones language - if you don't install it, Gobstones tests will fail:
+Mulang uses the `rungs` command to parse the Gobstones language - if you don't install it, Gobstones tests will fail:
 
 ```
-wget https://github.com/gobstones/gs-weblang-cli/releases/download/v1.3.3/rungs-ubuntu64 -O rungs
-chmod u+x rungs
-sudo mv rungs /usr/bin/rungs
+$ wget https://github.com/gobstones/gs-weblang-cli/releases/download/v1.3.3/rungs-ubuntu64 -O rungs
+$ chmod u+x rungs
+$ sudo mv rungs ~/.local/bin
 ```
 
-### Before start
+### Installing and creating an executable
 
-## Installing and creating an executable
 
-The following times, you just need to install project dependencies and build:
-
-```
-cabal sandbox init
-cabal install --only-dependencies --enable-tests --force-reinstalls
-cabal build
+```bash
+$ stack install
+$ mulang
 ```
 
-That will generate a `mulang` executable in the folder `dist/build/mulang`.
+That will generate a `mulang` executable in the folder `~/.local/bin`.
 
 ### Running tests
 
+```bash
+$ stack test --fast
 ```
-cabal test
+
+### Watching changes
+
+
+```bash
+$ stack test --fast --file-watch
 ```
 
 ### Loading mulang in the REPL
 
 ```
-cabal repl
-```
-
-And then, inside the REPL, do:
-
-```
-:m Language.Mulang
+stack ghci
 ```

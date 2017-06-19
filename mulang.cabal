@@ -10,48 +10,11 @@ category:            Language
 build-type:          Simple
 cabal-version:       >=1.10
 
-
-executable mulang
-  hs-source-dirs:
-    src
-  main-is: Main.hs
-  default-language:    Haskell2010
-
-  build-depends:
-    base                      >= 4.6     && < 4.7,
-    bytestring                == 0.10.6.0,
-    text                      == 1.2.2.1,
-    unordered-containers      == 0.2.7.1,
-    containers                == 0.5.6.2,
-    scientific                == 0.3.4.9,
-    vector                    == 0.11.0.0,
-    haskell-src               >= 1       && < 1.1,
-    language-javascript       >= 0.5.14  && <= 0.5.15,
-    aeson                     >= 1.2.0,
-    parsec                    == 3.1.9,
-    ParsecTools               >= 0.0.2.0,
-    split                     >= 0.2.3.1,
-    hashable                  >= 1.2.4.0  && < 1.3,
-    process                   >= 1.1 && < 1.4
-  build-tools:
-    happy,
-    alex
-
-  ghc-options:
-    -Wall
-    -fno-warn-missing-signatures
-    -fno-warn-unused-do-bind
-    -fno-warn-orphans
-    -fno-warn-name-shadowing
-    -fno-warn-incomplete-patterns
-    -fwarn-tabs
-    -funbox-strict-fields
-    -threaded
-    -O2
-
 library
-  build-depends:       base >=4.6 && < 4.7
+  hs-source-dirs:      src
   default-language:    Haskell2010
+
+-- TODO recheck this is actuall necessary
   ghc-options:
     -Wall
     -fno-warn-missing-signatures
@@ -61,11 +24,8 @@ library
     -fno-warn-incomplete-patterns
     -fwarn-tabs
     -funbox-strict-fields
-    -threaded
-    -O2
+    -O
 
-  hs-source-dirs:
-      src
   exposed-modules:
     Control.Fallible
     Text.SimpleParser
@@ -98,31 +58,45 @@ library
     Language.Mulang.Analyzer.ExpectationsAnalyzer
     Language.Mulang.Analyzer.ExpectationsCompiler
     Language.Mulang.Analyzer.SignaturesAnalyzer
+    Language.Mulang.Analyzer.SignatureStyleCompiler
     Language.Mulang.Analyzer.SmellsAnalyzer
   build-depends:
-    base                      >= 4.6     && < 4.7,
-    bytestring                == 0.10.6.0,
-    text                      == 1.2.2.1,
-    unordered-containers      == 0.2.7.1,
-    containers                == 0.5.6.2,
-    scientific                == 0.3.4.9,
-    vector                    == 0.11.0.0,
-    haskell-src               >= 1       && < 1.1,
-    language-javascript       >= 0.5.14  && <= 0.5.15,
-    aeson                     >= 1.2.0,
-    inflections               > 0.2       && < 0.3,
-    parsec                    == 3.1.9,
-    ParsecTools               >= 0.0.2.0,
-    split                     >= 0.2.3.1,
-    hashable                  >= 1.2.4.0  && < 1.3,
-    process                   >= 1.1 && < 1.4
+    base                      ,
+    bytestring                ,
+    text                      ,
+    unordered-containers      ,
+    containers                ,
+    scientific                ,
+    vector                    ,
+    haskell-src               ,
+    language-javascript       ,
+    aeson                     ,
+    inflections               ,
+    parsec                    ,
+    ParsecTools               ,
+    split                     ,
+    hashable                  ,
+    process
   build-tools:
     happy,
     alex
 
-test-suite spec
-  type:
-      exitcode-stdio-1.0
+executable mulang
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  default-language:    Haskell2010
+
+  build-depends:
+    base                      ,
+    bytestring                ,
+    text                      ,
+    aeson                     ,
+    process                   ,
+    mulang
+  build-tools:
+    happy,
+    alex
+
   ghc-options:
     -Wall
     -fno-warn-missing-signatures
@@ -133,29 +107,35 @@ test-suite spec
     -fwarn-tabs
     -funbox-strict-fields
     -threaded
-    -O2
-  hs-source-dirs:
-      spec
-  main-is:
-      Spec.hs
+    -O
+
+test-suite spec
+  type: exitcode-stdio-1.0
+  ghc-options:
+    -Wall
+    -fno-warn-missing-signatures
+    -fno-warn-unused-do-bind
+    -fno-warn-orphans
+    -fno-warn-name-shadowing
+    -fno-warn-incomplete-patterns
+    -fwarn-tabs
+    -funbox-strict-fields
+    -threaded
+    -O
+  hs-source-dirs: spec
+  main-is:        Spec.hs
   build-depends:
-    base                      >= 4.6     && < 4.7,
-    unordered-containers      == 0.2.7.1,
-    containers                == 0.5.6.2,
-    scientific                == 0.3.4.9,
-    vector                    == 0.11.0.0,
-    bytestring                == 0.10.6.0,
-    text                      == 1.2.2.1,
-    aeson                     >= 1.2.0,
-    haskell-src               >= 1     && < 1.1,
-    language-javascript       >= 0.5.14  && <= 0.5.15,
-    inflections               > 0.2      && < 0.3,
-    parsec                    == 3.1.9,
-    ParsecTools               >= 0.0.2.0,
-    hspec                     >= 2     && < 3,
-    neat-interpolation        == 0.2.0,
-    process                   >= 1.1 && < 2,
+    base                      ,
+    bytestring                ,
+    text                      ,
+    aeson                     ,
+    hspec                     ,
+    neat-interpolation        ,
     mulang
   build-tools:
     happy,
     alex
+
+source-repository head
+  type:     git
+  location: https://github.com/mumuki/mulang
