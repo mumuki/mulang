@@ -23,6 +23,8 @@ import Data.List (nub)
 (//)  :: Expression -> Binding -> [Expression]
 (//) = flip bindedDeclarationsOf
 
+-- | Returns the given expressions and all its subexpressions
+-- For example: in 'f x = x + 1', it returns 'f x = x + 1', 'x + 1', 'x' and '1'
 expressionsOf :: Expression -> [Expression]
 expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
   where
@@ -66,15 +68,23 @@ equationBodiesOf = concatMap bodiesOf . expressionsOf
     bodiesOf (Function _ equations) = map (\(Equation _ body) -> body) equations
     bodiesOf _ = []
 
+-- | Returns all the referenced bindings and the expressions that references them
+-- For example, in 'f (x + 1)', it returns '(f, f (x + 1))' and '(x, x)'
 referencesOf :: Expression -> [(Binding, Expression)]
 referencesOf = nub . concatMap (maybeToList . extractReference) . expressionsOf
 
+-- | Returns all the declared bindings and the expressions that binds them
+-- For example, in 'f x = g x where x = y', it returns '(f, f x = ...)' and '(x, x = y)'
 declarationsOf :: Expression -> [(Binding, Expression)]
 declarationsOf = concatMap (maybeToList . extractDeclaration) . expressionsOf
 
+-- | Returns all the referenced bindings
+-- For example, in 'f (x + 1)', it returns 'f' and 'x'
 referencedBindingsOf :: Expression -> [Binding]
 referencedBindingsOf = map fst . referencesOf
 
+-- | Returns all the declared bindings
+-- For example, in 'f x = g x where x = y', it returns 'f' and 'x'
 declaredBindingsOf :: Expression -> [Binding]
 declaredBindingsOf = map fst . declarationsOf
 
