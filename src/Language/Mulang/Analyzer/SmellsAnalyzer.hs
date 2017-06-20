@@ -3,6 +3,7 @@ module Language.Mulang.Analyzer.SmellsAnalyzer (
 
 import Language.Mulang
 import Language.Mulang.Inspector.Generic.Smell
+import Language.Mulang.Inspector.Generic.Expressiveness
 import Language.Mulang.Analyzer.Analysis
 import Data.List
 
@@ -33,7 +34,7 @@ inspectionFor DoesTypeTest                    = doesTypeTest
 inspectionFor ReturnsNull                     = returnsNull
 inspectionFor IsLongCode                      = const False
 inspectionFor IsMisspelled                    = const False
-inspectionFor IsTooShortBinding               = const False
+inspectionFor IsTooShortBinding               = isTooShortBinding
 inspectionFor HasCodeDuplication              = const False
 
 exectationFor :: Smell -> Binding -> Expectation
