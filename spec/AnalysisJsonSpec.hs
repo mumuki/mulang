@@ -1,4 +1,4 @@
- {-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
 
 module AnalysisJsonSpec(spec) where
 
@@ -25,7 +25,7 @@ textToLazyByteString = pack . unpack
 spec = describe "AnalysisJson" $ do
   it "works with advanced expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
-                            (AnalysisSpec [Advanced ["x"] "uses" Anyone False False] noSmells NoSignatures)
+                            (AnalysisSpec [Advanced ["x"] "uses" Anyone False False] noSmells NoSignatures Nothing)
     let json = [text|
 {
    "sample" : {
@@ -52,7 +52,7 @@ spec = describe "AnalysisJson" $ do
 
   it "works with basic expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
-                            (AnalysisSpec [Basic "x" "HasBinding"] noSmells NoSignatures)
+                            (AnalysisSpec [Basic "x" "HasBinding"] noSmells NoSignatures Nothing)
     let json = [text|
 {
    "sample" : {
@@ -93,7 +93,7 @@ spec = describe "AnalysisJson" $ do
    }
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return x + y; }")
-                            (AnalysisSpec [] noSmells (StyledSignatures HaskellStyle))
+                            (AnalysisSpec [] noSmells (StyledSignatures HaskellStyle) Nothing)
 
     run json `shouldBe` analysis
 
@@ -134,7 +134,7 @@ spec = describe "AnalysisJson" $ do
    }
 }|]
     let analysis = Analysis (MulangSample (Sequence [Variable "x" (MuNumber 1), Variable "y" (MuNumber 2)]))
-                            (AnalysisSpec [] noSmells (StyledSignatures HaskellStyle))
+                            (AnalysisSpec [] noSmells (StyledSignatures HaskellStyle) Nothing)
 
     run json `shouldBe` analysis
 
@@ -162,7 +162,7 @@ spec = describe "AnalysisJson" $ do
    }
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
-                            (AnalysisSpec [] onlySmells { include = [ReturnsNull, DoesNullTest]} (StyledSignatures HaskellStyle))
+                            (AnalysisSpec [] onlySmells { include = [ReturnsNull, DoesNullTest]} (StyledSignatures HaskellStyle) Nothing)
 
     run json `shouldBe` analysis
 
@@ -189,6 +189,6 @@ spec = describe "AnalysisJson" $ do
    }
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
-                            (AnalysisSpec [] allSmells { exclude = [ReturnsNull]} (StyledSignatures HaskellStyle))
+                            (AnalysisSpec [] allSmells { exclude = [ReturnsNull]} (StyledSignatures HaskellStyle) Nothing)
 
     run json `shouldBe` analysis

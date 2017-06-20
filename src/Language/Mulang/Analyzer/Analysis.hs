@@ -40,9 +40,10 @@ data Expectation =  Advanced {
                     inspection :: BasicInspection
                   } deriving (Show, Eq, Generic)
 
-data BindingPattern = Named { exactName :: Binding }
-                    | Like { similarName :: Binding }
-                    | Anyone deriving (Show, Eq, Generic)
+data BindingPattern
+  = Named { exactName :: Binding }
+  | Like { similarName :: Binding }
+  | Anyone deriving (Show, Eq, Generic)
 
 --
 -- Analysis input structures
@@ -56,7 +57,8 @@ data Analysis = Analysis {
 data AnalysisSpec = AnalysisSpec {
   expectations :: [Expectation],
   smellsSet :: SmellsSet,
-  signatureAnalysisType :: SignatureAnalysisType
+  signatureAnalysisType :: SignatureAnalysisType,
+  dictionaryPath :: Maybe FilePath
 } deriving (Show, Eq, Generic)
 
 data SmellsSet
@@ -74,9 +76,10 @@ data Smell
   | DoesNullTest
   | DoesTypeTest
   | IsLongCode
+  | IsMisspelled
+  | IsTooShortBinding
   | ReturnsNull
   | HasRedundantParameter
-  | HasBadNames
   | HasCodeDuplication deriving (Show, Eq, Enum, Bounded, Generic)
 
 data SignatureAnalysisType

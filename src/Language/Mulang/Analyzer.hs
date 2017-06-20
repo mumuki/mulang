@@ -34,7 +34,7 @@ allSmells :: SmellsSet
 allSmells = AllSmells []
 
 emptyAnalysisSpec :: AnalysisSpec
-emptyAnalysisSpec = AnalysisSpec [] noSmells NoSignatures
+emptyAnalysisSpec = AnalysisSpec [] noSmells NoSignatures Nothing
 
 emptyAnalysis :: Sample -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec

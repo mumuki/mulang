@@ -32,7 +32,8 @@ inspectionFor DoesNullTest                    = doesNullTest
 inspectionFor DoesTypeTest                    = doesTypeTest
 inspectionFor ReturnsNull                     = returnsNull
 inspectionFor IsLongCode                      = const False
-inspectionFor HasBadNames                     = const False
+inspectionFor IsMisspelled                    = const False
+inspectionFor IsTooShortBinding               = const False
 inspectionFor HasCodeDuplication              = const False
 
 exectationFor :: Smell -> Binding -> Expectation
