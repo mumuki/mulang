@@ -23,7 +23,6 @@ import  qualified Data.ByteString.Lazy.Char8 as LBS (pack)
 import  qualified Data.Text as T
 import  qualified Data.Vector as V
 
-import            Control.Applicative
 import            GHC.Generics ()
 
 import            System.Process (readProcessWithExitCode)
@@ -228,7 +227,7 @@ convertBody a _ = a
 convertCases [] _                    = []
 convertCases ((e1,b1):cases) hashMap = (e1,convertBody b1 hashMap):convertCases cases hashMap
 
-convertVariablesInEquation (Equation xs (UnguardedBody e)) = Equation xs $ UnguardedBody (convertAssignmentToDeclaration e)
+convertVariablesInEquation (SimpleEquation xs e) = SimpleEquation xs (convertAssignmentToDeclaration e)
 
 
 ------------------------------------------------

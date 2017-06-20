@@ -13,9 +13,6 @@
 -- |
 module Language.Mulang.Ast (
     equationParams,
-    unguardedEquationBody,
-    simpleProcedureBody,
-    simpleFunctionBody,
     Code,
     Equation(..),
     EquationBody(..),
@@ -164,15 +161,6 @@ data ComprehensionStatement
 
 equationParams :: Equation -> [Pattern]
 equationParams (Equation p _) = p
-
-unguardedEquationBody :: Equation -> Expression
-unguardedEquationBody (Equation _ (UnguardedBody body)) = body
-
-simpleProcedureBody :: Expression -> Expression
-simpleProcedureBody (Procedure _ [equation]) = unguardedEquationBody equation
-
-simpleFunctionBody :: Expression -> Expression
-simpleFunctionBody (Function _ [equation]) = unguardedEquationBody equation
 
 pattern SimpleEquation params body = Equation params (UnguardedBody body)
 
