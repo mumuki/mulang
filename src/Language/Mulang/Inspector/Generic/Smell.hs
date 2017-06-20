@@ -75,9 +75,8 @@ hasRedundantLambda = containsExpression f
 -- can be avoided using point-free
 hasRedundantParameter :: Inspection
 hasRedundantParameter = containsExpression f
-  where f (Function _ [Equation params (UnguardedBody (Return (Application _ args)))])
-                                                            | (VariablePattern param) <- last params,
-                                                              (Reference arg) <- last args = param == arg
+  where f (SimpleFunction _ params (Return (Application _ args))) | (VariablePattern param) <- last params,
+                                                                    (Reference arg) <- last args = param == arg
         f _ = False
 
 isBooleanLiteral (MuBool _) = True

@@ -1,4 +1,4 @@
-module Language.Mulang.Builder (compact, unguardedBody, normalize) where
+module Language.Mulang.Builder (compact, normalize) where
 
 import Language.Mulang.Ast
 
@@ -7,12 +7,9 @@ compact []  = MuNull
 compact [e] = e
 compact es  = Sequence es
 
-unguardedBody :: [Pattern] -> Expression -> [Equation]
-unguardedBody vars e = [Equation vars (UnguardedBody e)]
-
 normalize :: Expression -> Expression
 normalize (Variable n (MuObject e))        = Object n (normalizeInObject e)
-normalize (Variable n (Lambda vars e))     = Function n (unguardedBody vars (normalize e))
+normalize (Variable n (Lambda vars e))     = SimpleFunction n vars (normalize e)
 normalize (Variable n e)                   = Variable n (normalize e)
 normalize (Function n equations)           = Function n (map normalizeEquation equations)
 normalize (Procedure n equations)          = Procedure n (map normalizeEquation equations)
@@ -41,7 +38,7 @@ normalize e = e
 
 
 normalizeInObject (Function n eqs)             = Method n (map normalizeEquation eqs)
-normalizeInObject (Variable n (Lambda vars e)) = Method n (unguardedBody vars (normalize e))
+normalizeInObject (Variable n (Lambda vars e)) = SimpleMethod n vars (normalize e)
 normalizeInObject (Variable n e)               = Attribute n (normalize e)
 normalizeInObject (Sequence es)                = Sequence (map normalizeInObject es)
 normalizeInObject e                            = normalize e

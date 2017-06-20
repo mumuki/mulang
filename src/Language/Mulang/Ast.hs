@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric, PatternSynonyms #-}
 
 -- | The Ast module describes a generic, abstract language AST.
 -- |
@@ -22,7 +22,11 @@ module Language.Mulang.Ast (
     Expression(..),
     ComprehensionStatement(..),
     Pattern(..),
-    Identifier
+    Identifier,
+    pattern SimpleEquation,
+    pattern SimpleFunction,
+    pattern SimpleProcedure,
+    pattern SimpleMethod,
   ) where
 
 import           GHC.Generics
@@ -170,3 +174,8 @@ simpleProcedureBody (Procedure _ [equation]) = unguardedEquationBody equation
 simpleFunctionBody :: Expression -> Expression
 simpleFunctionBody (Function _ [equation]) = unguardedEquationBody equation
 
+pattern SimpleEquation params body = Equation params (UnguardedBody body)
+
+pattern SimpleFunction name params body  = Function  name [SimpleEquation params body]
+pattern SimpleProcedure name params body = Procedure name [SimpleEquation params body]
+pattern SimpleMethod name params body    = Method    name [SimpleEquation params body]

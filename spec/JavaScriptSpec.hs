@@ -4,7 +4,6 @@ module JavaScriptSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang
-import           Language.Mulang.Builder
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 
@@ -37,9 +36,10 @@ spec = do
 
     it "simple procedure declaration" $ do
       js "function f(x) { console.log('fruit') }" `shouldBe` (
-                Procedure
+                SimpleProcedure
                     "f"
-                    [Equation [VariablePattern "x"] (UnguardedBody (Send (Reference "console") (Reference "log") [MuString "fruit"]))])
+                    [VariablePattern "x"]
+                    (Send (Reference "console") (Reference "log") [MuString "fruit"]))
 
     it "multiple params function declaration" $ do
       hs "f x y = 1" `shouldBe` js "function f(x, y) { return 1 }"
@@ -111,12 +111,12 @@ spec = do
       js "var x = {}" `shouldBe` (Object "x" MuNull)
 
     it "handles function declarations as vars" $ do
-      js "var x = function(){}" `shouldBe` (Function "x" (unguardedBody [] MuNull))
+      js "var x = function(){}" `shouldBe` (SimpleFunction "x" [] MuNull)
 
     it "handles attribute and method declarations" $ do
-      js "var x = {y: 2, z: function(){}}" `shouldBe` (Object "x" (Sequence [
-                                                              Attribute "y" (MuNumber 2.0),
-                                                              Method "z" (unguardedBody [] MuNull)]))
+      js "var x = {y: 2, z: function(){}}" `shouldBe` Object "x" (Sequence [
+                                                            Attribute "y" (MuNumber 2.0),
+                                                            SimpleMethod "z" [] MuNull])
 
 
 

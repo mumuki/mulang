@@ -88,7 +88,7 @@ mu = compact . muNode . gc
            where f (JSIdentifier id) = id
 
 
-    muEquation params body = [Equation params (UnguardedBody body)]
+    muEquation params body = [SimpleEquation params body]
 
     compactMapMu :: [JSNode] -> Expression
     compactMapMu  = compact . mapMu

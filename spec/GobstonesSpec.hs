@@ -18,17 +18,17 @@ describe "gobstones" $ do
       (gbs "program{F()}") `shouldBe` EntryPoint (Application (Reference "F") [])
 
     it "translates simple procedure declaration " $ do
-      (gbs "procedure F(){}") `shouldBe` Procedure "F" [Equation [] (UnguardedBody MuNull)]
+      (gbs "procedure F(){}") `shouldBe` SimpleProcedure "F" [] MuNull
 
     it "translates simple procedure declaration and application  with a parameter" $ do
       let code = gbs "program{F(2)} procedure F(parameter){}"
 
-      code `shouldBe` Sequence [EntryPoint (Application (Reference "F") [MuNumber 2.0]),Procedure "F" [Equation [VariablePattern "parameter"] (UnguardedBody MuNull)]]
+      code `shouldBe` Sequence [EntryPoint (Application (Reference "F") [MuNumber 2.0]), SimpleProcedure "F" [VariablePattern "parameter"] MuNull]
 
     it "translates simple procedure Application " $ do
       let code = gbs "program{F()} procedure F(){}"
 
-      code `shouldBe` Sequence [EntryPoint (Application (Reference "F") []),Procedure "F" [Equation [] (UnguardedBody MuNull)]]
+      code `shouldBe` Sequence [EntryPoint (Application (Reference "F") []), SimpleProcedure "F" [] MuNull]
 
     it "translates Poner" $ do
       let code = gbs "program{Poner(Verde)}"
@@ -48,12 +48,12 @@ describe "gobstones" $ do
     it "translates simple function declaration" $ do
       let code = gbs "function f(){return (Verde)}"
 
-      code `shouldBe` Function "f" [Equation [] (UnguardedBody (Sequence [MuNull,Return (MuSymbol "Verde")]))]
+      code `shouldBe` SimpleFunction "f" [] (Sequence [MuNull, Return (MuSymbol "Verde")])
 
     it "translates simple function declaration" $ do
       let  code = gbs "function f(parameter){return (2)}"
 
-      code `shouldBe` Function "f" [Equation [VariablePattern "parameter"] (UnguardedBody (Sequence [MuNull,Return (MuNumber 2.0)]))]
+      code `shouldBe` SimpleFunction "f" [VariablePattern "parameter"] (Sequence [MuNull, Return (MuNumber 2.0)])
 
     it "translates simple variable assignment" $ do
       let code = gbs "program{x:= 1}"
@@ -103,12 +103,16 @@ describe "gobstones" $ do
     it "translates simple procedure declaration and application  with a parameter" $ do
       let code = gbs "program{F(Negro)} procedure F(parameter){}"
 
-      code `shouldBe` Sequence [EntryPoint (Application (Reference "F") [MuSymbol "Negro"]),Procedure "F" [Equation [VariablePattern "parameter"] (UnguardedBody MuNull)]]
+      code `shouldBe` Sequence [
+                        EntryPoint (Application (Reference "F") [MuSymbol "Negro"]),
+                        SimpleProcedure "F" [VariablePattern "parameter"] MuNull]
 
     it "translates simple procedure declaration and application  with a parameter" $ do
       let code = gbs "program{F(True)} procedure F(parameter){}"
 
-      code `shouldBe` Sequence [EntryPoint (Application (Reference "F") [MuBool True]),Procedure "F" [Equation [VariablePattern "parameter"] (UnguardedBody MuNull)]]
+      code `shouldBe` Sequence [
+                        EntryPoint (Application (Reference "F") [MuBool True]),
+                        SimpleProcedure "F" [VariablePattern "parameter"] MuNull]
 
     it "translates conditional declaration" $ do
       let code = gbs "program{if(True){}}"
@@ -148,5 +152,8 @@ describe "gobstones" $ do
     it "transform Assignment to Variable" $ do
       let code =  gbs "program{ x := 2 y := 3 x := 1 } function f () { x := 4 y := 6 z := 9 y := True return (x) } procedure P(){ x := 4 y := 6 z := 9 y := True }"
 
-      code `shouldBe`  Sequence [EntryPoint (Sequence [Assignment "x" (MuNumber 2.0),Assignment "y" (MuNumber 3.0),Assignment "x" (MuNumber 1.0)]),Function "f" [Equation [] (UnguardedBody (Sequence [Assignment "x" (MuNumber 4.0),Assignment "y" (MuNumber 6.0),Assignment "z" (MuNumber 9.0),Assignment "y" (MuBool True),Return (Reference "x")]))],Procedure "P" [Equation [] (UnguardedBody (Sequence [Assignment "x" (MuNumber 4.0),Assignment "y" (MuNumber 6.0),Assignment "z" (MuNumber 9.0),Assignment "y" (MuBool True)]))]]
+      code `shouldBe`  Sequence [
+                          EntryPoint (Sequence [Assignment "x" (MuNumber 2.0),Assignment "y" (MuNumber 3.0),Assignment "x" (MuNumber 1.0)]),
+                          Function "f" [Equation [] (UnguardedBody (Sequence [Assignment "x" (MuNumber 4.0),Assignment "y" (MuNumber 6.0),Assignment "z" (MuNumber 9.0),Assignment "y" (MuBool True),Return (Reference "x")]))],
+                          Procedure "P" [Equation [] (UnguardedBody (Sequence [Assignment "x" (MuNumber 4.0),Assignment "y" (MuNumber 6.0),Assignment "z" (MuNumber 9.0),Assignment "y" (MuBool True)]))]]
 
