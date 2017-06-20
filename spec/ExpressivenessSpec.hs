@@ -1,13 +1,23 @@
 module ExpressivenessSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Inspector.Generic.Expressiveness (isMisspelled, wordsOf)
+import           Language.Mulang.Inspector.Generic.Expressiveness (isMisspelled, isTooShortBinding)
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Text.Dictionary (toDictionary)
 import           Text.Inflections.Tokenizer (camelCase)
 
 spec :: Spec
 spec = do
+  describe "isTooShortBinding" $ do
+    it "is True when it is a one-char binding" $ do
+      isTooShortBinding (hs "x = True") `shouldBe` True
+
+    it "is True when it is a two-chars binding" $ do
+      isTooShortBinding (hs "xy = True") `shouldBe` True
+
+    it "is False when it is a three-chars binding" $ do
+      isTooShortBinding (hs "zip = []") `shouldBe` False
+
   describe "isMisspelled" $ do
     let english = toDictionary ["a","day","great","is","today"]
     let style   = camelCase
@@ -24,7 +34,3 @@ spec = do
     it "is False when there are typos" $ do
       isMisspelled style english (hs "tudayIsAGreatDay = True") `shouldBe` True
       isMisspelled style english (hs "todayIsAGraetDay = True") `shouldBe` True
-
-  describe "wordsOf" $ do
-    it "can tokenize camelCase words" $ do
-      wordsOf camelCase (hs "todayIsAGreatDay = True") `shouldBe` ["today", "is", "a", "great", "day"]
