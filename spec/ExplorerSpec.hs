@@ -30,7 +30,7 @@ spec = do
       (length $ mainExpressionsOf code) `shouldBe` 5
 
     it "programs" $ do
-      let mainExpressions = [Function "main" [Equation [] (UnguardedBody MuNull)],
+      let mainExpressions = [SimpleFunction "main" [] MuNull,
                              EntryPoint (Application (Reference "main") [])]
       let code = Sequence mainExpressions
       (mainExpressionsOf code) `shouldBe` mainExpressions
