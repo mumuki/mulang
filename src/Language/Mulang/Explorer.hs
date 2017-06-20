@@ -24,12 +24,14 @@ import Data.List (nub)
 (//)  :: Expression -> Binding -> [Expression]
 (//) = flip bindedDeclarationsOf
 
+type ExpressionUnfold = Expression -> [Expression]
+
 -- | Returns the given expressions and all its subexpressions
 -- For example: in 'f x = x + 1', it returns 'f x = x + 1', 'x + 1', 'x' and '1'
-expressionsOf :: Expression -> [Expression]
+expressionsOf :: ExpressionUnfold
 expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
   where
-    subExpressions :: Expression -> [Expression]
+    subExpressions :: ExpressionUnfold
     subExpressions (Variable _ v)          = [v]
     subExpressions (Function _ equations)  = expressionsOfEquations equations
     subExpressions (Procedure _ equations) = expressionsOfEquations equations
@@ -61,7 +63,7 @@ expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
     topExpressionOfBody (UnguardedBody e)      = [e]
     topExpressionOfBody (GuardedBody b)        = b >>= \(es1, es2) -> [es1, es2]
 
-mainExpressionsOf :: Expression -> [Expression]
+mainExpressionsOf :: ExpressionUnfold
 mainExpressionsOf o@(Object _ b)         = o : mainExpressionsOf b
 mainExpressionsOf c@(Class _ _ b)        = c : mainExpressionsOf b
 mainExpressionsOf e@(EntryPoint b)       = e : mainExpressionsOf b
@@ -76,8 +78,6 @@ mainExpressionsOf m@(Method _ _)         = [m]
 mainExpressionsOf a@(Attribute _ _)      = [a]
 mainExpressionsOf (Sequence es)          = concatMap mainExpressionsOf es
 mainExpressionsOf _                      = []
-
-
 
 -- | Returns all the body equations of functions, procedures and methods
 equationBodiesOf :: Expression -> [EquationBody]
@@ -111,10 +111,10 @@ referencedBindingsOf = map fst . referencesOf
 declaredBindingsOf :: Expression -> [Binding]
 declaredBindingsOf = map fst . declarationsOf
 
-bindedDeclarationsOf' :: BindingPredicate -> Expression -> [Expression]
+bindedDeclarationsOf' :: BindingPredicate -> ExpressionUnfold
 bindedDeclarationsOf' f = map snd . filter (f.fst) . declarationsOf
 
-bindedDeclarationsOf :: Binding -> Expression -> [Expression]
+bindedDeclarationsOf :: Binding -> ExpressionUnfold
 bindedDeclarationsOf b = bindedDeclarationsOf' (==b)
 
 transitiveReferencedBindingsOf :: Binding -> Expression -> [Binding]
