@@ -1,6 +1,7 @@
 module Language.Mulang.Explorer (
   (//),
   expressionsOf,
+  mainExpressionsOf,
   equationBodiesOf,
   referencesOf,
   declarationsOf,
@@ -59,6 +60,19 @@ expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
     expressionsOfEquations eqs = eqs >>= \(Equation _ body) -> topExpressionOfBody body
     topExpressionOfBody (UnguardedBody e)      = [e]
     topExpressionOfBody (GuardedBody b)        = b >>= \(es1, es2) -> [es1, es2]
+
+mainExpressionsOf :: Expression -> [Expression]
+mainExpressionsOf o@(Object _ b)          = o : mainExpressionsOf b
+mainExpressionsOf c@(Class _ _ b)         = c : mainExpressionsOf b
+mainExpressionsOf e@(EntryPoint b)        = e : mainExpressionsOf b
+mainExpressionsOf v@(Variable _ _)        = [v]
+mainExpressionsOf f@(Function _ _)        = [f]
+mainExpressionsOf p@(Procedure _ _)       = [p]
+mainExpressionsOf r@(Rule _ _ _)          = [r]
+mainExpressionsOf m@(Method _ _)          = [m]
+mainExpressionsOf a@(Attribute _ _)       = [a]
+mainExpressionsOf (Sequence es)           = concatMap mainExpressionsOf es
+mainExpressionsOf _                       = []
 
 
 equationBodiesOf :: Expression -> [EquationBody]
