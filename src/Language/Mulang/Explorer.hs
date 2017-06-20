@@ -62,17 +62,21 @@ expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
     topExpressionOfBody (GuardedBody b)        = b >>= \(es1, es2) -> [es1, es2]
 
 mainExpressionsOf :: Expression -> [Expression]
-mainExpressionsOf o@(Object _ b)          = o : mainExpressionsOf b
-mainExpressionsOf c@(Class _ _ b)         = c : mainExpressionsOf b
-mainExpressionsOf e@(EntryPoint b)        = e : mainExpressionsOf b
-mainExpressionsOf v@(Variable _ _)        = [v]
-mainExpressionsOf f@(Function _ _)        = [f]
-mainExpressionsOf p@(Procedure _ _)       = [p]
-mainExpressionsOf r@(Rule _ _ _)          = [r]
-mainExpressionsOf m@(Method _ _)          = [m]
-mainExpressionsOf a@(Attribute _ _)       = [a]
-mainExpressionsOf (Sequence es)           = concatMap mainExpressionsOf es
-mainExpressionsOf _                       = []
+mainExpressionsOf o@(Object _ b)         = o : mainExpressionsOf b
+mainExpressionsOf c@(Class _ _ b)        = c : mainExpressionsOf b
+mainExpressionsOf e@(EntryPoint b)       = e : mainExpressionsOf b
+mainExpressionsOf t@(TypeSignature _ _)  = [t]
+mainExpressionsOf t@(TypeAlias _ )       = [t]
+mainExpressionsOf r@(Record _)           = [r]
+mainExpressionsOf v@(Variable _ _)       = [v]
+mainExpressionsOf f@(Function _ _)       = [f]
+mainExpressionsOf p@(Procedure _ _)      = [p]
+mainExpressionsOf r@(Rule _ _ _)         = [r]
+mainExpressionsOf m@(Method _ _)         = [m]
+mainExpressionsOf a@(Attribute _ _)      = [a]
+mainExpressionsOf (Sequence es)          = concatMap mainExpressionsOf es
+mainExpressionsOf _                      = []
+
 
 
 -- | Returns all the body equations of functions, procedures and methods
