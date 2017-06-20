@@ -14,6 +14,7 @@ module Language.Mulang.Signature (
   Signature(..),
   SignatureStyle) where
 
+import Language.Mulang.Unfold (mainExpressions)
 import Language.Mulang.Binding
 import Language.Mulang.Ast
 import Language.Mulang.Explorer (declarationsOf)
@@ -49,7 +50,7 @@ parameterNames (TypedSignature _ types) = map (const Nothing) types
 parameterNames (NamedSignature _ names) = names
 
 signaturesOf :: Expression -> [Signature]
-signaturesOf = nub . mapMaybe (signatureOf.snd) . declarationsOf
+signaturesOf = nub . mapMaybe (signatureOf.snd) . declarationsOf mainExpressions
 
 signatureOf :: Expression -> Maybe Signature
 signatureOf (Function name equations)  = Just $ NamedSignature name (parameterNamesOf equations)

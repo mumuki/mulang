@@ -1,12 +1,16 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Language.Mulang.Analyzer.Analysis (
+  noDomainLanguageViolations,
+
   Expectation(..),
   BindingPattern(..),
 
   Analysis(..),
   AnalysisSpec(..),
   SmellsSet(..),
+  DomainLanguage(..),
+  CaseStyle(..),
   Smell(..),
   SignatureAnalysisType(..),
   SignatureStyle(..),
@@ -14,7 +18,8 @@ module Language.Mulang.Analyzer.Analysis (
   Language(..),
 
   AnalysisResult(..),
-  ExpectationResult(..)) where
+  ExpectationResult(..),
+  DomainLanguageViolations(..)) where
 
 import GHC.Generics
 
@@ -58,8 +63,20 @@ data AnalysisSpec = AnalysisSpec {
   expectations :: [Expectation],
   smellsSet :: SmellsSet,
   signatureAnalysisType :: SignatureAnalysisType,
-  dictionaryPath :: Maybe FilePath
+  domainLanguage :: Maybe DomainLanguage
 } deriving (Show, Eq, Generic)
+
+data DomainLanguage
+  = DomainLanguage {
+      dictionaryFilePath :: Maybe FilePath,
+      caseStyle :: Maybe CaseStyle,
+      strict :: Maybe Bool,
+      minimumBindingSize :: Maybe Int
+    }  deriving (Show, Eq, Generic)
+
+data CaseStyle
+  = CamelCase
+  | SnakeCase deriving (Show, Eq, Generic)
 
 data SmellsSet
   = NoSmells
@@ -76,8 +93,6 @@ data Smell
   | DoesNullTest
   | DoesTypeTest
   | IsLongCode
-  | IsMisspelled
-  | IsTooShortBinding
   | ReturnsNull
   | HasRedundantParameter
   | HasCodeDuplication deriving (Show, Eq, Enum, Bounded, Generic)
@@ -110,7 +125,10 @@ data Language
 --
 
 data AnalysisResult
-  = AnalysisCompleted { expectationResults :: [ExpectationResult], smells :: [Expectation], signatures :: [Code] }
+  = AnalysisCompleted { expectationResults :: [ExpectationResult],
+                        smells :: [Expectation],
+                        signatures :: [Code],
+                        domainLanguageViolations :: DomainLanguageViolations }
   | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
 data ExpectationResult = ExpectationResult {
@@ -118,3 +136,12 @@ data ExpectationResult = ExpectationResult {
   result :: Bool
 } deriving (Show, Eq, Generic)
 
+data DomainLanguageViolations
+  = DomainLanguageViolations {
+      tooShortBindings :: [Binding],
+      misspelledBindings :: [Binding]
+    } deriving (Show, Eq, Generic)
+
+
+noDomainLanguageViolations :: DomainLanguageViolations
+noDomainLanguageViolations = DomainLanguageViolations [] []

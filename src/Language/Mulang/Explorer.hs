@@ -1,7 +1,5 @@
 module Language.Mulang.Explorer (
   (//),
-  expressionsOf,
-  mainExpressionsOf,
   equationBodiesOf,
   referencesOf,
   declarationsOf,
@@ -17,6 +15,7 @@ module Language.Mulang.Explorer (
 
 import Language.Mulang.Ast
 import Language.Mulang.Binding
+import Language.Mulang.Unfold (Unfold, allExpressions, mainExpressions)
 
 import Data.Maybe (maybeToList)
 import Data.List (nub)
@@ -24,64 +23,9 @@ import Data.List (nub)
 (//)  :: Expression -> Binding -> [Expression]
 (//) = flip bindedDeclarationsOf
 
-type ExpressionUnfold = Expression -> [Expression]
-
--- | Returns the given expressions and all its subexpressions
--- For example: in 'f x = x + 1', it returns 'f x = x + 1', 'x + 1', 'x' and '1'
-expressionsOf :: ExpressionUnfold
-expressionsOf expr = expr : concatMap expressionsOf (subExpressions expr)
-  where
-    subExpressions :: ExpressionUnfold
-    subExpressions (Variable _ v)          = [v]
-    subExpressions (Function _ equations)  = expressionsOfEquations equations
-    subExpressions (Procedure _ equations) = expressionsOfEquations equations
-    subExpressions (Rule _ _ es)           = es
-    subExpressions (Method _ equations)    = expressionsOfEquations equations
-    subExpressions (Attribute _ v)         = [v]
-    subExpressions (Object _ v)            = [v]
-    subExpressions (Class _ _ v)           = [v]
-    subExpressions (EntryPoint e)          = [e]
-    subExpressions (Application a bs)      = a:bs
-    subExpressions (Send e1 e2 e3)         = [e1, e2] ++ e3
-    subExpressions (Lambda _ a)            = [a]
-    subExpressions (If a b c)              = [a, b, c]
-    subExpressions (While e1 e2)           = [e1, e2]
-    subExpressions (Repeat e1 e2)          = [e1, e2]
-    subExpressions (Switch e1 list)        = e1 : concatMap (\(x,y) -> [x,y]) list
-    subExpressions (Match e1 equations)    = e1:expressionsOfEquations equations
-    subExpressions (Comprehension a _)     = [a] --TODO
-    subExpressions (Not e)                 = [e]
-    subExpressions (Forall e1 e2)          = [e1, e2]
-    subExpressions (Return v)              = [v]
-    subExpressions (Sequence es)           = es
-    subExpressions (MuObject es)           = [es]
-    subExpressions (MuTuple as)            = as
-    subExpressions (MuList as)             = as
-    subExpressions _                       = []
-
-    expressionsOfEquations eqs = eqs >>= \(Equation _ body) -> topExpressionOfBody body
-    topExpressionOfBody (UnguardedBody e)      = [e]
-    topExpressionOfBody (GuardedBody b)        = b >>= \(es1, es2) -> [es1, es2]
-
-mainExpressionsOf :: ExpressionUnfold
-mainExpressionsOf o@(Object _ b)         = o : mainExpressionsOf b
-mainExpressionsOf c@(Class _ _ b)        = c : mainExpressionsOf b
-mainExpressionsOf e@(EntryPoint b)       = e : mainExpressionsOf b
-mainExpressionsOf t@(TypeSignature _ _)  = [t]
-mainExpressionsOf t@(TypeAlias _ )       = [t]
-mainExpressionsOf r@(Record _)           = [r]
-mainExpressionsOf v@(Variable _ _)       = [v]
-mainExpressionsOf f@(Function _ _)       = [f]
-mainExpressionsOf p@(Procedure _ _)      = [p]
-mainExpressionsOf r@(Rule _ _ _)         = [r]
-mainExpressionsOf m@(Method _ _)         = [m]
-mainExpressionsOf a@(Attribute _ _)      = [a]
-mainExpressionsOf (Sequence es)          = concatMap mainExpressionsOf es
-mainExpressionsOf _                      = []
-
 -- | Returns all the body equations of functions, procedures and methods
 equationBodiesOf :: Expression -> [EquationBody]
-equationBodiesOf = concatMap bodiesOf . mainExpressionsOf
+equationBodiesOf = concatMap bodiesOf . mainExpressions
   where
     bodiesOf :: Expression -> [EquationBody]
     bodiesOf (Function  _ equations) = equationBodies equations
@@ -94,12 +38,13 @@ equationBodiesOf = concatMap bodiesOf . mainExpressionsOf
 -- | Returns all the referenced bindings and the expressions that references them
 -- For example, in 'f (x + 1)', it returns '(f, f (x + 1))' and '(x, x)'
 referencesOf :: Expression -> [(Binding, Expression)]
-referencesOf = nub . concatMap (maybeToList . extractReference) . expressionsOf
+referencesOf = nub . concatMap (maybeToList . extractReference) . allExpressions
+
 
 -- | Returns all the declared bindings and the expressions that binds them
 -- For example, in 'f x = g x where x = y', it returns '(f, f x = ...)' and '(x, x = y)'
-declarationsOf :: Expression -> [(Binding, Expression)]
-declarationsOf = concatMap (maybeToList . extractDeclaration) . expressionsOf
+declarationsOf :: Unfold -> Expression -> [(Binding, Expression)]
+declarationsOf unfold = concatMap (maybeToList . extractDeclaration) .  unfold
 
 -- | Returns all the referenced bindings
 -- For example, in 'f (x + 1)', it returns 'f' and 'x'
@@ -108,13 +53,13 @@ referencedBindingsOf = map fst . referencesOf
 
 -- | Returns all the declared bindings
 -- For example, in 'f x = g x where x = y', it returns 'f' and 'x'
-declaredBindingsOf :: Expression -> [Binding]
-declaredBindingsOf = map fst . declarationsOf
+declaredBindingsOf :: Unfold -> Expression -> [Binding]
+declaredBindingsOf unfold = map fst . declarationsOf unfold
 
-bindedDeclarationsOf' :: BindingPredicate -> ExpressionUnfold
-bindedDeclarationsOf' f = map snd . filter (f.fst) . declarationsOf
+bindedDeclarationsOf' :: BindingPredicate -> Unfold
+bindedDeclarationsOf' f = map snd . filter (f.fst) . declarationsOf allExpressions
 
-bindedDeclarationsOf :: Binding -> ExpressionUnfold
+bindedDeclarationsOf :: Binding -> Unfold
 bindedDeclarationsOf b = bindedDeclarationsOf' (==b)
 
 transitiveReferencedBindingsOf :: Binding -> Expression -> [Binding]

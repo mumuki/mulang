@@ -7,9 +7,8 @@ import           Test.Hspec
 import           Data.Text (unpack, Text)
 import           Data.ByteString.Lazy.Char8 (pack, ByteString)
 
-import           Language.Mulang.Analyzer.Analysis hiding (spec)
 import           Language.Mulang.Analyzer.Analysis.Json ()
-import           Language.Mulang.Analyzer (noSmells, onlySmells, allSmells, emptyAnalysisSpec, AnalysisSpec(..))
+import           Language.Mulang.Analyzer hiding (spec)
 import           Language.Mulang.Ast
 
 import           Data.Maybe (fromJust)
@@ -203,21 +202,18 @@ spec = describe "AnalysisJson" $ do
    "sample" : {
       "tag" : "CodeSample",
       "language" : "JavaScript",
-      "content" : "function foo(x, y) { return null; }"
+      "content" : "function f(x, y) { return null; }"
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : {
-        "tag" : "AllSmells",
-        "exclude" : []
-      },
-      "dictionaryPath" : "/usr/share/dict/words",
+      "smellsSet" : { "tag" : "NoSmells" },
+      "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" },
       "signatureAnalysisType" : { "tag" : "NoSignatures" }
    }
 } |]
-    let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
+    let analysis = Analysis (CodeSample JavaScript "function f(x, y) { return null; }")
                             (emptyAnalysisSpec {
-                              smellsSet = allSmells,
-                              dictionaryPath = Just "/usr/share/dict/words" })
+                              smellsSet = noSmells,
+                              domainLanguage = Just emptyDomainLanguage { dictionaryFilePath = Just "/usr/share/dict/words" } })
 
     run json `shouldBe` analysis

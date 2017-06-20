@@ -3,7 +3,6 @@ module Language.Mulang.Analyzer.SmellsAnalyzer (
 
 import Language.Mulang
 import Language.Mulang.Inspector.Generic.Smell
-import Language.Mulang.Inspector.Generic.Expressiveness
 import Language.Mulang.Analyzer.Analysis
 import Data.List
 
@@ -11,7 +10,7 @@ analyseSmells :: Expression -> SmellsSet -> [Expectation]
 analyseSmells code set = concatMap (`detectSmell` code) (smellsFor set)
 
 detectSmell :: Smell -> Expression -> [Expectation]
-detectSmell smell =  map (exectationFor smell) . detect (inspectionFor smell)
+detectSmell smell =  map (exectationFor smell) . detectAll (inspectionFor smell)
 
 smellsFor :: SmellsSet -> [Smell]
 smellsFor (NoSmells)             = []
@@ -33,8 +32,6 @@ inspectionFor DoesNullTest                    = doesNullTest
 inspectionFor DoesTypeTest                    = doesTypeTest
 inspectionFor ReturnsNull                     = returnsNull
 inspectionFor IsLongCode                      = const False
-inspectionFor IsMisspelled                    = const False
-inspectionFor IsTooShortBinding               = isTooShortBinding
 inspectionFor HasCodeDuplication              = const False
 
 exectationFor :: Smell -> Binding -> Expectation

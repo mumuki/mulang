@@ -2,7 +2,7 @@ module Language.Mulang.Inspector.Generic.Duplication (hasCodeDuplication) where
 
 import           Language.Mulang.Ast
 import           Language.Mulang.Inspector
-import           Language.Mulang.Explorer (expressionsOf)
+import           Language.Mulang.Unfold (allExpressions)
 import qualified Data.Hashable as H (hash)
 import           Data.List (nub, subsequences)
 
@@ -51,7 +51,7 @@ positionalHash = sum . zipWith hashElement [1..] . reverse
           hashElement index expression = (31^index) * hash expression
 
 stripesOf :: Int -> Expression -> [[Expression]]
-stripesOf n = concatMap (makeStripes n) . expressionsOf
+stripesOf n = concatMap (makeStripes n) . allExpressions
 
 makeStripes :: Int -> Expression -> [[Expression]]
 makeStripes n (Sequence xs) = stripes n xs

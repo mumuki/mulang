@@ -3,6 +3,7 @@ module Language.Mulang.Analyzer (
   onlySmells,
   allSmells,
 
+  emptyDomainLanguage,
   emptyAnalysisSpec,
 
   emptyAnalysis,
@@ -19,6 +20,7 @@ import Language.Mulang.Analyzer.Analysis
 import Language.Mulang.Analyzer.SampleParser (parseSample)
 import Language.Mulang.Analyzer.SignaturesAnalyzer  (analyseSignatures)
 import Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
+import Language.Mulang.Analyzer.DomainLanguageAnalyzer (analyseDomainLanguage)
 import Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
 
 --
@@ -32,6 +34,9 @@ onlySmells = OnlySmells []
 
 allSmells :: SmellsSet
 allSmells = AllSmells []
+
+emptyDomainLanguage :: DomainLanguage
+emptyDomainLanguage = DomainLanguage Nothing Nothing Nothing Nothing
 
 emptyAnalysisSpec :: AnalysisSpec
 emptyAnalysisSpec = AnalysisSpec [] noSmells NoSignatures Nothing
@@ -48,7 +53,6 @@ smellsAnalysis code set = Analysis code (emptyAnalysisSpec { smellsSet = set })
 signaturesAnalysis :: Sample -> SignatureStyle -> Analysis
 signaturesAnalysis code style = Analysis code (emptyAnalysisSpec { signatureAnalysisType = StyledSignatures style })
 
-
 --
 -- Analysis running
 --
@@ -63,3 +67,5 @@ analyseAst ast spec =
   AnalysisCompleted (analyseExpectations ast (expectations spec))
                     (analyseSmells ast (smellsSet spec))
                     (analyseSignatures ast (signatureAnalysisType spec))
+                    (analyseDomainLanguage ast (domainLanguage spec))
+

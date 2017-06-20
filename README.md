@@ -472,6 +472,37 @@ $ mulang '
 }
 ```
 
+### With expressiveness expectations
+
+In order to use expresivness expectations, you need to specify a dictionary.
+
+```bash
+$ mulang  '
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "JavaScript",
+      "content" : "function f(x, y) { return null; }"
+   },
+   "spec" : {
+      "expectations" : [],
+      "smellsSet" : { "tag" : "NoSmells" },
+      "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" },
+      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+   }
+}' | json_pp
+{
+   "signatures" : [],
+   "tag" : "AnalysisCompleted",
+   "domainLanguageViolations" : {
+      "tooShortBindings" : [ "f" ],
+      "misspelledBindings" : []
+   },
+   "expectationResults" : [],
+   "smells" : []
+}
+```
+
 ## Expectations, Signatures and Smells
 
 Mulang CLI can do three different kinds of analysis:

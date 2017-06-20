@@ -35,8 +35,10 @@ library
     Language.Mulang.Ast
     Language.Mulang.Binding
     Language.Mulang.Builder
+    Language.Mulang.Unfold
     Language.Mulang.Explorer
     Language.Mulang.Signature
+    Language.Mulang.DomainLanguage
     Language.Mulang.Inspector
     Language.Mulang.Inspector.Generic
     Language.Mulang.Inspector.ObjectOriented
@@ -46,7 +48,6 @@ library
     Language.Mulang.Inspector.Combiner
     Language.Mulang.Inspector.Generic.Duplication
     Language.Mulang.Inspector.Generic.Smell
-    Language.Mulang.Inspector.Generic.Expressiveness
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Gobstones
@@ -57,6 +58,7 @@ library
     Language.Mulang.Analyzer.Analysis.Json
     Language.Mulang.Analyzer.SampleParser
     Language.Mulang.Analyzer.ExpectationsAnalyzer
+    Language.Mulang.Analyzer.DomainLanguageAnalyzer
     Language.Mulang.Analyzer.ExpectationsCompiler
     Language.Mulang.Analyzer.SignaturesAnalyzer
     Language.Mulang.Analyzer.SignatureStyleCompiler
