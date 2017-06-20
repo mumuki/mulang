@@ -76,7 +76,7 @@ mainExpressionsOf _                       = []
 
 
 equationBodiesOf :: Expression -> [EquationBody]
-equationBodiesOf = concatMap bodiesOf . expressionsOf
+equationBodiesOf = concatMap bodiesOf . mainExpressionsOf
   where
     bodiesOf :: Expression -> [EquationBody]
     bodiesOf (Function _ equations) = map (\(Equation _ body) -> body) equations
