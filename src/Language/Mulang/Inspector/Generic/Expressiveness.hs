@@ -1,6 +1,6 @@
 module Language.Mulang.Inspector.Generic.Expressiveness (
   wordsOf,
-  isWellWritten) where
+  isMisspelled) where
 
 import Language.Mulang.Inspector (Inspection)
 import Language.Mulang.Ast (Expression)
@@ -10,8 +10,8 @@ import Text.Dictionary (Dictionary, exists)
 
 import Text.Inflections.Tokenizer (CaseStyle, tokenize)
 
-isWellWritten :: CaseStyle -> Dictionary -> Inspection
-isWellWritten style dictionary = all (`exists` dictionary)  . wordsOf style
+isMisspelled :: CaseStyle -> Dictionary -> Inspection
+isMisspelled style dictionary = any (not . (`exists` dictionary))  . wordsOf style
 
 wordsOf :: CaseStyle -> Expression -> [String]
 wordsOf style = concatMap (tokenize style) . declaredBindingsOf
