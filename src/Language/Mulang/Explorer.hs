@@ -75,12 +75,17 @@ mainExpressionsOf (Sequence es)           = concatMap mainExpressionsOf es
 mainExpressionsOf _                       = []
 
 
+-- | Returns all the body equations of functions, procedures and methods
 equationBodiesOf :: Expression -> [EquationBody]
 equationBodiesOf = concatMap bodiesOf . mainExpressionsOf
   where
     bodiesOf :: Expression -> [EquationBody]
-    bodiesOf (Function _ equations) = map (\(Equation _ body) -> body) equations
+    bodiesOf (Function  _ equations) = equationBodies equations
+    bodiesOf (Procedure _ equations) = equationBodies equations
+    bodiesOf (Method    _ equations) = equationBodies equations
     bodiesOf _ = []
+
+    equationBodies = map (\(Equation _ body) -> body)
 
 -- | Returns all the referenced bindings and the expressions that references them
 -- For example, in 'f (x + 1)', it returns '(f, f (x + 1))' and '(x, x)'
