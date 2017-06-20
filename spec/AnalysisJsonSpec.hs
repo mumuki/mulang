@@ -196,3 +196,28 @@ spec = describe "AnalysisJson" $ do
                               signatureAnalysisType = (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
+
+  it "works with dictionary path" $ do
+    let json = [text|
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "JavaScript",
+      "content" : "function foo(x, y) { return null; }"
+   },
+   "spec" : {
+      "expectations" : [],
+      "smellsSet" : {
+        "tag" : "AllSmells",
+        "exclude" : []
+      },
+      "dictionaryPath" : "/usr/share/dict/words",
+      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+   }
+} |]
+    let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
+                            (emptyAnalysisSpec {
+                              smellsSet = allSmells,
+                              dictionaryPath = Just "/usr/share/dict/words" })
+
+    run json `shouldBe` analysis
