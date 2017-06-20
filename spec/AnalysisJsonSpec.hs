@@ -9,7 +9,7 @@ import           Data.ByteString.Lazy.Char8 (pack, ByteString)
 
 import           Language.Mulang.Analyzer.Analysis hiding (spec)
 import           Language.Mulang.Analyzer.Analysis.Json ()
-import           Language.Mulang.Analyzer (noSmells, onlySmells, allSmells)
+import           Language.Mulang.Analyzer (noSmells, onlySmells, allSmells, emptyAnalysisSpec, AnalysisSpec(..))
 import           Language.Mulang.Ast
 
 import           Data.Maybe (fromJust)
@@ -93,7 +93,7 @@ spec = describe "AnalysisJson" $ do
    }
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return x + y; }")
-                            (AnalysisSpec [] noSmells (StyledSignatures HaskellStyle) Nothing)
+                            (emptyAnalysisSpec { signatureAnalysisType = (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
 
@@ -134,7 +134,7 @@ spec = describe "AnalysisJson" $ do
    }
 }|]
     let analysis = Analysis (MulangSample (Sequence [Variable "x" (MuNumber 1), Variable "y" (MuNumber 2)]))
-                            (AnalysisSpec [] noSmells (StyledSignatures HaskellStyle) Nothing)
+                            (emptyAnalysisSpec { signatureAnalysisType = (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
 
@@ -162,7 +162,9 @@ spec = describe "AnalysisJson" $ do
    }
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
-                            (AnalysisSpec [] onlySmells { include = [ReturnsNull, DoesNullTest]} (StyledSignatures HaskellStyle) Nothing)
+                            (emptyAnalysisSpec {
+                              smellsSet = onlySmells { include = [ReturnsNull, DoesNullTest]},
+                              signatureAnalysisType = (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
 
@@ -189,6 +191,8 @@ spec = describe "AnalysisJson" $ do
    }
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
-                            (AnalysisSpec [] allSmells { exclude = [ReturnsNull]} (StyledSignatures HaskellStyle) Nothing)
+                            (emptyAnalysisSpec {
+                              smellsSet = allSmells { exclude = [ReturnsNull]},
+                              signatureAnalysisType = (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
