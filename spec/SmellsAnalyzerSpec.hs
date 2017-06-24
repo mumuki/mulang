@@ -11,24 +11,24 @@ runOnly language content smells = analyse (smellsAnalysis (CodeSample language c
 spec = describe "SmellsAnalyzer" $ do
   describe "Using exclusion" $ do
     it "works with empty set" $ do
-      (runExcept Haskell "f x = if x then True else False" []) `shouldBe` (result [Basic "f" "HasRedundantIf"])
+      (runExcept Haskell "f x = if x then True else False" []) `shouldReturn` (result [Basic "f" "HasRedundantIf"])
 
     describe "works with non-empty set hasRedundantLocalVariableReturn" $ do
       it "dont reports smell when excluded" $ do
         (runExcept JavaScript
                   "function foo() { var x = 1; return x }"
-                  [HasRedundantLocalVariableReturn]) `shouldBe` (result [])
+                  [HasRedundantLocalVariableReturn]) `shouldReturn` (result [])
 
       it "reports smell when not excluded and present" $ do
         (runExcept JavaScript
                   "function foo() { var x = 1; return x }"
-                  []) `shouldBe` (result [Basic "foo" "HasRedundantLocalVariableReturn"])
+                  []) `shouldReturn` (result [Basic "foo" "HasRedundantLocalVariableReturn"])
 
       it "dont reports smell when not excluded and not present" $ do
         (runExcept JavaScript
                   "function foo() { return 1; }"
-                  [HasRedundantLocalVariableReturn]) `shouldBe` (result [])
+                  [HasRedundantLocalVariableReturn]) `shouldReturn` (result [])
 
   describe "Using inclusion" $ do
     it "works with empty set" $ do
-      (runOnly Haskell "f x = if x then True else False" []) `shouldBe` (result [])
+      (runOnly Haskell "f x = if x then True else False" []) `shouldReturn` (result [])
