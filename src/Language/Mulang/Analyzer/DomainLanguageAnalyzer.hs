@@ -5,7 +5,7 @@ import qualified Language.Mulang.DomainLanguage as DL
 
 import Language.Mulang.Ast (Expression)
 import Language.Mulang.Inspector.Combiner (detect)
-import Language.Mulang.Unfold (allExpressions, mainExpressions)
+import Language.Mulang.Unfold (mainExpressions)
 import Language.Mulang.Analyzer.Analysis
 
 import Text.Inflections.Tokenizer (camelCase, snakeCase)
@@ -22,18 +22,15 @@ analyseDomainLanguage code (Just language)
       }
 
     where
-      detectWithLanguage inspection = detect (DL.unfold compiledLang) (inspection compiledLang) code
+      detectWithLanguage inspection = detect mainExpressions (inspection compiledLang) code
       compiledLang = compileLanguage language
 
-compileLanguage (DomainLanguage _ style strict size)
-  = DL.DomainLanguage (toDictionary []) (compileStyle style) (compileUnfold strict) (compileSize size)
+compileLanguage (DomainLanguage _ style size)
+  = DL.DomainLanguage (toDictionary []) (compileStyle style) (compileSize size)
 
    where
     compileSize (Just n) = n
     compileSize _        = 3
-
-    compileUnfold (Just True) = allExpressions
-    compileUnfold _           = mainExpressions
 
     compileStyle (Just SnakeCase) = snakeCase
     compileStyle _                = camelCase

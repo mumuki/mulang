@@ -36,7 +36,7 @@ allSmells :: SmellsSet
 allSmells = AllSmells []
 
 emptyDomainLanguage :: DomainLanguage
-emptyDomainLanguage = DomainLanguage Nothing Nothing Nothing Nothing
+emptyDomainLanguage = DomainLanguage Nothing Nothing Nothing
 
 emptyAnalysisSpec :: AnalysisSpec
 emptyAnalysisSpec = AnalysisSpec [] noSmells NoSignatures Nothing

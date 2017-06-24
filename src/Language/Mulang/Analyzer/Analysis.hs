@@ -70,7 +70,6 @@ data DomainLanguage
   = DomainLanguage {
       dictionaryFilePath :: Maybe FilePath,
       caseStyle :: Maybe CaseStyle,
-      strict :: Maybe Bool,
       minimumBindingSize :: Maybe Int
     }  deriving (Show, Eq, Generic)
 
