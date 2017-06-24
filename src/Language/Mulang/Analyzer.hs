@@ -21,12 +21,7 @@ import Language.Mulang.Analyzer.SampleParser (parseSample)
 import Language.Mulang.Analyzer.SignaturesAnalyzer  (analyseSignatures)
 import Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
 import Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
-
-import qualified Language.Mulang.DomainLanguage as DL
-import Text.Inflections.Tokenizer (camelCase, snakeCase)
-import Text.Dictionary (fromFile, toDictionary)
-
-
+import Language.Mulang.Analyzer.DomainLanguageCompiler (emptyDomainLanguage, compileDomainLanguage)
 
 --
 -- Builder functions
@@ -39,9 +34,6 @@ onlySmells = OnlySmells []
 
 allSmells :: SmellsSet
 allSmells = AllSmells []
-
-emptyDomainLanguage :: DomainLanguage
-emptyDomainLanguage = DomainLanguage Nothing Nothing Nothing
 
 emptyAnalysisSpec :: AnalysisSpec
 emptyAnalysisSpec = AnalysisSpec [] noSmells NoSignatures Nothing
@@ -72,21 +64,4 @@ analyseAst ast spec = do
   return $ AnalysisCompleted (analyseExpectations ast (expectations spec))
                              (analyseSmells ast language (smellsSet spec))
                              (analyseSignatures ast (signatureAnalysisType spec))
-
-compileDomainLanguage :: Maybe DomainLanguage -> IO DL.DomainLanguage
-compileDomainLanguage Nothing                                 = compileDomainLanguage (Just emptyDomainLanguage)
-compileDomainLanguage (Just (DomainLanguage path style size)) = do
-  dictionary <- compileDictionay path
-  return $ DL.DomainLanguage dictionary (compileStyle style) (compileSize size)
-
-  where
-    compileDictionay (Just path) = fromFile path
-    compileDictionay _           = return $ toDictionary []
-
-    compileSize (Just n) = n
-    compileSize _        = 3
-
-    compileStyle (Just SnakeCase) = snakeCase
-    compileStyle _                = camelCase
-
 

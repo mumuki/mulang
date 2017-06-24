@@ -486,7 +486,7 @@ $ mulang  '
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : { "tag" : "NoSmells" },
+      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
       "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" },
       "signatureAnalysisType" : { "tag" : "NoSignatures" }
    }
@@ -494,12 +494,19 @@ $ mulang  '
 {
    "signatures" : [],
    "tag" : "AnalysisCompleted",
-   "domainLanguageViolations" : {
-      "tooShortBindings" : [ "f" ],
-      "misspelledBindings" : []
-   },
    "expectationResults" : [],
-   "smells" : []
+   "smells" : [
+      {
+         "tag" : "Basic",
+         "binding" : "f",
+         "inspection" : "ReturnsNull"
+      },
+      {
+         "inspection" : "HasTooShortBindings",
+         "binding" : "f",
+         "tag" : "Basic"
+      }
+   ]
 }
 ```
 
