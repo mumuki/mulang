@@ -91,6 +91,8 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 
 * `declaresMethod`: **objects paradigm** is a given method declared?
 * `declaresAttribute`: **objects paradigm** is a given attribute declared?
+* `declaresClass`: **objects paradigm** is a given class declared?
+* `declaresObject`: **objects paradigm** is a given named object declared?
 * `declaresFunction`: **functional/imperative paradigm** is a given function declared?
 * `declaresTypeSignature`: **any paradigm** is a given computation type signature declared?
 * `declaresTypeAlias`: **any paradigm** is a given type synonym declared?
