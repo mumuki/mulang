@@ -119,6 +119,9 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 * `doesTypeTest`
 * `doesNullTest`
 * `returnsNull`
+* `hasTooShortBindings`
+* `hasWrongCaseBindings`
+* `hasMisspelledBindings`
 * `isLongCode`: **any code** has the code long sequences of statements?
 * `hasCodeDuplication`: **any paradigm** has the given code simple literal code duplication?
 
