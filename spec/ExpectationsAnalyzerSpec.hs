@@ -4,7 +4,7 @@ import           Language.Mulang
 import           Language.Mulang.Analyzer hiding (result, spec)
 import           Test.Hspec
 
-result expectationsResults smellResults = AnalysisCompleted expectationsResults smellResults [] noDomainLanguageViolations
+result expectationsResults smellResults = AnalysisCompleted expectationsResults smellResults []
 
 run language content expectations = analyse (expectationsAnalysis (CodeSample language content) expectations)
 runAst ast expectations = analyse (expectationsAnalysis (MulangSample ast) expectations)

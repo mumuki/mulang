@@ -28,7 +28,6 @@ instance FromJSON Pattern
 instance FromJSON ComprehensionStatement
 
 instance ToJSON AnalysisResult
-instance ToJSON DomainLanguageViolations
 instance ToJSON ExpectationResult
 
 instance ToJSON Expectation

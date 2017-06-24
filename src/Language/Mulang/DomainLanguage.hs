@@ -26,6 +26,7 @@ hasTooShortBindings (DomainLanguage _ _ size)
   = any ((<size).length) . mainDeclaredBindingsOf
 
 hasMisspelledBindings :: DomainLanguageInspection
+hasMisspelledBindings language | emptyDictionary language = const False
 hasMisspelledBindings language
   = any (not . (`exists` (dictionary language)))  . wordsOf language
 
@@ -38,3 +39,5 @@ wordsOf (DomainLanguage _ style _) = concatMap (tokenize style) . mainDeclaredBi
 
 
 mainDeclaredBindingsOf = declaredBindingsOf mainExpressions
+
+emptyDictionary = null . dictionary

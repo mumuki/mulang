@@ -58,7 +58,6 @@ library
     Language.Mulang.Analyzer.Analysis.Json
     Language.Mulang.Analyzer.SampleParser
     Language.Mulang.Analyzer.ExpectationsAnalyzer
-    Language.Mulang.Analyzer.DomainLanguageAnalyzer
     Language.Mulang.Analyzer.ExpectationsCompiler
     Language.Mulang.Analyzer.SignaturesAnalyzer
     Language.Mulang.Analyzer.SignatureStyleCompiler

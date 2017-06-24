@@ -20,8 +20,13 @@ import Language.Mulang.Analyzer.Analysis
 import Language.Mulang.Analyzer.SampleParser (parseSample)
 import Language.Mulang.Analyzer.SignaturesAnalyzer  (analyseSignatures)
 import Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
-import Language.Mulang.Analyzer.DomainLanguageAnalyzer (analyseDomainLanguage)
 import Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
+
+import qualified Language.Mulang.DomainLanguage as DL
+import Text.Inflections.Tokenizer (camelCase, snakeCase)
+import Text.Dictionary (fromFile, toDictionary)
+
+
 
 --
 -- Builder functions
@@ -58,13 +63,30 @@ signaturesAnalysis code style = Analysis code (emptyAnalysisSpec { signatureAnal
 --
 analyse :: Analysis -> IO AnalysisResult
 analyse (Analysis sample spec)
-      | Just ast <- parseSample sample = return $ analyseAst ast spec
+      | Just ast <- parseSample sample = analyseAst ast spec
       | otherwise = return $ AnalysisFailed "Sample code parsing error"
 
-analyseAst :: Expression -> AnalysisSpec -> AnalysisResult
-analyseAst ast spec =
-  AnalysisCompleted (analyseExpectations ast (expectations spec))
-                    (analyseSmells ast (smellsSet spec))
-                    (analyseSignatures ast (signatureAnalysisType spec))
-                    (analyseDomainLanguage ast (domainLanguage spec))
+analyseAst :: Expression -> AnalysisSpec -> IO AnalysisResult
+analyseAst ast spec = do
+  language <- compileDomainLanguage (domainLanguage spec)
+  return $ AnalysisCompleted (analyseExpectations ast (expectations spec))
+                             (analyseSmells ast language (smellsSet spec))
+                             (analyseSignatures ast (signatureAnalysisType spec))
+
+compileDomainLanguage :: Maybe DomainLanguage -> IO DL.DomainLanguage
+compileDomainLanguage Nothing                                 = compileDomainLanguage (Just emptyDomainLanguage)
+compileDomainLanguage (Just (DomainLanguage path style size)) = do
+  dictionary <- compileDictionay path
+  return $ DL.DomainLanguage dictionary (compileStyle style) (compileSize size)
+
+  where
+    compileDictionay (Just path) = fromFile path
+    compileDictionay _           = return $ toDictionary []
+
+    compileSize (Just n) = n
+    compileSize _        = 3
+
+    compileStyle (Just SnakeCase) = snakeCase
+    compileStyle _                = camelCase
+
 

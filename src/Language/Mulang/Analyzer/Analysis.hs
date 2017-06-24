@@ -1,8 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Language.Mulang.Analyzer.Analysis (
-  noDomainLanguageViolations,
-
   Expectation(..),
   BindingPattern(..),
 
@@ -18,8 +16,7 @@ module Language.Mulang.Analyzer.Analysis (
   Language(..),
 
   AnalysisResult(..),
-  ExpectationResult(..),
-  DomainLanguageViolations(..)) where
+  ExpectationResult(..)) where
 
 import GHC.Generics
 
@@ -93,6 +90,9 @@ data Smell
   | DoesTypeTest
   | IsLongCode
   | ReturnsNull
+  | HasTooShortBindings
+  | HasWrongCaseBindings
+  | HasMisspelledBindings
   | HasRedundantParameter
   | HasCodeDuplication deriving (Show, Eq, Enum, Bounded, Generic)
 
@@ -126,8 +126,7 @@ data Language
 data AnalysisResult
   = AnalysisCompleted { expectationResults :: [ExpectationResult],
                         smells :: [Expectation],
-                        signatures :: [Code],
-                        domainLanguageViolations :: DomainLanguageViolations }
+                        signatures :: [Code] }
   | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
 data ExpectationResult = ExpectationResult {
@@ -135,13 +134,4 @@ data ExpectationResult = ExpectationResult {
   result :: Bool
 } deriving (Show, Eq, Generic)
 
-data DomainLanguageViolations
-  = DomainLanguageViolations {
-      tooShortBindings :: [Binding],
-      misspelledBindings :: [Binding],
-      wrongCaseBindings :: [Binding]
-    } deriving (Show, Eq, Generic)
 
-
-noDomainLanguageViolations :: DomainLanguageViolations
-noDomainLanguageViolations = DomainLanguageViolations [] [] []

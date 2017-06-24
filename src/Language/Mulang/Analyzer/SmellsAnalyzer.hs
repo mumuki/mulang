@@ -3,14 +3,15 @@ module Language.Mulang.Analyzer.SmellsAnalyzer (
 
 import Language.Mulang
 import Language.Mulang.Inspector.Generic.Smell
-import Language.Mulang.Analyzer.Analysis
+import Language.Mulang.DomainLanguage
+import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage)
 import Data.List
 
-analyseSmells :: Expression -> SmellsSet -> [Expectation]
-analyseSmells code set = concatMap (`detectSmell` code) (smellsFor set)
+analyseSmells :: Expression -> DomainLanguage -> SmellsSet -> [Expectation]
+analyseSmells ast language set = concatMap (\smell -> detectSmell smell language ast) (smellsFor set)
 
-detectSmell :: Smell -> Expression -> [Expectation]
-detectSmell smell =  map (exectationFor smell) . detectAll (inspectionFor smell)
+detectSmell :: Smell -> DomainLanguage -> Expression -> [Expectation]
+detectSmell smell language =  map (exectationFor smell) . detectionFor smell language
 
 smellsFor :: SmellsSet -> [Smell]
 smellsFor (NoSmells)             = []
@@ -20,19 +21,33 @@ smellsFor (AllSmells excluded)   = allSmells \\ excluded
 allSmells :: [Smell]
 allSmells = enumFrom minBound
 
-inspectionFor :: Smell -> Inspection
-inspectionFor HasRedundantIf                  = hasRedundantIf
-inspectionFor HasRedundantLambda              = hasRedundantLambda
-inspectionFor HasRedundantBooleanComparison   = hasRedundantBooleanComparison
-inspectionFor HasRedundantGuards              = hasRedundantGuards
-inspectionFor HasRedundantLocalVariableReturn = hasRedundantLocalVariableReturn
-inspectionFor HasAssignmentReturn             = hasAssignmentReturn
-inspectionFor HasRedundantParameter           = hasRedundantParameter
-inspectionFor DoesNullTest                    = doesNullTest
-inspectionFor DoesTypeTest                    = doesTypeTest
-inspectionFor ReturnsNull                     = returnsNull
-inspectionFor IsLongCode                      = const False
-inspectionFor HasCodeDuplication              = const False
+detectionFor :: Smell -> Detection
+detectionFor HasRedundantIf                  = simple hasRedundantIf
+detectionFor HasRedundantLambda              = simple hasRedundantLambda
+detectionFor HasRedundantBooleanComparison   = simple hasRedundantBooleanComparison
+detectionFor HasRedundantGuards              = simple hasRedundantGuards
+detectionFor HasRedundantLocalVariableReturn = simple hasRedundantLocalVariableReturn
+detectionFor HasAssignmentReturn             = simple hasAssignmentReturn
+detectionFor HasRedundantParameter           = simple hasRedundantParameter
+detectionFor DoesNullTest                    = simple doesNullTest
+detectionFor DoesTypeTest                    = simple doesTypeTest
+detectionFor ReturnsNull                     = simple returnsNull
+detectionFor HasTooShortBindings             = withLanguage hasTooShortBindings
+detectionFor HasWrongCaseBindings            = withLanguage hasWrongCaseBindings
+detectionFor HasMisspelledBindings           = withLanguage hasMisspelledBindings
+detectionFor IsLongCode                      = unsupported
+detectionFor HasCodeDuplication              = unsupported
+
+
+type Detection = DomainLanguage -> Expression -> [Binding]
+unsupported :: Detection
+unsupported _ _ = []
+
+simple :: Inspection -> Detection
+simple inspection _ = detectAll inspection
+
+withLanguage :: (DomainLanguage -> Inspection) -> Detection
+withLanguage inspection language = detect mainExpressions (inspection language)
 
 exectationFor :: Smell -> Binding -> Expectation
 exectationFor smell binding = Basic binding (show smell)
