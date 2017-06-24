@@ -1,5 +1,6 @@
 module Language.Mulang.DomainLanguage (
   hasTooShortBindings,
+  hasWrongCaseBindings,
   hasMisspelledBindings,
   DomainLanguage(..)) where
 
@@ -10,7 +11,7 @@ import Language.Mulang.Explorer (declaredBindingsOf)
 
 import Text.Dictionary (Dictionary, exists)
 
-import Text.Inflections.Tokenizer (CaseStyle, tokenize)
+import Text.Inflections.Tokenizer (CaseStyle, tokenize, canTokenize)
 
 data DomainLanguage = DomainLanguage {
                           dictionary :: Dictionary,
@@ -25,6 +26,10 @@ hasTooShortBindings (DomainLanguage _ _ unfold size)
 hasMisspelledBindings :: DomainLanguage -> Inspection
 hasMisspelledBindings language
   = any (not . (`exists` (dictionary language)))  . wordsOf language
+
+hasWrongCaseBindings :: DomainLanguage -> Inspection
+hasWrongCaseBindings (DomainLanguage _ style unfold _)
+  = any (not . canTokenize style) . declaredBindingsOf unfold
 
 wordsOf :: DomainLanguage -> Expression -> [String]
 wordsOf (DomainLanguage _ style unfold _) = concatMap (tokenize style) . declaredBindingsOf unfold

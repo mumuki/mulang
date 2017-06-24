@@ -2,7 +2,7 @@ module DomainLanguageSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang.Unfold (mainExpressions)
-import           Language.Mulang.DomainLanguage (DomainLanguage(..), hasMisspelledBindings, hasTooShortBindings)
+import           Language.Mulang.DomainLanguage (DomainLanguage(..), hasMisspelledBindings, hasTooShortBindings, hasWrongCaseBindings)
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)
 import           Text.Dictionary (toDictionary)
@@ -46,6 +46,14 @@ spec = do
     it "is True when it contains a short variable name" $ do
       run (js "var x = 3;") `shouldBe` True
 
+  describe "hasWrongCaseBindings" $ do
+    let run = hasWrongCaseBindings language
+
+    it "is True when there are snake case binding on a camel case language" $ do
+      run (js "var a_day = 'monday'") `shouldBe` True
+
+    it "is False when there are only camel case binding on a camel case language" $ do
+      run (js "var aDay = 'monday'") `shouldBe` False
 
   describe "hasMisspelledBindings" $ do
     let run = hasMisspelledBindings language

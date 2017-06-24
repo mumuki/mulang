@@ -139,9 +139,10 @@ data ExpectationResult = ExpectationResult {
 data DomainLanguageViolations
   = DomainLanguageViolations {
       tooShortBindings :: [Binding],
-      misspelledBindings :: [Binding]
+      misspelledBindings :: [Binding],
+      wrongCaseBindings :: [Binding]
     } deriving (Show, Eq, Generic)
 
 
 noDomainLanguageViolations :: DomainLanguageViolations
-noDomainLanguageViolations = DomainLanguageViolations [] []
+noDomainLanguageViolations = DomainLanguageViolations [] [] []

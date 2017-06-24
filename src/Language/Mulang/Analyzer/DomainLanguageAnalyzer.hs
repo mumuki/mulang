@@ -17,6 +17,7 @@ analyseDomainLanguage code Nothing   = noDomainLanguageViolations
 analyseDomainLanguage code (Just language)
   =  DomainLanguageViolations {
         tooShortBindings = detectWithLanguage DL.hasTooShortBindings,
+        wrongCaseBindings = detectWithLanguage DL.hasWrongCaseBindings,
         misspelledBindings = []
       }
 
