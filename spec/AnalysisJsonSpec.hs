@@ -209,7 +209,8 @@ spec = describe "AnalysisJson" $ do
       "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
       "domainLanguage" : {
          "caseStyle" : "SnakeCase",
-         "minimumBindingSize" : 4
+         "minimumBindingSize" : 4,
+         "jargon" : ["id"]
       },
       "signatureAnalysisType" : { "tag" : "NoSignatures" }
    }
@@ -217,7 +218,10 @@ spec = describe "AnalysisJson" $ do
     let analysis = Analysis (CodeSample Prolog "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer).")
                             (emptyAnalysisSpec {
                               smellsSet = allSmells,
-                              domainLanguage = Just emptyDomainLanguage { caseStyle = Just SnakeCase, minimumBindingSize = Just 4 } })
+                              domainLanguage = Just emptyDomainLanguage {
+                                caseStyle = Just SnakeCase,
+                                minimumBindingSize = Just 4,
+                                jargon = Just ["id"] } })
 
     run json `shouldBe` analysis
 

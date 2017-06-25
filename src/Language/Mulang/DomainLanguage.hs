@@ -17,13 +17,14 @@ import Text.Inflections.Tokenizer (CaseStyle, tokenize, canTokenize)
 data DomainLanguage = DomainLanguage {
                           dictionary :: Dictionary,
                           caseStyle :: CaseStyle,
-                          minimumBindingSize :: Int }
+                          minimumBindingSize :: Int,
+                          jargon :: [String] }
 
 type DomainLanguageInspection = DomainLanguage -> Inspection
 
 hasTooShortBindings :: DomainLanguageInspection
-hasTooShortBindings (DomainLanguage _ _ size)
-  = any ((<size).length) . mainDeclaredBindingsOf
+hasTooShortBindings (DomainLanguage _ _ size jargon) = any isShort . mainDeclaredBindingsOf
+  where isShort binding = length binding < size && notElem binding jargon
 
 hasMisspelledBindings :: DomainLanguageInspection
 hasMisspelledBindings language | emptyDictionary language = const False
@@ -31,11 +32,11 @@ hasMisspelledBindings language
   = any (not . (`exists` (dictionary language)))  . wordsOf language
 
 hasWrongCaseBindings :: DomainLanguageInspection
-hasWrongCaseBindings (DomainLanguage _ style _)
+hasWrongCaseBindings (DomainLanguage _ style _ _)
   = any (not . canTokenize style) . mainDeclaredBindingsOf
 
 wordsOf :: DomainLanguage -> Expression -> [String]
-wordsOf (DomainLanguage _ style _) = concatMap (tokenize style) . mainDeclaredBindingsOf
+wordsOf (DomainLanguage _ style _ _) = concatMap (tokenize style) . mainDeclaredBindingsOf
 
 
 mainDeclaredBindingsOf = declaredBindingsOf mainExpressions

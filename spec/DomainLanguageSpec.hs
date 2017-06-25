@@ -10,7 +10,8 @@ import           Text.Inflections.Tokenizer (camelCase)
 spec :: Spec
 spec = do
   let english = toDictionary ["a","day","great","is","today"]
-  let language = DomainLanguage english camelCase 3
+  let jargon  = ["ui", "js"]
+  let language = DomainLanguage english camelCase 3 jargon
 
   describe "hasTooShortBindings" $ do
     let run = hasTooShortBindings language
@@ -44,6 +45,9 @@ spec = do
 
     it "is True when it contains a short variable name" $ do
       run (js "var x = 3;") `shouldBe` True
+
+    it "is False when it is jargon" $ do
+      run (hs "ui = False") `shouldBe` False
 
   describe "hasWrongCaseBindings" $ do
     let run = hasWrongCaseBindings language
