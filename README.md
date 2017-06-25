@@ -105,6 +105,9 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `declaresPredicate`: **logic paradigm** is a given rule o fact declared?
 1. `usesIf`
 1. `usesWhile`
+1. `usesForall`
+1. `usesFindall`
+1. `usesNot`
 1. `usesLambda`
 1. `usesGuards`
 1. `usesComposition`
@@ -205,7 +208,7 @@ But if you are not the Haskell inclined gal or guy - ok, I will try to forgive y
 
 ## Sample CLI usage
 
-### With advanced expectations:
+### With intransitive expectations:
 
 ```bash
 $ mulang '
@@ -218,12 +221,8 @@ $ mulang '
    "spec" : {
       "expectations" : [
          {
-            "tag" : "Advanced",
-            "subject" : [ "x" ],
-            "object" : { "tag" : "Anyone" },
-            "negated" : false,
-            "verb" : "uses",
-            "transitive" : false
+            "binding" : ":Intransitive:x",
+            "inspection" : "Uses:*"
          }
       ],
       "smellsSet" : { "tag" : "NoSmells" }
@@ -234,16 +233,8 @@ $ mulang '
    "expectationResults" : [
       {
          "expectation" : {
-            "subject" : [
-               "x"
-            ],
-            "verb" : "uses",
-            "tag" : "Advanced",
-            "object" : {
-               "tag" : "Anyone"
-            },
-            "negated" : false,
-            "transitive" : false
+            "binding" : ":Intransitive:x",
+            "inspection" : "Uses:*"
          },
          "result" : false
       }
@@ -254,7 +245,7 @@ $ mulang '
 }
 ```
 
-### With basic expectations
+### With Transitive expectations
 
 ```bash
 $ mulang '
@@ -268,7 +259,6 @@ $ mulang '
       "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
-            "tag" : "Basic",
             "binding" : "x",
             "inspection" : "HasBinding"
          }
@@ -283,7 +273,6 @@ $ mulang '
       {
          "result" : true,
          "expectation" : {
-            "tag" : "Basic",
             "binding" : "x",
             "inspection" : "HasBinding"
          }
@@ -432,7 +421,6 @@ $ mulang '
    ],
    "smells" : [
       {
-         "tag" : "Basic",
          "binding" : "foo",
          "inspection" : "ReturnsNull"
       }
@@ -503,13 +491,11 @@ $ mulang '
    "signatures" : [],
    "smells" : [
       {
-         "tag" : "Basic",
          "inspection" : "HasTooShortBindings",
          "binding" : "son"
       },
       {
          "binding" : "parentOf",
-         "tag" : "Basic",
          "inspection" : "HasWrongCaseBindings"
       }
    ],
@@ -540,12 +526,10 @@ $ mulang  '
    "smells" : [
       {
          "inspection" : "ReturnsNull",
-         "tag" : "Basic",
          "binding" : "foo"
       },
       {
          "inspection" : "HasMisspelledBindings",
-         "tag" : "Basic",
          "binding" : "foo"
       }
    ]
@@ -556,13 +540,13 @@ $ mulang  '
 
 Mulang CLI can do three different kinds of analysis:
 
-* **Expectation analysis**: you can provide an expression - called `inspection` - that will be tested against the provied program. Expectations answer questions like: _does the function X call the function Y?_ or _does the program use if's?_. It comes in two flavors:
-     * **basic expectations**: are composed by a binding and an inspection
-     * **advanced expectations**: are composed by
-       * subject
-       * verb
-       * object
-       * flags
+* **Expectation analysis**: you can provide an expression - called `inspection` - that will be tested against the provied program. Expectations answer questions like: _does the function X call the function Y?_ or _does the program use if's?_. They can be expressed with the following simple DSL:
+  * Simple inspections, like `HasIf` or `DeclaresClass`
+  * Negated inspections, like `Not:HasIf`
+  * Targeted inspections, like `DeclaresClass:Golondrina`. You can specify targets the following ways:
+    * Exact matches:  `DeclaresClass:=Golondrina` or simply `DeclaresClass:Golondrina`
+    * Approximate matches: `DeclaresClass:~Golondrina`
+    * Any matches: `DeclaresClass:*` or simply `DeclaresClass`
 * **Smell analysis**: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched.
 * **Signature analysis**: report the signatures of the computations present in source code.
 

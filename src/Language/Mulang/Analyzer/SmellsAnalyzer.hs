@@ -50,4 +50,4 @@ withLanguage :: (DomainLanguage -> Inspection) -> Detection
 withLanguage inspection language = detect mainExpressions (inspection language)
 
 exectationFor :: Smell -> Binding -> Expectation
-exectationFor smell binding = Basic binding (show smell)
+exectationFor smell binding = Expectation binding (show smell)
