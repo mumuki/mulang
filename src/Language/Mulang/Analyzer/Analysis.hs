@@ -59,7 +59,7 @@ data Analysis = Analysis {
 data AnalysisSpec = AnalysisSpec {
   expectations :: [Expectation],
   smellsSet :: SmellsSet,
-  signatureAnalysisType :: SignatureAnalysisType,
+  signatureAnalysisType :: Maybe SignatureAnalysisType,
   domainLanguage :: Maybe DomainLanguage
 } deriving (Show, Eq, Generic)
 
