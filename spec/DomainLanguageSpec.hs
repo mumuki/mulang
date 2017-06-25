@@ -61,10 +61,13 @@ spec = do
   describe "hasMisspelledBindings" $ do
     let run = hasMisspelledBindings language
 
-    it "is True when it is a single, well written token" $ do
+    it "is False when it is a single, well written token" $ do
       run (hs "today = True") `shouldBe` False
 
-    it "is True when all tokens are well-written" $ do
+    it "is False when it is a single, well written but jargon token" $ do
+      run (hs "js = True") `shouldBe` False
+
+    it "is False when all tokens are well-written" $ do
       run (hs "todayIsAGreatDay = True") `shouldBe` False
 
     it "is True when it is a single, bad written token" $ do

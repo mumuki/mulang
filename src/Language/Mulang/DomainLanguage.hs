@@ -23,13 +23,13 @@ data DomainLanguage = DomainLanguage {
 type DomainLanguageInspection = DomainLanguage -> Inspection
 
 hasTooShortBindings :: DomainLanguageInspection
-hasTooShortBindings (DomainLanguage _ _ size jargon) = any isShort . mainDeclaredBindingsOf
-  where isShort binding = length binding < size && notElem binding jargon
+hasTooShortBindings language = any isShort . mainDeclaredBindingsOf
+  where isShort binding = length binding < (minimumBindingSize language) && notJargonOf binding language
 
 hasMisspelledBindings :: DomainLanguageInspection
 hasMisspelledBindings language | emptyDictionary language = const False
-hasMisspelledBindings language
-  = any (not . (`exists` (dictionary language)))  . wordsOf language
+hasMisspelledBindings language = any isMisspelled  . wordsOf language
+  where isMisspelled binding = not (binding `exists` dictionary language) && notJargonOf binding language
 
 hasWrongCaseBindings :: DomainLanguageInspection
 hasWrongCaseBindings (DomainLanguage _ style _ _)
@@ -42,3 +42,5 @@ wordsOf (DomainLanguage _ style _ _) = concatMap (tokenize style) . mainDeclared
 mainDeclaredBindingsOf = declaredBindingsOf mainExpressions
 
 emptyDictionary = null . dictionary
+
+notJargonOf binding language = notElem binding (jargon language)
