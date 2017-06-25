@@ -148,7 +148,7 @@ spec = describe "AnalysisJson" $ do
    "spec" : {
       "expectations" : [],
       "smellsSet" : {
-        "tag" : "OnlySmells",
+        "tag" : "NoSmells",
         "include" : [
           "ReturnsNull",
           "DoesNullTest"
@@ -162,7 +162,7 @@ spec = describe "AnalysisJson" $ do
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
                             (emptyAnalysisSpec {
-                              smellsSet = onlySmells { include = [ReturnsNull, DoesNullTest]},
+                              smellsSet = noSmells { include = Just [ReturnsNull, DoesNullTest]},
                               signatureAnalysisType = (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
@@ -191,7 +191,7 @@ spec = describe "AnalysisJson" $ do
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
                             (emptyAnalysisSpec {
-                              smellsSet = allSmells { exclude = [ReturnsNull]},
+                              smellsSet = allSmells { exclude = Just [ReturnsNull]},
                               signatureAnalysisType = (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
@@ -206,7 +206,7 @@ spec = describe "AnalysisJson" $ do
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
+      "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : {
          "caseStyle" : "SnakeCase",
          "minimumBindingSize" : 4,
@@ -235,7 +235,7 @@ spec = describe "AnalysisJson" $ do
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
+      "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" },
       "signatureAnalysisType" : { "tag" : "NoSignatures" }
    }

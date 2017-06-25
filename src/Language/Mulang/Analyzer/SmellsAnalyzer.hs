@@ -6,6 +6,7 @@ import Language.Mulang.Inspector.Generic.Smell
 import Language.Mulang.DomainLanguage
 import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage)
 import Data.List
+import Data.Maybe (fromMaybe)
 
 analyseSmells :: Expression -> DomainLanguage -> SmellsSet -> [Expectation]
 analyseSmells ast language set = concatMap (\smell -> detectSmell smell language ast) (smellsFor set)
@@ -14,9 +15,8 @@ detectSmell :: Smell -> DomainLanguage -> Expression -> [Expectation]
 detectSmell smell language =  map (exectationFor smell) . detectionFor smell language
 
 smellsFor :: SmellsSet -> [Smell]
-smellsFor (NoSmells)             = []
-smellsFor (OnlySmells included)  = included
-smellsFor (AllSmells excluded)   = allSmells \\ excluded
+smellsFor (NoSmells included)    = fromMaybe [] included
+smellsFor (AllSmells excluded)   = allSmells \\ (fromMaybe [] excluded)
 
 allSmells :: [Smell]
 allSmells = enumFrom minBound

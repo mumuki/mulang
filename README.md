@@ -413,7 +413,7 @@ $ mulang '
    "spec" : {
       "expectations" : [],
       "smellsSet" : {
-        "tag" : "OnlySmells",
+        "tag" : "NoSmells",
         "include" : [
           "ReturnsNull",
           "DoesNullTest"
@@ -492,7 +492,7 @@ $ mulang '
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
+      "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : {
          "caseStyle" : "SnakeCase",
          "minimumBindingSize" : 4,
@@ -532,7 +532,7 @@ $ mulang  '
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
+      "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" },
       "signatureAnalysisType" : { "tag" : "NoSignatures" }
    }

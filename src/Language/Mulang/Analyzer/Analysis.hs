@@ -76,9 +76,8 @@ data CaseStyle
   | SnakeCase deriving (Show, Eq, Generic)
 
 data SmellsSet
-  = NoSmells
-  | OnlySmells { include :: [Smell] }
-  | AllSmells { exclude :: [Smell] } deriving (Show, Eq, Generic)
+  = NoSmells { include :: Maybe [Smell] }
+  | AllSmells { exclude :: Maybe [Smell] } deriving (Show, Eq, Generic)
 
 data Smell
   = HasRedundantIf
