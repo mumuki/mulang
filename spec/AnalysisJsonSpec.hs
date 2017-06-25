@@ -196,6 +196,31 @@ spec = describe "AnalysisJson" $ do
 
     run json `shouldBe` analysis
 
+  it "works with caseStyle and minimumBindingSize" $ do
+    let json = [text|
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "Prolog",
+      "content" : "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer)."
+   },
+   "spec" : {
+      "expectations" : [],
+      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
+      "domainLanguage" : {
+         "caseStyle" : "SnakeCase",
+         "minimumBindingSize" : 4
+      },
+      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+   }
+} |]
+    let analysis = Analysis (CodeSample Prolog "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer).")
+                            (emptyAnalysisSpec {
+                              smellsSet = allSmells,
+                              domainLanguage = Just emptyDomainLanguage { caseStyle = Just SnakeCase, minimumBindingSize = Just 4 } })
+
+    run json `shouldBe` analysis
+
   it "works with dictionary path" $ do
     let json = [text|
 {
@@ -206,14 +231,14 @@ spec = describe "AnalysisJson" $ do
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : { "tag" : "NoSmells" },
+      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
       "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" },
       "signatureAnalysisType" : { "tag" : "NoSignatures" }
    }
 } |]
     let analysis = Analysis (CodeSample JavaScript "function f(x, y) { return null; }")
                             (emptyAnalysisSpec {
-                              smellsSet = noSmells,
+                              smellsSet = allSmells,
                               domainLanguage = Just emptyDomainLanguage { dictionaryFilePath = Just "/usr/share/dict/words" } })
 
     run json `shouldBe` analysis

@@ -477,9 +477,49 @@ $ mulang '
 }
 ```
 
-### With expressiveness expectations
+### With expressiveness smells
 
-In order to use expresivness expectations, you need to specify a dictionary.
+Expressivnes smells are like other smells - they can be included or excluded using the `smellsSet` settings. However, their behaviour is also controlled
+by the `domainLanguage` setting, which you _can_ configure:
+
+```bash
+$ mulang '
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "Prolog",
+      "content" : "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer)."
+   },
+   "spec" : {
+      "expectations" : [],
+      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
+      "domainLanguage" : {
+         "caseStyle" : "SnakeCase",
+         "minimumBindingSize" : 4
+      },
+      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+   }
+}' | json_pp
+{
+   "tag" : "AnalysisCompleted",
+   "signatures" : [],
+   "smells" : [
+      {
+         "tag" : "Basic",
+         "inspection" : "HasTooShortBindings",
+         "binding" : "son"
+      },
+      {
+         "binding" : "parentOf",
+         "tag" : "Basic",
+         "inspection" : "HasWrongCaseBindings"
+      }
+   ],
+   "expectationResults" : []
+}
+```
+
+Also, if you want to use `HasMisspelledBindings` smell, you _need_ to specify a dictionary - with must be ordered, downcased and with unique words only:
 
 ```bash
 $ mulang  '
@@ -487,7 +527,7 @@ $ mulang  '
    "sample" : {
       "tag" : "CodeSample",
       "language" : "JavaScript",
-      "content" : "function f(x, y) { return null; }"
+      "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
       "expectations" : [],
@@ -497,19 +537,19 @@ $ mulang  '
    }
 }' | json_pp
 {
-   "signatures" : [],
    "tag" : "AnalysisCompleted",
    "expectationResults" : [],
+   "signatures" : [],
    "smells" : [
       {
+         "inspection" : "ReturnsNull",
          "tag" : "Basic",
-         "binding" : "f",
-         "inspection" : "ReturnsNull"
+         "binding" : "foo"
       },
       {
-         "inspection" : "HasTooShortBindings",
-         "binding" : "f",
-         "tag" : "Basic"
+         "inspection" : "HasMisspelledBindings",
+         "tag" : "Basic",
+         "binding" : "foo"
       }
    ]
 }
