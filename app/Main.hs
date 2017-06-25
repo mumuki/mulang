@@ -8,6 +8,8 @@ import Data.Aeson (eitherDecode, encode)
 import System.Environment (getArgs)
 import Control.Fallible (orFail)
 
+import           Data.List (intercalate)
+import           Version (prettyVersion)
 import           Data.Text.Lazy.Encoding (encodeUtf8)
 import qualified Data.ByteString.Lazy as LBS (putStrLn)
 import qualified Data.Text.Lazy as T (pack)
@@ -23,7 +25,7 @@ analyseJson = encode . analyse . decode . encodeUtf8 . T.pack
 
 parseArgs :: [String] -> String
 parseArgs [jsonBody] = jsonBody
-parseArgs _          = error usage
+parseArgs _          = error (intercalate "\n" [prettyVersion, usage])
 
 decode = orFail . eitherDecode
 
