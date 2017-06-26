@@ -47,6 +47,12 @@ compileInspectionPrimitive :: String -> BindingPredicate -> Maybe Inspection
 compileInspectionPrimitive = f
   where
 
+  f "HasRule"                        b = Just $ declaresRule b
+  f "DeclaresRule"                   b = Just $ declaresRule b
+  f "HasFact"                        b = Just $ declaresFact b
+  f "DeclaresFact"                   b = Just $ declaresFact b
+  f "HasPredicate"                   b = Just $ declaresPredicate b
+  f "DeclaresPredicate"              b = Just $ declaresPredicate b
   f "HasClass"                       b = Just $ declaresClass b
   f "DeclaresClass"                  b = Just $ declaresClass b
   f "HasObject"                      b = Just $ declaresObject b
@@ -92,6 +98,8 @@ compileInspectionPrimitive = f
   f "UsesComprehension"              _ = Just usesComprehension
   f "HasConditional"                 _ = Just usesConditional
   f "UsesConditional"                _ = Just usesConditional
+  f "HasUnifyOperator"               _ = Just usesUnifyOperator
+  f "UsesUnifyOperator"              _ = Just usesUnifyOperator
   f "HasFindall"                     _ = Just usesFindall
   f "UsesFindall"                    _ = Just usesFindall
   f "HasForall"                      _ = Just usesForall
