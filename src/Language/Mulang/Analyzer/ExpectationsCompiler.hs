@@ -12,9 +12,11 @@ compileExpectation = fromMaybe (\_ -> True) . compileMaybe
 
 compileMaybe :: Expectation -> Maybe Inspection
 compileMaybe (Expectation b i) = do
-  baseInspection  <- compileBaseInspection (splitOn ":" i)
-  slicer          <- compileSlicer (splitOn ":" b)
-  return $ slicer baseInspection
+  let inspectionParts = splitOn ":" i
+  let negator = compileNegator inspectionParts
+  baseInspection <- compileBaseInspection inspectionParts
+  slicer         <- compileSlicer (splitOn ":" b)
+  return . negator . slicer $ baseInspection
 
 compileSlicer :: [String] -> Maybe (Inspection -> Inspection)
 compileSlicer [""]                  = Just id
@@ -24,8 +26,12 @@ compileSlicer _                     = Nothing
 
 justSlicerFor f name = Just (flip f (splitOn "." name))
 
-compileBaseInspection :: [String] -> Maybe Inspection
-compileBaseInspection ("Not":parts)         = fmap negative . compileBaseInspection $ parts
+compileNegator :: [String] -> (Inspection -> Inspection)
+compileNegator ("Not":_) = negative
+compileNegator _         = id
+
+compileBaseInspection :: [String] -> Maybe (Inspection)
+compileBaseInspection ("Not":parts)         = compileBaseInspection parts
 compileBaseInspection [verb]                = compileBaseInspection [verb, "*"]
 compileBaseInspection [verb, object]        = compileInspectionPrimitive verb (compileObject object)
 compileBaseInspection _                     = Nothing
@@ -35,6 +41,7 @@ compileObject "*"        = anyone
 compileObject ('~':name) = like name
 compileObject ('=':name) = named name
 compileObject name       = named name
+
 
 compileInspectionPrimitive :: String -> BindingPredicate -> Maybe Inspection
 compileInspectionPrimitive = f
