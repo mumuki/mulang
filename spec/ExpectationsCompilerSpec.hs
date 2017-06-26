@@ -28,7 +28,7 @@ spec = do
     run (js "var pepita = {volar:function(){}}") "pepita" "DeclaresMethod:cantar" `shouldBe` False
 
   it "works with DeclaresMethod with scopde binding" $ do
-    run (js "var pepita = {volar:function(){}}") "pepita.volar" "DeclaresMethod" `shouldBe` True
+    run (js "var pepita = {volar:function(){}}") "Intransitive:pepita.volar" "DeclaresMethod" `shouldBe` True
     run (js "var pepita = {volar:function(){}}") "pepita.cantar" "DeclaresMethod" `shouldBe` False
 
   it "works with DeclaresFunction with empty binding and empty object" $ do
@@ -118,6 +118,7 @@ spec = do
   it "works with HasBinding" $ do
     run (hs "f a b = g") "g" "HasBinding" `shouldBe` False
     run (hs "f a b = g") "f" "HasBinding" `shouldBe` True
+    run (hs "f a b = g") ""  "HasBinding:f" `shouldBe` True
 
   it "works with Declares" $ do
     run (hs "f a b = g") "g" "Declares" `shouldBe` False
