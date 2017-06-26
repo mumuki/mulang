@@ -58,6 +58,21 @@ spec = do
 
   it "works with Not" $ do
     run (hs "f x = 2") "" "Not:UsesWhile" `shouldBe` True
+    run (hs "f x = 2") "f" "Not:UsesWhile" `shouldBe` True
+    run (hs "f x = 2") "g" "Not:UsesWhile" `shouldBe` True
+
+  it "works with Not:HasBinding" $ do
+    run (hs "f x = 2") "g" "Not:HasBinding" `shouldBe` True
+    run (hs "f x = 2") "f" "Not:HasBinding" `shouldBe` False
+
+  it "works with Not:DeclaresFunction" $ do
+    run (hs "f x = 2") ""  "Not:DeclaresFunction" `shouldBe` False
+    run (hs "f x = 2") "f" "Not:DeclaresFunction" `shouldBe` False
+    run (hs "f x = 2") "g" "Not:DeclaresFunction" `shouldBe` True
+
+  it "works with Not:DeclaresFunction:f" $ do
+    run (hs "f x = 2") ""  "Not:DeclaresFunction:f" `shouldBe` False
+    run (hs "f x = 2") ""  "Not:DeclaresFunction:g" `shouldBe` True
 
   it "works with UsesSwitch" $ do
     run (hs "f x = 2") "" "UsesSwitch" `shouldBe` False
