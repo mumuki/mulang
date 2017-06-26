@@ -67,8 +67,8 @@ declaresVariable = containsDeclaration f
   where f (Variable _ _)  = True
         f _               = False
 
-declaresEntryPoint :: BindedInspection
-declaresEntryPoint = containsDeclaration f
+declaresEntryPoint :: Inspection
+declaresEntryPoint = containsExpression f
   where f (EntryPoint _)  = True
         f _               = False
 
