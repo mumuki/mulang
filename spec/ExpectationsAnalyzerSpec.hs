@@ -14,7 +14,7 @@ failed e = ExpectationResult e False
 
 spec = describe "ExpectationsAnalyzer" $ do
   it "works with Mulang input" $ do
-    let ydeclares = Expectation "" "Declares:y"
+    let ydeclares = Expectation "" "HasBinding:y"
     (runAst MuNull [ydeclares]) `shouldReturn` (result [failed ydeclares] [])
 
   describe "Advanced expectations" $ do
@@ -30,13 +30,13 @@ spec = describe "ExpectationsAnalyzer" $ do
       (run Haskell "x = 2" []) `shouldReturn` (result [] [])
 
     it "evaluates present named expectations" $ do
-      let ydeclares = Expectation "" "Declares:y"
-      let xdeclares = Expectation "" "Declares:x"
+      let ydeclares = Expectation "" "HasBinding:y"
+      let xdeclares = Expectation "" "HasBinding:x"
       (run Haskell "x = 2" [ydeclares, xdeclares]) `shouldReturn` (result [failed ydeclares, passed xdeclares] [])
 
     it "evaluates present expectations" $ do
-      let declaresF = Expectation "" "DeclaresFunction"
-      let declaresT = Expectation "" "DeclaresTypeAlias"
+      let declaresF = Expectation "" "HasFunction"
+      let declaresT = Expectation "" "HasTypeAlias"
       (run Haskell "f x = 2" [declaresF, declaresT]) `shouldReturn` (result [passed declaresF, failed declaresT] [])
 
   describe "Basic expectations" $ do
