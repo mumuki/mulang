@@ -7,6 +7,8 @@ module Language.Mulang.Analyzer.Analysis (
   Analysis(..),
   AnalysisSpec(..),
   SmellsSet(..),
+  DomainLanguage(..),
+  CaseStyle(..),
   Smell(..),
   SignatureAnalysisType(..),
   SignatureStyle(..),
@@ -40,9 +42,10 @@ data Expectation =  Advanced {
                     inspection :: BasicInspection
                   } deriving (Show, Eq, Generic)
 
-data BindingPattern = Named { exactName :: Binding }
-                    | Like { similarName :: Binding }
-                    | Anyone deriving (Show, Eq, Generic)
+data BindingPattern
+  = Named { exactName :: Binding }
+  | Like { similarName :: Binding }
+  | Anyone deriving (Show, Eq, Generic)
 
 --
 -- Analysis input structures
@@ -56,8 +59,21 @@ data Analysis = Analysis {
 data AnalysisSpec = AnalysisSpec {
   expectations :: [Expectation],
   smellsSet :: SmellsSet,
-  signatureAnalysisType :: SignatureAnalysisType
+  signatureAnalysisType :: SignatureAnalysisType,
+  domainLanguage :: Maybe DomainLanguage
 } deriving (Show, Eq, Generic)
+
+data DomainLanguage
+  = DomainLanguage {
+      dictionaryFilePath :: Maybe FilePath,
+      caseStyle :: Maybe CaseStyle,
+      minimumBindingSize :: Maybe Int,
+      jargon :: Maybe [String]
+    }  deriving (Show, Eq, Generic)
+
+data CaseStyle
+  = CamelCase
+  | SnakeCase deriving (Show, Eq, Generic)
 
 data SmellsSet
   = NoSmells
@@ -75,8 +91,10 @@ data Smell
   | DoesTypeTest
   | IsLongCode
   | ReturnsNull
+  | HasTooShortBindings
+  | HasWrongCaseBindings
+  | HasMisspelledBindings
   | HasRedundantParameter
-  | HasBadNames
   | HasCodeDuplication deriving (Show, Eq, Enum, Bounded, Generic)
 
 data SignatureAnalysisType
@@ -107,11 +125,14 @@ data Language
 --
 
 data AnalysisResult
-  = AnalysisCompleted { expectationResults :: [ExpectationResult], smells :: [Expectation], signatures :: [Code] }
+  = AnalysisCompleted { expectationResults :: [ExpectationResult],
+                        smells :: [Expectation],
+                        signatures :: [Code] }
   | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
 data ExpectationResult = ExpectationResult {
   expectation :: Expectation,
   result :: Bool
 } deriving (Show, Eq, Generic)
+
 

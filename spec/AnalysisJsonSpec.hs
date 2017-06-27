@@ -1,4 +1,4 @@
- {-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
 
 module AnalysisJsonSpec(spec) where
 
@@ -7,9 +7,8 @@ import           Test.Hspec
 import           Data.Text (unpack, Text)
 import           Data.ByteString.Lazy.Char8 (pack, ByteString)
 
-import           Language.Mulang.Analyzer.Analysis hiding (spec)
 import           Language.Mulang.Analyzer.Analysis.Json ()
-import           Language.Mulang.Analyzer (noSmells, onlySmells, allSmells)
+import           Language.Mulang.Analyzer hiding (spec)
 import           Language.Mulang.Ast
 
 import           Data.Maybe (fromJust)
@@ -25,7 +24,7 @@ textToLazyByteString = pack . unpack
 spec = describe "AnalysisJson" $ do
   it "works with advanced expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
-                            (AnalysisSpec [Advanced ["x"] "uses" Anyone False False] noSmells NoSignatures)
+                            (AnalysisSpec [Advanced ["x"] "uses" Anyone False False] noSmells NoSignatures Nothing)
     let json = [text|
 {
    "sample" : {
@@ -52,7 +51,7 @@ spec = describe "AnalysisJson" $ do
 
   it "works with basic expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
-                            (AnalysisSpec [Basic "x" "HasBinding"] noSmells NoSignatures)
+                            (AnalysisSpec [Basic "x" "HasBinding"] noSmells NoSignatures Nothing)
     let json = [text|
 {
    "sample" : {
@@ -93,7 +92,7 @@ spec = describe "AnalysisJson" $ do
    }
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return x + y; }")
-                            (AnalysisSpec [] noSmells (StyledSignatures HaskellStyle))
+                            (emptyAnalysisSpec { signatureAnalysisType = (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
 
@@ -134,7 +133,7 @@ spec = describe "AnalysisJson" $ do
    }
 }|]
     let analysis = Analysis (MulangSample (Sequence [Variable "x" (MuNumber 1), Variable "y" (MuNumber 2)]))
-                            (AnalysisSpec [] noSmells (StyledSignatures HaskellStyle))
+                            (emptyAnalysisSpec { signatureAnalysisType = (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
 
@@ -162,7 +161,9 @@ spec = describe "AnalysisJson" $ do
    }
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
-                            (AnalysisSpec [] onlySmells { include = [ReturnsNull, DoesNullTest]} (StyledSignatures HaskellStyle))
+                            (emptyAnalysisSpec {
+                              smellsSet = onlySmells { include = [ReturnsNull, DoesNullTest]},
+                              signatureAnalysisType = (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
 
@@ -189,6 +190,59 @@ spec = describe "AnalysisJson" $ do
    }
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
-                            (AnalysisSpec [] allSmells { exclude = [ReturnsNull]} (StyledSignatures HaskellStyle))
+                            (emptyAnalysisSpec {
+                              smellsSet = allSmells { exclude = [ReturnsNull]},
+                              signatureAnalysisType = (StyledSignatures HaskellStyle) })
+
+    run json `shouldBe` analysis
+
+  it "works with caseStyle and minimumBindingSize" $ do
+    let json = [text|
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "Prolog",
+      "content" : "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer)."
+   },
+   "spec" : {
+      "expectations" : [],
+      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
+      "domainLanguage" : {
+         "caseStyle" : "SnakeCase",
+         "minimumBindingSize" : 4,
+         "jargon" : ["id"]
+      },
+      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+   }
+} |]
+    let analysis = Analysis (CodeSample Prolog "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer).")
+                            (emptyAnalysisSpec {
+                              smellsSet = allSmells,
+                              domainLanguage = Just emptyDomainLanguage {
+                                caseStyle = Just SnakeCase,
+                                minimumBindingSize = Just 4,
+                                jargon = Just ["id"] } })
+
+    run json `shouldBe` analysis
+
+  it "works with dictionary path" $ do
+    let json = [text|
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "JavaScript",
+      "content" : "function f(x, y) { return null; }"
+   },
+   "spec" : {
+      "expectations" : [],
+      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
+      "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" },
+      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+   }
+} |]
+    let analysis = Analysis (CodeSample JavaScript "function f(x, y) { return null; }")
+                            (emptyAnalysisSpec {
+                              smellsSet = allSmells,
+                              domainLanguage = Just emptyDomainLanguage { dictionaryFilePath = Just "/usr/share/dict/words" } })
 
     run json `shouldBe` analysis

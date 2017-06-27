@@ -20,6 +20,7 @@ module Language.Mulang.Inspector.Generic (
 
 import Language.Mulang.Ast
 import Language.Mulang.Binding
+import Language.Mulang.Unfold (allExpressions)
 import Language.Mulang.Explorer
 
 type Inspection = Expression  -> Bool
@@ -124,7 +125,7 @@ usesAnonymousVariable = containsExpression f
 
 
 containsExpression :: (Expression -> Bool) -> Inspection
-containsExpression f = has f expressionsOf
+containsExpression f = has f allExpressions
 
 containsBody :: (EquationBody -> Bool)-> Inspection
 containsBody f = has f equationBodiesOf

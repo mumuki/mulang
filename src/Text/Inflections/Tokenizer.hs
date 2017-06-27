@@ -1,28 +1,37 @@
 module Text.Inflections.Tokenizer (
-  camelCase, snakeCase,
+  CaseStyle,
+  camelCase,
+  snakeCase,
+  canTokenize,
   tokenize) where
 
 import Data.Char (toLower)
+import Data.Either (isRight)
 
 import Text.Inflections
 import Text.Inflections.Parse.Types
+import Text.Parsec.Error (ParseError)
 
 import Text.SimpleParser
 import Control.Fallible
 
-camelCase      :: MaybeParser [String]
-camelCase      = wordsOrNothing . parseCamelCase []
+type CaseStyle = String -> Either Text.Parsec.Error.ParseError [Text.Inflections.Parse.Types.Word]
 
-snakeCase      :: MaybeParser [String]
-snakeCase      = wordsOrNothing . parseSnakeCase []
+camelCase      :: CaseStyle
+camelCase      = parseCamelCase []
 
-wordsOrNothing = fmap (concatMap c). orNothing
-                where c (Word w) = [w]
-                      c _        = []
+snakeCase      :: CaseStyle
+snakeCase      = parseSnakeCase []
 
-tokenize :: MaybeParser [String] -> String -> [String]
-tokenize parser s | Just words <- parser s = concatMap toToken words
-                  | otherwise = []
+canTokenize :: CaseStyle -> String -> Bool
+canTokenize style = isRight . style
+
+tokenize :: CaseStyle -> String -> [String]
+tokenize style s | Just words <- (wordsOrNothing . style) s = concatMap toToken words
+                 | otherwise = []
                   where toToken = return . map toLower
 
 
+wordsOrNothing = fmap (concatMap c) . orNothing
+                where c (Word w) = [w]
+                      c _        = []

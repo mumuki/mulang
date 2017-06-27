@@ -89,38 +89,43 @@ False
 
 Nice, we know. But not very awesome, it only can tell you if you are using a _binding_, right? Eeer. Good news, it can tell you much much much more things:
 
-* `declaresMethod`: **objects paradigm** is a given method declared?
-* `declaresAttribute`: **objects paradigm** is a given attribute declared?
-* `declaresFunction`: **functional/imperative paradigm** is a given function declared?
-* `declaresTypeSignature`: **any paradigm** is a given computation type signature declared?
-* `declaresTypeAlias`: **any paradigm** is a given type synonym declared?
-* `declaresRecursively`: **any paradigm** is a given computation declared using recusion?
-* `declaresComputation`: **any paradigm** that is, does the given computation  - method, predicate, function, etc - exist?
-* `declaresComputationWithArity`: **any paradigm** that is, does the given computation arity match the given criteria
-* `declaresComputationWithExactArity`: **any paradigm** that is, does the given computation have the exact given arity?
-* `declaresRule`: **logic paradigm** is a given logic rule declared?
-* `declaresFact`: **logic paradigm** is a given logic fact declared?
-* `declaresPredicate`: **logic paradigm** is a given rule o fact declared?
-* `usesIf`
-* `usesWhile`
-* `usesLambda`
-* `usesGuards`
-* `usesComposition`
-* `usesComprehensions`
-* `usesAnonymousVariable`
-* `usesUnifyOperator`
-* `hasRedundantIf`
-* `hasRedundantGuards`
-* `hasRedundantParameter`
-* `hasRedundantLambda`
-* `hasRedundantBooleanComparison`
-* `hasRedundantLocalVariableReturn`
-* `hasAssignmentReturn`
-* `doesTypeTest`
-* `doesNullTest`
-* `returnsNull`
-* `isLongCode`: **any code** has the code long sequences of statements?
-* `hasCodeDuplication`: **any paradigm** has the given code simple literal code duplication?
+1. `declaresMethod`: **objects paradigm** is a given method declared?
+1. `declaresAttribute`: **objects paradigm** is a given attribute declared?
+1. `declaresClass`: **objects paradigm** is a given class declared?
+1. `declaresObject`: **objects paradigm** is a given named object declared?
+1. `declaresFunction`: **functional/imperative paradigm** is a given function declared?
+1. `declaresTypeSignature`: **any paradigm** is a given computation type signature declared?
+1. `declaresTypeAlias`: **any paradigm** is a given type synonym declared?
+1. `declaresRecursively`: **any paradigm** is a given computation declared using recusion?
+1. `declaresComputation`: **any paradigm** that is, does the given computation  - method, predicate, function, etc - exist?
+1. `declaresComputationWithArity`: **any paradigm** that is, does the given computation arity match the given criteria
+1. `declaresComputationWithExactArity`: **any paradigm** that is, does the given computation have the exact given arity?
+1. `declaresRule`: **logic paradigm** is a given logic rule declared?
+1. `declaresFact`: **logic paradigm** is a given logic fact declared?
+1. `declaresPredicate`: **logic paradigm** is a given rule o fact declared?
+1. `usesIf`
+1. `usesWhile`
+1. `usesLambda`
+1. `usesGuards`
+1. `usesComposition`
+1. `usesComprehensions`
+1. `usesAnonymousVariable`
+1. `usesUnifyOperator`
+1. `hasRedundantIf`
+1. `hasRedundantGuards`
+1. `hasRedundantParameter`
+1. `hasRedundantLambda`
+1. `hasRedundantBooleanComparison`
+1. `hasRedundantLocalVariableReturn`
+1. `hasAssignmentReturn`
+1. `doesTypeTest`
+1. `doesNullTest`
+1. `returnsNull`
+1. `hasTooShortBindings`: **any paradigm** whether a binding is too short and not part of domain language's jargon
+1. `hasWrongCaseBindings`: **any paradigm** whether a binding does not match the domain language's case style
+1. `hasMisspelledBindings`: **any paradigm** a binding is not a domain language dictionary's word and not part of its jargon
+1. `isLongCode`: **any paradigm** has the code long sequences of statements?
+1. `hasCodeDuplication`: **any paradigm** has the given code simple literal code duplication?
 
 For example, let's go trickier:
 
@@ -469,6 +474,85 @@ $ mulang '
    ],
    "tag" : "AnalysisCompleted",
    "expectationResults" : []
+}
+```
+
+### With expressiveness smells
+
+Expressivnes smells are like other smells - they can be included or excluded using the `smellsSet` settings. However, their behaviour is also controlled
+by the `domainLanguage` setting, which you _can_ configure:
+
+```bash
+$ mulang '
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "Prolog",
+      "content" : "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer)."
+   },
+   "spec" : {
+      "expectations" : [],
+      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
+      "domainLanguage" : {
+         "caseStyle" : "SnakeCase",
+         "minimumBindingSize" : 4,
+         "jargon" : ["id"]
+      },
+      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+   }
+}' | json_pp
+{
+   "tag" : "AnalysisCompleted",
+   "signatures" : [],
+   "smells" : [
+      {
+         "tag" : "Basic",
+         "inspection" : "HasTooShortBindings",
+         "binding" : "son"
+      },
+      {
+         "binding" : "parentOf",
+         "tag" : "Basic",
+         "inspection" : "HasWrongCaseBindings"
+      }
+   ],
+   "expectationResults" : []
+}
+```
+
+Also, if you want to use `HasMisspelledBindings` smell, you _need_ to specify a dictionary - with must be ordered, downcased and with unique words only:
+
+```bash
+$ mulang  '
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "JavaScript",
+      "content" : "function foo(x, y) { return null; }"
+   },
+   "spec" : {
+      "expectations" : [],
+      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
+      "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" },
+      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+   }
+}' | json_pp
+{
+   "tag" : "AnalysisCompleted",
+   "expectationResults" : [],
+   "signatures" : [],
+   "smells" : [
+      {
+         "inspection" : "ReturnsNull",
+         "tag" : "Basic",
+         "binding" : "foo"
+      },
+      {
+         "inspection" : "HasMisspelledBindings",
+         "tag" : "Basic",
+         "binding" : "foo"
+      }
+   ]
 }
 ```
 

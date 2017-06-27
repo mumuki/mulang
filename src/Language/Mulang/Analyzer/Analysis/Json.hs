@@ -12,6 +12,8 @@ instance FromJSON BindingPattern
 
 instance FromJSON SmellsSet
 instance FromJSON Smell
+instance FromJSON DomainLanguage
+instance FromJSON CaseStyle
 
 instance FromJSON SignatureAnalysisType
 instance FromJSON SignatureStyle

@@ -3,6 +3,7 @@ module Language.Mulang.Analyzer (
   onlySmells,
   allSmells,
 
+  emptyDomainLanguage,
   emptyAnalysisSpec,
 
   emptyAnalysis,
@@ -20,6 +21,7 @@ import Language.Mulang.Analyzer.SampleParser (parseSample)
 import Language.Mulang.Analyzer.SignaturesAnalyzer  (analyseSignatures)
 import Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
 import Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
+import Language.Mulang.Analyzer.DomainLanguageCompiler (emptyDomainLanguage, compileDomainLanguage)
 
 --
 -- Builder functions
@@ -34,7 +36,7 @@ allSmells :: SmellsSet
 allSmells = AllSmells []
 
 emptyAnalysisSpec :: AnalysisSpec
-emptyAnalysisSpec = AnalysisSpec [] noSmells NoSignatures
+emptyAnalysisSpec = AnalysisSpec [] noSmells NoSignatures Nothing
 
 emptyAnalysis :: Sample -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec
@@ -48,18 +50,18 @@ smellsAnalysis code set = Analysis code (emptyAnalysisSpec { smellsSet = set })
 signaturesAnalysis :: Sample -> SignatureStyle -> Analysis
 signaturesAnalysis code style = Analysis code (emptyAnalysisSpec { signatureAnalysisType = StyledSignatures style })
 
-
 --
 -- Analysis running
 --
-
-analyse :: Analysis -> AnalysisResult
+analyse :: Analysis -> IO AnalysisResult
 analyse (Analysis sample spec)
       | Just ast <- parseSample sample = analyseAst ast spec
-      | otherwise = AnalysisFailed "Sample code parsing error"
+      | otherwise = return $ AnalysisFailed "Sample code parsing error"
 
-analyseAst :: Expression -> AnalysisSpec -> AnalysisResult
-analyseAst ast spec =
-  AnalysisCompleted (analyseExpectations ast (expectations spec))
-                    (analyseSmells ast (smellsSet spec))
-                    (analyseSignatures ast (signatureAnalysisType spec))
+analyseAst :: Expression -> AnalysisSpec -> IO AnalysisResult
+analyseAst ast spec = do
+  language <- compileDomainLanguage (domainLanguage spec)
+  return $ AnalysisCompleted (analyseExpectations ast (expectations spec))
+                             (analyseSmells ast language (smellsSet spec))
+                             (analyseSignatures ast (signatureAnalysisType spec))
+

@@ -1,5 +1,6 @@
 module Language.Mulang.Inspector.Combiner (
   detect,
+  detectAll,
   negative,
   alternative,
   scoped,
@@ -8,13 +9,18 @@ module Language.Mulang.Inspector.Combiner (
   transitiveList) where
 
 import Language.Mulang.Ast
+import Language.Mulang.Unfold (Unfold, allExpressions)
 import Language.Mulang.Binding
 import Language.Mulang.Inspector.Generic
 import Language.Mulang.Explorer
 
-detect :: Inspection -> Expression -> [Binding]
-detect i expression = filter (`inspection` expression) $ declaredBindingsOf expression
-                  where inspection = scoped i
+detectAll :: Inspection -> Expression -> [Binding]
+detectAll = detect allExpressions
+
+detect :: Unfold -> Inspection -> Expression -> [Binding]
+detect unfold i expression = filter (`inspection` expression) $ declaredBindingsOf unfold expression
+                              where inspection = scoped i
+
 
 alternative :: Inspection -> Inspection -> Inspection
 alternative i1 i2 expression = i1 expression || i2 expression

@@ -28,14 +28,17 @@ library
 
   exposed-modules:
     Control.Fallible
+    Text.Dictionary
     Text.SimpleParser
     Text.Inflections.Tokenizer
     Language.Mulang
     Language.Mulang.Ast
     Language.Mulang.Binding
     Language.Mulang.Builder
+    Language.Mulang.Unfold
     Language.Mulang.Explorer
     Language.Mulang.Signature
+    Language.Mulang.DomainLanguage
     Language.Mulang.Inspector
     Language.Mulang.Inspector.Generic
     Language.Mulang.Inspector.ObjectOriented
@@ -45,7 +48,6 @@ library
     Language.Mulang.Inspector.Combiner
     Language.Mulang.Inspector.Generic.Duplication
     Language.Mulang.Inspector.Generic.Smell
-    Language.Mulang.Inspector.Generic.Expressiveness
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Gobstones
@@ -59,6 +61,7 @@ library
     Language.Mulang.Analyzer.ExpectationsCompiler
     Language.Mulang.Analyzer.SignaturesAnalyzer
     Language.Mulang.Analyzer.SignatureStyleCompiler
+    Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.SmellsAnalyzer
   build-depends:
     base                      ,

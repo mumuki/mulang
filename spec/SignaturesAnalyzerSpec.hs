@@ -9,14 +9,14 @@ run language content style = analyse (signaturesAnalysis (CodeSample language co
 
 spec = describe "SignturesAnalyzer" $ do
   it "handles MulangStyle" $ do
-    (run Haskell "f x = x + 1" MulangStyle ) `shouldBe` (result ["-- f(x)"])
+    (run Haskell "f x = x + 1" MulangStyle ) `shouldReturn` (result ["-- f(x)"])
 
   it "handles HaskellStyle" $ do
-    (run Haskell "f x = x + 1" HaskellStyle ) `shouldBe` (result ["-- f x"])
+    (run Haskell "f x = x + 1" HaskellStyle ) `shouldReturn` (result ["-- f x"])
 
   it "handles PrologStyle" $ do
-    (run Prolog "f(X):-g(X)." PrologStyle ) `shouldBe` (result ["%% f/1"])
+    (run Prolog "f(X):-g(X)." PrologStyle ) `shouldReturn` (result ["%% f/1"])
 
   it "handles UntypedCStyle" $ do
-    (run Haskell "f x = x + 1" UntypedCStyle) `shouldBe` (result ["// f(x)"])
+    (run Haskell "f x = x + 1" UntypedCStyle) `shouldReturn` (result ["// f(x)"])
 
