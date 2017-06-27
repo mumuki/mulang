@@ -96,6 +96,12 @@ spec = do
     run (hs "f a b = 2") "f" "HasArity1" `shouldBe` False
     run (hs "f a = 2") "f" "HasArity1" `shouldBe` True
 
+  it "works with HasArity" $ do
+    run (hs "f a b = 2") "f" "HasArity:1" `shouldBe` False
+    run (hs "f a = 2") "f" "HasArity:1" `shouldBe` True
+    run (hs "f a b = 2") "f" "HasArity:2" `shouldBe` True
+    run (hs "f a = 2") "f" "HasArity:2" `shouldBe` False
+
   it "works with DeclaresObject" $ do
     run (hs "f a b = 2") "f" "DeclaresObject" `shouldBe` False
 

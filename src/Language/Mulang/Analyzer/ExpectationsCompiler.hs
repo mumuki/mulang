@@ -31,6 +31,7 @@ compileNegator ("Not":_) = negative
 compileNegator _         = id
 
 compileBaseInspection :: [String] -> Maybe (Inspection)
+compileBaseInspection ["HasArity",n]        = Just $ declaresComputationWithExactArity (read n) anyone
 compileBaseInspection ("Not":parts)         = compileBaseInspection parts
 compileBaseInspection [verb]                = compileBaseInspection [verb, "*"]
 compileBaseInspection [verb, object]        = compileInspectionPrimitive verb (compileObject object)
@@ -91,7 +92,6 @@ compileInspectionPrimitive = f
   f "DeclaresEntryPoint"             _ = Just declaresEntryPoint
   f "HasAnonymousVariable"           _ = Just usesAnonymousVariable
   f "UsesAnonymousVariable"          _ = Just usesAnonymousVariable
-  f "HasArity"                       _ = Nothing
   f "HasComposition"                 _ = Just usesComposition
   f "UsesComposition"                _ = Just usesComposition
   f "HasComprehension"               _ = Just usesComprehension
