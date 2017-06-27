@@ -9,5 +9,5 @@ spec = do
     it "can tokenize camelCase words" $ do
       tokenize camelCase "todayIsAGreatDay" `shouldBe` ["today", "is", "a", "great", "day"]
 
-    it "can tokenize snakeCase words" $ do
+    it "can tokenize snake_case words" $ do
       tokenize snakeCase "the_first_and_the_last" `shouldBe` ["the", "first", "and", "the", "last"]
