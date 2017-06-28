@@ -7,6 +7,9 @@ import Language.Mulang.Analyzer.Analysis (Expectation(..))
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
+type Slicer = (Inspection -> Inspection)
+type Predicator = (BindingPredicate -> BindingPredicate)
+
 compileExpectation :: Expectation -> Inspection
 compileExpectation = fromMaybe (\_ -> True) . compileMaybe
 
@@ -14,33 +17,34 @@ compileMaybe :: Expectation -> Maybe Inspection
 compileMaybe (Expectation b i) = do
   let inspectionParts = splitOn ":" i
   let negator = compileNegator inspectionParts
-  baseInspection <- compileBaseInspection inspectionParts
-  slicer         <- compileSlicer (splitOn ":" b)
+  (slicer, predicator) <- compileSlicer (splitOn ":" b)
+  baseInspection       <- compileBaseInspection predicator inspectionParts
   return . negator . slicer $ baseInspection
 
-compileSlicer :: [String] -> Maybe (Inspection -> Inspection)
-compileSlicer [""]                  = Just id
+compileSlicer :: [String] -> Maybe ((Inspection -> Inspection), (BindingPredicate -> BindingPredicate))
+compileSlicer [""]                  = Just (id, id)
 compileSlicer ["Intransitive",name] = justSlicerFor scopedList name
 compileSlicer [name]                = justSlicerFor transitiveList name
 compileSlicer _                     = Nothing
 
-justSlicerFor f name = Just (flip f (splitOn "." name))
+justSlicerFor f name = Just (flip f names, \p b -> p b && b /= (last names) )
+  where names = splitOn "." name
 
 compileNegator :: [String] -> (Inspection -> Inspection)
 compileNegator ("Not":_) = negative
 compileNegator _         = id
 
-compileBaseInspection :: [String] -> Maybe (Inspection)
-compileBaseInspection ["HasArity",n]        = Just $ declaresComputationWithExactArity (read n) anyone
-compileBaseInspection ("Not":parts)         = compileBaseInspection parts
-compileBaseInspection [verb]                = compileBaseInspection [verb, "*"]
-compileBaseInspection [verb, object]        = compileInspectionPrimitive verb (compileObject object)
-compileBaseInspection _                     = Nothing
+compileBaseInspection :: (BindingPredicate -> BindingPredicate) -> [String] -> Maybe (Inspection)
+compileBaseInspection p ("Not":parts)         = compileBaseInspection p parts
+compileBaseInspection p [verb]                = compileBaseInspection p [verb, "*"]
+compileBaseInspection p [verb, object]        = compileInspectionPrimitive verb (p $ compileObject object)
+compileBaseInspection _ _                     = Nothing
 
 compileObject :: String -> BindingPredicate
 compileObject "*"        = anyone
 compileObject ('~':name) = like name
 compileObject ('=':name) = named name
+compileObject ('^':name) = except name
 compileObject name       = named name
 
 
@@ -48,41 +52,43 @@ compileInspectionPrimitive :: String -> BindingPredicate -> Maybe Inspection
 compileInspectionPrimitive = f
   where
 
-  f "HasRule"                        b = Just $ declaresRule b
-  f "HasFact"                        b = Just $ declaresFact b
-  f "HasPredicate"                   b = Just $ declaresPredicate b
-  f "HasClass"                       b = Just $ declaresClass b
-  f "HasObject"                      b = Just $ declaresObject b
-  f "HasAttribute"                   b = Just $ declaresAttribute b
-  f "HasMethod"                      b = Just $ declaresMethod b
-  f "HasFunction"                    b = Just $ declaresFunction b
-  f "HasProcedure"                   b = Just $ declaresProcedure b
-  f "HasVariable"                    b = Just $ declaresVariable b
-  f "HasTypeAlias"                   b = Just $ declaresTypeAlias b
-  f "HasTypeSignature"               b = Just $ declaresTypeSignature b
-  f "HasComputation"                 b = Just $ declaresComputation b
-  f "HasUsage"                       b = Just $ uses b
-  f "HasBinding"                     b = Just $ declares b
-  f "HasArity0"                      b = Just $ declaresComputationWithExactArity 0 b
-  f "HasArity1"                      b = Just $ declaresComputationWithExactArity 1 b
-  f "HasArity2"                      b = Just $ declaresComputationWithExactArity 2 b
-  f "HasArity3"                      b = Just $ declaresComputationWithExactArity 3 b
-  f "HasDirectRecursion"             b = Just $ declaresRecursively b
-  f "HasEntryPoint"                  _ = Just declaresEntryPoint
-  f "HasAnonymousVariable"           _ = Just usesAnonymousVariable
-  f "HasComposition"                 _ = Just usesComposition
-  f "HasComprehension"               _ = Just usesComprehension
-  f "HasConditional"                 _ = Just usesConditional
-  f "HasUnifyOperator"               _ = Just usesUnifyOperator
-  f "HasFindall"                     _ = Just usesFindall
-  f "HasForall"                      _ = Just usesForall
-  f "HasGuards"                      _ = Just usesGuards
-  f "HasIf"                          _ = Just usesIf
-  f "HasLambda"                      _ = Just usesLambda
-  f "HasNot"                         _ = Just usesNot
-  f "HasRepeat"                      _ = Just usesRepeat
-  f "HasWhile"                       _ = Just usesWhile
-  f "HasPatternMatching"             _ = Just usesPatternMatching
-  f "HasSwitch"                      _ = Just usesSwitch
-  f _                                _ = Nothing
+  f "DeclaresRule"                 b = Just $ declaresRule b
+  f "DeclaresFact"                 b = Just $ declaresFact b
+  f "DeclaresPredicate"            b = Just $ declaresPredicate b
+  f "DeclaresClass"                b = Just $ declaresClass b
+  f "DeclaresObject"               b = Just $ declaresObject b
+  f "DeclaresAttribute"            b = Just $ declaresAttribute b
+  f "DeclaresMethod"               b = Just $ declaresMethod b
+  f "DeclaresFunction"             b = Just $ declaresFunction b
+  f "DeclaresProcedure"            b = Just $ declaresProcedure b
+  f "DeclaresVariable"             b = Just $ declaresVariable b
+  f "DeclaresComputation"          b = Just $ declaresComputation b
+  f "Declares"                     b = Just $ declares b
+  f "DeclaresTypeAlias"            b = Just $ declaresTypeAlias b
+  f "DeclaresTypeSignature"        b = Just $ declaresTypeSignature b
+  f "DeclaresArity0"               b = Just $ declaresComputationWithExactArity 0 b
+  f "DeclaresArity1"               b = Just $ declaresComputationWithExactArity 1 b
+  f "DeclaresArity2"               b = Just $ declaresComputationWithExactArity 2 b
+  f "DeclaresArity3"               b = Just $ declaresComputationWithExactArity 3 b
+  f "DeclaresArity4"               b = Just $ declaresComputationWithExactArity 4 b
+  f "DeclaresArity5"               b = Just $ declaresComputationWithExactArity 5 b
+  f "DeclaresRecursively"          b = Just $ declaresRecursively b
+  f "DeclaresEntryPoint"           _ = Just declaresEntryPoint
+  f "Uses"                         b = Just $ uses b
+  f "UsesAnonymousVariable"         _ = Just usesAnonymousVariable
+  f "UsesComposition"               _ = Just usesComposition
+  f "UsesComprehension"             _ = Just usesComprehension
+  f "UsesConditional"               _ = Just usesConditional
+  f "UsesUnifyOperator"             _ = Just usesUnifyOperator
+  f "UsesFindall"                   _ = Just usesFindall
+  f "UsesForall"                    _ = Just usesForall
+  f "UsesGuards"                    _ = Just usesGuards
+  f "UsesIf"                        _ = Just usesIf
+  f "UsesLambda"                    _ = Just usesLambda
+  f "UsesNot"                       _ = Just usesNot
+  f "UsesRepeat"                    _ = Just usesRepeat
+  f "UsesWhile"                     _ = Just usesWhile
+  f "UsesPatternMatching"           _ = Just usesPatternMatching
+  f "UsesSwitch"                    _ = Just usesSwitch
+  f _                              _ = Nothing
 

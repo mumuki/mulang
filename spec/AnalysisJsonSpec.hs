@@ -46,7 +46,7 @@ spec = describe "AnalysisJson" $ do
 
   it "works with transitive expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
-                            (AnalysisSpec [Expectation "x" "HasBinding"] noSmells Nothing Nothing)
+                            (AnalysisSpec [Expectation "x" "Declares"] noSmells Nothing Nothing)
     let json = [text|
 {
    "sample" : {
@@ -59,7 +59,7 @@ spec = describe "AnalysisJson" $ do
       "expectations" : [
          {
             "binding" : "x",
-            "inspection" : "HasBinding"
+            "inspection" : "Declares"
          }
       ]
    }

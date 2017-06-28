@@ -14,7 +14,7 @@ failed e = ExpectationResult e False
 
 spec = describe "ExpectationsAnalyzer" $ do
   it "works with Mulang input" $ do
-    let ydeclares = Expectation "" "HasBinding:y"
+    let ydeclares = Expectation "" "Declares:y"
     (runAst MuNull [ydeclares]) `shouldReturn` (result [failed ydeclares] [])
 
   describe "Advanced expectations" $ do
@@ -30,82 +30,82 @@ spec = describe "ExpectationsAnalyzer" $ do
       (run Haskell "x = 2" []) `shouldReturn` (result [] [])
 
     it "evaluates present named expectations" $ do
-      let ydeclares = Expectation "" "HasBinding:y"
-      let xdeclares = Expectation "" "HasBinding:x"
+      let ydeclares = Expectation "" "Declares:y"
+      let xdeclares = Expectation "" "Declares:x"
       (run Haskell "x = 2" [ydeclares, xdeclares]) `shouldReturn` (result [failed ydeclares, passed xdeclares] [])
 
     it "evaluates present expectations" $ do
-      let declaresF = Expectation "" "HasFunction"
-      let declaresT = Expectation "" "HasTypeAlias"
+      let declaresF = Expectation "" "DeclaresFunction"
+      let declaresT = Expectation "" "DeclaresTypeAlias"
       (run Haskell "f x = 2" [declaresF, declaresT]) `shouldReturn` (result [passed declaresF, failed declaresT] [])
 
   describe "Basic expectations" $ do
     it "can be negated" $ do
-      let notDeclaresX = Expectation "x" "Not:HasBinding"
-      let notDeclaresY = Expectation "y" "Not:HasBinding"
+      let notDeclaresX = Expectation "" "Not:Declares:x"
+      let notDeclaresY = Expectation "" "Not:Declares:y"
       (run Haskell "x = \"¡\"" [notDeclaresY, notDeclaresX]) `shouldReturn` (result [
                                                                           passed notDeclaresY, failed notDeclaresX] [])
 
-    it "works with HasBinding" $ do
-      let xdeclares = Expectation "x" "HasBinding"
-      let ydeclares = Expectation "y" "HasBinding"
+    it "works with Declares" $ do
+      let xdeclares = Expectation "" "Declares:x"
+      let ydeclares = Expectation "" "Declares:y"
       (run Haskell "x = 2" [ydeclares, xdeclares]) `shouldReturn` (result [failed ydeclares, passed xdeclares] [])
 
-    it "works with HasUsage" $ do
-      let usesy = Expectation "x" "HasUsage:y"
-      let usesz = Expectation "x" "HasUsage:z"
+    it "works with Uses" $ do
+      let usesy = Expectation "x" "Uses:y"
+      let usesz = Expectation "x" "Uses:z"
       (run Haskell "x = y * 10" [usesy, usesz]) `shouldReturn` (result [passed usesy, failed usesz] [])
 
-    it "works with HasArity" $ do
-      let hasArity2 = Expectation "foo" "HasArity2"
-      let hasArity3 = Expectation "foo" "HasArity3"
+    it "works with DeclaresArity" $ do
+      let hasArity2 = Expectation "" "DeclaresArity2:foo"
+      let hasArity3 = Expectation "" "DeclaresArity3:foo"
       (run Prolog "foo(x, y)." [hasArity2, hasArity3]) `shouldReturn` (result [passed hasArity2, failed hasArity3] [])
 
-    it "works with HasTypeSignature" $ do
-      let hasTypeSignature = Expectation "f" "HasTypeSignature"
-      (run Haskell "f x y = y + x" [hasTypeSignature]) `shouldReturn` (result [failed hasTypeSignature] [])
-      (run Haskell "f :: Int -> Int -> Int \nf x y = y + x" [hasTypeSignature]) `shouldReturn` (result [passed hasTypeSignature] [])
+    it "works with DeclaresTypeSignature" $ do
+      let declaresTypeSignature = Expectation "" "DeclaresTypeSignature:f"
+      (run Haskell "f x y = y + x" [declaresTypeSignature]) `shouldReturn` (result [failed declaresTypeSignature] [])
+      (run Haskell "f :: Int -> Int -> Int \nf x y = y + x" [declaresTypeSignature]) `shouldReturn` (result [passed declaresTypeSignature] [])
 
-    it "works with HasTypeAlias" $ do
-      let hasTypeAlias = Expectation "Words" "HasTypeAlias"
+    it "works with DeclaresTypeAlias" $ do
+      let hasTypeAlias = Expectation "" "DeclaresTypeAlias:Words"
       (run Haskell "type Works = [String]" [hasTypeAlias]) `shouldReturn` (result [failed hasTypeAlias] [])
       (run Haskell "data Words = Words" [hasTypeAlias]) `shouldReturn` (result [failed hasTypeAlias] [])
       (run Haskell "type Words = [String]" [hasTypeAlias]) `shouldReturn` (result [passed hasTypeAlias] [])
 
-    it "works with HasIf" $ do
-      let hasIf = Expectation "min" "HasIf"
+    it "works with UsesIf" $ do
+      let hasIf = Expectation "min" "UsesIf"
       (run Haskell "min x y = True" [hasIf]) `shouldReturn` (result [failed hasIf] [])
       (run Haskell "min x y = if x < y then x else y" [hasIf]) `shouldReturn` (result [passed hasIf] [])
 
-    it "works with HasGuards" $ do
-      let hasGuards = Expectation "min" "HasGuards"
+    it "works with UsesGuards" $ do
+      let hasGuards = Expectation "min" "UsesGuards"
       (run Haskell "min x y = x" [hasGuards]) `shouldReturn` (result [failed hasGuards] [])
       (run Haskell "min x y | x < y = x | otherwise = y" [hasGuards]) `shouldReturn` (result [passed hasGuards] [])
 
-    it "works with HasAnonymousVariable" $ do
-      let hasAnonymousVariable = Expectation "c" "HasAnonymousVariable"
+    it "works with UsesAnonymousVariable" $ do
+      let hasAnonymousVariable = Expectation "c" "UsesAnonymousVariable"
       (run Haskell "c x = 14" [hasAnonymousVariable]) `shouldReturn` (result [failed hasAnonymousVariable] [])
       (run Haskell "c _ = 14" [hasAnonymousVariable]) `shouldReturn` (result [passed hasAnonymousVariable] [])
 
-    it "works with HasRepeat" $ do
+    it "works with UsesRepeat" $ do
       pendingWith "Should be implemented when Gobstones support is ready"
 
-    it "works with HasComposition" $ do
-      let hasComposition = Expectation "h" "HasComposition"
+    it "works with UsesComposition" $ do
+      let hasComposition = Expectation "h" "UsesComposition"
       (run Haskell "h = f" [hasComposition]) `shouldReturn` (result [failed hasComposition] [])
       (run Haskell "h = f . g" [hasComposition]) `shouldReturn` (result [passed hasComposition] [])
 
-    it "works with HasComprehension" $ do
-      let hasComprehension = Expectation "x" "HasComprehension"
+    it "works with UsesComprehension" $ do
+      let hasComprehension = Expectation "x" "UsesComprehension"
       (run Haskell "x = [m | m <- t]" [hasComprehension]) `shouldReturn` (result [passed hasComprehension] [])
 
-    it "works with HasConditional" $ do
-      let hasConditional = Expectation "min" "HasConditional"
+    it "works with UsesConditional" $ do
+      let hasConditional = Expectation "min" "UsesConditional"
       (run JavaScript "function min(x, y) { if (x < y) { return x } else { return y } }" [hasConditional]) `shouldReturn` (result [
                                                                                                             passed hasConditional] [])
 
-    it "works with HasWhile" $ do
-      let hasWhile = Expectation "f" "HasWhile"
+    it "works with UsesWhile" $ do
+      let hasWhile = Expectation "f" "UsesWhile"
       (run JavaScript "function f() { var x = 5; while (x < 10) { x++ } }" [hasWhile]) `shouldReturn` (result [passed hasWhile] [])
 
     it "works with HasForall" $ do
@@ -113,26 +113,26 @@ spec = describe "ExpectationsAnalyzer" $ do
       (run Prolog "f(X) :- isElement(Usuario), forall(isRelated(X, Y), complies(Y))." [hasForall]) `shouldReturn` (result [
                                                                                                             passed hasForall] [])
 
-    it "works with HasFindall" $ do
-      let hasFindall = Expectation "baz" "HasFindall"
+    it "works with UsesFindall" $ do
+      let hasFindall = Expectation "baz" "UsesFindall"
       (run Prolog "baz(X):- bar(X, Y)." [hasFindall]) `shouldReturn` (result [failed hasFindall] [])
       (run Prolog "baz(X):- findall(Y, bar(X, Y), Z)." [hasFindall]) `shouldReturn` (result [passed hasFindall] [])
 
-    it "works with HasLambda" $ do
-      let hasLambda = Expectation "f" "HasLambda"
+    it "works with UsesLambda" $ do
+      let hasLambda = Expectation "f" "UsesLambda"
       (run Haskell "f = map id" [hasLambda]) `shouldReturn` (result [failed hasLambda] [])
       (run Haskell "f = map $ \\x -> x + 1" [hasLambda]) `shouldReturn` (result [passed hasLambda] [])
 
-    it "works with HasDirectRecursion" $ do
-      let hasDirectRecursion = Expectation "f" "HasDirectRecursion"
+    it "works with DeclaresRecursively" $ do
+      let hasDirectRecursion = Expectation "" "DeclaresRecursively:f"
       (run Haskell "f x = if x < 5 then g (x - 1) else 2" [hasDirectRecursion]) `shouldReturn` (result [failed hasDirectRecursion] [])
       (run Haskell "f x = if x < 5 then f (x - 1) else 2" [hasDirectRecursion]) `shouldReturn` (result [passed hasDirectRecursion] [])
 
-    it "works with HasNot" $ do
-      let hasNot = Expectation "foo" "HasNot"
+    it "works with UsesNot" $ do
+      let hasNot = Expectation "foo" "UsesNot"
       (run Prolog "foo(X) :- bar(X)." [hasNot]) `shouldReturn` (result [failed hasNot] [])
       (run Prolog "foo(X) :- not(bar(X))." [hasNot]) `shouldReturn` (result [passed hasNot] [])
 
     it "proerly reports parsing errors" $ do
-      let hasNot = Expectation "foo" "HasNot"
+      let hasNot = Expectation "foo" "UsesNot"
       (run Haskell " foo " [hasNot]) `shouldReturn` (AnalysisFailed "Sample code parsing error")
