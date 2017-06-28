@@ -2,6 +2,7 @@ module Language.Mulang.Binding (
   named,
   like,
   anyone,
+  except,
   Binding,
   BindingPredicate) where
 
@@ -18,3 +19,6 @@ like = isInfixOf
 
 anyone :: BindingPredicate
 anyone = const True
+
+except :: String -> BindingPredicate
+except = (/=)

@@ -1,5 +1,4 @@
 module Language.Mulang.Explorer (
-  (//),
   equationBodiesOf,
   referencesOf,
   declarationsOf,
@@ -20,8 +19,6 @@ import Language.Mulang.Unfold (Unfold, allExpressions, mainExpressions)
 import Data.Maybe (maybeToList)
 import Data.List (nub)
 
-(//)  :: Expression -> Binding -> [Expression]
-(//) = flip bindedDeclarationsOf
 
 -- | Returns all the body equations of functions, procedures and methods
 equationBodiesOf :: Expression -> [EquationBody]
