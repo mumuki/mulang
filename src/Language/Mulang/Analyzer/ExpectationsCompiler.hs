@@ -21,31 +21,31 @@ compileMaybe (Expectation b i) = do
   baseInspection       <- compileBaseInspection predicator inspectionParts
   return . negator . slicer $ baseInspection
 
-compileSlicer :: [String] -> Maybe ((Inspection -> Inspection), (BindingPredicate -> BindingPredicate))
+compileSlicer :: [String] -> Maybe (Slicer, Predicator)
 compileSlicer [""]                  = Just (id, id)
 compileSlicer ["Intransitive",name] = justSlicerFor scopedList name
 compileSlicer [name]                = justSlicerFor transitiveList name
 compileSlicer _                     = Nothing
 
-justSlicerFor f name = Just (flip f names, \p b -> p b && b /= (last names) )
+justSlicerFor f name = Just (flip f names, andAlso (except (last names)))
   where names = splitOn "." name
 
-compileNegator :: [String] -> (Inspection -> Inspection)
+compileNegator :: [String] -> Slicer
 compileNegator ("Not":_) = negative
 compileNegator _         = id
 
-compileBaseInspection :: (BindingPredicate -> BindingPredicate) -> [String] -> Maybe (Inspection)
+compileBaseInspection :: Predicator -> [String] -> Maybe (Inspection)
 compileBaseInspection p ("Not":parts)         = compileBaseInspection p parts
 compileBaseInspection p [verb]                = compileBaseInspection p [verb, "*"]
-compileBaseInspection p [verb, object]        = compileInspectionPrimitive verb (p $ compileObject object)
+compileBaseInspection p [verb, object]        = compileInspectionPrimitive verb (compileObject p object)
 compileBaseInspection _ _                     = Nothing
 
-compileObject :: String -> BindingPredicate
-compileObject "*"        = anyone
-compileObject ('~':name) = like name
-compileObject ('=':name) = named name
-compileObject ('^':name) = except name
-compileObject name       = named name
+compileObject :: Predicator -> String -> BindingPredicate
+compileObject p "*"        = p $ anyone
+compileObject p ('~':name) = p $ like name
+compileObject _ ('=':name) = named name
+compileObject _ ('^':name) = except name
+compileObject _ name       = named name
 
 
 compileInspectionPrimitive :: String -> BindingPredicate -> Maybe Inspection

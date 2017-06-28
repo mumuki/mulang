@@ -3,6 +3,7 @@ module Language.Mulang.Binding (
   like,
   anyone,
   except,
+  andAlso,
   Binding,
   BindingPredicate) where
 
@@ -22,3 +23,6 @@ anyone = const True
 
 except :: String -> BindingPredicate
 except = (/=)
+
+andAlso :: BindingPredicate -> BindingPredicate -> BindingPredicate
+andAlso p1 p2 binding = p1 binding && p2 binding
