@@ -56,9 +56,9 @@ spec = describe "ExpectationsAnalyzer" $ do
       let usesz = Expectation "x" "Uses:z"
       (run Haskell "x = y * 10" [usesy, usesz]) `shouldReturn` (result [passed usesy, failed usesz] [])
 
-    it "works with DeclaresArity" $ do
-      let hasArity2 = Expectation "" "DeclaresArity2:foo"
-      let hasArity3 = Expectation "" "DeclaresArity3:foo"
+    it "works with DeclaresComputationWithArity" $ do
+      let hasArity2 = Expectation "" "DeclaresComputationWithArity2:foo"
+      let hasArity3 = Expectation "" "DeclaresComputationWithArity3:foo"
       (run Prolog "foo(x, y)." [hasArity2, hasArity3]) `shouldReturn` (result [passed hasArity2, failed hasArity3] [])
 
     it "works with DeclaresTypeSignature" $ do

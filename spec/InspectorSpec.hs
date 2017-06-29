@@ -154,45 +154,45 @@ spec = do
       it "is False when is a method" $ do
         declaresFunction (named "f") (js "var o = {f: function(){}}") `shouldBe` False
 
-  describe "declaresComputationWithExactArity" $ do
+  describe "declaresComputationWithArity" $ do
     describe "with function declarations, gbs" $ do
       it "is True when function is declared with the given arity" $ do
         let code = gbs "function f(x){return (x+1)}"
 
-        (declaresComputationWithExactArity 1) (named "f") code `shouldBe` True
+        (declaresComputationWithArity 1) (named "f") code `shouldBe` True
 
       it "is False when function is declared with another arity," $ do
         let code = gbs "function f(x){return (x+1)}"
 
-        (declaresComputationWithExactArity 2) (named "f") code `shouldBe` False
+        (declaresComputationWithArity 2) (named "f") code `shouldBe` False
 
     describe "with function declarations, hs" $ do
       it "is True when function is declared with the given arity" $ do
-        (declaresComputationWithExactArity 1) (named "f") (hs "f x = x + 1") `shouldBe` True
+        (declaresComputationWithArity 1) (named "f") (hs "f x = x + 1") `shouldBe` True
 
       it "is False when function is declared with another arity" $ do
-        (declaresComputationWithExactArity 2) (named "f") (hs "f x = x + 1") `shouldBe` False
+        (declaresComputationWithArity 2) (named "f") (hs "f x = x + 1") `shouldBe` False
 
     describe "with constant declaration, hs" $ do
       it "is True when constant is declared with lambda of given arity" $ do
-        (declaresComputationWithExactArity 2) (named "f") (hs "f = \\x y -> x + y") `shouldBe` True
+        (declaresComputationWithArity 2) (named "f") (hs "f = \\x y -> x + y") `shouldBe` True
 
       it "is False when constant is declared with lambda of given arity" $ do
-        (declaresComputationWithExactArity 3) (named "f") (hs "f = \\x y -> x + y") `shouldBe` False
+        (declaresComputationWithArity 3) (named "f") (hs "f = \\x y -> x + y") `shouldBe` False
 
       it "is False if it is a variable" $ do
-        (declaresComputationWithExactArity 1) (named "f") (hs "f = snd") `shouldBe` False
+        (declaresComputationWithArity 1) (named "f") (hs "f = snd") `shouldBe` False
 
     describe "with function declarations, js" $ do
       it "is True when function is declared with the given arity" $ do
-        (declaresComputationWithExactArity 1) (named "f") (js "function f(x) { return x + 1 }") `shouldBe` True
+        (declaresComputationWithArity 1) (named "f") (js "function f(x) { return x + 1 }") `shouldBe` True
 
       it "is False when function is declared with another arity" $ do
-        (declaresComputationWithExactArity 2) (named "f") (js "function f(x) { x + 1}") `shouldBe` False
+        (declaresComputationWithArity 2) (named "f") (js "function f(x) { x + 1}") `shouldBe` False
 
     describe "with constant declaration, js" $ do
       it "is True when constant is declared with lambda of given arity" $ do
-        (declaresComputationWithExactArity 2) (named "f") (js "var f = function(x, y) { return x + y }") `shouldBe` True
+        (declaresComputationWithArity 2) (named "f") (js "var f = function(x, y) { return x + y }") `shouldBe` True
 
   describe "isLongCode" $ do
     it "is False when the program has less than 16 nodes" $ do

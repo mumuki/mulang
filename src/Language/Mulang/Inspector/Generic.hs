@@ -9,7 +9,7 @@ module Language.Mulang.Inspector.Generic (
   declaresFunction,
   declaresComputation,
   declaresComputationWithArity,
-  declaresComputationWithExactArity,
+  declaresComputationWithArity',
   declaresTypeAlias,
   declaresTypeSignature,
   usesAnonymousVariable,
@@ -74,13 +74,13 @@ declaresEntryPoint = containsExpression f
 
 -- | Inspection that tells whether a top level computation binding exists
 declaresComputation :: BindedInspection
-declaresComputation = declaresComputationWithArity (const True)
+declaresComputation = declaresComputationWithArity' (const True)
 
-declaresComputationWithExactArity :: Int -> BindedInspection
-declaresComputationWithExactArity arity = declaresComputationWithArity (== arity)
+declaresComputationWithArity :: Int -> BindedInspection
+declaresComputationWithArity arity = declaresComputationWithArity' (== arity)
 
-declaresComputationWithArity :: (Int -> Bool) -> BindedInspection
-declaresComputationWithArity arityPredicate = containsDeclaration f
+declaresComputationWithArity' :: (Int -> Bool) -> BindedInspection
+declaresComputationWithArity' arityPredicate = containsDeclaration f
   where f (Function _ equations)  = any equationArityIs equations
         f (Procedure _ equations) = any equationArityIs equations
         f (Method _ equations)    = any equationArityIs equations

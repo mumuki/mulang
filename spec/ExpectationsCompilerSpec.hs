@@ -96,15 +96,15 @@ spec = do
     run (js "function f() { var m = 2; }") "f" "DeclaresVariable" `shouldBe` True
     run (js "function f() { var m = 2; }") "f" "DeclaresVariable:m" `shouldBe` True
 
-  it "works with DeclaresArity1" $ do
-    run (hs "f a b = 2") "" "DeclaresArity1:f" `shouldBe` False
-    run (hs "f a = 2")   "" "DeclaresArity1:f" `shouldBe` True
+  it "works with DeclaresComputationWithArity1" $ do
+    run (hs "f a b = 2") "" "DeclaresComputationWithArity1:f" `shouldBe` False
+    run (hs "f a = 2")   "" "DeclaresComputationWithArity1:f" `shouldBe` True
 
-  it "works with DeclaresArity" $ do
-    run (hs "f a b = 2") "" "DeclaresArity1:f" `shouldBe` False
-    run (hs "f a = 2")   "" "DeclaresArity1:f" `shouldBe` True
-    run (hs "f a b = 2") "" "DeclaresArity2:f" `shouldBe` True
-    run (hs "f a = 2")   "" "DeclaresArity2:f" `shouldBe` False
+  it "works with DeclaresComputationWithArity" $ do
+    run (hs "f a b = 2") "" "DeclaresComputationWithArity1:f" `shouldBe` False
+    run (hs "f a = 2")   "" "DeclaresComputationWithArity1:f" `shouldBe` True
+    run (hs "f a b = 2") "" "DeclaresComputationWithArity2:f" `shouldBe` True
+    run (hs "f a = 2")   "" "DeclaresComputationWithArity2:f" `shouldBe` False
 
   it "works with DeclaresObject" $ do
     run (hs "f a b = 2") "f" "DeclaresObject" `shouldBe` False
