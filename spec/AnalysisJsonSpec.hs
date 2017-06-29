@@ -24,7 +24,7 @@ textToLazyByteString = pack . unpack
 spec = describe "AnalysisJson" $ do
   it "works with advanced expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
-                            (AnalysisSpec [Advanced ["x"] "uses" Anyone False False] noSmells NoSignatures Nothing)
+                            (AnalysisSpec [Advanced ["x"] "uses" Anyone False False] noSmells Nothing Nothing)
     let json = [text|
 {
    "sample" : {
@@ -43,15 +43,14 @@ spec = describe "AnalysisJson" $ do
             "transitive" : false
          }
       ],
-      "smellsSet" : { "tag" : "NoSmells" },
-      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+      "smellsSet" : { "tag" : "NoSmells" }
    }
 } |]
     run json `shouldBe` analysis
 
   it "works with basic expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
-                            (AnalysisSpec [Basic "x" "HasBinding"] noSmells NoSignatures Nothing)
+                            (AnalysisSpec [Basic "x" "HasBinding"] noSmells Nothing Nothing)
     let json = [text|
 {
    "sample" : {
@@ -60,7 +59,6 @@ spec = describe "AnalysisJson" $ do
       "content" : "x = 1"
    },
    "spec" : {
-      "signatureAnalysisType" : { "tag" : "NoSignatures" },
       "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
@@ -92,7 +90,7 @@ spec = describe "AnalysisJson" $ do
    }
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return x + y; }")
-                            (emptyAnalysisSpec { signatureAnalysisType = (StyledSignatures HaskellStyle) })
+                            (emptyAnalysisSpec { signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
 
@@ -133,7 +131,7 @@ spec = describe "AnalysisJson" $ do
    }
 }|]
     let analysis = Analysis (MulangSample (Sequence [Variable "x" (MuNumber 1), Variable "y" (MuNumber 2)]))
-                            (emptyAnalysisSpec { signatureAnalysisType = (StyledSignatures HaskellStyle) })
+                            (emptyAnalysisSpec { signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
 
@@ -148,7 +146,7 @@ spec = describe "AnalysisJson" $ do
    "spec" : {
       "expectations" : [],
       "smellsSet" : {
-        "tag" : "OnlySmells",
+        "tag" : "NoSmells",
         "include" : [
           "ReturnsNull",
           "DoesNullTest"
@@ -162,8 +160,8 @@ spec = describe "AnalysisJson" $ do
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
                             (emptyAnalysisSpec {
-                              smellsSet = onlySmells { include = [ReturnsNull, DoesNullTest]},
-                              signatureAnalysisType = (StyledSignatures HaskellStyle) })
+                              smellsSet = noSmells { include = Just [ReturnsNull, DoesNullTest]},
+                              signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
 
@@ -191,8 +189,8 @@ spec = describe "AnalysisJson" $ do
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
                             (emptyAnalysisSpec {
-                              smellsSet = allSmells { exclude = [ReturnsNull]},
-                              signatureAnalysisType = (StyledSignatures HaskellStyle) })
+                              smellsSet = allSmells { exclude = Just [ReturnsNull]},
+                              signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
 
@@ -206,13 +204,12 @@ spec = describe "AnalysisJson" $ do
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
+      "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : {
          "caseStyle" : "SnakeCase",
          "minimumBindingSize" : 4,
          "jargon" : ["id"]
-      },
-      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+      }
    }
 } |]
     let analysis = Analysis (CodeSample Prolog "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer).")
@@ -235,9 +232,8 @@ spec = describe "AnalysisJson" $ do
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
-      "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" },
-      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+      "smellsSet" : { "tag" : "AllSmells" },
+      "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" }
    }
 } |]
     let analysis = Analysis (CodeSample JavaScript "function f(x, y) { return null; }")

@@ -22,6 +22,7 @@ library
     -fno-warn-orphans
     -fno-warn-name-shadowing
     -fno-warn-incomplete-patterns
+    -fno-warn-missing-pattern-synonym-signatures
     -fwarn-tabs
     -funbox-strict-fields
     -O
@@ -107,6 +108,7 @@ executable mulang
     -fno-warn-orphans
     -fno-warn-name-shadowing
     -fno-warn-incomplete-patterns
+    -fno-warn-missing-pattern-synonym-signatures
     -fwarn-tabs
     -funbox-strict-fields
     -threaded
@@ -121,6 +123,7 @@ test-suite spec
     -fno-warn-orphans
     -fno-warn-name-shadowing
     -fno-warn-incomplete-patterns
+    -fno-warn-missing-pattern-synonym-signatures
     -fwarn-tabs
     -funbox-strict-fields
     -threaded

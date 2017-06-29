@@ -226,8 +226,7 @@ $ mulang '
             "transitive" : false
          }
       ],
-      "smellsSet" : { "tag" : "NoSmells" },
-      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+      "smellsSet" : { "tag" : "NoSmells" }
    }
 }
 ' | json_pp
@@ -266,7 +265,6 @@ $ mulang '
       "content" : "x = 1"
    },
    "spec" : {
-      "signatureAnalysisType" : { "tag" : "NoSignatures" },
       "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
@@ -413,7 +411,7 @@ $ mulang '
    "spec" : {
       "expectations" : [],
       "smellsSet" : {
-        "tag" : "OnlySmells",
+        "tag" : "NoSmells",
         "include" : [
           "ReturnsNull",
           "DoesNullTest"
@@ -492,13 +490,12 @@ $ mulang '
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
+      "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : {
          "caseStyle" : "SnakeCase",
          "minimumBindingSize" : 4,
          "jargon" : ["id"]
-      },
-      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+      }
    }
 }' | json_pp
 {
@@ -532,9 +529,8 @@ $ mulang  '
    },
    "spec" : {
       "expectations" : [],
-      "smellsSet" : { "tag" : "AllSmells", "exclude" : [] },
-      "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" },
-      "signatureAnalysisType" : { "tag" : "NoSignatures" }
+      "smellsSet" : { "tag" : "AllSmells" },
+      "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" }
    }
 }' | json_pp
 {

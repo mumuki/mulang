@@ -12,7 +12,6 @@ import Text.Inflections
 import Text.Inflections.Parse.Types
 import Text.Parsec.Error (ParseError)
 
-import Text.SimpleParser
 import Control.Fallible
 
 type CaseStyle = String -> Either Text.Parsec.Error.ParseError [Text.Inflections.Parse.Types.Word]

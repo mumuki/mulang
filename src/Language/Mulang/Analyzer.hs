@@ -1,6 +1,5 @@
 module Language.Mulang.Analyzer (
   noSmells,
-  onlySmells,
   allSmells,
 
   emptyDomainLanguage,
@@ -27,16 +26,13 @@ import Language.Mulang.Analyzer.DomainLanguageCompiler (emptyDomainLanguage, com
 -- Builder functions
 --
 noSmells :: SmellsSet
-noSmells = NoSmells
-
-onlySmells :: SmellsSet
-onlySmells = OnlySmells []
+noSmells = NoSmells Nothing
 
 allSmells :: SmellsSet
-allSmells = AllSmells []
+allSmells = AllSmells Nothing
 
 emptyAnalysisSpec :: AnalysisSpec
-emptyAnalysisSpec = AnalysisSpec [] noSmells NoSignatures Nothing
+emptyAnalysisSpec = AnalysisSpec [] noSmells Nothing Nothing
 
 emptyAnalysis :: Sample -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec
@@ -48,7 +44,7 @@ smellsAnalysis :: Sample -> SmellsSet -> Analysis
 smellsAnalysis code set = Analysis code (emptyAnalysisSpec { smellsSet = set })
 
 signaturesAnalysis :: Sample -> SignatureStyle -> Analysis
-signaturesAnalysis code style = Analysis code (emptyAnalysisSpec { signatureAnalysisType = StyledSignatures style })
+signaturesAnalysis code style = Analysis code (emptyAnalysisSpec { signatureAnalysisType = Just (StyledSignatures style) })
 
 --
 -- Analysis running
