@@ -2,101 +2,93 @@ module Language.Mulang.Analyzer.ExpectationsCompiler(
   compileExpectation) where
 
 import Language.Mulang
-import Language.Mulang.Analyzer.Analysis (Expectation(..), BindingPattern(..))
+import Language.Mulang.Analyzer.Analysis (Expectation(..))
 
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
+
+type Slicer = (Inspection -> Inspection)
+type Predicator = (BindingPredicate -> BindingPredicate)
 
 compileExpectation :: Expectation -> Inspection
 compileExpectation = fromMaybe (\_ -> True) . compileMaybe
 
 compileMaybe :: Expectation -> Maybe Inspection
-compileMaybe (Advanced s v o t n) = do
-                                inspection <- compileInspection v (compilePattern o)
-                                return . compileSubject s t . compileNegation n $ inspection
-compileMaybe (Basic b i) = do
-                        let splitedInspection = splitOn ":" i
-                        let isNegated = elem "Not" splitedInspection
-                        expectation <- toAdvanced b (withoutNegation splitedInspection) isNegated
-                        return $ compileExpectation expectation
+compileMaybe (Expectation b i) = do
+  let inspectionParts = splitOn ":" i
+  let negator = compileNegator inspectionParts
+  (slicer, predicator) <- compileSlicer (splitOn ":" b)
+  baseInspection       <- compileBaseInspection predicator inspectionParts
+  return . negator . slicer $ baseInspection
+
+compileSlicer :: [String] -> Maybe (Slicer, Predicator)
+compileSlicer [""]                  = Just (id, id)
+compileSlicer ["Intransitive",name] = justSlicerFor scopedList name
+compileSlicer [name]                = justSlicerFor transitiveList name
+compileSlicer _                     = Nothing
+
+justSlicerFor f name = Just (flip f names, andAlso (except (last names)))
+  where names = splitOn "." name
+
+compileNegator :: [String] -> Slicer
+compileNegator ("Not":_) = negative
+compileNegator _         = id
+
+compileBaseInspection :: Predicator -> [String] -> Maybe (Inspection)
+compileBaseInspection p ("Not":parts)         = compileBaseInspection p parts
+compileBaseInspection p [verb]                = compileBaseInspection p [verb, "*"]
+compileBaseInspection p [verb, object]        = compileInspectionPrimitive verb (compileObject p object)
+compileBaseInspection _ _                     = Nothing
+
+compileObject :: Predicator -> String -> BindingPredicate
+compileObject p "*"        = p $ anyone
+compileObject p ('~':name) = p $ like name
+compileObject _ ('=':name) = named name
+compileObject _ ('^':name) = except name
+compileObject _ name       = named name
 
 
-withoutNegation :: [String] -> [String]
-withoutNegation = filter (/= "Not")
+compileInspectionPrimitive :: String -> BindingPredicate -> Maybe Inspection
+compileInspectionPrimitive = f
+  where
 
-toAdvanced :: String -> [String] -> Bool -> Maybe Expectation
-toAdvanced b ["HasAnonymousVariable"] = Just . nonTransitiveAdv b "usesAnonymousVariable"
-toAdvanced b ["HasArity", n]          = Just . nonTransitiveAdv b ("declaresComputationWithArity" ++ n)
-toAdvanced b ["HasBinding"]           = Just . Advanced [] "declares" (Named b) False
-toAdvanced b ["HasClass"]             = Just . Advanced [] "declaresClass" (Named b) False
-toAdvanced b ["HasObject"]            = Just . Advanced [] "declaresObject" (Named b) False
-toAdvanced b ["HasComposition"]       = Just . transitiveAdv b "usesComposition"
-toAdvanced b ["HasComprehension"]     = Just . transitiveAdv b "usesComprehension"
-toAdvanced b ["HasConditional"]       = Just . transitiveAdv b "usesConditional"
-toAdvanced b ["HasDirectRecursion"]   = Just . Advanced [] "declaresRecursively" (Named b) False
-toAdvanced b ["HasFindall"]           = Just . transitiveAdv b "usesFindall"
-toAdvanced b ["HasForall"]            = Just . transitiveAdv b "usesForall"
-toAdvanced b ["HasGuards"]            = Just . transitiveAdv b "usesGuards"
-toAdvanced b ["HasIf"]                = Just . nonTransitiveAdv b "usesIf"
-toAdvanced b ["HasLambda"]            = Just . transitiveAdv b "usesLambda"
-toAdvanced b ["HasNot"]               = Just . nonTransitiveAdv b "usesNot"
-toAdvanced b ["HasRepeat"]            = Just . nonTransitiveAdv b "usesRepeat"
-toAdvanced b ["HasTypeSignature"]     = Just . Advanced [] "declaresTypeSignature" (Named b) False
-toAdvanced b ["HasTypeDeclaration"]   = Just . nonTransitiveAdv b "declaresTypeAlias"
-toAdvanced b ["HasUsage", x]          = Just . Advanced [b] "uses" (Named x) True
-toAdvanced b ["HasWhile"]             = Just . nonTransitiveAdv b "usesWhile"
-toAdvanced _ _                        = const Nothing
--- TODO:
---"HasForeach",
---"HasPrefixApplication",
---"HasVariable"
-
-transitiveAdv     = adv True
-nonTransitiveAdv  = adv False
-adv negated binding inspection = Advanced [binding] inspection Anyone negated
-
-compileNegation :: Bool -> Inspection -> Inspection
-compileNegation False i = i
-compileNegation _     i = negative i
-
-compileInspection :: String -> BindingPredicate -> Maybe Inspection
-compileInspection "declaresObject"                 pred = Just $ declaresObject pred
-compileInspection "declaresClass"                  pred = Just $ declaresClass pred
-compileInspection "declaresAttribute"              pred = Just $ declaresAttribute pred
-compileInspection "declaresMethod"                 pred = Just $ declaresMethod pred
-compileInspection "declaresFunction"               pred = Just $ declaresFunction pred
-compileInspection "declaresTypeAlias"              pred = Just $ declaresTypeAlias pred
-compileInspection "declaresTypeSignature"          pred = Just $ declaresTypeSignature pred
-compileInspection "declares"                       pred = Just $ declares pred
-compileInspection "declaresRecursively"            pred = Just $ declaresRecursively pred
-compileInspection "declaresComputation"            pred = Just $ declaresComputation pred
-compileInspection "declaresComputationWithArity0"  pred = Just $ declaresComputationWithExactArity 0 pred
-compileInspection "declaresComputationWithArity1"  pred = Just $ declaresComputationWithExactArity 1 pred
-compileInspection "declaresComputationWithArity2"  pred = Just $ declaresComputationWithExactArity 2 pred
-compileInspection "declaresComputationWithArity3"  pred = Just $ declaresComputationWithExactArity 3 pred
-compileInspection "declaresComputationWithArity4"  pred = Just $ declaresComputationWithExactArity 4 pred
-compileInspection "uses"                           pred = Just $ uses pred
-compileInspection "usesAnonymousVariable"          _    = Just $ usesAnonymousVariable
-compileInspection "usesComposition"                _    = Just $ usesComposition
-compileInspection "usesComprehension"              _    = Just $ usesComprehension
-compileInspection "usesConditional"                _    = Just $ usesConditional
-compileInspection "usesGuards"                     _    = Just $ usesGuards
-compileInspection "usesFindall"                    _    = Just $ usesFindall
-compileInspection "usesForall"                     _    = Just $ usesForall
-compileInspection "usesIf"                         _    = Just $ usesIf
-compileInspection "usesLambda"                     _    = Just $ usesLambda
-compileInspection "usesNot"                        _    = Just $ usesNot
-compileInspection "usesRepeat"                     _    = Just $ usesRepeat
-compileInspection "usesWhile"                      _    = Just $ usesWhile
-compileInspection _                                _    = Nothing
-
-
-compilePattern :: BindingPattern -> BindingPredicate
-compilePattern (Named o) = named o
-compilePattern (Like o)  = like o
-compilePattern _         = anyone
-
-compileSubject :: [String] -> Bool -> (Inspection -> Inspection)
-compileSubject s True          = (`transitiveList` s)
-compileSubject s _             = (`scopedList` s)
+  f "DeclaresRule"                        b = Just $ declaresRule b
+  f "DeclaresFact"                        b = Just $ declaresFact b
+  f "DeclaresPredicate"                   b = Just $ declaresPredicate b
+  f "DeclaresClass"                       b = Just $ declaresClass b
+  f "DeclaresObject"                      b = Just $ declaresObject b
+  f "DeclaresAttribute"                   b = Just $ declaresAttribute b
+  f "DeclaresMethod"                      b = Just $ declaresMethod b
+  f "DeclaresFunction"                    b = Just $ declaresFunction b
+  f "DeclaresProcedure"                   b = Just $ declaresProcedure b
+  f "DeclaresVariable"                    b = Just $ declaresVariable b
+  f "DeclaresComputation"                 b = Just $ declaresComputation b
+  f "Declares"                            b = Just $ declares b
+  f "DeclaresTypeAlias"                   b = Just $ declaresTypeAlias b
+  f "DeclaresTypeSignature"               b = Just $ declaresTypeSignature b
+  f "DeclaresComputationWithArity0"       b = Just $ declaresComputationWithArity 0 b
+  f "DeclaresComputationWithArity1"       b = Just $ declaresComputationWithArity 1 b
+  f "DeclaresComputationWithArity2"       b = Just $ declaresComputationWithArity 2 b
+  f "DeclaresComputationWithArity3"       b = Just $ declaresComputationWithArity 3 b
+  f "DeclaresComputationWithArity4"       b = Just $ declaresComputationWithArity 4 b
+  f "DeclaresComputationWithArity5"       b = Just $ declaresComputationWithArity 5 b
+  f "DeclaresRecursively"                 b = Just $ declaresRecursively b
+  f "DeclaresEntryPoint"                  _ = Just declaresEntryPoint
+  f "Uses"                                b = Just $ uses b
+  f "UsesAnonymousVariable"               _ = Just usesAnonymousVariable
+  f "UsesComposition"                     _ = Just usesComposition
+  f "UsesComprehension"                   _ = Just usesComprehension
+  f "UsesConditional"                     _ = Just usesConditional
+  f "UsesUnifyOperator"                   _ = Just usesUnifyOperator
+  f "UsesFindall"                         _ = Just usesFindall
+  f "UsesForall"                          _ = Just usesForall
+  f "UsesGuards"                          _ = Just usesGuards
+  f "UsesIf"                              _ = Just usesIf
+  f "UsesLambda"                          _ = Just usesLambda
+  f "UsesNot"                             _ = Just usesNot
+  f "UsesRepeat"                          _ = Just usesRepeat
+  f "UsesWhile"                           _ = Just usesWhile
+  f "UsesPatternMatching"                 _ = Just usesPatternMatching
+  f "UsesSwitch"                          _ = Just usesSwitch
+  f _                                     _ = Nothing
 

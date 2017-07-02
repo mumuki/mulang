@@ -22,9 +22,9 @@ textToLazyByteString :: Text -> ByteString
 textToLazyByteString = pack . unpack
 
 spec = describe "AnalysisJson" $ do
-  it "works with advanced expectations" $ do
+  it "works with Intransitive expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
-                            (AnalysisSpec [Advanced ["x"] "uses" Anyone False False] noSmells Nothing Nothing)
+                            (AnalysisSpec [Expectation "Intransitive:x" "Uses:*"] noSmells Nothing Nothing)
     let json = [text|
 {
    "sample" : {
@@ -35,12 +35,8 @@ spec = describe "AnalysisJson" $ do
    "spec" : {
       "expectations" : [
          {
-            "tag" : "Advanced",
-            "subject" : [ "x" ],
-            "object" : { "tag" : "Anyone" },
-            "negated" : false,
-            "verb" : "uses",
-            "transitive" : false
+            "binding" : "Intransitive:x",
+            "inspection" : "Uses:*"
          }
       ],
       "smellsSet" : { "tag" : "NoSmells" }
@@ -48,9 +44,9 @@ spec = describe "AnalysisJson" $ do
 } |]
     run json `shouldBe` analysis
 
-  it "works with basic expectations" $ do
+  it "works with transitive expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
-                            (AnalysisSpec [Basic "x" "HasBinding"] noSmells Nothing Nothing)
+                            (AnalysisSpec [Expectation "x" "Declares"] noSmells Nothing Nothing)
     let json = [text|
 {
    "sample" : {
@@ -62,9 +58,8 @@ spec = describe "AnalysisJson" $ do
       "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
-            "tag" : "Basic",
             "binding" : "x",
-            "inspection" : "HasBinding"
+            "inspection" : "Declares"
          }
       ]
    }

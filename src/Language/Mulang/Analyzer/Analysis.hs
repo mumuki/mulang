@@ -2,7 +2,6 @@
 
 module Language.Mulang.Analyzer.Analysis (
   Expectation(..),
-  BindingPattern(..),
 
   Analysis(..),
   AnalysisSpec(..),
@@ -21,31 +20,15 @@ module Language.Mulang.Analyzer.Analysis (
 import GHC.Generics
 
 import Language.Mulang.Ast
-import Language.Mulang.Binding (Binding)
 
 ---
 -- Common structures
 --
 
-type BasicInspection = String
 type Inspection = String
 
-data Expectation =  Advanced {
-                      subject :: [Binding] ,
-                      verb :: Inspection,
-                      object :: BindingPattern,
-                      transitive :: Bool,
-                      negated :: Bool
-                    }
-                  | Basic {
-                    binding :: String,
-                    inspection :: BasicInspection
-                  } deriving (Show, Eq, Generic)
-
-data BindingPattern
-  = Named { exactName :: Binding }
-  | Like { similarName :: Binding }
-  | Anyone deriving (Show, Eq, Generic)
+data Expectation
+  = Expectation { binding :: String, inspection :: Inspection } deriving (Show, Eq, Generic)
 
 --
 -- Analysis input structures

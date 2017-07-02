@@ -8,7 +8,6 @@ instance FromJSON Analysis
 instance FromJSON AnalysisSpec
 
 instance FromJSON Expectation
-instance FromJSON BindingPattern
 
 instance FromJSON SmellsSet
 instance FromJSON Smell
@@ -31,7 +30,6 @@ instance ToJSON AnalysisResult
 instance ToJSON ExpectationResult
 
 instance ToJSON Expectation
-instance ToJSON BindingPattern
 
 instance ToJSON Equation
 instance ToJSON EquationBody

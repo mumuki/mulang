@@ -29,7 +29,7 @@ negative :: Inspection -> Inspection
 negative f = not . f
 
 scoped :: Inspection -> Binding -> Inspection
-scoped inspection scope expression =  any inspection (expression // scope)
+scoped inspection scope =  any inspection . bindedDeclarationsOf scope
 
 scopedList :: Inspection -> [Binding] -> Inspection
 scopedList i =  foldl scoped i . reverse

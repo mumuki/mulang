@@ -79,15 +79,15 @@ spec = do
       it "is False when predicate is not declared" $ do
         declaresPredicate (named "foo") (pl "bar(tom).") `shouldBe` False
 
-    describe "declaresComputationWithExactArity" $ do
+    describe "declaresComputationWithArity" $ do
       it "is True when fact is declared with given arity" $ do
-        declaresComputationWithExactArity 1 (named "foo") (pl "foo(tom).") `shouldBe` True
+        declaresComputationWithArity 1 (named "foo") (pl "foo(tom).") `shouldBe` True
 
       it "is True when rule is declared with given arity" $ do
-        declaresComputationWithExactArity 1 (named "foo") (pl "foo(tom) :- bar(5), baz(6).") `shouldBe` True
+        declaresComputationWithArity 1 (named "foo") (pl "foo(tom) :- bar(5), baz(6).") `shouldBe` True
 
       it "is False when fact is declared with another arity" $ do
-        declaresComputationWithExactArity 2 (named "foo") (pl "foo(tom).") `shouldBe` False
+        declaresComputationWithArity 2 (named "foo") (pl "foo(tom).") `shouldBe` False
 
     describe "usesUnifyOperator" $ do
       it "is True when equal" $ do

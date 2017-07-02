@@ -1,5 +1,4 @@
 module Language.Mulang.Explorer (
-  (//),
   equationBodiesOf,
   referencesOf,
   declarationsOf,
@@ -20,8 +19,6 @@ import Language.Mulang.Unfold (Unfold, allExpressions, mainExpressions)
 import Data.Maybe (maybeToList)
 import Data.List (nub)
 
-(//)  :: Expression -> Binding -> [Expression]
-(//) = flip bindedDeclarationsOf
 
 -- | Returns all the body equations of functions, procedures and methods
 equationBodiesOf :: Expression -> [EquationBody]
@@ -95,6 +92,5 @@ extractDeclaration e@(Object n _)         = Just (n, e)
 extractDeclaration e@(Class n _ _)        = Just (n, e)
 extractDeclaration e@(Method n _)         = Just (n, e)
 extractDeclaration e@(Attribute n _)      = Just (n, e)
-extractDeclaration e@(EntryPoint _)       = Just ("anonymous", e)
 extractDeclaration _                      = Nothing
 
