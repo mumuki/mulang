@@ -1,3 +1,5 @@
+{-# LANGUAGE RankNTypes #-}
+
 module Language.Mulang.Parsers.Prolog  (pl, parseProlog) where
 
 import Text.Parsec
@@ -11,7 +13,8 @@ import Data.Maybe (maybeToList)
 import Data.Char (isUpper)
 
 import Control.Fallible
-import Control.Applicative ((*>))
+
+type ParsecParser a = forall x . Parsec String x a
 
 pl :: Parser
 pl = orFail . parseProlog'
@@ -21,35 +24,32 @@ parseProlog = orNothing . parseProlog'
 
 parseProlog' = fmap compact . parse program ""
 
-program :: Parsec String a [Expression]
+program :: ParsecParser [Expression]
 program = many predicate
 
-identifier = many letter
-
-
-pattern :: Parsec String a Pattern
+pattern :: ParsecParser Pattern
 pattern = choice [try number, try wildcard, other] <* spaces
   where
-    wildcard :: Parsec String a Pattern
+    wildcard :: ParsecParser Pattern
     wildcard = string "_" >> return WildcardPattern
 
-    number :: Parsec String a Pattern
+    number :: ParsecParser Pattern
     number = fmap (LiteralPattern . show) parseFloat
 
-    other :: Parsec String a Pattern
+    other :: ParsecParser Pattern
     other = fmap otherToPattern phead
 
-    otherToPattern (name, []) | isUpper .head $ name = VariablePattern name
+    otherToPattern (name, []) | isUpper . head $ name = VariablePattern name
                               | otherwise = LiteralPattern name
     otherToPattern (name, args) = FunctorPattern name args
 
-fact :: Parsec String a Expression
+fact :: ParsecParser Expression
 fact = do
   (name, args) <- phead
   end
   return $ Fact name args
 
-rule :: Parsec String a Expression
+rule :: ParsecParser Expression
 rule = do
   (name, args) <- phead
   def
@@ -57,13 +57,14 @@ rule = do
   end
   return $ Rule name args consults
 
-phead :: Parsec String a (Identifier, [Pattern])
+phead :: ParsecParser (Identifier, [Pattern])
 phead = do
   name <- identifier
-  args <- rawPatternsList
+  args <- patternsList
   spaces
   return (name, concat.maybeToList $ args)
 
+forall :: ParsecParser Expression
 forall = do
   string "forall"
   startTuple
@@ -73,6 +74,7 @@ forall = do
   endTuple
   return $ Forall c1 c2
 
+findall :: ParsecParser Expression
 findall = do
   string "findall"
   startTuple
@@ -84,6 +86,7 @@ findall = do
   endTuple
   return $ Findall c1 c2 c3
 
+pnot :: ParsecParser Expression
 pnot = do
   string "not"
   startTuple
@@ -91,14 +94,20 @@ pnot = do
   endTuple
   return $ Not c
 
+exist :: ParsecParser Expression
 exist = fmap (\(name, args) -> Exist name args) phead
 
+body :: ParsecParser [Expression]
+body =  sepBy1 consult separator
+
+inlineBody :: ParsecParser Expression
 inlineBody = do
   startTuple
   queries <- body
   endTuple
   return $ Sequence queries
 
+pinfix :: ParsecParser Expression
 pinfix = do
   p1 <- pattern
   spaces
@@ -107,25 +116,26 @@ pinfix = do
   p2 <- pattern
   return $ Exist operator [p1, p2]
 
+consult :: ParsecParser Expression
 consult = choice [try findall, try forall, try pnot, try pinfix, inlineBody, exist]
 
-rawPatternsList = optionMaybe $ do
+predicate :: ParsecParser Expression
+predicate = try fact <|> rule
+
+patternsList :: ParsecParser (Maybe [Pattern])
+patternsList = optionMaybe $ do
   startTuple
   args <- sepBy1 pattern separator
   endTuple
   return args
 
-body = sepBy1 consult separator
 
-
+identifier = many letter
 def = string ":-" >> spaces
 startTuple = lparen >> spaces
 endTuple = rparen >> spaces
 separator = comma >> spaces
 end = dot >> spaces
-
-predicate :: Parsec String a Expression
-predicate = try fact <|> rule
 
 dot = char '.'
 lparen = char '('
