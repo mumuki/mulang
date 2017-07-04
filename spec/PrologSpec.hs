@@ -1,8 +1,15 @@
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+
 module PrologSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang
 import           Language.Mulang.Parsers.Prolog
+
+import           Data.Text (unpack)
+import           NeatInterpolation (text)
+
+unpackPl = pl.unpack
 
 spec :: Spec
 spec = do
@@ -26,6 +33,17 @@ spec = do
       pl "foo(bar).baz(bar)." `shouldBe` Sequence [
                                             Fact "foo" [LiteralPattern "bar"],
                                             Fact "baz" [LiteralPattern "bar"]]
+
+    it "multiple facts, whitespaces separated" $ do
+      pl "foo(bar). baz(bar)." `shouldBe` Sequence [
+                                            Fact "foo" [LiteralPattern "bar"],
+                                            Fact "baz" [LiteralPattern "bar"]]
+
+    it "multiple facts, newlines separated" $ do
+      pl "foo(bar).\nbaz(bar)." `shouldBe` Sequence [
+                                            Fact "foo" [LiteralPattern "bar"],
+                                            Fact "baz" [LiteralPattern "bar"]]
+
 
     it "simplest fact/2" $ do
       pl "foo(bar,baz)." `shouldBe` Fact "foo" [LiteralPattern "bar", LiteralPattern "baz"]
@@ -62,6 +80,12 @@ spec = do
     it "rule/1 with not" $ do
       pl "baz(X):-not(bar(X))." `shouldBe` Rule "baz" [VariablePattern "X"] [Not (Exist "bar" [VariablePattern "X"])]
 
+    it "rule/1 with complex not" $ do
+      pl "baz(X):-not((bar(X), baz(Y)))." `shouldBe` Rule "baz" [VariablePattern "X"] [Not (Sequence [
+                                                                                        Exist "bar" [VariablePattern "X"],
+                                                                                        Exist "baz" [VariablePattern "Y"]]) ]
+
+
     it "rule/1 with forall" $ do
       pl "baz(X):- forall(bar(X), bar(X))." `shouldBe` Rule "baz" [VariablePattern "X"] [Forall (Exist "bar" [VariablePattern "X"]) (Exist "bar" [VariablePattern "X"])]
 
@@ -95,14 +119,37 @@ spec = do
     it "rule/1 with multiple mixed conditions" $ do
       pl "baz(bar):-foo(bar),goo(bar),baz." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"],Exist "baz" []]
 
-    it "rule/1 with whitespeces among coditions" $ do
-      pl "baz(bar):-foo(bar) , goo(bar), baz." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"],Exist "baz" []]
-
     it "rule/1 with whitespeces among individuals" $ do
       pl "baz(bar):-foo(bar, baz) , goo(bar), baz." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar",LiteralPattern "baz"],Exist "goo" [LiteralPattern "bar"],Exist "baz" []]
 
     it "rule/1 with multiple whitespaces" $ do
-      pl "baz(bar) :-\n\
-          \    foo(bar),\n\
-          \    goo(bar),\n\
-          \    baz." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"],Exist "baz" []]
+      let expression = pl "baz(bar) :- foo(bar), goo(bar), baz."
+
+      pl "baz(bar):-foo(bar) , goo(bar), baz." `shouldBe` expression
+      pl "baz(bar) :- foo(bar) , goo(bar) , baz." `shouldBe` expression
+      pl "baz(bar) :- foo( bar ) , goo( bar ) , baz." `shouldBe` expression
+      pl "baz( bar ) :- foo( bar ) , goo( bar ) , baz." `shouldBe` expression
+      pl "baz( bar ) :- \n foo( bar ) , \n goo( bar ), \n  baz." `shouldBe` expression
+      pl "baz(bar) :-\n  foo(bar),\n  goo(bar),\n  baz.\n" `shouldBe` expression
+
+    it "sample real code" $ do
+      unpackPl [text|
+parent(bart, homer).
+parent(lisa, homer).
+parent(maggie, homer).
+
+parent(homer, abraham).
+
+siblings(One, Another) :-
+  parent(One, Parent),
+  parent(Other, Parent),
+  One \= Parent.
+      |] `shouldBe` Sequence [
+        Fact "parent" [LiteralPattern "bart",LiteralPattern "homer"],
+        Fact "parent" [LiteralPattern "lisa",LiteralPattern "homer"],
+        Fact "parent" [LiteralPattern "maggie",LiteralPattern "homer"],
+        Fact "parent" [LiteralPattern "homer",LiteralPattern "abraham"],
+        Rule "siblings" [VariablePattern "One",VariablePattern "Another"] [
+          Exist "parent" [VariablePattern "One",VariablePattern "Parent"],
+          Exist "parent" [VariablePattern "Other",VariablePattern "Parent"],
+          Exist "\\=" [VariablePattern "One",VariablePattern "Parent"]]]
