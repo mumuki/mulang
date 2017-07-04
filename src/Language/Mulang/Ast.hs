@@ -24,6 +24,8 @@ module Language.Mulang.Ast (
     pattern SimpleFunction,
     pattern SimpleProcedure,
     pattern SimpleMethod,
+    pattern MuTrue,
+    pattern MuFalse
   ) where
 
 import           GHC.Generics
@@ -167,3 +169,6 @@ pattern SimpleEquation params body = Equation params (UnguardedBody body)
 pattern SimpleFunction name params body  = Function  name [SimpleEquation params body]
 pattern SimpleProcedure name params body = Procedure name [SimpleEquation params body]
 pattern SimpleMethod name params body    = Method    name [SimpleEquation params body]
+
+pattern MuTrue  = MuBool True
+pattern MuFalse = MuBool False

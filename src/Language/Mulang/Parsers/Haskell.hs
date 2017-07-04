@@ -60,8 +60,8 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muPat _ = OtherPattern
 
     muExp (HsVar name) = muVar (muQName name)
-    muExp (HsCon (UnQual (HsIdent "True")))  = MuBool True
-    muExp (HsCon (UnQual (HsIdent "False"))) = MuBool False
+    muExp (HsCon (UnQual (HsIdent "True")))  = MuTrue
+    muExp (HsCon (UnQual (HsIdent "False"))) = MuFalse
     muExp (HsCon name)                       = Reference (muQName name)
     muExp (HsLit lit) = muLit lit
     muExp (HsInfixApp e1 op e2)                                  = Application ((muVar.muQOp) op) [muExp e1, muExp e2]
