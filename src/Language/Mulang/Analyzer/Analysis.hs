@@ -77,7 +77,10 @@ data Smell
   | HasWrongCaseBindings
   | HasMisspelledBindings
   | HasRedundantParameter
-  | HasCodeDuplication deriving (Show, Eq, Enum, Bounded, Generic)
+  | HasCodeDuplication
+  | UsesUnificationOperator
+  | UsesFail
+  | UsesCut deriving (Show, Eq, Enum, Bounded, Generic)
 
 data SignatureAnalysisType
   = NoSignatures

@@ -54,8 +54,11 @@ spec = do
     it "simplest rule/0" $ do
       pl "baz:-foo." `shouldBe` Rule "baz" [] [Exist "foo" []]
 
-    it "whitespaces are ignored/0" $ do
+    it "rules with withiespaces" $ do
       pl "baz:-foo(X), baz(X,Y)." `shouldBe` (pl "baz :- foo( X) ,baz( X , Y) .")
+
+    it "rules with bang" $ do
+      pl "baz:-fail,!." `shouldBe` Rule "baz" [] [Exist "fail" [], Exist "!" []]
 
     it "simplest rule/1 with condition/1" $ do
       pl "baz(bar):-foo(bar)." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"]]
@@ -79,6 +82,10 @@ spec = do
 
     it "rule/1 with not" $ do
       pl "baz(X):-not(bar(X))." `shouldBe` Rule "baz" [VariablePattern "X"] [Not (Exist "bar" [VariablePattern "X"])]
+
+    it "rules with infix not" $ do
+      pl "baz(X):-\\+ bar(X)." `shouldBe` Rule "baz" [VariablePattern "X"] [Not (Exist "bar" [VariablePattern "X"])]
+
 
     it "rule/1 with complex not" $ do
       pl "baz(X):-not((bar(X), baz(Y)))." `shouldBe` Rule "baz" [VariablePattern "X"] [Not (Sequence [
@@ -115,6 +122,9 @@ spec = do
 
     it "rule/1 with multiple conditions" $ do
       pl "baz(bar):-foo(bar),goo(bar)." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"]]
+
+    it "rule/1 with multiple conditions" $ do
+      pl "baz(bar):-foo(bar) ; goo(bar)." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"]]
 
     it "rule/1 with multiple mixed conditions" $ do
       pl "baz(bar):-foo(bar),goo(bar),baz." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"],Exist "baz" []]

@@ -89,9 +89,23 @@ spec = do
       it "is False when fact is declared with another arity" $ do
         declaresComputationWithArity 2 (named "foo") (pl "foo(tom).") `shouldBe` False
 
-    describe "usesUnifyOperator" $ do
+    describe "usesUnificationOperator" $ do
       it "is True when equal" $ do
-        usesUnifyOperator (pl "baz(X):- X = 4.") `shouldBe` True
+        usesUnificationOperator (pl "baz(X):- X = 4.") `shouldBe` True
 
       it "is False when no equal" $ do
-        usesUnifyOperator (pl "baz(X):- baz(X).") `shouldBe` False
+        usesUnificationOperator (pl "baz(X):- baz(X).") `shouldBe` False
+
+    describe "usesCut" $ do
+      it "is True when used" $ do
+        usesCut (pl "baz(X):- !.") `shouldBe` True
+
+      it "is False when not used" $ do
+        usesCut (pl "baz(X):- baz(X).") `shouldBe` False
+
+    describe "usesFail" $ do
+      it "is True when used" $ do
+        usesFail (pl "baz(X):- fail.") `shouldBe` True
+
+      it "is False when not used" $ do
+        usesFail (pl "baz(X):- baz(X).") `shouldBe` False

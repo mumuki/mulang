@@ -86,13 +86,18 @@ findall = do
   endTuple
   return $ Findall c1 c2 c3
 
+cut :: ParsecParser Expression
+cut = do
+  bang
+  return $ Exist "!" []
+
 pnot :: ParsecParser Expression
 pnot = do
-  string "not"
-  startTuple
-  c <- consult
-  endTuple
+  c <- operator <|> functor
   return $ Not c
+  where
+    functor = string "not" >> startTuple >> consult <* endTuple
+    operator = negation >> consult
 
 exist :: ParsecParser Expression
 exist = fmap (\(name, args) -> Exist name args) phead
@@ -117,7 +122,7 @@ pinfix = do
   return $ Exist operator [p1, p2]
 
 consult :: ParsecParser Expression
-consult = choice [try findall, try forall, try pnot, try pinfix, inlineBody, exist]
+consult = choice [try findall, try forall, try pnot, try pinfix, inlineBody, cut, exist]
 
 predicate :: ParsecParser Expression
 predicate = try fact <|> rule
@@ -129,15 +134,14 @@ patternsList = optionMaybe $ do
   endTuple
   return args
 
-
+bang = string "!" >> spaces
+negation = string "\\+" >> spaces
 identifier = many letter
 def = string ":-" >> spaces
 startTuple = lparen >> spaces
 endTuple = rparen >> spaces
-separator = comma >> spaces
-end = dot >> spaces
+separator = (char ',' <|> char ';') >> spaces
+end = char '.' >> spaces
 
-dot = char '.'
 lparen = char '('
 rparen = char ')'
-comma = char ','

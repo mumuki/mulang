@@ -35,6 +35,9 @@ detectionFor ReturnsNull                     = simple returnsNull
 detectionFor HasTooShortBindings             = withLanguage hasTooShortBindings
 detectionFor HasWrongCaseBindings            = withLanguage hasWrongCaseBindings
 detectionFor HasMisspelledBindings           = withLanguage hasMisspelledBindings
+detectionFor UsesFail                        = simple usesFail
+detectionFor UsesUnificationOperator         = simple usesUnificationOperator
+detectionFor UsesCut                         = simple usesCut
 detectionFor IsLongCode                      = unsupported
 detectionFor HasCodeDuplication              = unsupported
 
