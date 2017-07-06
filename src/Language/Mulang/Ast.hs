@@ -26,7 +26,7 @@ module Language.Mulang.Ast (
     pattern SimpleMethod,
     pattern MuTrue,
     pattern MuFalse,
-    pattern Equated,
+    pattern Subroutine,
     pattern Call
   ) where
 
@@ -173,20 +173,20 @@ pattern SimpleMethod name params body    = Method    name [SimpleEquation params
 pattern MuTrue  = MuBool True
 pattern MuFalse = MuBool False
 
-pattern Equated name equations <- (nameAndEquations -> Just (name, equations))
+pattern Subroutine name equations <- (extractSubroutine -> Just (name, equations))
 
-pattern Call operation arguments <- (operationAndArguments -> Just (operation, arguments))
+pattern Call operation arguments <- (extractCall -> Just (operation, arguments))
 
 equationParams :: Equation -> [Pattern]
 equationParams (Equation p _) = p
 
-nameAndEquations :: Expression -> Maybe (Identifier, [Equation])
-nameAndEquations (Function name equations)  = Just (name, equations)
-nameAndEquations (Procedure name equations) = Just (name, equations)
-nameAndEquations (Method name equations)    = Just (name, equations)
-nameAndEquations _                          = Nothing
+extractSubroutine :: Expression -> Maybe (Identifier, [Equation])
+extractSubroutine (Function name equations)  = Just (name, equations)
+extractSubroutine (Procedure name equations) = Just (name, equations)
+extractSubroutine (Method name equations)    = Just (name, equations)
+extractSubroutine _                          = Nothing
 
-operationAndArguments :: Expression -> Maybe (Expression, [Expression])
-operationAndArguments (Application op args)   = Just (op, args)
-operationAndArguments (Send receptor op args) = Just (op, (receptor:args))
-operationAndArguments _                       = Nothing
+extractCall :: Expression -> Maybe (Expression, [Expression])
+extractCall (Application op args)   = Just (op, args)
+extractCall (Send receptor op args) = Just (op, (receptor:args))
+extractCall _                       = Nothing
