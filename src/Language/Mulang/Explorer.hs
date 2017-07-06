@@ -25,9 +25,7 @@ equationBodiesOf :: Expression -> [EquationBody]
 equationBodiesOf = concatMap bodiesOf . mainExpressions
   where
     bodiesOf :: Expression -> [EquationBody]
-    bodiesOf (Function  _ equations) = equationBodies equations
-    bodiesOf (Procedure _ equations) = equationBodies equations
-    bodiesOf (Method    _ equations) = equationBodies equations
+    bodiesOf (Equated  _ equations) = equationBodies equations
     bodiesOf _ = []
 
     equationBodies = map (\(Equation _ body) -> body)
@@ -83,14 +81,12 @@ extractDeclaration :: Expression -> Maybe (Binding, Expression)
 extractDeclaration e@(TypeSignature n _)  = Just (n, e)
 extractDeclaration e@(TypeAlias n )       = Just (n, e)
 extractDeclaration e@(Variable n _)       = Just (n, e)
-extractDeclaration e@(Function n _)       = Just (n, e)
+extractDeclaration e@(Equated n _)        = Just (n, e)
 extractDeclaration e@(Record n)           = Just (n, e)
 extractDeclaration e@(Fact n _)           = Just (n, e)
 extractDeclaration e@(Rule n _ _)         = Just (n, e)
-extractDeclaration e@(Procedure n _)      = Just (n, e)
 extractDeclaration e@(Object n _)         = Just (n, e)
 extractDeclaration e@(Class n _ _)        = Just (n, e)
-extractDeclaration e@(Method n _)         = Just (n, e)
 extractDeclaration e@(Attribute n _)      = Just (n, e)
 extractDeclaration _                      = Nothing
 

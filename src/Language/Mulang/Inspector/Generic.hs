@@ -81,9 +81,7 @@ declaresComputationWithArity arity = declaresComputationWithArity' (== arity)
 
 declaresComputationWithArity' :: (Int -> Bool) -> BindedInspection
 declaresComputationWithArity' arityPredicate = containsDeclaration f
-  where f (Function _ equations)  = any equationArityIs equations
-        f (Procedure _ equations) = any equationArityIs equations
-        f (Method _ equations)    = any equationArityIs equations
+  where f (Equated _ equations)   = any equationArityIs equations
         f (Rule _ args _)         = argsHaveArity args
         f (Fact _ args)           = argsHaveArity args
         f _  = False
@@ -105,9 +103,7 @@ declaresTypeSignature = containsDeclaration f
 
 usesAnonymousVariable :: Inspection
 usesAnonymousVariable = containsExpression f
-  where f (Function _ equations)    = equationContainsWildcard equations
-        f (Procedure _ equations)   = equationContainsWildcard equations
-        f (Method _ equations)      = equationContainsWildcard equations
+  where f (Equated _ equations)     = equationContainsWildcard equations
 --TODO        f (Lambda args _)                      = equationContainsWildcard equations
         f (Fact _ params)             = paramsContainsWildcard params
         f (Rule _ params _)           = paramsContainsWildcard params

@@ -53,8 +53,7 @@ signaturesOf :: Expression -> [Signature]
 signaturesOf = nub . mapMaybe (signatureOf.snd) . declarationsOf mainExpressions
 
 signatureOf :: Expression -> Maybe Signature
-signatureOf (Function name equations)  = Just $ NamedSignature name (parameterNamesOf equations)
-signatureOf (Procedure name equations) = Just $ NamedSignature name (parameterNamesOf equations)
+signatureOf (Equated name equations)   = Just $ NamedSignature name (parameterNamesOf equations)
 signatureOf (Rule name args _)         = Just $ AritySignature name (length args)
 signatureOf (Fact name args)           = Just $ AritySignature name (length args)
 signatureOf (TypeSignature name args)  = Just $ TypedSignature name args

@@ -14,11 +14,9 @@ allExpressions expr = expr : concatMap allExpressions (subExpressions expr)
   where
     subExpressions :: Unfold
     subExpressions (Variable _ v)          = [v]
-    subExpressions (Function _ equations)  = expressionsOfEquations equations
-    subExpressions (Procedure _ equations) = expressionsOfEquations equations
+    subExpressions (Equated _ equations)   = expressionsOfEquations equations
     subExpressions (Rule _ _ es)           = es
     subExpressions (Fact _ _)              = []
-    subExpressions (Method _ equations)    = expressionsOfEquations equations
     subExpressions (Attribute _ v)         = [v]
     subExpressions (Object _ v)            = [v]
     subExpressions (Class _ _ v)           = [v]
@@ -53,11 +51,9 @@ mainExpressions t@(TypeSignature _ _)  = [t]
 mainExpressions t@(TypeAlias _ )       = [t]
 mainExpressions r@(Record _)           = [r]
 mainExpressions v@(Variable _ _)       = [v]
-mainExpressions f@(Function _ _)       = [f]
-mainExpressions p@(Procedure _ _)      = [p]
+mainExpressions e@(Equated _ _)        = [e]
 mainExpressions r@(Rule _ _ _)         = [r]
 mainExpressions r@(Fact _ _)           = [r]
-mainExpressions m@(Method _ _)         = [m]
 mainExpressions a@(Attribute _ _)      = [a]
 mainExpressions (Sequence es)          = concatMap mainExpressions es
 mainExpressions _                      = []
