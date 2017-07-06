@@ -27,6 +27,7 @@ module Language.Mulang.Ast (
     pattern MuTrue,
     pattern MuFalse,
     pattern Subroutine,
+    pattern Clause,
     pattern Call
   ) where
 
@@ -174,6 +175,7 @@ pattern MuTrue  = MuBool True
 pattern MuFalse = MuBool False
 
 pattern Subroutine name equations <- (extractSubroutine -> Just (name, equations))
+pattern Clause name patterns expressions <- (extractClause -> Just (name, patterns, expressions))
 
 pattern Call operation arguments <- (extractCall -> Just (operation, arguments))
 
@@ -190,3 +192,8 @@ extractCall :: Expression -> Maybe (Expression, [Expression])
 extractCall (Application op args)   = Just (op, args)
 extractCall (Send receptor op args) = Just (op, (receptor:args))
 extractCall _                       = Nothing
+
+extractClause :: Expression -> Maybe (Identifier, [Pattern], [Expression])
+extractClause (Fact name patterns)             = Just (name, patterns, [])
+extractClause (Rule name patterns expressions) = Just (name, patterns, expressions)
+extractClause _                                = Nothing

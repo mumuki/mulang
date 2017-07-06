@@ -54,8 +54,7 @@ signaturesOf = nub . mapMaybe (signatureOf.snd) . declarationsOf mainExpressions
 
 signatureOf :: Expression -> Maybe Signature
 signatureOf (Subroutine name es)       = Just $ NamedSignature name (parameterNamesOf es)
-signatureOf (Rule name args _)         = Just $ AritySignature name (length args)
-signatureOf (Fact name args)           = Just $ AritySignature name (length args)
+signatureOf (Clause name args _)       = Just $ AritySignature name (length args)
 signatureOf (TypeSignature name args)  = Just $ TypedSignature name args
 signatureOf (Variable name _)          = Just $ AritySignature name 0
 signatureOf _                          = Nothing
