@@ -27,6 +27,7 @@ module Language.Mulang.Ast (
     pattern MuTrue,
     pattern MuFalse,
     pattern Equated,
+    pattern Call
   ) where
 
 import           GHC.Generics
@@ -174,6 +175,8 @@ pattern MuFalse = MuBool False
 
 pattern Equated name equations <- (nameAndEquations -> Just (name, equations))
 
+pattern Call operation arguments <- (operationAndArguments -> Just (operation, arguments))
+
 equationParams :: Equation -> [Pattern]
 equationParams (Equation p _) = p
 
@@ -183,3 +186,7 @@ nameAndEquations (Procedure name equations) = Just (name, equations)
 nameAndEquations (Method name equations)    = Just (name, equations)
 nameAndEquations _                          = Nothing
 
+operationAndArguments :: Expression -> Maybe (Expression, [Expression])
+operationAndArguments (Application op args)   = Just (op, args)
+operationAndArguments (Send receptor op args) = Just (op, (receptor:args))
+operationAndArguments _                       = Nothing
