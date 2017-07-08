@@ -34,16 +34,7 @@ spec = do
 
         declaresProcedure (named "G") code `shouldBe` False
 
-  describe "usesWhile, gbs" $ do
-    it "is True when present in function" $ do
-      let code = gbs "function f(){while(True){} return (x)}"
-      usesWhile code  `shouldBe` True
-
-    it "is False when not present in function" $ do
-      let code = gbs "function f(x){return (1)}"
-      usesWhile code  `shouldBe` False
-
-  describe "usesWhile, js" $ do
+  describe "usesWhile" $ do
     it "is True when present in function" $ do
       usesWhile (js "function f() { while(true) { console.log('foo') }  }")  `shouldBe` True
 
@@ -94,17 +85,6 @@ spec = do
 
 
   describe "declaresFunction" $ do
-    describe "with function declarations, gobstones" $ do
-      it "is True when functions is declared" $ do
-        let code = gbs "function f(){return (1)}"
-
-        declaresFunction (named "f") code `shouldBe` True
-
-      it "is False when functions is not declared" $ do
-        let code = gbs "function f(){return (1)}"
-
-        declaresFunction (named "g") code `shouldBe` False
-
     describe "with function declarations, hs" $ do
       it "is True when functions is declared" $ do
         declaresFunction (named "f") (hs "f x = 1") `shouldBe` True
@@ -155,17 +135,6 @@ spec = do
         declaresFunction (named "f") (js "var o = {f: function(){}}") `shouldBe` False
 
   describe "declaresComputationWithArity" $ do
-    describe "with function declarations, gbs" $ do
-      it "is True when function is declared with the given arity" $ do
-        let code = gbs "function f(x){return (x+1)}"
-
-        (declaresComputationWithArity 1) (named "f") code `shouldBe` True
-
-      it "is False when function is declared with another arity," $ do
-        let code = gbs "function f(x){return (x+1)}"
-
-        (declaresComputationWithArity 2) (named "f") code `shouldBe` False
-
     describe "with function declarations, hs" $ do
       it "is True when function is declared with the given arity" $ do
         (declaresComputationWithArity 1) (named "f") (hs "f x = x + 1") `shouldBe` True
@@ -488,14 +457,14 @@ spec = do
     it "is False when not present" $ do
       usesIf (hs "f x = x") `shouldBe` False
 
-  describe "usesIf, gbs" $ do
+  describe "usesIf, js" $ do
     it "is True when present in function" $ do
-      let code = gbs "function f(){if(True){}else{} return (x)}"
+      let code = js "function f(){if(true){}else{}; return x;}"
 
       usesIf code  `shouldBe` True
 
     it "is False when not present in function" $ do
-      let code = gbs "function f(x){return (1)}"
+      let code = js "function f(x){return 1;}"
 
       usesIf code  `shouldBe` False
 
