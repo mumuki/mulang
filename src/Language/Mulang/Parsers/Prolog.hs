@@ -3,6 +3,7 @@
 module Language.Mulang.Parsers.Prolog  (pl, parseProlog) where
 
 import Text.Parsec
+import Text.Parsec.Expr
 import Text.Parsec.Numbers
 
 import Language.Mulang.Ast
@@ -28,20 +29,27 @@ program :: ParsecParser [Expression]
 program = many predicate
 
 pattern :: ParsecParser Pattern
-pattern = choice [try number, try wildcard, other] <* spaces
+pattern = buildExpressionParser optable term <* spaces
   where
-    wildcard :: ParsecParser Pattern
-    wildcard = string "_" >> return WildcardPattern
-
-    number :: ParsecParser Pattern
-    number = fmap (LiteralPattern . show) parseFloat
-
-    other :: ParsecParser Pattern
-    other = fmap otherToPattern phead
+    optable = [ [ Infix times AssocLeft ],
+                [ Infix div AssocLeft ],
+                [ Infix add AssocLeft ],
+                [ Infix minus AssocLeft ] ]
+    term    = try number <|> try wildcard <|> fmap otherToPattern phead <|> (lparen *> pattern <*rparen)
+    times   = string "*" >> return (\x y -> FunctorPattern "*" [x, y])
+    div     = string "/" >> return (\x y -> FunctorPattern "/" [x, y])
+    minus   = string "-" >> return (\x y -> FunctorPattern "-" [x, y])
+    add     = string "+" >> return (\x y -> FunctorPattern "+" [x, y])
 
     otherToPattern (name, []) | isUpper . head $ name = VariablePattern name
                               | otherwise = LiteralPattern name
     otherToPattern (name, args) = FunctorPattern name args
+
+wildcard :: ParsecParser Pattern
+wildcard = string "_" >> return WildcardPattern
+
+number :: ParsecParser Pattern
+number = fmap (LiteralPattern . show) parseFloat
 
 fact :: ParsecParser Expression
 fact = do
