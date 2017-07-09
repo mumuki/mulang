@@ -63,25 +63,25 @@ data SmellsSet
   | AllSmells { exclude :: Maybe [Smell] } deriving (Show, Eq, Generic)
 
 data Smell
-  = HasRedundantIf
-  | HasRedundantLambda
+  = DoesNullTest
+  | DoesTypeTest
+  | HasAssignmentReturn
+  | HasCodeDuplication
+  | HasMisspelledBindings
   | HasRedundantBooleanComparison
   | HasRedundantGuards
+  | HasRedundantIf
+  | HasRedundantLambda
   | HasRedundantLocalVariableReturn
-  | HasAssignmentReturn
-  | DoesNullTest
-  | DoesTypeTest
-  | IsLongCode
-  | ReturnsNull
+  | HasRedundantParameter
+  | HasRedundantReduction
   | HasTooShortBindings
   | HasWrongCaseBindings
-  | HasMisspelledBindings
-  | HasRedundantParameter
-  | HasCodeDuplication
-  | UsesUnificationOperator
-  | UsesFail
+  | IsLongCode
+  | ReturnsNull
   | UsesCut
-  | HasRedundantReduction deriving (Show, Eq, Enum, Bounded, Generic)
+  | UsesFail
+  | UsesUnificationOperator deriving (Show, Eq, Enum, Bounded, Generic)
 
 data SignatureAnalysisType
   = NoSignatures

@@ -89,46 +89,58 @@ False
 
 Nice, we know. But not very awesome, it only can tell you if you are using a _binding_, right? Eeer. Good news, it can tell you much much much more things:
 
-1. `declaresMethod`: **objects paradigm** is a given method declared?
+
+1. `declares`: **any paradigm** is the given element declared?
 1. `declaresAttribute`: **objects paradigm** is a given attribute declared?
 1. `declaresClass`: **objects paradigm** is a given class declared?
-1. `declaresObject`: **objects paradigm** is a given named object declared?
-1. `declaresFunction`: **functional/imperative paradigm** is a given function declared?
-1. `declaresTypeSignature`: **any paradigm** is a given computation type signature declared?
-1. `declaresTypeAlias`: **any paradigm** is a given type synonym declared?
-1. `declaresRecursively`: **any paradigm** is a given computation declared using recusion?
 1. `declaresComputation`: **any paradigm** that is, does the given computation  - method, predicate, function, etc - exist?
-1. `declaresComputationWithArity`: **any paradigm** that is, does the given computation arity match the given criteria
-1. `declaresComputationWithExactArity`: **any paradigm** that is, does the given computation have the exact given arity?
-1. `declaresRule`: **logic paradigm** is a given logic rule declared?
+1. `declaresComputationWithArity`: **any paradigm**  that is, does the given computation have the exact given arity?
+1. `declaresEntryPoint`: **any paradigm** is there a program entry point, like a `main` procedure?
 1. `declaresFact`: **logic paradigm** is a given logic fact declared?
+1. `declaresFunction`: **functional/imperative paradigm** is a given function declared?
+1. `declaresMethod`: **objects paradigm** is a given method declared?
+1. `declaresObject`: **objects paradigm** is a given named object declared?
 1. `declaresPredicate`: **logic paradigm** is a given rule o fact declared?
-1. `usesIf`
-1. `usesWhile`
-1. `usesForall`
-1. `usesFindall`
-1. `usesNot`
-1. `usesLambda`
-1. `usesGuards`
-1. `usesComposition`
-1. `usesComprehensions`
-1. `usesAnonymousVariable`
-1. `usesUnifyOperator`
-1. `hasRedundantIf`
-1. `hasRedundantGuards`
-1. `hasRedundantParameter`
-1. `hasRedundantLambda`
-1. `hasRedundantBooleanComparison`
-1. `hasRedundantLocalVariableReturn`
-1. `hasAssignmentReturn`
+1. `declaresProcedure`: **imperative paradigm** is a given procedure declared?
+1. `declaresRecursively`: **any paradigm** is a given computation declared using recusion?
+1. `declaresRule`: **logic paradigm** is a given logic rule declared?
+1. `declaresTypeAlias`: **any paradigm** is a given type synonym declared?
+1. `declaresTypeSignature`: **any paradigm** is a given computation type signature declared?
+1. `declaresVariable`: **any paradigm** is a given local o global variable declared?
+1. `doesNullTest`: **object oriented paradigm** is there a test agains a null value, like `if x == nil then puts 'is nil'`
 1. `doesTypeTest`
-1. `doesNullTest`
-1. `returnsNull`
+1. `hasAssignmentReturn`
+1. `hasCodeDuplication`: **any paradigm** has the given code simple literal code duplication?
+1. `hasMisspelledBindings`: **any paradigm** a binding is not a domain language dictionary's word and not part of its jargon
+1. `hasRedundantBooleanComparison`
+1. `hasRedundantGuards`
+1. `hasRedundantIf`
+1. `hasRedundantLambda`
+1. `hasRedundantLocalVariableReturn`
+1. `hasRedundantParameter`
+1. `hasRedundantReduction`: **logic paradigm** is a is-operator used to unify individuals that don't require a reduction, like `X is 4`
 1. `hasTooShortBindings`: **any paradigm** whether a binding is too short and not part of domain language's jargon
 1. `hasWrongCaseBindings`: **any paradigm** whether a binding does not match the domain language's case style
-1. `hasMisspelledBindings`: **any paradigm** a binding is not a domain language dictionary's word and not part of its jargon
 1. `isLongCode`: **any paradigm** has the code long sequences of statements?
-1. `hasCodeDuplication`: **any paradigm** has the given code simple literal code duplication?
+1. `returnsNull`
+1. `uses`: **any paradigm** is there any reference to the given element?
+1. `usesAnonymousVariable`
+1. `usesComposition`
+1. `usesComprehensions`
+1. `usesConditional`
+1. `usesCut`: **logic paradigm** is the logic `!` consult used?
+1. `usesFail`: **logic paradigm** is the logic `fail` consult used?
+1. `usesFindall`:  **logic paradigm** is the logic `findall` consult used?
+1. `usesForall`:  **logic paradigm** is the logic `forall` consult used?
+1. `usesGuards`
+1. `usesIf`
+1. `usesLambda`
+1. `usesNot`
+1. `usesPatternMatching`
+1. `usesRepeat`
+1. `usesSwitch`
+1. `usesUnificationOperator`:  **logic paradigm** is the logic unification operator `=` used?
+1. `usesWhile`
 
 For example, let's go trickier:
 
