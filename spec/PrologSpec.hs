@@ -129,10 +129,6 @@ spec = do
     it "fact/1 with tuples" $ do
       pl "baz((1, 2))." `shouldBe` Fact "baz" [TuplePattern [LiteralPattern "1.0",LiteralPattern "2.0"]]
 
-    it "can handle unknown operators" $ do
-      -- pl "foo(X, Y, Z) :-  X > Y -> Z = 9 ; Z = 4." `shouldBe` Other
-      pending
-
     it "rule/1 with is and -" $ do
       pl "baz(X, Y):- X is Y - 5  ." `shouldBe` (Rule "baz"
                                                  [VariablePattern "X",VariablePattern "Y"]

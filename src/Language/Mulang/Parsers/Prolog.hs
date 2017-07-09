@@ -31,7 +31,8 @@ program = many predicate
 pattern :: ParsecParser Pattern
 pattern = buildExpressionParser optable (term <* spaces)
   where
-    optable = [ [ Infix (op "*") AssocLeft ],
+    optable = [ [ Infix (op "^") AssocLeft ],
+                [ Infix (op "*") AssocLeft ],
                 [ Infix (op "/") AssocLeft ],
                 [ Infix (op "+") AssocLeft ],
                 [ Infix (op "-") AssocLeft ] ]
@@ -132,10 +133,11 @@ pinfix :: ParsecParser Expression
 pinfix = do
   p1 <- pattern
   spaces
-  operator <- choice . map try . map string $ ["is", ">=", "=<", "\\=", ">", "<", "=:=", "==", "="]
+  operator <- choice . map try . map string $ ["is", "|", ">=", "=<", "\\=", ">", "<", "=:=", "==", "=\\=", ":=", "=..", "=@=", "\\\\=@=", "="]
   spaces
   p2 <- pattern
   return $ Exist operator [p1, p2]
+
 
 consult :: ParsecParser Expression
 consult = choice [try findall, try forall, try pnot, try pinfix, inlineBody, cut, exist]
