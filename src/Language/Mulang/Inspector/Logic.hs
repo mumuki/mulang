@@ -3,6 +3,7 @@ module Language.Mulang.Inspector.Logic (
   usesFindall,
   usesForall,
   usesUnificationOperator,
+  hasRedundantReduction,
   usesCut,
   usesFail,
   declaresFact,
@@ -47,6 +48,12 @@ usesCut = uses (named "!")
 
 usesFail :: Inspection
 usesFail = uses (named "fail")
+
+hasRedundantReduction :: Inspection
+hasRedundantReduction = containsExpression f
+  where f (Exist "is" [(VariablePattern _), (ApplicationPattern _ _)]) = False
+        f (Exist "is" [(VariablePattern _), _]) = True
+        f _ = False
 
 declaresPredicate :: BindingPredicate -> Inspection
 declaresPredicate pred = alternative (declaresFact pred) (declaresRule pred)

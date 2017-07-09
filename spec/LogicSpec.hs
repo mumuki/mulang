@@ -109,3 +109,20 @@ spec = do
 
       it "is False when not used" $ do
         usesFail (pl "baz(X):- baz(X).") `shouldBe` False
+
+    describe "hasRedundantReduction" $ do
+      it "is False when there is no reduction operator" $ do
+        hasRedundantReduction (pl "baz(X):- X > 5.") `shouldBe` False
+
+      it "is False when there is a reduction of applications" $ do
+        hasRedundantReduction (pl "baz(X):- X is 5 + Y.") `shouldBe` False
+
+      it "is True when there is a redundant reduction of parameters" $ do
+        hasRedundantReduction (pl "baz(X, Y):- X is Y.") `shouldBe` True
+
+      it "is True when there is a redundant reduction of literals" $ do
+        hasRedundantReduction (pl "baz(X, Y):- X is 5.") `shouldBe` True
+
+      it "is True when there is a redundant reduction of functors" $ do
+        hasRedundantReduction (pl "baz(X, Y):- moo(X, Z), Z is aFunctor(5).") `shouldBe` True
+

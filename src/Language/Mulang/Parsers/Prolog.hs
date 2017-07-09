@@ -29,7 +29,7 @@ program :: ParsecParser [Expression]
 program = many predicate
 
 pattern :: ParsecParser Pattern
-pattern = buildExpressionParser optable term <* spaces
+pattern = buildExpressionParser optable (term <* spaces)
   where
     optable = [ [ Infix (op "*") AssocLeft ],
                 [ Infix (op "/") AssocLeft ],
@@ -38,14 +38,16 @@ pattern = buildExpressionParser optable term <* spaces
     term    = try number <|> wildcard <|> tuple <|> (fmap otherToPattern phead)
 
     op :: String -> ParsecParser (Pattern -> Pattern -> Pattern)
-    op symbol = string symbol >> return (\x y -> FunctorPattern symbol [x, y])
+    op symbol = string symbol <* spaces >> return (\x y -> ApplicationPattern symbol [x, y])
 
     otherToPattern (name, []) | isUpper . head $ name = VariablePattern name
                               | otherwise = LiteralPattern name
     otherToPattern (name, args) = FunctorPattern name args
 
 tuple :: ParsecParser Pattern
-tuple = fmap TuplePattern patternsList
+tuple = fmap compact patternsList
+  where compact [p] = p
+        compact ps  = TuplePattern ps
 
 wildcard :: ParsecParser Pattern
 wildcard = string "_" >> return WildcardPattern
