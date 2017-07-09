@@ -31,17 +31,14 @@ program = many predicate
 pattern :: ParsecParser Pattern
 pattern = buildExpressionParser optable term <* spaces
   where
-    optable = [ [ Infix times AssocLeft ],
-                [ Infix div AssocLeft ],
-                [ Infix add AssocLeft ],
-                [ Infix minus AssocLeft ] ]
+    optable = [ [ Infix (op "*") AssocLeft ],
+                [ Infix (op "/") AssocLeft ],
+                [ Infix (op "+") AssocLeft ],
+                [ Infix (op "-") AssocLeft ] ]
     term    = try number <|> wildcard <|> tuple <|> (fmap otherToPattern phead)
 
-    times   = string "*" >> return (\x y -> FunctorPattern "*" [x, y])
-    div     = string "/" >> return (\x y -> FunctorPattern "/" [x, y])
-    minus   = string "-" >> return (\x y -> FunctorPattern "-" [x, y])
-    add     = string "+" >> return (\x y -> FunctorPattern "+" [x, y])
-
+    op :: String -> ParsecParser (Pattern -> Pattern -> Pattern)
+    op symbol = string symbol >> return (\x y -> FunctorPattern symbol [x, y])
 
     otherToPattern (name, []) | isUpper . head $ name = VariablePattern name
                               | otherwise = LiteralPattern name
