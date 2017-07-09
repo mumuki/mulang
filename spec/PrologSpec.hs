@@ -1,8 +1,15 @@
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+
 module PrologSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang
 import           Language.Mulang.Parsers.Prolog
+
+import           Data.Text (unpack)
+import           NeatInterpolation (text)
+
+unpackPl = pl.unpack
 
 spec :: Spec
 spec = do
@@ -27,6 +34,17 @@ spec = do
                                             Fact "foo" [LiteralPattern "bar"],
                                             Fact "baz" [LiteralPattern "bar"]]
 
+    it "multiple facts, whitespaces separated" $ do
+      pl "foo(bar). baz(bar)." `shouldBe` Sequence [
+                                            Fact "foo" [LiteralPattern "bar"],
+                                            Fact "baz" [LiteralPattern "bar"]]
+
+    it "multiple facts, newlines separated" $ do
+      pl "foo(bar).\nbaz(bar)." `shouldBe` Sequence [
+                                            Fact "foo" [LiteralPattern "bar"],
+                                            Fact "baz" [LiteralPattern "bar"]]
+
+
     it "simplest fact/2" $ do
       pl "foo(bar,baz)." `shouldBe` Fact "foo" [LiteralPattern "bar", LiteralPattern "baz"]
 
@@ -36,8 +54,11 @@ spec = do
     it "simplest rule/0" $ do
       pl "baz:-foo." `shouldBe` Rule "baz" [] [Exist "foo" []]
 
-    it "whitespaces are ignored/0" $ do
+    it "rules with withiespaces" $ do
       pl "baz:-foo(X), baz(X,Y)." `shouldBe` (pl "baz :- foo( X) ,baz( X , Y) .")
+
+    it "rules with bang" $ do
+      pl "baz:-fail,!." `shouldBe` Rule "baz" [] [Exist "fail" [], Exist "!" []]
 
     it "simplest rule/1 with condition/1" $ do
       pl "baz(bar):-foo(bar)." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"]]
@@ -61,6 +82,16 @@ spec = do
 
     it "rule/1 with not" $ do
       pl "baz(X):-not(bar(X))." `shouldBe` Rule "baz" [VariablePattern "X"] [Not (Exist "bar" [VariablePattern "X"])]
+
+    it "rules with infix not" $ do
+      pl "baz(X):-\\+ bar(X)." `shouldBe` Rule "baz" [VariablePattern "X"] [Not (Exist "bar" [VariablePattern "X"])]
+
+
+    it "rule/1 with complex not" $ do
+      pl "baz(X):-not((bar(X), baz(Y)))." `shouldBe` Rule "baz" [VariablePattern "X"] [Not (Sequence [
+                                                                                        Exist "bar" [VariablePattern "X"],
+                                                                                        Exist "baz" [VariablePattern "Y"]]) ]
+
 
     it "rule/1 with forall" $ do
       pl "baz(X):- forall(bar(X), bar(X))." `shouldBe` Rule "baz" [VariablePattern "X"] [Forall (Exist "bar" [VariablePattern "X"]) (Exist "bar" [VariablePattern "X"])]
@@ -89,20 +120,108 @@ spec = do
     it "rule/1 with simple is" $ do
       pl "baz(X):- X is 4." `shouldBe` Rule "baz" [VariablePattern "X"] [Exist "is" [VariablePattern "X",LiteralPattern "4.0"]]
 
+    it "rule/1 with is with parenthesis" $ do
+      pl "baz(X):- X is (4)." `shouldBe` Rule "baz" [VariablePattern "X"] [Exist "is" [VariablePattern "X",LiteralPattern "4.0"]]
+
+    it "fact/1 with tuples" $ do
+      pl "baz((1, 2))." `shouldBe` Fact "baz" [TuplePattern [LiteralPattern "1.0",LiteralPattern "2.0"]]
+
+    it "fact/1 with tuples" $ do
+      pl "baz((1, 2))." `shouldBe` Fact "baz" [TuplePattern [LiteralPattern "1.0",LiteralPattern "2.0"]]
+
+    it "rule/1 with is and -" $ do
+      pl "baz(X, Y):- X is Y - 5  ." `shouldBe` (Rule "baz"
+                                                 [VariablePattern "X",VariablePattern "Y"]
+                                                 [Exist "is" [
+                                                    VariablePattern "X",
+                                                    ApplicationPattern "-" [VariablePattern "Y", LiteralPattern "5.0"]]])
+
+    it "rule/1 with is and +" $ do
+      pl "baz(X):- X is 5 + Y." `shouldBe` (Rule "baz"
+                                                 [VariablePattern "X"]
+                                                 [Exist "is" [
+                                                    VariablePattern "X",
+                                                    ApplicationPattern "+" [LiteralPattern "5.0", VariablePattern "Y"]]])
+
+
+    it "rule/1 with =:=" $ do
+      pl "baz(X, Y):- X =:= Y." `shouldBe` (Rule "baz"
+                                                 [VariablePattern "X",VariablePattern "Y"]
+                                                 [Exist "=:=" [
+                                                    VariablePattern "X",
+                                                    VariablePattern "Y"]])
+    it "rule/1 with ==" $ do
+      pl "baz(X, Y):- X == Y." `shouldBe` (Rule "baz"
+                                                 [VariablePattern "X",VariablePattern "Y"]
+                                                 [Exist "==" [
+                                                    VariablePattern "X",
+                                                    VariablePattern "Y"]])
+
+
+
+    it "rule/1 with is and parenthesis" $ do
+      pl "baz(X, Y):- X is (Y / 5) + 20." `shouldBe` (Rule "baz"
+                                                        [VariablePattern "X",VariablePattern "Y"]
+                                                        [Exist "is" [
+                                                          VariablePattern "X",
+                                                          ApplicationPattern "+" [
+                                                            ApplicationPattern "/" [VariablePattern "Y", LiteralPattern "5.0"],
+                                                            LiteralPattern "20.0"]]])
+
+    it "rule/1 with is and functions" $ do
+      pl "baz(X, Y):- X is f(Y)." `shouldBe` (Rule "baz"
+                                                [VariablePattern "X",VariablePattern "Y"]
+                                                [Exist "is" [
+                                                  VariablePattern "X",
+                                                  FunctorPattern "f" [VariablePattern "Y"]]])
+
+    it "rule/1 with > and math" $ do
+      pl "baz(X):- X + 50 > x * 2." `shouldBe` (Rule "baz"
+                                                  [VariablePattern "X"]
+                                                  [Exist ">" [
+                                                    ApplicationPattern "+" [VariablePattern "X", LiteralPattern "50.0"],
+                                                    ApplicationPattern "*" [LiteralPattern "x", LiteralPattern "2.0"]]])
+
     it "rule/1 with multiple conditions" $ do
       pl "baz(bar):-foo(bar),goo(bar)." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"]]
 
+    it "rule/1 with multiple conditions" $ do
+      pl "baz(bar):-foo(bar) ; goo(bar)." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"]]
+
     it "rule/1 with multiple mixed conditions" $ do
       pl "baz(bar):-foo(bar),goo(bar),baz." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"],Exist "baz" []]
-
-    it "rule/1 with whitespeces among coditions" $ do
-      pl "baz(bar):-foo(bar) , goo(bar), baz." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"],Exist "baz" []]
 
     it "rule/1 with whitespeces among individuals" $ do
       pl "baz(bar):-foo(bar, baz) , goo(bar), baz." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar",LiteralPattern "baz"],Exist "goo" [LiteralPattern "bar"],Exist "baz" []]
 
     it "rule/1 with multiple whitespaces" $ do
-      pl "baz(bar) :-\n\
-          \    foo(bar),\n\
-          \    goo(bar),\n\
-          \    baz." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"],Exist "baz" []]
+      let expression = pl "baz(bar) :- foo(bar), goo(bar), baz."
+
+      pl "baz(bar):-foo(bar) , goo(bar), baz." `shouldBe` expression
+      pl "baz(bar) :- foo(bar) , goo(bar) , baz." `shouldBe` expression
+      pl "baz(bar) :- foo( bar ) , goo( bar ) , baz." `shouldBe` expression
+      pl "baz( bar ) :- foo( bar ) , goo( bar ) , baz." `shouldBe` expression
+      pl "baz( bar ) :- \n foo( bar ) , \n goo( bar ), \n  baz." `shouldBe` expression
+      pl "baz(bar) :-\n  foo(bar),\n  goo(bar),\n  baz.\n" `shouldBe` expression
+
+    it "sample real code" $ do
+      unpackPl [text|
+parent(bart, homer).
+parent(lisa, homer).
+parent(maggie, homer).
+
+parent(homer, abraham).
+
+siblings(One, Another) :-
+  parent(One, Parent),
+  parent(Other, Parent),
+  One \= Parent.
+      |] `shouldBe` Sequence [
+        Fact "parent" [LiteralPattern "bart",LiteralPattern "homer"],
+        Fact "parent" [LiteralPattern "lisa",LiteralPattern "homer"],
+        Fact "parent" [LiteralPattern "maggie",LiteralPattern "homer"],
+        Fact "parent" [LiteralPattern "homer",LiteralPattern "abraham"],
+        Rule "siblings" [VariablePattern "One",VariablePattern "Another"] [
+          Exist "parent" [VariablePattern "One",VariablePattern "Parent"],
+          Exist "parent" [VariablePattern "Other",VariablePattern "Parent"],
+          Exist "\\=" [VariablePattern "One",VariablePattern "Parent"]]]

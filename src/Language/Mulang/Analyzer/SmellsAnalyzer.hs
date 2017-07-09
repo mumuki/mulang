@@ -22,21 +22,25 @@ allSmells :: [Smell]
 allSmells = enumFrom minBound
 
 detectionFor :: Smell -> Detection
-detectionFor HasRedundantIf                  = simple hasRedundantIf
-detectionFor HasRedundantLambda              = simple hasRedundantLambda
-detectionFor HasRedundantBooleanComparison   = simple hasRedundantBooleanComparison
-detectionFor HasRedundantGuards              = simple hasRedundantGuards
-detectionFor HasRedundantLocalVariableReturn = simple hasRedundantLocalVariableReturn
-detectionFor HasAssignmentReturn             = simple hasAssignmentReturn
-detectionFor HasRedundantParameter           = simple hasRedundantParameter
 detectionFor DoesNullTest                    = simple doesNullTest
 detectionFor DoesTypeTest                    = simple doesTypeTest
-detectionFor ReturnsNull                     = simple returnsNull
+detectionFor HasAssignmentReturn             = simple hasAssignmentReturn
+detectionFor HasCodeDuplication              = unsupported
+detectionFor HasMisspelledBindings           = withLanguage hasMisspelledBindings
+detectionFor HasRedundantBooleanComparison   = simple hasRedundantBooleanComparison
+detectionFor HasRedundantGuards              = simple hasRedundantGuards
+detectionFor HasRedundantIf                  = simple hasRedundantIf
+detectionFor HasRedundantLambda              = simple hasRedundantLambda
+detectionFor HasRedundantLocalVariableReturn = simple hasRedundantLocalVariableReturn
+detectionFor HasRedundantParameter           = simple hasRedundantParameter
+detectionFor HasRedundantReduction           = simple hasRedundantReduction
 detectionFor HasTooShortBindings             = withLanguage hasTooShortBindings
 detectionFor HasWrongCaseBindings            = withLanguage hasWrongCaseBindings
-detectionFor HasMisspelledBindings           = withLanguage hasMisspelledBindings
 detectionFor IsLongCode                      = unsupported
-detectionFor HasCodeDuplication              = unsupported
+detectionFor ReturnsNull                     = simple returnsNull
+detectionFor UsesCut                         = simple usesCut
+detectionFor UsesFail                        = simple usesFail
+detectionFor UsesUnificationOperator         = simple usesUnificationOperator
 
 
 type Detection = DomainLanguage -> Expression -> [Binding]

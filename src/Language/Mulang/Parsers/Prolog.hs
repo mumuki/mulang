@@ -1,16 +1,21 @@
+{-# LANGUAGE RankNTypes #-}
+
 module Language.Mulang.Parsers.Prolog  (pl, parseProlog) where
 
 import Text.Parsec
+import Text.Parsec.Expr
 import Text.Parsec.Numbers
 
 import Language.Mulang.Ast
 import Language.Mulang.Builder
 import Language.Mulang.Parsers
 
-import Data.Maybe (maybeToList)
+import Data.Maybe (fromMaybe)
 import Data.Char (isUpper)
 
 import Control.Fallible
+
+type ParsecParser a = forall x . Parsec String x a
 
 pl :: Parser
 pl = orFail . parseProlog'
@@ -20,106 +25,137 @@ parseProlog = orNothing . parseProlog'
 
 parseProlog' = fmap compact . parse program ""
 
-program :: Parsec String a [Expression]
+program :: ParsecParser [Expression]
 program = many predicate
 
-dot = char '.'
-
-identifier = many letter
-
-
-pattern :: Parsec String a Pattern
-pattern = choice [try number, try wildcard, other]
+pattern :: ParsecParser Pattern
+pattern = buildExpressionParser optable (term <* spaces)
   where
-    wildcard :: Parsec String a Pattern
-    wildcard = string "_" >> return WildcardPattern
+    optable = [ [ Infix (op "^") AssocLeft ],
+                [ Infix (op "*") AssocLeft ],
+                [ Infix (op "/") AssocLeft ],
+                [ Infix (op "+") AssocLeft ],
+                [ Infix (op "-") AssocLeft ] ]
+    term    = try number <|> wildcard <|> tuple <|> (fmap otherToPattern phead)
 
-    number :: Parsec String a Pattern
-    number = fmap (LiteralPattern . show) parseFloat
-
-    other :: Parsec String a Pattern
-    other = fmap otherToPattern phead
-
-    otherToPattern (name, []) | isUpper .head $ name = VariablePattern name
+    otherToPattern (name, []) | isUpper . head $ name = VariablePattern name
                               | otherwise = LiteralPattern name
-    otherToPattern (name, args) = FunctorPattern name args
+    otherToPattern ("abs", [p])           = ApplicationPattern "abs" [p]
+    otherToPattern ("mod", [p1, p2])      = ApplicationPattern "mod" [p1, p2]
+    otherToPattern ("div", [p1, p2])      = ApplicationPattern "div" [p1, p2]
+    otherToPattern ("rem", [p1, p2])      = ApplicationPattern "rem" [p1, p2]
+    otherToPattern (name, args)           = FunctorPattern name args
 
-fact :: Parsec String a Expression
+op :: String -> ParsecParser (Pattern -> Pattern -> Pattern)
+op symbol = string symbol <* spaces >> return (\x y -> ApplicationPattern symbol [x, y])
+
+tuple :: ParsecParser Pattern
+tuple = fmap compact patternsList
+  where compact [p] = p
+        compact ps  = TuplePattern ps
+
+wildcard :: ParsecParser Pattern
+wildcard = string "_" >> return WildcardPattern
+
+number :: ParsecParser Pattern
+number = fmap (LiteralPattern . show) parseFloat
+
+fact :: ParsecParser Expression
 fact = do
-        (name, args) <- phead
-        dot
-        return $ Fact name args
+  (name, args) <- phead
+  end
+  return $ Fact name args
 
-rule :: Parsec String a Expression
+rule :: ParsecParser Expression
 rule = do
-        (name, args) <- phead
-        def
-        consults <- body
-        dot
-        return $ Rule name args consults
+  (name, args) <- phead
+  def
+  consults <- body
+  end
+  return $ Rule name args consults
 
-phead :: Parsec String a (Identifier, [Pattern])
+phead :: ParsecParser (Identifier, [Pattern])
 phead = do
-            name <- identifier
-            args <- rawPatternsList
-            return (name, concat.maybeToList $ args)
+  name <- identifier
+  args <- optionMaybe patternsList
+  spaces
+  return (name, fromMaybe [] args)
 
+forall :: ParsecParser Expression
 forall = do
-          string "forall"
-          openParen
-          c1 <- consult
-          comma
-          c2 <- consult
-          closeParen
-          return $ Forall c1 c2
+  string "forall"
+  startTuple
+  c1 <- consult
+  separator
+  c2 <- consult
+  endTuple
+  return $ Forall c1 c2
 
+findall :: ParsecParser Expression
 findall = do
-          string "findall"
-          openParen
-          c1 <- consult
-          comma
-          c2 <- consult
-          comma
-          c3 <- consult
-          closeParen
-          return $ Findall c1 c2 c3
+  string "findall"
+  startTuple
+  c1 <- consult
+  separator
+  c2 <- consult
+  separator
+  c3 <- consult
+  endTuple
+  return $ Findall c1 c2 c3
 
+cut :: ParsecParser Expression
+cut = do
+  bang
+  return $ Exist "!" []
+
+pnot :: ParsecParser Expression
 pnot = do
-          string "not"
-          openParen
-          c <- consult
-          closeParen
-          return $ Not c
+  c <- operator <|> functor
+  return $ Not c
+  where
+    functor = string "not" >> startTuple >> consult <* endTuple
+    operator = negation >> consult
 
+exist :: ParsecParser Expression
 exist = fmap (\(name, args) -> Exist name args) phead
 
+body :: ParsecParser [Expression]
+body =  sepBy1 consult separator
+
+inlineBody :: ParsecParser Expression
+inlineBody = do
+  startTuple
+  queries <- body
+  endTuple
+  return $ Sequence queries
+
+pinfix :: ParsecParser Expression
 pinfix = do
-            p1 <- pattern
-            spaces
-            operator <- choice . map try . map string $ ["is", ">=", "=<", "\\=", ">", "<", "="]
-            spaces
-            p2 <- pattern
-            return $ Exist operator [p1, p2]
-
-consult = choice [try findall, try forall, try pnot, try pinfix, exist]
-
-rawPatternsList = optionMaybe $ do
-                 openParen
-                 args <- sepBy1 pattern comma
-                 closeParen
-                 return args
-
-body = sepBy1 consult comma
+  p1 <- pattern
+  spaces
+  operator <- choice . map try . map string $ ["is", "|", ">=", "=<", "\\=", ">", "<", "=:=", "==", "=\\=", ":=", "=..", "=@=", "\\\\=@=", "="]
+  spaces
+  p2 <- pattern
+  return $ Exist operator [p1, p2]
 
 
-def = do
-        spaces
-        string ":-"
-        spaces
+consult :: ParsecParser Expression
+consult = choice [try findall, try forall, try pnot, try pinfix, inlineBody, cut, exist]
 
-openParen = char '(' >> spaces
-closeParen = char ')' >> spaces
-comma = spaces >> char ',' >> spaces
-
-predicate :: Parsec String a Expression
+predicate :: ParsecParser Expression
 predicate = try fact <|> rule
+
+patternsList :: ParsecParser [Pattern]
+patternsList = startTuple >> sepBy1 pattern separator <* endTuple
+
+bang = string "!" >> spaces
+negation = string "\\+" >> spaces
+identifier = many1 letter
+def = string ":-" >> spaces
+startTuple = lparen >> spaces
+endTuple = rparen >> spaces
+separator = (char ',' <|> char ';') >> spaces
+end = char '.' >> spaces
+
+lparen = char '('
+rparen = char ')'

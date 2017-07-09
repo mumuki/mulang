@@ -2,7 +2,10 @@ module Language.Mulang.Inspector.Logic (
   usesNot,
   usesFindall,
   usesForall,
-  usesUnifyOperator,
+  usesUnificationOperator,
+  hasRedundantReduction,
+  usesCut,
+  usesFail,
   declaresFact,
   declaresRule,
   declaresPredicate) where
@@ -37,9 +40,19 @@ usesForall = containsExpression f
   where f (Forall  _ _) = True
         f _ = False
 
-usesUnifyOperator :: Inspection
-usesUnifyOperator = containsExpression f
-  where f (Exist "=" _) = True
+usesUnificationOperator :: Inspection
+usesUnificationOperator = uses (named "=")
+
+usesCut :: Inspection
+usesCut = uses (named "!")
+
+usesFail :: Inspection
+usesFail = uses (named "fail")
+
+hasRedundantReduction :: Inspection
+hasRedundantReduction = containsExpression f
+  where f (Exist "is" [(VariablePattern _), (ApplicationPattern _ _)]) = False
+        f (Exist "is" [(VariablePattern _), _]) = True
         f _ = False
 
 declaresPredicate :: BindingPredicate -> Inspection

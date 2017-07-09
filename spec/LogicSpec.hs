@@ -89,9 +89,46 @@ spec = do
       it "is False when fact is declared with another arity" $ do
         declaresComputationWithArity 2 (named "foo") (pl "foo(tom).") `shouldBe` False
 
-    describe "usesUnifyOperator" $ do
+    describe "usesUnificationOperator" $ do
       it "is True when equal" $ do
-        usesUnifyOperator (pl "baz(X):- X = 4.") `shouldBe` True
+        usesUnificationOperator (pl "baz(X):- X = 4.") `shouldBe` True
 
       it "is False when no equal" $ do
-        usesUnifyOperator (pl "baz(X):- baz(X).") `shouldBe` False
+        usesUnificationOperator (pl "baz(X):- baz(X).") `shouldBe` False
+
+    describe "usesCut" $ do
+      it "is True when used" $ do
+        usesCut (pl "baz(X):- !.") `shouldBe` True
+
+      it "is False when not used" $ do
+        usesCut (pl "baz(X):- baz(X).") `shouldBe` False
+
+    describe "usesFail" $ do
+      it "is True when used" $ do
+        usesFail (pl "baz(X):- fail.") `shouldBe` True
+
+      it "is False when not used" $ do
+        usesFail (pl "baz(X):- baz(X).") `shouldBe` False
+
+    describe "hasRedundantReduction" $ do
+      it "is False when there is no reduction operator" $ do
+        hasRedundantReduction (pl "baz(X):- X > 5.") `shouldBe` False
+
+      it "is False when there is a reduction of applications" $ do
+        hasRedundantReduction (pl "baz(X):- X is 5 + Y.") `shouldBe` False
+
+      it "is False when there is a reduction of named function applications" $ do
+        hasRedundantReduction (pl "baz(X):- X is abs(Y).") `shouldBe` False
+        hasRedundantReduction (pl "baz(X):- X is mod(Y, 2).") `shouldBe` False
+        hasRedundantReduction (pl "baz(X):- X is div(Y, 2).") `shouldBe` False
+        hasRedundantReduction (pl "baz(X):- X is rem(Y, 2).") `shouldBe` False
+
+      it "is True when there is a redundant reduction of parameters" $ do
+        hasRedundantReduction (pl "baz(X, Y):- X is Y.") `shouldBe` True
+
+      it "is True when there is a redundant reduction of literals" $ do
+        hasRedundantReduction (pl "baz(X, Y):- X is 5.") `shouldBe` True
+
+      it "is True when there is a redundant reduction of functors" $ do
+        hasRedundantReduction (pl "baz(X, Y):- moo(X, Z), Z is aFunctor(5).") `shouldBe` True
+

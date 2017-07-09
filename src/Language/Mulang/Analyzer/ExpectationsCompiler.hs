@@ -79,7 +79,6 @@ compileInspectionPrimitive = f
   f "UsesComposition"                     _ = Just usesComposition
   f "UsesComprehension"                   _ = Just usesComprehension
   f "UsesConditional"                     _ = Just usesConditional
-  f "UsesUnifyOperator"                   _ = Just usesUnifyOperator
   f "UsesFindall"                         _ = Just usesFindall
   f "UsesForall"                          _ = Just usesForall
   f "UsesGuards"                          _ = Just usesGuards
