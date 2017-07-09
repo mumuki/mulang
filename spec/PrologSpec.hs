@@ -120,13 +120,40 @@ spec = do
     it "rule/1 with simple is" $ do
       pl "baz(X):- X is 4." `shouldBe` Rule "baz" [VariablePattern "X"] [Exist "is" [VariablePattern "X",LiteralPattern "4.0"]]
 
+    it "rule/1 with is with parenthesis" $ do
+      pl "baz(X):- X is (4)." `shouldBe` Rule "baz" [VariablePattern "X"] [Exist "is" [VariablePattern "X",LiteralPattern "4.0"]]
+
+    it "fact/1 with tuples" $ do
+      pl "baz((1, 2))." `shouldBe` Fact "baz" [TuplePattern [LiteralPattern "1.0",LiteralPattern "2.0"]]
+
+    it "rule/1 with is and math" $ do
+      pl "baz(X, Y):- X is Y - 5." `shouldBe` (Rule "baz"
+                                                 [VariablePattern "X",VariablePattern "Y"]
+                                                 [Exist "is" [
+                                                    VariablePattern "X",
+                                                    FunctorPattern "-" [VariablePattern "Y", LiteralPattern "5.0"]]])
+    it "rule/1 with is and parenthesis" $ do
+      pl "baz(X, Y):- X is (Y / 5) + 20." `shouldBe` (Rule "baz"
+                                                        [VariablePattern "X",VariablePattern "Y"]
+                                                        [Exist "is" [
+                                                          VariablePattern "X",
+                                                          FunctorPattern "+" [
+                                                            TuplePattern [FunctorPattern "/" [VariablePattern "Y", LiteralPattern "5.0"]],
+                                                            LiteralPattern "20.0"]]])
+
+    it "rule/1 with is and functions" $ do
+      pl "baz(X, Y):- X is f(Y)." `shouldBe` (Rule "baz"
+                                                [VariablePattern "X",VariablePattern "Y"]
+                                                [Exist "is" [
+                                                  VariablePattern "X",
+                                                  FunctorPattern "f" [VariablePattern "Y"]]])
 
     it "rule/1 with > and math" $ do
       pl "baz(X):- X + 50 > x * 2." `shouldBe` (Rule "baz"
                                                   [VariablePattern "X"]
                                                   [Exist ">" [
-                                                    FunctorPattern "+" [VariablePattern "X",LiteralPattern "50.0"],
-                                                    FunctorPattern "*" [LiteralPattern "x",LiteralPattern "2.0"]]])
+                                                    FunctorPattern "+" [VariablePattern "X", LiteralPattern "50.0"],
+                                                    FunctorPattern "*" [LiteralPattern "x", LiteralPattern "2.0"]]])
 
     it "rule/1 with multiple conditions" $ do
       pl "baz(bar):-foo(bar),goo(bar)." `shouldBe` Rule "baz" [LiteralPattern "bar"] [Exist "foo" [LiteralPattern "bar"],Exist "goo" [LiteralPattern "bar"]]

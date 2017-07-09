@@ -10,7 +10,7 @@ import Language.Mulang.Ast
 import Language.Mulang.Builder
 import Language.Mulang.Parsers
 
-import Data.Maybe (maybeToList)
+import Data.Maybe (fromMaybe)
 import Data.Char (isUpper)
 
 import Control.Fallible
@@ -35,15 +35,20 @@ pattern = buildExpressionParser optable term <* spaces
                 [ Infix div AssocLeft ],
                 [ Infix add AssocLeft ],
                 [ Infix minus AssocLeft ] ]
-    term    = try number <|> try wildcard <|> fmap otherToPattern phead <|> (lparen *> pattern <*rparen)
+    term    = try number <|> try wildcard <|> tuple <|> try (fmap otherToPattern phead)
+
     times   = string "*" >> return (\x y -> FunctorPattern "*" [x, y])
     div     = string "/" >> return (\x y -> FunctorPattern "/" [x, y])
     minus   = string "-" >> return (\x y -> FunctorPattern "-" [x, y])
     add     = string "+" >> return (\x y -> FunctorPattern "+" [x, y])
 
+
     otherToPattern (name, []) | isUpper . head $ name = VariablePattern name
                               | otherwise = LiteralPattern name
     otherToPattern (name, args) = FunctorPattern name args
+
+tuple :: ParsecParser Pattern
+tuple = fmap TuplePattern patternsList
 
 wildcard :: ParsecParser Pattern
 wildcard = string "_" >> return WildcardPattern
@@ -68,9 +73,9 @@ rule = do
 phead :: ParsecParser (Identifier, [Pattern])
 phead = do
   name <- identifier
-  args <- patternsList
+  args <- optionMaybe patternsList
   spaces
-  return (name, concat.maybeToList $ args)
+  return (name, fromMaybe [] args)
 
 forall :: ParsecParser Expression
 forall = do
@@ -135,16 +140,12 @@ consult = choice [try findall, try forall, try pnot, try pinfix, inlineBody, cut
 predicate :: ParsecParser Expression
 predicate = try fact <|> rule
 
-patternsList :: ParsecParser (Maybe [Pattern])
-patternsList = optionMaybe $ do
-  startTuple
-  args <- sepBy1 pattern separator
-  endTuple
-  return args
+patternsList :: ParsecParser [Pattern]
+patternsList = startTuple >> sepBy1 pattern separator <* endTuple
 
 bang = string "!" >> spaces
 negation = string "\\+" >> spaces
-identifier = many letter
+identifier = many1 letter
 def = string ":-" >> spaces
 startTuple = lparen >> spaces
 endTuple = rparen >> spaces
