@@ -117,6 +117,12 @@ spec = do
       it "is False when there is a reduction of applications" $ do
         hasRedundantReduction (pl "baz(X):- X is 5 + Y.") `shouldBe` False
 
+      it "is False when there is a reduction of named function applications" $ do
+        hasRedundantReduction (pl "baz(X):- X is abs(Y).") `shouldBe` False
+        hasRedundantReduction (pl "baz(X):- X is mod(Y, 2).") `shouldBe` False
+        hasRedundantReduction (pl "baz(X):- X is div(Y, 2).") `shouldBe` False
+        hasRedundantReduction (pl "baz(X):- X is rem(Y, 2).") `shouldBe` False
+
       it "is True when there is a redundant reduction of parameters" $ do
         hasRedundantReduction (pl "baz(X, Y):- X is Y.") `shouldBe` True
 

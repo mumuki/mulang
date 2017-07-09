@@ -80,7 +80,8 @@ data Smell
   | HasCodeDuplication
   | UsesUnificationOperator
   | UsesFail
-  | UsesCut deriving (Show, Eq, Enum, Bounded, Generic)
+  | UsesCut
+  | HasRedundantReduction deriving (Show, Eq, Enum, Bounded, Generic)
 
 data SignatureAnalysisType
   = NoSignatures

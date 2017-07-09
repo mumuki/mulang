@@ -37,12 +37,16 @@ pattern = buildExpressionParser optable (term <* spaces)
                 [ Infix (op "-") AssocLeft ] ]
     term    = try number <|> wildcard <|> tuple <|> (fmap otherToPattern phead)
 
-    op :: String -> ParsecParser (Pattern -> Pattern -> Pattern)
-    op symbol = string symbol <* spaces >> return (\x y -> ApplicationPattern symbol [x, y])
-
     otherToPattern (name, []) | isUpper . head $ name = VariablePattern name
                               | otherwise = LiteralPattern name
-    otherToPattern (name, args) = FunctorPattern name args
+    otherToPattern ("abs", [p])           = ApplicationPattern "abs" [p]
+    otherToPattern ("mod", [p1, p2])      = ApplicationPattern "mod" [p1, p2]
+    otherToPattern ("div", [p1, p2])      = ApplicationPattern "div" [p1, p2]
+    otherToPattern ("rem", [p1, p2])      = ApplicationPattern "rem" [p1, p2]
+    otherToPattern (name, args)           = FunctorPattern name args
+
+op :: String -> ParsecParser (Pattern -> Pattern -> Pattern)
+op symbol = string symbol <* spaces >> return (\x y -> ApplicationPattern symbol [x, y])
 
 tuple :: ParsecParser Pattern
 tuple = fmap compact patternsList
