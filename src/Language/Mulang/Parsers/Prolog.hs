@@ -35,7 +35,7 @@ pattern = buildExpressionParser optable term <* spaces
                 [ Infix div AssocLeft ],
                 [ Infix add AssocLeft ],
                 [ Infix minus AssocLeft ] ]
-    term    = try number <|> try wildcard <|> tuple <|> try (fmap otherToPattern phead)
+    term    = try number <|> wildcard <|> tuple <|> (fmap otherToPattern phead)
 
     times   = string "*" >> return (\x y -> FunctorPattern "*" [x, y])
     div     = string "/" >> return (\x y -> FunctorPattern "/" [x, y])
@@ -129,7 +129,7 @@ pinfix :: ParsecParser Expression
 pinfix = do
   p1 <- pattern
   spaces
-  operator <- choice . map try . map string $ ["is", ">=", "=<", "\\=", ">", "<", "="]
+  operator <- choice . map try . map string $ ["is", ">=", "=<", "\\=", ">", "<", "=:=", "==", "="]
   spaces
   p2 <- pattern
   return $ Exist operator [p1, p2]

@@ -132,6 +132,21 @@ spec = do
                                                  [Exist "is" [
                                                     VariablePattern "X",
                                                     FunctorPattern "-" [VariablePattern "Y", LiteralPattern "5.0"]]])
+    it "rule/1 with =:=" $ do
+      pl "baz(X, Y):- X =:= Y." `shouldBe` (Rule "baz"
+                                                 [VariablePattern "X",VariablePattern "Y"]
+                                                 [Exist "=:=" [
+                                                    VariablePattern "X",
+                                                    VariablePattern "Y"]])
+    it "rule/1 with ==" $ do
+      pl "baz(X, Y):- X == Y." `shouldBe` (Rule "baz"
+                                                 [VariablePattern "X",VariablePattern "Y"]
+                                                 [Exist "==" [
+                                                    VariablePattern "X",
+                                                    VariablePattern "Y"]])
+
+
+
     it "rule/1 with is and parenthesis" $ do
       pl "baz(X, Y):- X is (Y / 5) + 20." `shouldBe` (Rule "baz"
                                                         [VariablePattern "X",VariablePattern "Y"]
