@@ -75,7 +75,7 @@ spec = do
       js "8; 9" `shouldBe` js "{8; 9}"
 
     it "handles booleans" $ do
-      js "true" `shouldBe` MuBool True
+      js "true" `shouldBe` MuTrue
 
     it "handles lambdas" $ do
       js "(function(x, y) { 1 })" `shouldBe` (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1))

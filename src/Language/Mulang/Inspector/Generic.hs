@@ -81,11 +81,8 @@ declaresComputationWithArity arity = declaresComputationWithArity' (== arity)
 
 declaresComputationWithArity' :: (Int -> Bool) -> BindedInspection
 declaresComputationWithArity' arityPredicate = containsDeclaration f
-  where f (Function _ equations)  = any equationArityIs equations
-        f (Procedure _ equations) = any equationArityIs equations
-        f (Method _ equations)    = any equationArityIs equations
-        f (Rule _ args _)         = argsHaveArity args
-        f (Fact _ args)           = argsHaveArity args
+  where f (Subroutine _ es)       = any equationArityIs es
+        f (Clause _ args _)       = argsHaveArity args
         f _  = False
 
         equationArityIs = \(Equation args _) -> argsHaveArity args
@@ -105,13 +102,10 @@ declaresTypeSignature = containsDeclaration f
 
 usesAnonymousVariable :: Inspection
 usesAnonymousVariable = containsExpression f
-  where f (Function _ equations)    = equationContainsWildcard equations
-        f (Procedure _ equations)   = equationContainsWildcard equations
-        f (Method _ equations)      = equationContainsWildcard equations
+  where f (Subroutine _ equations)    = equationContainsWildcard equations
 --TODO        f (Lambda args _)                      = equationContainsWildcard equations
-        f (Fact _ params)             = paramsContainsWildcard params
-        f (Rule _ params _)           = paramsContainsWildcard params
-        f _                                    = False
+        f (Clause _ params _)         = paramsContainsWildcard params
+        f _                           = False
 
         equationContainsWildcard = any (paramsContainsWildcard . equationParams)
         paramsContainsWildcard = any isOrContainsWildcard

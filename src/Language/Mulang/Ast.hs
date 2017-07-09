@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, PatternSynonyms #-}
+{-# LANGUAGE DeriveGeneric, PatternSynonyms, ViewPatterns #-}
 
 -- | The Ast module describes a generic, abstract language AST.
 -- |
@@ -24,6 +24,11 @@ module Language.Mulang.Ast (
     pattern SimpleFunction,
     pattern SimpleProcedure,
     pattern SimpleMethod,
+    pattern MuTrue,
+    pattern MuFalse,
+    pattern Subroutine,
+    pattern Clause,
+    pattern Call
   ) where
 
 import           GHC.Generics
@@ -159,11 +164,36 @@ data ComprehensionStatement
   deriving (Eq, Show, Read, Generic)
 
 
-equationParams :: Equation -> [Pattern]
-equationParams (Equation p _) = p
 
 pattern SimpleEquation params body = Equation params (UnguardedBody body)
 
 pattern SimpleFunction name params body  = Function  name [SimpleEquation params body]
 pattern SimpleProcedure name params body = Procedure name [SimpleEquation params body]
 pattern SimpleMethod name params body    = Method    name [SimpleEquation params body]
+
+pattern MuTrue  = MuBool True
+pattern MuFalse = MuBool False
+
+pattern Subroutine name equations <- (extractSubroutine -> Just (name, equations))
+pattern Clause name patterns expressions <- (extractClause -> Just (name, patterns, expressions))
+
+pattern Call operation arguments <- (extractCall -> Just (operation, arguments))
+
+equationParams :: Equation -> [Pattern]
+equationParams (Equation p _) = p
+
+extractSubroutine :: Expression -> Maybe (Identifier, [Equation])
+extractSubroutine (Function name equations)  = Just (name, equations)
+extractSubroutine (Procedure name equations) = Just (name, equations)
+extractSubroutine (Method name equations)    = Just (name, equations)
+extractSubroutine _                          = Nothing
+
+extractCall :: Expression -> Maybe (Expression, [Expression])
+extractCall (Application op args)   = Just (op, args)
+extractCall (Send receptor op args) = Just (op, (receptor:args))
+extractCall _                       = Nothing
+
+extractClause :: Expression -> Maybe (Identifier, [Pattern], [Expression])
+extractClause (Fact name patterns)             = Just (name, patterns, [])
+extractClause (Rule name patterns expressions) = Just (name, patterns, expressions)
+extractClause _                                = Nothing

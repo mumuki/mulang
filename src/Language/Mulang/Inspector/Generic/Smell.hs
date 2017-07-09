@@ -37,11 +37,9 @@ isLongCode = containsExpression f
 compares :: (Expression -> Bool) -> Inspection
 compares f = containsExpression (any f.comparisonOperands)
 
-comparisonOperands (Send a1 Equal    [a2])     = [a1, a2]
-comparisonOperands (Send a1 NotEqual [a2])     = [a1, a2]
-comparisonOperands (Application Equal    args) = args
-comparisonOperands (Application NotEqual args) = args
-comparisonOperands _                           = []
+comparisonOperands (Call Equal    [a1, a2])   = [a1, a2]
+comparisonOperands (Call NotEqual [a1, a2])   = [a1, a2]
+comparisonOperands _                          = []
 
 returnsNull :: Inspection
 returnsNull = containsExpression f
@@ -69,7 +67,7 @@ hasRedundantGuards = containsBody f -- TODO not true when condition is a pattern
 -- | Inspection that tells whether a binding has lambda expressions like '\x -> g x'
 hasRedundantLambda :: Inspection
 hasRedundantLambda = containsExpression f
-  where f (Lambda [VariablePattern (x)] (Return (Application _ [Reference (y)]))) = x == y
+  where f (Lambda [VariablePattern (x)] (Return (Call _ [Reference (y)]))) = x == y
         f _ = False
 
 
