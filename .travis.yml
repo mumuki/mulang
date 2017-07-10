@@ -30,7 +30,7 @@ deploy:
   provider: releases
   api_key:
     secure: YRjvQF6PtWGgHJ3c/klwnnswT+/4Bs1xZB9JnTqB9S8wcq0APN/DFx4c3sRTsknezZy0xb6raOvvTskTIghvYnukdrtUsI4qpJM9fERr9tAxNUPzrhybgzWNhgNzDfGL02mqQ1WFaqFnQtbQnuxEHKFBA3VYv41EchtOAlx7ZWt1LJADdCgXQolY7c8TChx9j0Pbgf/0FtUMu49nOpYwGMcZmjyZcuKgYfq7oFGU4nIp/emjA8MfZ9AiygKyV49WuptjAMAxPbbv3KzZH6zpwnXDnYRieapuaNrzjBhxJsC6h8YBUV0dGeccFyBsRCcUq2sf9Kk3McxcFlBBGxLlynbrfsR6GhWoD3RZlE/sWAgR9My2lhhq2h0SJH46YC15ccjnYrW1OgbqmkZDtsvSvgAam7eeeojAazW8c29kPe0s9prj46ZPpRIy3mRlctW8e+QA8nJ+nbQPMmxjdfzP2pqna39Rrircdbp7+MukRQM7ZV6XxJvCzAKxhJCB+ZJlXnbCTwWATfFKRR6OSKfiM8ZAhIxVbdx5DIDt46dZ4MkOiNk/FbguE6QxEKyQA4UtwMT8Wz3eLT8wWMod1WsMpsH6B0T//adu9c3cYO39TwBtzcs5EeyBp/TXhdOhEYiV/S0F/f420WPUGBsscJCdBe7NwjPVmiGY0Wy7b04sKno=
-  file: ~/.local/bin/mulang
+  file: /home/travis/.local/bin/mulang
   skip_cleanup: true
   on:
     repo: mumuki/mulang
