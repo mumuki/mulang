@@ -52,6 +52,7 @@ compileInspectionPrimitive :: String -> BindingPredicate -> Maybe Inspection
 compileInspectionPrimitive = f
   where
 
+  f "Assigns"                             b = Just $ assigns b
   f "DeclaresRule"                        b = Just $ declaresRule b
   f "DeclaresFact"                        b = Just $ declaresFact b
   f "DeclaresPredicate"                   b = Just $ declaresPredicate b

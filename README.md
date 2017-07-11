@@ -90,6 +90,7 @@ False
 Nice, we know. But not very awesome, it only can tell you if you are using a _binding_, right? Eeer. Good news, it can tell you much much much more things:
 
 
+1. `assigns`: **any paradigm** is the given variable or attribute assigned?
 1. `declares`: **any paradigm** is the given element declared?
 1. `declaresAttribute`: **objects paradigm** is a given attribute declared?
 1. `declaresClass`: **objects paradigm** is a given class declared?
