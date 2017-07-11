@@ -200,6 +200,19 @@ spec = do
     it "is True when anyone present, scoped" $ do
       declaresObject anyone (js "var g = {}")  `shouldBe` True
 
+  describe "usesInheritance" $ do
+    it "is True when present" $ do
+      usesInheritance (Class "Bird" (Just "Animal") MuNull) `shouldBe` True
+
+    it "is False when not present" $ do
+      usesInheritance (Class "Bird" Nothing MuNull) `shouldBe` False
+
+    it "is True when present, scoped" $ do
+      (scoped usesInheritance "Bird") (Sequence [Class "Bird" (Just "Animal") MuNull, Class "Fox" (Just "Animal") MuNull])  `shouldBe` True
+
+    it "is True when present, scoped" $ do
+      (scoped usesInheritance "Hercules") (Sequence [Class "Hercules" Nothing MuNull, Class "Fox" (Just "Animal") MuNull])  `shouldBe` False
+
   describe "declaresMethod" $ do
     it "is True when present" $ do
       declaresMethod (named "x") (js "var f = {x: function(){}}")  `shouldBe` True
