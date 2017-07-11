@@ -1,5 +1,6 @@
 module Language.Mulang.Inspector.Generic (
   parses,
+  assigns,
   uses,
   usesIf,
   declares,
@@ -30,6 +31,13 @@ type BindedInspection = BindingPredicate -> Inspection
 -- | Inspection that tells whether an expression is equal to a given piece of code after being parsed
 parses :: (String -> Expression) -> String -> Inspection
 parses parser code = (== (parser code))
+
+assigns :: BindedInspection
+assigns predicate = containsExpression f
+  where f (Assignment name _)  = predicate name
+        f (Variable name _)    = predicate name
+        f (Attribute name _)   = predicate name
+        f _                    = False
 
 -- | Inspection that tells whether an expression uses the the given target binding
 -- in its definition

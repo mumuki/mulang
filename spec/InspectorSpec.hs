@@ -73,16 +73,30 @@ spec = do
       usesRepeat code  `shouldBe` False
 
   describe "declaresVariable" $ do
-      it "is True when declare a variable" $ do
-        let code = gbs "procedure F(){ x := 2}"
+    it "is True when declare a variable" $ do
+      let code = gbs "procedure F(){ x := 2}"
 
-        declaresVariable (named "x") code `shouldBe` True
+      declaresVariable (named "x") code `shouldBe` True
 
-      it "is False when variable is not declared" $ do
-        let code = gbs "procedure F(){ x := 2}"
+    it "is False when variable is not declared" $ do
+      let code = gbs "procedure F(){ x := 2}"
 
-        declaresVariable (named "y") code `shouldBe` False
+      declaresVariable (named "y") code `shouldBe` False
 
+  describe "assigns" $ do
+    it "is True when initializes a variable" $ do
+      assigns (named "x") (Variable "x" (MuTrue)) `shouldBe` True
+
+    it "is True when declares an attribute" $ do
+      assigns (named "x") (MuObject (Attribute "x" (MuTrue))) `shouldBe` True
+
+    it "is True when assigns a variable" $ do
+      assigns (named "x") (Assignment "x" (MuTrue)) `shouldBe` True
+
+    it "is False otherwise" $ do
+      assigns (named "x") (Assignment "y" (MuTrue)) `shouldBe` False
+      assigns (named "x") (Other) `shouldBe` False
+      assigns (named "x") (MuFalse) `shouldBe` False
 
   describe "declaresFunction" $ do
     describe "with function declarations, hs" $ do
