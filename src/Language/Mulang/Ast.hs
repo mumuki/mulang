@@ -79,7 +79,7 @@ data Expression
     | Object Identifier Expression
     -- ^ Object oriented programming global, named object declaration,
     --   composed by a name and a body
-    | Class Identifier Identifier Expression
+    | Class Identifier (Maybe Identifier) Expression
     -- ^ Object oriented programming global, class declaration,
     --   composed by a name, superclass and a body
     | Rule Identifier [Pattern] [Expression]

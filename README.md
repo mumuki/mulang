@@ -105,6 +105,7 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `declaresProcedure`: **imperative paradigm** is a given procedure declared?
 1. `declaresRecursively`: **any paradigm** is a given computation declared using recusion?
 1. `declaresRule`: **logic paradigm** is a given logic rule declared?
+1. `declaresSuperclass`: **objects paradigm** is a given class declared as superclass?
 1. `declaresTypeAlias`: **any paradigm** is a given type synonym declared?
 1. `declaresTypeSignature`: **any paradigm** is a given computation type signature declared?
 1. `declaresVariable`: **any paradigm** is a given local o global variable declared?
@@ -135,6 +136,7 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `usesForall`:  **logic paradigm** is the logic `forall` consult used?
 1. `usesGuards`
 1. `usesIf`
+1. `usesInheritance`: **objects paradigm** is a superclass explicitly declared?
 1. `usesLambda`
 1. `usesNot`
 1. `usesPatternMatching`
