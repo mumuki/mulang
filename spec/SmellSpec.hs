@@ -29,6 +29,15 @@ spec = do
     it "is False when there are no literals" $ do
       hasRedundantIf (js "function x() { if(m) 2 else 4 }") `shouldBe` False
 
+    it "is True even if a variable is used" $ do
+      hasRedundantIf (js "function x(b) { var r = true; if(b) { r = true; } else { r = false; }; return r; }") `shouldBe` True
+
+    it "is True even if there is no return" $ do
+      hasRedundantIf (js "function x(b) { var r = true; if(b) { r = true; } else { r = false; }; console.log(r) }") `shouldBe` True
+
+    it "is True even if there is variable declaration" $ do
+      hasRedundantIf (js "function x(b) { if(b) { r = true; } else { r = false; } }") `shouldBe` True
+
     it "is True when if present and both branches are boolean literals, hs" $ do
       hasRedundantIf (hs "x = if m then True else False") `shouldBe` True
       hasRedundantIf (hs "x = if m then False else True") `shouldBe` True
