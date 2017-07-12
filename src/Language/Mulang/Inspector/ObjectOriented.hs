@@ -11,9 +11,7 @@ import Language.Mulang.Binding
 import Language.Mulang.Inspector.Generic
 
 usesInheritance :: Inspection
-usesInheritance = containsExpression f
-  where f (Class _ (Just _) _) = True
-        f _                    = False
+usesInheritance = declaresSuperclass anyone
 
 declaresObject :: BindingPredicate -> Inspection
 declaresObject =  containsDeclaration f
