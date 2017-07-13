@@ -141,11 +141,8 @@ parseExpression value = switchParser $ value
             arity          = HashMap.lookup "arity" expression
             alias          = HashMap.lookup "alias" expression
 
-            isNot    | isJust alias && (String "not"  == fromJust alias)    = True
-                     | otherwise                                            = False
-
-            isBinary | isJust arity && (String "binary"  == fromJust arity) = True
-                     | otherwise                                            = False
+            isNot    = isJust alias && (String "not"  == fromJust alias)
+            isBinary = isJust arity && (String "binary"  == fromJust arity)
 
 expressionValue text = parseExpression . lookUpValue text
 
@@ -154,7 +151,7 @@ convertReturn (Object value) = expressionValue "expression" value
 
 
 parseToken :: Value -> Object -> Data.Aeson.Types.Parser Expression
-parseToken "program" value                = EntryPoint "program" <$> lookupAndParseExpression parseBodyExpression "body" value
+parseToken "program" value                = EntryPoint "program" <$> parseProgramBody value
 parseToken "procedureDeclaration" value   = Procedure <$> lookupAndParseExpression parseNameExpression "name" value <*> return <$> (Equation <$> lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value <*> (UnguardedBody <$> lookupAndParseExpression  parseBodyExpression "body" value))
 parseToken "ProcedureCall" value          = Application <$> evaluatedFunction <$> lookupAndParseExpression parseNameExpression "name" value <*> lookupAndParseExpression (mapObjectArray parseExpression) "parameters" value
 parseToken ":=" value                     = Assignment <$> variableName value <*> expressionValue "right" value
@@ -169,6 +166,8 @@ parseToken "Grab" value                   = parsePrimitive "Sacar" value
 parseToken "MoveClaw" value               = parsePrimitive "Mover" value
 parseToken "hasStones" value              = parsePrimitive "hayBolitas" value
 parseToken "canMove" value                = parsePrimitive "puedeMover" value
+
+parseProgramBody value = lookupAndParseExpression parseBodyExpression "body" value
 
 
 parsePrimitive primitiveName value = Application <$> evaluatedFunction <$> pure primitiveName <*> lookupAndParseExpression (mapObjectArray parseExpression) "parameters" value
