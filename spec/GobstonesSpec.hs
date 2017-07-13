@@ -10,6 +10,11 @@ spec :: Spec
 spec = do
 
 describe "gobstones" $ do
+    it "foo" $ do
+      (gbs "program { result := foo(); return (result) }") `shouldBe` program (Sequence [
+                                                                                (Variable "result" (Application (Reference "foo") [])),
+                                                                                Return (Reference "result")])
+
     it "translates simple Gobstones program" $ do
       (gbs "program {}") `shouldBe` program MuNull
 
