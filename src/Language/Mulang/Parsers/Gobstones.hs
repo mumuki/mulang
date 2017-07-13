@@ -32,16 +32,16 @@ type JsonParser a = Value ->  Data.Aeson.Types.Parser a
 
 -- Combinators
 
-get :: Text -> Object -> Maybe Value
-get = HashMap.lookup
+get :: Text -> Value -> Maybe Value
+get key (Object o) = HashMap.lookup key o
 
-getJust :: Text -> Object -> Value
+getJust :: Text -> Value -> Value
 getJust key = fromJust . get key
 
-getValue :: Object -> Value
+getValue :: Value -> Value
 getValue = getJust "value"
 
-getWith :: (Value -> b) -> Text -> Object -> b
+getWith :: (Value -> b) -> Text -> Value -> b
 getWith f key = f . getJust key
 
 -- Actual Parser
@@ -56,23 +56,22 @@ parseBodyExpression Null         = pure MuNull
 parseBodyExpression _            = fail "Failed to parse Expression!"
 
 parseNodes :: JsonParser Expression
-parseNodes (Object v) = nodeAst
-    where nodeAst = parseToken (getJust "alias" v) v
+parseNodes o = parseToken (getJust "alias" o) o
 
 mapObjectArray f (Array list)
               | (V.null list) = pure []
               | otherwise = toList <$> traverse f list
 
-parseCaseValue (Object value) = (\x y -> (x, y)) <$> expressionValue "case" value <*> getWith parseBodyExpression "body" value
+parseCaseValue o = (\x y -> (x, y)) <$> expressionValue "case" o <*> getWith parseBodyExpression "body" o
 
 parseParameterPatterns :: JsonParser Pattern
-parseParameterPatterns (Object value) = VariablePattern <$> getWith parseNameExpression "value" value
+parseParameterPatterns o = VariablePattern <$> getWith parseNameExpression "value" o
 
 parseFunctionCall :: JsonParser Expression
-parseFunctionCall (Object value) = parseNodeAst (Just "ProcedureCall") value
+parseFunctionCall = parseToken "ProcedureCall"
 
 parseSimpleValue :: JsonParser Expression
-parseSimpleValue (Object value) = parseSimpleExpressionValue (get "alias" value) $ getValue value
+parseSimpleValue o = parseSimpleExpressionValue (get "alias" o) $ getValue o
     where
           parseSimpleExpressionValue (Just "NumericLiteral") n@(Number _) = MuNumber <$> parseJSON n
           parseSimpleExpressionValue _ b@(Bool _)         = MuBool <$> parseJSON b
@@ -104,16 +103,16 @@ scientificToInteger = extractInteger . Scientific.floatingOrInteger
                 extractInteger (Left d)  = error $ "Tried to parse an integer, but a floting " ++ show d ++" was found"
 
 parseBinaryValue :: JsonParser Expression
-parseBinaryValue (Object value) = Application <$> parseFunction <$> getWith parseNameExpression "alias" value <*> ((\x y -> [x,y]) <$> expressionValue  "left" value <*> expressionValue "right" value)
+parseBinaryValue o = Application <$> parseFunction <$> getWith parseNameExpression "alias" o <*> ((\x y -> [x,y]) <$> expressionValue  "left" o <*> expressionValue "right" o)
 
 parseNotValue :: JsonParser Expression
-parseNotValue (Object value) = Application <$> parseFunction <$> getWith parseNameExpression "alias" value <*> (:[]) <$> expressionValue  "expression" value
+parseNotValue o = Application <$> parseFunction <$> getWith parseNameExpression "alias" o <*> (:[]) <$> expressionValue  "expression" o
 
 parseNameExpression (String n) = pure $ T.unpack n
 
 
 parseVariableName :: JsonParser String
-parseVariableName (Object value) =  parseNameExpression . getValue $ value
+parseVariableName =  parseNameExpression . getValue
 
 
 variableName = getWith parseVariableName "left"
@@ -130,17 +129,14 @@ parseFunction "GreaterEqualOperation"            = Reference ">="
 parseFunction  fun                               = Reference fun
 
 parseExpression :: JsonParser Expression
-parseExpression value = switchParser value
-      where switchParser | isJust maybeName = parseFunctionCall
-                         | isBinary         = parseBinaryValue
-                         | isNot            = parseNotValue
-                         | otherwise        = parseSimpleValue
-
-            expression | (Object  v) <- value = v
-
-            maybeName      = get "name" expression
-            arity          = get "arity" expression
-            alias          = get "alias" expression
+parseExpression o | isJust maybeName = parseFunctionCall o
+                  | isBinary         = parseBinaryValue o
+                  | isNot            = parseNotValue o
+                  | otherwise        = parseSimpleValue o
+          where
+            maybeName      = get "name" o
+            arity          = get "arity" o
+            alias          = get "alias" o
 
             isNot    = isJust alias && (String "not"  == fromJust alias)
             isBinary = isJust arity && (String "binary"  == fromJust arity)
@@ -148,35 +144,31 @@ parseExpression value = switchParser value
 expressionValue = getWith parseExpression
 
 convertReturn :: JsonParser Expression
-convertReturn (Object value) = expressionValue "expression" value
+convertReturn = expressionValue "expression"
 
 
-parseToken :: Value -> Object -> Data.Aeson.Types.Parser Expression
-parseToken "program" value                = EntryPoint "program" <$> parseProgramBody value
-parseToken "procedureDeclaration" value   = Procedure <$> getWith parseNameExpression "name" value <*> return <$> (Equation <$> getWith (mapObjectArray parseParameterPatterns) "parameters" value <*> (UnguardedBody <$> getWith  parseBodyExpression "body" value))
-parseToken "ProcedureCall" value          = Application <$> parseFunction <$> getWith parseNameExpression "name" value <*> getWith (mapObjectArray parseExpression) "parameters" value
-parseToken ":=" value                     = Assignment <$> variableName value <*> expressionValue "right" value
-parseToken "functionDeclaration" value    = Function <$> getWith parseNameExpression "name" value <*> return <$> (Equation <$> getWith (mapObjectArray parseParameterPatterns) "parameters" value <*> (UnguardedBody <$> (addReturn <$> getWith  parseBodyExpression "body" value <*> getWith  convertReturn "return" value)))
-parseToken "if" value                     = If <$> expressionValue "condition" value <*> getWith parseBodyExpression "trueBranch" value <*> getWith parseBodyExpression "falseBranch" value
-parseToken "while" value                  = parseRepetitionFunction While value
-parseToken "repeat" value                 = parseRepetitionFunction Repeat value
-parseToken "switch" value                 = Switch <$> expressionValue "expression" value <*> getWith (mapObjectArray parseCaseValue) "cases" value
-parseToken "return" value                 = Return <$> expressionValue "expression" value
-parseToken "Drop" value                   = parsePrimitive "Poner" value
-parseToken "Grab" value                   = parsePrimitive "Sacar" value
-parseToken "MoveClaw" value               = parsePrimitive "Mover" value
-parseToken "hasStones" value              = parsePrimitive "hayBolitas" value
-parseToken "canMove" value                = parsePrimitive "puedeMover" value
+parseToken :: Value -> Value -> Data.Aeson.Types.Parser Expression
+parseToken "program" o                = EntryPoint "program" <$> parseProgramBody o
+parseToken "procedureDeclaration" o   = Procedure <$> getWith parseNameExpression "name" o <*> return <$> (Equation <$> getWith (mapObjectArray parseParameterPatterns) "parameters" o <*> (UnguardedBody <$> getWith  parseBodyExpression "body" o))
+parseToken "ProcedureCall" o          = Application <$> parseFunction <$> getWith parseNameExpression "name" o <*> getWith (mapObjectArray parseExpression) "parameters" o
+parseToken ":=" o                     = Assignment <$> variableName o <*> expressionValue "right" o
+parseToken "functionDeclaration" o    = Function <$> getWith parseNameExpression "name" o <*> return <$> (Equation <$> getWith (mapObjectArray parseParameterPatterns) "parameters" o <*> (UnguardedBody <$> (addReturn <$> getWith  parseBodyExpression "body" o <*> getWith  convertReturn "return" o)))
+parseToken "if" o                     = If <$> expressionValue "condition" o <*> getWith parseBodyExpression "trueBranch" o <*> getWith parseBodyExpression "falseBranch" o
+parseToken "while" o                  = parseRepetitionFunction While o
+parseToken "repeat" o                 = parseRepetitionFunction Repeat o
+parseToken "switch" o                 = Switch <$> expressionValue "expression" o <*> getWith (mapObjectArray parseCaseValue) "cases" o
+parseToken "return" o                 = Return <$> expressionValue "expression" o
+parseToken "Drop" o                   = parsePrimitive "Poner" o
+parseToken "Grab" o                   = parsePrimitive "Sacar" o
+parseToken "MoveClaw" o               = parsePrimitive "Mover" o
+parseToken "hasStones" o              = parsePrimitive "hayBolitas" o
+parseToken "canMove" o                = parsePrimitive "puedeMover" o
 
-parseProgramBody value = getWith parseBodyExpression "body" value
-
+parseProgramBody o = getWith parseBodyExpression "body" o
 
 parsePrimitive primitiveName value = Application <$> parseFunction <$> pure primitiveName <*> getWith (mapObjectArray parseExpression) "parameters" value
 
 parseRepetitionFunction f value = f <$> expressionValue "expression" value <*> getWith parseBodyExpression "body" value
-
-parseNodeAst (Just token)  = parseToken token
-
 
 ------------------------------------------------
 addReturn :: Expression -> Expression -> Expression
