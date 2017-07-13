@@ -19,7 +19,7 @@ allExpressions expr = expr : concatMap allExpressions (subExpressions expr)
     subExpressions (Attribute _ v)         = [v]
     subExpressions (Object _ v)            = [v]
     subExpressions (Class _ _ v)           = [v]
-    subExpressions (EntryPoint e)          = [e]
+    subExpressions (EntryPoint _ e)        = [e]
     subExpressions (Call op args)          = op:args
     subExpressions (Lambda _ a)            = [a]
     subExpressions (If a b c)              = [a, b, c]
@@ -44,7 +44,7 @@ allExpressions expr = expr : concatMap allExpressions (subExpressions expr)
 mainExpressions :: Unfold
 mainExpressions o@(Object _ b)         = o : mainExpressions b
 mainExpressions c@(Class _ _ b)        = c : mainExpressions b
-mainExpressions e@(EntryPoint b)       = e : mainExpressions b
+mainExpressions e@(EntryPoint _ b)     = e : mainExpressions b
 mainExpressions t@(TypeSignature _ _)  = [t]
 mainExpressions t@(TypeAlias _ )       = [t]
 mainExpressions r@(Record _)           = [r]
