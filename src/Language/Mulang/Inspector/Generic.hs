@@ -75,10 +75,10 @@ declaresVariable = containsDeclaration f
   where f (Variable _ _)  = True
         f _               = False
 
-declaresEntryPoint :: Inspection
-declaresEntryPoint = containsExpression f
-  where f (EntryPoint _)  = True
-        f _               = False
+declaresEntryPoint :: BindedInspection
+declaresEntryPoint = containsDeclaration f
+  where f (EntryPoint _ _)  = True
+        f _                 = False
 
 -- | Inspection that tells whether a top level computation binding exists
 declaresComputation :: BindedInspection

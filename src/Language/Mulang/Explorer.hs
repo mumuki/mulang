@@ -87,5 +87,6 @@ extractDeclaration e@(Clause n _ _)       = Just (n, e)
 extractDeclaration e@(Object n _)         = Just (n, e)
 extractDeclaration e@(Class n _ _)        = Just (n, e)
 extractDeclaration e@(Attribute n _)      = Just (n, e)
+extractDeclaration e@(EntryPoint n _)     = Just (n, e)
 extractDeclaration _                      = Nothing
 

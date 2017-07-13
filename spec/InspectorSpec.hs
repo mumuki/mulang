@@ -15,12 +15,12 @@ spec = do
       it "is True when program is declared" $ do
         let code = gbs "program{ Poner(Verde) }"
 
-        declaresEntryPoint code `shouldBe` True
+        declaresEntryPoint anyone code `shouldBe` True
 
       it "is False when program is not declared" $ do
         let code = gbs "procedure F(){}"
 
-        declaresEntryPoint code `shouldBe` False
+        declaresEntryPoint anyone code `shouldBe` False
 
   describe "declaresProcedure" $ do
     describe "with procedure declarations" $ do

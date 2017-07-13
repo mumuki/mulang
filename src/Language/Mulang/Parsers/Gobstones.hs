@@ -154,7 +154,7 @@ convertReturn (Object value) = expressionValue "expression" value
 
 
 parseToken :: Value -> Object -> Data.Aeson.Types.Parser Expression
-parseToken "program" value                = EntryPoint <$> lookupAndParseExpression parseBodyExpression "body" value
+parseToken "program" value                = EntryPoint "program" <$> lookupAndParseExpression parseBodyExpression "body" value
 parseToken "procedureDeclaration" value   = Procedure <$> lookupAndParseExpression parseNameExpression "name" value <*> return <$> (Equation <$> lookupAndParseExpression (mapObjectArray parseParameterPatterns) "parameters" value <*> (UnguardedBody <$> lookupAndParseExpression  parseBodyExpression "body" value))
 parseToken "ProcedureCall" value          = Application <$> evaluatedFunction <$> lookupAndParseExpression parseNameExpression "name" value <*> lookupAndParseExpression (mapObjectArray parseExpression) "parameters" value
 parseToken ":=" value                     = Assignment <$> variableName value <*> expressionValue "right" value

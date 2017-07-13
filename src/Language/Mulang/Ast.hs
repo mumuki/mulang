@@ -64,7 +64,7 @@ data Expression
     | TypeSignature Identifier [Identifier]
     -- ^ Generic type signature for a computation.
     --   Only the target name of the computation is parsed
-    | EntryPoint Expression
+    | EntryPoint Identifier Expression
     -- ^ Entry point with its body
     | Function Identifier [Equation]
     -- ^ Functional / Imperative programming function declaration.

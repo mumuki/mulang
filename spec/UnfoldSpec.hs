@@ -30,8 +30,8 @@ spec = do
       (length $ mainExpressions code) `shouldBe` 5
 
     it "programs" $ do
-      let es = [SimpleFunction "main" [] MuNull,
-                             EntryPoint (Application (Reference "main") [])]
+      let es = [SimpleFunction "foo" [] MuNull,
+                             EntryPoint "main" (Application (Reference "foo") [])]
       let code = Sequence es
       (mainExpressions code) `shouldBe` es
 
