@@ -116,7 +116,7 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `hasMisspelledBindings`: **any paradigm** a binding is not a domain language dictionary's word and not part of its jargon
 1. `hasRedundantBooleanComparison`
 1. `hasRedundantGuards`
-1. `hasRedundantIf`
+1. `hasRedundantIf`: **any paradigm** can a combination of `if`s, `assignment`s and `return`s be replaced by a boolean expression?
 1. `hasRedundantLambda`
 1. `hasRedundantLocalVariableReturn`
 1. `hasRedundantParameter`
@@ -135,7 +135,7 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `usesFindall`:  **logic paradigm** is the logic `findall` consult used?
 1. `usesForall`:  **logic paradigm** is the logic `forall` consult used?
 1. `usesGuards`
-1. `usesIf`
+1. `usesIf`: **any paradigm** is an `if` control structure used?
 1. `usesInheritance`: **objects paradigm** is a superclass explicitly declared?
 1. `usesLambda`
 1. `usesNot`
