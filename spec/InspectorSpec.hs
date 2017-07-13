@@ -251,6 +251,13 @@ spec = do
     it "is False when attribute not present, scoped" $ do
       scoped (declaresAttribute (named "x")) "g" (js "var f = {x: 6}")  `shouldBe` False
 
+  describe "uses" $ do
+    it "is True on direct usage in entry point" $ do
+      uses (named "m") (EntryPoint "main" (Reference "m")) `shouldBe` True
+
+    it "is True on direct usage in entry point" $ do
+      uses (named "m") (EntryPoint "main" (Reference "f")) `shouldBe` False
+
   describe "uses, hs" $ do
     it "is True when required function is used on application" $ do
       uses (named "m") (hs "y x = m x") `shouldBe` True
