@@ -51,6 +51,7 @@ returnsNull = containsExpression f
 hasRedundantIf :: Inspection
 hasRedundantIf = containsExpression f
   where f (If _ (Assignment v1 x) (Assignment v2 y)) = all isBooleanLiteral [x, y] && v1 == v2
+        f (If _ (Variable v1 x) (Variable v2 y))     = all isBooleanLiteral [x, y] && v1 == v2
         f (If _ (Return x) (Return y))               = all isBooleanLiteral [x, y]
         f (If _ x y)                                 = all isBooleanLiteral [x, y]
         f _                                          = False
@@ -93,4 +94,5 @@ hasRedundantLocalVariableReturn = containsExpression f
 hasAssignmentReturn :: Inspection
 hasAssignmentReturn = containsExpression f
   where f (Return (Assignment _ _)) = True
+        f (Return (Variable _ _))   = True
         f _                         = False
