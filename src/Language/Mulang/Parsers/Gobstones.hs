@@ -13,7 +13,7 @@ import            Language.Mulang.Parsers
 
 import            Data.Aeson
 import            Data.HashMap.Lazy as  HashMap (HashMap, lookup, member, insert, empty)
-import            Data.Maybe (fromJust)
+import            Data.Maybe (fromJust, fromMaybe)
 import            Data.Text (Text)
 import            Data.Scientific as Scientific
 import  qualified Data.ByteString.Lazy.Char8 as LBS (pack)
@@ -124,10 +124,10 @@ parseFunction "GreaterEqualOperation"            = Reference ">="
 parseFunction  fun                               = Reference fun
 
 parseExpression :: Value -> Expression
-parseExpression o | (Just _) <- get "name" o                  = parseFunctionCall o
+parseExpression o | (Just _)                 <- get "name" o  = parseFunctionCall o
                   | (Just (String "binary")) <- get "arity" o = parseBinary o
                   | (Just (String "not"))    <- get "alias" o = parseNot o
-                  | otherwise        = parseLiteral o
+                  | otherwise                                 = parseLiteral o
 
 parseReturn :: Value -> Expression
 parseReturn = getExpression "expression"
@@ -165,7 +165,7 @@ parseKeyword "MoveClaw" o               = parsePrimitive "Mover" o
 parseKeyword "hasStones" o              = parsePrimitive "hayBolitas" o
 parseKeyword "canMove" o                = parsePrimitive "puedeMover" o
 
-parseProgramBody o = getBody "body" o
+parseProgramBody o = addReturn (getBody "body" o) (fromMaybe MuNull . fmap parseReturn . get "returnSentence" $ o)
 
 parsePrimitive primitiveName value = Application (parseFunction primitiveName) (getArrayWith parseExpression "parameters" value)
 
@@ -176,9 +176,10 @@ parseRepeat f value = f (getExpression "expression" value) (getBody "body" value
 ---------------------------
 
 addReturn :: Expression -> Expression -> Expression
+addReturn e MuNull        = e
 addReturn (Sequence []) e = Return e
 addReturn (Sequence xs) e = Sequence $ xs ++ [Return e]
-addReturn x e = Sequence [x,(Return e)]
+addReturn x e             = Sequence [x,(Return e)]
 
 simplify :: Expression -> Expression
 simplify (Sequence ((Sequence xs):es) ) = convertAssignmentToDeclaration $ Sequence $ (map simplify xs) ++ map simplify es
