@@ -40,13 +40,19 @@ getWith f key = f . getJust key
 getArrayWith :: (Value -> b) -> Text -> Value -> [b]
 getArrayWith f = getWith (mapObjectArray f)
 
+getString :: Text -> Value -> String
+getString = getStringWith id
+
+getStringWith :: (String -> b) -> Text -> Value -> b
+getStringWith f = getWith (f . (\(String s) -> T.unpack s))
+
 -- Actual Parser
 
-parseBodyExpression :: Value -> Expression
-parseBodyExpression (Array list) | (V.null list) = MuNull
-parseBodyExpression a@(Array _)  = Builder.normalize . simplify . Sequence . mapObjectArray  parseNodes $ a
-parseBodyExpression Null         = MuNull
-parseBodyExpression _            = error "Failed to parse Expression!"
+parseBody :: Value -> Expression
+parseBody (Array list) | (V.null list) = MuNull
+parseBody a@(Array _)  = Builder.normalize . simplify . Sequence . mapObjectArray  parseNodes $ a
+parseBody Null         = MuNull
+parseBody _            = error "Failed to parse Expression!"
 
 parseNodes :: Value -> Expression
 parseNodes o = parseToken (getJust "alias" o) o
@@ -55,10 +61,10 @@ mapObjectArray :: (Value -> a) -> Value -> [a]
 mapObjectArray f (Array vector) = V.toList . V.map f $ vector
 
 parseCaseValue :: Value -> (Expression, Expression)
-parseCaseValue o = (expressionValue "case" o, getWith parseBodyExpression "body" o)
+parseCaseValue o = (expressionValue "case" o, getWith parseBody "body" o)
 
-parseParameterPatterns :: Value -> Pattern
-parseParameterPatterns o = VariablePattern $ getWith parseNameExpression "value" o
+parseParameter :: Value -> Pattern
+parseParameter  = VariablePattern . getString "value"
 
 parseFunctionCall :: Value -> Expression
 parseFunctionCall = parseToken "ProcedureCall"
@@ -69,14 +75,9 @@ parseSimpleValue o = parseSimpleExpressionValue (get "alias" o) $ getValue o
           parseSimpleExpressionValue (Just "NumericLiteral") (Number n) = MuNumber $ toRealFloat n
           parseSimpleExpressionValue _ (Bool b)         = MuBool b
           parseSimpleExpressionValue _ (Number number)   = MuSymbol $ parseColor number
-          parseSimpleExpressionValue _ s@(String _)      = Reference $ parseNameExpression s
+          parseSimpleExpressionValue _ (String s)      = Reference $ T.unpack s
           parseSimpleExpressionValue _ (Array direction) = MuSymbol $ parseListToDirection direction
 
-          parseColor :: Scientific -> String
-          parseColor = numberToColor . scientificToInteger
-
-          numberToColor :: Integer -> String
-          numberToColor = (!!) ["Azul", "Rojo", "Negro", "Verde"] . fromIntegral
 
           parseListToDirection direction = let (Number n1, Number n2) = (V.head direction , V.last direction)
                                            in parseDirection n1 n2
@@ -89,6 +90,9 @@ parseSimpleValue o = parseSimpleExpressionValue (get "alias" o) $ getValue o
           numbersToDirection (-1, 0) = "Oeste"
           numbersToDirection (0, -1) = "Sur"
 
+parseColor :: Scientific -> String
+parseColor = ((!!) ["Azul", "Rojo", "Negro", "Verde"]) . fromIntegral . scientificToInteger
+
 scientificToInteger :: Scientific -> Integer
 scientificToInteger = extractInteger . Scientific.floatingOrInteger
           where extractInteger :: Either Double Integer -> Integer
@@ -96,19 +100,11 @@ scientificToInteger = extractInteger . Scientific.floatingOrInteger
                 extractInteger (Left d)  = error $ "Tried to parse an integer, but a floting " ++ show d ++" was found"
 
 parseBinaryValue :: Value -> Expression
-parseBinaryValue o = Application (parseFunction (getWith parseNameExpression "alias" o)) [expressionValue  "left" o, expressionValue "right" o]
+parseBinaryValue o = Application (getStringWith parseFunction "alias" o) [expressionValue  "left" o, expressionValue "right" o]
 
 parseNotValue :: Value -> Expression
-parseNotValue o = Application (parseFunction (getWith parseNameExpression "alias" o)) [expressionValue  "expression" o]
+parseNotValue o = Application (getStringWith parseFunction "alias" o) [expressionValue  "expression" o]
 
-parseNameExpression (String n) = T.unpack n
-
-
-parseVariableName :: Value -> String
-parseVariableName =  parseNameExpression . getValue
-
-
-variableName = getWith parseVariableName "left"
 
 parseFunction :: String -> Expression
 parseFunction "EqOperation"                      = Equal
@@ -136,30 +132,30 @@ parseExpression o | isJust maybeName = parseFunctionCall o
 
 expressionValue = getWith parseExpression
 
-convertReturn :: Value -> Expression
-convertReturn = expressionValue "expression"
+parseReturn :: Value -> Expression
+parseReturn = expressionValue "expression"
 
 
 parseToken :: Value -> Value -> Expression
 parseToken "program" o                = EntryPoint "program" (parseProgramBody o)
 parseToken "procedureDeclaration" o   = (Procedure
-                                          (getWith parseNameExpression "name" o)
+                                          (getString "name" o)
                                           [Equation
-                                            (getArrayWith parseParameterPatterns "parameters" o)
-                                            (UnguardedBody (getWith parseBodyExpression "body" o))])
+                                            (getArrayWith parseParameter "parameters" o)
+                                            (UnguardedBody (getWith parseBody "body" o))])
 parseToken "ProcedureCall" o          = (Application
-                                          (parseFunction (getWith parseNameExpression "name" o))
+                                          (getStringWith parseFunction "name" o)
                                           (getArrayWith parseExpression "parameters" o))
-parseToken ":=" o                     = Assignment (variableName o) (expressionValue "right" o)
+parseToken ":=" o                     = Assignment (getWith (getString "value") "left" o) (expressionValue "right" o)
 parseToken "functionDeclaration" o    = (Function
-                                          (getWith parseNameExpression "name" o)
+                                          (getString "name" o)
                                           [Equation
-                                            (getArrayWith parseParameterPatterns "parameters" o)
-                                            (UnguardedBody (addReturn (getWith  parseBodyExpression "body" o) (getWith  convertReturn "return" o)))])
+                                            (getArrayWith parseParameter "parameters" o)
+                                            (UnguardedBody (addReturn (getWith  parseBody "body" o) (getWith  parseReturn "return" o)))])
 parseToken "if" o                     = (If
                                           (expressionValue "condition" o)
-                                          (getWith parseBodyExpression "trueBranch" o)
-                                          (getWith parseBodyExpression "falseBranch" o))
+                                          (getWith parseBody "trueBranch" o)
+                                          (getWith parseBody "falseBranch" o))
 parseToken "while" o                  = parseRepetitionFunction While o
 parseToken "repeat" o                 = parseRepetitionFunction Repeat o
 parseToken "switch" o                 = Switch (expressionValue "expression" o) (getArrayWith parseCaseValue "cases" o)
@@ -170,11 +166,11 @@ parseToken "MoveClaw" o               = parsePrimitive "Mover" o
 parseToken "hasStones" o              = parsePrimitive "hayBolitas" o
 parseToken "canMove" o                = parsePrimitive "puedeMover" o
 
-parseProgramBody o = getWith parseBodyExpression "body" o
+parseProgramBody o = getWith parseBody "body" o
 
 parsePrimitive primitiveName value = Application (parseFunction primitiveName) (getArrayWith parseExpression "parameters" value)
 
-parseRepetitionFunction f value = f (expressionValue "expression" value) (getWith parseBodyExpression "body" value)
+parseRepetitionFunction f value = f (expressionValue "expression" value) (getWith parseBody "body" value)
 
 ------------------------------------------------
 addReturn :: Expression -> Expression -> Expression
@@ -199,7 +195,6 @@ convertListWithMap (p@(Procedure _ _):xs) hashMap                =  (convertVari
 convertListWithMap (x:xs) hashMap                                           =  (convertVariablesInConditionals x hashMap) : convertListWithMap xs hashMap
 
 
---  TODO : de aca para abajo falta refactor.
 convertVariable v@(Assignment identifier body) map | HashMap.member identifier map = (v,map)
                                                            | otherwise                     = (Variable identifier body,HashMap.insert identifier identifier map)
 
@@ -233,7 +228,7 @@ gba :: Parser
 gba  =  fromJust . parseGobstonesAst
 
 parseGobstonesAst :: MaybeParser
-parseGobstonesAst = fmap parseBodyExpression . decode . LBS.pack
+parseGobstonesAst = fmap parseBody . decode . LBS.pack
 
 gbs :: Parser
 gbs  = fromJust . parseGobstones
