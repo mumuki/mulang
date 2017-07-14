@@ -14,8 +14,6 @@ import            Language.Mulang.Parsers
 import            Data.Aeson
 import  qualified Data.Aeson.Types (Parser)
 import            Data.HashMap.Lazy as  HashMap (HashMap, lookup, member, insert, empty)
-import            Data.Traversable (traverse)
-import            Data.Foldable (toList)
 import            Data.Maybe (fromJust, isJust)
 import            Data.Text (Text)
 import            Data.Scientific as Scientific
@@ -27,8 +25,6 @@ import            GHC.Generics ()
 
 import            System.Process (readProcessWithExitCode)
 import            System.IO.Unsafe (unsafePerformIO)
-
-type JsonParser a = Value ->  Data.Aeson.Types.Parser a
 
 -- Combinators
 
@@ -46,50 +42,47 @@ getWith f key = f . getJust key
 
 -- Actual Parser
 
-instance FromJSON Expression where
-    parseJSON  =  parseBodyExpression
+parseBodyExpression :: Value -> Expression
+parseBodyExpression (Array list) | (V.null list) = MuNull
+parseBodyExpression a@(Array _)  = Builder.normalize . simplify . Sequence . mapObjectArray  parseNodes $ a
+parseBodyExpression Null         = MuNull
+parseBodyExpression _            = error "Failed to parse Expression!"
 
-parseBodyExpression :: JsonParser Expression
-parseBodyExpression (Array list) | (V.null list) = pure MuNull
-parseBodyExpression (Array list) = Builder.normalize . simplify . Sequence . toList <$> traverse parseNodes list
-parseBodyExpression Null         = pure MuNull
-parseBodyExpression _            = fail "Failed to parse Expression!"
-
-parseNodes :: JsonParser Expression
+parseNodes :: Value -> Expression
 parseNodes o = parseToken (getJust "alias" o) o
 
-mapObjectArray f (Array list)
-              | (V.null list) = pure []
-              | otherwise = toList <$> traverse f list
+mapObjectArray :: (Value -> a) -> Value -> [a]
+mapObjectArray f (Array vector) = V.toList . V.map f $ vector
 
-parseCaseValue o = (\x y -> (x, y)) <$> expressionValue "case" o <*> getWith parseBodyExpression "body" o
+parseCaseValue :: Value -> (Expression, Expression)
+parseCaseValue o = (expressionValue "case" o, getWith parseBodyExpression "body" o)
 
-parseParameterPatterns :: JsonParser Pattern
-parseParameterPatterns o = VariablePattern <$> getWith parseNameExpression "value" o
+parseParameterPatterns :: Value -> Pattern
+parseParameterPatterns o = VariablePattern $ getWith parseNameExpression "value" o
 
-parseFunctionCall :: JsonParser Expression
+parseFunctionCall :: Value -> Expression
 parseFunctionCall = parseToken "ProcedureCall"
 
-parseSimpleValue :: JsonParser Expression
+parseSimpleValue :: Value -> Expression
 parseSimpleValue o = parseSimpleExpressionValue (get "alias" o) $ getValue o
     where
-          parseSimpleExpressionValue (Just "NumericLiteral") n@(Number _) = MuNumber <$> parseJSON n
-          parseSimpleExpressionValue _ b@(Bool _)         = MuBool <$> parseJSON b
-          parseSimpleExpressionValue _ (Number number)   = MuSymbol <$> parseColor number
-          parseSimpleExpressionValue _ s@(String _)      = Reference <$> parseNameExpression s
-          parseSimpleExpressionValue _ (Array direction) = MuSymbol <$> parseListToDirection direction
+          parseSimpleExpressionValue (Just "NumericLiteral") (Number n) = MuNumber $ toRealFloat n
+          parseSimpleExpressionValue _ (Bool b)         = MuBool b
+          parseSimpleExpressionValue _ (Number number)   = MuSymbol $ parseColor number
+          parseSimpleExpressionValue _ s@(String _)      = Reference $ parseNameExpression s
+          parseSimpleExpressionValue _ (Array direction) = MuSymbol $ parseListToDirection direction
 
-          parseColor :: Scientific -> Data.Aeson.Types.Parser String
-          parseColor = parseJSON . numberToColor . scientificToInteger
+          parseColor :: Scientific -> String
+          parseColor = numberToColor . scientificToInteger
 
-          numberToColor :: Integer -> Value
+          numberToColor :: Integer -> String
           numberToColor = (!!) ["Azul", "Rojo", "Negro", "Verde"] . fromIntegral
 
           parseListToDirection direction = let (Number n1, Number n2) = (V.head direction , V.last direction)
                                            in parseDirection n1 n2
 
-          parseDirection :: Scientific -> Scientific -> Data.Aeson.Types.Parser String
-          parseDirection number1 number2 = parseJSON . numbersToDirection $ (scientificToInteger number1 , scientificToInteger number2)
+          parseDirection :: Scientific -> Scientific -> String
+          parseDirection number1 number2 = numbersToDirection $ (scientificToInteger number1 , scientificToInteger number2)
 
           numbersToDirection (1, 0)  = "Este"
           numbersToDirection (0, 1)  = "Norte"
@@ -102,16 +95,16 @@ scientificToInteger = extractInteger . Scientific.floatingOrInteger
                 extractInteger (Right i) = i
                 extractInteger (Left d)  = error $ "Tried to parse an integer, but a floting " ++ show d ++" was found"
 
-parseBinaryValue :: JsonParser Expression
-parseBinaryValue o = Application <$> parseFunction <$> getWith parseNameExpression "alias" o <*> ((\x y -> [x,y]) <$> expressionValue  "left" o <*> expressionValue "right" o)
+parseBinaryValue :: Value -> Expression
+parseBinaryValue o = Application (parseFunction (getWith parseNameExpression "alias" o)) [expressionValue  "left" o, expressionValue "right" o]
 
-parseNotValue :: JsonParser Expression
-parseNotValue o = Application <$> parseFunction <$> getWith parseNameExpression "alias" o <*> (:[]) <$> expressionValue  "expression" o
+parseNotValue :: Value -> Expression
+parseNotValue o = Application (parseFunction (getWith parseNameExpression "alias" o)) [expressionValue  "expression" o]
 
-parseNameExpression (String n) = pure $ T.unpack n
+parseNameExpression (String n) = T.unpack n
 
 
-parseVariableName :: JsonParser String
+parseVariableName :: Value -> String
 parseVariableName =  parseNameExpression . getValue
 
 
@@ -128,7 +121,7 @@ parseFunction "GraterOperation"                  = Reference ">"
 parseFunction "GreaterEqualOperation"            = Reference ">="
 parseFunction  fun                               = Reference fun
 
-parseExpression :: JsonParser Expression
+parseExpression :: Value -> Expression
 parseExpression o | isJust maybeName = parseFunctionCall o
                   | isBinary         = parseBinaryValue o
                   | isNot            = parseNotValue o
@@ -143,21 +136,32 @@ parseExpression o | isJust maybeName = parseFunctionCall o
 
 expressionValue = getWith parseExpression
 
-convertReturn :: JsonParser Expression
+convertReturn :: Value -> Expression
 convertReturn = expressionValue "expression"
 
 
-parseToken :: Value -> Value -> Data.Aeson.Types.Parser Expression
-parseToken "program" o                = EntryPoint "program" <$> parseProgramBody o
-parseToken "procedureDeclaration" o   = Procedure <$> getWith parseNameExpression "name" o <*> return <$> (Equation <$> getWith (mapObjectArray parseParameterPatterns) "parameters" o <*> (UnguardedBody <$> getWith  parseBodyExpression "body" o))
-parseToken "ProcedureCall" o          = Application <$> parseFunction <$> getWith parseNameExpression "name" o <*> getWith (mapObjectArray parseExpression) "parameters" o
-parseToken ":=" o                     = Assignment <$> variableName o <*> expressionValue "right" o
-parseToken "functionDeclaration" o    = Function <$> getWith parseNameExpression "name" o <*> return <$> (Equation <$> getWith (mapObjectArray parseParameterPatterns) "parameters" o <*> (UnguardedBody <$> (addReturn <$> getWith  parseBodyExpression "body" o <*> getWith  convertReturn "return" o)))
-parseToken "if" o                     = If <$> expressionValue "condition" o <*> getWith parseBodyExpression "trueBranch" o <*> getWith parseBodyExpression "falseBranch" o
+parseToken :: Value -> Value -> Expression
+parseToken "program" o                = EntryPoint "program" (parseProgramBody o)
+parseToken "procedureDeclaration" o   = (Procedure
+                                          (getWith parseNameExpression "name" o)
+                                          [Equation (getWith (mapObjectArray parseParameterPatterns) "parameters" o) (UnguardedBody (getWith parseBodyExpression "body" o))])
+parseToken "ProcedureCall" o          = (Application
+                                          (parseFunction (getWith parseNameExpression "name" o))
+                                          (getWith (mapObjectArray parseExpression) "parameters" o))
+parseToken ":=" o                     = Assignment (variableName o) (expressionValue "right" o)
+parseToken "functionDeclaration" o    = (Function
+                                          (getWith parseNameExpression "name" o)
+                                          [Equation
+                                            (getWith (mapObjectArray parseParameterPatterns) "parameters" o)
+                                            (UnguardedBody (addReturn (getWith  parseBodyExpression "body" o) (getWith  convertReturn "return" o)))])
+parseToken "if" o                     = (If
+                                          (expressionValue "condition" o)
+                                          (getWith parseBodyExpression "trueBranch" o)
+                                          (getWith parseBodyExpression "falseBranch" o))
 parseToken "while" o                  = parseRepetitionFunction While o
 parseToken "repeat" o                 = parseRepetitionFunction Repeat o
-parseToken "switch" o                 = Switch <$> expressionValue "expression" o <*> getWith (mapObjectArray parseCaseValue) "cases" o
-parseToken "return" o                 = Return <$> expressionValue "expression" o
+parseToken "switch" o                 = Switch (expressionValue "expression" o) (getWith (mapObjectArray parseCaseValue) "cases" o)
+parseToken "return" o                 = Return (expressionValue "expression" o)
 parseToken "Drop" o                   = parsePrimitive "Poner" o
 parseToken "Grab" o                   = parsePrimitive "Sacar" o
 parseToken "MoveClaw" o               = parsePrimitive "Mover" o
@@ -166,9 +170,9 @@ parseToken "canMove" o                = parsePrimitive "puedeMover" o
 
 parseProgramBody o = getWith parseBodyExpression "body" o
 
-parsePrimitive primitiveName value = Application <$> parseFunction <$> pure primitiveName <*> getWith (mapObjectArray parseExpression) "parameters" value
+parsePrimitive primitiveName value = Application (parseFunction primitiveName) (getWith (mapObjectArray parseExpression) "parameters" value)
 
-parseRepetitionFunction f value = f <$> expressionValue "expression" value <*> getWith parseBodyExpression "body" value
+parseRepetitionFunction f value = f (expressionValue "expression" value) (getWith parseBodyExpression "body" value)
 
 ------------------------------------------------
 addReturn :: Expression -> Expression -> Expression
@@ -224,10 +228,10 @@ convertVariablesInEquation (SimpleEquation xs e) = SimpleEquation xs (convertAss
 ------------------------------------------------
 
 gba :: Parser
-gba  = fromJust . parseGobstonesAst
+gba  =  fromJust . parseGobstonesAst
 
 parseGobstonesAst :: MaybeParser
-parseGobstonesAst = decode . LBS.pack
+parseGobstonesAst = fmap parseBodyExpression . decode . LBS.pack
 
 gbs :: Parser
 gbs  = fromJust . parseGobstones
