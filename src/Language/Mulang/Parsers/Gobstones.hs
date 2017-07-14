@@ -12,7 +12,6 @@ import            Language.Mulang.Parsers
 
 
 import            Data.Aeson
-import  qualified Data.Aeson.Types (Parser)
 import            Data.HashMap.Lazy as  HashMap (HashMap, lookup, member, insert, empty)
 import            Data.Maybe (fromJust, isJust)
 import            Data.Text (Text)
@@ -20,8 +19,6 @@ import            Data.Scientific as Scientific
 import  qualified Data.ByteString.Lazy.Char8 as LBS (pack)
 import  qualified Data.Text as T
 import  qualified Data.Vector as V
-
-import            GHC.Generics ()
 
 import            System.Process (readProcessWithExitCode)
 import            System.IO.Unsafe (unsafePerformIO)
@@ -39,6 +36,9 @@ getValue = getJust "value"
 
 getWith :: (Value -> b) -> Text -> Value -> b
 getWith f key = f . getJust key
+
+getArrayWith :: (Value -> b) -> Text -> Value -> [b]
+getArrayWith f = getWith (mapObjectArray f)
 
 -- Actual Parser
 
@@ -144,15 +144,17 @@ parseToken :: Value -> Value -> Expression
 parseToken "program" o                = EntryPoint "program" (parseProgramBody o)
 parseToken "procedureDeclaration" o   = (Procedure
                                           (getWith parseNameExpression "name" o)
-                                          [Equation (getWith (mapObjectArray parseParameterPatterns) "parameters" o) (UnguardedBody (getWith parseBodyExpression "body" o))])
+                                          [Equation
+                                            (getArrayWith parseParameterPatterns "parameters" o)
+                                            (UnguardedBody (getWith parseBodyExpression "body" o))])
 parseToken "ProcedureCall" o          = (Application
                                           (parseFunction (getWith parseNameExpression "name" o))
-                                          (getWith (mapObjectArray parseExpression) "parameters" o))
+                                          (getArrayWith parseExpression "parameters" o))
 parseToken ":=" o                     = Assignment (variableName o) (expressionValue "right" o)
 parseToken "functionDeclaration" o    = (Function
                                           (getWith parseNameExpression "name" o)
                                           [Equation
-                                            (getWith (mapObjectArray parseParameterPatterns) "parameters" o)
+                                            (getArrayWith parseParameterPatterns "parameters" o)
                                             (UnguardedBody (addReturn (getWith  parseBodyExpression "body" o) (getWith  convertReturn "return" o)))])
 parseToken "if" o                     = (If
                                           (expressionValue "condition" o)
@@ -160,7 +162,7 @@ parseToken "if" o                     = (If
                                           (getWith parseBodyExpression "falseBranch" o))
 parseToken "while" o                  = parseRepetitionFunction While o
 parseToken "repeat" o                 = parseRepetitionFunction Repeat o
-parseToken "switch" o                 = Switch (expressionValue "expression" o) (getWith (mapObjectArray parseCaseValue) "cases" o)
+parseToken "switch" o                 = Switch (expressionValue "expression" o) (getArrayWith parseCaseValue "cases" o)
 parseToken "return" o                 = Return (expressionValue "expression" o)
 parseToken "Drop" o                   = parsePrimitive "Poner" o
 parseToken "Grab" o                   = parsePrimitive "Sacar" o
@@ -170,7 +172,7 @@ parseToken "canMove" o                = parsePrimitive "puedeMover" o
 
 parseProgramBody o = getWith parseBodyExpression "body" o
 
-parsePrimitive primitiveName value = Application (parseFunction primitiveName) (getWith (mapObjectArray parseExpression) "parameters" value)
+parsePrimitive primitiveName value = Application (parseFunction primitiveName) (getArrayWith parseExpression "parameters" value)
 
 parseRepetitionFunction f value = f (expressionValue "expression" value) (getWith parseBodyExpression "body" value)
 
