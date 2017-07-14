@@ -3,7 +3,6 @@ module SmellSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Ast
 import           Language.Mulang.Inspector.Generic.Smell
-import           Language.Mulang.Parsers.Gobstones (gbs)
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)
 
@@ -43,11 +42,8 @@ spec = do
       hasRedundantIf (hs "x = if m then True else False") `shouldBe` True
       hasRedundantIf (hs "x = if m then False else True") `shouldBe` True
 
-    it "is True in gbs" $ do
-      hasRedundantIf (gbs "function foo(x) { y := x; if (x) { y := True  } else { y := False } return (y) }") `shouldBe` True
-
-    it "is True in gbs, no return" $ do
-      hasRedundantIf (gbs "procedure Foo(x) { y := x; if (x) { y := True  } else { y := False } }") `shouldBe` True
+    it "is True, no return" $ do
+      hasRedundantIf (js "function foo(x) { var y = x; if (x) { y = true  } else { y = false } }") `shouldBe` True
 
     it "is False when there is no if, hs" $ do
       hasRedundantIf (hs "x = False") `shouldBe` False

@@ -102,8 +102,6 @@ data Language
   =  Json
   |  JavaScript
   |  Prolog
-  |  GobstonesAst
-  |  Gobstones
   |  Haskell deriving (Show, Eq, Generic)
 
 --

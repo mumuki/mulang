@@ -51,7 +51,6 @@ library
     Language.Mulang.Inspector.Generic.Smell
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
-    Language.Mulang.Parsers.Gobstones
     Language.Mulang.Parsers.Prolog
     Language.Mulang.Parsers.JavaScript
     Language.Mulang.Analyzer
