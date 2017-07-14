@@ -38,7 +38,7 @@ getWith :: (Value -> b) -> Text -> Value -> b
 getWith f key = f . getJust key
 
 getArrayWith :: (Value -> b) -> Text -> Value -> [b]
-getArrayWith f = getWith (mapObjectArray f)
+getArrayWith f = getWith (parseArray f)
 
 getString :: Text -> Value -> String
 getString = getStringWith id
@@ -50,15 +50,15 @@ getStringWith f = getWith (f . (\(String s) -> T.unpack s))
 
 parseBody :: Value -> Expression
 parseBody (Array list) | (V.null list) = MuNull
-parseBody a@(Array _)  = Builder.normalize . simplify . Sequence . mapObjectArray  parseNodes $ a
+parseBody a@(Array _)  = Builder.normalize . simplify . Sequence . parseArray  parseNodes $ a
 parseBody Null         = MuNull
 parseBody _            = error "Failed to parse Expression!"
 
 parseNodes :: Value -> Expression
 parseNodes o = parseToken (getJust "alias" o) o
 
-mapObjectArray :: (Value -> a) -> Value -> [a]
-mapObjectArray f (Array vector) = V.toList . V.map f $ vector
+parseArray :: (Value -> a) -> Value -> [a]
+parseArray f (Array vector) = V.toList . V.map f $ vector
 
 parseCaseValue :: Value -> (Expression, Expression)
 parseCaseValue o = (expressionValue "case" o, getWith parseBody "body" o)
@@ -95,15 +95,15 @@ parseColor = ((!!) ["Azul", "Rojo", "Negro", "Verde"]) . fromIntegral . scientif
 
 scientificToInteger :: Scientific -> Integer
 scientificToInteger = extractInteger . Scientific.floatingOrInteger
-          where extractInteger :: Either Double Integer -> Integer
-                extractInteger (Right i) = i
-                extractInteger (Left d)  = error $ "Tried to parse an integer, but a floting " ++ show d ++" was found"
+  where extractInteger :: Either Double Integer -> Integer
+        extractInteger (Right i) = i
+        extractInteger (Left d)  = error $ "Tried to parse an integer, but a floting " ++ show d ++" was found"
 
-parseBinaryValue :: Value -> Expression
-parseBinaryValue o = Application (getStringWith parseFunction "alias" o) [expressionValue  "left" o, expressionValue "right" o]
+parseBinary :: Value -> Expression
+parseBinary o = Application (getStringWith parseFunction "alias" o) [expressionValue  "left" o, expressionValue "right" o]
 
-parseNotValue :: Value -> Expression
-parseNotValue o = Application (getStringWith parseFunction "alias" o) [expressionValue  "expression" o]
+parseNot :: Value -> Expression
+parseNot o = Application (getStringWith parseFunction "alias" o) [expressionValue  "expression" o]
 
 
 parseFunction :: String -> Expression
@@ -119,8 +119,8 @@ parseFunction  fun                               = Reference fun
 
 parseExpression :: Value -> Expression
 parseExpression o | isJust maybeName = parseFunctionCall o
-                  | isBinary         = parseBinaryValue o
-                  | isNot            = parseNotValue o
+                  | isBinary         = parseBinary o
+                  | isNot            = parseNot o
                   | otherwise        = parseSimpleValue o
           where
             maybeName      = get "name" o
@@ -156,8 +156,8 @@ parseToken "if" o                     = (If
                                           (expressionValue "condition" o)
                                           (getWith parseBody "trueBranch" o)
                                           (getWith parseBody "falseBranch" o))
-parseToken "while" o                  = parseRepetitionFunction While o
-parseToken "repeat" o                 = parseRepetitionFunction Repeat o
+parseToken "while" o                  = parseRepeat While o
+parseToken "repeat" o                 = parseRepeat Repeat o
 parseToken "switch" o                 = Switch (expressionValue "expression" o) (getArrayWith parseCaseValue "cases" o)
 parseToken "return" o                 = Return (expressionValue "expression" o)
 parseToken "Drop" o                   = parsePrimitive "Poner" o
@@ -170,7 +170,7 @@ parseProgramBody o = getWith parseBody "body" o
 
 parsePrimitive primitiveName value = Application (parseFunction primitiveName) (getArrayWith parseExpression "parameters" value)
 
-parseRepetitionFunction f value = f (expressionValue "expression" value) (getWith parseBody "body" value)
+parseRepeat f value = f (expressionValue "expression" value) (getWith parseBody "body" value)
 
 ------------------------------------------------
 addReturn :: Expression -> Expression -> Expression
