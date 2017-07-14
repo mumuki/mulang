@@ -13,7 +13,7 @@ import            Language.Mulang.Parsers
 
 import            Data.Aeson
 import            Data.HashMap.Lazy as  HashMap (HashMap, lookup, member, insert, empty)
-import            Data.Maybe (fromJust, isJust)
+import            Data.Maybe (fromJust)
 import            Data.Text (Text)
 import            Data.Scientific as Scientific
 import  qualified Data.ByteString.Lazy.Char8 as LBS (pack)
@@ -23,72 +23,78 @@ import  qualified Data.Vector as V
 import            System.Process (readProcessWithExitCode)
 import            System.IO.Unsafe (unsafePerformIO)
 
--- Combinators
+-------------
+-- Getters --
+-------------
 
-get :: Text -> Value -> Maybe Value
+type Getter a = Text -> Value -> a
+
+get :: Getter (Maybe Value)
 get key (Object o) = HashMap.lookup key o
 
-getJust :: Text -> Value -> Value
+getJust :: Getter Value
 getJust key = fromJust . get key
 
-getValue :: Value -> Value
-getValue = getJust "value"
-
-getWith :: (Value -> b) -> Text -> Value -> b
+getWith :: (Value -> b) -> Getter b
 getWith f key = f . getJust key
 
-getArrayWith :: (Value -> b) -> Text -> Value -> [b]
+getArrayWith :: (Value -> b) -> Getter [b]
 getArrayWith f = getWith (parseArray f)
 
-getString :: Text -> Value -> String
+getString :: Getter String
 getString = getStringWith id
 
-getStringWith :: (String -> b) -> Text -> Value -> b
+getStringWith :: (String -> b) -> Getter b
 getStringWith f = getWith (f . (\(String s) -> T.unpack s))
 
--- Actual Parser
+getExpression :: Getter Expression
+getExpression = getWith parseExpression
+
+getBody :: Getter Expression
+getBody = getWith parseBody
+
+-------------------
+-- Actual Parser --
+-------------------
 
 parseBody :: Value -> Expression
 parseBody (Array list) | (V.null list) = MuNull
-parseBody a@(Array _)  = Builder.normalize . simplify . Sequence . parseArray  parseNodes $ a
+parseBody a@(Array _)  = Builder.normalize . simplify . Sequence . parseArray  parseKeyword' $ a
 parseBody Null         = MuNull
 parseBody _            = error "Failed to parse Expression!"
-
-parseNodes :: Value -> Expression
-parseNodes o = parseToken (getJust "alias" o) o
 
 parseArray :: (Value -> a) -> Value -> [a]
 parseArray f (Array vector) = V.toList . V.map f $ vector
 
 parseCaseValue :: Value -> (Expression, Expression)
-parseCaseValue o = (expressionValue "case" o, getWith parseBody "body" o)
+parseCaseValue o = (getExpression "case" o, getBody "body" o)
 
 parseParameter :: Value -> Pattern
 parseParameter  = VariablePattern . getString "value"
 
 parseFunctionCall :: Value -> Expression
-parseFunctionCall = parseToken "ProcedureCall"
+parseFunctionCall = parseKeyword "ProcedureCall"
 
-parseSimpleValue :: Value -> Expression
-parseSimpleValue o = parseSimpleExpressionValue (get "alias" o) $ getValue o
+parseLiteral :: Value -> Expression
+parseLiteral o = f (get "alias" o) (getJust "value" o)
     where
-          parseSimpleExpressionValue (Just "NumericLiteral") (Number n) = MuNumber $ toRealFloat n
-          parseSimpleExpressionValue _ (Bool b)         = MuBool b
-          parseSimpleExpressionValue _ (Number number)   = MuSymbol $ parseColor number
-          parseSimpleExpressionValue _ (String s)      = Reference $ T.unpack s
-          parseSimpleExpressionValue _ (Array direction) = MuSymbol $ parseListToDirection direction
+          f (Just "NumericLiteral") (Number n) = MuNumber $ toRealFloat n
+          f _                (Bool b)          = MuBool b
+          f _                (Number number)   = MuSymbol $ parseColor number
+          f _                (String s)        = Reference $ T.unpack s
+          f _                (Array direction) = MuSymbol $ parseListToDirection direction
 
 
           parseListToDirection direction = let (Number n1, Number n2) = (V.head direction , V.last direction)
                                            in parseDirection n1 n2
 
-          parseDirection :: Scientific -> Scientific -> String
-          parseDirection number1 number2 = numbersToDirection $ (scientificToInteger number1 , scientificToInteger number2)
-
-          numbersToDirection (1, 0)  = "Este"
-          numbersToDirection (0, 1)  = "Norte"
-          numbersToDirection (-1, 0) = "Oeste"
-          numbersToDirection (0, -1) = "Sur"
+parseDirection :: Scientific -> Scientific -> String
+parseDirection number1 number2 = f (scientificToInteger number1 , scientificToInteger number2)
+  where
+    f (1, 0)  = "Este"
+    f (0, 1)  = "Norte"
+    f (-1, 0) = "Oeste"
+    f (0, -1) = "Sur"
 
 parseColor :: Scientific -> String
 parseColor = ((!!) ["Azul", "Rojo", "Negro", "Verde"]) . fromIntegral . scientificToInteger
@@ -100,10 +106,10 @@ scientificToInteger = extractInteger . Scientific.floatingOrInteger
         extractInteger (Left d)  = error $ "Tried to parse an integer, but a floting " ++ show d ++" was found"
 
 parseBinary :: Value -> Expression
-parseBinary o = Application (getStringWith parseFunction "alias" o) [expressionValue  "left" o, expressionValue "right" o]
+parseBinary o = Application (getStringWith parseFunction "alias" o) [getExpression  "left" o, getExpression "right" o]
 
 parseNot :: Value -> Expression
-parseNot o = Application (getStringWith parseFunction "alias" o) [expressionValue  "expression" o]
+parseNot o = Application (getStringWith parseFunction "alias" o) [getExpression  "expression" o]
 
 
 parseFunction :: String -> Expression
@@ -118,61 +124,57 @@ parseFunction "GreaterEqualOperation"            = Reference ">="
 parseFunction  fun                               = Reference fun
 
 parseExpression :: Value -> Expression
-parseExpression o | isJust maybeName = parseFunctionCall o
-                  | isBinary         = parseBinary o
-                  | isNot            = parseNot o
-                  | otherwise        = parseSimpleValue o
-          where
-            maybeName      = get "name" o
-            arity          = get "arity" o
-            alias          = get "alias" o
-
-            isNot    = isJust alias && (String "not"  == fromJust alias)
-            isBinary = isJust arity && (String "binary"  == fromJust arity)
-
-expressionValue = getWith parseExpression
+parseExpression o | (Just _) <- get "name" o                  = parseFunctionCall o
+                  | (Just (String "binary")) <- get "arity" o = parseBinary o
+                  | (Just (String "not"))    <- get "alias" o = parseNot o
+                  | otherwise        = parseLiteral o
 
 parseReturn :: Value -> Expression
-parseReturn = expressionValue "expression"
+parseReturn = getExpression "expression"
 
+parseKeyword' :: Value -> Expression
+parseKeyword' o = parseKeyword (getJust "alias" o) o
 
-parseToken :: Value -> Value -> Expression
-parseToken "program" o                = EntryPoint "program" (parseProgramBody o)
-parseToken "procedureDeclaration" o   = (Procedure
-                                          (getString "name" o)
-                                          [Equation
-                                            (getArrayWith parseParameter "parameters" o)
-                                            (UnguardedBody (getWith parseBody "body" o))])
-parseToken "ProcedureCall" o          = (Application
-                                          (getStringWith parseFunction "name" o)
-                                          (getArrayWith parseExpression "parameters" o))
-parseToken ":=" o                     = Assignment (getWith (getString "value") "left" o) (expressionValue "right" o)
-parseToken "functionDeclaration" o    = (Function
-                                          (getString "name" o)
-                                          [Equation
-                                            (getArrayWith parseParameter "parameters" o)
-                                            (UnguardedBody (addReturn (getWith  parseBody "body" o) (getWith  parseReturn "return" o)))])
-parseToken "if" o                     = (If
-                                          (expressionValue "condition" o)
-                                          (getWith parseBody "trueBranch" o)
-                                          (getWith parseBody "falseBranch" o))
-parseToken "while" o                  = parseRepeat While o
-parseToken "repeat" o                 = parseRepeat Repeat o
-parseToken "switch" o                 = Switch (expressionValue "expression" o) (getArrayWith parseCaseValue "cases" o)
-parseToken "return" o                 = Return (expressionValue "expression" o)
-parseToken "Drop" o                   = parsePrimitive "Poner" o
-parseToken "Grab" o                   = parsePrimitive "Sacar" o
-parseToken "MoveClaw" o               = parsePrimitive "Mover" o
-parseToken "hasStones" o              = parsePrimitive "hayBolitas" o
-parseToken "canMove" o                = parsePrimitive "puedeMover" o
+parseKeyword :: Value -> Value -> Expression
+parseKeyword "program" o                = EntryPoint "program" (parseProgramBody o)
+parseKeyword "procedureDeclaration" o   = (Procedure
+                                            (getString "name" o)
+                                            [Equation
+                                              (getArrayWith parseParameter "parameters" o)
+                                              (UnguardedBody (getBody "body" o))])
+parseKeyword "ProcedureCall" o          = (Application
+                                            (getStringWith parseFunction "name" o)
+                                            (getArrayWith parseExpression "parameters" o))
+parseKeyword ":=" o                     = Assignment (getWith (getString "value") "left" o) (getExpression "right" o)
+parseKeyword "functionDeclaration" o    = (Function
+                                            (getString "name" o)
+                                            [Equation
+                                              (getArrayWith parseParameter "parameters" o)
+                                              (UnguardedBody (addReturn (getWith  parseBody "body" o) (getWith  parseReturn "return" o)))])
+parseKeyword "if" o                     = (If
+                                            (getExpression "condition" o)
+                                            (getBody "trueBranch" o)
+                                            (getBody "falseBranch" o))
+parseKeyword "while" o                  = parseRepeat While o
+parseKeyword "repeat" o                 = parseRepeat Repeat o
+parseKeyword "switch" o                 = Switch (getExpression "expression" o) (getArrayWith parseCaseValue "cases" o)
+parseKeyword "return" o                 = Return (getExpression "expression" o)
+parseKeyword "Drop" o                   = parsePrimitive "Poner" o
+parseKeyword "Grab" o                   = parsePrimitive "Sacar" o
+parseKeyword "MoveClaw" o               = parsePrimitive "Mover" o
+parseKeyword "hasStones" o              = parsePrimitive "hayBolitas" o
+parseKeyword "canMove" o                = parsePrimitive "puedeMover" o
 
-parseProgramBody o = getWith parseBody "body" o
+parseProgramBody o = getBody "body" o
 
 parsePrimitive primitiveName value = Application (parseFunction primitiveName) (getArrayWith parseExpression "parameters" value)
 
-parseRepeat f value = f (expressionValue "expression" value) (getWith parseBody "body" value)
+parseRepeat f value = f (getExpression "expression" value) (getBody "body" value)
 
-------------------------------------------------
+---------------------------
+-- Expression Transforms --
+---------------------------
+
 addReturn :: Expression -> Expression -> Expression
 addReturn (Sequence []) e = Return e
 addReturn (Sequence xs) e = Sequence $ xs ++ [Return e]
@@ -222,7 +224,9 @@ convertCases ((e1,b1):cases) hashMap = (e1,convertBody b1 hashMap):convertCases 
 convertVariablesInEquation (SimpleEquation xs e) = SimpleEquation xs (convertAssignmentToDeclaration e)
 
 
-------------------------------------------------
+----------------------
+-- Public Interface --
+----------------------
 
 gba :: Parser
 gba  =  fromJust . parseGobstonesAst
