@@ -51,7 +51,7 @@ spec = do
 
   describe "usesSwitch" $ do
     it "is True when present in function" $ do
-      let code = js "function f(x) {switch (2) to { 2 -> {x := 2}} return (x)}"
+      let code = Switch (Reference "x") [(MuNull, MuNumber 0)]
 
       usesSwitch code  `shouldBe` True
 
