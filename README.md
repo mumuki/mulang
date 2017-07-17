@@ -206,8 +206,14 @@ The really awesome is here: it is an universal tool which can _potentially_ work
   * JS (ES5)
   * Haskell
   * Prolog
-  * Gobstones
   * Mulang itself, expressed as a JSON AST.
+
+In addition, through external tools, it offers support for the following languages:
+
+  * Java, using [mulang-java](https://github.com/mumuki/mulang-java)
+  * Ruby, using [mulang-ruby](https://github.com/mumuki/mulang-ruby)
+  * Python, using [mulang-python](https://github.com/mumuki/mulang-python)
+  * Gobstones, using [gs-weblang-cli](https://github.com/gobstones/gs-weblang-cli)
 
 So in order to use it with a particular language, you have to:
 
