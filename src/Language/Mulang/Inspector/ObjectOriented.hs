@@ -3,6 +3,8 @@ module Language.Mulang.Inspector.ObjectOriented (
   declaresObject,
   declaresSuperclass,
   declaresClass,
+  declaresInterface,
+  declaresEnumeration,
   declaresAttribute,
   declaresMethod)  where
 
@@ -27,6 +29,16 @@ declaresClass :: BindingPredicate -> Inspection
 declaresClass =  containsDeclaration f
   where f (Class _ _ _) = True
         f _             = False
+
+declaresEnumeration :: BindingPredicate -> Inspection
+declaresEnumeration =  containsDeclaration f
+  where f (Enumeration _ _) = True
+        f _                 = False
+
+declaresInterface :: BindingPredicate -> Inspection
+declaresInterface =  containsDeclaration f
+  where f (Interface _ _ _) = True
+        f _                 = False
 
 declaresAttribute :: BindingPredicate -> Inspection
 declaresAttribute =  containsDeclaration f

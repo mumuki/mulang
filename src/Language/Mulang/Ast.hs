@@ -81,7 +81,12 @@ data Expression
     --   composed by a name and a body
     | Class Identifier (Maybe Identifier) Expression
     -- ^ Object oriented programming global, class declaration,
-    --   composed by a name, superclass and a body
+    --   composed by a name, an optional superclass, implemented interfaces and a body
+    | Enumeration Identifier [Identifier]
+    -- ^ Imperative named enumeration of values
+    | Interface Identifier [Identifier] Expression
+    -- ^ Object oriented programming global interface or contract declaration,
+    --   composed by a name, subinterfaces and a body
     | Rule Identifier [Pattern] [Expression]
     -- ^ Logic programming declaration of a fact, composed by the rue name, rule arguments, and rule body
     | Fact Identifier [Pattern]

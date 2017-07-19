@@ -199,6 +199,20 @@ spec = do
     it "is True when anyone present, scoped" $ do
       declaresObject anyone (js "var g = {}")  `shouldBe` True
 
+  describe "declaresEnumeration" $ do
+    it "is True when present" $ do
+      declaresEnumeration (named "Direction") (Enumeration "Direction" ["SOUTH", "EAST", "WEST", "NORTH"]) `shouldBe` True
+
+    it "is False when not present" $ do
+      declaresEnumeration (named "Bird") (Class "Bird" (Just "Animal") MuNull) `shouldBe` False
+
+  describe "declaresInterface" $ do
+    it "is True when present" $ do
+      declaresInterface (named "Optional") (Interface "Optional" [] (TypeSignature "get" ["A"])) `shouldBe` True
+
+    it "is False when not present" $ do
+      declaresInterface (named "Bird") (Class "Bird" (Just "Animal") MuNull) `shouldBe` False
+
   describe "usesInheritance" $ do
     it "is True when present" $ do
       usesInheritance (Class "Bird" (Just "Animal") MuNull) `shouldBe` True
