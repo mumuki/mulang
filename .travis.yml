@@ -18,9 +18,6 @@ before_install:
 - export PATH=$HOME/.local/bin:$PATH
 - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 # Install Rungs
-- wget https://github.com/gobstones/gs-weblang-cli/releases/download/v1.3.3/rungs-ubuntu64 -O rungs
-- chmod u+x rungs
-- mv rungs ~/.local/bin/rungs
 install:
 - stack --no-terminal --install-ghc test --only-dependencies
 script:
