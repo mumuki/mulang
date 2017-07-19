@@ -1,0 +1,4 @@
+#!/bin/bash
+
+time mulang "$1" | json_pp 
+

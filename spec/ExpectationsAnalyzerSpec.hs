@@ -87,9 +87,6 @@ spec = describe "ExpectationsAnalyzer" $ do
       (run Haskell "c x = 14" [hasAnonymousVariable]) `shouldReturn` (result [failed hasAnonymousVariable] [])
       (run Haskell "c _ = 14" [hasAnonymousVariable]) `shouldReturn` (result [passed hasAnonymousVariable] [])
 
-    it "works with UsesRepeat" $ do
-      pendingWith "Should be implemented when Gobstones support is ready"
-
     it "works with UsesComposition" $ do
       let hasComposition = Expectation "h" "UsesComposition"
       (run Haskell "h = f" [hasComposition]) `shouldReturn` (result [failed hasComposition] [])

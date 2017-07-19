@@ -4,7 +4,6 @@ import           Test.Hspec
 import           Language.Mulang
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
-import           Language.Mulang.Parsers.Gobstones
 import           Language.Mulang.Inspector.Generic.Smell
 import           Data.Maybe (fromJust)
 
@@ -13,26 +12,26 @@ spec = do
   describe "declaresEntryPoint" $ do
     describe "with program declarations" $ do
       it "is True when program is declared" $ do
-        let code = gbs "program{ Poner(Verde) }"
+        let code = EntryPoint "main" MuNull
 
         declaresEntryPoint anyone code `shouldBe` True
 
       it "is False when program is not declared" $ do
-        let code = gbs "procedure F(){}"
+        let code = js "function(){}"
 
         declaresEntryPoint anyone code `shouldBe` False
 
   describe "declaresProcedure" $ do
     describe "with procedure declarations" $ do
       it "is True when procedure is declared" $ do
-        let code =  gbs "procedure F(){}"
+        let code =  js "function f(){}"
 
-        declaresProcedure (named "F") code `shouldBe` True
+        declaresProcedure (named "f") code `shouldBe` True
 
       it "is False when procedures is not declared" $ do
-        let code = gbs "procedure F(){}"
+        let code = js "function f(){}"
 
-        declaresProcedure (named "G") code `shouldBe` False
+        declaresProcedure (named "g") code `shouldBe` False
 
   describe "usesWhile" $ do
     it "is True when present in function" $ do
@@ -52,34 +51,34 @@ spec = do
 
   describe "usesSwitch" $ do
     it "is True when present in function" $ do
-      let code = gbs "function f(x) {switch (2) to { 2 -> {x := 2}} return (x)}"
+      let code = Switch (Reference "x") [(MuNull, MuNumber 0)]
 
       usesSwitch code  `shouldBe` True
 
     it "is False when not present in function" $ do
-      let code = gbs "function f(x){return (1)}"
+      let code = js "function f(x){return 1;}"
 
       usesSwitch code  `shouldBe` False
 
   describe "usesRepeat" $ do
     it "is True when present in function" $ do
-      let code = gbs "function f(){repeat(2){} return (x)}"
+      let code = SimpleFunction "f" [] (Sequence [Repeat (MuNumber 2) MuNull, Return (MuNumber 2)])
 
       usesRepeat code  `shouldBe` True
 
     it "is False when not present in function" $ do
-      let code = gbs "function f(x){return (1)}"
+      let code = js "function f(x){return 1;}"
 
       usesRepeat code  `shouldBe` False
 
   describe "declaresVariable" $ do
     it "is True when declare a variable" $ do
-      let code = gbs "procedure F(){ x := 2}"
+      let code = js "function f(){ var x = 2}"
 
       declaresVariable (named "x") code `shouldBe` True
 
     it "is False when variable is not declared" $ do
-      let code = gbs "procedure F(){ x := 2}"
+      let code = js "function f(){ var x = 2}"
 
       declaresVariable (named "y") code `shouldBe` False
 
