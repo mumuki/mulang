@@ -78,7 +78,7 @@ extractReference _               = Nothing
 
 
 extractDeclaration :: Expression -> Maybe (Binding, Expression)
-extractDeclaration e@(TypeSignature n _)  = Just (n, e)
+extractDeclaration e@(TypeSignature n _ _)= Just (n, e)
 extractDeclaration e@(TypeAlias n )       = Just (n, e)
 extractDeclaration e@(Variable n _)       = Just (n, e)
 extractDeclaration e@(Subroutine n _)     = Just (n, e)

@@ -10,6 +10,7 @@ run language content style = analyse (signaturesAnalysis (CodeSample language co
 spec = describe "SignturesAnalyzer" $ do
   it "handles MulangStyle" $ do
     (run Haskell "f x = x + 1" MulangStyle ) `shouldReturn` (result ["-- f(x)"])
+    (run Haskell "f :: Int -> String" MulangStyle ) `shouldReturn` (result ["-- f(Int): String"])
 
   it "handles HaskellStyle" $ do
     (run Haskell "f x = x + 1" HaskellStyle ) `shouldReturn` (result ["-- f x"])

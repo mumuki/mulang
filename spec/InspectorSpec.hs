@@ -208,7 +208,7 @@ spec = do
 
   describe "declaresInterface" $ do
     it "is True when present" $ do
-      declaresInterface (named "Optional") (Interface "Optional" [] (TypeSignature "get" ["A"])) `shouldBe` True
+      declaresInterface (named "Optional") (Interface "Optional" [] (TypeSignature "get" [] "A")) `shouldBe` True
 
     it "is False when not present" $ do
       declaresInterface (named "Bird") (Class "Bird" (Just "Animal") MuNull) `shouldBe` False

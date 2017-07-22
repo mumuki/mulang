@@ -45,13 +45,13 @@ spec = do
 
   describe "TypedSignature" $ do
     it "simple variable type declaration" $ do
-      signaturesOf (hs "foo :: Int") `shouldBe` [TypedSignature "foo" ["Int"]]
+      signaturesOf (hs "foo :: Int") `shouldBe` [TypedSignature "foo" [] "Int"]
 
     it "simple function type declaration" $ do
-      signaturesOf (hs "foo :: Int -> Int") `shouldBe` [TypedSignature "foo" ["Int", "Int"]]
+      signaturesOf (hs "foo :: Int -> Int") `shouldBe` [TypedSignature "foo" ["Int"] "Int"]
 
     it "simple function tuple declaration" $ do
-      signaturesOf (hs "foo :: b -> (Int, [a])") `shouldBe` [TypedSignature "foo" ["b", "(Int, [a])"]]
+      signaturesOf (hs "foo :: b -> (Int, [a])") `shouldBe` [TypedSignature "foo" ["b"] "(Int, [a])"]
 
   describe "NamedSignature" $ do
     it "empty expression" $ do
