@@ -73,6 +73,7 @@ library
     vector                    ,
     haskell-src               ,
     language-javascript       ,
+    language-java             ,
     aeson                     ,
     inflections               ,
     parsec                    ,
@@ -136,6 +137,8 @@ test-suite spec
     aeson                     ,
     hspec                     ,
     neat-interpolation        ,
+        language-java             ,
+
     mulang
   build-tools:
     happy,

@@ -35,8 +35,6 @@ normalize (MuTuple es)                     = MuTuple (map normalize es)
 normalize (MuList es)                      = MuList (map normalize es)
 normalize e = e
 
-
-
 normalizeInObject (Function n eqs)             = Method n (map normalizeEquation eqs)
 normalizeInObject (Variable n (Lambda vars e)) = SimpleMethod n vars (normalize e)
 normalizeInObject (Variable n e)               = Attribute n (normalize e)
