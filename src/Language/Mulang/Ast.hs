@@ -24,6 +24,7 @@ module Language.Mulang.Ast (
     pattern SimpleFunction,
     pattern SimpleProcedure,
     pattern SimpleMethod,
+    pattern SimpleSend,
     pattern MuTrue,
     pattern MuFalse,
     pattern Subroutine,
@@ -171,6 +172,8 @@ data ComprehensionStatement
 
 
 pattern SimpleEquation params body = Equation params (UnguardedBody body)
+
+pattern SimpleSend receptor selector args = Send receptor (Reference selector) args
 
 pattern SimpleFunction name params body  = Function  name [SimpleEquation params body]
 pattern SimpleProcedure name params body = Procedure name [SimpleEquation params body]

@@ -85,8 +85,83 @@ spec = do
              public void hello() { int x = 1; }
           }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Variable "x" (MuNumber 1)))
 
+    it "parses Variables And Ints" $ do
+      run [text|
+          class Foo {
+             public void hello() { Foo x = this; }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Variable "x" Self))
+
+    it "parses Variables And ternaries" $ do
+      run [text|
+          class Foo {
+             public void hello() { Foo x = true ? this : this; }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Variable "x" (If MuTrue Self Self)))
+
     it "parses Variables without initialization" $ do
       run [text|
           class Foo {
              public void hello() { int x; }
           }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Variable "x" MuNull))
+
+    it "parses self-send" $ do
+      run [text|
+          class Foo {
+             public void hello() { f(); }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (SimpleSend Self "f" []))
+
+    it "parses self-send" $ do
+      run [text|
+          class Foo {
+             public void hello() { f(2); }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (SimpleSend Self "f" [MuNumber 2]))
+
+    it "parses explict self-send" $ do
+      run [text|
+          class Foo {
+             public void hello() { this.f(); }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (SimpleSend Self "f" []))
+
+    it "parses argument-send" $ do
+      run [text|
+          class Foo {
+             public void hello(String g) { g.toString(); }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [VariablePattern "g"] (SimpleSend (Reference "g") "toString" []))
+
+    it "parses expression-send" $ do
+      run [text|
+          class Foo {
+             public void hello(String g) { g.size().toString(); }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [VariablePattern "g"] (SimpleSend (SimpleSend (Reference "g") "size" []) "toString" []))
+
+
+    it "parses Ifs with empty braces" $ do
+      run [text|
+          class Foo {
+             public void hello() { if (true) { } }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (If MuTrue MuNull MuNull))
+
+    it "parses Ifs with return in braces" $ do
+      run [text|
+          class Foo {
+             public void hello() { if (true) { return true; } else { return false; } }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (If MuTrue (Return MuTrue) (Return MuFalse)))
+
+    it "parses Ifs with equal comparisons on conditions" $ do
+      run [text|
+          class Foo {
+             public void hello(String x) { if (x == "foo") { } }
+          }|] `shouldBe` Class "Foo" Nothing (
+                           SimpleMethod "hello" [VariablePattern "x"] (
+                             If (Send (Reference "x") Equal [MuString "foo"])
+                              MuNull
+                              MuNull))
+
+    it "parses Ifs with not-equal comparisons on conditions" $ do
+      run [text|
+          class Foo {
+             public void hello(String x) { if (x != "foo") { } }
+          }|] `shouldBe` Class "Foo" Nothing (
+                           SimpleMethod "hello" [VariablePattern "x"] (
+                             If (Send (Reference "x") NotEqual [MuString "foo"])
+                              MuNull
+                              MuNull))
