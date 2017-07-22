@@ -97,8 +97,10 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `declaresComputation`: **any paradigm** that is, does the given computation  - method, predicate, function, etc - exist?
 1. `declaresComputationWithArity`: **any paradigm**  that is, does the given computation have the exact given arity?
 1. `declaresEntryPoint`: **any paradigm** is there a program entry point, like a `main` procedure?
+1. `declaresEnumeration`: **imperative paradigm** is a given enumeration declared?
 1. `declaresFact`: **logic paradigm** is a given logic fact declared?
 1. `declaresFunction`: **functional/imperative paradigm** is a given function declared?
+1. `declaresInterface`: **objects paradigm** is a given interface declared?
 1. `declaresMethod`: **objects paradigm** is a given method declared?
 1. `declaresObject`: **objects paradigm** is a given named object declared?
 1. `declaresPredicate`: **logic paradigm** is a given rule o fact declared?
@@ -143,7 +145,7 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `usesRepeat`
 1. `usesSwitch`
 1. `usesUnificationOperator`:  **logic paradigm** is the logic unification operator `=` used?
-1. `usesWhile`
+1. `usesWhile`: **imperative paradigm** is a `while` control structure used?
 
 For example, let's go trickier:
 
