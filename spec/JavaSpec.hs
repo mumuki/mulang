@@ -25,6 +25,9 @@ spec = do
     it "parses Simple Interface" $ do
       run "public interface Foo {}" `shouldBe` Interface "Foo" [] MuNull
 
+    it "parses Simple Interface With Messages" $ do
+      run "public interface Foo { void foo(); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" [] "void")
+
     it "parses Interface with superinterfaces" $ do
       run "public interface Foo extends Bar, Baz {}" `shouldBe` Interface "Foo" ["Bar", "Baz"] MuNull
 
@@ -38,3 +41,15 @@ spec = do
         run [text|class Foo {
                public void hello() { return; }
             }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return MuNull))
+
+    it "parses Returns In Strings" $ do
+      run [text|class Foo {
+             public String hello() { return "hello"; }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return (MuString "hello")))
+
+    it "parses Parameters" $ do
+      run "public class Foo extends Bar { int succ(int y) {} }" `shouldBe` Class "Foo" (Just "Bar") (SimpleMethod "succ" [VariablePattern "y"] MuNull)
+
+    it "parses Enums" $ do
+      run "public enum Foo { A, B }" `shouldBe` Enumeration "Foo" ["A", "B"]
+
