@@ -42,10 +42,30 @@ spec = do
                public void hello() { return; }
             }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return MuNull))
 
-    it "parses Returns In Strings" $ do
+    it "parses Strings In Returns" $ do
       run [text|class Foo {
              public String hello() { return "hello"; }
           }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return (MuString "hello")))
+
+    it "parses Int In Returns" $ do
+      run [text|class Foo {
+             public int hello() { return 1; }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return (MuNumber 1)))
+
+    it "parses Double In Returns" $ do
+      run [text|class Foo {
+             public double hello() { return 453.2; }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return (MuNumber 453.2)))
+
+    it "parses Bools In Returns" $ do
+      run [text|class Foo {
+             public boolean hello() { return true; }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return MuTrue))
+
+    it "parses Chars In Returns" $ do
+      run [text|class Foo {
+             public char hello() { return 'f'; }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return (MuString "f")))
 
     it "parses Parameters" $ do
       run "public class Foo extends Bar { int succ(int y) {} }" `shouldBe` Class "Foo" (Just "Bar") (SimpleMethod "succ" [VariablePattern "y"] MuNull)
@@ -54,7 +74,19 @@ spec = do
       run "public enum Foo { A, B }" `shouldBe` Enumeration "Foo" ["A", "B"]
 
     it "parsesMain" $ do
-      run [text|public class MyMain {
+      run [text|
+          public class MyMain {
              public static void main(String[] args) { }
           }|] `shouldBe` Class "MyMain" Nothing (EntryPoint "main" MuNull)
 
+    it "parses Variables And Ints" $ do
+      run [text|
+          class Foo {
+             public void hello() { int x = 1; }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Variable "x" (MuNumber 1)))
+
+    it "parses Variables without initialization" $ do
+      run [text|
+          class Foo {
+             public void hello() { int x; }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Variable "x" MuNull))

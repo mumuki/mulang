@@ -1,6 +1,12 @@
-module Language.Mulang.Builder (compact, normalize) where
+module Language.Mulang.Builder (compact, compactMap, compactConcatMap, normalize) where
 
 import Language.Mulang.Ast
+
+compactConcatMap :: (a -> [Expression]) -> [a] -> Expression
+compactConcatMap f = compact . concat . map f
+
+compactMap :: (a -> Expression) -> [a] -> Expression
+compactMap f = compact . map f
 
 compact :: [Expression] -> Expression
 compact []  = MuNull
