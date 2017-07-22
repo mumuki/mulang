@@ -35,8 +35,12 @@ muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
 muDecl (InitDecl _ _)          = Other
 
 muMemberDecl (FieldDecl _ _type varDecls) = Other
-muMemberDecl (MethodDecl _ _ _ name params _ (MethodBody (Just block))) = SimpleMethod (i name) (map (VariablePattern . muFormalParam) params) (muBlock block)
-muMemberDecl (MethodDecl _ _ _ name params _ (MethodBody Nothing))      = TypeSignature (i name) (map muFormalParam params) "void"
+muMemberDecl (MethodDecl modifiers _ _ (Ident "main") [_args] _ (MethodBody (Just block))) | elem Static modifiers =
+  EntryPoint "main" (muBlock block)
+muMemberDecl (MethodDecl _ _ _ name params _ (MethodBody (Just block))) =
+  SimpleMethod (i name) (map (VariablePattern . muFormalParam) params) (muBlock block)
+muMemberDecl (MethodDecl _ _ _ name params _ (MethodBody Nothing))      =
+  TypeSignature (i name) (map muFormalParam params) "void"
 muMemberDecl (ConstructorDecl _ _ _ params _ constructorBody)           = Other
 muMemberDecl (MemberClassDecl decl) = muClassTypeDecl decl
 muMemberDecl (MemberInterfaceDecl decl) = muInterfaceTypeDecl decl

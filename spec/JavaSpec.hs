@@ -53,3 +53,8 @@ spec = do
     it "parses Enums" $ do
       run "public enum Foo { A, B }" `shouldBe` Enumeration "Foo" ["A", "B"]
 
+    it "parsesMain" $ do
+      run [text|public class MyMain {
+             public static void main(String[] args) { }
+          }|] `shouldBe` Class "MyMain" Nothing (EntryPoint "main" MuNull)
+
