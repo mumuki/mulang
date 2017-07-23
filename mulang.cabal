@@ -138,8 +138,6 @@ test-suite spec
     aeson                     ,
     hspec                     ,
     neat-interpolation        ,
-        language-java             ,
-
     mulang
   build-tools:
     happy,
