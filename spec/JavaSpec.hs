@@ -62,6 +62,11 @@ spec = do
              public boolean hello() { return true; }
           }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return MuTrue))
 
+    it "parses Negation In Returns" $ do
+      run [text|class Foo {
+             public boolean hello() { return !true; }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return (SimpleSend MuTrue "!" [])))
+
     it "parses Chars In Returns" $ do
       run [text|class Foo {
              public char hello() { return 'f'; }
@@ -165,3 +170,23 @@ spec = do
                              If (Send (Reference "x") NotEqual [MuString "foo"])
                               MuNull
                               MuNull))
+
+    it "parsesAssignmentsAndDoubles" $ do
+      run [text|class Foo {
+             public void hello() { double m = 1.0; m = 3.4; }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
+                           Sequence [
+                             Variable "m" (MuNumber 1.0),
+                             Assignment "m" (MuNumber 3.4)]))
+
+    it "parses Lambdas" $ do
+      run [text|class Foo {
+             public Object hello() { return (int x) -> x + 1; }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
+                           Return (Lambda [VariablePattern "x"] (SimpleSend (Reference "x") "+" [MuNumber 1]))))
+
+    it "parses News" $ do
+      run [text|class Foo {
+             public Foo hello() { return new Bar(3); }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
+                           Return (SimpleNew "Bar" [MuNumber 3])))

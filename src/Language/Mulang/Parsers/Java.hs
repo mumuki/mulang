@@ -3,8 +3,8 @@
 
 module Language.Mulang.Parsers.Java (java, parseJava) where
 
-import Language.Mulang.Ast hiding (While, Return, Equal)
-import qualified Language.Mulang.Ast as M (Expression(Return, Equal))
+import Language.Mulang.Ast hiding (While, Return, Equal, Lambda)
+import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda))
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compactMap, compactConcatMap)
 
@@ -29,10 +29,10 @@ m (CompilationUnit _ _ typeDecls) = compactMap muTypeDecl $ typeDecls
 muTypeDecl (ClassTypeDecl decl)    = muClassTypeDecl decl
 muTypeDecl (InterfaceTypeDecl decl) = muInterfaceTypeDecl decl
 
-muClassTypeDecl (ClassDecl _ name _ superclass _interfaces (ClassBody body)) = Class (i name) (fmap r superclass) (compactMap muDecl body )
+muClassTypeDecl (ClassDecl _ name _ superclass _interfaces (ClassBody body)) = Class (i name) (fmap muClassRefType superclass) (compactMap muDecl body )
 muClassTypeDecl (EnumDecl _ name _ (EnumBody constants _))                  = Enumeration (i name) (map muEnumConstant constants)
 
-muInterfaceTypeDecl (InterfaceDecl _ name _ interfaces (InterfaceBody body)) = Interface (i name) (map r interfaces) (compactMap muMemberDecl body )
+muInterfaceTypeDecl (InterfaceDecl _ name _ interfaces (InterfaceBody body)) = Interface (i name) (map muClassRefType interfaces) (compactMap muMemberDecl body )
 
 muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
 muDecl (InitDecl _ _)          = Other
@@ -58,19 +58,40 @@ muBlockStmt (LocalVars _ _type vars) = map muVarDecl vars
 muStmt (StmtBlock block)               = muBlock block
 muStmt (IfThen exp ifTrue)             = If (muExp exp) (muStmt ifTrue) MuNull
 muStmt (IfThenElse exp ifTrue ifFalse) = If (muExp exp) (muStmt ifTrue) (muStmt ifFalse)
-muStmt (While _Exp _Stmt)              = Other
-muStmt (BasicFor _MaybeForInit _MaybeExp _MaybeExps _Stmt) = Other
+muStmt (While cond body)               = M.While (muExp cond) (muStmt body)
 muStmt (Return exp)                    = M.Return $ fmapOrNull muExp exp
 muStmt (ExpStmt exp)                   = muExp exp
+muStmt Empty                           = MuNull
+muStmt (Assert exp _)                  = SimpleSend Self "assert" [muExp exp]
+muStmt (Synchronized _ block)          = muBlock block
+muStmt (Labeled _ stmt)                = muStmt stmt
+--muStmt (EnhancedFor _ _ name gen body) = Other
+--Throw Exp
+--Try Block [Catch] (Maybe Block)
+--Switch Exp [SwitchBlock]
 muStmt _                               = Other
 
-muExp (Lit lit)                   = muLit lit
-muExp (MethodInv invoke)          = muMethodInvocation invoke
-muExp This                        = Self
-muExp (BinOp arg1 op arg2)        = Send (muExp arg1) (muOp op) [muExp arg2]
-muExp (Cond cond ifTrue ifFalse)  = If (muExp cond) (muExp ifTrue) (muExp ifFalse)
-muExp (ExpName name)              = muName name
-muExp _                           = Other
+muExp (Lit lit)                         = muLit lit
+muExp (MethodInv invoke)                = muMethodInvocation invoke
+muExp This                              = Self
+muExp (BinOp arg1 op arg2)              = Send (muExp arg1) (muOp op) [muExp arg2]
+muExp (Cond cond ifTrue ifFalse)        = If (muExp cond) (muExp ifTrue) (muExp ifFalse)
+muExp (ExpName name)                    = muName name
+muExp (Assign lhs EqualA exp)           = Assignment (muLhs lhs) (muExp exp)
+muExp (InstanceCreation _ clazz args _) = SimpleNew (r clazz) (map muExp args)
+muExp (PreNot exp)                      = SimpleSend (muExp exp) "!" []
+muExp (Lambda params exp)               = M.Lambda (muLambdaParams params) (muLambdaExp exp)
+muExp (MethodRef _ message)             = M.Lambda [VariablePattern "it"] (SimpleSend (Reference "it") (i message) [])
+muExp _                                 = Other
+
+muLambdaExp (LambdaExpression exp) = muExp exp
+muLambdaExp (LambdaBlock block) = muBlock block
+
+muLambdaParams (LambdaSingleParam name)     = [VariablePattern (i name)]
+muLambdaParams (LambdaInferredParams names) = map (VariablePattern . i) names
+muLambdaParams (LambdaFormalParams params)  = map (VariablePattern . muFormalParam) params
+
+muLhs (NameLhs (Name names)) = ns names
 
 muName (Name names) = Reference . ns $ names
 
@@ -110,6 +131,8 @@ muMethodInvocation (MethodCall (Name (receptor:message)) args)  =  SimpleSend (R
 muMethodInvocation (PrimaryMethodCall receptor _ selector args) =  SimpleSend (muExp receptor) (i selector) (map muExp args)
 muMethodInvocation _ = Other
 
+muClassRefType (ClassRefType clazz) = r clazz
+
 {-
 Invoking a method of a class computed from a primary expression, giving arguments for any generic type parameters.
 SuperMethodCall [RefType] Ident [Argument]
@@ -130,7 +153,7 @@ v (VarId name) = i name
 v (VarDeclArray id) =  (v id) ++ "[]"
 
 i (Ident name) = name
-r (ClassRefType (ClassType [(name, _)])) = i name
+r (ClassType [(name, _)]) = i name
 
 j = parser compilationUnit
 
