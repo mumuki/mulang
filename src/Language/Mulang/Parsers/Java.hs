@@ -29,10 +29,13 @@ m (CompilationUnit _ _ typeDecls) = compactMap muTypeDecl $ typeDecls
 muTypeDecl (ClassTypeDecl decl)    = muClassTypeDecl decl
 muTypeDecl (InterfaceTypeDecl decl) = muInterfaceTypeDecl decl
 
-muClassTypeDecl (ClassDecl _ name _ superclass _interfaces (ClassBody body)) = Class (i name) (fmap muClassRefType superclass) (compactMap muDecl body )
-muClassTypeDecl (EnumDecl _ name _ (EnumBody constants _))                  = Enumeration (i name) (map muEnumConstant constants)
+muClassTypeDecl (ClassDecl _ name _ superclass _interfaces (ClassBody body)) =
+  Class (i name) (fmap muClassRefType superclass) (compactMap muDecl body )
+muClassTypeDecl (EnumDecl _ name _ (EnumBody constants _))                   =
+  Enumeration (i name) (map muEnumConstant constants)
 
-muInterfaceTypeDecl (InterfaceDecl _ name _ interfaces (InterfaceBody body)) = Interface (i name) (map muClassRefType interfaces) (compactMap muMemberDecl body )
+muInterfaceTypeDecl (InterfaceDecl _ name _ interfaces (InterfaceBody body)) =
+  Interface (i name) (map (Reference . muClassRefType) interfaces) (compactMap muMemberDecl body )
 
 muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
 muDecl (InitDecl _ _)          = Other

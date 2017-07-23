@@ -88,7 +88,7 @@ data Expression
     --   composed by a name, an optional superclass, implemented interfaces and a body
     | Enumeration Identifier [Identifier]
     -- ^ Imperative named enumeration of values
-    | Interface Identifier [Identifier] Expression
+    | Interface Identifier [Expression] Expression
     -- ^ Object oriented programming global interface or contract declaration,
     --   composed by a name, superinterfaces and a body
     | Rule Identifier [Pattern] [Expression]

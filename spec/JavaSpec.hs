@@ -29,7 +29,7 @@ spec = do
       run "public interface Foo { void foo(); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" [] "void")
 
     it "parses Interface with superinterfaces" $ do
-      run "public interface Foo extends Bar, Baz {}" `shouldBe` Interface "Foo" ["Bar", "Baz"] MuNull
+      run "public interface Foo extends Bar, Baz {}" `shouldBe` Interface "Foo" [Reference "Bar", Reference "Baz"] MuNull
 
     it "parses Class With Methods" $ do
       run [text|
