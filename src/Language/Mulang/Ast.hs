@@ -25,7 +25,6 @@ module Language.Mulang.Ast (
     pattern SimpleProcedure,
     pattern SimpleMethod,
     pattern SimpleSend,
-    pattern SimpleNew,
     pattern MuTrue,
     pattern MuFalse,
     pattern Subroutine,
@@ -40,8 +39,6 @@ type Code = String
 -- | An identifier
 -- | Mulang does not assume any special naming convention or format
 type Identifier = String
-
-type Type = String
 
 -- | An equation. See @Function@ and @Procedure@ above
 data Equation = Equation [Pattern] EquationBody deriving (Eq, Show, Read, Generic)
@@ -65,7 +62,7 @@ data Expression
     | Record Identifier
     -- ^ Imperative / Functional programming struct declaration.
     --   Only the record name is parsed
-    | TypeSignature Identifier [Type] Type
+    | TypeSignature Identifier [Identifier] Identifier
     -- ^ Generic type signature for a computation,
     --   composed by a name, parameter types and return type
     | EntryPoint Identifier Expression
@@ -88,7 +85,7 @@ data Expression
     --   composed by a name, an optional superclass, implemented interfaces and a body
     | Enumeration Identifier [Identifier]
     -- ^ Imperative named enumeration of values
-    | Interface Identifier [Expression] Expression
+    | Interface Identifier [Identifier] Expression
     -- ^ Object oriented programming global interface or contract declaration,
     --   composed by a name, superinterfaces and a body
     | Rule Identifier [Pattern] [Expression]
@@ -109,8 +106,12 @@ data Expression
     -- ^ Generic, non-curried application of a function or procedure, composed by the applied element itself, and the application arguments
     | Send Expression Expression [Expression]
     -- ^ Object oriented programming message send, composed by the reciever, selector and arguments
-    | New Expression [Expression]
-    -- ^ Object oriented instantiation, composed by the class expression and instantiation arguments
+    | New Identifier [Expression]
+    -- ^ Object oriented instantiation, composed by the class reference and instantiation arguments
+    | Implement Identifier
+    -- ^ Object oriented instantiation, interface implementation
+    | Include Identifier
+    -- ^ Object oriented instantiation, mixin inclusion
     | Lambda [Pattern] Expression
     | If Expression Expression Expression
     | Return Expression
@@ -179,7 +180,6 @@ data ComprehensionStatement
 pattern SimpleEquation params body = Equation params (UnguardedBody body)
 
 pattern SimpleSend receptor selector args = Send receptor (Reference selector) args
-pattern SimpleNew clazz args = New (Reference clazz) args
 
 pattern SimpleFunction name params body  = Function  name [SimpleEquation params body]
 pattern SimpleProcedure name params body = Procedure name [SimpleEquation params body]

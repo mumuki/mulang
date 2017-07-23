@@ -72,9 +72,9 @@ nameOf :: Expression -> Maybe Binding
 nameOf = fmap fst . extractDeclaration
 
 extractReference :: Expression -> Maybe (Binding, Expression)
-extractReference e@(Reference n) = Just (n, e)
-extractReference e@(Exist n _)   = Just (n, e)
-extractReference _               = Nothing
+extractReference e@(Reference n)        = Just (n, e)
+extractReference e@(Exist n _)          = Just (n, e)
+extractReference _                      = Nothing
 
 
 extractDeclaration :: Expression -> Maybe (Binding, Expression)

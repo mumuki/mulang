@@ -31,8 +31,9 @@ spec = do
     it "parses Simple Interface With Messages With Params" $ do
       run "public interface Foo { void foo(String x, int y); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" ["String", "int"] "void")
 
+
     it "parses Interface with superinterfaces" $ do
-      run "public interface Foo extends Bar, Baz {}" `shouldBe` Interface "Foo" [Reference "Bar", Reference "Baz"] MuNull
+      run "public interface Foo extends Bar, Baz {}" `shouldBe` Interface "Foo" ["Bar", "Baz"] MuNull
 
     it "parses Class With Methods" $ do
       run [text|
@@ -192,4 +193,4 @@ spec = do
       run [text|class Foo {
              public Foo hello() { return new Bar(3); }
           }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
-                           Return (SimpleNew "Bar" [MuNumber 3])))
+                           Return (New "Bar" [MuNumber 3])))

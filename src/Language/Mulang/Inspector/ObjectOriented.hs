@@ -1,4 +1,6 @@
 module Language.Mulang.Inspector.ObjectOriented (
+  implements,
+  instantiates,
   usesInheritance,
   declaresObject,
   declaresSuperclass,
@@ -12,40 +14,51 @@ import Language.Mulang.Ast
 import Language.Mulang.Binding
 import Language.Mulang.Inspector.Generic
 
+implements :: BindedInspection
+implements predicate = containsExpression f
+  where f (Implement name) = predicate name
+        f _                = False
+
+instantiates :: BindedInspection
+instantiates predicate = containsExpression f
+  where f (New name _) = predicate name
+        f _            = False
+
+
 usesInheritance :: Inspection
 usesInheritance = declaresSuperclass anyone
 
-declaresObject :: BindingPredicate -> Inspection
+declaresObject :: BindedInspection
 declaresObject =  containsDeclaration f
   where f (Object _ _) = True
         f _            = False
 
-declaresSuperclass :: BindingPredicate -> Inspection
+declaresSuperclass :: BindedInspection
 declaresSuperclass predicate = containsExpression f
   where f (Class _ (Just name) _) = predicate name
         f _                       = False
 
-declaresClass :: BindingPredicate -> Inspection
+declaresClass :: BindedInspection
 declaresClass =  containsDeclaration f
   where f (Class _ _ _) = True
         f _             = False
 
-declaresEnumeration :: BindingPredicate -> Inspection
+declaresEnumeration :: BindedInspection
 declaresEnumeration =  containsDeclaration f
   where f (Enumeration _ _) = True
         f _                 = False
 
-declaresInterface :: BindingPredicate -> Inspection
+declaresInterface :: BindedInspection
 declaresInterface =  containsDeclaration f
   where f (Interface _ _ _) = True
         f _                 = False
 
-declaresAttribute :: BindingPredicate -> Inspection
+declaresAttribute :: BindedInspection
 declaresAttribute =  containsDeclaration f
   where f (Attribute _ _) = True
         f _               = False
 
-declaresMethod :: BindingPredicate -> Inspection
+declaresMethod :: BindedInspection
 declaresMethod =  containsDeclaration f
   where f (Method _ _) = True
         f _            = False

@@ -6,7 +6,7 @@ module Language.Mulang.Parsers.Java (java, parseJava) where
 import Language.Mulang.Ast hiding (While, Return, Equal, Lambda)
 import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda))
 import Language.Mulang.Parsers
-import Language.Mulang.Builder (compactMap, compactConcatMap)
+import Language.Mulang.Builder (compact, compactMap, compactConcatMap)
 
 import Language.Java.Parser
 import Language.Java.Syntax
@@ -30,13 +30,15 @@ m (CompilationUnit _ _ typeDecls) = compactMap muTypeDecl $ typeDecls
 muTypeDecl (ClassTypeDecl decl)    = muClassTypeDecl decl
 muTypeDecl (InterfaceTypeDecl decl) = muInterfaceTypeDecl decl
 
-muClassTypeDecl (ClassDecl _ name _ superclass _interfaces (ClassBody body)) =
-  Class (i name) (fmap muRefType superclass) (compactMap muDecl body )
+muClassTypeDecl (ClassDecl _ name _ superclass interfaces (ClassBody body)) =
+  Class (i name) (fmap muRefType superclass) (compact (map muImplements interfaces ++ map muDecl body))
 muClassTypeDecl (EnumDecl _ name _ (EnumBody constants _))                   =
   Enumeration (i name) (map muEnumConstant constants)
 
+muImplements interface = Implement $ muRefType interface
+
 muInterfaceTypeDecl (InterfaceDecl _ name _ interfaces (InterfaceBody body)) =
-  Interface (i name) (map (Reference . muRefType) interfaces) (compactMap muMemberDecl body )
+  Interface (i name) (map muRefType interfaces) (compactMap muMemberDecl body )
 
 muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
 muDecl (InitDecl _ _)          = Other
@@ -86,7 +88,7 @@ muExp (BinOp arg1 op arg2)              = Send (muExp arg1) (muOp op) [muExp arg
 muExp (Cond cond ifTrue ifFalse)        = If (muExp cond) (muExp ifTrue) (muExp ifFalse)
 muExp (ExpName name)                    = muName name
 muExp (Assign lhs EqualA exp)           = Assignment (muLhs lhs) (muExp exp)
-muExp (InstanceCreation _ clazz args _) = SimpleNew (r clazz) (map muExp args)
+muExp (InstanceCreation _ clazz args _) = New (r clazz) (map muExp args)
 muExp (PreNot exp)                      = SimpleSend (muExp exp) "!" []
 muExp (Lambda params exp)               = M.Lambda (muLambdaParams params) (muLambdaExp exp)
 muExp (MethodRef _ message)             = M.Lambda [VariablePattern "it"] (SimpleSend (Reference "it") (i message) [])
