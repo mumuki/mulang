@@ -1,6 +1,12 @@
-module Language.Mulang.Builder (compact, normalize) where
+module Language.Mulang.Builder (compact, compactMap, compactConcatMap, normalize) where
 
 import Language.Mulang.Ast
+
+compactConcatMap :: (a -> [Expression]) -> [a] -> Expression
+compactConcatMap f = compact . concat . map f
+
+compactMap :: (a -> Expression) -> [a] -> Expression
+compactMap f = compact . map f
 
 compact :: [Expression] -> Expression
 compact []  = MuNull
@@ -34,8 +40,6 @@ normalize (MuObject e)                     = MuObject (normalize e)
 normalize (MuTuple es)                     = MuTuple (map normalize es)
 normalize (MuList es)                      = MuList (map normalize es)
 normalize e = e
-
-
 
 normalizeInObject (Function n eqs)             = Method n (map normalizeEquation eqs)
 normalizeInObject (Variable n (Lambda vars e)) = SimpleMethod n vars (normalize e)

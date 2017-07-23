@@ -52,6 +52,7 @@ library
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Prolog
+    Language.Mulang.Parsers.Java
     Language.Mulang.Parsers.JavaScript
     Language.Mulang.Analyzer
     Language.Mulang.Analyzer.Analysis
@@ -72,6 +73,7 @@ library
     scientific                ,
     vector                    ,
     haskell-src               ,
+    language-java             ,
     language-javascript       ,
     aeson                     ,
     inflections               ,

@@ -5,6 +5,7 @@ import           Language.Mulang.Analyzer hiding (spec)
 import           Language.Mulang.Analyzer.ExpectationsCompiler (compileExpectation)
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
+import           Language.Mulang.Parsers.Java
 
 spec :: Spec
 spec = do
@@ -166,3 +167,6 @@ spec = do
   it "works with UsesLambda" $ do
     run (hs "f 3 = 3") "f" "UsesLambda" `shouldBe` False
 
+  it "works with Implements" $ do
+    run (java "class Foo implements Bar {}") "Foo" "Implements:Bar" `shouldBe` True
+    run (java "class Foo implements Bar {}") "Foo" "Implements:Baz" `shouldBe` False

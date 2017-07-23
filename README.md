@@ -92,20 +92,22 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 
 1. `assigns`: **any paradigm** is the given variable or attribute assigned?
 1. `declares`: **any paradigm** is the given element declared?
-1. `declaresAttribute`: **objects paradigm** is a given attribute declared?
-1. `declaresClass`: **objects paradigm** is a given class declared?
+1. `declaresAttribute`: **object oriented paradigm** is a given attribute declared?
+1. `declaresClass`: **object oriented paradigm** is a given class declared?
 1. `declaresComputation`: **any paradigm** that is, does the given computation  - method, predicate, function, etc - exist?
 1. `declaresComputationWithArity`: **any paradigm**  that is, does the given computation have the exact given arity?
 1. `declaresEntryPoint`: **any paradigm** is there a program entry point, like a `main` procedure?
+1. `declaresEnumeration`: **imperative paradigm** is a given enumeration declared?
 1. `declaresFact`: **logic paradigm** is a given logic fact declared?
 1. `declaresFunction`: **functional/imperative paradigm** is a given function declared?
-1. `declaresMethod`: **objects paradigm** is a given method declared?
-1. `declaresObject`: **objects paradigm** is a given named object declared?
+1. `declaresInterface`: **object oriented paradigm** is a given interface declared?
+1. `declaresMethod`: **object oriented paradigm** is a given method declared?
+1. `declaresObject`: **object oriented paradigm** is a given named object declared?
 1. `declaresPredicate`: **logic paradigm** is a given rule o fact declared?
 1. `declaresProcedure`: **imperative paradigm** is a given procedure declared?
 1. `declaresRecursively`: **any paradigm** is a given computation declared using recusion?
 1. `declaresRule`: **logic paradigm** is a given logic rule declared?
-1. `declaresSuperclass`: **objects paradigm** is a given class declared as superclass?
+1. `declaresSuperclass`: **object oriented paradigm** is a given class declared as superclass?
 1. `declaresTypeAlias`: **any paradigm** is a given type synonym declared?
 1. `declaresTypeSignature`: **any paradigm** is a given computation type signature declared?
 1. `declaresVariable`: **any paradigm** is a given local o global variable declared?
@@ -123,6 +125,8 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `hasRedundantReduction`: **logic paradigm** is a is-operator used to unify individuals that don't require a reduction, like `X is 4`
 1. `hasTooShortBindings`: **any paradigm** whether a binding is too short and not part of domain language's jargon
 1. `hasWrongCaseBindings`: **any paradigm** whether a binding does not match the domain language's case style
+1. `implements`: **object oriented paradigm** is the given interface implemented?
+1. `instantiates`: **object oriented paradigm** is the given class instantiated?
 1. `isLongCode`: **any paradigm** has the code long sequences of statements?
 1. `returnsNull`
 1. `uses`: **any paradigm** is there any reference to the given element?
@@ -136,14 +140,14 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `usesForall`:  **logic paradigm** is the logic `forall` consult used?
 1. `usesGuards`
 1. `usesIf`: **any paradigm** is an `if` control structure used?
-1. `usesInheritance`: **objects paradigm** is a superclass explicitly declared?
+1. `usesInheritance`: **object oriented paradigm** is a superclass explicitly declared?
 1. `usesLambda`
 1. `usesNot`
 1. `usesPatternMatching`
 1. `usesRepeat`
 1. `usesSwitch`
 1. `usesUnificationOperator`:  **logic paradigm** is the logic unification operator `=` used?
-1. `usesWhile`
+1. `usesWhile`: **imperative paradigm** is a `while` control structure used?
 
 For example, let's go trickier:
 

@@ -6,6 +6,7 @@ import        Language.Mulang.Parsers (MaybeParser)
 import        Language.Mulang.Parsers.Haskell
 import        Language.Mulang.Parsers.JavaScript (parseJavaScript)
 import        Language.Mulang.Parsers.Prolog (parseProlog)
+import        Language.Mulang.Parsers.Java (parseJava)
 import        Language.Mulang.Analyzer.Analysis (Sample(..), Language(..))
 
 parseSample :: Sample -> Maybe Expression
@@ -14,5 +15,6 @@ parseSample (MulangSample ast)            = Just ast
 
 parserFor :: Language -> MaybeParser
 parserFor Haskell        = parseHaskell
+parserFor Java           = parseJava
 parserFor JavaScript     = parseJavaScript
 parserFor Prolog         = parseProlog

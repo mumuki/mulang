@@ -4,6 +4,7 @@ import           Test.Hspec
 import           Language.Mulang
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
+import           Language.Mulang.Parsers.Java (java)
 import           Language.Mulang.Inspector.Generic.Smell
 import           Data.Maybe (fromJust)
 
@@ -199,7 +200,37 @@ spec = do
     it "is True when anyone present, scoped" $ do
       declaresObject anyone (js "var g = {}")  `shouldBe` True
 
-  describe "usesInheritance" $ do
+  describe "declaresEnumeration" $ do
+    it "is True when present" $ do
+      declaresEnumeration (named "Direction") (Enumeration "Direction" ["SOUTH", "EAST", "WEST", "NORTH"]) `shouldBe` True
+
+    it "is False when not present" $ do
+      declaresEnumeration (named "Bird") (Class "Bird" (Just "Animal") MuNull) `shouldBe` False
+
+  describe "declaresInterface" $ do
+    it "is True when present" $ do
+      declaresInterface (named "Optional") (java "interface Optional { Object get(); }") `shouldBe` True
+
+    it "is False when not present" $ do
+      declaresInterface (named "Bird") (java "class Bird extends Animal {}") `shouldBe` False
+
+  describe "instantiates" $ do
+    it "is True when instantiates" $ do
+      instantiates (named "Bird") (java "class Main {  void main(String[] args) { Animal a = new Bird(); }  }") `shouldBe` True
+
+    it "is False when not instantiates" $ do
+      instantiates (named "Bird") (java "class Main {  void main(String[] args) { Animal a = new Mammal(); }  }") `shouldBe` False
+
+  describe "implements" $ do
+    it "is True when implements" $ do
+      implements (named "Bird") (java "class Eagle implements Bird {}") `shouldBe` True
+
+    it "is False when implements declaration not present" $ do
+      implements (named "Bird") (java "class Cell {}") `shouldBe` False
+
+    it "is False when a superinterface is declares" $ do
+      implements (named "Iterable") (java "interface Collection extends Iterable {}") `shouldBe` False
+
     it "is True when present" $ do
       usesInheritance (Class "Bird" (Just "Animal") MuNull) `shouldBe` True
 
@@ -218,6 +249,12 @@ spec = do
 
     it "is True when any present" $ do
       declaresMethod anyone (js "var f = {x: function(){}}")  `shouldBe` True
+
+    it "is True when scoped in a class" $ do
+      scoped (declaresMethod (named "foo")) "A" (java "class A { void foo() {} }")  `shouldBe` True
+
+    it "is False when scoped in a class and not present" $ do
+      scoped (declaresMethod (named "foo")) "A" (java "class A { void foobar() {} }") `shouldBe` False
 
     it "is False when not present" $ do
       declaresMethod (named "m") (js "var f = {x: function(){}}")  `shouldBe` False

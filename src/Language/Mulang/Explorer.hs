@@ -72,13 +72,13 @@ nameOf :: Expression -> Maybe Binding
 nameOf = fmap fst . extractDeclaration
 
 extractReference :: Expression -> Maybe (Binding, Expression)
-extractReference e@(Reference n) = Just (n, e)
-extractReference e@(Exist n _)   = Just (n, e)
-extractReference _               = Nothing
+extractReference e@(Reference n)        = Just (n, e)
+extractReference e@(Exist n _)          = Just (n, e)
+extractReference _                      = Nothing
 
 
 extractDeclaration :: Expression -> Maybe (Binding, Expression)
-extractDeclaration e@(TypeSignature n _)  = Just (n, e)
+extractDeclaration e@(TypeSignature n _ _)= Just (n, e)
 extractDeclaration e@(TypeAlias n )       = Just (n, e)
 extractDeclaration e@(Variable n _)       = Just (n, e)
 extractDeclaration e@(Subroutine n _)     = Just (n, e)
@@ -86,6 +86,8 @@ extractDeclaration e@(Record n)           = Just (n, e)
 extractDeclaration e@(Clause n _ _)       = Just (n, e)
 extractDeclaration e@(Object n _)         = Just (n, e)
 extractDeclaration e@(Class n _ _)        = Just (n, e)
+extractDeclaration e@(Interface n _ _)    = Just (n, e)
+extractDeclaration e@(Enumeration n _)    = Just (n, e)
 extractDeclaration e@(Attribute n _)      = Just (n, e)
 extractDeclaration e@(EntryPoint n _)     = Just (n, e)
 extractDeclaration _                      = Nothing

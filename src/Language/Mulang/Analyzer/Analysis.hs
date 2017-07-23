@@ -100,6 +100,7 @@ data Sample
 
 data Language
   =  Json
+  |  Java
   |  JavaScript
   |  Prolog
   |  Haskell deriving (Show, Eq, Generic)
