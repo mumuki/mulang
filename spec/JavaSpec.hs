@@ -28,6 +28,9 @@ spec = do
     it "parses Simple Interface With Messages" $ do
       run "public interface Foo { void foo(); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" [] "void")
 
+    it "parses Simple Interface With Messages With Params" $ do
+      run "public interface Foo { void foo(String x, int y); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" ["String", "int"] "void")
+
     it "parses Interface with superinterfaces" $ do
       run "public interface Foo extends Bar, Baz {}" `shouldBe` Interface "Foo" [Reference "Bar", Reference "Baz"] MuNull
 

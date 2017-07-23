@@ -15,6 +15,7 @@ import Control.Fallible
 
 import Data.Maybe (fromMaybe)
 import Data.List (intercalate)
+import Data.Char (toLower)
 
 java :: Parser
 java = orFail . parseJava'
@@ -30,33 +31,37 @@ muTypeDecl (ClassTypeDecl decl)    = muClassTypeDecl decl
 muTypeDecl (InterfaceTypeDecl decl) = muInterfaceTypeDecl decl
 
 muClassTypeDecl (ClassDecl _ name _ superclass _interfaces (ClassBody body)) =
-  Class (i name) (fmap muClassRefType superclass) (compactMap muDecl body )
+  Class (i name) (fmap muRefType superclass) (compactMap muDecl body )
 muClassTypeDecl (EnumDecl _ name _ (EnumBody constants _))                   =
   Enumeration (i name) (map muEnumConstant constants)
 
 muInterfaceTypeDecl (InterfaceDecl _ name _ interfaces (InterfaceBody body)) =
-  Interface (i name) (map (Reference . muClassRefType) interfaces) (compactMap muMemberDecl body )
+  Interface (i name) (map (Reference . muRefType) interfaces) (compactMap muMemberDecl body )
 
 muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
 muDecl (InitDecl _ _)          = Other
 
 muMemberDecl (FieldDecl _ _type _varDecls)                                    = Other
-muMemberDecl (MethodDecl _ _ _ name params _ (MethodBody Nothing))            = TypeSignature (i name) (map muFormalParam params) "void"
+muMemberDecl (MethodDecl _ _ _ name params _ (MethodBody Nothing))            = TypeSignature (i name) (map muFormalParamType params) "void"
 muMemberDecl (MethodDecl (elem Static -> True) _ _ (Ident "main") [_] _ body) = EntryPoint "main" (muMethodBody body)
-muMemberDecl (MethodDecl _ _ _ name params _ body)                            = SimpleMethod (i name) (map (VariablePattern . muFormalParam) params) (muMethodBody body)
+muMemberDecl (MethodDecl _ _ _ name params _ body)                            = SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)
 muMemberDecl (ConstructorDecl _ _ _ _params _ _constructorBody)               = Other
 muMemberDecl (MemberClassDecl decl)                                           = muClassTypeDecl decl
 muMemberDecl (MemberInterfaceDecl decl)                                       = muInterfaceTypeDecl decl
 
 muEnumConstant (EnumConstant name _ _) = i name
 
-muFormalParam (FormalParam _ _types _ id) = (v id)
+muFormalParam (FormalParam _ _ _ id)      = VariablePattern (v id)
+muFormalParamType (FormalParam _ typ _ _) = (muType typ)
 
 muBlock (Block statements) = compactConcatMap muBlockStmt statements
 
 muBlockStmt (BlockStmt stmt) = [muStmt stmt]
 muBlockStmt (LocalClass decl) = [muClassTypeDecl decl]
 muBlockStmt (LocalVars _ _type vars) = map muVarDecl vars
+
+muType (PrimType t) = muPrimType t
+muType (RefType t)  = muRefType t
 
 muStmt (StmtBlock block)               = muBlock block
 muStmt (IfThen exp ifTrue)             = If (muExp exp) (muStmt ifTrue) MuNull
@@ -92,7 +97,7 @@ muLambdaExp (LambdaBlock block) = muBlock block
 
 muLambdaParams (LambdaSingleParam name)     = [VariablePattern (i name)]
 muLambdaParams (LambdaInferredParams names) = map (VariablePattern . i) names
-muLambdaParams (LambdaFormalParams params)  = map (VariablePattern . muFormalParam) params
+muLambdaParams (LambdaFormalParams params)  = map muFormalParam params
 
 muLhs (NameLhs (Name names)) = ns names
 
@@ -134,17 +139,10 @@ muMethodInvocation (MethodCall (Name (receptor:message)) args)  =  SimpleSend (R
 muMethodInvocation (PrimaryMethodCall receptor _ selector args) =  SimpleSend (muExp receptor) (i selector) (map muExp args)
 muMethodInvocation _ = Other
 
-muClassRefType (ClassRefType clazz) = r clazz
+muRefType (ClassRefType clazz) = r clazz
+muRefType (ArrayType t)        = (muType t) ++ "[]"
 
-{-
-Invoking a method of a class computed from a primary expression, giving arguments for any generic type parameters.
-SuperMethodCall [RefType] Ident [Argument]
-Invoking a method of the super class, giving arguments for any generic type parameters.
-ClassMethodCall Name [RefType] Ident [Argument]
-Invoking a method of the superclass of a named class, giving arguments for any generic type parameters.
-TypeMethodCall Name [RefType] Ident [Argument]
-Invoking a method of a named type, giving arguments for any generic type parameters.
--}
+muPrimType = map toLower . dropLast 1 . show
 
 -- Combinators
 
@@ -161,3 +159,7 @@ r (ClassType [(name, _)]) = i name
 j = parser compilationUnit
 
 ns = intercalate "." . map i
+
+-- list helpers
+
+dropLast n xs = take (length xs - n) xs
