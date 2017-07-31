@@ -120,6 +120,9 @@ data Expression
     | Repeat Expression Expression
     -- ^ Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
     | Match Expression [Equation]
+    | Raise Expression
+    | Rescue Pattern Expression
+    | Print Expression
     | Switch Expression [(Expression,Expression)]
     | Comprehension Expression [ComprehensionStatement]
     | Sequence [Expression]
@@ -159,9 +162,10 @@ data Pattern
     -- ^ tuple pattern like @(3, _)@
     | ListPattern [Pattern]
     -- ^ list pattern like @[x, y, _]@
-    | FunctorPattern String [Pattern]
+    | FunctorPattern Identifier [Pattern]
     -- ^ prolog-like functor pattern, like @f(X, 6)@
-    | AsPattern String Pattern
+    | AsPattern Identifier Pattern
+    | TypePattern Identifier
     -- ^ @\@@-pattern
     | WildcardPattern
     -- ^ wildcard pattern @_@

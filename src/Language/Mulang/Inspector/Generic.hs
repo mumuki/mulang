@@ -14,6 +14,10 @@ module Language.Mulang.Inspector.Generic (
   declaresTypeAlias,
   declaresTypeSignature,
   usesAnonymousVariable,
+  raises,
+  rescuesType,
+  usesExceptions,
+  usesExceptionHandling,
   containsExpression,
   containsDeclaration,
   containsBody,
@@ -107,6 +111,27 @@ declaresTypeSignature = containsDeclaration f
   where f (TypeSignature _ _ _) = True
         f _                     = False
 
+raises :: BindedInspection
+raises predicate = containsExpression f
+  where f (Raise (New n _))     = predicate n
+        f (Raise (Reference n)) = predicate n
+        f _                     = False
+
+usesExceptions :: Inspection
+usesExceptions = containsExpression f
+  where f (Raise _)     = True
+        f _             = False
+
+rescuesType :: BindedInspection
+rescuesType predicate = containsExpression f
+  where f (Rescue (TypePattern n) _)               = predicate n
+        f (Rescue (AsPattern _ (TypePattern n)) _) = predicate n
+        f _                                        = False
+
+usesExceptionHandling :: Inspection
+usesExceptionHandling  = containsExpression f
+  where f (Rescue _ _) = True
+        f _            = False
 
 usesAnonymousVariable :: Inspection
 usesAnonymousVariable = containsExpression f
