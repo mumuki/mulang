@@ -126,6 +126,8 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `hasTooShortBindings`: **any paradigm** whether a binding is too short and not part of domain language's jargon
 1. `hasWrongCaseBindings`: **any paradigm** whether a binding does not match the domain language's case style
 1. `implements`: **object oriented paradigm** is the given interface implemented?
+1. `includes`: **object oriented paradigm** is a given mixins included?
+1. `inherits`: **object oriented paradigm** is a given class declared as superclass? - alias of `declaresSuperclass`
 1. `instantiates`: **object oriented paradigm** is the given class instantiated?
 1. `isLongCode`: **any paradigm** has the code long sequences of statements?
 1. `returnsNull`
@@ -140,8 +142,9 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `usesForall`:  **logic paradigm** is the logic `forall` consult used?
 1. `usesGuards`
 1. `usesIf`: **any paradigm** is an `if` control structure used?
-1. `usesInheritance`: **object oriented paradigm** is a superclass explicitly declared?
+1. `usesInheritance`: **object oriented paradigm** is any superclass explicitly declared?
 1. `usesLambda`
+1. `usesMixins`: **object oriented paradigm** is any mixins explicitly included?
 1. `usesNot`
 1. `usesPatternMatching`
 1. `usesRepeat`

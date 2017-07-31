@@ -1,7 +1,10 @@
 module Language.Mulang.Inspector.ObjectOriented (
   implements,
+  includes,
+  inherits,
   instantiates,
   usesInheritance,
+  usesMixins,
   declaresObject,
   declaresSuperclass,
   declaresClass,
@@ -19,14 +22,26 @@ implements predicate = containsExpression f
   where f (Implement name) = predicate name
         f _                = False
 
+includes :: BindedInspection
+includes predicate = containsExpression f
+  where f (Include name) = predicate name
+        f _              = False
+
+inherits :: BindedInspection
+inherits predicate = containsExpression f
+  where f (Class _ (Just name) _) = predicate name
+        f _                       = False
+
 instantiates :: BindedInspection
 instantiates predicate = containsExpression f
   where f (New name _) = predicate name
         f _            = False
 
-
 usesInheritance :: Inspection
 usesInheritance = declaresSuperclass anyone
+
+usesMixins :: Inspection
+usesMixins = includes anyone
 
 declaresObject :: BindedInspection
 declaresObject =  containsDeclaration f
@@ -34,9 +49,7 @@ declaresObject =  containsDeclaration f
         f _            = False
 
 declaresSuperclass :: BindedInspection
-declaresSuperclass predicate = containsExpression f
-  where f (Class _ (Just name) _) = predicate name
-        f _                       = False
+declaresSuperclass = inherits
 
 declaresClass :: BindedInspection
 declaresClass =  containsDeclaration f
