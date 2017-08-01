@@ -575,6 +575,8 @@ Mulang CLI can do three different kinds of analysis:
     * Exact matches:  `DeclaresClass:=Golondrina` or simply `DeclaresClass:Golondrina`
     * Approximate matches: `DeclaresClass:~Golondrina`
     * Any matches: `DeclaresClass:*` or simply `DeclaresClass`
+    * Except matches: `Declares:^Foo` - wich means that will match any declaration that is not `Foo`
+    * Any-Of matches: `Declares:[Foo|IFoo|AbstractFoo]` - which means that will match any declaration of `Foo`, `IFoo` or `AbstractFoo`
 * **Smell analysis**: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched.
 * **Signature analysis**: report the signatures of the computations present in source code.
 
