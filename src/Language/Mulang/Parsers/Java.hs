@@ -75,8 +75,9 @@ muStmt Empty                           = MuNull
 muStmt (Assert exp _)                  = SimpleSend Self "assert" [muExp exp]
 muStmt (Synchronized _ block)          = muBlock block
 muStmt (Labeled _ stmt)                = muStmt stmt
+muStmt (Throw exp)                     = Raise $ muExp exp
+--muStmt (Try _ stmt)                    = Rescue
 --muStmt (EnhancedFor _ _ name gen body) = Other
---Throw Exp
 --Try Block [Catch] (Maybe Block)
 --Switch Exp [SwitchBlock]
 muStmt _                               = Other
