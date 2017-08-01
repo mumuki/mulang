@@ -231,6 +231,7 @@ spec = do
     it "is False when a superinterface is declares" $ do
       implements (named "Iterable") (java "interface Collection extends Iterable {}") `shouldBe` False
 
+  describe "usesInheritance" $ do
     it "is True when present" $ do
       usesInheritance (Class "Bird" (Just "Animal") MuNull) `shouldBe` True
 
@@ -242,6 +243,13 @@ spec = do
 
     it "is True when present, scoped" $ do
       (scoped usesInheritance "Hercules") (Sequence [Class "Hercules" Nothing MuNull, Class "Fox" (Just "Animal") MuNull])  `shouldBe` False
+
+  describe "usesMixins" $ do
+    it "is True when include present" $ do
+      usesMixins (Class "Dragon" Nothing (Include "FlyingCreature")) `shouldBe` True
+
+    it "is False when include not present" $ do
+      usesMixins (Class "Dragon" Nothing (Implement "FlyingCreature")) `shouldBe` False
 
   describe "declaresMethod" $ do
     it "is True when present" $ do
