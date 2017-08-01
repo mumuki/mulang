@@ -45,6 +45,7 @@ compileObject p "*"        = p $ anyone
 compileObject p ('~':name) = p $ like name
 compileObject _ ('=':name) = named name
 compileObject _ ('^':name) = except name
+compileObject _ ('[':ns)   | last ns == ']' = anyOf (splitOn "|" (init ns))
 compileObject _ name       = named name
 
 

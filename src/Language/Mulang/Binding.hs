@@ -1,9 +1,10 @@
 module Language.Mulang.Binding (
-  named,
-  like,
+  andAlso,
+  anyOf,
   anyone,
   except,
-  andAlso,
+  like,
+  named,
   Binding,
   BindingPredicate) where
 
@@ -12,11 +13,11 @@ import  Data.List (isInfixOf)
 type Binding = String
 type BindingPredicate = Binding -> Bool
 
-named :: String -> BindingPredicate
-named = (==)
+andAlso :: BindingPredicate -> BindingPredicate -> BindingPredicate
+andAlso p1 p2 binding = p1 binding && p2 binding
 
-like :: String -> BindingPredicate
-like = isInfixOf
+anyOf :: [Binding] -> BindingPredicate
+anyOf options binding = any (== binding) options
 
 anyone :: BindingPredicate
 anyone = const True
@@ -24,5 +25,8 @@ anyone = const True
 except :: String -> BindingPredicate
 except = (/=)
 
-andAlso :: BindingPredicate -> BindingPredicate -> BindingPredicate
-andAlso p1 p2 binding = p1 binding && p2 binding
+like :: String -> BindingPredicate
+like = isInfixOf
+
+named :: String -> BindingPredicate
+named = (==)
