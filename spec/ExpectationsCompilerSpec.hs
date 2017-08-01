@@ -118,6 +118,10 @@ spec = do
     run (hs "f a b = h") "f" "Uses:g" `shouldBe` False
     run (hs "f a b = g") "f" "Uses:g" `shouldBe` True
 
+  it "works with UsesInheritance" $ do
+    run (java "class Foo extends Bar {}") "Foo" "UsesInheritance" `shouldBe` True
+    run (java "class Foo {}") "Foo" "UsesInheritance" `shouldBe` False
+
   it "works with transitive inspections" $ do
     run (hs "f a b = g\ng = m") "f" "Uses:h" `shouldBe` False
     run (hs "f a b = g\ng = h") "f" "Uses:h" `shouldBe` True
@@ -170,3 +174,7 @@ spec = do
   it "works with Implements" $ do
     run (java "class Foo implements Bar {}") "Foo" "Implements:Bar" `shouldBe` True
     run (java "class Foo implements Bar {}") "Foo" "Implements:Baz" `shouldBe` False
+
+  it "works with Inherits" $ do
+    run (java "class Foo extends Bar {}") "Foo" "Inherits:Bar" `shouldBe` True
+    run (java "class Foo extends Bar {}") "Foo" "Inherits:Baz" `shouldBe` False
