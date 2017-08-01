@@ -282,6 +282,19 @@ spec = do
     it "is False when object not present, scoped" $ do
       scoped (declaresMethod (named "x")) "p"  (js "var f = {x: function(){}}")  `shouldBe` False
 
+  describe "typesReturnAs" $ do
+    it "is True when typed, in hs" $ do
+      typesReturnAs (named "Int") (hs "f :: Int\nf = 4")  `shouldBe` True
+
+    it "is False when not explicitly typed, in hs" $ do
+      typesReturnAs (named "Int") (hs "f = 4")  `shouldBe` False
+
+    it "is True when typed, in java" $ do
+      typesReturnAs (named "int") (java "class Foo { int f() { return 4; } }")  `shouldBe` True
+
+    it "is False when typed with another type, in java" $ do
+      typesReturnAs (named "double") (java "class Foo { int f() { return 4; } }")  `shouldBe` False
+
   describe "declaresAttribute" $ do
     it "is True when present" $ do
       declaresAttribute (named "x") (js "var f = {x: 6}")  `shouldBe` True
