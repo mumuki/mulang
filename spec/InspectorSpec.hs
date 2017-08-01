@@ -310,11 +310,26 @@ spec = do
       uses (named "m") (EntryPoint "main" (Reference "f")) `shouldBe` False
 
   describe "usesExceptions" $ do
-    it "is True when a raise is used" $ do
+    it "is True when a raise is used, java" $ do
       usesExceptions (java "class Sample { void aMethod() { throw new RuntimeException(); } }") `shouldBe` True
 
-    it "is False when no raise is used" $ do
+    it "is True when a raise is used, js" $ do
+      usesExceptions (js "throw new Error()") `shouldBe` True
+
+    it "is True when undefined is used, hs" $ do
+      usesExceptions (hs "f = undefined") `shouldBe` True
+
+    it "is True when error is used, hs" $ do
+      usesExceptions (hs "f = error \"ups\"") `shouldBe` True
+
+    it "is False when no raise is used, java" $ do
       usesExceptions (java "class Sample { void aMethod() {} }") `shouldBe` False
+
+    it "is False when a raise is used, js" $ do
+      usesExceptions (js "new Error()") `shouldBe` False
+
+    it "is False when no raise is used, hs" $ do
+      usesExceptions (hs "f = 4") `shouldBe` False
 
   describe "uses, hs" $ do
     it "is True when required function is used on application" $ do
