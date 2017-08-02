@@ -139,8 +139,12 @@ muMethodBody (MethodBody (Just block)) = muBlock block
 muVarInit (InitExp exp) = muExp exp
 muVarInit (InitArray _ArrayInit) = Other
 
+muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "println"]) [expr])  = Print (muExp expr)
+muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "print"]) [expr])    = Print (muExp expr)
+muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "printf"]) (expr:_)) = Print (muExp expr)
+
 muMethodInvocation (MethodCall (Name [message]) args)           =  SimpleSend Self (i message) (map muExp args)
-muMethodInvocation (MethodCall (Name (receptor:message)) args)  =  SimpleSend (Reference (i receptor)) (ns message) (map muExp args)
+muMethodInvocation (MethodCall (Name receptorAndMessage) args)  =  SimpleSend (Reference  (ns . init $ receptorAndMessage)) (i . last $ receptorAndMessage) (map muExp args)
 muMethodInvocation (PrimaryMethodCall receptor _ selector args) =  SimpleSend (muExp receptor) (i selector) (map muExp args)
 muMethodInvocation _ = Other
 

@@ -130,6 +130,15 @@ spec = do
              public void hello() { this.f(); }
           }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (SimpleSend Self "f" []))
 
+    it "parses nested send" $ do
+      run [text|
+          class Foo {
+            void foo() {
+              System.err.println("hello");
+            }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "foo" [] (SimpleSend  (Reference "System.err") "println" [MuString "hello"]))
+
+
     it "parses argument-send" $ do
       run [text|
           class Foo {

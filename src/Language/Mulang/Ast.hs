@@ -126,6 +126,7 @@ data Expression
     | Raise Expression
     -- ^ Generic raise expression, like a throw or raise statament, composed by the raised expression
     | Print Expression
+    -- ^ Generic print expression
     | Comprehension Expression [ComprehensionStatement]
     | Sequence [Expression]
     -- ^ Generic sequence of statements
