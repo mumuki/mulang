@@ -255,6 +255,13 @@ spec = do
     it "is True when present" $ do
       declaresMethod (named "x") (js "var f = {x: function(){}}")  `shouldBe` True
 
+    it "is True when present anyOf bindings" $ do
+      declaresMethod (anyOf ["x", "y"]) (js "var f = {x: function(){}}")  `shouldBe` True
+      declaresMethod (anyOf ["x", "y"]) (js "var f = {y: function(){}}")  `shouldBe` True
+
+    it "is True when not present anyOf bindings" $ do
+      declaresMethod (anyOf ["x", "y"]) (js "var f = {z: function(){}}")  `shouldBe` False
+
     it "is True when any present" $ do
       declaresMethod anyone (js "var f = {x: function(){}}")  `shouldBe` True
 

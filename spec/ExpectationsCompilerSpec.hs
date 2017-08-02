@@ -178,3 +178,8 @@ spec = do
   it "works with Inherits" $ do
     run (java "class Foo extends Bar {}") "Foo" "Inherits:Bar" `shouldBe` True
     run (java "class Foo extends Bar {}") "Foo" "Inherits:Baz" `shouldBe` False
+
+  it "works with any-of predicate" $ do
+    run (java "class Foo implements Bar {}") "Foo" "Implements:[Bar|Baz|Foobar]" `shouldBe` True
+    run (java "class Foo implements Baz {}") "Foo" "Implements:[Bar|Baz|Foobar]" `shouldBe` True
+    run (java "class Foo implements Foobaz {}") "Foo" "Implements:[Bar|Baz|Foobar]" `shouldBe` False
