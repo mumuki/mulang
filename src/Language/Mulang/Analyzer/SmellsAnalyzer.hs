@@ -22,6 +22,8 @@ allSmells :: [Smell]
 allSmells = enumFrom minBound
 
 detectionFor :: Smell -> Detection
+detectionFor DiscardsExceptions              = simple discardsExceptions
+detectionFor DoesConsolePrint                = simple doesConsolePrint
 detectionFor DoesNullTest                    = simple doesNullTest
 detectionFor DoesTypeTest                    = simple doesTypeTest
 detectionFor HasAssignmentReturn             = simple hasAssignmentReturn
@@ -41,7 +43,6 @@ detectionFor ReturnsNull                     = simple returnsNull
 detectionFor UsesCut                         = simple usesCut
 detectionFor UsesFail                        = simple usesFail
 detectionFor UsesUnificationOperator         = simple usesUnificationOperator
-
 
 type Detection = DomainLanguage -> Expression -> [Binding]
 unsupported :: Detection

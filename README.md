@@ -110,6 +110,8 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `declaresTypeAlias`: **any paradigm** is a given type synonym declared?
 1. `declaresTypeSignature`: **any paradigm** is a given computation type signature declared?
 1. `declaresVariable`: **any paradigm** is a given local o global variable declared?
+1. `discardsExceptions`
+1. `doesConsolePrint`
 1. `doesNullTest`: **object oriented paradigm** is there a test agains a null value, like `if x == nil then puts 'is nil'`
 1. `doesTypeTest`
 1. `hasAssignmentReturn`

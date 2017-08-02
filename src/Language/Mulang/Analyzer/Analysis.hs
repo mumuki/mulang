@@ -63,7 +63,9 @@ data SmellsSet
   | AllSmells { exclude :: Maybe [Smell] } deriving (Show, Eq, Generic)
 
 data Smell
-  = DoesNullTest
+  = DiscardsExceptions
+  | DoesConsolePrint
+  | DoesNullTest
   | DoesTypeTest
   | HasAssignmentReturn
   | HasCodeDuplication
