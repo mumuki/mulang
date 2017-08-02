@@ -331,6 +331,21 @@ spec = do
     it "is False when no raise is used, hs" $ do
       usesExceptions (hs "f = 4") `shouldBe` False
 
+  describe "raises" $ do
+    it "is True when raises an expected exception" $ do
+      raises (named "RuntimeException") (java "class Sample { void aMethod() { throw new RuntimeException(); } }") `shouldBe` True
+
+    it "is False when raises an unexpected exception" $ do
+      raises (named "RuntimeException") (java "class Sample { void aMethod() { throw new Exception(); } }") `shouldBe` False
+
+
+  describe "rescues" $ do
+    it "is True when rescues an expected exception" $ do
+      rescues (named "RuntimeException") (java "class Sample { void aMethod() { try { foo(); } catch (RuntimeException e) { } } }") `shouldBe` True
+
+    it "is False when rescues an unexpected exception" $ do
+      rescues (named "RuntimeException") (java "class Sample { void aMethod() { try { foo(); } catch (Exception e) { } } }") `shouldBe` False
+
   describe "uses, hs" $ do
     it "is True when required function is used on application" $ do
       uses (named "m") (hs "y x = m x") `shouldBe` True

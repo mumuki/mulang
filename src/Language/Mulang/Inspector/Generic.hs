@@ -15,7 +15,7 @@ module Language.Mulang.Inspector.Generic (
   declaresTypeSignature,
   usesAnonymousVariable,
   raises,
-  rescuesType,
+  rescues,
   usesExceptions,
   usesExceptionHandling,
   containsExpression,
@@ -123,8 +123,8 @@ usesExceptions = containsExpression f
   where f (Raise _)     = True
         f _             = False
 
-rescuesType :: BindedInspection
-rescuesType predicate = containsExpression f
+rescues :: BindedInspection
+rescues predicate = containsExpression f
   where f (Try _ rescues _) = any (matchesType predicate) . map fst  $ rescues
         f _                 = False
 

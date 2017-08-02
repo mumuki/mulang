@@ -102,7 +102,7 @@ muLambdaParams (LambdaInferredParams names) = map (VariablePattern . i) names
 muLambdaParams (LambdaFormalParams params)  = map muFormalParam params
 
 muCatch :: Catch -> (Pattern, Expression)
-muCatch (Catch _ block) = (WildcardPattern, muBlock block)
+muCatch (Catch param block) = (TypePattern (muFormalParamType param), muBlock block)
 
 muLhs (NameLhs (Name names)) = ns names
 
