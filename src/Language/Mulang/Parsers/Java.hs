@@ -3,8 +3,8 @@
 
 module Language.Mulang.Parsers.Java (java, parseJava) where
 
-import Language.Mulang.Ast hiding (While, Return, Equal, Lambda)
-import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda))
+import Language.Mulang.Ast hiding (While, Return, Equal, Lambda, Try)
+import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda, Try))
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compact, compactMap, compactConcatMap)
 
@@ -76,9 +76,8 @@ muStmt (Assert exp _)                  = SimpleSend Self "assert" [muExp exp]
 muStmt (Synchronized _ block)          = muBlock block
 muStmt (Labeled _ stmt)                = muStmt stmt
 muStmt (Throw exp)                     = Raise $ muExp exp
---muStmt (Try _ stmt)                    = Rescue
+muStmt (Try block catches finally)     = M.Try (muBlock block) (map muCatch catches) (fmapOrNull muBlock finally)
 --muStmt (EnhancedFor _ _ name gen body) = Other
---Try Block [Catch] (Maybe Block)
 --Switch Exp [SwitchBlock]
 muStmt _                               = Other
 
@@ -101,6 +100,9 @@ muLambdaExp (LambdaBlock block) = muBlock block
 muLambdaParams (LambdaSingleParam name)     = [VariablePattern (i name)]
 muLambdaParams (LambdaInferredParams names) = map (VariablePattern . i) names
 muLambdaParams (LambdaFormalParams params)  = map muFormalParam params
+
+muCatch :: Catch -> (Pattern, Expression)
+muCatch (Catch _ block) = (WildcardPattern, muBlock block)
 
 muLhs (NameLhs (Name names)) = ns names
 

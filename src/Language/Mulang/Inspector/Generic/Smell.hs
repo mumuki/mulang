@@ -100,9 +100,10 @@ hasAssignmentReturn = containsExpression f
 
 discardsExceptions :: Inspection
 discardsExceptions = containsExpression f
-  where f (Rescue _ MuNull)    = True
-        f (Rescue _ (Print _)) = True
-        f _                    = False
+  where f (Try _ [(_, MuNull)] _)  = True
+        f (Try _ [(_, Print _)] _) = True
+        f _                        = False
+
 
 doesConsolePrint :: Inspection
 doesConsolePrint = containsExpression f

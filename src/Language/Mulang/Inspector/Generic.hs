@@ -21,6 +21,7 @@ module Language.Mulang.Inspector.Generic (
   containsExpression,
   containsDeclaration,
   containsBody,
+  matchesType,
   Inspection,
   BindedInspection) where
 
@@ -124,14 +125,13 @@ usesExceptions = containsExpression f
 
 rescuesType :: BindedInspection
 rescuesType predicate = containsExpression f
-  where f (Rescue (TypePattern n) _)               = predicate n
-        f (Rescue (AsPattern _ (TypePattern n)) _) = predicate n
-        f _                                        = False
+  where f (Try _ rescues _) = any (matchesType predicate) . map fst  $ rescues
+        f _                 = False
 
 usesExceptionHandling :: Inspection
 usesExceptionHandling  = containsExpression f
-  where f (Rescue _ _) = True
-        f _            = False
+  where f (Try _ _ _) = True
+        f _           = False
 
 usesAnonymousVariable :: Inspection
 usesAnonymousVariable = containsExpression f
@@ -161,6 +161,11 @@ containsBody f = has f equationBodiesOf
 
 containsDeclaration :: (Expression -> Bool) -> BindedInspection
 containsDeclaration f b  = has f (bindedDeclarationsOf' b)
+
+matchesType :: BindingPredicate -> Pattern -> Bool
+matchesType predicate (TypePattern n)               = predicate n
+matchesType predicate (AsPattern _ (TypePattern n)) = predicate n
+matchesType _         _                             = False
 
 -- private
 

@@ -120,10 +120,12 @@ data Expression
     | Repeat Expression Expression
     -- ^ Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
     | Match Expression [Equation]
+    | Switch Expression [(Expression, Expression)]
+    | Try Expression [(Pattern, Expression)] Expression
+    -- ^ Generic try expression, composed by a body, a list of exception-handling patterns and statments, and a finally expression
     | Raise Expression
-    | Rescue Pattern Expression
+    -- ^ Generic raise expression, like a throw or raise statament, composed by the raised expression
     | Print Expression
-    | Switch Expression [(Expression,Expression)]
     | Comprehension Expression [ComprehensionStatement]
     | Sequence [Expression]
     -- ^ Generic sequence of statements
@@ -178,7 +180,6 @@ data ComprehensionStatement
         | MuQualifier Expression
         | LetStmt     Expression
   deriving (Eq, Show, Read, Generic)
-
 
 
 pattern SimpleEquation params body = Equation params (UnguardedBody body)
