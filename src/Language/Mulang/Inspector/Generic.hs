@@ -98,7 +98,7 @@ declaresComputationWithArity' arityPredicate = containsDeclaration f
         f (Clause _ args _)       = argsHaveArity args
         f _  = False
 
-        equationArityIs = \(Equation args _) -> argsHaveArity args
+        equationArityIs (Equation args _) = argsHaveArity args
 
         argsHaveArity = arityPredicate.length
 
