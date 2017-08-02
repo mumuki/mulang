@@ -89,7 +89,6 @@ False
 
 Nice, we know. But not very awesome, it only can tell you if you are using a _binding_, right? Eeer. Good news, it can tell you much much much more things:
 
-
 1. `assigns`: **any paradigm** is the given variable or attribute assigned?
 1. `declares`: **any paradigm** is the given element declared?
 1. `declaresAttribute`: **object oriented paradigm** is a given attribute declared?
@@ -130,6 +129,8 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `inherits`: **object oriented paradigm** is a given class declared as superclass? - alias of `declaresSuperclass`
 1. `instantiates`: **object oriented paradigm** is the given class instantiated?
 1. `isLongCode`: **any paradigm** has the code long sequences of statements?
+1. `raises`: **any paradigm** is the given _exception type_ raised?
+1. `rescues`: **any paradigm** is the given _exception type_ rescued?
 1. `returnsNull`
 1. `uses`: **any paradigm** is there any reference to the given element?
 1. `usesAnonymousVariable`
@@ -137,6 +138,8 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `usesComprehensions`
 1. `usesConditional`
 1. `usesCut`: **logic paradigm** is the logic `!` consult used?
+1. `usesExceptionHandling`: **any paradigm** is any _exception_ handlded?
+1. `usesExceptions`: **any paradigm** is any _exception_ raised?
 1. `usesFail`: **logic paradigm** is the logic `fail` consult used?
 1. `usesFindall`:  **logic paradigm** is the logic `findall` consult used?
 1. `usesForall`:  **logic paradigm** is the logic `forall` consult used?
