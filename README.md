@@ -211,13 +211,13 @@ _Which means that there are null returns within  `bar` and also within `foo`_
 The really awesome is here: it is an universal tool which can _potentially_ work with every programming language. it natively supports:
 
   * JS (ES5)
+  * Java
   * Haskell
   * Prolog
   * Mulang itself, expressed as a JSON AST.
 
 In addition, through external tools, it offers support for the following languages:
 
-  * Java, using [mulang-java](https://github.com/mumuki/mulang-java)
   * Ruby, using [mulang-ruby](https://github.com/mumuki/mulang-ruby)
   * Python, using [mulang-python](https://github.com/mumuki/mulang-python)
   * Gobstones, using [gs-weblang-cli](https://github.com/gobstones/gs-weblang-cli)
