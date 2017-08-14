@@ -17,6 +17,19 @@ spec = do
   it "works with DeclaresProcedure" $ do
     run (hs "f x = 2") "" "DeclaresProcedure" `shouldBe` False
 
+  it "works with DeclaresAttribute on a class" $ do
+    run (java "class Person { String name() { return \"name\"; } }") "Person" "DeclaresAttribute:name" `shouldBe` False
+    run (java "class Person { String name; }") "Person" "DeclaresAttribute" `shouldBe` True
+    run (java "class Person { String name; }") "Person" "DeclaresAttribute:name" `shouldBe` True
+
+  it "works with DeclaresAttribute on an object" $ do
+    run (js "var Person = {}") "Person" "DeclaresAttribute:name" `shouldBe` False
+    run (js "var Person = {name: 'name'}") "Person" "DeclaresAttribute:name" `shouldBe` True
+
+  it "works with DeclaresMethod on a class" $ do
+    run (java "class Person { }") "Person" "DeclaresMethod:name" `shouldBe` False
+    run (java "class Person { String name() { return \"name\"; } }") "Person" "DeclaresMethod:name" `shouldBe` True
+
   it "works with DeclaresMethod on empty code" $ do
     run (js "") "pepita" "DeclaresMethod:*" `shouldBe` False
 
