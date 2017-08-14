@@ -3,8 +3,8 @@
 
 module Language.Mulang.Parsers.Java (java, parseJava) where
 
-import Language.Mulang.Ast hiding (While, Return, Equal, Lambda)
-import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda))
+import Language.Mulang.Ast hiding (While, Return, Equal, Lambda, Try)
+import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda, Try))
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compact, compactMap, compactConcatMap)
 
@@ -75,9 +75,9 @@ muStmt Empty                           = MuNull
 muStmt (Assert exp _)                  = SimpleSend Self "assert" [muExp exp]
 muStmt (Synchronized _ block)          = muBlock block
 muStmt (Labeled _ stmt)                = muStmt stmt
+muStmt (Throw exp)                     = Raise $ muExp exp
+muStmt (Try block catches finally)     = M.Try (muBlock block) (map muCatch catches) (fmapOrNull muBlock finally)
 --muStmt (EnhancedFor _ _ name gen body) = Other
---Throw Exp
---Try Block [Catch] (Maybe Block)
 --Switch Exp [SwitchBlock]
 muStmt _                               = Other
 
@@ -100,6 +100,9 @@ muLambdaExp (LambdaBlock block) = muBlock block
 muLambdaParams (LambdaSingleParam name)     = [VariablePattern (i name)]
 muLambdaParams (LambdaInferredParams names) = map (VariablePattern . i) names
 muLambdaParams (LambdaFormalParams params)  = map muFormalParam params
+
+muCatch :: Catch -> (Pattern, Expression)
+muCatch (Catch param block) = (TypePattern (muFormalParamType param), muBlock block)
 
 muLhs (NameLhs (Name names)) = ns names
 
@@ -136,8 +139,12 @@ muMethodBody (MethodBody (Just block)) = muBlock block
 muVarInit (InitExp exp) = muExp exp
 muVarInit (InitArray _ArrayInit) = Other
 
+muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "println"]) [expr])  = Print (muExp expr)
+muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "print"]) [expr])    = Print (muExp expr)
+muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "printf"]) (expr:_)) = Print (muExp expr)
+
 muMethodInvocation (MethodCall (Name [message]) args)           =  SimpleSend Self (i message) (map muExp args)
-muMethodInvocation (MethodCall (Name (receptor:message)) args)  =  SimpleSend (Reference (i receptor)) (ns message) (map muExp args)
+muMethodInvocation (MethodCall (Name receptorAndMessage) args)  =  SimpleSend (Reference  (ns . init $ receptorAndMessage)) (i . last $ receptorAndMessage) (map muExp args)
 muMethodInvocation (PrimaryMethodCall receptor _ selector args) =  SimpleSend (muExp receptor) (i selector) (map muExp args)
 muMethodInvocation _ = Other
 

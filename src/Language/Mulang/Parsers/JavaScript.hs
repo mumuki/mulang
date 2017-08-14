@@ -56,7 +56,8 @@ mu = compact . muNode . gc
     muNode (JSFunction _ name _ params _ body)               = [muFunction name params body]
     muNode (JSExpressionBinary op l _ r)                     = [Application (muOp op) [compactMapMu l, compactMapMu r]]
     muNode (JSMemberDot receptor _ selector)                 = [Send (compactMapMu receptor) (mu selector) []]
-    muNode e = error (show e)
+    muNode (JSThrow _ e)                                     = [Raise (mu e)]
+    muNode e                                                 = [Other]
 
 
 

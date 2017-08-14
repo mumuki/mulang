@@ -52,7 +52,6 @@ compileObject _ name       = named name
 compileInspectionPrimitive :: String -> BindingPredicate -> Maybe Inspection
 compileInspectionPrimitive = f
   where
-
   f "Assigns"                        = binded assigns
   f "Declares"                       = binded declares
   f "DeclaresAttribute"              = binded declaresAttribute
@@ -83,11 +82,15 @@ compileInspectionPrimitive = f
   f "Includes"                       = binded includes
   f "Inherits"                       = binded inherits
   f "Instantiates"                   = binded instantiates
+  f "Raises"                         = binded raises
+  f "Rescues"                        = binded rescues
   f "Uses"                           = binded uses
   f "UsesAnonymousVariable"          = simple usesAnonymousVariable
   f "UsesComposition"                = simple usesComposition
   f "UsesComprehension"              = simple usesComprehension
   f "UsesConditional"                = simple usesConditional
+  f "UsesExceptionHandling"          = simple usesExceptionHandling
+  f "UsesExceptions"                 = simple usesExceptions
   f "UsesFindall"                    = simple usesFindall
   f "UsesForall"                     = simple usesForall
   f "UsesGuards"                     = simple usesGuards

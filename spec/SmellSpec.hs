@@ -5,7 +5,10 @@ import           Language.Mulang.Ast
 import           Language.Mulang.Inspector.Generic.Smell
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)
+import           Language.Mulang.Parsers.Java (java)
 
+
+javaStatement m = java ("class Foo { void bar() { " ++ m ++ " } }")
 
 spec :: Spec
 spec = do
@@ -173,3 +176,20 @@ spec = do
 
     it "is False when there is no guard" $ do
       hasRedundantGuards (hs "x = False") `shouldBe` False
+
+  describe "discardsExceptions" $ do
+    it "is True when there is an empty catch" $ do
+      discardsExceptions (javaStatement "try { new Bar().baz(); } catch (Exception e) { /*TODO handle exception*/ }") `shouldBe` True
+
+    it "is False when catch is non-emty" $ do
+      discardsExceptions (javaStatement "try { new Bar().baz(); } catch (Exception e) { throw e; }") `shouldBe` False
+
+    it "is False when there is no catch" $ do
+      discardsExceptions (javaStatement "new Bar().baz();")  `shouldBe` False
+
+  describe "doesConsolePrint" $ do
+    it "is True java's system.out is used" $ do
+      doesConsolePrint (javaStatement "int i = 4; System.out.println(4);") `shouldBe` True
+
+    it "is False when no pint is used" $ do
+      doesConsolePrint (javaStatement "int i = 4; System.err.println(4);") `shouldBe` False

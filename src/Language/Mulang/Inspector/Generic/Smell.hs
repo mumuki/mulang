@@ -9,7 +9,9 @@ module Language.Mulang.Inspector.Generic.Smell (
   doesNullTest,
   doesTypeTest,
   isLongCode,
-  returnsNull) where
+  returnsNull,
+  discardsExceptions,
+  doesConsolePrint) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Inspector
@@ -90,9 +92,20 @@ hasRedundantLocalVariableReturn = containsExpression f
                       Return (Reference returnedVariable)]) = returnedVariable == declaredVariable
         f _                                                 = False
 
-
 hasAssignmentReturn :: Inspection
 hasAssignmentReturn = containsExpression f
   where f (Return (Assignment _ _)) = True
         f (Return (Variable _ _))   = True
         f _                         = False
+
+discardsExceptions :: Inspection
+discardsExceptions = containsExpression f
+  where f (Try _ [(_, MuNull)] _)  = True
+        f (Try _ [(_, Print _)] _) = True
+        f _                        = False
+
+
+doesConsolePrint :: Inspection
+doesConsolePrint = containsExpression f
+  where f (Print _) = True
+        f _         = False

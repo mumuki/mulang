@@ -120,7 +120,13 @@ data Expression
     | Repeat Expression Expression
     -- ^ Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
     | Match Expression [Equation]
-    | Switch Expression [(Expression,Expression)]
+    | Switch Expression [(Expression, Expression)]
+    | Try Expression [(Pattern, Expression)] Expression
+    -- ^ Generic try expression, composed by a body, a list of exception-handling patterns and statments, and a finally expression
+    | Raise Expression
+    -- ^ Generic raise expression, like a throw or raise statament, composed by the raised expression
+    | Print Expression
+    -- ^ Generic print expression
     | Comprehension Expression [ComprehensionStatement]
     | Sequence [Expression]
     -- ^ Generic sequence of statements
@@ -159,9 +165,10 @@ data Pattern
     -- ^ tuple pattern like @(3, _)@
     | ListPattern [Pattern]
     -- ^ list pattern like @[x, y, _]@
-    | FunctorPattern String [Pattern]
+    | FunctorPattern Identifier [Pattern]
     -- ^ prolog-like functor pattern, like @f(X, 6)@
-    | AsPattern String Pattern
+    | AsPattern Identifier Pattern
+    | TypePattern Identifier
     -- ^ @\@@-pattern
     | WildcardPattern
     -- ^ wildcard pattern @_@
@@ -174,7 +181,6 @@ data ComprehensionStatement
         | MuQualifier Expression
         | LetStmt     Expression
   deriving (Eq, Show, Read, Generic)
-
 
 
 pattern SimpleEquation params body = Equation params (UnguardedBody body)

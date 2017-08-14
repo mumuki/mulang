@@ -14,9 +14,14 @@ module Language.Mulang.Inspector.Generic (
   declaresTypeAlias,
   declaresTypeSignature,
   usesAnonymousVariable,
+  raises,
+  rescues,
+  usesExceptions,
+  usesExceptionHandling,
   containsExpression,
   containsDeclaration,
   containsBody,
+  matchesType,
   Inspection,
   BindedInspection) where
 
@@ -93,7 +98,7 @@ declaresComputationWithArity' arityPredicate = containsDeclaration f
         f (Clause _ args _)       = argsHaveArity args
         f _  = False
 
-        equationArityIs = \(Equation args _) -> argsHaveArity args
+        equationArityIs (Equation args _) = argsHaveArity args
 
         argsHaveArity = arityPredicate.length
 
@@ -107,6 +112,26 @@ declaresTypeSignature = containsDeclaration f
   where f (TypeSignature _ _ _) = True
         f _                     = False
 
+raises :: BindedInspection
+raises predicate = containsExpression f
+  where f (Raise (New n _))     = predicate n
+        f (Raise (Reference n)) = predicate n
+        f _                     = False
+
+usesExceptions :: Inspection
+usesExceptions = containsExpression f
+  where f (Raise _)     = True
+        f _             = False
+
+rescues :: BindedInspection
+rescues predicate = containsExpression f
+  where f (Try _ rescues _) = any (matchesType predicate) . map fst  $ rescues
+        f _                 = False
+
+usesExceptionHandling :: Inspection
+usesExceptionHandling  = containsExpression f
+  where f (Try _ _ _) = True
+        f _           = False
 
 usesAnonymousVariable :: Inspection
 usesAnonymousVariable = containsExpression f
@@ -136,6 +161,11 @@ containsBody f = has f equationBodiesOf
 
 containsDeclaration :: (Expression -> Bool) -> BindedInspection
 containsDeclaration f b  = has f (bindedDeclarationsOf' b)
+
+matchesType :: BindingPredicate -> Pattern -> Bool
+matchesType predicate (TypePattern n)               = predicate n
+matchesType predicate (AsPattern _ (TypePattern n)) = predicate n
+matchesType _         _                             = False
 
 -- private
 
