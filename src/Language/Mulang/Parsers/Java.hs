@@ -31,25 +31,27 @@ muTypeDecl (ClassTypeDecl decl)    = muClassTypeDecl decl
 muTypeDecl (InterfaceTypeDecl decl) = muInterfaceTypeDecl decl
 
 muClassTypeDecl (ClassDecl _ name _ superclass interfaces (ClassBody body)) =
-  Class (i name) (fmap muRefType superclass) (compact (map muImplements interfaces ++ map muDecl body))
+  Class (i name) (fmap muRefType superclass) (compact (map muImplements interfaces ++ concatMap muDecl body))
 muClassTypeDecl (EnumDecl _ name _ (EnumBody constants _))                   =
   Enumeration (i name) (map muEnumConstant constants)
 
 muImplements interface = Implement $ muRefType interface
 
 muInterfaceTypeDecl (InterfaceDecl _ name _ interfaces (InterfaceBody body)) =
-  Interface (i name) (map muRefType interfaces) (compactMap muMemberDecl body )
+  Interface (i name) (map muRefType interfaces) (compactConcatMap muMemberDecl body )
 
+muDecl :: Decl -> [Expression]
 muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
-muDecl (InitDecl _ _)          = Other
+muDecl (InitDecl _ _)          = return Other
 
-muMemberDecl (FieldDecl _ _type _varDecls)                                    = Other
-muMemberDecl (MethodDecl _ _ _ name params _ (MethodBody Nothing))            = TypeSignature (i name) (map muFormalParamType params) "void"
-muMemberDecl (MethodDecl (elem Static -> True) _ _ (Ident "main") [_] _ body) = EntryPoint "main" (muMethodBody body)
-muMemberDecl (MethodDecl _ _ _ name params _ body)                            = SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)
-muMemberDecl (ConstructorDecl _ _ _ _params _ _constructorBody)               = Other
-muMemberDecl (MemberClassDecl decl)                                           = muClassTypeDecl decl
-muMemberDecl (MemberInterfaceDecl decl)                                       = muInterfaceTypeDecl decl
+muMemberDecl :: MemberDecl -> [Expression]
+muMemberDecl (FieldDecl _ _type varDecls)                                     = map (variableToAttribute.muVarDecl) varDecls
+muMemberDecl (MethodDecl _ _ _ name params _ (MethodBody Nothing))            = return $ TypeSignature (i name) (map muFormalParamType params) "void"
+muMemberDecl (MethodDecl (elem Static -> True) _ _ (Ident "main") [_] _ body) = return $ EntryPoint "main" (muMethodBody body)
+muMemberDecl (MethodDecl _ _ _ name params _ body)                            = return $ SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)
+muMemberDecl (ConstructorDecl _ _ _ _params _ _constructorBody)               = return $ Other
+muMemberDecl (MemberClassDecl decl)                                           = return $ muClassTypeDecl decl
+muMemberDecl (MemberInterfaceDecl decl)                                       = return $ muInterfaceTypeDecl decl
 
 muEnumConstant (EnumConstant name _ _) = i name
 
@@ -158,6 +160,8 @@ muPrimType = map toLower . dropLast 1 . show
 fmapOrNull f = fromMaybe MuNull . fmap f
 
 -- Helpers
+
+variableToAttribute (Variable id init) = Attribute id init
 
 v (VarId name) = i name
 v (VarDeclArray id) =  (v id) ++ "[]"
