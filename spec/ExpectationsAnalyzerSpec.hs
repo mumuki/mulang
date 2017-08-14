@@ -14,7 +14,7 @@ failed e = ExpectationResult e False
 
 spec = describe "ExpectationsAnalyzer" $ do
   it "works with Mulang input" $ do
-    let ydeclares = Expectation "" "Declares:y"
+    let ydeclares = Expectation "*" "Declares:y"
     (runAst MuNull [ydeclares]) `shouldReturn` (result [failed ydeclares] [])
 
   describe "Advanced expectations" $ do
@@ -30,25 +30,25 @@ spec = describe "ExpectationsAnalyzer" $ do
       (run Haskell "x = 2" []) `shouldReturn` (result [] [])
 
     it "evaluates present named expectations" $ do
-      let ydeclares = Expectation "" "Declares:y"
-      let xdeclares = Expectation "" "Declares:x"
+      let ydeclares = Expectation "*" "Declares:y"
+      let xdeclares = Expectation "*" "Declares:x"
       (run Haskell "x = 2" [ydeclares, xdeclares]) `shouldReturn` (result [failed ydeclares, passed xdeclares] [])
 
     it "evaluates present expectations" $ do
-      let declaresF = Expectation "" "DeclaresFunction"
-      let declaresT = Expectation "" "DeclaresTypeAlias"
+      let declaresF = Expectation "*" "DeclaresFunction"
+      let declaresT = Expectation "*" "DeclaresTypeAlias"
       (run Haskell "f x = 2" [declaresF, declaresT]) `shouldReturn` (result [passed declaresF, failed declaresT] [])
 
   describe "Basic expectations" $ do
     it "can be negated" $ do
-      let notDeclaresX = Expectation "" "Not:Declares:x"
-      let notDeclaresY = Expectation "" "Not:Declares:y"
+      let notDeclaresX = Expectation "*" "Not:Declares:x"
+      let notDeclaresY = Expectation "*" "Not:Declares:y"
       (run Haskell "x = \"¡\"" [notDeclaresY, notDeclaresX]) `shouldReturn` (result [
                                                                           passed notDeclaresY, failed notDeclaresX] [])
 
     it "works with Declares" $ do
-      let xdeclares = Expectation "" "Declares:x"
-      let ydeclares = Expectation "" "Declares:y"
+      let xdeclares = Expectation "*" "Declares:x"
+      let ydeclares = Expectation "*" "Declares:y"
       (run Haskell "x = 2" [ydeclares, xdeclares]) `shouldReturn` (result [failed ydeclares, passed xdeclares] [])
 
     it "works with Uses" $ do
@@ -57,17 +57,17 @@ spec = describe "ExpectationsAnalyzer" $ do
       (run Haskell "x = y * 10" [usesy, usesz]) `shouldReturn` (result [passed usesy, failed usesz] [])
 
     it "works with DeclaresComputationWithArity" $ do
-      let hasArity2 = Expectation "" "DeclaresComputationWithArity2:foo"
-      let hasArity3 = Expectation "" "DeclaresComputationWithArity3:foo"
+      let hasArity2 = Expectation "*" "DeclaresComputationWithArity2:foo"
+      let hasArity3 = Expectation "*" "DeclaresComputationWithArity3:foo"
       (run Prolog "foo(x, y)." [hasArity2, hasArity3]) `shouldReturn` (result [passed hasArity2, failed hasArity3] [])
 
     it "works with DeclaresTypeSignature" $ do
-      let declaresTypeSignature = Expectation "" "DeclaresTypeSignature:f"
+      let declaresTypeSignature = Expectation "*" "DeclaresTypeSignature:f"
       (run Haskell "f x y = y + x" [declaresTypeSignature]) `shouldReturn` (result [failed declaresTypeSignature] [])
       (run Haskell "f :: Int -> Int -> Int \nf x y = y + x" [declaresTypeSignature]) `shouldReturn` (result [passed declaresTypeSignature] [])
 
     it "works with DeclaresTypeAlias" $ do
-      let hasTypeAlias = Expectation "" "DeclaresTypeAlias:Words"
+      let hasTypeAlias = Expectation "*" "DeclaresTypeAlias:Words"
       (run Haskell "type Works = [String]" [hasTypeAlias]) `shouldReturn` (result [failed hasTypeAlias] [])
       (run Haskell "data Words = Words" [hasTypeAlias]) `shouldReturn` (result [failed hasTypeAlias] [])
       (run Haskell "type Words = [String]" [hasTypeAlias]) `shouldReturn` (result [passed hasTypeAlias] [])
@@ -121,7 +121,7 @@ spec = describe "ExpectationsAnalyzer" $ do
       (run Haskell "f = map $ \\x -> x + 1" [hasLambda]) `shouldReturn` (result [passed hasLambda] [])
 
     it "works with DeclaresRecursively" $ do
-      let hasDirectRecursion = Expectation "" "DeclaresRecursively:f"
+      let hasDirectRecursion = Expectation "*" "DeclaresRecursively:f"
       (run Haskell "f x = if x < 5 then g (x - 1) else 2" [hasDirectRecursion]) `shouldReturn` (result [failed hasDirectRecursion] [])
       (run Haskell "f x = if x < 5 then f (x - 1) else 2" [hasDirectRecursion]) `shouldReturn` (result [passed hasDirectRecursion] [])
 
