@@ -22,7 +22,7 @@ compileMaybe (Expectation b i) = do
   return . negator . slicer $ baseInspection
 
 compileSlicer :: [String] -> Maybe (Slicer, Predicator)
-compileSlicer [""]                  = Just (id, id)
+compileSlicer ["*"]                 = Just (id, id)
 compileSlicer ["Intransitive",name] = justSlicerFor scopedList name
 compileSlicer [name]                = justSlicerFor transitiveList name
 compileSlicer _                     = Nothing

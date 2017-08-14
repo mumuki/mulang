@@ -12,10 +12,10 @@ spec = do
   let run code binding inspection = compileExpectation (Expectation binding inspection) code
 
   it "works with DeclaresEntryPoint" $ do
-    run (hs "f x = 2") "" "DeclaresEntryPoint" `shouldBe` False
+    run (hs "f x = 2") "*" "DeclaresEntryPoint" `shouldBe` False
 
   it "works with DeclaresProcedure" $ do
-    run (hs "f x = 2") "" "DeclaresProcedure" `shouldBe` False
+    run (hs "f x = 2") "*" "DeclaresProcedure" `shouldBe` False
 
   it "works with DeclaresMethod on empty code" $ do
     run (js "") "pepita" "DeclaresMethod:*" `shouldBe` False
@@ -34,32 +34,32 @@ spec = do
     run (js "var pepita = {volar:function(){}}") "pepita.cantar" "DeclaresMethod" `shouldBe` False
 
   it "works with DeclaresFunction with empty binding and empty object" $ do
-    run (hs "f x = 2") "" "DeclaresFunction" `shouldBe` True
+    run (hs "f x = 2") "*" "DeclaresFunction" `shouldBe` True
 
   it "works with DeclaresFunction with empty binding and explicitly anyone object" $ do
-    run (hs "f x = 2") "" "DeclaresFunction:*" `shouldBe` True
+    run (hs "f x = 2") "*" "DeclaresFunction:*" `shouldBe` True
 
   it "works with DeclaresFunction with non-empty binding and empty object" $ do
     run (hs "f x = 2") "f" "DeclaresFunction:^f" `shouldBe` False
     run (hs "f x = 2") "g" "DeclaresFunction:^f" `shouldBe` False
 
   it "works with DeclaresFunction with empty binding and non-empty object" $ do
-    run (hs "f x = 2") "" "DeclaresFunction:f" `shouldBe` True
-    run (hs "f x = 2") "" "DeclaresFunction:g" `shouldBe` False
+    run (hs "f x = 2") "*" "DeclaresFunction:f" `shouldBe` True
+    run (hs "f x = 2") "*" "DeclaresFunction:g" `shouldBe` False
 
   it "works with DeclaresFunction with empty binding and explicitly equal object" $ do
-    run (hs "f x = 2") "" "DeclaresFunction:=f" `shouldBe` True
-    run (hs "f x = 2") "" "DeclaresFunction:=g" `shouldBe` False
+    run (hs "f x = 2") "*" "DeclaresFunction:=f" `shouldBe` True
+    run (hs "f x = 2") "*" "DeclaresFunction:=g" `shouldBe` False
 
   it "works with DeclaresFunction with empty binding and explicitly like object" $ do
-    run (hs "foo x = 2") "" "DeclaresFunction:~fo" `shouldBe` True
-    run (hs "foo x = 2") "" "DeclaresFunction:~go" `shouldBe` False
+    run (hs "foo x = 2") "*" "DeclaresFunction:~fo" `shouldBe` True
+    run (hs "foo x = 2") "*" "DeclaresFunction:~go" `shouldBe` False
 
   it "works with UsesWhile" $ do
-    run (hs "f x = 2") "" "UsesWhile" `shouldBe` False
+    run (hs "f x = 2") "*" "UsesWhile" `shouldBe` False
 
   it "works with Not" $ do
-    run (hs "f x = 2") "" "Not:UsesWhile" `shouldBe` True
+    run (hs "f x = 2") "*" "Not:UsesWhile" `shouldBe` True
     run (hs "f x = 2") "f" "Not:UsesWhile" `shouldBe` True
     run (hs "f x = 2") "g" "Not:UsesWhile" `shouldBe` True
 
@@ -69,23 +69,23 @@ spec = do
     run (hs "f x = m where m = 2") "f" "Not:Declares" `shouldBe` False
 
   it "works with Not:DeclaresFunction" $ do
-    run (hs "f x = 2") ""  "Not:DeclaresFunction" `shouldBe` False
+    run (hs "f x = 2") "*"  "Not:DeclaresFunction" `shouldBe` False
     run (hs "f x = 2") "f" "Not:DeclaresFunction" `shouldBe` True
     run (hs "f x = 2") "g" "Not:DeclaresFunction" `shouldBe` True
 
   it "works with Not:DeclaresFunction:f" $ do
-    run (hs "f x = 2") ""  "Not:DeclaresFunction:f" `shouldBe` False
-    run (hs "f x = 2") ""  "Not:DeclaresFunction:g" `shouldBe` True
+    run (hs "f x = 2") "*"  "Not:DeclaresFunction:f" `shouldBe` False
+    run (hs "f x = 2") "*"  "Not:DeclaresFunction:g" `shouldBe` True
 
   it "works with UsesSwitch" $ do
-    run (hs "f x = 2") "" "UsesSwitch" `shouldBe` False
+    run (hs "f x = 2") "*" "UsesSwitch" `shouldBe` False
 
   it "works with UsesRepeat" $ do
-    run (hs "f x = 2") "" "UsesRepeat" `shouldBe` False
+    run (hs "f x = 2") "*" "UsesRepeat" `shouldBe` False
 
   it "works with UsesPatternMatching" $ do
-    run (hs "f x = 2") "" "UsesPatternMatching" `shouldBe` False
-    run (hs "f [] = 2\nf _ = 3") "" "UsesPatternMatching" `shouldBe` True
+    run (hs "f x = 2") "*" "UsesPatternMatching" `shouldBe` False
+    run (hs "f [] = 2\nf _ = 3") "*" "UsesPatternMatching" `shouldBe` True
 
   it "works with UsesPatternMatching, with binding" $ do
     run (hs "f x = 2") "f" "UsesPatternMatching" `shouldBe` False
@@ -98,14 +98,14 @@ spec = do
     run (js "function f() { var m = 2; }") "f" "DeclaresVariable:m" `shouldBe` True
 
   it "works with DeclaresComputationWithArity1" $ do
-    run (hs "f a b = 2") "" "DeclaresComputationWithArity1:f" `shouldBe` False
-    run (hs "f a = 2")   "" "DeclaresComputationWithArity1:f" `shouldBe` True
+    run (hs "f a b = 2") "*" "DeclaresComputationWithArity1:f" `shouldBe` False
+    run (hs "f a = 2")   "*" "DeclaresComputationWithArity1:f" `shouldBe` True
 
   it "works with DeclaresComputationWithArity" $ do
-    run (hs "f a b = 2") "" "DeclaresComputationWithArity1:f" `shouldBe` False
-    run (hs "f a = 2")   "" "DeclaresComputationWithArity1:f" `shouldBe` True
-    run (hs "f a b = 2") "" "DeclaresComputationWithArity2:f" `shouldBe` True
-    run (hs "f a = 2")   "" "DeclaresComputationWithArity2:f" `shouldBe` False
+    run (hs "f a b = 2") "*" "DeclaresComputationWithArity1:f" `shouldBe` False
+    run (hs "f a = 2")   "*" "DeclaresComputationWithArity1:f" `shouldBe` True
+    run (hs "f a b = 2") "*" "DeclaresComputationWithArity2:f" `shouldBe` True
+    run (hs "f a = 2")   "*" "DeclaresComputationWithArity2:f" `shouldBe` False
 
   it "works with DeclaresObject" $ do
     run (hs "f a b = 2") "f" "DeclaresObject" `shouldBe` False
@@ -133,22 +133,22 @@ spec = do
   it "works with Declares" $ do
     run (hs "f a b = g") "g" "Declares" `shouldBe` False
     run (hs "f a b = g") "f" "Declares:^f" `shouldBe` False
-    run (hs "f a b = g") "" "Declares" `shouldBe` True
+    run (hs "f a b = g") "*" "Declares" `shouldBe` True
 
   it "works with Declares with object" $ do
-    run (hs "f a b = g") ""  "Declares:f" `shouldBe` True
-    run (hs "f a b = g") ""  "Declares:g" `shouldBe` False
+    run (hs "f a b = g") "*"  "Declares:f" `shouldBe` True
+    run (hs "f a b = g") "*"  "Declares:g" `shouldBe` False
     run (hs "f a b = g where g = 2") "f" "Declares:h" `shouldBe` False
     run (hs "f a b = g where g = 2") "f" "Declares:g" `shouldBe` True
 
   it "works with DeclaresComputation" $ do
     run (hs "f a b = g") "g" "DeclaresComputation" `shouldBe` False
     run (hs "f a b = g") "f" "DeclaresComputation" `shouldBe` False
-    run (hs "f a b = g") ""  "DeclaresComputation:f" `shouldBe` True
+    run (hs "f a b = g") "*"  "DeclaresComputation:f" `shouldBe` True
 
   it "works with DeclaresTypeSignature" $ do
-    run (hs "f x = 1")  "" "DeclaresTypeSignature:f" `shouldBe` False
-    run (hs "f :: Int") "" "DeclaresTypeSignature:f" `shouldBe` True
+    run (hs "f x = 1")  "*" "DeclaresTypeSignature:f" `shouldBe` False
+    run (hs "f :: Int") "*" "DeclaresTypeSignature:f" `shouldBe` True
 
   it "works with UsesComprehension" $ do
     run (hs "f :: Int") "f" "UsesComprehension" `shouldBe` False
