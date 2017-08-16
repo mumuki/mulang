@@ -113,9 +113,9 @@ muJSExpression (JSExpressionTernary condition _ trueVal _ falseVal) = If (muJSEx
 muJSExpression (JSFunctionExpression _ ident _ params _ body)       = muComputation ident params body
 --muJSExpression (JSMemberDot JSExpression _ JSExpression) -- ^firstpart, dot, name
 muJSExpression (JSMemberExpression id _ params _)                   = Application (muJSExpression id) (map muJSExpression.muJSCommaList $ params)
-muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _)       = New name (map muJSExpression.muJSCommaList $ args)
+muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _)       = New (Reference name) (map muJSExpression.muJSCommaList $ args)
 --muJSExpression (JSMemberSquare JSExpression _ JSExpression _) -- ^firstpart, lb, expr, rb
-muJSExpression (JSNewExpression _ (JSIdentifier _ name))            = New name []
+muJSExpression (JSNewExpression _ (JSIdentifier _ name))            = New (Reference name) []
 muJSExpression (JSObjectLiteral _ propertyList _)                   = MuObject (compactMap id.map muJSObjectProperty.muJSCommaTrailingList $ propertyList)
 muJSExpression (JSUnaryExpression (JSUnaryOpNot _) e)               = Application (Reference "!") [muJSExpression e]
 muJSExpression (JSUnaryExpression op (JSIdentifier _ name))         = Assignment name (muJSUnaryOp op name)

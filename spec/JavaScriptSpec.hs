@@ -137,16 +137,16 @@ spec = do
                                                             SimpleMethod "z" [] MuNull])
 
     it "handles new parentheses-less" $ do
-      js "new Foo" `shouldBe` New "Foo" []
+      js "new Foo" `shouldBe` New (Reference "Foo") []
 
     it "handles new with parentheses" $ do
-      js "new Foo()" `shouldBe` New "Foo" []
+      js "new Foo()" `shouldBe` New (Reference "Foo") []
 
     it "handles new with args" $ do
-      js "new Foo(1, 2)" `shouldBe` New "Foo" [MuNumber 1, MuNumber 2]
+      js "new Foo(1, 2)" `shouldBe` New (Reference "Foo") [MuNumber 1, MuNumber 2]
 
     it "handles new with args" $ do
-      js "new Foo(1, 2)" `shouldBe` New "Foo" [MuNumber 1, MuNumber 2]
+      js "new Foo(1, 2)" `shouldBe` New (Reference "Foo") [MuNumber 1, MuNumber 2]
 
     it "handles switch" $ do
       run [text|
@@ -164,12 +164,12 @@ spec = do
 
     it "handles c-style for" $ do
       run "for(i = 0; i < 3; i++) i;" `shouldBe` ForLoop (Assignment "i" (MuNumber 0)) (js "i < 3") (js "i++") (Reference "i")
-      
+
     it "handles c-style for with var" $ do
       run "for(var i = 0; i < 3; i++) i;" `shouldBe` ForLoop (Variable "i" (MuNumber 0)) (js "i < 3") (js "i++") (Reference "i")
-      
+
     it "handles for in" $ do
       run "for(i in [1,2]) i;" `shouldBe` For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
-      
+
     it "handles for var in" $ do
       run "for(var i in [1,2]) i;" `shouldBe` For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")

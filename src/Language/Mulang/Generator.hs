@@ -62,13 +62,15 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Forall e1 e2)          = [e1, e2]
     subExpressions (ForLoop i c p s)       = [i, c, p, s]
     subExpressions (If a b c)              = [a, b, c]
+    subExpressions (Implement e)           = [e]
+    subExpressions (Include e)             = [e]
     subExpressions (Interface _ _ v)       = [v]
     subExpressions (Lambda _ a)            = [a]
     subExpressions (Match e1 equations)    = e1:equationExpressions equations
     subExpressions (MuList as)             = as
     subExpressions (MuObject es)           = [es]
     subExpressions (MuTuple as)            = as
-    subExpressions (New _ es)              = es
+    subExpressions (New e es)              = e:es
     subExpressions (Not e)                 = [e]
     subExpressions (Object _ v)            = [v]
     subExpressions (Other _ (Just e))      = [e]
@@ -132,9 +134,6 @@ declarationsOf b = boundDeclarations (named b)
 extractReference :: Expression -> Maybe Identifier
 extractReference (Reference n)        = Just n
 extractReference (Exist n _)          = Just n
-extractReference (New n _)            = Just n
-extractReference (Implement n)        = Just n
-extractReference (Include n)          = Just n
 extractReference _                    = Nothing
 
 equationExpressions = concatMap (\(Equation _ body) -> bodyExpressions body)
