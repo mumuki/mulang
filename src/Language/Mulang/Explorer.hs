@@ -1,6 +1,5 @@
 module Language.Mulang.Explorer (
   equationBodiesOf,
-  referencesOf,
   declarationsOf,
   referencedBindingsOf,
   declaredBindingsOf,
@@ -9,14 +8,13 @@ module Language.Mulang.Explorer (
   transitiveReferencedBindingsOf,
   nameOf,
   extractDeclaration,
-  extractReference,
   Expression(..)) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Binding
 import Language.Mulang.Unfold (Unfold, allExpressions, mainExpressions)
 
-import Data.Maybe (maybeToList)
+import Data.Maybe (mapMaybe)
 import Data.List (nub)
 
 
@@ -30,21 +28,16 @@ equationBodiesOf = concatMap bodiesOf . mainExpressions
 
     equationBodies = map (\(Equation _ body) -> body)
 
--- | Returns all the referenced bindings and the expressions that references them
--- For example, in 'f (x + 1)', it returns '(f, f (x + 1))' and '(x, x)'
-referencesOf :: Expression -> [(Binding, Expression)]
-referencesOf = nub . concatMap (maybeToList . extractReference) . allExpressions
-
 
 -- | Returns all the declared bindings and the expressions that binds them
 -- For example, in 'f x = g x where x = y', it returns '(f, f x = ...)' and '(x, x = y)'
 declarationsOf :: Unfold -> Expression -> [(Binding, Expression)]
-declarationsOf unfold = concatMap (maybeToList . extractDeclaration) .  unfold
+declarationsOf unfold = mapMaybe extractDeclaration .  unfold
 
 -- | Returns all the referenced bindings
 -- For example, in 'f (x + 1)', it returns 'f' and 'x'
 referencedBindingsOf :: Expression -> [Binding]
-referencedBindingsOf = map fst . referencesOf
+referencedBindingsOf = nub . mapMaybe extractReference . allExpressions
 
 -- | Returns all the declared bindings
 -- For example, in 'f x = g x where x = y', it returns 'f' and 'x'
@@ -71,10 +64,10 @@ transitiveReferencedBindingsOf binding code =  expand (concatMap referencedBindi
 nameOf :: Expression -> Maybe Binding
 nameOf = fmap fst . extractDeclaration
 
-extractReference :: Expression -> Maybe (Binding, Expression)
-extractReference e@(Reference n)        = Just (n, e)
-extractReference e@(Exist n _)          = Just (n, e)
-extractReference _                      = Nothing
+extractReference :: Expression -> Maybe Binding
+extractReference (Reference n)        = Just n
+extractReference (Exist n _)          = Just n
+extractReference _                    = Nothing
 
 
 extractDeclaration :: Expression -> Maybe (Binding, Expression)

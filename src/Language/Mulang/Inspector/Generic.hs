@@ -48,7 +48,7 @@ assigns predicate = containsExpression f
 -- in its definition
 uses :: BindedInspection
 uses p = containsExpression f
-  where f = any p . map fst .  referencesOf
+  where f = any p . referencedBindingsOf
 
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
