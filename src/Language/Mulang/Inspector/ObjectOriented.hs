@@ -11,6 +11,9 @@ module Language.Mulang.Inspector.ObjectOriented (
   declaresInterface,
   declaresEnumeration,
   declaresAttribute,
+
+  usesDyamicPolymorphism,
+
   declaresMethod)  where
 
 import Language.Mulang.Ast
@@ -18,6 +21,9 @@ import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Primitive (
   Inspection, IdentifierInspection,
   containsExpression, containsDeclaration, containsBoundDeclaration)
+
+import Control.Monad (MonadPlus, mzero, guard)
+import Language.Mulang.Generator (declarations, boundDeclarations, expressions)
 
 implements :: IdentifierInspection
 implements predicate = containsExpression f
@@ -38,6 +44,34 @@ instantiates :: IdentifierInspection
 instantiates predicate = containsExpression f
   where f (New (Reference name) _) = predicate name
         f _                        = False
+
+exists :: [a] -> Bool
+exists = not.null
+
+guardCount :: MonadPlus m => (Int -> Bool) -> [a] -> m ()
+guardCount condition list = guard (condition . length $ list)
+
+usedSelectors :: Expression -> [Identifier]
+usedSelectors e = do
+  (Send _ (Reference m) _) <- expressions e
+  return m
+
+methodDeclarationsOf :: Identifier -> Expression -> [Expression]
+methodDeclarationsOf selector e = do
+  m@(Method s _) <- map snd  . declarations $ e
+  guard (s == selector)
+  return m
+
+usesDyamicPolymorphism :: Inspection
+usesDyamicPolymorphism expression = exists $ do
+  selector <- usedSelectors expression
+  guardCount (>1) (methodDeclarationsOf selector expression)
+
+-- usesStaticPolymorphism :: Inspection
+-- usesStaticPolymorphism expression = exists $ do
+--   interface <- staticInterfaces expression
+--   _ <- usersOf interface expression
+--   guardCount (>1) (implementorsOf interface expression)
 
 usesInheritance :: Inspection
 usesInheritance = declaresSuperclass anyone

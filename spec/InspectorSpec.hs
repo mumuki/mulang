@@ -350,6 +350,19 @@ spec = do
     it "is False when raises an unexpected exception" $ do
       raises (named "RuntimeException") (java "class Sample { void aMethod() { throw new Exception(); } }") `shouldBe` False
 
+  describe "usesDyamicPolymorphism" $ do
+    it "is True when uses" $ do
+      usesDyamicPolymorphism (java "class Bird { void sing() {} } class Singer { void sing() {} } class Festival { void run(Object o) { o.sing(); } }") `shouldBe` True
+
+    it "is False when there is just one implementor" $ do
+      usesDyamicPolymorphism (java "class Bird { void sing() {} } class Festival { void run(Object o) { o.sing(); } }") `shouldBe` False
+
+    it "is False when there is no user" $ do
+      usesDyamicPolymorphism (java "class Bird { void sing() {} } class Singer { void sing() {} }") `shouldBe` False
+
+    it "is False when not uses" $ do
+      usesDyamicPolymorphism (java "class Sample { void aMethod() { throw new Exception(); } }") `shouldBe` False
+
 
   describe "rescues" $ do
     it "is True when rescues an expected exception" $ do
