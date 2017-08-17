@@ -8,7 +8,7 @@ module Language.Mulang.Inspector.Combiner (
   transitiveList) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Generator (Unfold, transitiveReferencedIdentifiers, boundDeclarationsOf, declaredIdentifiers)
+import Language.Mulang.Generator (transitiveReferencedIdentifiers, declarationsOf, declaredIdentifiers)
 import Language.Mulang.Inspector.Generic
 
 detect :: Inspection -> Expression -> [Identifier]
@@ -23,7 +23,7 @@ negative :: Inspection -> Inspection
 negative f = not . f
 
 scoped :: Inspection -> Identifier -> Inspection
-scoped inspection scope =  any inspection . boundDeclarationsOf scope
+scoped inspection scope =  any inspection . declarationsOf scope
 
 scopedList :: Inspection -> [Identifier] -> Inspection
 scopedList i =  foldl scoped i . reverse

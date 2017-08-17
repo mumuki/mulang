@@ -1,14 +1,12 @@
 module Language.Mulang.Generator (
-  equationBodies,
-  declarations,
-  referencedIdentifiers,
-  declaredIdentifiers,
-  boundDeclarationsOf,
   boundDeclarations,
-  transitiveReferencedIdentifiers,
-  nameOf,
+  declarations,
+  declarationsOf,
+  declaredIdentifiers,
+  equationBodies,
   expressions,
-  Unfold,
+  referencedIdentifiers,
+  transitiveReferencedIdentifiers,
   Generator,
   Expression(..)) where
 
@@ -19,7 +17,6 @@ import Data.Maybe (mapMaybe)
 import Data.List (nub)
 
 type Generator a = Expression -> [a]
-type Unfold = Generator Expression
 
 -- | Returns all the declarations their identifiers -
 -- | classes, methods, functions, records, local and global variables, and so on
@@ -44,15 +41,15 @@ declarations _                      = []
 
 -- | Returns all declarations bound to the given identifier predicate
 -- |
-boundDeclarations :: IdentifierPredicate -> Unfold
+boundDeclarations :: IdentifierPredicate -> Generator Expression
 boundDeclarations f = map snd . filter (f.fst) . declarations
 
 -- | Returns the given expression and all its subexpressions
 -- For example: in 'f x = x + 1', it returns 'f x = x + 1', 'x + 1', 'x' and '1'
-expressions :: Unfold
+expressions :: Generator Expression
 expressions expr = expr : concatMap expressions (subExpressions expr)
   where
-    subExpressions :: Unfold
+    subExpressions :: Generator Expression
     subExpressions (Variable _ v)          = [v]
     subExpressions (Subroutine _ es)       = equationExpressions es
     subExpressions (Clause _ _ es)         = es
@@ -88,7 +85,7 @@ referencedIdentifiers = nub . mapMaybe extractReference . expressions
 -- | Returns all the identifiers transitively referenced by the given one
 -- |
 transitiveReferencedIdentifiers :: Identifier -> Generator Identifier
-transitiveReferencedIdentifiers identifier code =  expand (concatMap referencedIdentifiers . (`boundDeclarationsOf` code)) identifier
+transitiveReferencedIdentifiers identifier code =  expand (concatMap referencedIdentifiers . (`declarationsOf` code)) identifier
   where
     expand :: Eq a => (a-> [a]) -> a -> [a]
     expand f x = expand' [] f [x]
@@ -113,36 +110,13 @@ equationBodies = concatMap (bodiesOf . snd) . declarations
 
     equationBodies = map (\(Equation _ body) -> body)
 
-
--------------------------------------
-
-
-boundDeclarationsOf :: Identifier -> Unfold
-boundDeclarationsOf b = boundDeclarations (named b)
-
-nameOf :: Expression -> Maybe Identifier
-nameOf = fmap fst . extractDeclaration
+declarationsOf :: Identifier -> Generator Expression
+declarationsOf b = boundDeclarations (named b)
 
 extractReference :: Expression -> Maybe Identifier
 extractReference (Reference n)        = Just n
 extractReference (Exist n _)          = Just n
 extractReference _                    = Nothing
-
-extractDeclaration :: Expression -> Maybe (Identifier, Expression)
-extractDeclaration e@(Attribute n _)      = Just (n, e)
-extractDeclaration e@(Class n _ _)        = Just (n, e)
-extractDeclaration e@(Clause n _ _)       = Just (n, e)
-extractDeclaration e@(EntryPoint n _)     = Just (n, e)
-extractDeclaration e@(Enumeration n _)    = Just (n, e)
-extractDeclaration e@(Interface n _ _)    = Just (n, e)
-extractDeclaration e@(Object n _)         = Just (n, e)
-extractDeclaration e@(Record n)           = Just (n, e)
-extractDeclaration e@(Subroutine n _)     = Just (n, e)
-extractDeclaration e@(TypeAlias n )       = Just (n, e)
-extractDeclaration e@(TypeSignature n _ _)= Just (n, e)
-extractDeclaration e@(Variable n _)       = Just (n, e)
-extractDeclaration _                      = Nothing
-
 
 equationExpressions = concatMap (\(Equation _ body) -> bodyExpressions body)
   where

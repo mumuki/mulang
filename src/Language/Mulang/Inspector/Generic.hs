@@ -27,7 +27,9 @@ module Language.Mulang.Inspector.Generic (
 
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
-import Language.Mulang.Generator (expressions, boundDeclarations, equationBodies, nameOf, referencedIdentifiers)
+import Language.Mulang.Generator (expressions, boundDeclarations, equationBodies, declarations, referencedIdentifiers)
+
+import Data.Maybe (listToMaybe)
 
 type Inspection = Expression  -> Bool
 type IdentifierInspection = IdentifierPredicate -> Inspection
@@ -67,6 +69,9 @@ declaresRecursively :: IdentifierInspection
 declaresRecursively = containsDeclaration f
   where f e | (Just name) <- (nameOf e) = uses (named name) e
             | otherwise = False
+
+        nameOf :: Expression -> Maybe Identifier
+        nameOf = fmap fst . listToMaybe . declarations
 
 
 declaresFunction :: IdentifierInspection
