@@ -1,6 +1,7 @@
 module Language.Mulang.Inspector.Generic (
   parses,
   assigns,
+  calls,
   uses,
   usesIf,
   declares,
@@ -51,6 +52,12 @@ assigns predicate = containsExpression f
 uses :: IdentifierInspection
 uses p = containsExpression f
   where f = any p . referencedIdentifiers
+
+calls :: IdentifierInspection
+calls p = containsExpression f
+  where f (Call (Reference id) _ ) = p id
+        f _                        = False
+
 
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
