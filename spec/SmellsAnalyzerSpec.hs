@@ -14,7 +14,7 @@ spec = describe "SmellsAnalyzer" $ do
       (runExcept Haskell "fun x = if x then True else False" []) `shouldReturn` (result [Expectation "fun" "HasRedundantIf"])
 
     describe "detect domain language violations" $ do
-      it "detects binding length violations" $ do
+      it "detects identifier length violations" $ do
         (runExcept Haskell "f x = x" []) `shouldReturn` (result [Expectation "f" "HasTooShortIdentifiers"])
 
       it "detects case violations" $ do

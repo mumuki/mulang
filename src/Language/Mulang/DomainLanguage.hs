@@ -23,7 +23,7 @@ data DomainLanguage = DomainLanguage {
 type DomainLanguageInspection = DomainLanguage -> Inspection
 
 hasTooShortIdentifiers :: DomainLanguageInspection
-hasTooShortIdentifiers language = any isShort . mainDeclaredBindingsOf
+hasTooShortIdentifiers language = any isShort . mainDeclaredIdentifiersOf
   where isShort identifier = length identifier < (minimumIdentifierSize language) && notJargonOf identifier language
 
 hasMisspelledIdentifiers :: DomainLanguageInspection
@@ -33,13 +33,13 @@ hasMisspelledIdentifiers language = any isMisspelled  . wordsOf language
 
 hasWrongCaseIdentifiers :: DomainLanguageInspection
 hasWrongCaseIdentifiers (DomainLanguage _ style _ _)
-  = any (not . canTokenize style) . mainDeclaredBindingsOf
+  = any (not . canTokenize style) . mainDeclaredIdentifiersOf
 
 wordsOf :: DomainLanguage -> Expression -> [String]
-wordsOf (DomainLanguage _ style _ _) = concatMap (tokenize style) . mainDeclaredBindingsOf
+wordsOf (DomainLanguage _ style _ _) = concatMap (tokenize style) . mainDeclaredIdentifiersOf
 
 
-mainDeclaredBindingsOf = declaredIdentifiersOf mainExpressions
+mainDeclaredIdentifiersOf = declaredIdentifiersOf mainExpressions
 
 emptyDictionary = null . dictionary
 
