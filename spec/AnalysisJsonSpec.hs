@@ -35,7 +35,7 @@ spec = describe "AnalysisJson" $ do
    "spec" : {
       "expectations" : [
          {
-            "binding" : "Intransitive:x",
+            "scope" : "Intransitive:x",
             "inspection" : "Uses:*"
          }
       ],
@@ -58,7 +58,7 @@ spec = describe "AnalysisJson" $ do
       "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
-            "binding" : "x",
+            "scope" : "x",
             "inspection" : "Declares"
          }
       ]

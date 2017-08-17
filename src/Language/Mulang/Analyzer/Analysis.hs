@@ -28,7 +28,7 @@ import Language.Mulang.Ast
 type Inspection = String
 
 data Expectation
-  = Expectation { binding :: String, inspection :: Inspection } deriving (Show, Eq, Generic)
+  = Expectation { scope :: String, inspection :: Inspection } deriving (Show, Eq, Generic)
 
 --
 -- Analysis input structures

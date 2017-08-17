@@ -124,8 +124,8 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _id
 1. `hasRedundantLocalVariableReturn`
 1. `hasRedundantParameter`
 1. `hasRedundantReduction`: **logic paradigm** is a is-operator used to unify individuals that don't require a reduction, like `X is 4`
-1. `hasTooShortIdentifiers`: **any paradigm** whether a binding is too short and not part of domain language's jargon
-1. `hasWrongCaseIdentifiers`: **any paradigm** whether a binding does not match the domain language's case style
+1. `hasTooShortIdentifiers`: **any paradigm** whether an identifier is too short and not part of domain language's jargon
+1. `hasWrongCaseIdentifiers`: **any paradigm** whether an identifier does not match the domain language's case style
 1. `implements`: **object oriented paradigm** is the given interface implemented?
 1. `includes`: **object oriented paradigm** is a given mixins included?
 1. `inherits`: **object oriented paradigm** is a given class declared as superclass? - alias of `declaresSuperclass`
@@ -254,7 +254,7 @@ $ mulang '
    "spec" : {
       "expectations" : [
          {
-            "binding" : ":Intransitive:x",
+            "scope" : ":Intransitive:x",
             "inspection" : "Uses:*"
          }
       ],
@@ -266,7 +266,7 @@ $ mulang '
    "expectationResults" : [
       {
          "expectation" : {
-            "binding" : ":Intransitive:x",
+            "scope" : ":Intransitive:x",
             "inspection" : "Uses:*"
          },
          "result" : false
@@ -292,7 +292,7 @@ $ mulang '
       "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
-            "binding" : "x",
+            "scope" : "x",
             "inspection" : "HasBinding"
          }
       ]
@@ -306,7 +306,7 @@ $ mulang '
       {
          "result" : true,
          "expectation" : {
-            "binding" : "x",
+            "scope" : "x",
             "inspection" : "HasBinding"
          }
       }
@@ -454,7 +454,7 @@ $ mulang '
    ],
    "smells" : [
       {
-         "binding" : "foo",
+         "scope" : "foo",
          "inspection" : "ReturnsNull"
       }
    ]
@@ -525,10 +525,10 @@ $ mulang '
    "smells" : [
       {
          "inspection" : "HasTooShortIdentifiers",
-         "binding" : "son"
+         "scope" : "son"
       },
       {
-         "binding" : "parentOf",
+         "scope" : "parentOf",
          "inspection" : "HasWrongCaseIdentifiers"
       }
    ],
@@ -559,11 +559,11 @@ $ mulang  '
    "smells" : [
       {
          "inspection" : "ReturnsNull",
-         "binding" : "foo"
+         "scope" : "foo"
       },
       {
          "inspection" : "HasMisspelledIdentifiers",
-         "binding" : "foo"
+         "scope" : "foo"
       }
    ]
 }

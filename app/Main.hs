@@ -39,7 +39,7 @@ usage = "Wrong usage.                                            \n\
         \  $ mulang '{                                           \n\
         \      \"expectations\":[{                               \n\
         \                \"tag\":\"Basic\",                      \n\
-        \                \"binding\":\"x\",                      \n\
+        \                \"scope\":\"x\",                        \n\
         \                \"inspection\":\"HasBiniding\"}],       \n\
         \        \"code\": {                                     \n\
         \            \"content\":\"x = 1\",                      \n\
