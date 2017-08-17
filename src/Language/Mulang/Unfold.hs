@@ -5,7 +5,8 @@ module Language.Mulang.Unfold (
 
 import Language.Mulang.Ast
 
-type Unfold = Expression -> [Expression]
+type Generator a = Expression -> [a]
+type Unfold = Generator Expression
 
 -- | Returns the given expressions and all its subexpressions
 -- For example: in 'f x = x + 1', it returns 'f x = x + 1', 'x + 1', 'x' and '1'

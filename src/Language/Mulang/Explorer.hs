@@ -17,12 +17,13 @@ import Language.Mulang.Unfold (Unfold, allExpressions, mainExpressions)
 import Data.Maybe (mapMaybe)
 import Data.List (nub)
 
+type Generator a = Expression -> [a]
 
 -- | Returns all the body equations of functions, procedures and methods
-equationBodiesOf :: Expression -> [EquationBody]
+equationBodiesOf :: Generator EquationBody
 equationBodiesOf = concatMap bodiesOf . mainExpressions
   where
-    bodiesOf :: Expression -> [EquationBody]
+    bodiesOf :: Generator EquationBody
     bodiesOf (Subroutine  _ equations) = equationBodies equations
     bodiesOf _ = []
 
@@ -30,17 +31,17 @@ equationBodiesOf = concatMap bodiesOf . mainExpressions
 
 -- | Returns all the declared identifiers and the expressions that binds them
 -- For example, in 'f x = g x where x = y', it returns '(f, f x = ...)' and '(x, x = y)'
-declarationsOf :: Unfold -> Expression -> [(Identifier, Expression)]
+declarationsOf :: Unfold -> Generator (Identifier, Expression)
 declarationsOf unfold = mapMaybe extractDeclaration .  unfold
 
 -- | Returns all the referenced identifiers
 -- For example, in 'f (x + 1)', it returns 'f' and 'x'
-referencedIdentifiersOf :: Expression -> [Identifier]
+referencedIdentifiersOf :: Generator Identifier
 referencedIdentifiersOf = nub . mapMaybe extractReference . allExpressions
 
 -- | Returns all the declared identifiers
 -- For example, in 'f x = g x where x = y', it returns 'f' and 'x'
-declaredIdentifiersOf :: Unfold -> Expression -> [Identifier]
+declaredIdentifiersOf :: Unfold -> Generator Identifier
 declaredIdentifiersOf unfold = map fst . declarationsOf unfold
 
 boundDeclarationsOf' :: IdentifierPredicate -> Unfold
@@ -49,7 +50,7 @@ boundDeclarationsOf' f = map snd . filter (f.fst) . declarationsOf allExpression
 boundDeclarationsOf :: Identifier -> Unfold
 boundDeclarationsOf b = boundDeclarationsOf' (==b)
 
-transitiveReferencedIdentifiersOf :: Identifier -> Expression -> [Identifier]
+transitiveReferencedIdentifiersOf :: Identifier -> Generator Identifier
 transitiveReferencedIdentifiersOf identifier code =  expand (concatMap referencedIdentifiersOf . (`boundDeclarationsOf` code)) identifier
   where
     expand :: Eq a => (a-> [a]) -> a -> [a]
