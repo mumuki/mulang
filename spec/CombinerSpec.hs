@@ -6,12 +6,12 @@ import           Language.Mulang.Parsers.Haskell
 
 spec :: Spec
 spec = do
-  describe "detectAll" $ do
-    it "can detectAll inspections" $ do
+  describe "detect" $ do
+    it "can detect inspections" $ do
       let code = hs "x = if True then True else False\n\
                  \y = 2\n\
                  \z = if True then True else False"
-      detectAll usesIf code `shouldBe` ["x", "z"]
+      detect usesIf code `shouldBe` ["x", "z"]
 
   describe "negate" $ do
     it "is False when inspection is true" $ do

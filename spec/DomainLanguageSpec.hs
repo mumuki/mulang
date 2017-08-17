@@ -28,14 +28,17 @@ spec = do
     it "is False when it contains a short parameter name"  $ do
       run (hs "aFunction a = a") `shouldBe` False
 
-    it "is False when it contains a short local variable name" $ do
-      run (js "function foo() { var x = 1; return x }") `shouldBe` False
+    it "is True when it contains a short local variable name" $ do
+      run (js "function foo() { var x = 1; return x }") `shouldBe` True
 
     it "is False when it uses a short named function" $ do
       run (hs "aFunction aNumber = f aNumber") `shouldBe` False
 
     it "is False when it contains a short local variable name in a method" $ do
-      run (js "var pepita = {come:function(){var x = 1; }, vola:function(){}};") `shouldBe` False
+      run (js "var pepita = {come:function(){var x = 1; }, vola:function(){}};") `shouldBe` True
+
+    it "is False when it contains a short local parameter name in a method" $ do
+      run (js "var pepita = {come:function(x){ }, vola:function(){}};") `shouldBe` False
 
     it "is True when it contains a short named method" $ do
       run (js "var pepita = {x:function(){}, vola:function(){}};") `shouldBe` True

@@ -1,7 +1,7 @@
 module ExplorerSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Generator (mainExpressions, allExpressions, transitiveReferencedIdentifiersOf, declaredIdentifiersOf, referencedIdentifiersOf)
+import           Language.Mulang.Generator (transitiveReferencedIdentifiersOf, declaredIdentifiersOf, referencedIdentifiersOf)
 import           Language.Mulang.Parsers.Haskell (hs)
 
 spec :: Spec
@@ -10,14 +10,8 @@ spec = do
     let code = hs "f x =  (:[]) . m x y . g h 2\n\
                    \w k = p\n\
                    \     where z = 2"
-    context "when using all expressions" $ do
-      it "answers declared identifiers" $ do
-        (declaredIdentifiersOf allExpressions code) `shouldBe` ["f", "w", "z"]
-
-    context "when using main expressions" $ do
-      it "answers declared identifiers" $ do
-        (declaredIdentifiersOf mainExpressions code) `shouldBe` ["f", "w"]
-
+    it "answers declared identifiers" $ do
+      (declaredIdentifiersOf code) `shouldBe` ["f", "w", "z"]
 
   describe "referencedIdentifiersOf" $ do
     it "answers referenced identifiers" $ do
