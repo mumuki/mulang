@@ -44,18 +44,18 @@ allExpressions expr = expr : concatMap allExpressions (subExpressions expr)
     topExpressionOfBody (GuardedBody b)        = b >>= \(es1, es2) -> [es1, es2]
 
 mainExpressions :: Unfold
-mainExpressions o@(Object _ b)         = o : mainExpressions b
+mainExpressions (Sequence es)          = concatMap mainExpressions es
+mainExpressions a@(Attribute _ _)      = [a]
 mainExpressions c@(Class _ _ b)        = c : mainExpressions b
+mainExpressions c@(Clause _ _ es)      = c : concatMap mainExpressions es
+mainExpressions c@(Enumeration _ _)    = [c]
 mainExpressions c@(Interface _ _ b)    = c : mainExpressions b
 mainExpressions e@(EntryPoint _ b)     = e : mainExpressions b
-mainExpressions t@(TypeSignature _ _ _)= [t]
-mainExpressions t@(TypeAlias _ )       = [t]
-mainExpressions r@(Record _)           = [r]
-mainExpressions v@(Variable _ _)       = [v]
 mainExpressions e@(Subroutine _ _)     = [e]
+mainExpressions o@(Object _ b)         = o : mainExpressions b
 mainExpressions r@(Clause _ _ _)       = [r]
-mainExpressions a@(Attribute _ _)      = [a]
-mainExpressions (Sequence es)          = concatMap mainExpressions es
+mainExpressions r@(Record _)           = [r]
+mainExpressions t@(TypeAlias _ )       = [t]
+mainExpressions t@(TypeSignature _ _ _)= [t]
+mainExpressions v@(Variable _ _)       = [v]
 mainExpressions _                      = []
-
-
