@@ -7,27 +7,27 @@ import           Language.Mulang.Parsers.Haskell (hs)
 
 spec :: Spec
 spec = do
-  describe "declaredBindingsOf" $ do
+  describe "declaredIdentifiersOf" $ do
     let code = hs "f x =  (:[]) . m x y . g h 2\n\
                    \w k = p\n\
                    \     where z = 2"
     context "when using all expressions" $ do
       it "answers declared identifiers" $ do
-        (declaredBindingsOf allExpressions code) `shouldBe` ["f", "w", "z"]
+        (declaredIdentifiersOf allExpressions code) `shouldBe` ["f", "w", "z"]
 
     context "when using main expressions" $ do
       it "answers declared identifiers" $ do
-        (declaredBindingsOf mainExpressions code) `shouldBe` ["f", "w"]
+        (declaredIdentifiersOf mainExpressions code) `shouldBe` ["f", "w"]
 
 
-  describe "referencedBindingsOf" $ do
+  describe "referencedIdentifiersOf" $ do
     it "answers referenced identifiers" $ do
       let code = hs "f x =  (:[]) . m x y . g h 2"
-      (referencedBindingsOf code) `shouldBe` [".","m","x","y", "g","h"]
+      (referencedIdentifiersOf code) `shouldBe` [".","m","x","y", "g","h"]
 
-  describe "transitiveReferencedBindingsOf" $ do
+  describe "transitiveReferencedIdentifiersOf" $ do
     it "answers transitive referenced identifiers" $ do
       let code = hs "f x = m x\n\
                  \m 0 = p 0\n\
                  \p x = g x"
-      (transitiveReferencedBindingsOf "f" code) `shouldBe` ["f","m","x","p","g"]
+      (transitiveReferencedIdentifiersOf "f" code) `shouldBe` ["f","m","x","p","g"]

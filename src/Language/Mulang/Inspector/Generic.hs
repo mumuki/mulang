@@ -48,7 +48,7 @@ assigns predicate = containsExpression f
 -- in its definition
 uses :: IdentifierInspection
 uses p = containsExpression f
-  where f = any p . referencedBindingsOf
+  where f = any p . referencedIdentifiersOf
 
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
@@ -160,7 +160,7 @@ containsBody :: (EquationBody -> Bool)-> Inspection
 containsBody f = has f equationBodiesOf
 
 containsDeclaration :: (Expression -> Bool) -> IdentifierInspection
-containsDeclaration f b  = has f (bindedDeclarationsOf' b)
+containsDeclaration f b  = has f (boundDeclarationsOf' b)
 
 matchesType :: IdentifierPredicate -> Pattern -> Bool
 matchesType predicate (TypePattern n)               = predicate n

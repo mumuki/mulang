@@ -7,7 +7,7 @@ module Language.Mulang.DomainLanguage (
 import Language.Mulang.Unfold (mainExpressions)
 import Language.Mulang.Inspector (Inspection)
 import Language.Mulang.Ast (Expression)
-import Language.Mulang.Explorer (declaredBindingsOf)
+import Language.Mulang.Explorer (declaredIdentifiersOf)
 
 import Text.Dictionary (Dictionary, exists)
 
@@ -39,7 +39,7 @@ wordsOf :: DomainLanguage -> Expression -> [String]
 wordsOf (DomainLanguage _ style _ _) = concatMap (tokenize style) . mainDeclaredBindingsOf
 
 
-mainDeclaredBindingsOf = declaredBindingsOf mainExpressions
+mainDeclaredBindingsOf = declaredIdentifiersOf mainExpressions
 
 emptyDictionary = null . dictionary
 
