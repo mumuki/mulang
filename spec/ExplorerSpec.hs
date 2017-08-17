@@ -12,21 +12,21 @@ spec = do
                    \w k = p\n\
                    \     where z = 2"
     context "when using all expressions" $ do
-      it "answers bindings for binding" $ do
+      it "answers declared identifiers" $ do
         (declaredBindingsOf allExpressions code) `shouldBe` ["f", "w", "z"]
 
     context "when using main expressions" $ do
-      it "answers bindings for binding" $ do
+      it "answers declared identifiers" $ do
         (declaredBindingsOf mainExpressions code) `shouldBe` ["f", "w"]
 
 
   describe "referencedBindingsOf" $ do
-    it "answers bindings for binding" $ do
+    it "answers referenced identifiers" $ do
       let code = hs "f x =  (:[]) . m x y . g h 2"
       (referencedBindingsOf code) `shouldBe` [".","m","x","y", "g","h"]
 
   describe "transitiveReferencedBindingsOf" $ do
-    it "answers transitive bindings for binding" $ do
+    it "answers transitive referenced identifiers" $ do
       let code = hs "f x = m x\n\
                  \m 0 = p 0\n\
                  \p x = g x"

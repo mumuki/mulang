@@ -1,7 +1,7 @@
 module Language.Mulang.DomainLanguage (
-  hasTooShortBindings,
-  hasWrongCaseBindings,
-  hasMisspelledBindings,
+  hasTooShortIdentifiers,
+  hasWrongCaseIdentifiers,
+  hasMisspelledIdentifiers,
   DomainLanguage(..)) where
 
 import Language.Mulang.Unfold (mainExpressions)
@@ -17,22 +17,22 @@ import Text.Inflections.Tokenizer (CaseStyle, tokenize, canTokenize)
 data DomainLanguage = DomainLanguage {
                           dictionary :: Dictionary,
                           caseStyle :: CaseStyle,
-                          minimumBindingSize :: Int,
+                          minimumIdentifierSize :: Int,
                           jargon :: [String] }
 
 type DomainLanguageInspection = DomainLanguage -> Inspection
 
-hasTooShortBindings :: DomainLanguageInspection
-hasTooShortBindings language = any isShort . mainDeclaredBindingsOf
-  where isShort identifier = length identifier < (minimumBindingSize language) && notJargonOf identifier language
+hasTooShortIdentifiers :: DomainLanguageInspection
+hasTooShortIdentifiers language = any isShort . mainDeclaredBindingsOf
+  where isShort identifier = length identifier < (minimumIdentifierSize language) && notJargonOf identifier language
 
-hasMisspelledBindings :: DomainLanguageInspection
-hasMisspelledBindings language | emptyDictionary language = const False
-hasMisspelledBindings language = any isMisspelled  . wordsOf language
+hasMisspelledIdentifiers :: DomainLanguageInspection
+hasMisspelledIdentifiers language | emptyDictionary language = const False
+hasMisspelledIdentifiers language = any isMisspelled  . wordsOf language
   where isMisspelled identifier = not (identifier `exists` dictionary language) && notJargonOf identifier language
 
-hasWrongCaseBindings :: DomainLanguageInspection
-hasWrongCaseBindings (DomainLanguage _ style _ _)
+hasWrongCaseIdentifiers :: DomainLanguageInspection
+hasWrongCaseIdentifiers (DomainLanguage _ style _ _)
   = any (not . canTokenize style) . mainDeclaredBindingsOf
 
 wordsOf :: DomainLanguage -> Expression -> [String]

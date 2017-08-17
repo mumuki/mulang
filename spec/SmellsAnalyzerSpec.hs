@@ -15,16 +15,16 @@ spec = describe "SmellsAnalyzer" $ do
 
     describe "detect domain language violations" $ do
       it "detects binding length violations" $ do
-        (runExcept Haskell "f x = x" []) `shouldReturn` (result [Expectation "f" "HasTooShortBindings"])
+        (runExcept Haskell "f x = x" []) `shouldReturn` (result [Expectation "f" "HasTooShortIdentifiers"])
 
       it "detects case violations" $ do
-        (runExcept Haskell "fixme_now x = x" []) `shouldReturn` (result [Expectation "fixme_now" "HasWrongCaseBindings"])
+        (runExcept Haskell "fixme_now x = x" []) `shouldReturn` (result [Expectation "fixme_now" "HasWrongCaseIdentifiers"])
 
     describe "works with non-empty set" $ do
       it "dont reports smell when excluded" $ do
         (runExcept JavaScript
                   "function f() { var x = 1; return x }"
-                  [HasRedundantLocalVariableReturn, HasTooShortBindings]) `shouldReturn` (result [])
+                  [HasRedundantLocalVariableReturn, HasTooShortIdentifiers]) `shouldReturn` (result [])
 
       it "reports smell when not excluded and present" $ do
         (runExcept JavaScript
