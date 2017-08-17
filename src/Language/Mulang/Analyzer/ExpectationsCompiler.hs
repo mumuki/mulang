@@ -7,8 +7,9 @@ import Language.Mulang.Analyzer.Analysis (Expectation(..))
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
-type Slicer = (Inspection -> Inspection)
-type Predicator = (IdentifierPredicate -> IdentifierPredicate)
+type Modifiers = (Scope, PredicateModifier)
+type Scope = (Inspection -> Inspection)
+type PredicateModifier = (IdentifierPredicate -> IdentifierPredicate)
 
 compileExpectation :: Expectation -> Inspection
 compileExpectation = fromMaybe (\_ -> True) . compileMaybe
@@ -17,30 +18,30 @@ compileMaybe :: Expectation -> Maybe Inspection
 compileMaybe (Expectation b i) = do
   let inspectionParts = splitOn ":" i
   let negator = compileNegator inspectionParts
-  (slicer, predicator) <- compileSlicer (splitOn ":" b)
-  baseInspection       <- compileBaseInspection predicator inspectionParts
-  return . negator . slicer $ baseInspection
+  (scope, predicateModifier) <- compileModifiers (splitOn ":" b)
+  baseInspection             <- compileBaseInspection predicateModifier inspectionParts
+  return . negator . scope $ baseInspection
 
-compileSlicer :: [String] -> Maybe (Slicer, Predicator)
-compileSlicer ["*"]                 = Just (id, id)
-compileSlicer ["Intransitive",name] = justSlicerFor scopedList name
-compileSlicer [name]                = justSlicerFor transitiveList name
-compileSlicer _                     = Nothing
+compileModifiers :: [String] -> Maybe Modifiers
+compileModifiers ["*"]                 = Just (id, id)
+compileModifiers ["Intransitive",name] = justScopeFor scopedList name
+compileModifiers [name]                = justScopeFor transitiveList name
+compileModifiers _                     = Nothing
 
-justSlicerFor f name = Just (flip f names, andAlso (except (last names)))
+justScopeFor f name = Just (flip f names, andAlso (except (last names)))
   where names = splitOn "." name
 
-compileNegator :: [String] -> Slicer
+compileNegator :: [String] -> Scope
 compileNegator ("Not":_) = negative
 compileNegator _         = id
 
-compileBaseInspection :: Predicator -> [String] -> Maybe (Inspection)
+compileBaseInspection :: PredicateModifier -> [String] -> Maybe (Inspection)
 compileBaseInspection p ("Not":parts)         = compileBaseInspection p parts
 compileBaseInspection p [verb]                = compileBaseInspection p [verb, "*"]
 compileBaseInspection p [verb, object]        = compileInspectionPrimitive verb (compileObject p object)
 compileBaseInspection _ _                     = Nothing
 
-compileObject :: Predicator -> String -> IdentifierPredicate
+compileObject :: PredicateModifier -> String -> IdentifierPredicate
 compileObject p "*"        = p $ anyone
 compileObject p ('~':name) = p $ like name
 compileObject _ ('=':name) = named name
