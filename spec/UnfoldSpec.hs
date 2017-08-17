@@ -1,7 +1,7 @@
 module UnfoldSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Unfold (mainExpressions)
+import           Language.Mulang.Generator (mainExpressions)
 import           Language.Mulang.Ast
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)

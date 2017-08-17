@@ -2,7 +2,7 @@ module Language.Mulang.Inspector.Generic.Duplication (hasCodeDuplication) where
 
 import           Language.Mulang.Ast
 import           Language.Mulang.Inspector
-import           Language.Mulang.Unfold (allExpressions)
+import           Language.Mulang.Generator (allExpressions)
 import qualified Data.Hashable as H (hash)
 import           Data.List (nub, subsequences)
 

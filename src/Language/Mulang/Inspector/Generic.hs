@@ -27,8 +27,7 @@ module Language.Mulang.Inspector.Generic (
 
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
-import Language.Mulang.Unfold (allExpressions)
-import Language.Mulang.Explorer
+import Language.Mulang.Generator (allExpressions, boundDeclarationsOf', equationBodiesOf, nameOf, referencedIdentifiersOf)
 
 type Inspection = Expression  -> Bool
 type IdentifierInspection = IdentifierPredicate -> Inspection

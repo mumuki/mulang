@@ -4,10 +4,9 @@ module Language.Mulang.DomainLanguage (
   hasMisspelledIdentifiers,
   DomainLanguage(..)) where
 
-import Language.Mulang.Unfold (mainExpressions)
 import Language.Mulang.Inspector (Inspection)
 import Language.Mulang.Ast (Expression)
-import Language.Mulang.Explorer (declaredIdentifiersOf)
+import Language.Mulang.Generator (declaredIdentifiersOf, mainExpressions)
 
 import Text.Dictionary (Dictionary, exists)
 

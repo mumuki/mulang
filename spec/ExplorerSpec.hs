@@ -1,8 +1,7 @@
 module ExplorerSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Unfold (mainExpressions, allExpressions)
-import           Language.Mulang.Explorer
+import           Language.Mulang.Generator (mainExpressions, allExpressions, transitiveReferencedIdentifiersOf, declaredIdentifiersOf, referencedIdentifiersOf)
 import           Language.Mulang.Parsers.Haskell (hs)
 
 spec :: Spec

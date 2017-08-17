@@ -9,9 +9,8 @@ module Language.Mulang.Inspector.Combiner (
   transitiveList) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Unfold (Unfold, allExpressions)
+import Language.Mulang.Generator (Unfold, allExpressions, transitiveReferencedIdentifiersOf, boundDeclarationsOf, declaredIdentifiersOf)
 import Language.Mulang.Inspector.Generic
-import Language.Mulang.Explorer
 
 detectAll :: Inspection -> Expression -> [Identifier]
 detectAll = detect allExpressions
