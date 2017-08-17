@@ -8,7 +8,6 @@ module Language.Mulang.Generator (
   transitiveReferencedIdentifiers,
   nameOf,
   expressions,
-  mainExpressions,
   Unfold,
   Generator,
   Expression(..)) where
@@ -27,7 +26,21 @@ type Unfold = Generator Expression
 -- |
 -- | For example, in 'f x = g x where x = y', it returns '(f, f x = ...)' and '(x, x = y)'
 declarations :: Generator (Identifier, Expression)
-declarations = mapMaybe extractDeclaration .  mainExpressions
+declarations (Sequence es)          = concatMap declarations es
+declarations e@(Attribute n _)      = [(n, e)]
+declarations e@(Class n _ b)        = (n, e) : declarations b
+declarations e@(Clause n _ es)      = (n, e) : concatMap declarations es
+declarations e@(Enumeration n _)    = [(n, e)]
+declarations e@(Interface n _ b)    = (n, e) : declarations b
+declarations e@(EntryPoint n b)     = (n, e) : declarations b
+declarations e@(Subroutine n b)     = (n, e) : concatMap declarations (equationExpressions b)
+declarations e@(Object n b)         = (n, e) : declarations b
+declarations e@(Clause n _ _)       = [(n, e)]
+declarations e@(Record n)           = [(n, e)]
+declarations e@(TypeAlias n)        = [(n, e)]
+declarations e@(TypeSignature n _ _)= [(n, e)]
+declarations e@(Variable n _)       = [(n, e)]
+declarations _                      = []
 
 -- | Returns all declarations bound to the given identifier predicate
 -- |
@@ -92,7 +105,7 @@ declaredIdentifiers = map fst . declarations
 
 -- | Returns all the body equations of functions, procedures and methods
 equationBodies :: Generator EquationBody
-equationBodies = concatMap bodiesOf . mainExpressions
+equationBodies = concatMap (bodiesOf . snd) . declarations
   where
     bodiesOf :: Generator EquationBody
     bodiesOf (Subroutine  _ equations) = equationBodies equations
@@ -105,8 +118,7 @@ equationBodies = concatMap bodiesOf . mainExpressions
 
 
 boundDeclarationsOf :: Identifier -> Unfold
-boundDeclarationsOf b = boundDeclarations (==b)
-
+boundDeclarationsOf b = boundDeclarations (named b)
 
 nameOf :: Expression -> Maybe Identifier
 nameOf = fmap fst . extractDeclaration
@@ -116,39 +128,20 @@ extractReference (Reference n)        = Just n
 extractReference (Exist n _)          = Just n
 extractReference _                    = Nothing
 
-
 extractDeclaration :: Expression -> Maybe (Identifier, Expression)
-extractDeclaration e@(TypeSignature n _ _)= Just (n, e)
-extractDeclaration e@(TypeAlias n )       = Just (n, e)
-extractDeclaration e@(Variable n _)       = Just (n, e)
-extractDeclaration e@(Subroutine n _)     = Just (n, e)
-extractDeclaration e@(Record n)           = Just (n, e)
-extractDeclaration e@(Clause n _ _)       = Just (n, e)
-extractDeclaration e@(Object n _)         = Just (n, e)
-extractDeclaration e@(Class n _ _)        = Just (n, e)
-extractDeclaration e@(Interface n _ _)    = Just (n, e)
-extractDeclaration e@(Enumeration n _)    = Just (n, e)
 extractDeclaration e@(Attribute n _)      = Just (n, e)
+extractDeclaration e@(Class n _ _)        = Just (n, e)
+extractDeclaration e@(Clause n _ _)       = Just (n, e)
 extractDeclaration e@(EntryPoint n _)     = Just (n, e)
+extractDeclaration e@(Enumeration n _)    = Just (n, e)
+extractDeclaration e@(Interface n _ _)    = Just (n, e)
+extractDeclaration e@(Object n _)         = Just (n, e)
+extractDeclaration e@(Record n)           = Just (n, e)
+extractDeclaration e@(Subroutine n _)     = Just (n, e)
+extractDeclaration e@(TypeAlias n )       = Just (n, e)
+extractDeclaration e@(TypeSignature n _ _)= Just (n, e)
+extractDeclaration e@(Variable n _)       = Just (n, e)
 extractDeclaration _                      = Nothing
-
-
-mainExpressions :: Unfold
-mainExpressions (Sequence es)          = concatMap mainExpressions es
-mainExpressions a@(Attribute _ _)      = [a]
-mainExpressions c@(Class _ _ b)        = c : mainExpressions b
-mainExpressions c@(Clause _ _ es)      = c : concatMap mainExpressions es
-mainExpressions c@(Enumeration _ _)    = [c]
-mainExpressions c@(Interface _ _ b)    = c : mainExpressions b
-mainExpressions e@(EntryPoint _ b)     = e : mainExpressions b
-mainExpressions e@(Subroutine _ b)     = e : concatMap mainExpressions (equationExpressions b)
-mainExpressions o@(Object _ b)         = o : mainExpressions b
-mainExpressions r@(Clause _ _ _)       = [r]
-mainExpressions r@(Record _)           = [r]
-mainExpressions t@(TypeAlias _ )       = [t]
-mainExpressions t@(TypeSignature _ _ _)= [t]
-mainExpressions v@(Variable _ _)       = [v]
-mainExpressions _                      = []
 
 
 equationExpressions = concatMap (\(Equation _ body) -> bodyExpressions body)

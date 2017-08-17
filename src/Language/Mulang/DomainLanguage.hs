@@ -6,7 +6,7 @@ module Language.Mulang.DomainLanguage (
 
 import Language.Mulang.Inspector (Inspection)
 import Language.Mulang.Ast (Expression)
-import Language.Mulang.Generator (declaredIdentifiers, mainExpressions)
+import Language.Mulang.Generator (declaredIdentifiers)
 
 import Text.Dictionary (Dictionary, exists)
 
