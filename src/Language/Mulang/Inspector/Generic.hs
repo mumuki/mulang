@@ -27,7 +27,7 @@ module Language.Mulang.Inspector.Generic (
 
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
-import Language.Mulang.Generator (allExpressions, boundDeclarationsOf', equationBodiesOf, nameOf, referencedIdentifiersOf)
+import Language.Mulang.Generator (expressions, boundDeclarations, equationBodies, nameOf, referencedIdentifiers)
 
 type Inspection = Expression  -> Bool
 type IdentifierInspection = IdentifierPredicate -> Inspection
@@ -47,7 +47,7 @@ assigns predicate = containsExpression f
 -- in its definition
 uses :: IdentifierInspection
 uses p = containsExpression f
-  where f = any p . referencedIdentifiersOf
+  where f = any p . referencedIdentifiers
 
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
@@ -153,13 +153,13 @@ usesAnonymousVariable = containsExpression f
 
 
 containsExpression :: (Expression -> Bool) -> Inspection
-containsExpression f = has f allExpressions
+containsExpression f = has f expressions
 
 containsBody :: (EquationBody -> Bool)-> Inspection
-containsBody f = has f equationBodiesOf
+containsBody f = has f equationBodies
 
 containsDeclaration :: (Expression -> Bool) -> IdentifierInspection
-containsDeclaration f b  = has f (boundDeclarationsOf' b)
+containsDeclaration f b  = has f (boundDeclarations b)
 
 matchesType :: IdentifierPredicate -> Pattern -> Bool
 matchesType predicate (TypePattern n)               = predicate n

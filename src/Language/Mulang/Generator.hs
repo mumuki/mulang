@@ -1,13 +1,13 @@
 module Language.Mulang.Generator (
-  equationBodiesOf,
-  declarationsOf,
-  referencedIdentifiersOf,
-  declaredIdentifiersOf,
+  equationBodies,
+  declarations,
+  referencedIdentifiers,
+  declaredIdentifiers,
   boundDeclarationsOf,
-  boundDeclarationsOf',
-  transitiveReferencedIdentifiersOf,
+  boundDeclarations,
+  transitiveReferencedIdentifiers,
   nameOf,
-  allExpressions,
+  expressions,
   mainExpressions,
   Unfold,
   Generator,
@@ -22,37 +22,22 @@ import Data.List (nub)
 type Generator a = Expression -> [a]
 type Unfold = Generator Expression
 
-{-
-* declarariones (clases, métodos, funciones, estructuras, variables globales y locales)
-  * Generator (Identifier, Expression)
-  * declarations
--}
+-- | Returns all the declarations their identifiers -
+-- | classes, methods, functions, records, local and global variables, and so on
+-- |
+-- | For example, in 'f x = g x where x = y', it returns '(f, f x = ...)' and '(x, x = y)'
+declarations :: Generator (Identifier, Expression)
+declarations = mapMaybe extractDeclaration .  mainExpressions
 
--- | Returns all the declared identifiers and the expressions that binds them
--- For example, in 'f x = g x where x = y', it returns '(f, f x = ...)' and '(x, x = y)'
-declarationsOf :: Generator (Identifier, Expression)
-declarationsOf = mapMaybe extractDeclaration .  mainExpressions
+-- | Returns all declarations bound to the given identifier predicate
+-- |
+boundDeclarations :: IdentifierPredicate -> Unfold
+boundDeclarations f = map snd . filter (f.fst) . declarations
 
-{-
-* declarariones enlazadas (idem anterior)
-  * IdentifierPredicate -> Generator Expression
-  * boundDeclarations
--}
-
-boundDeclarationsOf' :: IdentifierPredicate -> Unfold
-boundDeclarationsOf' f = map snd . filter (f.fst) . declarationsOf
-
-{-
-* todas las expresiones (idem anterior + otras expresiones)
-  * Generator Expression
-  * expressions
-
--}
-
--- | Returns the given expressions and all its subexpressions
+-- | Returns the given expression and all its subexpressions
 -- For example: in 'f x = x + 1', it returns 'f x = x + 1', 'x + 1', 'x' and '1'
-allExpressions :: Unfold
-allExpressions expr = expr : concatMap allExpressions (subExpressions expr)
+expressions :: Unfold
+expressions expr = expr : concatMap expressions (subExpressions expr)
   where
     subExpressions :: Unfold
     subExpressions (Variable _ v)          = [v]
@@ -81,28 +66,16 @@ allExpressions expr = expr : concatMap allExpressions (subExpressions expr)
     subExpressions _                       = []
 
 
-{-
-
-* todos los identificadores referenciados
-  * Generator Identifier
-  * referencedIdentifiers
-
--}
-
 -- | Returns all the referenced identifiers
 -- For example, in 'f (x + 1)', it returns 'f' and 'x'
-referencedIdentifiersOf :: Generator Identifier
-referencedIdentifiersOf = nub . mapMaybe extractReference . allExpressions
+referencedIdentifiers :: Generator Identifier
+referencedIdentifiers = nub . mapMaybe extractReference . expressions
 
-{-
 
-* todos los identificadores referenciados transitivamente
-  * Identifier -> Generator Identifier
-  * transitiveReferencedIdentifiers
--}
-
-transitiveReferencedIdentifiersOf :: Identifier -> Generator Identifier
-transitiveReferencedIdentifiersOf identifier code =  expand (concatMap referencedIdentifiersOf . (`boundDeclarationsOf` code)) identifier
+-- | Returns all the identifiers transitively referenced by the given one
+-- |
+transitiveReferencedIdentifiers :: Identifier -> Generator Identifier
+transitiveReferencedIdentifiers identifier code =  expand (concatMap referencedIdentifiers . (`boundDeclarationsOf` code)) identifier
   where
     expand :: Eq a => (a-> [a]) -> a -> [a]
     expand f x = expand' [] f [x]
@@ -112,28 +85,14 @@ transitiveReferencedIdentifiersOf identifier code =  expand (concatMap reference
                         | otherwise = [x] ++ expand' (x:ps) f (xs ++ f x)
 
 
-{-
-
-* todos los identificadores declarados
-  * Generator Identifier
-  * declaredIdentifiers
--}
-
 -- | Returns all the declared identifiers
 -- For example, in 'f x = g x where x = y', it returns 'f' and 'x'
-declaredIdentifiersOf :: Generator Identifier
-declaredIdentifiersOf = map fst . declarationsOf
-
-{-
-* cuerpos de ecuaciones
-  * Generator EquationBody
-  * equationBodies
--}
-
+declaredIdentifiers :: Generator Identifier
+declaredIdentifiers = map fst . declarations
 
 -- | Returns all the body equations of functions, procedures and methods
-equationBodiesOf :: Generator EquationBody
-equationBodiesOf = concatMap bodiesOf . mainExpressions
+equationBodies :: Generator EquationBody
+equationBodies = concatMap bodiesOf . mainExpressions
   where
     bodiesOf :: Generator EquationBody
     bodiesOf (Subroutine  _ equations) = equationBodies equations
@@ -146,7 +105,7 @@ equationBodiesOf = concatMap bodiesOf . mainExpressions
 
 
 boundDeclarationsOf :: Identifier -> Unfold
-boundDeclarationsOf b = boundDeclarationsOf' (==b)
+boundDeclarationsOf b = boundDeclarations (==b)
 
 
 nameOf :: Expression -> Maybe Identifier
