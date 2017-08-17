@@ -20,6 +20,7 @@ module Language.Mulang.Inspector.Generic (
   usesExceptionHandling,
   containsExpression,
   containsDeclaration,
+  containsBoundDeclaration,
   containsBody,
   matchesType,
   Inspection,
@@ -60,13 +61,13 @@ usesIf = containsExpression f
 
 -- | Inspection that tells whether a top level declaration exists
 declares :: IdentifierInspection
-declares = containsDeclaration f
+declares = containsBoundDeclaration f
   where f (TypeSignature _ _ _) = False
         f _                     = True
 
 -- | Inspection that tells whether an expression is direct recursive
 declaresRecursively :: IdentifierInspection
-declaresRecursively = containsDeclaration f
+declaresRecursively = containsBoundDeclaration f
   where f e | (Just name) <- (nameOf e) = uses (named name) e
             | otherwise = False
 
@@ -75,17 +76,17 @@ declaresRecursively = containsDeclaration f
 
 
 declaresFunction :: IdentifierInspection
-declaresFunction = containsDeclaration f
+declaresFunction = containsBoundDeclaration f
   where f (Function _ _) = True
         f _              = False
 
 declaresVariable :: IdentifierInspection
-declaresVariable = containsDeclaration f
+declaresVariable = containsBoundDeclaration f
   where f (Variable _ _)  = True
         f _               = False
 
 declaresEntryPoint :: IdentifierInspection
-declaresEntryPoint = containsDeclaration f
+declaresEntryPoint = containsBoundDeclaration f
   where f (EntryPoint _ _)  = True
         f _                 = False
 
@@ -97,7 +98,7 @@ declaresComputationWithArity :: Int -> IdentifierInspection
 declaresComputationWithArity arity = declaresComputationWithArity' (== arity)
 
 declaresComputationWithArity' :: (Int -> Bool) -> IdentifierInspection
-declaresComputationWithArity' arityPredicate = containsDeclaration f
+declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
   where f (Subroutine _ es)       = any equationArityIs es
         f (Clause _ args _)       = argsHaveArity args
         f _  = False
@@ -107,12 +108,12 @@ declaresComputationWithArity' arityPredicate = containsDeclaration f
         argsHaveArity = arityPredicate.length
 
 declaresTypeAlias :: IdentifierInspection
-declaresTypeAlias = containsDeclaration f
+declaresTypeAlias = containsBoundDeclaration f
   where f (TypeAlias _) = True
         f _             = False
 
 declaresTypeSignature :: IdentifierInspection
-declaresTypeSignature = containsDeclaration f
+declaresTypeSignature = containsBoundDeclaration f
   where f (TypeSignature _ _ _) = True
         f _                     = False
 
@@ -163,8 +164,11 @@ containsExpression f = has f expressions
 containsBody :: (EquationBody -> Bool)-> Inspection
 containsBody f = has f equationBodies
 
-containsDeclaration :: (Expression -> Bool) -> IdentifierInspection
-containsDeclaration f b  = has f (boundDeclarations b)
+containsBoundDeclaration :: (Expression -> Bool) -> IdentifierInspection
+containsBoundDeclaration f b  = has f (boundDeclarations b)
+
+containsDeclaration :: (Expression -> Bool) -> Inspection
+containsDeclaration f = has f (map snd . declarations)
 
 matchesType :: IdentifierPredicate -> Pattern -> Bool
 matchesType predicate (TypePattern n)               = predicate n

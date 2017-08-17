@@ -9,7 +9,7 @@ import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Generic
 
 declaresProcedure :: IdentifierPredicate -> Inspection
-declaresProcedure = containsDeclaration f
+declaresProcedure = containsBoundDeclaration f
   where f (Procedure _ _) = True
         f _                          = False
 

@@ -28,7 +28,7 @@ includes predicate = containsExpression f
         f _              = False
 
 inherits :: IdentifierInspection
-inherits predicate = containsExpression f
+inherits predicate = containsDeclaration f
   where f (Class _ (Just name) _) = predicate name
         f _                       = False
 
@@ -44,7 +44,7 @@ usesMixins :: Inspection
 usesMixins = includes anyone
 
 declaresObject :: IdentifierInspection
-declaresObject =  containsDeclaration f
+declaresObject =  containsBoundDeclaration f
   where f (Object _ _) = True
         f _            = False
 
@@ -52,26 +52,26 @@ declaresSuperclass :: IdentifierInspection
 declaresSuperclass = inherits
 
 declaresClass :: IdentifierInspection
-declaresClass =  containsDeclaration f
+declaresClass =  containsBoundDeclaration f
   where f (Class _ _ _) = True
         f _             = False
 
 declaresEnumeration :: IdentifierInspection
-declaresEnumeration =  containsDeclaration f
+declaresEnumeration =  containsBoundDeclaration f
   where f (Enumeration _ _) = True
         f _                 = False
 
 declaresInterface :: IdentifierInspection
-declaresInterface =  containsDeclaration f
+declaresInterface =  containsBoundDeclaration f
   where f (Interface _ _ _) = True
         f _                 = False
 
 declaresAttribute :: IdentifierInspection
-declaresAttribute =  containsDeclaration f
+declaresAttribute =  containsBoundDeclaration f
   where f (Attribute _ _) = True
         f _               = False
 
 declaresMethod :: IdentifierInspection
-declaresMethod =  containsDeclaration f
+declaresMethod =  containsBoundDeclaration f
   where f (Method _ _) = True
         f _            = False
