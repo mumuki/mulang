@@ -16,13 +16,13 @@ spec = do
   describe "hasTooShortBindings" $ do
     let run = hasTooShortBindings language
 
-    it "is True when it is a one-char binding" $ do
+    it "is True when it is a one-char identifier" $ do
       run (hs "x = True") `shouldBe` True
 
-    it "is True when it is a two-chars binding" $ do
+    it "is True when it is a two-chars identifier" $ do
       run (hs "xy = True") `shouldBe` True
 
-    it "is False when it is a three-chars binding" $ do
+    it "is False when it is a three-chars identifier" $ do
       run (hs "zip = []") `shouldBe` False
 
     it "is False when it contains a short parameter name"  $ do
@@ -52,10 +52,10 @@ spec = do
   describe "hasWrongCaseBindings" $ do
     let run = hasWrongCaseBindings language
 
-    it "is True when there are snake case binding on a camel case language" $ do
+    it "is True when there are snake case identifier on a camel case language" $ do
       run (js "var a_day = 'monday'") `shouldBe` True
 
-    it "is False when there are only camel case binding on a camel case language" $ do
+    it "is False when there are only camel case identifier on a camel case language" $ do
       run (js "var aDay = 'monday'") `shouldBe` False
 
   describe "hasMisspelledBindings" $ do

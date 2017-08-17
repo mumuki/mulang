@@ -362,7 +362,7 @@ spec = do
     it "is False when required function is not used in function" $ do
       uses (named "m") (hs "y = x 3") `shouldBe` False
 
-    it "is False when binding is not present, scoped" $ do
+    it "is False when reference is not present, scoped" $ do
       scoped (uses (named "m")) "p" (hs "z = m 3") `shouldBe` False
 
     it "is False when required function is blank" $ do
@@ -449,23 +449,23 @@ spec = do
 
   describe "declaresComputation" $ do
     describe "with constants" $ do
-      it "is False when binding exists" $ do
+      it "is False when exists" $ do
         declaresComputation (named "x") (hs "x = 1") `shouldBe` False
 
     describe "with type declarations" $ do
-      it "is False when binding exists" $ do
+      it "is False when exists" $ do
         declaresComputation (named "x") (hs "x :: Int -> Int") `shouldBe` False
 
     describe "with function declarations" $ do
-      it "is True when binding exists" $ do
+      it "is True when exists" $ do
         declaresComputation (named "x") (hs "x _ = True") `shouldBe` True
 
   describe "declares" $ do
     describe "with constants" $ do
-      it "is True when binding exists" $ do
+      it "is True when exists" $ do
         declares (named "x") (hs "x = 1") `shouldBe` True
 
-      it "is False when binding doesnt exists" $ do
+      it "is False when reference doesnt exists" $ do
         declares (named "y") (hs "x = 1") `shouldBe` False
 
     describe "with types signatures" $ do
@@ -473,10 +473,10 @@ spec = do
         declares (named "x") (hs "x :: Int") `shouldBe` False
 
     describe "with functions" $ do
-      it "is True when binding exists" $ do
+      it "is True when exists" $ do
         declares (named "x") (hs "x m = 1") `shouldBe` True
 
-      it "is False when binding doesnt exists" $ do
+      it "is False when reference doesnt exists" $ do
         declares (named "y") (hs "x m = 1") `shouldBe` False
 
   describe "usesComprehension" $ do

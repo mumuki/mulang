@@ -34,7 +34,7 @@ library
     Text.Inflections.Tokenizer
     Language.Mulang
     Language.Mulang.Ast
-    Language.Mulang.Binding
+    Language.Mulang.Identifier
     Language.Mulang.Builder
     Language.Mulang.Unfold
     Language.Mulang.Explorer

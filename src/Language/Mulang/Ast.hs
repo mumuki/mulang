@@ -33,12 +33,9 @@ module Language.Mulang.Ast (
   ) where
 
 import           GHC.Generics
+import           Language.Mulang.Identifier (Identifier)
 
 type Code = String
-
--- | An identifier
--- | Mulang does not assume any special naming convention or format
-type Identifier = String
 
 -- | An equation. See @Function@ and @Procedure@ above
 data Equation = Equation [Pattern] EquationBody deriving (Eq, Show, Read, Generic)

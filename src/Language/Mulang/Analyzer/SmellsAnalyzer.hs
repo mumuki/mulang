@@ -44,7 +44,7 @@ detectionFor UsesCut                         = simple usesCut
 detectionFor UsesFail                        = simple usesFail
 detectionFor UsesUnificationOperator         = simple usesUnificationOperator
 
-type Detection = DomainLanguage -> Expression -> [Binding]
+type Detection = DomainLanguage -> Expression -> [Identifier]
 unsupported :: Detection
 unsupported _ _ = []
 
@@ -54,5 +54,5 @@ simple inspection _ = detectAll inspection
 withLanguage :: (DomainLanguage -> Inspection) -> Detection
 withLanguage inspection language = detect mainExpressions (inspection language)
 
-exectationFor :: Smell -> Binding -> Expectation
-exectationFor smell binding = Expectation binding (show smell)
+exectationFor :: Smell -> Identifier -> Expectation
+exectationFor smell identifier = Expectation identifier (show smell)

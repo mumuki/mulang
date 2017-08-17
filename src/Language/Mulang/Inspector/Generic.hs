@@ -23,30 +23,30 @@ module Language.Mulang.Inspector.Generic (
   containsBody,
   matchesType,
   Inspection,
-  BindedInspection) where
+  IdentifierInspection) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Binding
+import Language.Mulang.Identifier
 import Language.Mulang.Unfold (allExpressions)
 import Language.Mulang.Explorer
 
 type Inspection = Expression  -> Bool
-type BindedInspection = BindingPredicate -> Inspection
+type IdentifierInspection = IdentifierPredicate -> Inspection
 
 -- | Inspection that tells whether an expression is equal to a given piece of code after being parsed
 parses :: (String -> Expression) -> String -> Inspection
 parses parser code = (== (parser code))
 
-assigns :: BindedInspection
+assigns :: IdentifierInspection
 assigns predicate = containsExpression f
   where f (Assignment name _)  = predicate name
         f (Variable name _)    = predicate name
         f (Attribute name _)   = predicate name
         f _                    = False
 
--- | Inspection that tells whether an expression uses the the given target binding
+-- | Inspection that tells whether an expression uses the the given target identifier
 -- in its definition
-uses :: BindedInspection
+uses :: IdentifierInspection
 uses p = containsExpression f
   where f = any p . referencedBindingsOf
 
@@ -57,42 +57,42 @@ usesIf = containsExpression f
   where f (If _ _ _) = True
         f _          = False
 
--- | Inspection that tells whether a top level binding exists
-declares :: BindedInspection
+-- | Inspection that tells whether a top level declaration exists
+declares :: IdentifierInspection
 declares = containsDeclaration f
   where f (TypeSignature _ _ _) = False
         f _                     = True
 
 -- | Inspection that tells whether an expression is direct recursive
-declaresRecursively :: BindedInspection
+declaresRecursively :: IdentifierInspection
 declaresRecursively = containsDeclaration f
   where f e | (Just name) <- (nameOf e) = uses (named name) e
             | otherwise = False
 
 
-declaresFunction :: BindedInspection
+declaresFunction :: IdentifierInspection
 declaresFunction = containsDeclaration f
   where f (Function _ _) = True
         f _              = False
 
-declaresVariable :: BindedInspection
+declaresVariable :: IdentifierInspection
 declaresVariable = containsDeclaration f
   where f (Variable _ _)  = True
         f _               = False
 
-declaresEntryPoint :: BindedInspection
+declaresEntryPoint :: IdentifierInspection
 declaresEntryPoint = containsDeclaration f
   where f (EntryPoint _ _)  = True
         f _                 = False
 
--- | Inspection that tells whether a top level computation binding exists
-declaresComputation :: BindedInspection
+-- | Inspection that tells whether a top level computation declaration exists
+declaresComputation :: IdentifierInspection
 declaresComputation = declaresComputationWithArity' (const True)
 
-declaresComputationWithArity :: Int -> BindedInspection
+declaresComputationWithArity :: Int -> IdentifierInspection
 declaresComputationWithArity arity = declaresComputationWithArity' (== arity)
 
-declaresComputationWithArity' :: (Int -> Bool) -> BindedInspection
+declaresComputationWithArity' :: (Int -> Bool) -> IdentifierInspection
 declaresComputationWithArity' arityPredicate = containsDeclaration f
   where f (Subroutine _ es)       = any equationArityIs es
         f (Clause _ args _)       = argsHaveArity args
@@ -102,17 +102,17 @@ declaresComputationWithArity' arityPredicate = containsDeclaration f
 
         argsHaveArity = arityPredicate.length
 
-declaresTypeAlias :: BindedInspection
+declaresTypeAlias :: IdentifierInspection
 declaresTypeAlias = containsDeclaration f
   where f (TypeAlias _) = True
         f _             = False
 
-declaresTypeSignature :: BindedInspection
+declaresTypeSignature :: IdentifierInspection
 declaresTypeSignature = containsDeclaration f
   where f (TypeSignature _ _ _) = True
         f _                     = False
 
-raises :: BindedInspection
+raises :: IdentifierInspection
 raises predicate = containsExpression f
   where f (Raise (New n _))     = predicate n
         f (Raise (Reference n)) = predicate n
@@ -123,7 +123,7 @@ usesExceptions = containsExpression f
   where f (Raise _)     = True
         f _             = False
 
-rescues :: BindedInspection
+rescues :: IdentifierInspection
 rescues predicate = containsExpression f
   where f (Try _ rescues _) = any (matchesType predicate) . map fst  $ rescues
         f _                 = False
@@ -159,10 +159,10 @@ containsExpression f = has f allExpressions
 containsBody :: (EquationBody -> Bool)-> Inspection
 containsBody f = has f equationBodiesOf
 
-containsDeclaration :: (Expression -> Bool) -> BindedInspection
+containsDeclaration :: (Expression -> Bool) -> IdentifierInspection
 containsDeclaration f b  = has f (bindedDeclarationsOf' b)
 
-matchesType :: BindingPredicate -> Pattern -> Bool
+matchesType :: IdentifierPredicate -> Pattern -> Bool
 matchesType predicate (TypePattern n)               = predicate n
 matchesType predicate (AsPattern _ (TypePattern n)) = predicate n
 matchesType _         _                             = False

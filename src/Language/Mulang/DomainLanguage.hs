@@ -24,12 +24,12 @@ type DomainLanguageInspection = DomainLanguage -> Inspection
 
 hasTooShortBindings :: DomainLanguageInspection
 hasTooShortBindings language = any isShort . mainDeclaredBindingsOf
-  where isShort binding = length binding < (minimumBindingSize language) && notJargonOf binding language
+  where isShort identifier = length identifier < (minimumBindingSize language) && notJargonOf identifier language
 
 hasMisspelledBindings :: DomainLanguageInspection
 hasMisspelledBindings language | emptyDictionary language = const False
 hasMisspelledBindings language = any isMisspelled  . wordsOf language
-  where isMisspelled binding = not (binding `exists` dictionary language) && notJargonOf binding language
+  where isMisspelled identifier = not (identifier `exists` dictionary language) && notJargonOf identifier language
 
 hasWrongCaseBindings :: DomainLanguageInspection
 hasWrongCaseBindings (DomainLanguage _ style _ _)
@@ -43,4 +43,4 @@ mainDeclaredBindingsOf = declaredBindingsOf mainExpressions
 
 emptyDictionary = null . dictionary
 
-notJargonOf binding language = notElem binding (jargon language)
+notJargonOf identifier language = notElem identifier (jargon language)

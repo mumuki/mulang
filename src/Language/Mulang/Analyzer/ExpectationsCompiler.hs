@@ -8,7 +8,7 @@ import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
 type Slicer = (Inspection -> Inspection)
-type Predicator = (BindingPredicate -> BindingPredicate)
+type Predicator = (IdentifierPredicate -> IdentifierPredicate)
 
 compileExpectation :: Expectation -> Inspection
 compileExpectation = fromMaybe (\_ -> True) . compileMaybe
@@ -40,7 +40,7 @@ compileBaseInspection p [verb]                = compileBaseInspection p [verb, "
 compileBaseInspection p [verb, object]        = compileInspectionPrimitive verb (compileObject p object)
 compileBaseInspection _ _                     = Nothing
 
-compileObject :: Predicator -> String -> BindingPredicate
+compileObject :: Predicator -> String -> IdentifierPredicate
 compileObject p "*"        = p $ anyone
 compileObject p ('~':name) = p $ like name
 compileObject _ ('=':name) = named name
@@ -49,7 +49,7 @@ compileObject _ ('[':ns)   | last ns == ']' = anyOf . splitOn "|" . init $ ns
 compileObject _ name       = named name
 
 
-compileInspectionPrimitive :: String -> BindingPredicate -> Maybe Inspection
+compileInspectionPrimitive :: String -> IdentifierPredicate -> Maybe Inspection
 compileInspectionPrimitive = f
   where
   f "Assigns"                        = binded assigns

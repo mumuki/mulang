@@ -17,7 +17,7 @@ import Language.Mulang.Ast
 import Language.Mulang.Inspector
 
 
--- | Inspection that tells whether a binding has expressions like 'x == True'
+-- | Inspection that tells whether an identifier has expressions like 'x == True'
 hasRedundantBooleanComparison :: Inspection
 hasRedundantBooleanComparison = compares isBooleanLiteral
 
@@ -48,7 +48,7 @@ returnsNull = containsExpression f
   where f (Return MuNull) = True
         f _               = False
 
--- | Inspection that tells whether a binding has an if expression where both branches return
+-- | Inspection that tells whether an identifier has an if expression where both branches return
 -- boolean literals
 hasRedundantIf :: Inspection
 hasRedundantIf = containsExpression f
@@ -58,7 +58,7 @@ hasRedundantIf = containsExpression f
         f (If _ x y)                                 = all isBooleanLiteral [x, y]
         f _                                          = False
 
--- | Inspection that tells whether a binding has guards where both branches return
+-- | Inspection that tells whether an identifier has guards where both branches return
 -- boolean literals
 hasRedundantGuards :: Inspection
 hasRedundantGuards = containsBody f -- TODO not true when condition is a pattern
@@ -68,14 +68,14 @@ hasRedundantGuards = containsBody f -- TODO not true when condition is a pattern
         f _ = False
 
 
--- | Inspection that tells whether a binding has lambda expressions like '\x -> g x'
+-- | Inspection that tells whether an identifier has lambda expressions like '\x -> g x'
 hasRedundantLambda :: Inspection
 hasRedundantLambda = containsExpression f
   where f (Lambda [VariablePattern (x)] (Return (Call _ [Reference (y)]))) = x == y
         f _ = False
 
 
--- | Inspection that tells whether a binding has parameters that
+-- | Inspection that tells whether an identifier has parameters that
 -- can be avoided using point-free
 hasRedundantParameter :: Inspection
 hasRedundantParameter = containsExpression f
