@@ -278,7 +278,7 @@ $ mulang '
 }
 ```
 
-### With Transitive expectations
+### With unscoped expectations
 
 ```bash
 $ mulang '
@@ -292,8 +292,8 @@ $ mulang '
       "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
-            "scope" : "x",
-            "inspection" : "HasBinding"
+            "scope" : "*",
+            "inspection" : "Declares:x"
          }
       ]
    }
@@ -306,8 +306,8 @@ $ mulang '
       {
          "result" : true,
          "expectation" : {
-            "scope" : "x",
-            "inspection" : "HasBinding"
+            "scope" : "*",
+            "inspection" : "Declares:x"
          }
       }
    ],

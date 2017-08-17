@@ -38,9 +38,8 @@ usage = "Wrong usage.                                            \n\
         \  #read from argument                                   \n\
         \  $ mulang '{                                           \n\
         \      \"expectations\":[{                               \n\
-        \                \"tag\":\"Basic\",                      \n\
-        \                \"scope\":\"x\",                        \n\
-        \                \"inspection\":\"HasBiniding\"}],       \n\
+        \                \"scope\":\"*\",                        \n\
+        \                \"inspection\":\"Declares:x\"}],        \n\
         \        \"code\": {                                     \n\
         \            \"content\":\"x = 1\",                      \n\
         \            \"language\":\"Haskell\"}                   \n\
