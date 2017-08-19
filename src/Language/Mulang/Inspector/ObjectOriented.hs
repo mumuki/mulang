@@ -22,8 +22,8 @@ import Language.Mulang.Inspector.Primitive (
   Inspection, IdentifierInspection,
   containsExpression, containsDeclaration, containsBoundDeclaration)
 
-import Control.Monad (MonadPlus, mzero, guard)
-import Language.Mulang.Generator (declarations, boundDeclarations, expressions)
+import Control.Monad (MonadPlus, guard)
+import Language.Mulang.Generator (declarations, expressions)
 
 implements :: IdentifierInspection
 implements predicate = containsExpression f
@@ -58,7 +58,7 @@ usedSelectors e = do
 
 methodDeclarationsOf :: Identifier -> Expression -> [Expression]
 methodDeclarationsOf selector e = do
-  m@(Method s _) <- map snd  . declarations $ e
+  m@(Method s _) <- declarations e
   guard (s == selector)
   return m
 

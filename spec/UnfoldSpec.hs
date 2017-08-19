@@ -1,7 +1,7 @@
 module UnfoldSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Generator (declarations)
+import           Language.Mulang.Generator (declarations, declaredIdentifiers)
 import           Language.Mulang.Ast
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)
@@ -32,5 +32,5 @@ spec = do
     it "programs" $ do
       let es = [SimpleFunction "foo" [] MuNull, EntryPoint "main" (Application (Reference "foo") [])]
       let code = Sequence es
-      (declarations code) `shouldBe` (zip ["foo", "main"] es)
-
+      (declarations code) `shouldBe` es
+      (declaredIdentifiers code) `shouldBe` ["foo", "main"]

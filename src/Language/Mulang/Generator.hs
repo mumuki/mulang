@@ -1,5 +1,6 @@
 module Language.Mulang.Generator (
   boundDeclarations,
+  declarators,
   declarations,
   declarationsOf,
   declaredIdentifiers,
@@ -19,32 +20,36 @@ import Data.Maybe (mapMaybe)
 import Data.List (nub)
 
 type Generator a = Expression -> [a]
+type Declarator = (Identifier, Expression)
 
 -- | Returns all the declarations their identifiers -
 -- | classes, methods, functions, records, local and global variables, and so on
 -- |
 -- | For example, in 'f x = g x where x = y', it returns '(f, f x = ...)' and '(x, x = y)'
-declarations :: Generator (Identifier, Expression)
-declarations (Sequence es)          = concatMap declarations es
-declarations e@(Attribute n _)      = [(n, e)]
-declarations e@(Class n _ b)        = (n, e) : declarations b
-declarations e@(Clause n _ es)      = (n, e) : concatMap declarations es
-declarations e@(Enumeration n _)    = [(n, e)]
-declarations e@(Interface n _ b)    = (n, e) : declarations b
-declarations e@(EntryPoint n b)     = (n, e) : declarations b
-declarations e@(Subroutine n b)     = (n, e) : concatMap declarations (equationExpressions b)
-declarations e@(Object n b)         = (n, e) : declarations b
-declarations e@(Clause n _ _)       = [(n, e)]
-declarations e@(Record n)           = [(n, e)]
-declarations e@(TypeAlias n _)      = [(n, e)]
-declarations e@(TypeSignature n _)  = [(n, e)]
-declarations e@(Variable n _)       = [(n, e)]
-declarations _                      = []
+declarators :: Generator (Identifier, Expression)
+declarators (Sequence es)          = concatMap declarators es
+declarators e@(Attribute n _)      = [(n, e)]
+declarators e@(Class n _ b)        = (n, e) : declarators b
+declarators e@(Clause n _ es)      = (n, e) : concatMap declarators es
+declarators e@(Enumeration n _)    = [(n, e)]
+declarators e@(Interface n _ b)    = (n, e) : declarators b
+declarators e@(EntryPoint n b)     = (n, e) : declarators b
+declarators e@(Subroutine n b)     = (n, e) : concatMap declarators (equationExpressions b)
+declarators e@(Object n b)         = (n, e) : declarators b
+declarators e@(Clause n _ _)       = [(n, e)]
+declarators e@(Record n)           = [(n, e)]
+declarators e@(TypeAlias n _)      = [(n, e)]
+declarators e@(TypeSignature n _)  = [(n, e)]
+declarators e@(Variable n _)       = [(n, e)]
+declarators _                      = []
+
+declarations :: Generator Expression
+declarations = map snd . declarators
 
 -- | Returns all declarations bound to the given identifier predicate
 -- |
 boundDeclarations :: IdentifierPredicate -> Generator Expression
-boundDeclarations f = map snd . filter (f.fst) . declarations
+boundDeclarations f = map snd . filter (f.fst) . declarators
 
 -- | Returns the given expression and all its subexpressions
 -- For example: in 'f x = x + 1', it returns 'f x = x + 1', 'x + 1', 'x' and '1'
@@ -112,7 +117,7 @@ transitiveReferencedIdentifiers identifier code =  expand (concatMap referencedI
 -- | Returns all the declared identifiers
 -- For example, in 'f x = g x where x = y', it returns 'f' and 'x'
 declaredIdentifiers :: Generator Identifier
-declaredIdentifiers = map fst . declarations
+declaredIdentifiers = map fst . declarators
 
 mainDeclaredIdentifiers :: Generator Identifier
 mainDeclaredIdentifiers (Sequence _) = []
@@ -120,7 +125,7 @@ mainDeclaredIdentifiers expression   = take 1 . declaredIdentifiers $ expression
 
 -- | Returns all the body equations of functions, procedures and methods
 equationBodies :: Generator EquationBody
-equationBodies = concatMap (bodiesOf . snd) . declarations
+equationBodies = concatMap bodiesOf . declarations
   where
     bodiesOf :: Generator EquationBody
     bodiesOf (Subroutine  _ equations) = equationBodies equations
