@@ -295,12 +295,18 @@ spec = do
     it "is False when typed with another type, in java" $ do
       typesReturnAs (named "double") (java "class Foo { int f() { return 4; } }")  `shouldBe` False
 
-  -- typesAs => (TypeSignature _ [] n) | predicate n
-  -- typesReturnAs => (TypeSignature _ _ n) | predicate n
-  -- typesParametersAs => (TypeSignature _ pts _ | predicate . mkSignature $ n
-  -- typesAttributeAs => (Sequence [s, a]) = typesAs p s && declaresAttribute anyone a
-  -- typesVariableAs
-  --
+  describe "typesParameterAs" $ do
+    it "is True when typed, in hs" $ do
+      typesParameterAs (named "Int") (hs "f :: Int -> Bool\nf n = n > 4 ")  `shouldBe` True
+
+    it "is False when not explicitly typed, in hs" $ do
+      typesParameterAs (named "Int") (hs "f n = n > 4 ")  `shouldBe` False
+
+    it "is True when typed, in java" $ do
+      typesParameterAs (named "int") (java "class Foo { bool f(int n) { return n > 4; } }")  `shouldBe` True
+
+    it "is False when typed with another type, in java" $ do
+      typesParameterAs (named "int") (java "class Foo { bool f(double n) { return n > 4; } }")  `shouldBe` False
 
   describe "declaresAttribute" $ do
     it "is True when present" $ do
