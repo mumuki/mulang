@@ -26,6 +26,8 @@ module Language.Mulang.Inspector.Generic (
   containsBoundDeclaration,
   containsBody,
   matchesType,
+  typesReturnAs,
+  typesParameterAs,
   Inspection,
   IdentifierInspection) where
 
@@ -37,6 +39,16 @@ import Data.Maybe (listToMaybe)
 
 type Inspection = Expression  -> Bool
 type IdentifierInspection = IdentifierPredicate -> Inspection
+
+typesReturnAs :: IdentifierInspection
+typesReturnAs predicate = containsDeclaration f
+  where f (TypeSignature _ _ name)  = predicate name
+        f _                         = False
+
+typesParameterAs :: IdentifierInspection
+typesParameterAs predicate = containsDeclaration f
+  where f (TypeSignature _ names _)  = any predicate names
+        f _                          = False
 
 -- | Inspection that tells whether an expression is equal to a given piece of code after being parsed
 parses :: (String -> Expression) -> String -> Inspection
