@@ -1,3 +1,5 @@
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+
 module InspectorSpec (spec) where
 
 import           Test.Hspec
@@ -6,6 +8,12 @@ import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Java (java)
 import           Language.Mulang.Inspector.Generic.Smell
+
+import           Data.Text (Text, unpack)
+import           NeatInterpolation (text)
+
+javaText :: Text -> Expression
+javaText = java . unpack
 
 spec :: Spec
 spec = do
@@ -352,17 +360,69 @@ spec = do
 
   describe "usesDyamicPolymorphism" $ do
     it "is True when uses" $ do
-      usesDyamicPolymorphism (java "class Bird { void sing() {} } class Singer { void sing() {} } class Festival { void run(Object o) { o.sing(); } }") `shouldBe` True
+      usesDyamicPolymorphism (java "class Bird { void sing() {} } class Performer { void sing() {} } class Festival { void run(Object o) { o.sing(); } }") `shouldBe` True
 
     it "is False when there is just one implementor" $ do
       usesDyamicPolymorphism (java "class Bird { void sing() {} } class Festival { void run(Object o) { o.sing(); } }") `shouldBe` False
 
     it "is False when there is no user" $ do
-      usesDyamicPolymorphism (java "class Bird { void sing() {} } class Singer { void sing() {} }") `shouldBe` False
+      usesDyamicPolymorphism (java "class Bird { void sing() {} } class Performer { void sing() {} }") `shouldBe` False
 
     it "is False when not uses" $ do
       usesDyamicPolymorphism (java "class Sample { void aMethod() { throw new Exception(); } }") `shouldBe` False
 
+  describe "usesStaticPolymorphism" $ do
+    it "is True when there is an usage of an interface implemented by two or more classes" $ do
+      usesStaticPolymorphism (javaText [text|
+            interface Singer {
+              void sing();
+            }
+            class Bird implements Singer {
+              void sing() {}
+            }
+            class Performer implements Singer {
+              void sing() {}
+            }
+            class Festival {
+              Singer o;
+              void run() { o.sing(); }
+            }|]) `shouldBe` True
+
+    it "is False when there is an usage of an interface implemented by just one class" $ do
+      usesStaticPolymorphism (javaText [text|
+            interface Singer {
+              void sing();
+            }
+            class Bird implements Singer {
+              void sing() {}
+            }
+            class Festival {
+              void run(Singer o) { o.sing(); }
+            }|]) `shouldBe` False
+
+    it "is False when there is no interace" $ do
+      usesStaticPolymorphism (javaText [text|
+            class Bird {
+              void sing() {}
+            }
+            class Performer {
+              void sing() {}
+            }
+            class Festival {
+              void run(Singer o) { o.sing(); }
+            }|]) `shouldBe` False
+
+    it "is False when there is no usage" $ do
+      usesStaticPolymorphism (javaText [text|
+            interface Singer {
+              void sing();
+            }
+            class Bird implements Singer {
+              void sing() {}
+            }
+            class Performer implements Singer {
+              void sing() {}
+            }|]) `shouldBe` False
 
   describe "rescues" $ do
     it "is True when rescues an expected exception" $ do
