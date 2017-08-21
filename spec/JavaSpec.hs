@@ -26,13 +26,13 @@ spec = do
       run "public interface Foo {}" `shouldBe` Interface "Foo" [] MuNull
 
     it "parses Simple Interface With Messages" $ do
-      run "public interface Foo { void foo(); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" [] "void")
+      run "public interface Foo { void foo(); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" (Just []) "void")
 
     it "parses Simple Interface With Non-Void Messages" $ do
       run "public interface Foo { int foo(); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" [] "int")
 
     it "parses Simple Interface With Messages With Params" $ do
-      run "public interface Foo { void foo(String x, int y); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" ["String", "int"] "void")
+      run "public interface Foo { void foo(String x, int y); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" (Just ["String", "int"]) "void")
 
     it "parses Interface with superinterfaces" $ do
       run "public interface Foo extends Bar, Baz {}" `shouldBe` Interface "Foo" ["Bar", "Baz"] MuNull
