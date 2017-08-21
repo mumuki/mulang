@@ -47,16 +47,18 @@ muDecl e                       = return . debug $ e
 
 muMemberDecl :: MemberDecl -> [Expression]
 muMemberDecl (FieldDecl _ _type varDecls)                            = map (variableToAttribute.muVarDecl) varDecls
-muMemberDecl (MethodDecl _ _ typ name params _ (MethodBody Nothing)) = return $ TypeSignature (i name) (Just $ map muFormalParamType params) (muMaybeType typ)
+muMemberDecl (MethodDecl _ _ typ name params _ (MethodBody Nothing)) = return $ muMethodSignature name params typ
 muMemberDecl (MethodDecl (elem Static -> True) _ Nothing (Ident "main") [_] _ body)
                                                                      = return $ EntryPoint "main" (muMethodBody body)
 muMemberDecl (MethodDecl _ _ _ (Ident "equals") params _ body)       = return $ EqualMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
 muMemberDecl (MethodDecl _ _ _ (Ident "hashCode") params _ body)     = return $ HashMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
-muMemberDecl (MethodDecl _ _ _ name params _ body)                   = return $ SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)
+muMemberDecl (MethodDecl _ _ returnType name params _ body)          = [ muMethodSignature name params returnType,
+                                                                         SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)]
 muMemberDecl e@(ConstructorDecl _ _ _ _params _ _constructorBody)    = return . debug $ e
 muMemberDecl (MemberClassDecl decl)                                  = return $ muClassTypeDecl decl
 muMemberDecl (MemberInterfaceDecl decl)                              = return $ muInterfaceTypeDecl decl
 
+muMethodSignature name params returnType = TypeSignature (i name) (Just $ map muFormalParamType params) (muReturnType returnType)
 muEnumConstant (EnumConstant name _ _) = i name
 
 muFormalParam (FormalParam _ _ _ id)      = VariablePattern (v id)
@@ -73,6 +75,7 @@ muMaybeType (Just typ) = muType typ
 
 muType (PrimType t) = muPrimType t
 muType (RefType t)  = muRefType t
+muReturnType = fromMaybe "void" . fmap muType
 
 muStmt (StmtBlock block)               = muBlock block
 muStmt (IfThen exp ifTrue)             = If (muExp exp) (muStmt ifTrue) MuNull
