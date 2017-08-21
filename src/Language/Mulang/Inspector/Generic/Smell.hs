@@ -18,8 +18,8 @@ module Language.Mulang.Inspector.Generic.Smell (
   overridesEqualOrHashButNotBoth) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Inspector
-import Language.Mulang.Generator(identifierReferences)
+import Language.Mulang.Generator (identifierReferences)
+import Language.Mulang.Inspector.Primitive
 
 -- | Inspection that tells whether an identifier has expressions like 'x == True'
 hasRedundantBooleanComparison :: Inspection
@@ -128,7 +128,7 @@ hasTooManyMethods :: Inspection
 hasTooManyMethods = containsExpression f
   where f (Sequence expressions) = (>15).length.filter isMethod $ expressions
         f _ = False
-        
+
         isMethod (Method _ _) = True
         isMethod _ = False
 
@@ -141,7 +141,7 @@ overridesEqualOrHashButNotBoth = containsExpression f
 
         isEqual (EqualMethod _) = True
         isEqual _ = False
-        
+
         isHash (HashMethod _) = True
         isHash _ = False
 

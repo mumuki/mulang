@@ -9,7 +9,7 @@ module Language.Mulang.Inspector.Combiner (
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (transitiveReferencedIdentifiers, declarationsOf, declaredIdentifiers)
-import Language.Mulang.Inspector.Generic
+import Language.Mulang.Inspector.Primitive
 
 detect :: Inspection -> Expression -> [Identifier]
 detect i expression =
