@@ -29,7 +29,7 @@ spec = do
       run "public interface Foo { void foo(); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" (Just []) "void")
 
     it "parses Simple Interface With Non-Void Messages" $ do
-      run "public interface Foo { int foo(); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" [] "int")
+      run "public interface Foo { int foo(); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" (Just []) "int")
 
     it "parses Simple Interface With Messages With Params" $ do
       run "public interface Foo { void foo(String x, int y); }" `shouldBe` Interface "Foo" [] (TypeSignature "foo" (Just ["String", "int"]) "void")
@@ -41,45 +41,65 @@ spec = do
       run [text|
             class Foo {
                public void hello() {}
-            }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] MuNull)
+            }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                              TypeSignature "hello" (Just []) "void",
+                              (SimpleMethod "hello" [] MuNull)])
 
     it "parses Empty Returns" $ do
         run [text|class Foo {
                public void hello() { return; }
-            }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return MuNull))
+            }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                              TypeSignature "hello" (Just []) "void",
+                              (SimpleMethod "hello" [] (Return MuNull))])
 
     it "parses Strings In Returns" $ do
       run [text|class Foo {
              public String hello() { return "hello"; }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return (MuString "hello")))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                                                TypeSignature "hello" (Just []) "String",
+                                                (SimpleMethod "hello" [] (Return (MuString "hello")))])
 
     it "parses Int In Returns" $ do
       run [text|class Foo {
              public int hello() { return 1; }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return (MuNumber 1)))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just []) "int",
+                          (SimpleMethod "hello" [] (Return (MuNumber 1)))])
+
 
     it "parses Double In Returns" $ do
       run [text|class Foo {
              public double hello() { return 453.2; }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return (MuNumber 453.2)))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just []) "double",
+                          (SimpleMethod "hello" [] (Return (MuNumber 453.2)))])
+
 
     it "parses Bools In Returns" $ do
       run [text|class Foo {
              public boolean hello() { return true; }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return MuTrue))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            TypeSignature "hello" (Just []) "boolean",
+                            (SimpleMethod "hello" [] (Return MuTrue))])
 
     it "parses Negation In Returns" $ do
       run [text|class Foo {
              public boolean hello() { return !true; }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return (SimpleSend MuTrue "!" [])))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just []) "boolean",
+                          (SimpleMethod "hello" [] (Return (SimpleSend MuTrue "!" [])))])
 
     it "parses Chars In Returns" $ do
       run [text|class Foo {
              public char hello() { return 'f'; }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Return (MuString "f")))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just []) "char",
+                          (SimpleMethod "hello" [] (Return (MuString "f")))])
 
     it "parses Parameters" $ do
-      run "public class Foo extends Bar { int succ(int y) {} }" `shouldBe` Class "Foo" (Just "Bar") (SimpleMethod "succ" [VariablePattern "y"] MuNull)
+      run "public class Foo extends Bar { int succ(int y) {} }" `shouldBe` Class "Foo" (Just "Bar") (Sequence [
+                                                                              TypeSignature "succ" (Just ["int"]) "int",
+                                                                              (SimpleMethod "succ" [VariablePattern "y"] MuNull)])
 
     it "parses Enums" $ do
       run "public enum Foo { A, B }" `shouldBe` Enumeration "Foo" ["A", "B"]
@@ -94,43 +114,58 @@ spec = do
       run [text|
           class Foo {
              public void hello() { int x = 1; }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Variable "x" (MuNumber 1)))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            TypeSignature "hello" (Just []) "void",
+                            (SimpleMethod "hello" [] (Variable "x" (MuNumber 1)))])
 
     it "parses Variables And Ints" $ do
       run [text|
           class Foo {
              public void hello() { Foo x = this; }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Variable "x" Self))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                           TypeSignature "hello" (Just []) "void",
+                           (SimpleMethod "hello" [] (Variable "x" Self))])
 
     it "parses Variables And ternaries" $ do
       run [text|
           class Foo {
              public void hello() { Foo x = true ? this : this; }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Variable "x" (If MuTrue Self Self)))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            TypeSignature "hello" (Just []) "void",
+                            (SimpleMethod "hello" [] (Variable "x" (If MuTrue Self Self)))])
 
     it "parses Variables without initialization" $ do
       run [text|
           class Foo {
              public void hello() { int x; }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (Variable "x" MuNull))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            TypeSignature "hello" (Just []) "void",
+                            (SimpleMethod "hello" [] (Variable "x" MuNull))])
+
 
     it "parses self-send" $ do
       run [text|
           class Foo {
              public void hello() { f(); }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (SimpleSend Self "f" []))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            TypeSignature "hello" (Just []) "void",
+                            (SimpleMethod "hello" [] (SimpleSend Self "f" []))])
 
     it "parses self-send" $ do
       run [text|
           class Foo {
              public void hello() { f(2); }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (SimpleSend Self "f" [MuNumber 2]))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            TypeSignature "hello" (Just []) "void",
+                            (SimpleMethod "hello" [] (SimpleSend Self "f" [MuNumber 2]))])
 
     it "parses explict self-send" $ do
       run [text|
           class Foo {
              public void hello() { this.f(); }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (SimpleSend Self "f" []))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just []) "void",
+                          (SimpleMethod "hello" [] (SimpleSend Self "f" []))])
 
     it "parses nested send" $ do
       run [text|
@@ -138,73 +173,91 @@ spec = do
             void foo() {
               System.err.println("hello");
             }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "foo" [] (SimpleSend  (Reference "System.err") "println" [MuString "hello"]))
-
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            TypeSignature "foo" (Just []) "void",
+                            (SimpleMethod "foo" [] (SimpleSend  (Reference "System.err") "println" [MuString "hello"]))])
 
     it "parses argument-send" $ do
       run [text|
           class Foo {
              public void hello(String g) { g.toString(); }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [VariablePattern "g"] (SimpleSend (Reference "g") "toString" []))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just ["String"]) "void",
+                          (SimpleMethod "hello" [VariablePattern "g"] (SimpleSend (Reference "g") "toString" []))])
+
 
     it "parses expression-send" $ do
       run [text|
           class Foo {
              public void hello(String g) { g.size().toString(); }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [VariablePattern "g"] (SimpleSend (SimpleSend (Reference "g") "size" []) "toString" []))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just ["String"]) "void",
+                          (SimpleMethod "hello" [VariablePattern "g"] (SimpleSend (SimpleSend (Reference "g") "size" []) "toString" []))])
 
 
     it "parses Ifs with empty braces" $ do
       run [text|
           class Foo {
              public void hello() { if (true) { } }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (If MuTrue MuNull MuNull))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just []) "void",
+                          (SimpleMethod "hello" [] (If MuTrue MuNull MuNull))])
 
     it "parses Ifs with return in braces" $ do
       run [text|
           class Foo {
              public void hello() { if (true) { return true; } else { return false; } }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (If MuTrue (Return MuTrue) (Return MuFalse)))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just []) "void",
+                          (SimpleMethod "hello" [] (If MuTrue (Return MuTrue) (Return MuFalse)))])
 
     it "parses Ifs with equal comparisons on conditions" $ do
       run [text|
           class Foo {
              public void hello(String x) { if (x == "foo") { } }
-          }|] `shouldBe` Class "Foo" Nothing (
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                           TypeSignature "hello" (Just ["String"]) "void",
                            SimpleMethod "hello" [VariablePattern "x"] (
                              If (Send (Reference "x") Equal [MuString "foo"])
                               MuNull
-                              MuNull))
+                              MuNull)])
 
     it "parses Ifs with not-equal comparisons on conditions" $ do
       run [text|
           class Foo {
              public void hello(String x) { if (x != "foo") { } }
-          }|] `shouldBe` Class "Foo" Nothing (
-                           SimpleMethod "hello" [VariablePattern "x"] (
-                             If (Send (Reference "x") NotEqual [MuString "foo"])
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            TypeSignature "hello" (Just ["String"]) "void",
+                            (SimpleMethod "hello" [VariablePattern "x"] (
+                            If (Send (Reference "x") NotEqual [MuString "foo"])
                               MuNull
-                              MuNull))
+                              MuNull))])
 
     it "parsesAssignmentsAndDoubles" $ do
       run [text|class Foo {
              public void hello() { double m = 1.0; m = 3.4; }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
-                           Sequence [
-                             Variable "m" (MuNumber 1.0),
-                             Assignment "m" (MuNumber 3.4)]))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            TypeSignature "hello" (Just []) "void",
+                            (SimpleMethod "hello" [] (
+                                                     Sequence [
+                                                       Variable "m" (MuNumber 1.0),
+                                                       Assignment "m" (MuNumber 3.4)]))])
 
     it "parses Lambdas" $ do
       run [text|class Foo {
              public Object hello() { return (int x) -> x + 1; }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
-                           Return (Lambda [VariablePattern "x"] (SimpleSend (Reference "x") "+" [MuNumber 1]))))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            TypeSignature "hello" (Just []) "Object",
+                            (SimpleMethod "hello" [] (
+                            Return (Lambda [VariablePattern "x"] (SimpleSend (Reference "x") "+" [MuNumber 1]))))])
 
     it "parses News" $ do
       run [text|class Foo {
              public Foo hello() { return new Bar(3); }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
-                           Return (New "Bar" [MuNumber 3])))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just []) "Foo",
+                          SimpleMethod "hello" [] (
+                           Return (New "Bar" [MuNumber 3]))])
 
     it "parses switch with default" $ do
       run [text|class Foo {
@@ -214,8 +267,10 @@ spec = do
                 default: return 3;
               }
             }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
-                           Switch (Reference "a") [(MuNumber 1, Return (MuNumber 1))] (Return (MuNumber 3.0))))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just []) "Foo",
+                          SimpleMethod "hello" [] (
+                           Switch (Reference "a") [(MuNumber 1, Return (MuNumber 1))] (Return (MuNumber 3.0)))])
 
     it "parses switch with no default" $ do
       run [text|class Foo {
@@ -225,13 +280,17 @@ spec = do
                 case 2: return 2;
               }
             }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
-                           Switch (Reference "a") [(MuNumber 1,Return (MuNumber 1)), (MuNumber 2, Return (MuNumber 2))] MuNull))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just []) "Foo",
+                          SimpleMethod "hello" [] (
+                           Switch (Reference "a") [(MuNumber 1,Return (MuNumber 1)), (MuNumber 2, Return (MuNumber 2))] MuNull)])
 
     it "parses for" $ do
       run [text|class Foo {
             public Foo hello() { 
               for(int i : ints) a();
             }
-          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] 
-            (For [Generator (VariablePattern "i") (Reference "ints")] (Send Self (Reference "a") [])))
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just []) "Foo",
+                          SimpleMethod "hello" [] 
+                            (For [Generator (VariablePattern "i") (Reference "ints")] (Send Self (Reference "a") []))])
