@@ -28,6 +28,7 @@ module Language.Mulang.Inspector.Generic (
   matchesType,
   typesReturnAs,
   typesParameterAs,
+  typesAs,
   Inspection,
   IdentifierInspection) where
 
@@ -42,13 +43,18 @@ type IdentifierInspection = IdentifierPredicate -> Inspection
 
 typesReturnAs :: IdentifierInspection
 typesReturnAs predicate = containsDeclaration f
-  where f (TypeSignature _ _ name)  = predicate name
-        f _                         = False
+  where f (TypeSignature _ (Just _) name)  = predicate name
+        f _                                = False
 
 typesParameterAs :: IdentifierInspection
 typesParameterAs predicate = containsDeclaration f
-  where f (TypeSignature _ names _)  = any predicate names
-        f _                          = False
+  where f (TypeSignature _ (Just names) _)  = any predicate names
+        f _                                 = False
+
+typesAs :: IdentifierInspection
+typesAs predicate = containsDeclaration f
+  where f (TypeSignature _ Nothing name) = predicate name
+        f _                              = False
 
 -- | Inspection that tells whether an expression is equal to a given piece of code after being parsed
 parses :: (String -> Expression) -> String -> Inspection

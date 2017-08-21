@@ -63,7 +63,7 @@ data Expression
     | Record Identifier
     -- ^ Imperative / Functional programming struct declaration.
     --   Only the record name is parsed
-    | TypeSignature Identifier [Identifier] Identifier
+    | TypeSignature Identifier (Maybe [Identifier]) Identifier
     -- ^ Generic type signature for a computation,
     --   composed by a name, parameter types and return type
     | EntryPoint Identifier Expression

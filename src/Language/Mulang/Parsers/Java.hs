@@ -47,7 +47,7 @@ muDecl e                       = return . debug $ e
 
 muMemberDecl :: MemberDecl -> [Expression]
 muMemberDecl (FieldDecl _ _type varDecls)                            = map (variableToAttribute.muVarDecl) varDecls
-muMemberDecl (MethodDecl _ _ typ name params _ (MethodBody Nothing)) = return $ TypeSignature (i name) (map muFormalParamType params) (muMaybeType typ)
+muMemberDecl (MethodDecl _ _ typ name params _ (MethodBody Nothing)) = return $ TypeSignature (i name) (Just $ map muFormalParamType params) (muMaybeType typ)
 muMemberDecl (MethodDecl (elem Static -> True) _ Nothing (Ident "main") [_] _ body)
                                                                      = return $ EntryPoint "main" (muMethodBody body)
 muMemberDecl (MethodDecl _ _ _ (Ident "equals") params _ body)       = return $ EqualMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
