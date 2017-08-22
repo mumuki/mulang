@@ -14,10 +14,9 @@ module Language.Mulang.Signature (
   Signature(..),
   SignatureStyle) where
 
-import Language.Mulang.Unfold (mainExpressions)
 import Language.Mulang.Identifier
 import Language.Mulang.Ast
-import Language.Mulang.Explorer (declarationsOf)
+import Language.Mulang.Generator (declarations)
 
 import Data.List (transpose, intercalate, nub, groupBy)
 import Data.Maybe (fromMaybe, mapMaybe)
@@ -50,7 +49,7 @@ parameterNames (TypedSignature _ types _) = map (const Nothing) types
 parameterNames (NamedSignature _ names)   = names
 
 signaturesOf :: Expression -> [Signature]
-signaturesOf = nub . mapMaybe (signatureOf.snd) . declarationsOf mainExpressions
+signaturesOf = nub . mapMaybe (signatureOf.snd) . declarations
 
 signatureOf :: Expression -> Maybe Signature
 signatureOf (Subroutine name es)          = Just $ NamedSignature name (parameterNamesOf es)

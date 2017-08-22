@@ -16,12 +16,12 @@ import Language.Mulang.Inspector.Generic
 import Language.Mulang.Inspector.Combiner
 
 declaresFact :: IdentifierPredicate -> Inspection
-declaresFact = containsDeclaration f
+declaresFact = containsBoundDeclaration f
   where f (Fact _ _) = True
         f _          = False
 
 declaresRule :: IdentifierPredicate -> Inspection
-declaresRule = containsDeclaration f
+declaresRule = containsBoundDeclaration f
   where f (Rule _ _ _) = True
         f _            = False
 

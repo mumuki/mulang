@@ -36,8 +36,7 @@ library
     Language.Mulang.Ast
     Language.Mulang.Identifier
     Language.Mulang.Builder
-    Language.Mulang.Unfold
-    Language.Mulang.Explorer
+    Language.Mulang.Generator
     Language.Mulang.Signature
     Language.Mulang.DomainLanguage
     Language.Mulang.Inspector

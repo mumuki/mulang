@@ -49,10 +49,10 @@ unsupported :: Detection
 unsupported _ _ = []
 
 simple :: Inspection -> Detection
-simple inspection _ = detectAll inspection
+simple inspection _ = detect inspection
 
 withLanguage :: (DomainLanguage -> Inspection) -> Detection
-withLanguage inspection language = detect mainExpressions (inspection language)
+withLanguage inspection language = detect (inspection language)
 
 exectationFor :: Smell -> Identifier -> Expectation
 exectationFor smell identifier = Expectation identifier (show smell)

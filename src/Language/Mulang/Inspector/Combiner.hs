@@ -1,6 +1,5 @@
 module Language.Mulang.Inspector.Combiner (
   detect,
-  detectAll,
   negative,
   alternative,
   scoped,
@@ -9,17 +8,13 @@ module Language.Mulang.Inspector.Combiner (
   transitiveList) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Unfold (Unfold, allExpressions)
+import Language.Mulang.Generator (transitiveReferencedIdentifiers, declarationsOf, declaredIdentifiers)
 import Language.Mulang.Inspector.Generic
-import Language.Mulang.Explorer
 
-detectAll :: Inspection -> Expression -> [Identifier]
-detectAll = detect allExpressions
-
-detect :: Unfold -> Inspection -> Expression -> [Identifier]
-detect unfold i expression = filter (`inspection` expression) $ declaredIdentifiersOf unfold expression
-                              where inspection = scoped i
-
+detect :: Inspection -> Expression -> [Identifier]
+detect i expression =
+  filter (`inspection` expression) $ declaredIdentifiers expression
+    where inspection = scoped i
 
 alternative :: Inspection -> Inspection -> Inspection
 alternative i1 i2 expression = i1 expression || i2 expression
@@ -28,13 +23,13 @@ negative :: Inspection -> Inspection
 negative f = not . f
 
 scoped :: Inspection -> Identifier -> Inspection
-scoped inspection scope =  any inspection . boundDeclarationsOf scope
+scoped inspection scope =  any inspection . declarationsOf scope
 
 scopedList :: Inspection -> [Identifier] -> Inspection
 scopedList i =  foldl scoped i . reverse
 
 transitive :: Inspection -> Identifier -> Inspection
-transitive inspection identifier code = any (`scopedInspection` code) . transitiveReferencedIdentifiersOf identifier $ code
+transitive inspection identifier code = any (`scopedInspection` code) . transitiveReferencedIdentifiers identifier $ code
   where scopedInspection = scoped inspection
 
 transitiveList :: Inspection -> [Identifier] -> Inspection
