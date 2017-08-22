@@ -1,13 +1,13 @@
 module Language.Mulang.DomainLanguage (
-  hasTooShortBindings,
-  hasWrongCaseBindings,
-  hasMisspelledBindings,
+  hasTooShortIdentifiers,
+  hasWrongCaseIdentifiers,
+  hasMisspelledIdentifiers,
   DomainLanguage(..)) where
 
 import Language.Mulang.Unfold (mainExpressions)
 import Language.Mulang.Inspector (Inspection)
 import Language.Mulang.Ast (Expression)
-import Language.Mulang.Explorer (declaredBindingsOf)
+import Language.Mulang.Explorer (declaredIdentifiersOf)
 
 import Text.Dictionary (Dictionary, exists)
 
@@ -17,30 +17,30 @@ import Text.Inflections.Tokenizer (CaseStyle, tokenize, canTokenize)
 data DomainLanguage = DomainLanguage {
                           dictionary :: Dictionary,
                           caseStyle :: CaseStyle,
-                          minimumBindingSize :: Int,
+                          minimumIdentifierSize :: Int,
                           jargon :: [String] }
 
 type DomainLanguageInspection = DomainLanguage -> Inspection
 
-hasTooShortBindings :: DomainLanguageInspection
-hasTooShortBindings language = any isShort . mainDeclaredBindingsOf
-  where isShort binding = length binding < (minimumBindingSize language) && notJargonOf binding language
+hasTooShortIdentifiers :: DomainLanguageInspection
+hasTooShortIdentifiers language = any isShort . mainDeclaredIdentifiersOf
+  where isShort identifier = length identifier < (minimumIdentifierSize language) && notJargonOf identifier language
 
-hasMisspelledBindings :: DomainLanguageInspection
-hasMisspelledBindings language | emptyDictionary language = const False
-hasMisspelledBindings language = any isMisspelled  . wordsOf language
-  where isMisspelled binding = not (binding `exists` dictionary language) && notJargonOf binding language
+hasMisspelledIdentifiers :: DomainLanguageInspection
+hasMisspelledIdentifiers language | emptyDictionary language = const False
+hasMisspelledIdentifiers language = any isMisspelled  . wordsOf language
+  where isMisspelled identifier = not (identifier `exists` dictionary language) && notJargonOf identifier language
 
-hasWrongCaseBindings :: DomainLanguageInspection
-hasWrongCaseBindings (DomainLanguage _ style _ _)
-  = any (not . canTokenize style) . mainDeclaredBindingsOf
+hasWrongCaseIdentifiers :: DomainLanguageInspection
+hasWrongCaseIdentifiers (DomainLanguage _ style _ _)
+  = any (not . canTokenize style) . mainDeclaredIdentifiersOf
 
 wordsOf :: DomainLanguage -> Expression -> [String]
-wordsOf (DomainLanguage _ style _ _) = concatMap (tokenize style) . mainDeclaredBindingsOf
+wordsOf (DomainLanguage _ style _ _) = concatMap (tokenize style) . mainDeclaredIdentifiersOf
 
 
-mainDeclaredBindingsOf = declaredBindingsOf mainExpressions
+mainDeclaredIdentifiersOf = declaredIdentifiersOf mainExpressions
 
 emptyDictionary = null . dictionary
 
-notJargonOf binding language = notElem binding (jargon language)
+notJargonOf identifier language = notElem identifier (jargon language)

@@ -35,7 +35,7 @@ spec = describe "AnalysisJson" $ do
    "spec" : {
       "expectations" : [
          {
-            "binding" : "Intransitive:x",
+            "scope" : "Intransitive:x",
             "inspection" : "Uses:*"
          }
       ],
@@ -58,7 +58,7 @@ spec = describe "AnalysisJson" $ do
       "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
-            "binding" : "x",
+            "scope" : "x",
             "inspection" : "Declares"
          }
       ]
@@ -189,7 +189,7 @@ spec = describe "AnalysisJson" $ do
 
     run json `shouldBe` analysis
 
-  it "works with caseStyle and minimumBindingSize" $ do
+  it "works with caseStyle and minimumIdentifierSize" $ do
     let json = [text|
 {
    "sample" : {
@@ -202,7 +202,7 @@ spec = describe "AnalysisJson" $ do
       "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : {
          "caseStyle" : "SnakeCase",
-         "minimumBindingSize" : 4,
+         "minimumIdentifierSize" : 4,
          "jargon" : ["id"]
       }
    }
@@ -212,7 +212,7 @@ spec = describe "AnalysisJson" $ do
                               smellsSet = allSmells,
                               domainLanguage = Just emptyDomainLanguage {
                                 caseStyle = Just SnakeCase,
-                                minimumBindingSize = Just 4,
+                                minimumIdentifierSize = Just 4,
                                 jargon = Just ["id"] } })
 
     run json `shouldBe` analysis

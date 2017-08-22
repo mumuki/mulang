@@ -9,7 +9,7 @@ import           Language.Mulang.Parsers.Java
 
 spec :: Spec
 spec = do
-  let run code binding inspection = compileExpectation (Expectation binding inspection) code
+  let run code scope inspection = compileExpectation (Expectation scope inspection) code
 
   it "works with DeclaresEntryPoint" $ do
     run (hs "f x = 2") "*" "DeclaresEntryPoint" `shouldBe` False
@@ -41,30 +41,30 @@ spec = do
     run (js "var pepita = {volar:function(){}}") "pepita" "DeclaresMethod:volar" `shouldBe` True
     run (js "var pepita = {volar:function(){}}") "pepita" "DeclaresMethod:cantar" `shouldBe` False
 
-  it "works with DeclaresMethod with scopde binding" $ do
+  it "works with DeclaresMethod with scope" $ do
     run (js "var pepita = {volar:function(){}}") "pepita.volar" "DeclaresMethod" `shouldBe` False
     run (js "var pepita = {volar:function(){}}") "Intransitive:pepita.volar" "DeclaresMethod:^volar" `shouldBe` False
     run (js "var pepita = {volar:function(){}}") "pepita.cantar" "DeclaresMethod" `shouldBe` False
 
-  it "works with DeclaresFunction with empty binding and empty object" $ do
+  it "works with DeclaresFunction in any scope and empty target" $ do
     run (hs "f x = 2") "*" "DeclaresFunction" `shouldBe` True
 
-  it "works with DeclaresFunction with empty binding and explicitly anyone object" $ do
+  it "works with DeclaresFunction in any scope and explicitly anyone target" $ do
     run (hs "f x = 2") "*" "DeclaresFunction:*" `shouldBe` True
 
-  it "works with DeclaresFunction with non-empty binding and empty object" $ do
+  it "works with DeclaresFunction with non-empty scope and empty target" $ do
     run (hs "f x = 2") "f" "DeclaresFunction:^f" `shouldBe` False
     run (hs "f x = 2") "g" "DeclaresFunction:^f" `shouldBe` False
 
-  it "works with DeclaresFunction with empty binding and non-empty object" $ do
+  it "works with DeclaresFunction in any scope and non-empty target" $ do
     run (hs "f x = 2") "*" "DeclaresFunction:f" `shouldBe` True
     run (hs "f x = 2") "*" "DeclaresFunction:g" `shouldBe` False
 
-  it "works with DeclaresFunction with empty binding and explicitly equal object" $ do
+  it "works with DeclaresFunction in any scope and explicitly equal target" $ do
     run (hs "f x = 2") "*" "DeclaresFunction:=f" `shouldBe` True
     run (hs "f x = 2") "*" "DeclaresFunction:=g" `shouldBe` False
 
-  it "works with DeclaresFunction with empty binding and explicitly like object" $ do
+  it "works with DeclaresFunction in any scope and explicitly like target" $ do
     run (hs "foo x = 2") "*" "DeclaresFunction:~fo" `shouldBe` True
     run (hs "foo x = 2") "*" "DeclaresFunction:~go" `shouldBe` False
 
@@ -100,7 +100,7 @@ spec = do
     run (hs "f x = 2") "*" "UsesPatternMatching" `shouldBe` False
     run (hs "f [] = 2\nf _ = 3") "*" "UsesPatternMatching" `shouldBe` True
 
-  it "works with UsesPatternMatching, with binding" $ do
+  it "works with UsesPatternMatching, with scope" $ do
     run (hs "f x = 2") "f" "UsesPatternMatching" `shouldBe` False
     run (hs "f [] = 2\nf _ = 3") "f" "UsesPatternMatching" `shouldBe` True
 

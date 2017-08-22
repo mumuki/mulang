@@ -23,7 +23,7 @@ $ ghci
 > let e = js "var pepita = {lugar: bsAs1, peso: 20}; var bsAs1 = bsAs"
 ```
 
-Now the magic begins. We want to know if the code expression uses a certain binding - that could be a variable, function, or anything that has a name:
+Now the magic begins. We want to know if the code expression uses a certain identifier - that could be a variable, function, or anything that has a name:
 
 ```haskell
 > uses (named "bsAs") e
@@ -39,7 +39,7 @@ That _seems_ easy, but just in case you are wondering: no, Mulang doesn't perfor
 False
 ```
 
-So let's ask something more interesting - does `bsAs1` use the binding `bsAs`?
+So let's ask something more interesting - does `bsAs1` use the identifier `bsAs`?
 
 ```haskell
 > scoped (uses (named "bsAs")) "bsAs1"  e
@@ -87,7 +87,7 @@ True
 False
 ```
 
-Nice, we know. But not very awesome, it only can tell you if you are using a _binding_, right? Eeer. Good news, it can tell you much much much more things:
+Nice, we know. But not very awesome, it only can tell you if you are using a _identifier_, right? Eeer. Good news, it can tell you much much much more things:
 
 1. `assigns`: **any paradigm** is the given variable or attribute assigned?
 1. `declares`: **any paradigm** is the given element declared?
@@ -116,7 +116,7 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `doesTypeTest`
 1. `hasAssignmentReturn`
 1. `hasCodeDuplication`: **any paradigm** has the given code simple literal code duplication?
-1. `hasMisspelledBindings`: **any paradigm** a binding is not a domain language dictionary's word and not part of its jargon
+1. `hasMisspelledIdentifiers`: **any paradigm** an identifier is not a domain language dictionary's word and not part of its jargon
 1. `hasRedundantBooleanComparison`
 1. `hasRedundantGuards`
 1. `hasRedundantIf`: **any paradigm** can a combination of `if`s, `assignment`s and `return`s be replaced by a boolean expression?
@@ -124,8 +124,8 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _bi
 1. `hasRedundantLocalVariableReturn`
 1. `hasRedundantParameter`
 1. `hasRedundantReduction`: **logic paradigm** is a is-operator used to unify individuals that don't require a reduction, like `X is 4`
-1. `hasTooShortBindings`: **any paradigm** whether a binding is too short and not part of domain language's jargon
-1. `hasWrongCaseBindings`: **any paradigm** whether a binding does not match the domain language's case style
+1. `hasTooShortIdentifiers`: **any paradigm** whether an identifier is too short and not part of domain language's jargon
+1. `hasWrongCaseIdentifiers`: **any paradigm** whether an identifier does not match the domain language's case style
 1. `implements`: **object oriented paradigm** is the given interface implemented?
 1. `includes`: **object oriented paradigm** is a given mixins included?
 1. `inherits`: **object oriented paradigm** is a given class declared as superclass? - alias of `declaresSuperclass`
@@ -254,7 +254,7 @@ $ mulang '
    "spec" : {
       "expectations" : [
          {
-            "binding" : ":Intransitive:x",
+            "scope" : ":Intransitive:x",
             "inspection" : "Uses:*"
          }
       ],
@@ -266,7 +266,7 @@ $ mulang '
    "expectationResults" : [
       {
          "expectation" : {
-            "binding" : ":Intransitive:x",
+            "scope" : ":Intransitive:x",
             "inspection" : "Uses:*"
          },
          "result" : false
@@ -278,7 +278,7 @@ $ mulang '
 }
 ```
 
-### With Transitive expectations
+### With unscoped expectations
 
 ```bash
 $ mulang '
@@ -292,8 +292,8 @@ $ mulang '
       "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
-            "binding" : "x",
-            "inspection" : "HasBinding"
+            "scope" : "*",
+            "inspection" : "Declares:x"
          }
       ]
    }
@@ -306,8 +306,8 @@ $ mulang '
       {
          "result" : true,
          "expectation" : {
-            "binding" : "x",
-            "inspection" : "HasBinding"
+            "scope" : "*",
+            "inspection" : "Declares:x"
          }
       }
    ],
@@ -454,7 +454,7 @@ $ mulang '
    ],
    "smells" : [
       {
-         "binding" : "foo",
+         "scope" : "foo",
          "inspection" : "ReturnsNull"
       }
    ]
@@ -524,19 +524,19 @@ $ mulang '
    "signatures" : [],
    "smells" : [
       {
-         "inspection" : "HasTooShortBindings",
-         "binding" : "son"
+         "inspection" : "HasTooShortIdentifiers",
+         "scope" : "son"
       },
       {
-         "binding" : "parentOf",
-         "inspection" : "HasWrongCaseBindings"
+         "scope" : "parentOf",
+         "inspection" : "HasWrongCaseIdentifiers"
       }
    ],
    "expectationResults" : []
 }
 ```
 
-Also, if you want to use `HasMisspelledBindings` smell, you _need_ to specify a dictionary - with must be ordered, downcased and with unique words only:
+Also, if you want to use `HasMisspelledIdentifiers` smell, you _need_ to specify a dictionary - with must be ordered, downcased and with unique words only:
 
 ```bash
 $ mulang  '
@@ -559,11 +559,11 @@ $ mulang  '
    "smells" : [
       {
          "inspection" : "ReturnsNull",
-         "binding" : "foo"
+         "scope" : "foo"
       },
       {
-         "inspection" : "HasMisspelledBindings",
-         "binding" : "foo"
+         "inspection" : "HasMisspelledIdentifiers",
+         "scope" : "foo"
       }
    ]
 }

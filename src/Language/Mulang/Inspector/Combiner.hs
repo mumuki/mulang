@@ -10,15 +10,14 @@ module Language.Mulang.Inspector.Combiner (
 
 import Language.Mulang.Ast
 import Language.Mulang.Unfold (Unfold, allExpressions)
-import Language.Mulang.Binding
 import Language.Mulang.Inspector.Generic
 import Language.Mulang.Explorer
 
-detectAll :: Inspection -> Expression -> [Binding]
+detectAll :: Inspection -> Expression -> [Identifier]
 detectAll = detect allExpressions
 
-detect :: Unfold -> Inspection -> Expression -> [Binding]
-detect unfold i expression = filter (`inspection` expression) $ declaredBindingsOf unfold expression
+detect :: Unfold -> Inspection -> Expression -> [Identifier]
+detect unfold i expression = filter (`inspection` expression) $ declaredIdentifiersOf unfold expression
                               where inspection = scoped i
 
 
@@ -28,15 +27,15 @@ alternative i1 i2 expression = i1 expression || i2 expression
 negative :: Inspection -> Inspection
 negative f = not . f
 
-scoped :: Inspection -> Binding -> Inspection
-scoped inspection scope =  any inspection . bindedDeclarationsOf scope
+scoped :: Inspection -> Identifier -> Inspection
+scoped inspection scope =  any inspection . boundDeclarationsOf scope
 
-scopedList :: Inspection -> [Binding] -> Inspection
+scopedList :: Inspection -> [Identifier] -> Inspection
 scopedList i =  foldl scoped i . reverse
 
-transitive :: Inspection -> Binding -> Inspection
-transitive inspection binding code = any (`scopedInspection` code) . transitiveReferencedBindingsOf binding $ code
+transitive :: Inspection -> Identifier -> Inspection
+transitive inspection identifier code = any (`scopedInspection` code) . transitiveReferencedIdentifiersOf identifier $ code
   where scopedInspection = scoped inspection
 
-transitiveList :: Inspection -> [Binding] -> Inspection
-transitiveList i bindings = transitive (scopedList i (init bindings)) (last bindings)
+transitiveList :: Inspection -> [Identifier] -> Inspection
+transitiveList i identifiers = transitive (scopedList i (init identifiers)) (last identifiers)

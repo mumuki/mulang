@@ -1,7 +1,7 @@
 module DomainLanguageSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.DomainLanguage (DomainLanguage(..), hasMisspelledBindings, hasTooShortBindings, hasWrongCaseBindings)
+import           Language.Mulang.DomainLanguage (DomainLanguage(..), hasMisspelledIdentifiers, hasTooShortIdentifiers, hasWrongCaseIdentifiers)
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)
 import           Text.Dictionary (toDictionary)
@@ -13,16 +13,16 @@ spec = do
   let jargon  = ["ui", "js"]
   let language = DomainLanguage english camelCase 3 jargon
 
-  describe "hasTooShortBindings" $ do
-    let run = hasTooShortBindings language
+  describe "hasTooShortIdentifiers" $ do
+    let run = hasTooShortIdentifiers language
 
-    it "is True when it is a one-char binding" $ do
+    it "is True when it is a one-char identifier" $ do
       run (hs "x = True") `shouldBe` True
 
-    it "is True when it is a two-chars binding" $ do
+    it "is True when it is a two-chars identifier" $ do
       run (hs "xy = True") `shouldBe` True
 
-    it "is False when it is a three-chars binding" $ do
+    it "is False when it is a three-chars identifier" $ do
       run (hs "zip = []") `shouldBe` False
 
     it "is False when it contains a short parameter name"  $ do
@@ -49,17 +49,17 @@ spec = do
     it "is False when it is jargon" $ do
       run (hs "ui = False") `shouldBe` False
 
-  describe "hasWrongCaseBindings" $ do
-    let run = hasWrongCaseBindings language
+  describe "hasWrongCaseIdentifiers" $ do
+    let run = hasWrongCaseIdentifiers language
 
-    it "is True when there are snake case binding on a camel case language" $ do
+    it "is True when there are snake case identifier on a camel case language" $ do
       run (js "var a_day = 'monday'") `shouldBe` True
 
-    it "is False when there are only camel case binding on a camel case language" $ do
+    it "is False when there are only camel case identifier on a camel case language" $ do
       run (js "var aDay = 'monday'") `shouldBe` False
 
-  describe "hasMisspelledBindings" $ do
-    let run = hasMisspelledBindings language
+  describe "hasMisspelledIdentifiers" $ do
+    let run = hasMisspelledIdentifiers language
 
     it "is False when it is a single, well written token" $ do
       run (hs "today = True") `shouldBe` False

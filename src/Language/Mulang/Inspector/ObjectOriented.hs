@@ -14,25 +14,25 @@ module Language.Mulang.Inspector.ObjectOriented (
   declaresMethod)  where
 
 import Language.Mulang.Ast
-import Language.Mulang.Binding
+import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Generic
 
-implements :: BindedInspection
+implements :: IdentifierInspection
 implements predicate = containsExpression f
   where f (Implement name) = predicate name
         f _                = False
 
-includes :: BindedInspection
+includes :: IdentifierInspection
 includes predicate = containsExpression f
   where f (Include name) = predicate name
         f _              = False
 
-inherits :: BindedInspection
+inherits :: IdentifierInspection
 inherits predicate = containsExpression f
   where f (Class _ (Just name) _) = predicate name
         f _                       = False
 
-instantiates :: BindedInspection
+instantiates :: IdentifierInspection
 instantiates predicate = containsExpression f
   where f (New name _) = predicate name
         f _            = False
@@ -43,35 +43,35 @@ usesInheritance = declaresSuperclass anyone
 usesMixins :: Inspection
 usesMixins = includes anyone
 
-declaresObject :: BindedInspection
+declaresObject :: IdentifierInspection
 declaresObject =  containsDeclaration f
   where f (Object _ _) = True
         f _            = False
 
-declaresSuperclass :: BindedInspection
+declaresSuperclass :: IdentifierInspection
 declaresSuperclass = inherits
 
-declaresClass :: BindedInspection
+declaresClass :: IdentifierInspection
 declaresClass =  containsDeclaration f
   where f (Class _ _ _) = True
         f _             = False
 
-declaresEnumeration :: BindedInspection
+declaresEnumeration :: IdentifierInspection
 declaresEnumeration =  containsDeclaration f
   where f (Enumeration _ _) = True
         f _                 = False
 
-declaresInterface :: BindedInspection
+declaresInterface :: IdentifierInspection
 declaresInterface =  containsDeclaration f
   where f (Interface _ _ _) = True
         f _                 = False
 
-declaresAttribute :: BindedInspection
+declaresAttribute :: IdentifierInspection
 declaresAttribute =  containsDeclaration f
   where f (Attribute _ _) = True
         f _               = False
 
-declaresMethod :: BindedInspection
+declaresMethod :: IdentifierInspection
 declaresMethod =  containsDeclaration f
   where f (Method _ _) = True
         f _            = False

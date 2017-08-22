@@ -5,10 +5,10 @@ module Language.Mulang.Inspector.Procedural (
   declaresProcedure) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Binding
+import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Generic
 
-declaresProcedure :: BindingPredicate -> Inspection
+declaresProcedure :: IdentifierPredicate -> Inspection
 declaresProcedure = containsDeclaration f
   where f (Procedure _ _) = True
         f _                          = False

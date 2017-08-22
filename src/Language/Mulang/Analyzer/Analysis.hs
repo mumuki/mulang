@@ -28,7 +28,7 @@ import Language.Mulang.Ast
 type Inspection = String
 
 data Expectation
-  = Expectation { binding :: String, inspection :: Inspection } deriving (Show, Eq, Generic)
+  = Expectation { scope :: String, inspection :: Inspection } deriving (Show, Eq, Generic)
 
 --
 -- Analysis input structures
@@ -50,7 +50,7 @@ data DomainLanguage
   = DomainLanguage {
       dictionaryFilePath :: Maybe FilePath,
       caseStyle :: Maybe CaseStyle,
-      minimumBindingSize :: Maybe Int,
+      minimumIdentifierSize :: Maybe Int,
       jargon :: Maybe [String]
     }  deriving (Show, Eq, Generic)
 
@@ -69,7 +69,7 @@ data Smell
   | DoesTypeTest
   | HasAssignmentReturn
   | HasCodeDuplication
-  | HasMisspelledBindings
+  | HasMisspelledIdentifiers
   | HasRedundantBooleanComparison
   | HasRedundantGuards
   | HasRedundantIf
@@ -77,8 +77,8 @@ data Smell
   | HasRedundantLocalVariableReturn
   | HasRedundantParameter
   | HasRedundantReduction
-  | HasTooShortBindings
-  | HasWrongCaseBindings
+  | HasTooShortIdentifiers
+  | HasWrongCaseIdentifiers
   | IsLongCode
   | ReturnsNull
   | UsesCut

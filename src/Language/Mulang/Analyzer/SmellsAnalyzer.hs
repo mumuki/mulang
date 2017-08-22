@@ -28,7 +28,7 @@ detectionFor DoesNullTest                    = simple doesNullTest
 detectionFor DoesTypeTest                    = simple doesTypeTest
 detectionFor HasAssignmentReturn             = simple hasAssignmentReturn
 detectionFor HasCodeDuplication              = unsupported
-detectionFor HasMisspelledBindings           = withLanguage hasMisspelledBindings
+detectionFor HasMisspelledIdentifiers        = withLanguage hasMisspelledIdentifiers
 detectionFor HasRedundantBooleanComparison   = simple hasRedundantBooleanComparison
 detectionFor HasRedundantGuards              = simple hasRedundantGuards
 detectionFor HasRedundantIf                  = simple hasRedundantIf
@@ -36,15 +36,15 @@ detectionFor HasRedundantLambda              = simple hasRedundantLambda
 detectionFor HasRedundantLocalVariableReturn = simple hasRedundantLocalVariableReturn
 detectionFor HasRedundantParameter           = simple hasRedundantParameter
 detectionFor HasRedundantReduction           = simple hasRedundantReduction
-detectionFor HasTooShortBindings             = withLanguage hasTooShortBindings
-detectionFor HasWrongCaseBindings            = withLanguage hasWrongCaseBindings
+detectionFor HasTooShortIdentifiers          = withLanguage hasTooShortIdentifiers
+detectionFor HasWrongCaseIdentifiers         = withLanguage hasWrongCaseIdentifiers
 detectionFor IsLongCode                      = unsupported
 detectionFor ReturnsNull                     = simple returnsNull
 detectionFor UsesCut                         = simple usesCut
 detectionFor UsesFail                        = simple usesFail
 detectionFor UsesUnificationOperator         = simple usesUnificationOperator
 
-type Detection = DomainLanguage -> Expression -> [Binding]
+type Detection = DomainLanguage -> Expression -> [Identifier]
 unsupported :: Detection
 unsupported _ _ = []
 
@@ -54,5 +54,5 @@ simple inspection _ = detectAll inspection
 withLanguage :: (DomainLanguage -> Inspection) -> Detection
 withLanguage inspection language = detect mainExpressions (inspection language)
 
-exectationFor :: Smell -> Binding -> Expectation
-exectationFor smell binding = Expectation binding (show smell)
+exectationFor :: Smell -> Identifier -> Expectation
+exectationFor smell identifier = Expectation identifier (show smell)

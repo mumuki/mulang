@@ -15,7 +15,7 @@ module Language.Mulang.Signature (
   SignatureStyle) where
 
 import Language.Mulang.Unfold (mainExpressions)
-import Language.Mulang.Binding
+import Language.Mulang.Identifier
 import Language.Mulang.Ast
 import Language.Mulang.Explorer (declarationsOf)
 
@@ -26,9 +26,9 @@ import Data.Function (on)
 
 type SignatureStyle = [Signature] -> [String]
 
-data Signature = AritySignature Binding Int
-               | TypedSignature Binding [Binding] Binding
-               | NamedSignature Binding [Maybe Binding] deriving (Show, Eq)
+data Signature = AritySignature Identifier Int
+               | TypedSignature Identifier [Identifier] Identifier
+               | NamedSignature Identifier [Maybe Identifier] deriving (Show, Eq)
 
 
 arity :: Signature -> Int
@@ -36,15 +36,15 @@ arity (AritySignature _ a)    = a
 arity (TypedSignature _ ps _) = length ps
 arity (NamedSignature _ ps)   = length ps
 
-name :: Signature -> Binding
+name :: Signature -> Identifier
 name (AritySignature n _)   = n
 name (TypedSignature n _ _) = n
 name (NamedSignature n _)   = n
 
-nameAndArity :: Signature -> (Binding, Int)
+nameAndArity :: Signature -> (Identifier, Int)
 nameAndArity signature = (name signature, arity signature)
 
-parameterNames :: Signature -> [Maybe Binding]
+parameterNames :: Signature -> [Maybe Identifier]
 parameterNames (AritySignature _ arity)   = replicate arity Nothing
 parameterNames (TypedSignature _ types _) = map (const Nothing) types
 parameterNames (NamedSignature _ names)   = names
@@ -59,10 +59,10 @@ signatureOf (TypeSignature name args ret) = Just $ TypedSignature name args ret
 signatureOf (Variable name _)             = Just $ AritySignature name 0
 signatureOf _                             = Nothing
 
-parameterNamesOf :: [Equation] -> [Maybe Binding]
+parameterNamesOf :: [Equation] -> [Maybe Identifier]
 parameterNamesOf = map msum . transpose . map (map parameterNameOf . equationParams)
 
-parameterNameOf :: Pattern -> Maybe Binding
+parameterNameOf :: Pattern -> Maybe Identifier
 parameterNameOf (VariablePattern v) = Just v
 parameterNameOf _                   = Nothing
 
