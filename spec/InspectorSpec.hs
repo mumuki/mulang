@@ -306,8 +306,21 @@ spec = do
     it "is True on direct usage in entry point" $ do
       uses (named "m") (EntryPoint "main" (Reference "m")) `shouldBe` True
 
-    it "is True on direct usage in entry point" $ do
+    it "is False if there is no usage" $ do
       uses (named "m") (EntryPoint "main" (Reference "f")) `shouldBe` False
+
+  describe "calls" $ do
+    it "is True on function application in entry point" $ do
+      calls (named "m") (EntryPoint "main" (Application (Reference "m") [])) `shouldBe` True
+
+    it "is True on message send application in entry point" $ do
+      calls (named "m") (EntryPoint "main" (Send Self (Reference "m") [])) `shouldBe` True
+
+    it "is False on direct usage in entry point" $ do
+      calls (named "m") (EntryPoint "main" (Reference "m")) `shouldBe` False
+
+    it "is False if there is no usage" $ do
+      calls (named "m") (EntryPoint "main" (Reference "f")) `shouldBe` False
 
   describe "usesExceptions" $ do
     it "is True when a raise is used, java" $ do

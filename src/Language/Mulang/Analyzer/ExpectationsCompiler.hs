@@ -54,6 +54,7 @@ compileInspectionPrimitive :: String -> IdentifierPredicate -> Maybe Inspection
 compileInspectionPrimitive = f
   where
   f "Assigns"                        = binded assigns
+  f "Calls"                          = binded calls
   f "Declares"                       = binded declares
   f "DeclaresAttribute"              = binded declaresAttribute
   f "DeclaresClass"                  = binded declaresClass

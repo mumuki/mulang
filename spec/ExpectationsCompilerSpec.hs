@@ -131,6 +131,12 @@ spec = do
     run (hs "f a b = h") "f" "Uses:g" `shouldBe` False
     run (hs "f a b = g") "f" "Uses:g" `shouldBe` True
 
+  it "works with Calls" $ do
+    run (hs "f a b = g") "m" "Calls:g" `shouldBe` False
+    run (hs "f a b = h") "f" "Calls:g" `shouldBe` False
+    run (hs "f a b = g") "f" "Calls:g" `shouldBe` False
+    run (hs "f a b = g b") "f" "Calls:g" `shouldBe` True
+
   it "works with UsesInheritance" $ do
     run (java "class Foo extends Bar {}") "Foo" "UsesInheritance" `shouldBe` True
     run (java "class Foo {}") "Foo" "UsesInheritance" `shouldBe` False
