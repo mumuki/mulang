@@ -178,13 +178,12 @@ usesExceptionHandling  = containsExpression f
 
 usesAnonymousVariable :: Inspection
 usesAnonymousVariable = containsExpression f
-  where f (Subroutine _ equations)    = equationContainsWildcard equations
---TODO        f (Lambda args _)                      = equationContainsWildcard equations
-        f (Clause _ params _)         = paramsContainsWildcard params
-        f _                           = False
+  where f (Subroutine _ body)    = equationContainsWildcard body
+--TODO        f (Lambda args _)  = equationContainsWildcard equations
+        f (Clause _ params _)    = any isOrContainsWildcard params
+        f _                      = False
 
-        equationContainsWildcard = any (paramsContainsWildcard . equationParams)
-        paramsContainsWildcard = any isOrContainsWildcard
+        equationContainsWildcard =  has isOrContainsWildcard subroutineBodyPatterns
 
         isOrContainsWildcard (InfixApplicationPattern p1 _ p2) = any isOrContainsWildcard [p1, p2]
         isOrContainsWildcard (ApplicationPattern _ ps)         = any isOrContainsWildcard ps

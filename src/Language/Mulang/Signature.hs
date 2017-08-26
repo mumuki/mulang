@@ -59,7 +59,7 @@ signatureOf (Variable name _)             = Just $ AritySignature name 0
 signatureOf _                             = Nothing
 
 parameterNamesOf :: [Equation] -> [Maybe Identifier]
-parameterNamesOf = map msum . transpose . map (map parameterNameOf . equationParams)
+parameterNamesOf = map msum . transpose . map (map parameterNameOf . equationPatterns)
 
 parameterNameOf :: Pattern -> Maybe Identifier
 parameterNameOf (VariablePattern v) = Just v

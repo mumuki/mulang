@@ -12,7 +12,8 @@
 -- |    * logic programing
 -- |
 module Language.Mulang.Ast (
-    equationParams,
+    subroutineBodyPatterns,
+    equationPatterns,
     Code,
     Equation(..),
     EquationBody(..),
@@ -20,6 +21,7 @@ module Language.Mulang.Ast (
     Statement(..),
     Pattern(..),
     Identifier,
+    SubroutineBody,
     debug,
     pattern Other,
     pattern OtherBody,
@@ -49,6 +51,7 @@ data EquationBody
          | GuardedBody  [(Expression, Expression)]
   deriving (Eq, Show, Read, Generic)
 
+type SubroutineBody = [Equation]
 
 -- | Expression is the root element of a Mulang program.
 -- | With the exception of Patterns, nearly everything is an Expression: variable declarations, literals,
@@ -68,14 +71,14 @@ data Expression
     --   composed by a name, parameter types and return type
     | EntryPoint Identifier Expression
     -- ^ Entry point with its body
-    | Function Identifier [Equation]
+    | Function Identifier SubroutineBody
     -- ^ Functional / Imperative programming function declaration.
     --   It is is composed by an identifier and one or more equations
-    | Procedure Identifier [Equation]
+    | Procedure Identifier SubroutineBody
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
-    | Method Identifier [Equation]
-    | EqualMethod [Equation]
-    | HashMethod [Equation]
+    | Method Identifier SubroutineBody
+    | EqualMethod SubroutineBody
+    | HashMethod SubroutineBody
     | Variable Identifier Expression
     | Assignment Identifier Expression
     | Attribute Identifier Expression
@@ -207,7 +210,7 @@ pattern SimpleMethod name params body    = Method    name [SimpleEquation params
 pattern MuTrue  = MuBool True
 pattern MuFalse = MuBool False
 
-pattern Subroutine name equations <- (extractSubroutine -> Just (name, equations))
+pattern Subroutine name body <- (extractSubroutine -> Just (name, body))
 pattern Clause name patterns expressions <- (extractClause -> Just (name, patterns, expressions))
 
 pattern Call operation arguments <- (extractCall -> Just (operation, arguments))
@@ -217,11 +220,17 @@ pattern Params params <- (extractParams -> Just params)
 equationParams :: Equation -> [Pattern]
 equationParams (Equation p _) = p
 
-extractSubroutine :: Expression -> Maybe (Identifier, [Equation])
-extractSubroutine (Function name equations)  = Just (name, equations)
-extractSubroutine (Procedure name equations) = Just (name, equations)
-extractSubroutine (Method name equations)    = Just (name, equations)
-extractSubroutine _                          = Nothing
+subroutineBodyPatterns :: SubroutineBody -> [Pattern]
+subroutineBodyPatterns = concatMap equationPatterns
+
+equationPatterns :: Equation -> [Pattern]
+equationPatterns (Equation p _) = p
+
+extractSubroutine :: Expression -> Maybe (Identifier, SubroutineBody)
+extractSubroutine (Function name body)  = Just (name, body)
+extractSubroutine (Procedure name body) = Just (name, body)
+extractSubroutine (Method name body)    = Just (name, body)
+extractSubroutine _                     = Nothing
 
 extractParams :: Expression -> Maybe ([Pattern])
 extractParams (Subroutine _ equations) = Just (equationParams.head $ equations)
