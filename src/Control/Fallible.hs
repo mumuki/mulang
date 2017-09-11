@@ -18,6 +18,11 @@ orNothing f = case failure f of
             (Left v) -> Just v
             _        -> Nothing
 
+orLeft :: Fallible f => f v -> Either String v
+orLeft f = case failure f of
+            (Right e) -> Left e
+            (Left v)  -> Right v
+
 
 
 

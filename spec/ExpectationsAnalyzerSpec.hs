@@ -132,4 +132,4 @@ spec = describe "ExpectationsAnalyzer" $ do
 
     it "proerly reports parsing errors" $ do
       let hasNot = Expectation "foo" "UsesNot"
-      (run Haskell " foo " [hasNot]) `shouldReturn` (AnalysisFailed "Sample code parsing error")
+      (run Haskell " foo " [hasNot]) `shouldReturn` (AnalysisFailed "Parse error")

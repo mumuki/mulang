@@ -20,8 +20,8 @@ import Data.Char (toLower)
 java :: Parser
 java = orFail . parseJava'
 
-parseJava :: MaybeParser
-parseJava = orNothing . parseJava'
+parseJava :: EitherParser
+parseJava = orLeft . parseJava'
 
 parseJava' = fmap m . j
 

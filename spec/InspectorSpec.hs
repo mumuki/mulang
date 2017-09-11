@@ -636,7 +636,7 @@ spec = do
       usesAnonymousVariable (hs "foo x = 1") `shouldBe` False
 
     it "is False if _ is present only in seccond equation" $ do
-      let code = fromJust . parseHaskell . unlines $ ["foo False bool = bool", "foo True _ = True"]
+      let code = hs . unlines $ ["foo False bool = bool", "foo True _ = True"]
       usesAnonymousVariable code `shouldBe` True
 
     it "is False if there is no _ but a comment" $ do

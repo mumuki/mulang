@@ -18,8 +18,8 @@ instance Fallible ParseResult where
 hs :: Parser
 hs = orFail . parseHaskell'
 
-parseHaskell :: MaybeParser
-parseHaskell = orNothing . parseHaskell'
+parseHaskell :: EitherParser
+parseHaskell = orLeft . parseHaskell'
 
 parseHaskell' :: String -> ParseResult Expression
 parseHaskell' = fmap (normalize . mu) . parseModule . (++"\n")

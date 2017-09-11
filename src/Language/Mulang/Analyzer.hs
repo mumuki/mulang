@@ -50,9 +50,9 @@ signaturesAnalysis code style = Analysis code (emptyAnalysisSpec { signatureAnal
 -- Analysis running
 --
 analyse :: Analysis -> IO AnalysisResult
-analyse (Analysis sample spec)
-      | Just ast <- parseSample sample = analyseAst ast spec
-      | otherwise = return $ AnalysisFailed "Sample code parsing error"
+analyse (Analysis sample spec) = analyseSample (parseSample sample)
+  where analyseSample (Right ast)    = analyseAst ast spec
+        analyseSample (Left message) = return $ AnalysisFailed message
 
 analyseAst :: Expression -> AnalysisSpec -> IO AnalysisResult
 analyseAst ast spec = do

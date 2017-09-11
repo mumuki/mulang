@@ -20,8 +20,8 @@ type ParsecParser a = forall x . Parsec String x a
 pl :: Parser
 pl = orFail . parseProlog'
 
-parseProlog :: MaybeParser
-parseProlog = orNothing . parseProlog'
+parseProlog :: EitherParser
+parseProlog = orLeft . parseProlog'
 
 parseProlog' = fmap compact . parse program ""
 
