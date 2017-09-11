@@ -308,6 +308,35 @@ spec = do
     it "is False when typed with another type, in java" $ do
       typesParameterAs (named "int") (java "class Foo { bool f(double n) { return n > 4; } }")  `shouldBe` False
 
+  describe "typesAs" $ do
+    it "is True when param typed, in hs" $ do
+      typesAs (named "Int") (hs "f :: Int -> Bool\nf n = n > 4 ")  `shouldBe` True
+
+    it "is True when constant typed, in hs" $ do
+      typesAs (named "Int") (hs "f :: Int\nf = 4 ")  `shouldBe` True
+
+    it "is False when nothing is explicitly typed, in hs" $ do
+      typesAs (named "Int") (hs "f n = n > 4 ")  `shouldBe` False
+
+    it "is True when attribute typed, in java" $ do
+      typesAs (named "int") (java "class Foo { int x; }")  `shouldBe` True
+
+    it "is False when attribute typed with nother type, in java" $ do
+      typesAs (named "int") (java "class Foo { double x; }")  `shouldBe` False
+
+    it "is True when param typed, in java" $ do
+      typesAs (named "int") (java "class Foo { bool f(int n) { return n > 4; } }")  `shouldBe` True
+
+    it "is True when local variable typed, in java" $ do
+      typesAs (named "int") (java "class Foo { bool f() { int x = 3; return x > 4; } }")  `shouldBe` True
+
+    it "is False when param typed with another type, in java" $ do
+      typesAs (named "int") (java "class Foo { bool f(double n) { return n > 4; } }")  `shouldBe` False
+
+    it "is False when local variable typed with another type, in java" $ do
+      typesAs (named "int") (java "class Foo { bool f() { double n = 0; return n > 4; } }")  `shouldBe` False
+
+
   describe "declaresAttribute" $ do
     it "is True when present" $ do
       declaresAttribute (named "x") (js "var f = {x: 6}")  `shouldBe` True

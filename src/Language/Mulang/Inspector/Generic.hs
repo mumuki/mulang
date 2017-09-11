@@ -53,8 +53,9 @@ typesParameterAs predicate = containsDeclaration f
 
 typesAs :: IdentifierInspection
 typesAs predicate = containsDeclaration f
-  where f (TypeSignature _ Nothing name) = predicate name
-        f _                              = False
+  where f (TypeSignature _ Nothing name)   = predicate name
+        f (TypeSignature _ (Just names) _) = any predicate names
+        f _                                = False
 
 -- | Inspection that tells whether an expression is equal to a given piece of code after being parsed
 parses :: (String -> Expression) -> String -> Inspection
