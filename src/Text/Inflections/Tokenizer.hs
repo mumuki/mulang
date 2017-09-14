@@ -5,7 +5,7 @@ module Text.Inflections.Tokenizer (
   canTokenize,
   tokenize) where
 
-import Data.Char (toLower)
+import Data.Char (toLower, isDigit)
 import Data.Either (isRight)
 
 import Text.Inflections
@@ -17,7 +17,7 @@ import Control.Fallible
 type CaseStyle = String -> Either Text.Parsec.Error.ParseError [Text.Inflections.Parse.Types.Word]
 
 camelCase      :: CaseStyle
-camelCase      = parseCamelCase []
+camelCase      = parseCamelCase [] . filter (not.isDigit)
 
 snakeCase      :: CaseStyle
 snakeCase      = parseSnakeCase []

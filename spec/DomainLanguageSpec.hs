@@ -19,6 +19,9 @@ spec = do
     it "is True when it is a one-char identifier" $ do
       run (hs "x = True") `shouldBe` True
 
+    it "is True when it has numbers" $ do
+      run (hs "x1 = True") `shouldBe` True
+
     it "is True when it is a two-chars identifier" $ do
       run (hs "xy = True") `shouldBe` True
 
@@ -60,6 +63,11 @@ spec = do
 
     it "is False when there are only camel case identifier on a camel case language" $ do
       run (js "var aDay = 'monday'") `shouldBe` False
+
+    it "is False when it has numbers but proper casing" $ do
+      run (js "var aFoo2 = 'monday'") `shouldBe` False
+
+
 
   describe "hasMisspelledIdentifiers" $ do
     let run = hasMisspelledIdentifiers language
