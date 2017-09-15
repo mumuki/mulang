@@ -49,7 +49,7 @@ usage = unpack [text|
              "spec" : {
                 "expectations" : [
                    {
-                      "scope" : ":Intransitive:x",
+                      "binding" : ":Intransitive:x",
                       "inspection" : "Uses:*"
                    }
                 ],

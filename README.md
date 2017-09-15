@@ -255,7 +255,7 @@ $ mulang '
    "spec" : {
       "expectations" : [
          {
-            "scope" : ":Intransitive:x",
+            "binding" : ":Intransitive:x",
             "inspection" : "Uses:*"
          }
       ],
@@ -267,7 +267,7 @@ $ mulang '
    "expectationResults" : [
       {
          "expectation" : {
-            "scope" : ":Intransitive:x",
+            "binding" : ":Intransitive:x",
             "inspection" : "Uses:*"
          },
          "result" : false
@@ -293,7 +293,7 @@ $ mulang '
       "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
-            "scope" : "*",
+            "binding" : "*",
             "inspection" : "Declares:x"
          }
       ]
@@ -307,7 +307,7 @@ $ mulang '
       {
          "result" : true,
          "expectation" : {
-            "scope" : "*",
+            "binding" : "*",
             "inspection" : "Declares:x"
          }
       }
@@ -455,7 +455,7 @@ $ mulang '
    ],
    "smells" : [
       {
-         "scope" : "foo",
+         "binding" : "foo",
          "inspection" : "ReturnsNull"
       }
    ]
@@ -526,10 +526,10 @@ $ mulang '
    "smells" : [
       {
          "inspection" : "HasTooShortIdentifiers",
-         "scope" : "son"
+         "binding" : "son"
       },
       {
-         "scope" : "parentOf",
+         "binding" : "parentOf",
          "inspection" : "HasWrongCaseIdentifiers"
       }
    ],
@@ -560,11 +560,11 @@ $ mulang  '
    "smells" : [
       {
          "inspection" : "ReturnsNull",
-         "scope" : "foo"
+         "binding" : "foo"
       },
       {
          "inspection" : "HasMisspelledIdentifiers",
-         "scope" : "foo"
+         "binding" : "foo"
       }
    ]
 }
