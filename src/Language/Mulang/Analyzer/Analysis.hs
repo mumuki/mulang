@@ -25,6 +25,7 @@ import Language.Mulang.Ast
 -- Common structures
 --
 
+type Smell = String
 type Inspection = String
 
 data Expectation
@@ -61,29 +62,6 @@ data CaseStyle
 data SmellsSet
   = NoSmells { include :: Maybe [Smell] }
   | AllSmells { exclude :: Maybe [Smell] } deriving (Show, Eq, Generic)
-
-data Smell
-  = DiscardsExceptions
-  | DoesConsolePrint
-  | DoesNullTest
-  | DoesTypeTest
-  | HasAssignmentReturn
-  | HasCodeDuplication
-  | HasMisspelledIdentifiers
-  | HasRedundantBooleanComparison
-  | HasRedundantGuards
-  | HasRedundantIf
-  | HasRedundantLambda
-  | HasRedundantLocalVariableReturn
-  | HasRedundantParameter
-  | HasRedundantReduction
-  | HasTooShortIdentifiers
-  | HasWrongCaseIdentifiers
-  | IsLongCode
-  | ReturnsNull
-  | UsesCut
-  | UsesFail
-  | UsesUnificationOperator deriving (Show, Eq, Enum, Bounded, Generic)
 
 data SignatureAnalysisType
   = NoSignatures

@@ -10,7 +10,6 @@ instance FromJSON AnalysisSpec
 instance FromJSON Expectation
 
 instance FromJSON SmellsSet
-instance FromJSON Smell
 instance FromJSON DomainLanguage
 instance FromJSON CaseStyle
 

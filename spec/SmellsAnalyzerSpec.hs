@@ -24,7 +24,7 @@ spec = describe "SmellsAnalyzer" $ do
       it "dont reports smell when excluded" $ do
         (runExcept JavaScript
                   "function f() { var x = 1; return x }"
-                  [HasRedundantLocalVariableReturn, HasTooShortIdentifiers]) `shouldReturn` (result [])
+                  ["HasRedundantLocalVariableReturn", "HasTooShortIdentifiers"]) `shouldReturn` (result [])
 
       it "reports smell when not excluded and present" $ do
         (runExcept JavaScript
@@ -34,7 +34,7 @@ spec = describe "SmellsAnalyzer" $ do
       it "dont reports smell when not excluded and not present" $ do
         (runExcept JavaScript
                   "function foo() { return 1; }"
-                  [HasRedundantLocalVariableReturn]) `shouldReturn` (result [])
+                  ["HasRedundantLocalVariableReturn"]) `shouldReturn` (result [])
 
   describe "Using inclusion" $ do
     it "works with empty set" $ do
