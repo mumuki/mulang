@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric, QuasiQuotes, OverloadedStrings #-}
 
 module Main (main) where
 
@@ -13,6 +13,9 @@ import           Version (prettyVersion)
 import           Data.Text.Lazy.Encoding (encodeUtf8)
 import qualified Data.ByteString.Lazy as LBS (putStrLn)
 import qualified Data.Text.Lazy as T (pack)
+import           Data.Text (unpack)
+import           NeatInterpolation (text)
+
 
 main :: IO ()
 main = do
@@ -30,17 +33,26 @@ parseArgs _          = error (intercalate "\n" [prettyVersion, usage])
 
 decode = orFail . eitherDecode
 
-usage = "Wrong usage.                                            \n\
-        \                                                        \n\
-        \  #read from STDIN                                      \n\
-        \  $ mulang -s                                           \n\
-        \                                                        \n\
-        \  #read from argument                                   \n\
-        \  $ mulang '{                                           \n\
-        \      \"expectations\":[{                               \n\
-        \                \"scope\":\"*\",                        \n\
-        \                \"inspection\":\"Declares:x\"}],        \n\
-        \        \"code\": {                                     \n\
-        \            \"content\":\"x = 1\",                      \n\
-        \            \"language\":\"Haskell\"}                   \n\
-        \  }'"
+usage = unpack [text|
+        Wrong usage.
+
+         #read from STDIN
+         $ mulang -s
+
+         #read from argument
+         $ mulang '{
+             "sample" : {
+                "tag" : "CodeSample",
+                "language" : "Haskell",
+                "content" : "x = 1"
+             },
+             "spec" : {
+                "expectations" : [
+                   {
+                      "scope" : ":Intransitive:x",
+                      "inspection" : "Uses:*"
+                   }
+                ],
+                "smellsSet" : { "tag" : "NoSmells" }
+             }
+          }'|]

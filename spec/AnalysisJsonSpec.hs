@@ -155,7 +155,7 @@ spec = describe "AnalysisJson" $ do
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
                             (emptyAnalysisSpec {
-                              smellsSet = noSmells { include = Just [ReturnsNull, DoesNullTest]},
+                              smellsSet = noSmells { include = Just ["ReturnsNull", "DoesNullTest"]},
                               signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
@@ -184,7 +184,7 @@ spec = describe "AnalysisJson" $ do
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
                             (emptyAnalysisSpec {
-                              smellsSet = allSmells { exclude = Just [ReturnsNull]},
+                              smellsSet = allSmells { exclude = Just ["ReturnsNull"]},
                               signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis

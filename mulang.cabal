@@ -96,6 +96,7 @@ executable mulang
     text                      ,
     aeson                     ,
     process                   ,
+    neat-interpolation        ,
     mulang
   build-tools:
     happy,
