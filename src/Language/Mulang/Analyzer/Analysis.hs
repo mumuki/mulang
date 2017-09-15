@@ -8,7 +8,7 @@ module Language.Mulang.Analyzer.Analysis (
   SmellsSet(..),
   DomainLanguage(..),
   CaseStyle(..),
-  Smell(..),
+  Smell,
   SignatureAnalysisType(..),
   SignatureStyle(..),
   Sample(..),
@@ -29,7 +29,7 @@ type Smell = String
 type Inspection = String
 
 data Expectation
-  = Expectation { scope :: String, inspection :: Inspection } deriving (Show, Eq, Generic)
+  = Expectation { binding :: String, inspection :: Inspection } deriving (Show, Eq, Generic)
 
 --
 -- Analysis input structures
