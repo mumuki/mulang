@@ -81,9 +81,14 @@ spec = do
       it "is False when there are lower snake case identifier" $ do
         run (Variable "hello_world" MuNull) `shouldBe` False
 
+      it "is False when there is a single upper case char" $ do
+        run (Variable "H" MuNull) `shouldBe` False
+
+      it "is False when there is a single lower case char" $ do
+        run (Variable "h" MuNull) `shouldBe` False
+
       it "is True when there are upper snake case identifier" $ do
         run (Variable "Hello_World" MuNull) `shouldBe` True
-
 
   describe "hasMisspelledIdentifiers" $ do
     let run = hasMisspelledIdentifiers language
