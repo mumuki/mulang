@@ -57,7 +57,8 @@ data DomainLanguage
 
 data CaseStyle
   = CamelCase
-  | SnakeCase deriving (Show, Eq, Generic)
+  | SnakeCase
+  | RubyCase deriving (Show, Eq, Generic)
 
 data SmellsSet
   = NoSmells { include :: Maybe [Smell] }

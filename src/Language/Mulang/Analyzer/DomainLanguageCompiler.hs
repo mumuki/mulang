@@ -5,7 +5,7 @@ module Language.Mulang.Analyzer.DomainLanguageCompiler (
 import           Data.Maybe (fromMaybe)
 import           Language.Mulang.Analyzer.Analysis
 import qualified Language.Mulang.DomainLanguage as DL
-import           Text.Inflections.Tokenizer (camelCase, snakeCase)
+import           Text.Inflections.Tokenizer (camelCase, rubyCase, snakeCase)
 import           Text.Dictionary (fromFile, toDictionary)
 
 
@@ -25,6 +25,7 @@ compileDomainLanguage (Just (DomainLanguage path style size jargon)) = do
     compileSize = fromMaybe 3
 
     compileStyle (Just SnakeCase) = snakeCase
+    compileStyle (Just RubyCase)  = rubyCase
     compileStyle _                = camelCase
 
     compileJargon = fromMaybe []

@@ -1,11 +1,12 @@
 module DomainLanguageSpec (spec) where
 
 import           Test.Hspec
+import           Language.Mulang.Ast
 import           Language.Mulang.DomainLanguage (DomainLanguage(..), hasMisspelledIdentifiers, hasTooShortIdentifiers, hasWrongCaseIdentifiers)
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)
 import           Text.Dictionary (toDictionary)
-import           Text.Inflections.Tokenizer (camelCase)
+import           Text.Inflections.Tokenizer (camelCase, rubyCase)
 
 spec :: Spec
 spec = do
@@ -56,17 +57,32 @@ spec = do
       run (hs "ui = False") `shouldBe` False
 
   describe "hasWrongCaseIdentifiers" $ do
-    let run = hasWrongCaseIdentifiers language
+    context "camelCase language" $ do
+      let run = hasWrongCaseIdentifiers language
 
-    it "is True when there are snake case identifier on a camel case language" $ do
-      run (js "var a_day = 'monday'") `shouldBe` True
+      it "is True when there are snake case identifier on a camel case language" $ do
+        run (js "var a_day = 'monday'") `shouldBe` True
 
-    it "is False when there are only camel case identifier on a camel case language" $ do
-      run (js "var aDay = 'monday'") `shouldBe` False
+      it "is False when there are only camel case identifier on a camel case language" $ do
+        run (js "var aDay = 'monday'") `shouldBe` False
 
-    it "is False when it has numbers but proper casing" $ do
-      run (js "var aFoo2 = 'monday'") `shouldBe` False
+      it "is False when it has numbers but proper casing" $ do
+        run (js "var aFoo2 = 'monday'") `shouldBe` False
 
+    context "rubyCase language" $ do
+      let run = hasWrongCaseIdentifiers (DomainLanguage english rubyCase 3 jargon)
+
+      it "is True when there are lower camel case identifier" $ do
+        run (Variable "helloWorld" MuNull) `shouldBe` True
+
+      it "is False when there are upper camel case identifier" $ do
+        run (Variable "HelloWorld" MuNull) `shouldBe` False
+
+      it "is False when there are lower snake case identifier" $ do
+        run (Variable "hello_world" MuNull) `shouldBe` False
+
+      it "is True when there are upper snake case identifier" $ do
+        run (Variable "Hello_World" MuNull) `shouldBe` True
 
 
   describe "hasMisspelledIdentifiers" $ do

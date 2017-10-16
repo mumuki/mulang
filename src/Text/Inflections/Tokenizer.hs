@@ -2,10 +2,11 @@ module Text.Inflections.Tokenizer (
   CaseStyle,
   camelCase,
   snakeCase,
+  rubyCase,
   canTokenize,
   tokenize) where
 
-import Data.Char (toLower, isDigit)
+import Data.Char (toLower, isDigit, isLower)
 import Data.Either (isRight)
 
 import Text.Inflections
@@ -21,6 +22,10 @@ camelCase      = parseCamelCase [] . filter (not.isDigit)
 
 snakeCase      :: CaseStyle
 snakeCase      = parseSnakeCase []
+
+rubyCase       :: CaseStyle
+rubyCase  word | (isLower.head) word = snakeCase word
+               | otherwise           = camelCase word
 
 canTokenize :: CaseStyle -> String -> Bool
 canTokenize style = isRight . style
