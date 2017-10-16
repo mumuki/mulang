@@ -515,7 +515,7 @@ $ mulang '
       "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : {
          "caseStyle" : "SnakeCase",
-         "minimumBindingSize" : 4,
+         "minimumIdentifierSize" : 4,
          "jargon" : ["id"]
       }
    }
