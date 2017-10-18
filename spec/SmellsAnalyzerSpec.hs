@@ -1,6 +1,7 @@
 module SmellsAnalyzerSpec(spec) where
 
 import           Language.Mulang.Analyzer hiding (result, spec)
+import           Language.Mulang.Ast
 import           Test.Hspec
 
 result smellResults = AnalysisCompleted [] smellResults []
@@ -9,6 +10,21 @@ runExcept language content smells = analyse (smellsAnalysis (CodeSample language
 runOnly language content smells = analyse (smellsAnalysis (CodeSample language content) noSmells { include = Just smells })
 
 spec = describe "SmellsAnalyzer" $ do
+  describe "Using domain language and nested structures" $ do
+    let runRuby sample = analyse (domainLanguageAnalysis (MulangSample sample) (DomainLanguage Nothing (Just RubyCase) (Just 3) Nothing))
+    it "works with empty set" $ do
+      (runRuby (Sequence [
+        (Object "Foo_Bar" (Sequence [
+          (SimpleMethod "y" [] MuNull),
+          (SimpleMethod "aB" [] MuNull),
+          (SimpleMethod "fooBar" [] MuNull)])),
+        (Object "Foo" MuNull)])) `shouldReturn` (result [
+                                                    Expectation "y" "HasTooShortIdentifiers",
+                                                    Expectation "aB" "HasTooShortIdentifiers",
+                                                    Expectation "Foo_Bar" "HasWrongCaseIdentifiers",
+                                                    Expectation "aB" "HasWrongCaseIdentifiers",
+                                                    Expectation "fooBar" "HasWrongCaseIdentifiers"])
+
   describe "Using exclusion" $ do
     it "works with empty set" $ do
       (runExcept Haskell "fun x = if x then True else False" []) `shouldReturn` (result [Expectation "fun" "HasRedundantIf"])

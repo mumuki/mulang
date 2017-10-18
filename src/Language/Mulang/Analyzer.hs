@@ -6,6 +6,7 @@ module Language.Mulang.Analyzer (
   emptyAnalysisSpec,
 
   emptyAnalysis,
+  domainLanguageAnalysis,
   expectationsAnalysis,
   smellsAnalysis,
   signaturesAnalysis,
@@ -36,6 +37,9 @@ emptyAnalysisSpec = AnalysisSpec [] noSmells Nothing Nothing
 
 emptyAnalysis :: Sample -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec
+
+domainLanguageAnalysis :: Sample -> DomainLanguage -> Analysis
+domainLanguageAnalysis code domainLanguage = Analysis code (emptyAnalysisSpec { domainLanguage = Just domainLanguage, smellsSet = allSmells })
 
 expectationsAnalysis :: Sample -> [Expectation] -> Analysis
 expectationsAnalysis code es = Analysis code (emptyAnalysisSpec { expectations = es })

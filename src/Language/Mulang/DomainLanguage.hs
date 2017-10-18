@@ -6,7 +6,7 @@ module Language.Mulang.DomainLanguage (
 
 import Language.Mulang.Inspector (Inspection)
 import Language.Mulang.Ast (Expression)
-import Language.Mulang.Generator (declaredIdentifiers)
+import Language.Mulang.Generator (mainDeclaredIdentifiers)
 
 import Text.Dictionary (Dictionary, exists)
 
@@ -22,7 +22,7 @@ data DomainLanguage = DomainLanguage {
 type DomainLanguageInspection = DomainLanguage -> Inspection
 
 hasTooShortIdentifiers :: DomainLanguageInspection
-hasTooShortIdentifiers language = any isShort . declaredIdentifiers
+hasTooShortIdentifiers language = any isShort . mainDeclaredIdentifiers
   where isShort identifier = length identifier < (minimumIdentifierSize language) && notJargonOf identifier language
 
 hasMisspelledIdentifiers :: DomainLanguageInspection
@@ -32,10 +32,10 @@ hasMisspelledIdentifiers language = any isMisspelled  . wordsOf language
 
 hasWrongCaseIdentifiers :: DomainLanguageInspection
 hasWrongCaseIdentifiers (DomainLanguage _ style _ _)
-  = any (not . canTokenize style) . declaredIdentifiers
+  = any (not . canTokenize style) . mainDeclaredIdentifiers
 
 wordsOf :: DomainLanguage -> Expression -> [String]
-wordsOf (DomainLanguage _ style _ _) = concatMap (tokenize style) . declaredIdentifiers
+wordsOf (DomainLanguage _ style _ _) = concatMap (tokenize style) . mainDeclaredIdentifiers
 
 emptyDictionary = null . dictionary
 
