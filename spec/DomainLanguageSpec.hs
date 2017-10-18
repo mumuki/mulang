@@ -2,6 +2,7 @@ module DomainLanguageSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang.Ast
+import           Language.Mulang.Inspector.Combiner (detect)
 import           Language.Mulang.DomainLanguage (DomainLanguage(..), hasMisspelledIdentifiers, hasTooShortIdentifiers, hasWrongCaseIdentifiers)
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)
@@ -16,6 +17,7 @@ spec = do
 
   describe "hasTooShortIdentifiers" $ do
     let run = hasTooShortIdentifiers language
+    let runDetection = detect (hasTooShortIdentifiers language)
 
     it "is True when it is a one-char identifier" $ do
       run (hs "x = True") `shouldBe` True
@@ -32,23 +34,35 @@ spec = do
     it "is False when it contains a short parameter name"  $ do
       run (hs "aFunction a = a") `shouldBe` False
 
-    it "is True when it contains a short local variable name" $ do
-      run (js "function foo() { var x = 1; return x }") `shouldBe` True
+    it "is False when it contains a short local variable name, but it is detected" $ do
+      let sample = js "function foo() { var x = 1; return x }"
+
+      run sample `shouldBe` False
+      runDetection sample `shouldBe` ["x"]
 
     it "is False when it uses a short named function" $ do
       run (hs "aFunction aNumber = f aNumber") `shouldBe` False
 
-    it "is False when it contains a short local variable name in a method" $ do
-      run (js "var pepita = {come:function(){var x = 1; }, vola:function(){}};") `shouldBe` True
+    it "is False when it contains a short local variable name in a method, but it is detected" $ do
+      let sample = js "var pepita = {come:function(){var x = 1; }, vola:function(){}};"
+
+      runDetection sample `shouldBe` ["x"]
+      run sample `shouldBe` False
 
     it "is False when it contains a short local parameter name in a method" $ do
       run (js "var pepita = {come:function(x){ }, vola:function(){}};") `shouldBe` False
 
-    it "is True when it contains a short named method" $ do
-      run (js "var pepita = {x:function(){}, vola:function(){}};") `shouldBe` True
+    it "is False when it contains a short named method, but it is detected" $ do
+      let sample = js "var pepita = {x:function(){}, vola:function(){}};"
+
+      runDetection sample `shouldBe` ["x"]
+      run sample `shouldBe` False
 
     it "is True when it contains a short named attribute" $ do
-      run (js "var pepita = {x: 2, vola:function(){}};") `shouldBe` True
+      let sample = js "var pepita = {x: 2, vola:function(){}};"
+
+      runDetection sample `shouldBe` ["x"]
+      run sample `shouldBe` False
 
     it "is True when it contains a short variable name" $ do
       run (js "var x = 3;") `shouldBe` True

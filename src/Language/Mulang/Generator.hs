@@ -3,6 +3,7 @@ module Language.Mulang.Generator (
   declarations,
   declarationsOf,
   declaredIdentifiers,
+  mainDeclaredIdentifiers,
   equationBodies,
   expressions,
   referencedIdentifiers,
@@ -99,6 +100,10 @@ transitiveReferencedIdentifiers identifier code =  expand (concatMap referencedI
 -- For example, in 'f x = g x where x = y', it returns 'f' and 'x'
 declaredIdentifiers :: Generator Identifier
 declaredIdentifiers = map fst . declarations
+
+mainDeclaredIdentifiers :: Generator Identifier
+mainDeclaredIdentifiers (Sequence _) = []
+mainDeclaredIdentifiers expression   = take 1 . declaredIdentifiers $ expression
 
 -- | Returns all the body equations of functions, procedures and methods
 equationBodies :: Generator EquationBody
