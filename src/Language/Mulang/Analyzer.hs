@@ -22,7 +22,7 @@ import Language.Mulang.Analyzer.SignaturesAnalyzer  (analyseSignatures)
 import Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
 import Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
 import Language.Mulang.Analyzer.DomainLanguageCompiler (emptyDomainLanguage, compileDomainLanguage)
-
+import Data.Maybe (fromMaybe)
 --
 -- Builder functions
 --
@@ -64,5 +64,9 @@ analyseAst ast spec = do
   return $ AnalysisCompleted (analyseExpectations ast (expectations spec))
                              (analyseSmells ast language (smellsSet spec))
                              (analyseSignatures ast (signatureAnalysisType spec))
-                             (Nothing)
+                             (analyzeIntermediateLanguage ast spec)
 
+analyzeIntermediateLanguage :: Expression -> AnalysisSpec -> Maybe Expression
+analyzeIntermediateLanguage ast spec
+  | fromMaybe False (includeIntermediateLanguage spec) = Just ast
+  | otherwise = Nothing
