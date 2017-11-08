@@ -24,7 +24,7 @@ textToLazyByteString = pack . unpack
 spec = describe "AnalysisJson" $ do
   it "works with Intransitive expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
-                            (AnalysisSpec [Expectation "Intransitive:x" "Uses:*"] noSmells Nothing Nothing)
+                            (emptyAnalysisSpec { expectations = [Expectation "Intransitive:x" "Uses:*"] })
     let json = [text|
 {
    "sample" : {
@@ -46,7 +46,7 @@ spec = describe "AnalysisJson" $ do
 
   it "works with transitive expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
-                            (AnalysisSpec [Expectation "x" "Declares"] noSmells Nothing Nothing)
+                            (emptyAnalysisSpec { expectations = [Expectation "x" "Declares"] })
     let json = [text|
 {
    "sample" : {
