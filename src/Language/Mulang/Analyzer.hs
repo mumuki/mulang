@@ -64,4 +64,5 @@ analyseAst ast spec = do
   return $ AnalysisCompleted (analyseExpectations ast (expectations spec))
                              (analyseSmells ast language (smellsSet spec))
                              (analyseSignatures ast (signatureAnalysisType spec))
+                             (Nothing)
 
