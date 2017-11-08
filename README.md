@@ -570,6 +570,63 @@ $ mulang  '
 }
 ```
 
+
+### With Intermediate Language Generation
+
+```bash
+$ mulang '
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "JavaScript",
+      "content" : "function foo(x, y) { return null; }"
+   },
+   "spec" : {
+      "expectations" : [],
+      "smellsSet" : { "tag" : "NoSmells" },
+      "includeIntermediateLanguage" : true
+   }
+}
+' | json_pp
+{
+   "expectationResults" : [],
+   "smells" : [],
+   "tag" : "AnalysisCompleted",
+   "signatures" : [],
+   "intermediateLanguage" : {
+      "tag" : "Function",
+      "contents" : [
+         "foo",
+         [
+            [
+               [
+                  {
+                     "tag" : "VariablePattern",
+                     "contents" : "x"
+                  },
+                  {
+                     "tag" : "VariablePattern",
+                     "contents" : "y"
+                  }
+               ],
+               {
+                  "tag" : "UnguardedBody",
+                  "contents" : {
+                     "contents" : {
+                        "tag" : "MuNull"
+                     },
+                     "tag" : "Return"
+                  }
+               }
+            ]
+         ]
+      ]
+   }
+}
+
+```
+
+
 ## Expectations, Signatures and Smells
 
 Mulang CLI can do three different kinds of analysis:

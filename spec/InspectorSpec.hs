@@ -6,7 +6,6 @@ import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Java (java)
 import           Language.Mulang.Inspector.Generic.Smell
-import           Data.Maybe (fromJust)
 
 spec :: Spec
 spec = do

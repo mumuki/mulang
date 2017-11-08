@@ -44,7 +44,8 @@ data AnalysisSpec = AnalysisSpec {
   expectations :: [Expectation],
   smellsSet :: SmellsSet,
   signatureAnalysisType :: Maybe SignatureAnalysisType,
-  domainLanguage :: Maybe DomainLanguage
+  domainLanguage :: Maybe DomainLanguage,
+  includeIntermediateLanguage :: Maybe Bool
 } deriving (Show, Eq, Generic)
 
 data DomainLanguage
@@ -93,7 +94,8 @@ data Language
 data AnalysisResult
   = AnalysisCompleted { expectationResults :: [ExpectationResult],
                         smells :: [Expectation],
-                        signatures :: [Code] }
+                        signatures :: [Code],
+                        intermediateLanguage :: Maybe Expression }
   | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
 data ExpectationResult = ExpectationResult {
