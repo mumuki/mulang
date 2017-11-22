@@ -12,7 +12,8 @@ module Language.Mulang.Inspector.Generic.Smell (
   returnsNull,
   discardsExceptions,
   doesConsolePrint,
-  hasLongParameterList) where
+  hasLongParameterList,
+  hasTooManyMethods) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Inspector
@@ -115,3 +116,12 @@ hasLongParameterList :: Inspection
 hasLongParameterList = containsExpression f
   where f (Params p) = (>4).length $ p
         f _ = False
+
+hasTooManyMethods :: Inspection
+hasTooManyMethods = containsExpression f
+  where f (Sequence expressions) = (>15).length.filter isMethod $ expressions
+        f _ = False
+
+isMethod:: Inspection
+isMethod (Method _ _) = True
+isMethod _ = False

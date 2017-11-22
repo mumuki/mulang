@@ -35,6 +35,7 @@ allSmells = [
   "HasRedundantLocalVariableReturn",
   "HasRedundantParameter",
   "HasRedundantReduction",
+  "HasTooManyMethods",
   "HasTooShortIdentifiers",
   "HasWrongCaseIdentifiers",
   "IsLongCode",
@@ -60,6 +61,7 @@ detectionFor "HasRedundantLambda"              = simple hasRedundantLambda
 detectionFor "HasRedundantLocalVariableReturn" = simple hasRedundantLocalVariableReturn
 detectionFor "HasRedundantParameter"           = simple hasRedundantParameter
 detectionFor "HasRedundantReduction"           = simple hasRedundantReduction
+detectionFor "HasTooManyMethods"               = simple hasTooManyMethods
 detectionFor "HasTooShortIdentifiers"          = withLanguage hasTooShortIdentifiers
 detectionFor "HasTooShortBindings"             = withLanguage hasTooShortIdentifiers
 detectionFor "HasWrongCaseIdentifiers"         = withLanguage hasWrongCaseIdentifiers

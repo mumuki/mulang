@@ -213,3 +213,10 @@ spec = do
 
     it "is False when no predicates have over 4 parameters" $ do
       hasLongParameterList (pl "foo(A):- bar(A).") `shouldBe` False
+
+  describe "hasTooManyMethods" $ do
+    it "is True when a class has over 15 methods" $ do
+      hasTooManyMethods (java ("public class A{ public void a(){}" ++ (concat.replicate 16 $ "\npublic void a(){}") ++ " }")) `shouldBe` True
+
+    it "is False when no classes have over 15 methods" $ do
+      hasTooManyMethods (java "public class A{ public void a(){}\npublic void a(){} }") `shouldBe` False
