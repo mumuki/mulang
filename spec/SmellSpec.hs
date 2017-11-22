@@ -6,6 +6,7 @@ import           Language.Mulang.Inspector.Generic.Smell
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)
 import           Language.Mulang.Parsers.Java (java)
+import           Language.Mulang.Parsers.Prolog (pl)
 
 
 javaStatement m = java ("class Foo { void bar() { " ++ m ++ " } }")
@@ -191,5 +192,24 @@ spec = do
     it "is True java's system.out is used" $ do
       doesConsolePrint (javaStatement "int i = 4; System.out.println(4);") `shouldBe` True
 
-    it "is False when no pint is used" $ do
+    it "is False when no print is used" $ do
       doesConsolePrint (javaStatement "int i = 4; System.err.println(4);") `shouldBe` False
+
+  describe "hasLongParameterList" $ do
+    it "is True when a function has over 4 parameters" $ do
+      hasLongParameterList (hs "f a b c d e = a") `shouldBe` True
+
+    it "is False when no functions have over 4 parameters" $ do
+      hasLongParameterList (hs "f a = a") `shouldBe` False
+
+    it "is True when a method has over 4 parameters" $ do
+      hasLongParameterList (java "public class a{ public void a(A a,B b,C c,D d, E e){} }") `shouldBe` True
+
+    it "is False when no methods have over 4 parameters" $ do
+      hasLongParameterList (java "public class a{ public void a(A a,B b,C c,D d){} }") `shouldBe` False
+
+    it "is True when a predicate has over 4 parameters" $ do
+      hasLongParameterList (pl "foo(A, B, C, D, E):- bar(A).") `shouldBe` True
+
+    it "is False when no predicates have over 4 parameters" $ do
+      hasLongParameterList (pl "foo(A):- bar(A).") `shouldBe` False

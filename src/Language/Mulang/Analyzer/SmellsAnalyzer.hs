@@ -26,6 +26,7 @@ allSmells = [
   "DoesTypeTest",
   "HasAssignmentReturn",
   "HasCodeDuplication",
+  "HasLongParameterList",
   "HasMisspelledIdentifiers",
   "HasRedundantBooleanComparison",
   "HasRedundantGuards",
@@ -49,6 +50,7 @@ detectionFor "DoesNullTest"                    = simple doesNullTest
 detectionFor "DoesTypeTest"                    = simple doesTypeTest
 detectionFor "HasAssignmentReturn"             = simple hasAssignmentReturn
 detectionFor "HasCodeDuplication"              = unsupported
+detectionFor "HasLongParameterList"            = simple hasLongParameterList
 detectionFor "HasMisspelledIdentifiers"        = withLanguage hasMisspelledIdentifiers
 detectionFor "HasMisspelledBindings"           = withLanguage hasMisspelledIdentifiers
 detectionFor "HasRedundantBooleanComparison"   = simple hasRedundantBooleanComparison

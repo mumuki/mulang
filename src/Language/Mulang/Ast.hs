@@ -29,7 +29,8 @@ module Language.Mulang.Ast (
     pattern MuFalse,
     pattern Subroutine,
     pattern Clause,
-    pattern Call
+    pattern Call,
+    pattern Params
   ) where
 
 import           GHC.Generics
@@ -48,7 +49,7 @@ data EquationBody
 
 -- | Expression is the root element of a Mulang program.
 -- | With the exception of Patterns, nearly everything is an Expression: variable declarations, literals,
--- | constrol structures, even object oriented classes declarations.
+-- | control structures, even object oriented classes declarations.
 -- |
 -- | However, although all those elements can be used as subexpressions and have an dohave an associated value,
 -- | Mulang does not state WHICH is that value.
@@ -196,6 +197,8 @@ pattern Clause name patterns expressions <- (extractClause -> Just (name, patter
 
 pattern Call operation arguments <- (extractCall -> Just (operation, arguments))
 
+pattern Params params <- (extractParams -> Just params)
+
 equationParams :: Equation -> [Pattern]
 equationParams (Equation p _) = p
 
@@ -204,6 +207,14 @@ extractSubroutine (Function name equations)  = Just (name, equations)
 extractSubroutine (Procedure name equations) = Just (name, equations)
 extractSubroutine (Method name equations)    = Just (name, equations)
 extractSubroutine _                          = Nothing
+
+extractParams :: Expression -> Maybe ([Pattern])
+extractParams (Function _ equations)  = Just (equationParams.head $ equations)
+extractParams (Procedure _ equations) = Just (equationParams.head $ equations)
+extractParams (Method _ equations)    = Just (equationParams.head $ equations)
+extractParams (Rule _ params _)       = Just params
+extractParams (Fact _ params)         = Just params
+extractParams _                       = Nothing
 
 extractCall :: Expression -> Maybe (Expression, [Expression])
 extractCall (Application op args)   = Just (op, args)

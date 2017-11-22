@@ -11,7 +11,8 @@ module Language.Mulang.Inspector.Generic.Smell (
   isLongCode,
   returnsNull,
   discardsExceptions,
-  doesConsolePrint) where
+  doesConsolePrint,
+  hasLongParameterList) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Inspector
@@ -109,3 +110,8 @@ doesConsolePrint :: Inspection
 doesConsolePrint = containsExpression f
   where f (Print _) = True
         f _         = False
+
+hasLongParameterList :: Inspection
+hasLongParameterList = containsExpression f
+  where f (Params p) = (>4).length $ p
+        f _ = False
