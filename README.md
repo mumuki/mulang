@@ -117,6 +117,7 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _id
 1. `doesTypeTest`
 1. `hasAssignmentReturn`
 1. `hasCodeDuplication`: **any paradigm** has the given code simple literal code duplication?
+1. `hasLongParameterList`: **any paradigm** does a given method/function/predicate take too many parameters?
 1. `hasMisspelledIdentifiers`: **any paradigm** an identifier is not a domain language dictionary's word and not part of its jargon
 1. `hasRedundantBooleanComparison`
 1. `hasRedundantGuards`
@@ -125,6 +126,7 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _id
 1. `hasRedundantLocalVariableReturn`
 1. `hasRedundantParameter`
 1. `hasRedundantReduction`: **logic paradigm** is a is-operator used to unify individuals that don't require a reduction, like `X is 4`
+1. `hasTooManyMethods`: **object oriented paradigm** does a given class/object/interface have too many methods?
 1. `hasTooShortIdentifiers`: **any paradigm** whether an identifier is too short and not part of domain language's jargon
 1. `hasWrongCaseIdentifiers`: **any paradigm** whether an identifier does not match the domain language's case style
 1. `implements`: **object oriented paradigm** is the given interface implemented?
@@ -132,6 +134,7 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _id
 1. `inherits`: **object oriented paradigm** is a given class declared as superclass? - alias of `declaresSuperclass`
 1. `instantiates`: **object oriented paradigm** is the given class instantiated?
 1. `isLongCode`: **any paradigm** has the code long sequences of statements?
+1. `overridesEqualsOrHashButNotBoth`: **object oriented paradigm** does a given class override equals but not hash? or hash but not equals?
 1. `raises`: **any paradigm** is the given _exception type_ raised?
 1. `rescues`: **any paradigm** is the given _exception type_ rescued?
 1. `returnsNull`
