@@ -48,6 +48,8 @@ muMemberDecl :: MemberDecl -> [Expression]
 muMemberDecl (FieldDecl _ _type varDecls)                                     = map (variableToAttribute.muVarDecl) varDecls
 muMemberDecl (MethodDecl _ _ _ name params _ (MethodBody Nothing))            = return $ TypeSignature (i name) (map muFormalParamType params) "void"
 muMemberDecl (MethodDecl (elem Static -> True) _ _ (Ident "main") [_] _ body) = return $ EntryPoint "main" (muMethodBody body)
+muMemberDecl (MethodDecl _ _ _ (Ident "equals") params _ body)                = return $ EqualsMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
+muMemberDecl (MethodDecl _ _ _ (Ident "hashCode") params _ body)              = return $ HashMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
 muMemberDecl (MethodDecl _ _ _ name params _ body)                            = return $ SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)
 muMemberDecl (ConstructorDecl _ _ _ _params _ _constructorBody)               = return $ Other
 muMemberDecl (MemberClassDecl decl)                                           = return $ muClassTypeDecl decl

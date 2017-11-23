@@ -129,14 +129,15 @@ isMethod _ = False
 
 overridesEqualsOrHashButNotBoth :: Inspection
 overridesEqualsOrHashButNotBoth = containsExpression f
-  where f (Sequence expressions) = (overrides "equals" expressions) /= (overrides "hashCode" expressions)
-        f (Class _ _ (Method "equals" _)) = True
-        f (Class _ _ (Method "hashCode" _)) = True
+  where f (Sequence expressions) = (any isEquals expressions) /= (any isHash expressions)
+        f (Class _ _ (EqualsMethod _)) = True
+        f (Class _ _ (HashMethod _)) = True
         f _ = False
 
-overrides :: Identifier -> [Expression] -> Bool
-overrides method = any (hasSameName method)
+isEquals :: Expression -> Bool
+isEquals (EqualsMethod _) = True
+isEquals _ = False
 
-hasSameName :: Identifier -> Expression -> Bool
-hasSameName method1 (Method method2 _) =  method1 == method2
-hasSameName _ _ = False
+isHash :: Expression -> Bool
+isHash (HashMethod _) = True
+isHash _ = False

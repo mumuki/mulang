@@ -71,6 +71,8 @@ data Expression
     | Procedure Identifier [Equation]
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
     | Method Identifier [Equation]
+    | EqualsMethod [Equation]
+    | HashMethod [Equation]
     | Variable Identifier Expression
     | Assignment Identifier Expression
     | Attribute Identifier Expression
