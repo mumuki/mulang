@@ -71,7 +71,7 @@ data Expression
     | Procedure Identifier [Equation]
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
     | Method Identifier [Equation]
-    | EqualsMethod [Equation]
+    | EqualMethod [Equation]
     | HashMethod [Equation]
     | Variable Identifier Expression
     | Assignment Identifier Expression
@@ -211,12 +211,9 @@ extractSubroutine (Method name equations)    = Just (name, equations)
 extractSubroutine _                          = Nothing
 
 extractParams :: Expression -> Maybe ([Pattern])
-extractParams (Function _ equations)  = Just (equationParams.head $ equations)
-extractParams (Procedure _ equations) = Just (equationParams.head $ equations)
-extractParams (Method _ equations)    = Just (equationParams.head $ equations)
-extractParams (Rule _ params _)       = Just params
-extractParams (Fact _ params)         = Just params
-extractParams _                       = Nothing
+extractParams (Subroutine _ equations) = Just (equationParams.head $ equations)
+extractParams (Clause _ params _)      = Just params
+extractParams _                        = Nothing
 
 extractCall :: Expression -> Maybe (Expression, [Expression])
 extractCall (Application op args)   = Just (op, args)

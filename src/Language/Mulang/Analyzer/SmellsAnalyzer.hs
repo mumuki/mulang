@@ -39,7 +39,7 @@ allSmells = [
   "HasTooShortIdentifiers",
   "HasWrongCaseIdentifiers",
   "IsLongCode",
-  "OverridesEqualsOrHashButNotBoth",
+  "OverridesEqualOrHashButNotBoth",
   "ReturnsNull",
   "UsesCut",
   "UsesFail",
@@ -68,7 +68,7 @@ detectionFor "HasTooShortBindings"             = withLanguage hasTooShortIdentif
 detectionFor "HasWrongCaseIdentifiers"         = withLanguage hasWrongCaseIdentifiers
 detectionFor "HasWrongCaseBinding"             = withLanguage hasWrongCaseIdentifiers
 detectionFor "IsLongCode"                      = unsupported
-detectionFor "OverridesEqualsOrHashButNotBoth" = simple overridesEqualsOrHashButNotBoth
+detectionFor "OverridesEqualOrHashButNotBoth"  = simple overridesEqualOrHashButNotBoth
 detectionFor "ReturnsNull"                     = simple returnsNull
 detectionFor "UsesCut"                         = simple usesCut
 detectionFor "UsesFail"                        = simple usesFail

@@ -14,7 +14,7 @@ module Language.Mulang.Inspector.Generic.Smell (
   doesConsolePrint,
   hasLongParameterList,
   hasTooManyMethods,
-  overridesEqualsOrHashButNotBoth) where
+  overridesEqualOrHashButNotBoth) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Inspector
@@ -122,22 +122,19 @@ hasTooManyMethods :: Inspection
 hasTooManyMethods = containsExpression f
   where f (Sequence expressions) = (>15).length.filter isMethod $ expressions
         f _ = False
+        
+        isMethod (Method _ _) = True
+        isMethod _ = False
 
-isMethod :: Inspection
-isMethod (Method _ _) = True
-isMethod _ = False
-
-overridesEqualsOrHashButNotBoth :: Inspection
-overridesEqualsOrHashButNotBoth = containsExpression f
-  where f (Sequence expressions) = (any isEquals expressions) /= (any isHash expressions)
-        f (Class _ _ (EqualsMethod _)) = True
+overridesEqualOrHashButNotBoth :: Inspection
+overridesEqualOrHashButNotBoth = containsExpression f
+  where f (Sequence expressions) = (any isEqual expressions) /= (any isHash expressions)
+        f (Class _ _ (EqualMethod _)) = True
         f (Class _ _ (HashMethod _)) = True
         f _ = False
 
-isEquals :: Expression -> Bool
-isEquals (EqualsMethod _) = True
-isEquals _ = False
-
-isHash :: Expression -> Bool
-isHash (HashMethod _) = True
-isHash _ = False
+        isEqual (EqualMethod _) = True
+        isEqual _ = False
+        
+        isHash (HashMethod _) = True
+        isHash _ = False

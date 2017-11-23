@@ -223,13 +223,13 @@ spec = do
 
   describe "overridesEqualsOrHashCodeButNotTheOther" $ do
     it "is False when neither is overridden" $ do
-      overridesEqualsOrHashButNotBoth (java ("public class A{ public void a(){} }")) `shouldBe` False
+      overridesEqualOrHashButNotBoth (java ("public class A{ public void a(){} }")) `shouldBe` False
 
     it "is True when equals is overridden but not hashCode" $ do
-      overridesEqualsOrHashButNotBoth (java "public class A{ public void equals(){}\npublic void a(){} }") `shouldBe` True
+      overridesEqualOrHashButNotBoth (java "public class A{ public void equals(){}\npublic void a(){} }") `shouldBe` True
 
     it "is True when hashCode is overridden but not equals" $ do
-      overridesEqualsOrHashButNotBoth (java "public class A{ public void hashCode(){}\npublic void a(){} }") `shouldBe` True
+      overridesEqualOrHashButNotBoth (java "public class A{ public void hashCode(){}\npublic void a(){} }") `shouldBe` True
 
     it "is False when both are overriden" $ do
-      overridesEqualsOrHashButNotBoth (java "public class A{ public void equals(){}\npublic void hashCode(){} }") `shouldBe` False
+      overridesEqualOrHashButNotBoth (java "public class A{ public void equals(){}\npublic void hashCode(){} }") `shouldBe` False
