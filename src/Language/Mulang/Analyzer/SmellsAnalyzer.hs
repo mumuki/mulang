@@ -26,6 +26,7 @@ allSmells = [
   "DoesTypeTest",
   "HasAssignmentReturn",
   "HasCodeDuplication",
+  "HasLongParameterList",
   "HasMisspelledIdentifiers",
   "HasRedundantBooleanComparison",
   "HasRedundantGuards",
@@ -34,9 +35,11 @@ allSmells = [
   "HasRedundantLocalVariableReturn",
   "HasRedundantParameter",
   "HasRedundantReduction",
+  "HasTooManyMethods",
   "HasTooShortIdentifiers",
   "HasWrongCaseIdentifiers",
   "IsLongCode",
+  "OverridesEqualOrHashButNotBoth",
   "ReturnsNull",
   "UsesCut",
   "UsesFail",
@@ -49,6 +52,7 @@ detectionFor "DoesNullTest"                    = simple doesNullTest
 detectionFor "DoesTypeTest"                    = simple doesTypeTest
 detectionFor "HasAssignmentReturn"             = simple hasAssignmentReturn
 detectionFor "HasCodeDuplication"              = unsupported
+detectionFor "HasLongParameterList"            = simple hasLongParameterList
 detectionFor "HasMisspelledIdentifiers"        = withLanguage hasMisspelledIdentifiers
 detectionFor "HasMisspelledBindings"           = withLanguage hasMisspelledIdentifiers
 detectionFor "HasRedundantBooleanComparison"   = simple hasRedundantBooleanComparison
@@ -58,11 +62,13 @@ detectionFor "HasRedundantLambda"              = simple hasRedundantLambda
 detectionFor "HasRedundantLocalVariableReturn" = simple hasRedundantLocalVariableReturn
 detectionFor "HasRedundantParameter"           = simple hasRedundantParameter
 detectionFor "HasRedundantReduction"           = simple hasRedundantReduction
+detectionFor "HasTooManyMethods"               = simple hasTooManyMethods
 detectionFor "HasTooShortIdentifiers"          = withLanguage hasTooShortIdentifiers
 detectionFor "HasTooShortBindings"             = withLanguage hasTooShortIdentifiers
 detectionFor "HasWrongCaseIdentifiers"         = withLanguage hasWrongCaseIdentifiers
 detectionFor "HasWrongCaseBinding"             = withLanguage hasWrongCaseIdentifiers
 detectionFor "IsLongCode"                      = unsupported
+detectionFor "OverridesEqualOrHashButNotBoth"  = simple overridesEqualOrHashButNotBoth
 detectionFor "ReturnsNull"                     = simple returnsNull
 detectionFor "UsesCut"                         = simple usesCut
 detectionFor "UsesFail"                        = simple usesFail
