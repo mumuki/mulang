@@ -45,15 +45,16 @@ muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
 muDecl (InitDecl _ _)          = return Other
 
 muMemberDecl :: MemberDecl -> [Expression]
-muMemberDecl (FieldDecl _ _type varDecls)                                     = map (variableToAttribute.muVarDecl) varDecls
-muMemberDecl (MethodDecl _ _ _ name params _ (MethodBody Nothing))            = return $ TypeSignature (i name) (map muFormalParamType params) "void"
-muMemberDecl (MethodDecl (elem Static -> True) _ _ (Ident "main") [_] _ body) = return $ EntryPoint "main" (muMethodBody body)
-muMemberDecl (MethodDecl _ _ _ (Ident "equals") params _ body)                = return $ EqualMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
-muMemberDecl (MethodDecl _ _ _ (Ident "hashCode") params _ body)              = return $ HashMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
-muMemberDecl (MethodDecl _ _ _ name params _ body)                            = return $ SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)
-muMemberDecl (ConstructorDecl _ _ _ _params _ _constructorBody)               = return $ Other
-muMemberDecl (MemberClassDecl decl)                                           = return $ muClassTypeDecl decl
-muMemberDecl (MemberInterfaceDecl decl)                                       = return $ muInterfaceTypeDecl decl
+muMemberDecl (FieldDecl _ _type varDecls)                            = map (variableToAttribute.muVarDecl) varDecls
+muMemberDecl (MethodDecl _ _ typ name params _ (MethodBody Nothing)) = return $ TypeSignature (i name) (map muFormalParamType params) (muMaybeType typ)
+muMemberDecl (MethodDecl (elem Static -> True) _ Nothing (Ident "main") [_] _ body)
+                                                                     = return $ EntryPoint "main" (muMethodBody body)
+muMemberDecl (MethodDecl _ _ _ (Ident "equals") params _ body)       = return $ EqualMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
+muMemberDecl (MethodDecl _ _ _ (Ident "hashCode") params _ body)     = return $ HashMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
+muMemberDecl (MethodDecl _ _ _ name params _ body)                   = return $ SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)
+muMemberDecl (ConstructorDecl _ _ _ _params _ _constructorBody)      = return $ Other
+muMemberDecl (MemberClassDecl decl)                                  = return $ muClassTypeDecl decl
+muMemberDecl (MemberInterfaceDecl decl)                              = return $ muInterfaceTypeDecl decl
 
 muEnumConstant (EnumConstant name _ _) = i name
 
@@ -65,6 +66,9 @@ muBlock (Block statements) = compactConcatMap muBlockStmt statements
 muBlockStmt (BlockStmt stmt) = [muStmt stmt]
 muBlockStmt (LocalClass decl) = [muClassTypeDecl decl]
 muBlockStmt (LocalVars _ _type vars) = map muVarDecl vars
+
+muMaybeType Nothing    = "void"
+muMaybeType (Just typ) = muType typ
 
 muType (PrimType t) = muPrimType t
 muType (RefType t)  = muRefType t
