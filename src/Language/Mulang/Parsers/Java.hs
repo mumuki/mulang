@@ -26,8 +26,12 @@ type Unparser = Expression -> String
 unjava :: Unparser
 unjava (Class name Nothing _ )           = unwords ["public class", name, "{}"]
 unjava (Class name (Just superclass) _ ) = unwords ["public class", name, "extends", superclass, "{}"]
-unjava (Interface name [] body)          = unwords ["public interface", name, "{", unbody body, "}"]
+unjava (Interface name extends body)     = unwords ["public interface", name, unextends extends, "{", unbody body, "}"]
 unjava _                                 = ""
+
+unextends :: [Identifier] -> String
+unextends [] = ""
+unextends parents = unwords ["extends", intercalate "," parents]
 
 unbody :: Unparser
 unbody MuNull                        = ""
