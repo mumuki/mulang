@@ -9,10 +9,10 @@ import Data.String (unwords)
 type Unparser = Expression -> String
 
 unjava :: Unparser
-unjava (Class name Nothing _ )           = unwords ["public class", name, "{}"]
-unjava (Class name (Just superclass) _ ) = unwords ["public class", name, "extends", superclass, "{}"]
-unjava (Interface name extends body)     = unwords ["public interface", name, unextends extends, "{", unbody body, "}"]
-unjava _                                 = ""
+unjava (Class name Nothing body)           = unwords ["public class", name, "{", unbody body, "}"]
+unjava (Class name (Just superclass) body) = unwords ["public class", name, "extends", superclass, "{", unbody body, "}"]
+unjava (Interface name extends body)       = unwords ["public interface", name, unextends extends, "{", unbody body, "}"]
+unjava _                                   = ""
 
 unextends :: [Identifier] -> String
 unextends [] = ""
@@ -20,6 +20,7 @@ unextends parents = unwords ["extends", intercalate "," parents]
 
 unbody :: Unparser
 unbody MuNull                        = ""
+unbody (SimpleMethod name [] MuNull) = unwords ["public", "void", name, "()", "{}"]
 unbody (Sequence members)            = unlines (map unbody members)
 unbody (TypeSignature name args typ) = unwords ["public abstract", typ, name, "(", unparam args, ");"]
 
