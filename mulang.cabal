@@ -67,6 +67,8 @@ library
     Language.Mulang.Operators.Java
     Language.Mulang.Operators.Python
     Language.Mulang.Operators.Ruby
+    Language.Mulang.Unparsers
+    Language.Mulang.Unparsers.Java
     Language.Mulang.Analyzer
     Language.Mulang.Analyzer.Analysis
     Language.Mulang.Analyzer.Analysis.Json
