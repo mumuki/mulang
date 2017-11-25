@@ -1,12 +1,11 @@
 {-# LANGUAGE ViewPatterns #-}
 
 module Language.Mulang.Unparsers.Java (unjava) where
+import Language.Mulang.Unparsers (Unparser)
 import Language.Mulang.Ast
 
 import Data.List (intercalate)
 import Data.String (unwords)
-
-type Unparser = Expression -> String
 
 unjava :: Unparser
 unjava (Class name Nothing body)           = unwords ["public class", name, "{", unbody body, "}"]

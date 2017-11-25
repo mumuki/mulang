@@ -7,9 +7,6 @@ import           Language.Mulang
 import           Language.Mulang.Parsers.Java (java)
 import           Language.Mulang.Unparsers.Java (unjava)
 
-import           Data.Text (Text, unpack, pack)
-import           NeatInterpolation (text)
-
 checkRoundTrip expression =  (java.unjava) expression `shouldBe` expression
 
 spec :: Spec
