@@ -29,6 +29,7 @@ library
 
   exposed-modules:
     Control.Fallible
+    Text.Reparser
     Text.Dictionary
     Text.SimpleParser
     Text.Inflections.Tokenizer
