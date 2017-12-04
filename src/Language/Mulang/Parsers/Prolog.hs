@@ -5,6 +5,7 @@ module Language.Mulang.Parsers.Prolog  (pl, parseProlog) where
 import Text.Parsec
 import Text.Parsec.Expr
 import Text.Parsec.Numbers
+import Text.SimpleParser (ParsecParser)
 
 import Language.Mulang.Ast
 import Language.Mulang.Builder
@@ -14,8 +15,6 @@ import Data.Maybe (fromMaybe)
 import Data.Char (isUpper)
 
 import Control.Fallible
-
-type ParsecParser a = forall x . Parsec String x a
 
 pl :: Parser
 pl = orFail . parseProlog'

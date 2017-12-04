@@ -6,11 +6,10 @@ module Text.Reparser (
   SyntaxErrorKind (..)) where
 
 import Text.Parsec
+import Text.SimpleParser (ParsecParser)
 import Control.Fallible (orFail)
 import Control.Monad (msum, join)
 import Data.Maybe (isJust)
-
-type ParsecParser a = forall x . Parsec String x a
 
 data SyntaxError
   = SyntaxError { line :: Int, column :: Int, kind :: SyntaxErrorKind } deriving (Show, Eq)
