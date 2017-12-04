@@ -30,13 +30,19 @@ data SyntaxErrorKind
   | NonAsciiChar
   deriving (Show, Eq)
 
-lparen, rparen, rbrace, lbrace, lbracket, rbracket :: ParsecParser Char
+lparen, rparen,
+  rbrace, lbrace,
+  lbracket, rbracket,
+  quote, doubleQuote :: ParsecParser Char
+
 lparen = char '('
 rparen = char ')'
 lbrace = char '{'
 rbrace = char '}'
 lbracket = char '['
 rbracket = char ']'
+quote = char '\''
+doubleQuote = char '"'
 
 
 reparse :: String -> Maybe SyntaxError
@@ -50,7 +56,7 @@ strip nested = fmap msum $ many (choice choices)
   where choices | nested = commonParsers
                 | otherwise = commonParsers ++ withModes unopen
 
-        commonParsers = stream : withModes open
+        commonParsers = stream : quotation : doubleQuotation : withModes open
         withModes f = map f [bracketMode, parenMode, braceMode]
 
 data Mode = Mode {
@@ -63,6 +69,13 @@ data Mode = Mode {
 parenMode   = Mode lparen rparen UnopenParen UnclosedParen
 bracketMode = Mode lbracket rbracket UnopenBracket UnclosedBracket
 braceMode   = Mode lbrace rbrace UnopenBrace UnclosedBrace
+
+quotation :: Reparser
+quotation = quote *> many (noneOf "'") *> quote *> return Nothing
+
+doubleQuotation :: Reparser
+doubleQuotation = doubleQuote *> many (noneOf "\"") *> doubleQuote *> return Nothing
+
 
 open :: Mode -> Reparser
 open mode = do
@@ -87,6 +100,6 @@ closed mode = rightParser mode *> return Nothing
 unclosed mode position = returnSyntaxError position (unclosedKind mode)
 
 stream :: Reparser
-stream = many1 (noneOf "{}[]()") *> return Nothing
+stream = many1 (noneOf "'\"{}[]()") *> return Nothing
 
 returnSyntaxError position = return . Just . SyntaxError (sourceLine position) (sourceColumn position)

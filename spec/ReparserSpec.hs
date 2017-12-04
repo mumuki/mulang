@@ -128,6 +128,18 @@ spec = do
     it "`( ( )`" $ do
       reparse "( ( )" `shouldBe` Just (SyntaxError 1 1 UnclosedParen)
 
+    it "`'{'`" $ do
+      reparse "'{'" `shouldBe` Nothing
+
+    it "`('{')`" $ do
+      reparse "('{')" `shouldBe` Nothing
+
+    it "`\"{\"`" $ do
+      reparse "\"{\"" `shouldBe` Nothing
+
+    it "`(\"{\")`" $ do
+      reparse "(\"{\")" `shouldBe` Nothing
+
     it "`public class Main {\npublic static void main(String[] args) {\nSystem.out.println(new int[]{1, 2});\n}\n}`" $ do
       reparse "public class Main {\npublic static void main(String[] args) {\nSystem.out.println(new int[]{1, 2});\n}\n}" `shouldBe` Nothing
 
