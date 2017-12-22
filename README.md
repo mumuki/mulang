@@ -656,16 +656,6 @@ To generate `mulang` executable, you have to build the project using [stack](htt
 2. Go to the mulang project directory and setup it: `stack setup`
 3. Build the project: `stack build`
 
-### Rungs
-
-Mulang uses the `rungs` command to parse the Gobstones language - if you don't install it, Gobstones tests will fail:
-
-```
-$ wget https://github.com/gobstones/gs-weblang-cli/releases/download/v1.3.3/rungs-ubuntu64 -O rungs
-$ chmod u+x rungs
-$ sudo mv rungs ~/.local/bin
-```
-
 ### Installing and creating an executable
 
 
