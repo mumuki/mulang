@@ -74,6 +74,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (MuObject es)           = [es]
     subExpressions (MuTuple as)            = as
     subExpressions (MuList as)             = as
+    subExpressions (Try t cs f)            = t : map snd cs ++ [f]
     subExpressions _                       = []
 
 
