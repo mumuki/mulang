@@ -172,6 +172,7 @@ data Pattern
     -- ^ @\@@-pattern
     | WildcardPattern
     -- ^ wildcard pattern @_@
+    | UnionPattern [Pattern]
     | OtherPattern
     -- ^ Other unrecognized pattern
   deriving (Eq, Show, Read, Generic)
