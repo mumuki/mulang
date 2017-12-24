@@ -6,19 +6,24 @@ Mulang
 
 Mulang is three different  - but thighly related - things:
 
-  * an intermediate language, sometimes refered as the **Mulang AST**;
-  * a command line tool for analysing the Mulang AST and some popular languages by transforming to it
-  * a Haskell composable combinators library for analysing the Mulang AST;
+  * an intermediate language, known as the [Mulang AST](#mulang-ast-spec);
+  * a [command line tool](#command-line-tool) for analysing the Mulang AST and [some popular languages](#supported-languages) by transforming to it
+  * a Haskell composable [combinators library]((#combinators-crash-course)) for analysing the Mulang AST;
 
 # Table of contents
 
+- [Mulang](#mulang)
+- [Table of contents](#table-of-contents)
 - [Combinators Crash course](#combinators-crash-course)
-  * [Inspections and Inspection Combinators](#inspections-and-inspection-combinators)
+  * [Inspections](#inspections)
+  * [Inspection Combinators](#inspection-combinators)
   * [Identifier predicates](#identifier-predicates)
   * [Detections](#detections)
 - [Supported inspections](#supported-inspections)
 - [Supported languages](#supported-languages)
 - [Command Line Tool](#command-line-tool)
+  * [The expectations DSL](#the-expectations-dsl)
+  * [Examples](#examples)
     + [With intransitive expectations](#with-intransitive-expectations)
     + [With unscoped expectations](#with-unscoped-expectations)
     + [With signature analysis](#with-signature-analysis)
@@ -28,14 +33,7 @@ Mulang is three different  - but thighly related - things:
     + [With Smell Analysis, by exclusion](#with-smell-analysis-by-exclusion)
     + [With expressiveness smells](#with-expressiveness-smells)
     + [With Intermediate Language Generation](#with-intermediate-language-generation)
-  * [Expectations, Intermediate Langauge, Signatures and Smells](#expectations-intermediate-langauge-signatures-and-smells)
-  * [Building mulang from source](#building-mulang-from-source)
-    + [Setup](#setup)
-    + [Installing and creating an executable](#installing-and-creating-an-executable)
-    + [Running tests](#running-tests)
-    + [Watching changes](#watching-changes)
-    + [Loading mulang in the REPL](#loading-mulang-in-the-repl)
-- [The AST spec](#the-ast-spec)
+- [Mulang AST spec](#mulang-ast-spec)
   * [Expressions](#expressions)
     + [Record](#record)
       - [Syntax](#syntax)
@@ -233,12 +231,20 @@ Mulang is three different  - but thighly related - things:
     + [`MuList`](#mulist)
       - [Syntax](#syntax-50)
       - [Semantics](#semantics-50)
+- [Building mulang from source](#building-mulang-from-source)
+  * [Setup](#setup)
+  * [Installing and creating an executable](#installing-and-creating-an-executable)
+  * [Running tests](#running-tests)
+  * [Watching changes](#watching-changes)
+  * [Loading mulang in the REPL](#loading-mulang-in-the-repl)
 
 # Combinators Crash course
 
-## Inspections and Inspection Combinators
+Better than explaining what Mulang is, let's see what can do it for you.
 
-Better than explaining what Mulang is, let's see what can do it for you. Let's suppose we have the following JS code...
+## Inspections
+
+Let's suppose we have the following JS code...
 
 ```javascript
 var aPlace = buenosAires;
@@ -247,38 +253,40 @@ var aBird = {position: aPlace, weight: 20};
 
 ...and we want to recognize some code patterns on it. We will first load the expression into Mulang:
 
-
 ```
 $ ghci
 > :m Language.Mulang.All
 > let e = js "var aPlace = buenosAires; var aBird = {position: aPlace, weight: 20};"
 ```
 
-Now the magic begins. We want to know if the code expression _uses_ - that is, contains any reference to - a certain identifier. Such identifier could be a variable, function, or anything that has a name:
+Now the magic begins. We want to know if the code expression _uses_ - that is, contains any reference to - a given _identifier_. Such identifier could be a variable, function, or anything that has a name:
 
 ```haskell
 > uses (named "buenosAires") e
-True
+True -- because of the reference in `...aPlace = buenosAires...`
 > uses (named "rosario") e
-False
+False -- no reference to the identifier `rosario` is found on the code
 ```
 
 `uses (named "buenosAires")` is our first _inspection_: a function that takes a Mulang AST and answers a boolan question about it. That _seems_ easy, but just in case you are wondering: no, Mulang doesn't perform a `string.contains` or something like that :stuck_out_tongue: :
 
 ```haskell
 > uses (named "buenos") e
-False
+False -- no reference to the identifier `buenos` is found on the code
 ```
+
+## Inspection Combinators
 
 So let's ask something more interesting - does `aPlace` _use_ the identifier `buenosAires`?
 
 ```haskell
 > scoped (uses (named "buenosAires")) "aPlace"  e
-True
+True -- again, because of the the reference in `...aPlace = buenosAires...`
+> scoped (uses (named "buenosAires")) "aBird"  e
+False -- because `...aBird = {position: aPlace, weight: 20}...` does not reference `buenosAires` directly...
 ```
 
-Here we have used the our first _inspection combinator_, a function that takes an inspection - `uses (named "buenosAires")` - and returns a new one that is more powerful. In this case, `scoped` is capable of restricting the analysis to the given context - the `aPlace` identifier.
-
+Here we have used the our first _inspection combinator_, a function that takes an inspection - `uses (named "buenosAires")` - and returns a new one that is more powerful. In this case, `scoped` is capable of restricting the analysis to the given _context_ - the `aPlace` identifier.
 
 Let's tray again: does `"aPlace"` it _use_ `rosario`?
 
@@ -296,14 +304,7 @@ True
 False
 ```
 
-Does `aBird` use `buenosAires`?
-
-```haskell
-> scoped (uses (named "buenosAires")) "aBird"  e
-False
-```
-
-Oh, wait there! We know, it is true that it does not use **exactly** that variable, but come on, `aPlace` does use `buenosAires`! Wouldn't it be sweet to be transitive?
+Oh, wait! Let go back to `scoped (uses (named "buenosAires")) "aBird"  e`.  We know, it is true that it does not use **exactly** that variable, `aPlace` does use `buenosAires`! Wouldn't it be sweet to be transitive?
 
 ```haskell
 > transitive (uses (named "buenosAires")) "aBird"  e
@@ -312,7 +313,7 @@ True
 
 Here we can see another _inspections combinator_: `transitive`, which inspects the given context and all the contexts that are refered from it.
 
-Contexts can be nested, too: for example, if you want to know whether `aBird.position` _uses_ `aPlace` - ignoring that `weight` attribute:
+_Contexts_ can be nested, too: for example, if you want to know whether `aBird.position` _uses_ `aPlace` - ignoring that `weight` attribute:
 
 ```haskell
 > scopedList (uses (named "aPlace")) ["aBird", "position"]  e
@@ -321,7 +322,7 @@ True
 False
 ```
 
-Nice, we know. But not very awesome, it only can tell you if you are using a _identifier_, right? Eeer. Good news, it can tell you much much much more things. See the supported inspections list.
+Nice, we know. But not very awesome, it only can tell you if you are using a _identifier_, right? Eeer. Good news, it can tell you much much much more things. See the [supported inspections list](#supported-inspections).
 
 ## Identifier predicates
 
@@ -487,7 +488,36 @@ So in order to use it with a particular language, you have to:
 
 # Command Line Tool
 
-You can also use Mulang from the Command Line, without having to interact with Haskell code. Let's see some samples:
+You can also use Mulang from the Command Line, without having to interact with Haskell code. This tool allows to perform most common analysis out of the box by using a JSON spec. It supports four different kinds of analysis:
+
+1. **Expectation analysis**: you can pass _inspections_ that will be tested against the provied program. Expectations answer questions like: _does the function X call the function Y?_ or _does the program use if's?_.
+4. **Smell analysis**: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched.
+2. **Intermediate Language analysis**: you can ask the tool to generate the Mulang AST for a given source code.
+3. **Signature analysis**: report the signatures of the computations present in source code.
+
+## The expectations DSL
+
+In order to pass expectations to the Command Line Tool, you must use a simple DSL that builds the inspections for you.
+
+| Kind        | DSL Sample                  | Haskell Combinators Sample
+|-------------|-----------------------------|----------------------------
+| Basic       | `* UsesIf`                  |  `usesIf`
+| Negated     | `* Not:UsesWhile`           | `(negative usesWhile)`
+| Predicated  | `* DeclaresClass:Foo`       | `(declaresClass (named "Foo"))`
+|             | `* DeclaresClass:=Foo`      | `(declaresClass (named "Foo"))`
+|             | `* DeclaresClass:~Foo`      | `(declaresClass (like "Foo"))`
+|             | `* DeclaresClass:^Foo`      | `(declaresClass (except "Foo"))`
+|             | `* DeclaresClass:[Foo|Bar]` | `(declaresClass (anyOf ["Foo", "Bar"]))`
+|             | `* DeclaresClass:*`         | `(declaresClass anyone)`
+|             | `* DeclaresClass`           | `(declaresClass anyone)`
+| Transitive  | `foo UsesLambda`            | `(transitive usesLambda "foo")`
+| Scoped      | `Intransitive:foo UsesIf`   | `(scoped usesIf "foo")`
+| Scoped List | `foo.bar UsesIf`            | `(scopedList usesIf ["foo", "bar"])`
+
+
+## Examples
+
+Let's see some usage samples:
 
 ### With intransitive expectations
 
@@ -874,66 +904,9 @@ $ mulang '
 ```
 
 
-## Expectations, Intermediate Langauge, Signatures and Smells
+# Mulang AST spec
 
-Mulang CLI can do four different kinds of analysis:
-
-* **Expectation analysis**: you can provide an expression - called `inspection` - that will be tested against the provied program. Expectations answer questions like: _does the function X call the function Y?_ or _does the program use if's?_. They can be expressed with the following simple DSL:
-  * Simple inspections, like `HasIf` or `DeclaresClass`
-  * Negated inspections, like `Not:HasIf`
-  * Targeted inspections, like `DeclaresClass:Golondrina`. You can specify targets the following ways:
-    * Exact matches:  `DeclaresClass:=Golondrina` or simply `DeclaresClass:Golondrina`
-    * Approximate matches: `DeclaresClass:~Golondrina`
-    * Any matches: `DeclaresClass:*` or simply `DeclaresClass`
-    * Except matches: `Declares:^Foo` - wich means that will match any declaration that is not `Foo`
-    * Any-Of matches: `Declares:[Foo|IFoo|AbstractFoo]` - which means that will match any declaration of `Foo`, `IFoo` or `AbstractFoo`
-* **Intermediate Language**: Mulang Command Line Tool can generate the Mulang AST for a given source code.
-* **Signature analysis**: report the signatures of the computations present in source code.
-* **Smell analysis**: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched.
-
-## Building mulang from source
-
-### Setup
-
-To generate `mulang` executable, you have to build the project using [stack](https://haskellstack.org):
-
-1. Install stack: `wget -qO- https://get.haskellstack.org/ | sh`
-2. Go to the mulang project directory and setup it: `stack setup`
-3. Build the project: `stack build`
-
-### Installing and creating an executable
-
-
-```bash
-$ stack install
-$ mulang
-```
-
-That will generate a `mulang` executable in the folder `~/.local/bin`.
-
-### Running tests
-
-```bash
-$ stack test --fast
-```
-
-### Watching changes
-
-
-```bash
-$ stack test --fast --file-watch
-```
-
-### Loading mulang in the REPL
-
-```
-stack ghci
-```
-
-
-# The AST spec
-
-In this last section, we will get into the technical details of the Mulang AST. It is built around 4 core elements:
+In this section, we will get into the technical details of the Mulang AST. It is built around 4 core elements:
 
 * Expressions
 * Patterns
@@ -1679,3 +1652,43 @@ Generic symbol/atom literal
 ```
 
 #### Semantics
+
+
+# Building mulang from source
+
+## Setup
+
+To generate `mulang` executable, you have to build the project using [stack](https://haskellstack.org):
+
+1. Install stack: `wget -qO- https://get.haskellstack.org/ | sh`
+2. Go to the mulang project directory and setup it: `stack setup`
+3. Build the project: `stack build`
+
+## Installing and creating an executable
+
+
+```bash
+$ stack install
+$ mulang
+```
+
+That will generate a `mulang` executable in the folder `~/.local/bin`.
+
+## Running tests
+
+```bash
+$ stack test --fast
+```
+
+## Watching changes
+
+
+```bash
+$ stack test --fast --file-watch
+```
+
+## Loading mulang in the REPL
+
+```
+stack ghci
+```
