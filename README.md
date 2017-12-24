@@ -147,6 +147,7 @@ Mulang is three different  - but thighly related - things:
       - [Ruby Example](#ruby-example-3)
     + [`Comprehension`](#comprehension)
       - [Syntax](#syntax-37)
+      - [Caveats](#caveats-3)
     + [`Sequence`](#sequence)
       - [Syntax](#syntax-38)
       - [Example](#example-21)
@@ -176,25 +177,25 @@ Mulang is three different  - but thighly related - things:
         * [Example](#example-23)
     + [`InfixApplicationPattern`](#infixapplicationpattern)
       - [Syntax](#syntax-48)
-        * [Example](#example-24)
+        * [Caveats](#caveats-4)
     + [`ApplicationPattern`](#applicationpattern)
       - [Syntax](#syntax-49)
-        * [Example](#example-25)
+        * [Example](#example-24)
     + [`TuplePattern`](#tuplepattern)
       - [Syntax](#syntax-50)
-        * [Example](#example-26)
+        * [Example](#example-25)
     + [`ListPattern`](#listpattern)
       - [Syntax](#syntax-51)
-        * [Example](#example-27)
+        * [Example](#example-26)
     + [`FunctorPattern`](#functorpattern)
       - [Syntax](#syntax-52)
-        * [Example](#example-28)
+        * [Example](#example-27)
     + [`AsPattern`](#aspattern)
       - [Syntax](#syntax-53)
-        * [Example](#example-29)
+        * [Example](#example-28)
     + [`TypePattern`](#typepattern)
       - [Syntax](#syntax-54)
-        * [Example](#example-30)
+        * [Example](#example-29)
     + [`WildcardPattern`](#wildcardpattern)
       - [Syntax](#syntax-55)
     + [`UnionPattern`](#unionpattern)
@@ -881,7 +882,7 @@ In this section, we will get into the technical details of the Mulang AST. It is
 
 * [Expressions](#expressions)
 * [Patterns](#patterns)
-* [Equations](#equations)
+* Equations
 * Generators
 
 All the AST elements fall within any of this 4 categories.
@@ -1501,6 +1502,10 @@ puts "Hello World"
 (Comprehension Expression [ComprehensionStatement])
 ```
 
+#### Caveats
+
+`Comprehension`s are going to be deprecated and replaced by new `ForStatement`. See [This PR](https://github.com/mumuki/mulang/pull/98).
+
 ### `Sequence`
 
 > Generic sequence of statements
@@ -1635,6 +1640,9 @@ true
 
 ## Patterns
 
+Patterns are the second most important element of Mulang AST. They represent things that don't hold a value, but are instead used to match values, like
+patterns in imperative `case` or `switch` statements, functional pattern matching in `match` or `case` expressions, or exception matching in `try-catch` or `begin-rescue`-like statements in object oriented languages.
+
 ### `VariablePattern`
 
 > Variable pattern represent a variable match. It corresponds to normal formal parameters in precedural languages,
@@ -1661,7 +1669,7 @@ function foo(x, y) { }
 
 ### `LiteralPattern`
 
-> literal constant pattern like @4@
+> Literal constant pattern
 
 #### Syntax
 
@@ -1674,7 +1682,7 @@ function foo(x, y) { }
 
 ### `InfixApplicationPattern`
 
-> infix application pattern like @4:X@
+> Infix application pattern like `4:X`
 
 #### Syntax
 
@@ -1682,12 +1690,13 @@ function foo(x, y) { }
 ```haskell
 (InfixApplicationPattern Pattern String Pattern)
 ```
+##### Caveats
 
-##### Example
+`InfixApplicationPattern` exposes the underying syntax and will be deprecated.
 
 ### `ApplicationPattern`
 
-> prefix application pattern like @f _@
+> prefix application pattern like `f _`
 
 #### Syntax
 
@@ -1700,7 +1709,7 @@ function foo(x, y) { }
 
 ### `TuplePattern`
 
-> tuple pattern like @(3, _)@
+> tuple pattern like `(3, _)`
 
 #### Syntax
 
@@ -1713,7 +1722,7 @@ function foo(x, y) { }
 
 ### `ListPattern`
 
-> list pattern like @[x, y, _]@
+> list pattern like `[x, y, _]`
 
 #### Syntax
 
@@ -1726,10 +1735,9 @@ function foo(x, y) { }
 
 ### `FunctorPattern`
 
-> Prolog-like functor pattern, like `f(X, 6)`, or Lisp's s-expressions
+> Prolog-like functor pattern, like `f(X, 6)`.
 
 #### Syntax
-
 
 ```haskell
 (FunctorPattern Identifier [Pattern])
