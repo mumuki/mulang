@@ -53,6 +53,186 @@ Mulang is three different  - but thighly related - things:
       - [Haskell Example](#haskell-example-1)
       - [Java Example](#java-example)
       - [Caveats](#caveats-2)
+    + [`EntryPoint`](#entrypoint)
+      - [Syntax](#syntax-3)
+      - [Semantics](#semantics-3)
+      - [Java Example](#java-example-1)
+    + [`Function`](#function)
+      - [Syntax](#syntax-4)
+      - [Semantics](#semantics-4)
+      - [Example](#example)
+    + [`Procedure`](#procedure)
+      - [Syntax](#syntax-5)
+      - [Semantics](#semantics-5)
+      - [Example](#example-1)
+    + [`Method`](#method)
+      - [Syntax](#syntax-6)
+      - [Semantics](#semantics-6)
+    + [`EqualMethod` and `HashMethod`](#equalmethod-and-hashmethod)
+      - [Syntax](#syntax-7)
+      - [Semantics](#semantics-7)
+      - [Example](#example-2)
+    + [`Variable`](#variable)
+      - [Syntax](#syntax-8)
+      - [Semantics](#semantics-8)
+    + [`Assignment`](#assignment)
+      - [Syntax](#syntax-9)
+      - [Semantics](#semantics-9)
+    + [`Attribute`](#attribute)
+      - [Syntax](#syntax-10)
+      - [Semantics](#semantics-10)
+      - [Example](#example-3)
+    + [`Object`](#object)
+      - [Syntax](#syntax-11)
+      - [Semantics](#semantics-11)
+      - [Example](#example-4)
+      - [Example](#example-5)
+    + [`Class`](#class)
+      - [Syntax](#syntax-12)
+      - [Semantics](#semantics-12)
+      - [Example](#example-6)
+      - [Example](#example-7)
+    + [`Enumeration`](#enumeration)
+      - [Syntax](#syntax-13)
+      - [Semantics](#semantics-13)
+      - [Example](#example-8)
+    + [`Interface`](#interface)
+      - [Syntax](#syntax-14)
+      - [Semantics](#semantics-14)
+      - [Example](#example-9)
+      - [Example](#example-10)
+    + [`Rule`](#rule)
+      - [Syntax](#syntax-15)
+      - [Semantics](#semantics-15)
+      - [Example](#example-11)
+    + [`Fact`](#fact)
+      - [Syntax](#syntax-16)
+      - [Semantics](#semantics-16)
+      - [Example](#example-12)
+    + [`Exist`](#exist)
+      - [Syntax](#syntax-17)
+      - [Semantics](#semantics-17)
+      - [Example](#example-13)
+    + [`Not`](#not)
+      - [Syntax](#syntax-18)
+      - [Semantics](#semantics-18)
+      - [Example](#example-14)
+    + [`Findall`](#findall)
+      - [Syntax](#syntax-19)
+      - [Semantics](#semantics-19)
+      - [Example](#example-15)
+    + [`Forall`](#forall)
+      - [Syntax](#syntax-20)
+      - [Semantics](#semantics-20)
+      - [Example](#example-16)
+    + [`Reference`](#reference)
+      - [Syntax](#syntax-21)
+      - [Semantics](#semantics-21)
+      - [Example](#example-17)
+    + [`Application`](#application)
+      - [Syntax](#syntax-22)
+      - [Semantics](#semantics-22)
+      - [Example](#example-18)
+    + [`Send`](#send)
+      - [Syntax](#syntax-23)
+      - [Semantics](#semantics-23)
+      - [Example](#example-19)
+    + [`New`](#new)
+      - [Syntax](#syntax-24)
+      - [Semantics](#semantics-24)
+      - [Example](#example-20)
+    + [`Implement`](#implement)
+      - [Syntax](#syntax-25)
+      - [Semantics](#semantics-25)
+      - [Example](#example-21)
+    + [`Include`](#include)
+      - [Syntax](#syntax-26)
+      - [Semantics](#semantics-26)
+      - [Example](#example-22)
+    + [`Lambda`](#lambda)
+      - [Syntax](#syntax-27)
+      - [Semantics](#semantics-27)
+    + [`If`](#if)
+      - [Syntax](#syntax-28)
+      - [Semantics](#semantics-28)
+    + [`Return`](#return)
+      - [Syntax](#syntax-29)
+      - [Semantics](#semantics-29)
+    + [`While`](#while)
+      - [Syntax](#syntax-30)
+      - [Semantics](#semantics-30)
+      - [Example](#example-23)
+    + [`Repeat`](#repeat)
+      - [Syntax](#syntax-31)
+      - [Semantics](#semantics-31)
+      - [Example](#example-24)
+    + [`Match`](#match)
+      - [Syntax](#syntax-32)
+      - [Semantics](#semantics-32)
+    + [`Switch`](#switch)
+      - [Syntax](#syntax-33)
+      - [Semantics](#semantics-33)
+    + [`Try`](#try)
+      - [Syntax](#syntax-34)
+      - [Semantics](#semantics-34)
+      - [Example](#example-25)
+    + [`Raise`](#raise)
+      - [Syntax](#syntax-35)
+      - [Semantics](#semantics-35)
+      - [Example](#example-26)
+    + [`Print`](#print)
+      - [Syntax](#syntax-36)
+      - [Semantics](#semantics-36)
+      - [Example](#example-27)
+    + [`Comprehension`](#comprehension)
+      - [Syntax](#syntax-37)
+      - [Semantics](#semantics-37)
+    + [`Sequence`](#sequence)
+      - [Syntax](#syntax-38)
+      - [Semantics](#semantics-38)
+      - [Example](#example-28)
+    + [`Other`](#other)
+      - [Syntax](#syntax-39)
+      - [Semantics](#semantics-39)
+    + [`Equal`](#equal)
+      - [Syntax](#syntax-40)
+      - [Semantics](#semantics-40)
+    + [`NotEqual`](#notequal)
+      - [Syntax](#syntax-41)
+      - [Semantics](#semantics-41)
+    + [`Self`](#self)
+      - [Syntax](#syntax-42)
+      - [Semantics](#semantics-42)
+    + [`MuNull`](#munull)
+      - [Syntax](#syntax-43)
+      - [Semantics](#semantics-43)
+      - [Example](#example-29)
+    + [`MuObject`](#muobject)
+      - [Syntax](#syntax-44)
+      - [Semantics](#semantics-44)
+      - [Example](#example-30)
+    + [`MuNumber`](#munumber)
+      - [Syntax](#syntax-45)
+      - [Semantics](#semantics-45)
+      - [Example](#example-31)
+    + [`MuBool`](#mubool)
+      - [Syntax](#syntax-46)
+      - [Semantics](#semantics-46)
+      - [Example](#example-32)
+    + [`MuString`](#mustring)
+      - [Syntax](#syntax-47)
+      - [Semantics](#semantics-47)
+      - [Example](#example-33)
+    + [`MuSymbol`](#musymbol)
+      - [Syntax](#syntax-48)
+      - [Semantics](#semantics-48)
+      - [Example](#example-34)
+    + [`MuTuple`](#mutuple)
+      - [Syntax](#syntax-49)
+      - [Semantics](#semantics-49)
+    + [`MuList`](#mulist)
+      - [Syntax](#syntax-50)
+      - [Semantics](#semantics-50)
 
 # Combinators Crash course
 
@@ -866,4 +1046,636 @@ String name;
 
 `TypeSignature`s of zero-args computation and variables are identical.
 
+### `EntryPoint`
 
+#### Syntax
+
+```haskell
+(EntryPoint Identifier Expression)
+```
+
+#### Semantics
+
+Entry point with its name and body
+
+#### Java Example
+
+```java
+public static main(String[] args) {}
+```
+
+```haskell
+(EntryPoint "main" MuNull)
+```
+
+### `Function`
+
+#### Syntax
+
+```haskell
+(Function Identifier [Equation])
+```
+
+#### Semantics
+
+Functional / Imperative programming function declaration.
+It is is composed by an identifier and one or more equations
+
+#### Example
+
+### `Procedure`
+
+#### Syntax
+
+```haskell
+(Procedure Identifier [Equation])
+```
+
+#### Semantics
+
+Imperative programming procedure declaration. It is composed by a name and one or more equations
+
+#### Example
+
+### `Method`
+
+#### Syntax
+
+```haskell
+(Method Identifier [Equation])
+```
+
+#### Semantics
+
+### `EqualMethod` and `HashMethod`
+
+#### Syntax
+
+```haskell
+(EqualMethod [Equation])
+(HashMethod [Equation])
+```
+
+#### Semantics
+
+Declaration of custom equivalance and _hash code_ operations. `EqualMethod` typically corresponds to `equals` or `==` method declarations, while `HashMethod`, typically corresponds to `hash` or `hashCode`- like methods.
+
+#### Example
+
+### `Variable`
+
+#### Syntax
+
+```haskell
+(Variable Identifier Expression)
+```
+
+#### Semantics
+
+### `Assignment`
+
+#### Syntax
+
+```haskell
+(Assignment Identifier Expression)
+```
+
+#### Semantics
+
+### `Attribute`
+
+#### Syntax
+
+```haskell
+(Attribute Identifier Expression)
+```
+
+#### Semantics
+
+Object oriented programming attribute declaration, composed by an identifier and an initializer
+
+#### Example
+
+### `Object`
+
+#### Syntax
+
+```haskell
+(Object Identifier Expression)
+```
+
+#### Semantics
+
+Object oriented programming global, named object declaration,
+
+#### Example
+
+composed by a name and a body
+
+#### Example
+
+### `Class`
+
+#### Syntax
+
+```haskell
+(Class Identifier (Maybe Identifier) Expression)
+```
+
+#### Semantics
+
+Object oriented programming global, class declaration,
+
+#### Example
+
+composed by a name, an optional superclass, implemented interfaces and a body
+
+#### Example
+
+### `Enumeration`
+
+#### Syntax
+
+```haskell
+(Enumeration Identifier [Identifier])
+```
+
+#### Semantics
+
+Imperative named enumeration of values
+
+#### Example
+
+### `Interface`
+
+#### Syntax
+
+```haskell
+(Interface Identifier [Identifier] Expression)
+```
+
+#### Semantics
+
+Object oriented programming global interface or contract declaration,
+
+#### Example
+
+composed by a name, superinterfaces and a body
+
+#### Example
+
+### `Rule`
+
+#### Syntax
+
+```haskell
+(Rule Identifier [Pattern] [Expression])
+```
+
+#### Semantics
+
+Logic programming declaration of a fact, composed by the rue name, rule arguments, and rule body
+
+#### Example
+
+### `Fact`
+
+#### Syntax
+
+```haskell
+(Fact Identifier [Pattern])
+```
+
+#### Semantics
+
+Logic programming declaration of a fact , composed by the fact name and fact arguments
+
+#### Example
+
+### `Exist`
+
+#### Syntax
+
+```haskell
+(Exist Identifier [Pattern])
+```
+
+#### Semantics
+
+Logic programming existential cuantification / consult
+
+#### Example
+
+### `Not`
+
+#### Syntax
+
+```haskell
+(Not Expression)
+```
+
+#### Semantics
+
+Logic programming negation
+
+#### Example
+
+### `Findall`
+
+#### Syntax
+
+```haskell
+(Findall Expression Expression Expression)
+```
+
+#### Semantics
+
+Logic programming findall
+
+#### Example
+
+### `Forall`
+
+#### Syntax
+
+```haskell
+(Forall Expression Expression)
+```
+
+#### Semantics
+
+Logic programming universal cuantification
+
+#### Example
+
+### `Reference`
+
+#### Syntax
+
+```haskell
+(Reference Identifier)
+```
+
+#### Semantics
+
+Generic variable
+
+#### Example
+
+### `Application`
+
+#### Syntax
+
+```haskell
+(Application Expression [Expression])
+```
+
+#### Semantics
+
+Generic, non-curried application of a function or procedure, composed by the applied element itself, and the application arguments
+
+#### Example
+
+### `Send`
+
+#### Syntax
+
+```haskell
+(Send Expression Expression [Expression])
+```
+
+#### Semantics
+
+Object oriented programming message send, composed by the reciever, selector and arguments
+
+#### Example
+
+### `New`
+
+#### Syntax
+
+```haskell
+(New Identifier [Expression])
+```
+
+#### Semantics
+
+Object oriented instantiation, composed by the class reference and instantiation arguments
+
+#### Example
+
+### `Implement`
+
+#### Syntax
+
+```haskell
+(Implement Identifier)
+```
+
+#### Semantics
+
+Object oriented instantiation, interface implementation
+
+#### Example
+
+### `Include`
+
+#### Syntax
+
+```haskell
+(Include Identifier)
+```
+
+#### Semantics
+
+Object oriented instantiation, mixin inclusion
+
+#### Example
+
+### `Lambda`
+
+#### Syntax
+
+```haskell
+(Lambda [Pattern] Expression)
+```
+
+#### Semantics
+
+### `If`
+
+#### Syntax
+
+```haskell
+(If Expression Expression Expression)
+```
+
+#### Semantics
+
+### `Return`
+
+#### Syntax
+
+```haskell
+(Return Expression)
+```
+
+#### Semantics
+
+### `While`
+
+#### Syntax
+
+```haskell
+(While Expression Expression)
+```
+
+#### Semantics
+
+Imperative programming conditional repetition control structure, composed by a condition and a body
+
+#### Example
+
+### `Repeat`
+
+#### Syntax
+
+```haskell
+(Repeat Expression Expression)
+```
+
+#### Semantics
+
+Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
+
+#### Example
+
+### `Match`
+
+#### Syntax
+
+```haskell
+(Match Expression [Equation])
+```
+
+#### Semantics
+
+### `Switch`
+
+#### Syntax
+
+```haskell
+(Switch Expression [(Expression, Expression)])
+```
+
+#### Semantics
+
+### `Try`
+
+#### Syntax
+
+```haskell
+(Try Expression [(Pattern, Expression)] Expression)
+```
+
+#### Semantics
+
+Generic try expression, composed by a body, a list of exception-handling patterns and statments, and a finally expression
+
+#### Example
+
+### `Raise`
+
+#### Syntax
+
+```haskell
+(Raise Expression)
+```
+
+#### Semantics
+
+Generic raise expression, like a throw or raise statament, composed by the raised expression
+
+#### Example
+
+### `Print`
+
+#### Syntax
+
+```haskell
+(Print Expression)
+```
+
+#### Semantics
+
+Generic print expression
+
+#### Example
+
+### `Comprehension`
+
+#### Syntax
+
+```haskell
+(Comprehension Expression [ComprehensionStatement])
+```
+
+#### Semantics
+
+### `Sequence`
+
+#### Syntax
+
+```haskell
+(Sequence [Expression])
+```
+
+#### Semantics
+
+Generic sequence of statements
+
+#### Example
+
+### `Other`
+
+#### Syntax
+
+```haskell
+(Other)
+```
+
+#### Semantics
+
+### `Equal`
+
+#### Syntax
+
+```haskell
+(Equal)
+```
+
+#### Semantics
+
+### `NotEqual`
+
+#### Syntax
+
+```haskell
+(NotEqual)
+```
+
+#### Semantics
+
+### `Self`
+
+#### Syntax
+
+```haskell
+(Self)
+```
+
+#### Semantics
+
+### `MuNull`
+
+#### Syntax
+
+```haskell
+(MuNull)
+```
+
+#### Semantics
+
+Generic nothing value literal - nil, null, undefined or unit
+
+#### Example
+
+### `MuObject`
+
+#### Syntax
+
+```haskell
+(MuObject Expression)
+```
+
+#### Semantics
+
+Object oriented unnamed object literal
+
+#### Example
+
+### `MuNumber`
+
+#### Syntax
+
+```haskell
+(MuNumber Double)
+```
+
+#### Semantics
+
+Generic number literal
+
+#### Example
+
+### `MuBool`
+
+#### Syntax
+
+```haskell
+(MuBool Bool)
+```
+
+#### Semantics
+
+Generic boolean literal
+
+#### Example
+
+### `MuString`
+
+#### Syntax
+
+```haskell
+(MuString String)
+```
+
+#### Semantics
+
+Generic string literal
+
+#### Example
+
+### `MuSymbol`
+
+#### Syntax
+
+```haskell
+(MuSymbol String)
+```
+
+#### Semantics
+
+Generic symbol/atom literal
+
+#### Example
+
+### `MuTuple`
+
+#### Syntax
+
+```haskell
+(MuTuple [Expression])
+```
+
+#### Semantics
+
+### `MuList`
+
+#### Syntax
+
+```haskell
+(MuList [Expression])
+```
+
+#### Semantics
