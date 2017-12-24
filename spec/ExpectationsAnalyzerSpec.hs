@@ -91,8 +91,8 @@ spec = describe "ExpectationsAnalyzer" $ do
       (run Haskell "h = f" [hasComposition]) `shouldReturn` (result [failed hasComposition] [])
       (run Haskell "h = f . g" [hasComposition]) `shouldReturn` (result [passed hasComposition] [])
 
-    it "works with UsesComprehension" $ do
-      let hasComprehension = Expectation "x" "UsesComprehension"
+    it "works with UsesForComprehension" $ do
+      let hasComprehension = Expectation "x" "UsesForComprehension"
       (run Haskell "x = [m | m <- t]" [hasComprehension]) `shouldReturn` (result [passed hasComprehension] [])
 
     it "works with UsesConditional" $ do

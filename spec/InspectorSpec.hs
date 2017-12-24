@@ -506,15 +506,15 @@ spec = do
       it "is False when reference doesnt exists" $ do
         declares (named "y") (hs "x m = 1") `shouldBe` False
 
-  describe "usesComprehension" $ do
+  describe "usesForComprehension" $ do
     it "is True when list comprehension exists" $ do
-      usesComprehension (hs "x = [m|m<-t]") `shouldBe` True
+      usesForComprehension (hs "x = [m|m<-t]") `shouldBe` True
 
     it "is False when comprehension doesnt exists" $ do
-      usesComprehension (hs "x = []") `shouldBe` False
+      usesForComprehension (hs "x = []") `shouldBe` False
 
     it "is True when do syntax is used" $ do
-      usesComprehension (hs "y = do { x <- xs; return x }") `shouldBe` True
+      usesForComprehension (hs "y = do { x <- xs; return x }") `shouldBe` True
 
   describe "parses" $ do
     it "is True when similar" $ do

@@ -17,7 +17,7 @@ module Language.Mulang.Ast (
     Equation(..),
     EquationBody(..),
     Expression(..),
-    ComprehensionStatement(..),
+    Statement(..),
     Pattern(..),
     Identifier,
     pattern SimpleEquation,
@@ -115,6 +115,7 @@ data Expression
     | Lambda [Pattern] Expression
     | If Expression Expression Expression
     | Return Expression
+    | Yield Expression
     | While Expression Expression
     -- ^ Imperative programming conditional repetition control structure, composed by a condition and a body
     | Repeat Expression Expression
@@ -127,7 +128,7 @@ data Expression
     -- ^ Generic raise expression, like a throw or raise statament, composed by the raised expression
     | Print Expression
     -- ^ Generic print expression
-    | Comprehension Expression [ComprehensionStatement]
+    | For [Statement] Expression
     | Sequence [Expression]
     -- ^ Generic sequence of statements
     | Other
@@ -179,10 +180,9 @@ data Pattern
     -- ^ Other unrecognized pattern
   deriving (Eq, Show, Read, Generic)
 
-data ComprehensionStatement
-        = MuGenerator Pattern Expression
-        | MuQualifier Expression
-        | LetStmt     Expression
+data Statement
+  = Generator Pattern Expression
+  | Guard Expression
   deriving (Eq, Show, Read, Generic)
 
 
