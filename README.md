@@ -35,208 +35,145 @@ Mulang is three different  - but thighly related - things:
     + [With Intermediate Language Generation](#with-intermediate-language-generation)
 - [Mulang AST spec](#mulang-ast-spec)
   * [Expressions](#expressions)
-    + [Record](#record)
+    + [`Record`](#record)
       - [Syntax](#syntax)
-      - [Semantics](#semantics)
       - [C Example](#c-example)
       - [Caveats](#caveats)
     + [TypeAlias](#typealias)
       - [Syntax](#syntax-1)
-      - [Semantics](#semantics-1)
       - [Haskell Example](#haskell-example)
       - [Caveats](#caveats-1)
     + [TypeSignature](#typesignature)
       - [Syntax](#syntax-2)
-      - [Semantics](#semantics-2)
       - [Haskell Example](#haskell-example-1)
       - [Java Example](#java-example)
       - [Caveats](#caveats-2)
     + [`EntryPoint`](#entrypoint)
       - [Syntax](#syntax-3)
-      - [Semantics](#semantics-3)
       - [Java Example](#java-example-1)
     + [`Function`](#function)
       - [Syntax](#syntax-4)
-      - [Semantics](#semantics-4)
       - [Example](#example)
     + [`Procedure`](#procedure)
       - [Syntax](#syntax-5)
-      - [Semantics](#semantics-5)
       - [Example](#example-1)
     + [`Method`](#method)
       - [Syntax](#syntax-6)
-      - [Semantics](#semantics-6)
     + [`EqualMethod` and `HashMethod`](#equalmethod-and-hashmethod)
       - [Syntax](#syntax-7)
-      - [Semantics](#semantics-7)
-      - [Example](#example-2)
+      - [Ruby Example](#ruby-example)
     + [`Variable`](#variable)
       - [Syntax](#syntax-8)
-      - [Semantics](#semantics-8)
+      - [Example](#example-2)
     + [`Assignment`](#assignment)
       - [Syntax](#syntax-9)
-      - [Semantics](#semantics-9)
+      - [Example](#example-3)
     + [`Attribute`](#attribute)
       - [Syntax](#syntax-10)
-      - [Semantics](#semantics-10)
-      - [Example](#example-3)
+      - [Example](#example-4)
     + [`Object`](#object)
       - [Syntax](#syntax-11)
-      - [Semantics](#semantics-11)
-      - [Example](#example-4)
       - [Example](#example-5)
     + [`Class`](#class)
       - [Syntax](#syntax-12)
-      - [Semantics](#semantics-12)
-      - [Example](#example-6)
-      - [Example](#example-7)
+      - [Ruby Example](#ruby-example-1)
+      - [Java Example](#java-example-2)
     + [`Enumeration`](#enumeration)
       - [Syntax](#syntax-13)
-      - [Semantics](#semantics-13)
-      - [Example](#example-8)
+      - [Java Example](#java-example-3)
     + [`Interface`](#interface)
       - [Syntax](#syntax-14)
-      - [Semantics](#semantics-14)
-      - [Example](#example-9)
-      - [Example](#example-10)
+      - [Example](#example-6)
     + [`Rule`](#rule)
       - [Syntax](#syntax-15)
-      - [Semantics](#semantics-15)
-      - [Example](#example-11)
+      - [Example](#example-7)
     + [`Fact`](#fact)
       - [Syntax](#syntax-16)
-      - [Semantics](#semantics-16)
-      - [Example](#example-12)
+      - [Example](#example-8)
     + [`Exist`](#exist)
       - [Syntax](#syntax-17)
-      - [Semantics](#semantics-17)
-      - [Example](#example-13)
+      - [Example](#example-9)
     + [`Not`](#not)
       - [Syntax](#syntax-18)
-      - [Semantics](#semantics-18)
-      - [Example](#example-14)
+      - [Example](#example-10)
     + [`Findall`](#findall)
       - [Syntax](#syntax-19)
-      - [Semantics](#semantics-19)
-      - [Example](#example-15)
+      - [Example](#example-11)
     + [`Forall`](#forall)
       - [Syntax](#syntax-20)
-      - [Semantics](#semantics-20)
-      - [Example](#example-16)
+      - [Example](#example-12)
     + [`Reference`](#reference)
       - [Syntax](#syntax-21)
-      - [Semantics](#semantics-21)
-      - [Example](#example-17)
+      - [Example](#example-13)
     + [`Application`](#application)
       - [Syntax](#syntax-22)
-      - [Semantics](#semantics-22)
-      - [Example](#example-18)
+      - [Example](#example-14)
     + [`Send`](#send)
       - [Syntax](#syntax-23)
-      - [Semantics](#semantics-23)
-      - [Example](#example-19)
+      - [Ruby Example](#ruby-example-2)
     + [`New`](#new)
       - [Syntax](#syntax-24)
-      - [Semantics](#semantics-24)
-      - [Example](#example-20)
+      - [Example](#example-15)
     + [`Implement`](#implement)
       - [Syntax](#syntax-25)
-      - [Semantics](#semantics-25)
-      - [Example](#example-21)
+      - [Example](#example-16)
     + [`Include`](#include)
       - [Syntax](#syntax-26)
-      - [Semantics](#semantics-26)
-      - [Example](#example-22)
-    + [`Lambda`](#lambda)
-      - [Syntax](#syntax-27)
-      - [Semantics](#semantics-27)
+      - [Example](#example-17)
     + [`If`](#if)
+      - [Syntax](#syntax-27)
+    + [`Lambda`](#lambda)
       - [Syntax](#syntax-28)
-      - [Semantics](#semantics-28)
     + [`Return`](#return)
       - [Syntax](#syntax-29)
-      - [Semantics](#semantics-29)
     + [`While`](#while)
       - [Syntax](#syntax-30)
-      - [Semantics](#semantics-30)
-      - [Example](#example-23)
+      - [Example](#example-18)
     + [`Repeat`](#repeat)
       - [Syntax](#syntax-31)
-      - [Semantics](#semantics-31)
-      - [Example](#example-24)
+      - [Example](#example-19)
     + [`Match`](#match)
       - [Syntax](#syntax-32)
-      - [Semantics](#semantics-32)
     + [`Switch`](#switch)
       - [Syntax](#syntax-33)
-      - [Semantics](#semantics-33)
     + [`Try`](#try)
       - [Syntax](#syntax-34)
-      - [Semantics](#semantics-34)
-      - [Example](#example-25)
+      - [Example](#example-20)
     + [`Raise`](#raise)
       - [Syntax](#syntax-35)
-      - [Semantics](#semantics-35)
-      - [Example](#example-26)
+      - [Example](#example-21)
     + [`Print`](#print)
       - [Syntax](#syntax-36)
-      - [Semantics](#semantics-36)
-      - [Example](#example-27)
+      - [Ruby Example](#ruby-example-3)
     + [`Comprehension`](#comprehension)
       - [Syntax](#syntax-37)
-      - [Semantics](#semantics-37)
     + [`Sequence`](#sequence)
       - [Syntax](#syntax-38)
-      - [Semantics](#semantics-38)
-      - [Example](#example-28)
+      - [Example](#example-22)
     + [`Other`](#other)
       - [Syntax](#syntax-39)
-      - [Semantics](#semantics-39)
-    + [`Equal`](#equal)
+    + [`Equal` and `NotEqual`](#equal-and-notequal)
       - [Syntax](#syntax-40)
-      - [Semantics](#semantics-40)
-    + [`NotEqual`](#notequal)
-      - [Syntax](#syntax-41)
-      - [Semantics](#semantics-41)
     + [`Self`](#self)
-      - [Syntax](#syntax-42)
-      - [Semantics](#semantics-42)
+      - [Syntax](#syntax-41)
     + [`MuNull`](#munull)
-      - [Syntax](#syntax-43)
-      - [Semantics](#semantics-43)
-      - [Example](#example-29)
+      - [Syntax](#syntax-42)
+      - [Example](#example-23)
     + [`MuObject`](#muobject)
+      - [Syntax](#syntax-43)
+      - [JavaScript Example](#javascript-example)
+    + [`MuNumber`, `MuBool`, `MuString` and `MuSymbol`](#munumber-mubool-mustring-and-musymbol)
       - [Syntax](#syntax-44)
-      - [Semantics](#semantics-44)
-      - [Example](#example-30)
-    + [`MuNumber`](#munumber)
+      - [Ruby Example](#ruby-example-4)
+    + [`MuTuple` and `MuList`](#mutuple-and-mulist)
       - [Syntax](#syntax-45)
-      - [Semantics](#semantics-45)
-      - [Example](#example-31)
-    + [`MuBool`](#mubool)
-      - [Syntax](#syntax-46)
-      - [Semantics](#semantics-46)
-      - [Example](#example-32)
-    + [`MuString`](#mustring)
-      - [Syntax](#syntax-47)
-      - [Semantics](#semantics-47)
-      - [Example](#example-33)
-    + [`MuSymbol`](#musymbol)
-      - [Syntax](#syntax-48)
-      - [Semantics](#semantics-48)
-      - [Example](#example-34)
-    + [`MuTuple`](#mutuple)
-      - [Syntax](#syntax-49)
-      - [Semantics](#semantics-49)
-    + [`MuList`](#mulist)
-      - [Syntax](#syntax-50)
-      - [Semantics](#semantics-50)
 - [Building mulang from source](#building-mulang-from-source)
   * [Setup](#setup)
   * [Installing and creating an executable](#installing-and-creating-an-executable)
   * [Running tests](#running-tests)
   * [Watching changes](#watching-changes)
   * [Loading mulang in the REPL](#loading-mulang-in-the-repl)
+
 
 # Combinators Crash course
 
@@ -925,17 +862,16 @@ However, Mulang extends this concept to most kind of elements in a program, rega
 
 As a rule of thumb if something is or can be represented as an statement, declararion or expression, the it is modeled as `Expression` in Mulang AST.
 
-### Record
+### `Record`
+
+> A `Record` represents a record, data or struct declaration,
+> as found in most procedural and functional languages, like the C-like `struct` declaration
 
 #### Syntax
 
 ```haskell
 (Record Identifier)
 ```
-
-#### Semantics
-
-A `Record` represents a record, data or struct declaration, as found in most procedural and functional languages, like the C-like `struct` declaration
 
 #### C Example
 
@@ -957,15 +893,14 @@ Currently, the `Record` expression does not hold information about the record co
 
 ### TypeAlias
 
+> A `TypeAlias` represents a synonym for a type, like the `type` declaration in Haskell and Scala or C's `typedef`.
+> It is a typical statically typed functional programming feature.
+
 #### Syntax
 
 ```haskell
 (TypeAlias Identifier)
 ```
-
-#### Semantics
-
-A `TypeAlias` represents a synonym for a type, like the `type` declaration in Haskell and Scala or C's `typedef`. It is a typical statically typed functional programming feature.
 
 #### Haskell Example
 
@@ -983,15 +918,14 @@ Currently, the `TypeAlias` expression does not hold information about the aliase
 
 ### TypeSignature
 
+> A `TypeSignature` represents an explicit type annotation for a computation,
+> variable or constant, as you can find in Java or Haskell.
+
 #### Syntax
 
 ```haskell
 (TypeSignature Identifier [Identifier] Identifier)
 ```
-
-#### Semantics
-
-A `TypeSignature` represents an explicit type annotation for a computation, variable or constant, as you can find in Java or Haskell.
 
 #### Haskell Example
 
@@ -1021,15 +955,13 @@ String name;
 
 ### `EntryPoint`
 
+> Entry point with its name and body. It typically correspond to C-like `main` procedures, or `program` declarations.
+
 #### Syntax
 
 ```haskell
 (EntryPoint Identifier Expression)
 ```
-
-#### Semantics
-
-Entry point with its name and body
 
 #### Java Example
 
@@ -1043,20 +975,20 @@ public static main(String[] args) {}
 
 ### `Function`
 
+> Functional / Imperative programming function declaration.
+> It is is composed by an identifier and one or more equations
+
 #### Syntax
 
 ```haskell
 (Function Identifier [Equation])
 ```
 
-#### Semantics
-
-Functional / Imperative programming function declaration.
-It is is composed by an identifier and one or more equations
-
 #### Example
 
 ### `Procedure`
+
+> Imperative programming procedure declaration. It is composed by an identifier and one or more equations
 
 #### Syntax
 
@@ -1064,13 +996,12 @@ It is is composed by an identifier and one or more equations
 (Procedure Identifier [Equation])
 ```
 
-#### Semantics
-
-Imperative programming procedure declaration. It is composed by a name and one or more equations
-
 #### Example
 
 ### `Method`
+
+> Object oriented programming method declaration. It is composed by an identifier and one or more equations
+
 
 #### Syntax
 
@@ -1078,9 +1009,10 @@ Imperative programming procedure declaration. It is composed by a name and one o
 (Method Identifier [Equation])
 ```
 
-#### Semantics
-
 ### `EqualMethod` and `HashMethod`
+
+> Declaration of custom equivalance and _hash code_ operations. `EqualMethod` typically corresponds to `equals` or `==` method declarations, while `HashMethod`, typically corresponds
+to `hash` or `hashCode`- like methods.
 
 #### Syntax
 
@@ -1089,13 +1021,30 @@ Imperative programming procedure declaration. It is composed by a name and one o
 (HashMethod [Equation])
 ```
 
-#### Semantics
+#### Ruby Example
 
-Declaration of custom equivalance and _hash code_ operations. `EqualMethod` typically corresponds to `equals` or `==` method declarations, while `HashMethod`, typically corresponds to `hash` or `hashCode`- like methods.
+```ruby
+def ==(other)
+end
 
-#### Example
+def hash
+end
+```
+
+```haskell
+(EqualMethod (Equation
+                [VariablePatten "other"]
+                (UnguardedBody MuNull)))
+
+(HashMethod (Equation
+              []
+              (UnguardedBody MuNull)))
+
+```
 
 ### `Variable`
+
+> Generic variable declaration, composed by an identifier and an initializer
 
 #### Syntax
 
@@ -1103,7 +1052,7 @@ Declaration of custom equivalance and _hash code_ operations. `EqualMethod` typi
 (Variable Identifier Expression)
 ```
 
-#### Semantics
+#### Example
 
 ### `Assignment`
 
@@ -1113,9 +1062,11 @@ Declaration of custom equivalance and _hash code_ operations. `EqualMethod` typi
 (Assignment Identifier Expression)
 ```
 
-#### Semantics
+#### Example
 
 ### `Attribute`
+
+> Object oriented programming attribute declaration, composed by an identifier and an initializer
 
 #### Syntax
 
@@ -1123,13 +1074,11 @@ Declaration of custom equivalance and _hash code_ operations. `EqualMethod` typi
 (Attribute Identifier Expression)
 ```
 
-#### Semantics
-
-Object oriented programming attribute declaration, composed by an identifier and an initializer
-
 #### Example
 
 ### `Object`
+
+> Object oriented programming global, named object declaration, like Scala's `object`, composed by a name and a body.
 
 #### Syntax
 
@@ -1137,17 +1086,12 @@ Object oriented programming attribute declaration, composed by an identifier and
 (Object Identifier Expression)
 ```
 
-#### Semantics
-
-Object oriented programming global, named object declaration,
-
-#### Example
-
-composed by a name and a body
-
 #### Example
 
 ### `Class`
+
+> Object oriented programming global, class declaration,
+> composed by a name, an optional superclass and a body
 
 #### Syntax
 
@@ -1155,17 +1099,32 @@ composed by a name and a body
 (Class Identifier (Maybe Identifier) Expression)
 ```
 
-#### Semantics
+#### Ruby Example
 
-Object oriented programming global, class declaration,
+```ruby
+class Bird < Animal
+end
+```
 
-#### Example
+```haskell
+(Class "Bird" (Just "Animal") MuNull)
+```
 
-composed by a name, an optional superclass, implemented interfaces and a body
+#### Java Example
 
-#### Example
+```java
+public class Bird extends Animal {
+
+}
+```
+
+```haskell
+(Class "Bird" (Just "Animal") MuNull)
+```
 
 ### `Enumeration`
+
+> Imperative named enumeration of values
 
 #### Syntax
 
@@ -1173,13 +1132,22 @@ composed by a name, an optional superclass, implemented interfaces and a body
 (Enumeration Identifier [Identifier])
 ```
 
-#### Semantics
 
-Imperative named enumeration of values
+#### Java Example
 
-#### Example
+```java
+public enum Fuzzy {
+  YES, NO, MAYBE
+}
+```
+
+```haskell
+(Enumeration "Fuzzy" ["YES", "NO", "MAYBE"])
+```
 
 ### `Interface`
+
+> Object oriented programming global interface or contract declaration, composed by a name, superinterfaces and a body.
 
 #### Syntax
 
@@ -1187,17 +1155,12 @@ Imperative named enumeration of values
 (Interface Identifier [Identifier] Expression)
 ```
 
-#### Semantics
-
-Object oriented programming global interface or contract declaration,
-
-#### Example
-
-composed by a name, superinterfaces and a body
 
 #### Example
 
 ### `Rule`
+
+> Logic programming declaration of a fact, composed by the rue name, rule arguments, and rule body
 
 #### Syntax
 
@@ -1205,13 +1168,12 @@ composed by a name, superinterfaces and a body
 (Rule Identifier [Pattern] [Expression])
 ```
 
-#### Semantics
-
-Logic programming declaration of a fact, composed by the rue name, rule arguments, and rule body
 
 #### Example
 
 ### `Fact`
+
+> Logic programming declaration of a fact , composed by the fact name and fact arguments
 
 #### Syntax
 
@@ -1219,13 +1181,12 @@ Logic programming declaration of a fact, composed by the rue name, rule argument
 (Fact Identifier [Pattern])
 ```
 
-#### Semantics
-
-Logic programming declaration of a fact , composed by the fact name and fact arguments
 
 #### Example
 
 ### `Exist`
+
+> Logic programming existential cuantification / consult
 
 #### Syntax
 
@@ -1233,13 +1194,12 @@ Logic programming declaration of a fact , composed by the fact name and fact arg
 (Exist Identifier [Pattern])
 ```
 
-#### Semantics
-
-Logic programming existential cuantification / consult
 
 #### Example
 
 ### `Not`
+
+> Logic programming negation
 
 #### Syntax
 
@@ -1247,13 +1207,12 @@ Logic programming existential cuantification / consult
 (Not Expression)
 ```
 
-#### Semantics
-
-Logic programming negation
 
 #### Example
 
 ### `Findall`
+
+> Logic programming findall
 
 #### Syntax
 
@@ -1261,13 +1220,12 @@ Logic programming negation
 (Findall Expression Expression Expression)
 ```
 
-#### Semantics
-
-Logic programming findall
 
 #### Example
 
 ### `Forall`
+
+> Logic programming universal cuantification
 
 #### Syntax
 
@@ -1275,13 +1233,12 @@ Logic programming findall
 (Forall Expression Expression)
 ```
 
-#### Semantics
-
-Logic programming universal cuantification
 
 #### Example
 
 ### `Reference`
+
+> Generic variable
 
 #### Syntax
 
@@ -1289,13 +1246,13 @@ Logic programming universal cuantification
 (Reference Identifier)
 ```
 
-#### Semantics
-
-Generic variable
 
 #### Example
 
 ### `Application`
+
+> Generic, non-curried application of a function or procedure,
+> composed by the applied element itself, and the application arguments
 
 #### Syntax
 
@@ -1303,13 +1260,12 @@ Generic variable
 (Application Expression [Expression])
 ```
 
-#### Semantics
-
-Generic, non-curried application of a function or procedure, composed by the applied element itself, and the application arguments
-
 #### Example
 
 ### `Send`
+
+> Object oriented programming message send, composed by the reciever,
+> selector and arguments
 
 #### Syntax
 
@@ -1317,13 +1273,19 @@ Generic, non-curried application of a function or procedure, composed by the app
 (Send Expression Expression [Expression])
 ```
 
-#### Semantics
+#### Ruby Example
 
-Object oriented programming message send, composed by the reciever, selector and arguments
+```ruby
+1 + 5
+```
 
-#### Example
+```haskell
+(Send (MuNumber 1) (Reference "+") [MuNumber 5])
+```
 
 ### `New`
+
+> Object oriented instantiation, composed by the class reference and instantiation arguments
 
 #### Syntax
 
@@ -1331,13 +1293,11 @@ Object oriented programming message send, composed by the reciever, selector and
 (New Identifier [Expression])
 ```
 
-#### Semantics
-
-Object oriented instantiation, composed by the class reference and instantiation arguments
-
 #### Example
 
 ### `Implement`
+
+> Object oriented instantiation, interface implementation
 
 #### Syntax
 
@@ -1345,13 +1305,12 @@ Object oriented instantiation, composed by the class reference and instantiation
 (Implement Identifier)
 ```
 
-#### Semantics
-
-Object oriented instantiation, interface implementation
 
 #### Example
 
 ### `Include`
+
+> Object oriented instantiation, mixin inclusion
 
 #### Syntax
 
@@ -1359,21 +1318,8 @@ Object oriented instantiation, interface implementation
 (Include Identifier)
 ```
 
-#### Semantics
-
-Object oriented instantiation, mixin inclusion
 
 #### Example
-
-### `Lambda`
-
-#### Syntax
-
-```haskell
-(Lambda [Pattern] Expression)
-```
-
-#### Semantics
 
 ### `If`
 
@@ -1382,8 +1328,13 @@ Object oriented instantiation, mixin inclusion
 ```haskell
 (If Expression Expression Expression)
 ```
+### `Lambda`
 
-#### Semantics
+#### Syntax
+
+```haskell
+(Lambda [Pattern] Expression)
+```
 
 ### `Return`
 
@@ -1393,9 +1344,9 @@ Object oriented instantiation, mixin inclusion
 (Return Expression)
 ```
 
-#### Semantics
-
 ### `While`
+
+> Imperative programming conditional repetition control structure, composed by a condition and a body
 
 #### Syntax
 
@@ -1403,23 +1354,17 @@ Object oriented instantiation, mixin inclusion
 (While Expression Expression)
 ```
 
-#### Semantics
-
-Imperative programming conditional repetition control structure, composed by a condition and a body
-
 #### Example
 
 ### `Repeat`
+
+> Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
 
 #### Syntax
 
 ```haskell
 (Repeat Expression Expression)
 ```
-
-#### Semantics
-
-Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
 
 #### Example
 
@@ -1431,8 +1376,6 @@ Imperative programming fixed repetition control structure, composed by a repetit
 (Match Expression [Equation])
 ```
 
-#### Semantics
-
 ### `Switch`
 
 #### Syntax
@@ -1441,9 +1384,9 @@ Imperative programming fixed repetition control structure, composed by a repetit
 (Switch Expression [(Expression, Expression)])
 ```
 
-#### Semantics
-
 ### `Try`
+
+> Generic try expression, composed by a body, a list of exception-handling patterns and statments, and a finally expression
 
 #### Syntax
 
@@ -1451,13 +1394,12 @@ Imperative programming fixed repetition control structure, composed by a repetit
 (Try Expression [(Pattern, Expression)] Expression)
 ```
 
-#### Semantics
-
-Generic try expression, composed by a body, a list of exception-handling patterns and statments, and a finally expression
 
 #### Example
 
 ### `Raise`
+
+> Generic raise expression, like a throw or raise statament, composed by the raised expression
 
 #### Syntax
 
@@ -1465,13 +1407,11 @@ Generic try expression, composed by a body, a list of exception-handling pattern
 (Raise Expression)
 ```
 
-#### Semantics
-
-Generic raise expression, like a throw or raise statament, composed by the raised expression
-
 #### Example
 
 ### `Print`
+
+> Generic print expression
 
 #### Syntax
 
@@ -1479,11 +1419,15 @@ Generic raise expression, like a throw or raise statament, composed by the raise
 (Print Expression)
 ```
 
-#### Semantics
+#### Ruby Example
 
-Generic print expression
+```ruby
+puts "Hello World"
+```
 
-#### Example
+```haskell
+(Print (MuString "Hello World"))
+```
 
 ### `Comprehension`
 
@@ -1493,19 +1437,15 @@ Generic print expression
 (Comprehension Expression [ComprehensionStatement])
 ```
 
-#### Semantics
-
 ### `Sequence`
+
+> Generic sequence of statements
 
 #### Syntax
 
 ```haskell
 (Sequence [Expression])
 ```
-
-#### Semantics
-
-Generic sequence of statements
 
 #### Example
 
@@ -1517,29 +1457,18 @@ Generic sequence of statements
 (Other)
 ```
 
-#### Semantics
-
-### `Equal`
+### `Equal` and `NotEqual`
 
 #### Syntax
 
 ```haskell
 (Equal)
-```
-
-#### Semantics
-
-### `NotEqual`
-
-#### Syntax
-
-```haskell
 (NotEqual)
 ```
 
-#### Semantics
-
 ### `Self`
+
+> Object oriented self-reference, like  C-like `this` and Smalltalk-derived `self`
 
 #### Syntax
 
@@ -1547,9 +1476,10 @@ Generic sequence of statements
 (Self)
 ```
 
-#### Semantics
-
 ### `MuNull`
+
+> Generic nothing value literal - `nil`, `null`, `undefined`, `()` or `unit`.
+> It is also used as a placeholder for empty bodies.
 
 #### Syntax
 
@@ -1557,13 +1487,11 @@ Generic sequence of statements
 (MuNull)
 ```
 
-#### Semantics
-
-Generic nothing value literal - nil, null, undefined or unit
-
 #### Example
 
 ### `MuObject`
+
+> Object oriented unnamed object literal
 
 #### Syntax
 
@@ -1571,88 +1499,59 @@ Generic nothing value literal - nil, null, undefined or unit
 (MuObject Expression)
 ```
 
-#### Semantics
+#### JavaScript Example
 
-Object oriented unnamed object literal
+```javascript
+{}
+{foo: 1}
+{foo: 1, bar: 2}
+```
 
-#### Example
+```haskell
+(MuObject MuNull)
+(MuObject (Attribute "foo" (MuNumber 1)))
+(MuObject (Sequence [
+            Attribute "foo" (MuNumber 1),
+            Attribute "bar" (MuNumber 2)]))
+```
 
-### `MuNumber`
+### `MuNumber`, `MuBool`, `MuString` and `MuSymbol`
+
+> Generic number, boolean, string and symbol (atoms) literals
 
 #### Syntax
 
 ```haskell
 (MuNumber Double)
-```
-
-#### Semantics
-
-Generic number literal
-
-#### Example
-
-### `MuBool`
-
-#### Syntax
-
-```haskell
 (MuBool Bool)
-```
-
-#### Semantics
-
-Generic boolean literal
-
-#### Example
-
-### `MuString`
-
-#### Syntax
-
-```haskell
 (MuString String)
-```
-
-#### Semantics
-
-Generic string literal
-
-#### Example
-
-### `MuSymbol`
-
-#### Syntax
-
-```haskell
 (MuSymbol String)
 ```
 
-#### Semantics
+#### Ruby Example
 
-Generic symbol/atom literal
+```ruby
+1
+true
+"hello"
+:hello
+```
 
-#### Example
+```haskell
+(MuNumber 1)
+(MuBool True)
+(MuString "hello")
+(MuSymbol "hello")
+```
 
-### `MuTuple`
+### `MuTuple` and `MuList`
 
 #### Syntax
 
 ```haskell
 (MuTuple [Expression])
-```
-
-#### Semantics
-
-### `MuList`
-
-#### Syntax
-
-```haskell
 (MuList [Expression])
 ```
-
-#### Semantics
-
 
 # Building mulang from source
 
