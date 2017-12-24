@@ -77,49 +77,49 @@ Mulang is three different  - but thighly related - things:
     + [`Class`](#class)
       - [Syntax](#syntax-12)
       - [Ruby Example](#ruby-example-1)
-      - [Java Example](#java-example-2)
+      - [Java Examples](#java-examples)
     + [`Enumeration`](#enumeration)
       - [Syntax](#syntax-13)
-      - [Java Example](#java-example-3)
+      - [Java Example](#java-example-2)
     + [`Interface`](#interface)
       - [Syntax](#syntax-14)
-      - [Example](#example-6)
+      - [Java Example](#java-example-3)
     + [`Rule`](#rule)
       - [Syntax](#syntax-15)
-      - [Example](#example-7)
+      - [Example](#example-6)
     + [`Fact`](#fact)
       - [Syntax](#syntax-16)
-      - [Example](#example-8)
+      - [Example](#example-7)
     + [`Exist`](#exist)
       - [Syntax](#syntax-17)
-      - [Example](#example-9)
+      - [Example](#example-8)
     + [`Not`](#not)
       - [Syntax](#syntax-18)
-      - [Example](#example-10)
+      - [Example](#example-9)
     + [`Findall`](#findall)
       - [Syntax](#syntax-19)
-      - [Example](#example-11)
+      - [Example](#example-10)
     + [`Forall`](#forall)
       - [Syntax](#syntax-20)
-      - [Example](#example-12)
+      - [Example](#example-11)
     + [`Reference`](#reference)
       - [Syntax](#syntax-21)
-      - [Example](#example-13)
+      - [Example](#example-12)
     + [`Application`](#application)
       - [Syntax](#syntax-22)
-      - [Example](#example-14)
+      - [Example](#example-13)
     + [`Send`](#send)
       - [Syntax](#syntax-23)
       - [Ruby Example](#ruby-example-2)
     + [`New`](#new)
       - [Syntax](#syntax-24)
-      - [Example](#example-15)
+      - [Example](#example-14)
     + [`Implement`](#implement)
       - [Syntax](#syntax-25)
-      - [Example](#example-16)
+      - [Example](#example-15)
     + [`Include`](#include)
       - [Syntax](#syntax-26)
-      - [Example](#example-17)
+      - [Example](#example-16)
     + [`If`](#if)
       - [Syntax](#syntax-27)
     + [`Lambda`](#lambda)
@@ -128,20 +128,20 @@ Mulang is three different  - but thighly related - things:
       - [Syntax](#syntax-29)
     + [`While`](#while)
       - [Syntax](#syntax-30)
-      - [Example](#example-18)
+      - [Example](#example-17)
     + [`Repeat`](#repeat)
       - [Syntax](#syntax-31)
-      - [Example](#example-19)
+      - [Example](#example-18)
     + [`Match`](#match)
       - [Syntax](#syntax-32)
     + [`Switch`](#switch)
       - [Syntax](#syntax-33)
     + [`Try`](#try)
       - [Syntax](#syntax-34)
-      - [Example](#example-20)
+      - [Example](#example-19)
     + [`Raise`](#raise)
       - [Syntax](#syntax-35)
-      - [Example](#example-21)
+      - [Example](#example-20)
     + [`Print`](#print)
       - [Syntax](#syntax-36)
       - [Ruby Example](#ruby-example-3)
@@ -149,7 +149,7 @@ Mulang is three different  - but thighly related - things:
       - [Syntax](#syntax-37)
     + [`Sequence`](#sequence)
       - [Syntax](#syntax-38)
-      - [Example](#example-22)
+      - [Example](#example-21)
     + [`Other`](#other)
       - [Syntax](#syntax-39)
     + [`Equal` and `NotEqual`](#equal-and-notequal)
@@ -158,7 +158,7 @@ Mulang is three different  - but thighly related - things:
       - [Syntax](#syntax-41)
     + [`MuNull`](#munull)
       - [Syntax](#syntax-42)
-      - [Example](#example-23)
+      - [Example](#example-22)
     + [`MuObject`](#muobject)
       - [Syntax](#syntax-43)
       - [JavaScript Example](#javascript-example)
@@ -167,6 +167,40 @@ Mulang is three different  - but thighly related - things:
       - [Ruby Example](#ruby-example-4)
     + [`MuTuple` and `MuList`](#mutuple-and-mulist)
       - [Syntax](#syntax-45)
+  * [Patterns](#patterns)
+    + [`VariablePattern`](#variablepattern)
+      - [Syntax](#syntax-46)
+        * [JavaScript Example](#javascript-example-1)
+    + [`LiteralPattern`](#literalpattern)
+      - [Syntax](#syntax-47)
+        * [Example](#example-23)
+    + [`InfixApplicationPattern`](#infixapplicationpattern)
+      - [Syntax](#syntax-48)
+        * [Example](#example-24)
+    + [`ApplicationPattern`](#applicationpattern)
+      - [Syntax](#syntax-49)
+        * [Example](#example-25)
+    + [`TuplePattern`](#tuplepattern)
+      - [Syntax](#syntax-50)
+        * [Example](#example-26)
+    + [`ListPattern`](#listpattern)
+      - [Syntax](#syntax-51)
+        * [Example](#example-27)
+    + [`FunctorPattern`](#functorpattern)
+      - [Syntax](#syntax-52)
+        * [Example](#example-28)
+    + [`AsPattern`](#aspattern)
+      - [Syntax](#syntax-53)
+        * [Example](#example-29)
+    + [`TypePattern`](#typepattern)
+      - [Syntax](#syntax-54)
+        * [Example](#example-30)
+    + [`WildcardPattern`](#wildcardpattern)
+      - [Syntax](#syntax-55)
+    + [`UnionPattern`](#unionpattern)
+      - [Syntax](#syntax-56)
+    + [`OtherPattern`](#otherpattern)
+      - [Syntax](#syntax-57)
 - [Building mulang from source](#building-mulang-from-source)
   * [Setup](#setup)
   * [Installing and creating an executable](#installing-and-creating-an-executable)
@@ -845,9 +879,9 @@ $ mulang '
 
 In this section, we will get into the technical details of the Mulang AST. It is built around 4 core elements:
 
-* Expressions
-* Patterns
-* Equations
+* [Expressions](#expressions)
+* [Patterns](#patterns)
+* [Equations](#equations)
 * Generators
 
 All the AST elements fall within any of this 4 categories.
@@ -1018,6 +1052,9 @@ to `hash` or `hashCode`- like methods.
 
 ```haskell
 (EqualMethod [Equation])
+```
+
+```haskell
 (HashMethod [Equation])
 ```
 
@@ -1032,13 +1069,13 @@ end
 ```
 
 ```haskell
-(EqualMethod (Equation
+(Sequence [
+  (EqualMethod (Equation
                 [VariablePatten "other"]
-                (UnguardedBody MuNull)))
-
-(HashMethod (Equation
+                (UnguardedBody MuNull))),
+  (HashMethod (Equation
               []
-              (UnguardedBody MuNull)))
+              (UnguardedBody MuNull)))]
 
 ```
 
@@ -1110,12 +1147,10 @@ end
 (Class "Bird" (Just "Animal") MuNull)
 ```
 
-#### Java Example
+#### Java Examples
 
 ```java
-public class Bird extends Animal {
-
-}
+public class Bird extends Animal {}
 ```
 
 ```haskell
@@ -1155,12 +1190,24 @@ public enum Fuzzy {
 (Interface Identifier [Identifier] Expression)
 ```
 
+#### Java Example
 
-#### Example
+```java
+public interface Foo extends Bar, Baz {
+  void foo();
+}
+```
+
+```haskell
+(Interface
+    "Foo"
+    ["Bar", "Baz"]
+    (TypeSignature "foo" [] "void"))
+```
 
 ### `Rule`
 
-> Logic programming declaration of a fact, composed by the rue name, rule arguments, and rule body
+> Logic programming declaration of rule fact, composed by the rule name, rule arguments, and rule body
 
 #### Syntax
 
@@ -1168,8 +1215,18 @@ public enum Fuzzy {
 (Rule Identifier [Pattern] [Expression])
 ```
 
-
 #### Example
+
+```prolog
+baz(bar) :- foo(bar)
+```
+
+```haskell
+(Rule "baz"
+    [(LiteralPattern "bar")]
+    [(Exist "foo"
+        [(LiteralPattern "bar")])])
+```
 
 ### `Fact`
 
@@ -1181,8 +1238,15 @@ public enum Fuzzy {
 (Fact Identifier [Pattern])
 ```
 
-
 #### Example
+
+```prolog
+foo(bar).
+```
+
+```haskell
+(Fact "foo" [(LiteralPattern "bar")])
+```
 
 ### `Exist`
 
@@ -1511,8 +1575,8 @@ puts "Hello World"
 (MuObject MuNull)
 (MuObject (Attribute "foo" (MuNumber 1)))
 (MuObject (Sequence [
-            Attribute "foo" (MuNumber 1),
-            Attribute "bar" (MuNumber 2)]))
+            (Attribute "foo" (MuNumber 1)),
+            (Attribute "bar" (MuNumber 2))]))
 ```
 
 ### `MuNumber`, `MuBool`, `MuString` and `MuSymbol`
@@ -1523,8 +1587,17 @@ puts "Hello World"
 
 ```haskell
 (MuNumber Double)
+```
+
+```haskell
 (MuBool Bool)
+```
+
+```haskell
 (MuString String)
+```
+
+```haskell
 (MuSymbol String)
 ```
 
@@ -1538,19 +1611,180 @@ true
 ```
 
 ```haskell
-(MuNumber 1)
-(MuBool True)
-(MuString "hello")
-(MuSymbol "hello")
+(Sequence [
+  (MuNumber 1),
+  (MuBool True),
+  (MuString "hello"),
+  (MuSymbol "hello")])
 ```
 
 ### `MuTuple` and `MuList`
+
+> They represent tuples - generic non-uniform fixed-size collection of elements - and lists - generic uniform variable-size collection of elements.
+> Lists typically map to arrays, lists or sequence-like structures.
 
 #### Syntax
 
 ```haskell
 (MuTuple [Expression])
+```
+
+```haskell
 (MuList [Expression])
+```
+
+## Patterns
+
+### `VariablePattern`
+
+> Variable pattern represent a variable match. It corresponds to normal formal parameters in precedural languages,
+> and to simple pattern matching against a free identifier.
+
+#### Syntax
+
+```haskell
+(VariablePattern String)
+```
+
+##### JavaScript Example
+
+```javascript
+function foo(x, y) { }
+```
+
+```haskell
+(Function "foo"
+  [(Equation
+      [(VariablePattern "x"), (VariablePattern "y")]
+      (UnguardedBody MuNull))])
+```
+
+### `LiteralPattern`
+
+> literal constant pattern like @4@
+
+#### Syntax
+
+
+```haskell
+(LiteralPattern String)
+```
+
+##### Example
+
+### `InfixApplicationPattern`
+
+> infix application pattern like @4:X@
+
+#### Syntax
+
+
+```haskell
+(InfixApplicationPattern Pattern String Pattern)
+```
+
+##### Example
+
+### `ApplicationPattern`
+
+> prefix application pattern like @f _@
+
+#### Syntax
+
+
+```haskell
+(ApplicationPattern String [Pattern])
+```
+
+##### Example
+
+### `TuplePattern`
+
+> tuple pattern like @(3, _)@
+
+#### Syntax
+
+
+```haskell
+(TuplePattern [Pattern])
+```
+
+##### Example
+
+### `ListPattern`
+
+> list pattern like @[x, y, _]@
+
+#### Syntax
+
+
+```haskell
+(ListPattern [Pattern])
+```
+
+##### Example
+
+### `FunctorPattern`
+
+> Prolog-like functor pattern, like `f(X, 6)`, or Lisp's s-expressions
+
+#### Syntax
+
+
+```haskell
+(FunctorPattern Identifier [Pattern])
+```
+
+##### Example
+
+### `AsPattern`
+
+#### Syntax
+
+```haskell
+(AsPattern Identifier Pattern)
+```
+
+##### Example
+
+### `TypePattern`
+
+> A type pattern, like in exception handling constructs in most object-oriented languages
+
+#### Syntax
+
+```haskell
+(TypePattern Identifier)
+```
+
+##### Example
+
+### `WildcardPattern`
+
+> Wildcard pattern, typically `_` in functional an logic programming languages.
+
+#### Syntax
+
+```haskell
+(WildcardPattern)
+```
+
+### `UnionPattern`
+
+#### Syntax
+
+```haskell
+(UnionPattern [Pattern])
+```
+
+### `OtherPattern`
+
+> Other unrecognized pattern
+
+#### Syntax
+
+```haskell
+(OtherPattern)
 ```
 
 # Building mulang from source
