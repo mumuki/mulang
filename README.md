@@ -167,77 +167,79 @@ But instead of asking one by one, we could use `detect` :
 
 The power of Mulang is grounded on more than 70 different kind of inspections:
 
-1. `assigns`: **any paradigm** is the given variable or attribute assigned?
-1. `calls`: **any paradigm** is the given method, function or procedure called?
-1. `declares`: **any paradigm** is the given element declared?
-1. `declaresAttribute`: **object oriented paradigm** is a given attribute declared?
-1. `declaresClass`: **object oriented paradigm** is a given class declared?
-1. `declaresComputation`: **any paradigm** that is, does the given computation  - method, predicate, function, etc - exist?
-1. `declaresComputationWithArity`: **any paradigm**  that is, does the given computation have the exact given arity?
-1. `declaresEntryPoint`: **any paradigm** is there a program entry point, like a `main` procedure?
-1. `declaresEnumeration`: **imperative paradigm** is a given enumeration declared?
-1. `declaresFact`: **logic paradigm** is a given logic fact declared?
-1. `declaresFunction`: **functional/imperative paradigm** is a given function declared?
-1. `declaresInterface`: **object oriented paradigm** is a given interface declared?
-1. `declaresMethod`: **object oriented paradigm** is a given method declared?
-1. `declaresObject`: **object oriented paradigm** is a given named object declared?
-1. `declaresPredicate`: **logic paradigm** is a given rule o fact declared?
-1. `declaresProcedure`: **imperative paradigm** is a given procedure declared?
-1. `declaresRecursively`: **any paradigm** is a given computation declared using recusion?
-1. `declaresRule`: **logic paradigm** is a given logic rule declared?
-1. `declaresSuperclass`: **object oriented paradigm** is a given class declared as superclass?
-1. `declaresTypeAlias`: **any paradigm** is a given type synonym declared?
-1. `declaresTypeSignature`: **any paradigm** is a given computation type signature declared?
-1. `declaresVariable`: **any paradigm** is a given local o global variable declared?
-1. `discardsExceptions`: **any paradigm** are exceptions discarded within an empty catch block?
-1. `doesConsolePrint`: **any paradigm** is there any console-print-statement like `System.out.println`, `puts` or `console.log`?
-1. `doesNullTest`: **object oriented paradigm** is there a test agains a null value, like `if x == nil then puts 'is nil'`
-1. `doesTypeTest`
-1. `hasAssignmentReturn`
-1. `hasCodeDuplication`: **any paradigm** has the given code simple literal code duplication?
-1. `hasLongParameterList`: **any paradigm** does a given method/function/predicate take too many parameters?
-1. `hasMisspelledIdentifiers`: **any paradigm** an identifier is not a domain language dictionary's word and not part of its jargon
-1. `hasRedundantBooleanComparison`
-1. `hasRedundantGuards`
-1. `hasRedundantIf`: **any paradigm** can a combination of `if`s, `assignment`s and `return`s be replaced by a boolean expression?
-1. `hasRedundantLambda`
-1. `hasRedundantLocalVariableReturn`
-1. `hasRedundantParameter`
-1. `hasRedundantReduction`: **logic paradigm** is a is-operator used to unify individuals that don't require a reduction, like `X is 4`
-1. `hasTooManyMethods`: **object oriented paradigm** does a given class/object/interface have too many methods?
-1. `hasTooShortIdentifiers`: **any paradigm** whether an identifier is too short and not part of domain language's jargon
-1. `hasWrongCaseIdentifiers`: **any paradigm** whether an identifier does not match the domain language's case style
-1. `implements`: **object oriented paradigm** is the given interface implemented?
-1. `includes`: **object oriented paradigm** is a given mixins included?
-1. `inherits`: **object oriented paradigm** is a given class declared as superclass? - alias of `declaresSuperclass`
-1. `instantiates`: **object oriented paradigm** is the given class instantiated?
-1. `isLongCode`: **any paradigm** has the code long sequences of statements?
-1. `overridesEqualsOrHashButNotBoth`: **object oriented paradigm** does a given class override equals but not hash? or hash but not equals?
-1. `raises`: **any paradigm** is the given _exception type_ raised?
-1. `rescues`: **any paradigm** is the given _exception type_ rescued?
-1. `returnsNull`
-1. `uses`: **any paradigm** is there any reference to the given element?
-1. `usesAnonymousVariable`
-1. `usesComposition`
-1. `usesComprehensions`
-1. `usesConditional`
-1. `usesCut`: **logic paradigm** is the logic `!` consult used?
-1. `usesExceptionHandling`: **any paradigm** is any _exception_ handlded?
-1. `usesExceptions`: **any paradigm** is any _exception_ raised?
-1. `usesFail`: **logic paradigm** is the logic `fail` consult used?
-1. `usesFindall`:  **logic paradigm** is the logic `findall` consult used?
-1. `usesForall`:  **logic paradigm** is the logic `forall` consult used?
-1. `usesGuards`
-1. `usesIf`: **any paradigm** is an `if` control structure used?
-1. `usesInheritance`: **object oriented paradigm** is any superclass explicitly declared?
-1. `usesLambda`
-1. `usesMixins`: **object oriented paradigm** is any mixins explicitly included?
-1. `usesNot`
-1. `usesPatternMatching`
-1. `usesRepeat`
-1. `usesSwitch`
-1. `usesUnificationOperator`:  **logic paradigm** is the logic unification operator `=` used?
-1. `usesWhile`: **imperative paradigm** is a `while` control structure used?
+| Inspection                        | Paradigm           | Meaning
+|-----------------------------------|--------------------|------------------------------------------------------
+| `assigns`                         |  any               | the given variable or attribute assigned?
+| `calls`                           |  any               | is the given method, function or procedure called?
+| `declares`                        |  any               | is the given element declared?
+| `declaresAttribute`               |  object oriented   | is a given attribute declared?
+| `declaresClass`                   |  object oriented   | is a given class declared?
+| `declaresComputation`             |  any               | that is, does the given computation  - method, predicate, function, etc - exist?
+| `declaresComputationWithArity`    |  any               |  that is, does the given computation have the exact given arity?
+| `declaresEntryPoint`              |  any               | is there a program entry point, like a `main` procedure?
+| `declaresEnumeration`             |  imperative        | is a given enumeration declared?
+| `declaresFact`                    |  logic             | is a given logic fact declared?
+| `declaresFunction`                |  functional/imperative | is a given function declared?
+| `declaresInterface`               |  object oriented   | is a given interface declared?
+| `declaresMethod`                  |  object oriented   | is a given method declared?
+| `declaresObject`                  |  object oriented   | is a given named object declared?
+| `declaresPredicate`               |  logic             | is a given rule o fact declared?
+| `declaresProcedure`               |  imperative        | is a given procedure declared?
+| `declaresRecursively`             |  any               | is a given computation declared using recusion?
+| `declaresRule`                    |  logic             | is a given logic rule declared?
+| `declaresSuperclass`              |  object oriented   | is a given class declared as superclass?
+| `declaresTypeAlias`               |  any               | is a given type synonym declared?
+| `declaresTypeSignature`           |  any               | is a given computation type signature declared?
+| `declaresVariable`                |  any               | is a given local o global variable declared?
+| `discardsExceptions`              |  any               | are exceptions discarded within an empty catch block?
+| `doesConsolePrint`                |  any               | is there any console-print-statement like `System.out.println`, `puts` or `console.log`?
+| `doesNullTest`                    |  object oriented   | is there a test agains a null value, like `if x == nil then puts 'is nil'`
+| `doesTypeTest`                    |
+| `hasAssignmentReturn`             |
+| `hasCodeDuplication`              |  any               | has the given code simple literal code duplication?
+| `hasLongParameterList`            |  any               | does a given method/function/predicate take too many parameters?
+| `hasMisspelledIdentifiers`        |  any               | an identifier is not a domain language dictionary's word and not part of its jargon
+| `hasRedundantBooleanComparison`   |
+| `hasRedundantGuards`              |
+| `hasRedundantIf`                  |  any               | can a combination of `if`s, `assignment`s and `return`s be replaced by a boolean expression?
+| `hasRedundantLambda`              |
+| `hasRedundantLocalVariableReturn` |
+| `hasRedundantParameter`           |
+| `hasRedundantReduction`           |  logic             | is a is-operator used to unify individuals that don't require a reduction, like `X is 4`
+| `hasTooManyMethods`               |  object oriented   | does a given class/object/interface have too many methods?
+| `hasTooShortIdentifiers`          |  any               | whether an identifier is too short and not part of domain language's jargon
+| `hasWrongCaseIdentifiers`         |  any               | whether an identifier does not match the domain language's case style
+| `implements`                      |  object oriented   | is the given interface implemented?
+| `includes`                        |  object oriented   | is a given mixins included?
+| `inherits`                        |  object oriented   | is a given class declared as superclass? - alias of `declaresSuperclass`
+| `instantiates`                    |  object oriented   | is the given class instantiated?
+| `isLongCode`                      |  any               | has the code long sequences of statements?
+| `overridesEqualsOrHashButNotBoth` |  object oriented   | does a given class override equals but not hash? or hash but not equals?
+| `raises`                          |  any               | is the given _exception type_ raised?
+| `rescues`                         |  any               | is the given _exception type_ rescued?
+| `returnsNull`                     |
+| `uses`                            |  any               | is there any reference to the given element?
+| `usesAnonymousVariable`           |
+| `usesComposition`                 |
+| `usesComprehensions`              |
+| `usesConditional`                 |
+| `usesCut`                         |  logic             | is the logic `!` consult used?
+| `usesExceptionHandling`           |  any               | is any _exception_ handlded?
+| `usesExceptions`                  |  any               | is any _exception_ raised?
+| `usesFail`                        |  logic             | is the logic `fail` consult used?
+| `usesFindall`                     |  logic             | is the logic `findall` consult used?
+| `usesForall`                      |  logic             | is the logic `forall` consult used?
+| `usesGuards`                      |
+| `usesIf`                          |  any               | is an `if` control structure used?
+| `usesInheritance`                 |  object oriented   | is any superclass explicitly declared?
+| `usesLambda`                      |
+| `usesMixins`                      |  object oriented   | is any mixins explicitly included?
+| `usesNot`                         |
+| `usesPatternMatching`             |
+| `usesRepeat`                      |
+| `usesSwitch`                      |
+| `usesUnificationOperator`         |  logic             | is the logic unification operator `=` used?
+| `usesWhile`                       |  imperative        | is a `while` control structure used?
 
 
 # Supported languages
