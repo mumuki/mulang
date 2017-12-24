@@ -4,13 +4,55 @@ Mulang
 ======
 > A universal, multi-language, multi-paradigm code analyzer
 
-# What Mulang is
-
-Mulang itself is three different but thighly related things:
+Mulang is three different  - but thighly related - things:
 
   * an intermediate language, sometimes refered as the **Mulang AST**;
   * a command line tool for analysing the Mulang AST and some popular languages by transforming to it
   * a Haskell composable combinators library for analysing the Mulang AST;
+
+# Table of contents
+
+- [Combinators Crash course](#combinators-crash-course)
+  * [Inspections and Inspection Combinators](#inspections-and-inspection-combinators)
+  * [Identifier predicates](#identifier-predicates)
+  * [Detections](#detections)
+- [Supported inspections](#supported-inspections)
+- [Supported languages](#supported-languages)
+- [Command Line Tool](#command-line-tool)
+    + [With intransitive expectations](#with-intransitive-expectations)
+    + [With unscoped expectations](#with-unscoped-expectations)
+    + [With signature analysis](#with-signature-analysis)
+    + [With broken input](#with-broken-input)
+    + [With AST as input](#with-ast-as-input)
+    + [With Smell Analysis, by inclusion](#with-smell-analysis-by-inclusion)
+    + [With Smell Analysis, by exclusion](#with-smell-analysis-by-exclusion)
+    + [With expressiveness smells](#with-expressiveness-smells)
+    + [With Intermediate Language Generation](#with-intermediate-language-generation)
+  * [Expectations, Intermediate Langauge, Signatures and Smells](#expectations-intermediate-langauge-signatures-and-smells)
+  * [Building mulang from source](#building-mulang-from-source)
+    + [Setup](#setup)
+    + [Installing and creating an executable](#installing-and-creating-an-executable)
+    + [Running tests](#running-tests)
+    + [Watching changes](#watching-changes)
+    + [Loading mulang in the REPL](#loading-mulang-in-the-repl)
+- [The AST spec](#the-ast-spec)
+  * [Expressions](#expressions)
+    + [Record](#record)
+      - [Syntax](#syntax)
+      - [Semantics](#semantics)
+      - [C Example](#c-example)
+      - [Caveats](#caveats)
+    + [TypeAlias](#typealias)
+      - [Syntax](#syntax-1)
+      - [Semantics](#semantics-1)
+      - [Haskell Example](#haskell-example)
+      - [Caveats](#caveats-1)
+    + [TypeSignature](#typesignature)
+      - [Syntax](#syntax-2)
+      - [Semantics](#semantics-2)
+      - [Haskell Example](#haskell-example-1)
+      - [Java Example](#java-example)
+      - [Caveats](#caveats-2)
 
 # Combinators Crash course
 
