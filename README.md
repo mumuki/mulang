@@ -2,92 +2,170 @@
 
 Mulang
 ======
-> The Universal, Multi Language, Multi Paradigm code analyzer
+> A universal, multi-language, multi-paradigm code analyzer
 
-## Getting Started
+# What Mulang is
 
-Better than explaining what Mulang is, let's see what can do it for you.
+Mulang itself is three different but thighly related things:
 
-Let's start simple - we have the following JS expression:
+  * an intermediate language, sometimes refered as the **Mulang AST**;
+  * a command line tool for analysing the Mulang AST and some popular languages by transforming to it
+  * a Haskell composable combinators library for analysing the Mulang AST;
+
+# Combinators Crash course
+
+## Inspections and Inspection Combinators
+
+Better than explaining what Mulang is, let's see what can do it for you. Let's suppose we have the following JS code...
 
 ```javascript
-var pepita = {lugar: bsAs1, peso: 20};
-var bsAs1 = bsAs
+var aPlace = buenosAires;
+var aBird = {position: aPlace, weight: 20};
 ```
 
-We want to recognize some code patterns on it, so we will first load the expression into Mulang:
+...and we want to recognize some code patterns on it. We will first load the expression into Mulang:
+
 
 ```
 $ ghci
 > :m Language.Mulang.All
-> let e = js "var pepita = {lugar: bsAs1, peso: 20}; var bsAs1 = bsAs"
+> let e = js "var aPlace = buenosAires; var aBird = {position: aPlace, weight: 20};"
 ```
 
-Now the magic begins. We want to know if the code expression uses a certain identifier - that could be a variable, function, or anything that has a name:
+Now the magic begins. We want to know if the code expression _uses_ - that is, contains any reference to - a certain identifier. Such identifier could be a variable, function, or anything that has a name:
 
 ```haskell
-> uses (named "bsAs") e
+> uses (named "buenosAires") e
 True
 > uses (named "rosario") e
 False
 ```
 
-That _seems_ easy, but just in case you are wondering: no, Mulang doesn't perform a `string.contains` or something like that :stuck_out_tongue: :
+`uses (named "buenosAires")` is our first _inspection_: a function that takes a Mulang AST and answers a boolan question about it. That _seems_ easy, but just in case you are wondering: no, Mulang doesn't perform a `string.contains` or something like that :stuck_out_tongue: :
 
 ```haskell
-> uses (named "bs") e
+> uses (named "buenos") e
 False
 ```
 
-So let's ask something more interesting - does `bsAs1` use the identifier `bsAs`?
+So let's ask something more interesting - does `aPlace` _use_ the identifier `buenosAires`?
 
 ```haskell
-> scoped (uses (named "bsAs")) "bsAs1"  e
+> scoped (uses (named "buenosAires")) "aPlace"  e
 True
 ```
 
-And does it use `rosario`?
+Here we have used the our first _inspection combinator_, a function that takes an inspection - `uses (named "buenosAires")` - and returns a new one that is more powerful. In this case, `scoped` is capable of restricting the analysis to the given context - the `aPlace` identifier.
+
+
+Let's tray again: does `"aPlace"` it _use_ `rosario`?
 
 ```haskell
-> scoped (uses (named "rosario")) "bsAs1"  e
+> scoped (uses (named "rosario")) "aPlace"  e
 False
 ```
 
-What about the object `pepita`? Does it use `bsAs1` or `rosario`?
+What about the object `aBird`? Does it use `aPlace` or `rosario`?
 
 ```haskell
-> scoped (uses (named "bsAs1")) "pepita"  e
+> scoped (uses (named "aPlace")) "aBird"  e
 True
-> scoped (uses (named "rosario")) "pepita"  e
+> scoped (uses (named "rosario")) "aBird"  e
 False
 ```
 
-Does `pepita` use `bsAs`?
+Does `aBird` use `buenosAires`?
 
 ```haskell
-> scoped (uses (named "bsAs")) "pepita"  e
+> scoped (uses (named "buenosAires")) "aBird"  e
 False
 ```
 
-Oh, wait there! We know, it is true that it does not use **exactly** that variable, but come on, `bsAs1` does use `bsAs`! Wouldn't it be sweet to be transitive?
-
-You ask for it, you get it:
+Oh, wait there! We know, it is true that it does not use **exactly** that variable, but come on, `aPlace` does use `buenosAires`! Wouldn't it be sweet to be transitive?
 
 ```haskell
-> transitive (uses (named "bsAs")) "pepita"  e
+> transitive (uses (named "buenosAires")) "aBird"  e
 True
 ```
 
-I know what you are thinking:  now you wan't to be stricter, you want to know if `pepita.lugar` uses bsAs1 - ignoring that `peso` attribute. Piece of cake:
+Here we can see another _inspections combinator_: `transitive`, which inspects the given context and all the contexts that are refered from it.
+
+Contexts can be nested, too: for example, if you want to know whether `aBird.position` _uses_ `aPlace` - ignoring that `weight` attribute:
 
 ```haskell
-> scopedList (uses (named "bsAs1")) ["pepita", "lugar"]  e
+> scopedList (uses (named "aPlace")) ["aBird", "position"]  e
 True
-> scopedList (uses (named "bsAs1")) ["pepita", "peso"]  e
+> scopedList (uses (named "aPlace")) ["aBird", "weight"]  e
 False
 ```
 
-Nice, we know. But not very awesome, it only can tell you if you are using a _identifier_, right? Eeer. Good news, it can tell you much much much more things:
+Nice, we know. But not very awesome, it only can tell you if you are using a _identifier_, right? Eeer. Good news, it can tell you much much much more things. See the supported inspections list.
+
+## Identifier predicates
+
+In previous examples, we have always combined the `uses` inspection with the `named` function, but what does `named` mean?
+
+Many inspections support an _identifier predicate_, that is, a matcher for identifier. It can be one of the following:
+
+* `anyone`: true for all identifiers
+* `except`: true for any identifier different to the given one
+* `like`: true for any identifier that contains the given one
+* `named`: true for only the given identifier
+* `andAlso`: identifier predicates combiner. True when both predicates are True
+* `anyOf`: identifier predicates combiner. True when any of the predicates are True
+
+For example, does the former piece of code declare any attribute?
+
+```haskell
+> declaresAttribute anyone e
+True
+```
+
+Does it declare an attribute like `eight`?
+
+```haskell
+> declaresAttribute (like "eight") e
+True
+```
+
+And does `aBird` use any if within its definition?
+
+```haskell
+> scoped usesIf "aBird" e
+False
+```
+
+## Detections
+
+Let's suppose we want to knoe whether something returns null in the following code:
+
+```haskell
+let e = js "var bar = {baz: function(){ return g }, foo: function(){ return null }}"
+```
+
+We could manually check if it is the `foo` method in `bar` or the `baz` method in `bar`:
+
+```haskell
+> scopedList returnsNull ["bar", "foo"] e
+True
+> scopedList returnsNull ["bar", "baz"] e
+False
+```
+
+But instead of asking one by one, we could use `detect` :
+
+```haskell
+> detect returnsNull e
+["bar","foo"]
+-- This means that there are null returns within  `bar` and also within `foo`.
+```
+
+`detect` converts an _inspection_ into a _detection_: a function that tells which identifier match a given criteria.
+
+
+# Supported inspections
+
+The power of Mulang is grounded on more than 70 different kind of inspections:
 
 1. `assigns`: **any paradigm** is the given variable or attribute assigned?
 1. `calls`: **any paradigm** is the given method, function or procedure called?
@@ -161,69 +239,15 @@ Nice, we know. But not very awesome, it only can tell you if you are using a _id
 1. `usesUnificationOperator`:  **logic paradigm** is the logic unification operator `=` used?
 1. `usesWhile`: **imperative paradigm** is a `while` control structure used?
 
-For example, let's go trickier:
 
-Does that piece of code declare any attribute?
+# Supported languages
 
-```haskell
-> declaresAttribute anyone e
-True
-```
-
-But does it declare an attribute like 'eso'?
-
-```haskell
-> declaresAttribute (like "eso") e
-True
-```
-
-And does `pepita` use any if within its definition?
-
-```haskell
-> scoped usesIf "pepita" e
-False
-```
-
-Does something in the following code...
-
-```haskell
-let e = js "var bar = {baz: function(){ return g }, foo: function(){ return null }}"
-```
-
-...return null?
-
-```haskell
-> returnsNull e
-True
-```
-
-is it the `foo` method in `bar`? or the `baz` method?
-
-```haskell
-> scopedList returnsNull ["bar", "foo"] e
-True
-> scopedList returnsNull ["bar", "baz"] e
-False
-```
-
-But instead of asking one by one, we could use `detect` :wink: :
-
-```haskell
-> detect returnsNull e
-["bar","foo"]
-```
-
-_Which means that there are null returns within  `bar` and also within `foo`_
-
-## An universal tool
-
-The really awesome is here: it is an universal tool which can _potentially_ work with every programming language. it natively supports:
+Mulang is an universal tool which can work with many different programming languages. it natively supports:
 
   * JS (ES5)
   * Java
   * Haskell
   * Prolog
-  * Mulang itself, expressed as a JSON AST.
 
 In addition, through external tools, it offers support for the following languages:
 
@@ -237,15 +261,11 @@ So in order to use it with a particular language, you have to:
 * translate your language into one of the natively supported ones, or
 * translate your language to the Mulang JSON AST
 
-## Installing it
+# Command Line Tool
 
-Mulang is just a Haskell library. You can install it though cabal.
+You can also use Mulang from the Command Line, without having to interact with Haskell code. Let's see some samples:
 
-But if you are not the Haskell inclined gal or guy - ok, I will try to forgive you - this code comes with a command line too. So you don't even have to typecheck!
-
-## Sample CLI usage
-
-### With intransitive expectations:
+### With intransitive expectations
 
 ```bash
 $ mulang '
@@ -630,9 +650,9 @@ $ mulang '
 ```
 
 
-## Expectations, Signatures and Smells
+## Expectations, Intermediate Langauge, Signatures and Smells
 
-Mulang CLI can do three different kinds of analysis:
+Mulang CLI can do four different kinds of analysis:
 
 * **Expectation analysis**: you can provide an expression - called `inspection` - that will be tested against the provied program. Expectations answer questions like: _does the function X call the function Y?_ or _does the program use if's?_. They can be expressed with the following simple DSL:
   * Simple inspections, like `HasIf` or `DeclaresClass`
@@ -643,8 +663,9 @@ Mulang CLI can do three different kinds of analysis:
     * Any matches: `DeclaresClass:*` or simply `DeclaresClass`
     * Except matches: `Declares:^Foo` - wich means that will match any declaration that is not `Foo`
     * Any-Of matches: `Declares:[Foo|IFoo|AbstractFoo]` - which means that will match any declaration of `Foo`, `IFoo` or `AbstractFoo`
-* **Smell analysis**: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched.
+* **Intermediate Language**: Mulang Command Line Tool can generate the Mulang AST for a given source code.
 * **Signature analysis**: report the signatures of the computations present in source code.
+* **Smell analysis**: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched.
 
 ## Building mulang from source
 
@@ -684,3 +705,121 @@ $ stack test --fast --file-watch
 ```
 stack ghci
 ```
+
+
+# The AST spec
+
+In this last section, we will get into the technical details of the Mulang AST. It is built around 4 core elements:
+
+* Expressions
+* Patterns
+* Equations
+* Generators
+
+All the AST elements fall within any of this 4 categories.
+
+## Expressions
+
+Expressions are the most important element kind, since contain most of the information of a Mulang program and are always the root element of it. In fact, this implementation does not contain an `AST` or `Program` datatype - it is instead types as `Expression`.
+
+Expression in Mulang model what you will normally spec in a language as a expression, that is something that holds a value and a type. For example, `4 + 5` and `[2, 3].toString()` are typical expresion.
+
+However, Mulang extends this concept to most kind of elements in a program, regadless they are have an actual value in the original language. For example, class declarations and while statements are modeled as expression, although in many languages they aren't.
+
+As a rule of thumb if something is or can be represented as an statement, declararion or expression, the it is modeled as `Expression` in Mulang AST.
+
+### Record
+
+#### Syntax
+
+```haskell
+(Record Identifier)
+```
+
+#### Semantics
+
+A `Record` represents a record, data or struct declaration, as found in most procedural and functional languages, like the C-like `struct` declaration
+
+#### C Example
+
+```c
+struct Point {
+  int x;
+  int y;
+}
+```
+
+```haskell
+(Record "Point")
+```
+
+#### Caveats
+
+Currently, the `Record` expression does not hold information about the record contents.
+
+
+### TypeAlias
+
+#### Syntax
+
+```haskell
+(TypeAlias Identifier)
+```
+
+#### Semantics
+
+A `TypeAlias` represents a synonym for a type, like the `type` declaration in Haskell and Scala or C's `typedef`. It is a typical statically typed functional programming feature.
+
+#### Haskell Example
+
+```haskell
+type Point = (Point, Int)
+```
+
+```haskell
+(TypeAlias "Point")
+```
+
+#### Caveats
+
+Currently, the `TypeAlias` expression does not hold information about the aliased type.
+
+### TypeSignature
+
+#### Syntax
+
+```haskell
+(TypeSignature Identifier [Identifier] Identifier)
+```
+
+#### Semantics
+
+A `TypeSignature` represents an explicit type annotation for a computation, variable or constant, as you can find in Java or Haskell.
+
+#### Haskell Example
+
+```haskell
+name :: String
+```
+
+```haskell
+(TypeSignature "name" [] "String")
+```
+
+#### Java Example
+
+In Java, as in most typed C-like languages, type signature and variable declartions are bound. This means that, for example, a local variable declaration will produce both a `TypeSignature` and a `Variable` expression.
+
+```java
+String name;
+```
+
+```haskell
+(TypeSignature "name" [] "String")
+```
+
+#### Caveats
+
+`TypeSignature`s of zero-args computation and variables are identical.
+
+
