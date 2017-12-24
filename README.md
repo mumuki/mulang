@@ -146,9 +146,10 @@ Mulang is three different  - but thighly related - things:
     + [`Print`](#print)
       - [Syntax](#syntax-36)
       - [Ruby Example](#ruby-example-4)
-    + [`Comprehension`](#comprehension)
+    + [`For`](#for)
       - [Syntax](#syntax-37)
-      - [Caveats](#caveats-3)
+      - [Haskell Example](#haskell-example-2)
+      - [Java Example](#java-example-5)
     + [`Sequence`](#sequence)
       - [Syntax](#syntax-38)
       - [Example](#example-20)
@@ -180,7 +181,7 @@ Mulang is three different  - but thighly related - things:
       - [Example](#example-22)
     + [`InfixApplicationPattern`](#infixapplicationpattern)
       - [Syntax](#syntax-49)
-        * [Caveats](#caveats-4)
+        * [Caveats](#caveats-3)
     + [`ApplicationPattern`](#applicationpattern)
       - [Syntax](#syntax-50)
       - [Example](#example-23)
@@ -420,14 +421,16 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `uses`                            |  any               | is there any reference to the given element?
 | `usesAnonymousVariable`           |
 | `usesComposition`                 |
-| `usesComprehensions`              |
 | `usesConditional`                 |
 | `usesCut`                         |  logic             | is the logic `!` consult used?
 | `usesExceptionHandling`           |  any               | is any _exception_ handlded?
 | `usesExceptions`                  |  any               | is any _exception_ raised?
 | `usesFail`                        |  logic             | is the logic `fail` consult used?
 | `usesFindall`                     |  logic             | is the logic `findall` consult used?
+| `usesFor`                         |  any               | is any kind of comprehension or indexed repetition used?
 | `usesForall`                      |  logic             | is the logic `forall` consult used?
+| `usesForComprehension`            |  functional        | is the functional for/do/list comprehension used?
+| `usesForEach`                     |  procedural        | is the procedural indexed repetition used?
 | `usesGuards`                      |
 | `usesIf`                          |  any               | is an `if` control structure used?
 | `usesInheritance`                 |  object oriented   | is any superclass explicitly declared?
@@ -439,6 +442,7 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `usesSwitch`                      |
 | `usesUnificationOperator`         |  logic             | is the logic unification operator `=` used?
 | `usesWhile`                       |  imperative        | is a `while` control structure used?
+| `usesYield`                       |  functional        | is an expression yielded within a comprehension?
 
 
 # Supported languages
@@ -1535,17 +1539,50 @@ puts "Hello World"
 (Print (MuString "Hello World"))
 ```
 
-### `Comprehension`
+### `For`
+
+> `For`s generalices the concept of comprehensions an indexed repetition. With a `For` you can build:
+>
+> * `ForComprehension`, when the for expression is a yield. Scala's `for` comprehensions, Erlang's and Haskell's list comprehensions, and Haskell's `do-syntaxt` map to it.
+> * `ForEach`, when the for expression is not a yield.  Java's `for:`, or some scenarios of scala's `for` map to it.
 
 #### Syntax
 
 ```haskell
-(Comprehension Expression [ComprehensionStatement])
+(For [Statment] Expression)
 ```
 
-#### Caveats
+#### Haskell Example
 
-`Comprehension`s are going to be deprecated and replaced by new `ForStatement`. See [This PR](https://github.com/mumuki/mulang/pull/98).
+```haskell
+m = [ f x | x <- [1, 2, 3, 4] ]
+```
+
+```haskell
+(Variable "m"
+  (For
+    [(Generator
+      (VariablePattern "x")
+      (MuList [(MuNumber 1), (MuNumber 2), (MuNumber 3), (MuNumber 4)]))]
+    (Yield
+      (Application (Reference "f") [(Reference "x")]))))
+```
+
+#### Java Example
+
+```java
+for (Integer i : ints) {
+  System.out.println(i);
+}
+```
+
+```haskell
+(For
+  [(Generator
+      (VariablePattern "i")
+      (Reference "ints"))]
+  (Print (Reference "i")))
+```
 
 ### `Sequence`
 
