@@ -23,7 +23,7 @@ instance FromJSON Equation
 instance FromJSON EquationBody
 instance FromJSON Expression
 instance FromJSON Pattern
-instance FromJSON ComprehensionStatement
+instance FromJSON Statement
 
 instance ToJSON AnalysisResult
 instance ToJSON ExpectationResult
@@ -34,5 +34,5 @@ instance ToJSON Equation
 instance ToJSON EquationBody
 instance ToJSON Expression
 instance ToJSON Pattern
-instance ToJSON ComprehensionStatement
+instance ToJSON Statement
 

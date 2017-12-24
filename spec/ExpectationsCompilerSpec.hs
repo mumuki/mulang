@@ -176,8 +176,8 @@ spec = do
     run (hs "f x = 1")  "*" "DeclaresTypeSignature:f" `shouldBe` False
     run (hs "f :: Int") "*" "DeclaresTypeSignature:f" `shouldBe` True
 
-  it "works with UsesComprehension" $ do
-    run (hs "f :: Int") "f" "UsesComprehension" `shouldBe` False
+  it "works with UsesForComprehension" $ do
+    run (hs "f :: Int") "f" "UsesForComprehension" `shouldBe` False
 
   it "works with DeclaresRecursively" $ do
     run (hs "f :: Int") "f" "DeclaresRecursively" `shouldBe` False

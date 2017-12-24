@@ -4,6 +4,8 @@ module Language.Mulang.Inspector.Generic (
   calls,
   uses,
   usesIf,
+  usesYield,
+  usesFor,
   declares,
   declaresVariable,
   declaresRecursively,
@@ -65,6 +67,17 @@ usesIf :: Inspection
 usesIf = containsExpression f
   where f (If _ _ _) = True
         f _          = False
+
+usesYield :: Inspection
+usesYield = containsExpression f
+  where f (Yield _) = True
+        f _         = False
+
+usesFor :: Inspection
+usesFor = containsExpression f
+  where f (For _ _) = True
+        f _         = False
+
 
 -- | Inspection that tells whether a top level declaration exists
 declares :: IdentifierInspection

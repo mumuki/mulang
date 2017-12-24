@@ -3,7 +3,7 @@ module Language.Mulang.Inspector.Functional (
   usesComposition,
   usesLambda,
   usesPatternMatching,
-  usesComprehension,
+  usesForComprehension,
   usesConditional) where
 
 import Language.Mulang.Ast
@@ -38,10 +38,10 @@ usesPatternMatching = containsExpression f
 -- | Inspection that tells whether an expression uses
 -- comprehensions - list comprehension, for comprehension, do-syntax, etc -
 -- in its definitions
-usesComprehension :: Inspection
-usesComprehension = containsExpression f
-  where f (Comprehension _ _) = True
-        f _ = False
+usesForComprehension :: Inspection
+usesForComprehension = containsExpression f
+  where f (For _ e) = usesYield e
+        f _         = False
 
 -- | Inspection that tells whether an expression uses a lambda expression
 -- in its definition

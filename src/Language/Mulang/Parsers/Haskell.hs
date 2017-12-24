@@ -87,8 +87,8 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muExp (HsEnumFromTo from to)         = Application (Reference "enumFromTo") [(muExp from), (muExp to)]
     muExp (HsEnumFromThen from thn)      = Application (Reference "enumFromThen") [(muExp from), (muExp thn)]
     muExp (HsEnumFromThenTo from thn to) = Application (Reference "enumFromThenTo") [(muExp from), (muExp thn), (muExp to)]
-    muExp (HsListComp exp stmts)         = Comprehension (muExp exp) (map muStmt stmts)
-    muExp (HsDo stmts) | (HsQualifier exp) <- last stmts  = Comprehension (muExp exp) (map muStmt stmts)
+    muExp (HsListComp exp stmts)         = For (map muStmt stmts) (Yield (muExp exp))
+    muExp (HsDo stmts) | (HsQualifier exp) <- last stmts  = For (map muStmt stmts)  (Yield (muExp exp))
     muExp _ = Other
 
     muLit (HsCharPrim    v) = MuString [v]
@@ -121,8 +121,8 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muQOp (HsQVarOp name) = muQName name
     muQOp (HsQConOp name) = muQName name
 
-    muStmt (HsGenerator _ pat exp) = MuGenerator (muPat pat) (muExp exp)
-    muStmt (HsQualifier exp) = MuQualifier (muExp exp)
+    muStmt (HsGenerator _ pat exp) = Generator (muPat pat) (muExp exp)
+    muStmt (HsQualifier exp)       = Guard (muExp exp)
 
     muTypeSignature t name = TypeSignature (muName name) (init topTypes) (last topTypes)
       where topTypes = muTopTypes t

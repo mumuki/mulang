@@ -57,8 +57,8 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Call op args)          = op:args
     subExpressions (Class _ _ v)           = [v]
     subExpressions (Clause _ _ es)         = es
-    subExpressions (Comprehension a _)     = [a] --TODO
     subExpressions (EntryPoint _ e)        = [e]
+    subExpressions (For _ a)               = [a]
     subExpressions (Forall e1 e2)          = [e1, e2]
     subExpressions (If a b c)              = [a, b, c]
     subExpressions (Interface _ _ v)       = [v]
@@ -78,6 +78,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Try t cs f)            = t : map snd cs ++ [f]
     subExpressions (Variable _ v)          = [v]
     subExpressions (While e1 e2)           = [e1, e2]
+    subExpressions (Yield v)               = [v]
     subExpressions _                       = []
 
 
