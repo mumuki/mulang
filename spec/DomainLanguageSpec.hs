@@ -86,6 +86,21 @@ spec = do
     context "rubyCase language" $ do
       let run = hasWrongCaseIdentifiers (DomainLanguage english rubyCase 3 jargon)
 
+      it "is True when method name is camelCase" $ do
+        run (SimpleMethod "helloWorld" [] MuNull) `shouldBe` True
+
+      it "is False when method name is snake_case" $ do
+        run (SimpleMethod "hello_world" [] MuNull) `shouldBe` False
+
+      it "is False when method name is snake_case!" $ do
+        run (SimpleMethod "hello_world!" [] MuNull) `shouldBe` False
+
+      it "is False when method name is snake_case?" $ do
+        run (SimpleMethod "hello_world?" [] MuNull) `shouldBe` False
+
+      it "is False when method is a symbol" $ do
+        run (SimpleMethod "+" [] MuNull) `shouldBe` False
+
       it "is True when there are lower camel case identifier" $ do
         run (Variable "helloWorld" MuNull) `shouldBe` True
 
