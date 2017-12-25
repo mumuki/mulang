@@ -127,6 +127,9 @@ declarationsOf b = boundDeclarations (named b)
 extractReference :: Expression -> Maybe Identifier
 extractReference (Reference n)        = Just n
 extractReference (Exist n _)          = Just n
+extractReference (New n _)            = Just n
+extractReference (Implement n)        = Just n
+extractReference (Include n)          = Just n
 extractReference _                    = Nothing
 
 equationExpressions = concatMap (\(Equation _ body) -> bodyExpressions body)
