@@ -27,7 +27,7 @@ rubyCase       :: CaseStyle
 rubyCase  word | (isLower.head) word = snakeCase baseWord
                | otherwise           = camelCase baseWord
 
-               where baseWord = filter (`notElem` "!?") word
+               where baseWord = filter (`notElem` "!?+-=[]<>|&*/") word
 
 canTokenize :: CaseStyle -> String -> Bool
 canTokenize style = isRight . style
