@@ -1,5 +1,3 @@
-{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
-
 module HaskellSpec (spec) where
 
 import           Test.Hspec
