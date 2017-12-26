@@ -16,7 +16,7 @@ spec = do
   describe "referencedIdentifiers" $ do
     it "answers referenced identifiers" $ do
       let code = hs "f x =  (:[]) . m x y . g h 2"
-      (referencedIdentifiers code) `shouldBe` [".","m","x","y", "g","h"]
+      (referencedIdentifiers code) `shouldBe` [".", ":", "m","x","y", "g","h"]
 
   describe "transitiveReferencedIdentifiers" $ do
     it "answers transitive referenced identifiers" $ do
