@@ -398,6 +398,15 @@ spec = do
     it "is False when required function is not used on list comprehension" $ do
       uses (named "f") (hs "y x = [ g m | m <- ms  ]") `shouldBe` False
 
+    it "is True when an identifier is used within a New expression" $ do
+      uses (named "LinkedList") (New "LinkedList" []) `shouldBe` True
+
+    it "is True when an identifier is used within an Include expression" $ do
+      uses (named "Enumerable") (Include "Enumerable") `shouldBe` True
+
+    it "is True when an identifier is used within an Implement expression" $ do
+      uses (named "Iterator") (Implement "Iterator") `shouldBe` True
+
     it "is False when there is variable hiding in list comprehension" $ do
       --uses (named "m") "y x = [ g m | m <- ms  ]") `shouldBe` False
       pending

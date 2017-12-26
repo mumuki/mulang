@@ -52,30 +52,31 @@ expressions :: Generator Expression
 expressions expr = expr : concatMap expressions (subExpressions expr)
   where
     subExpressions :: Generator Expression
-    subExpressions (Variable _ v)          = [v]
-    subExpressions (Subroutine _ es)       = equationExpressions es
-    subExpressions (Clause _ _ es)         = es
     subExpressions (Attribute _ v)         = [v]
-    subExpressions (Object _ v)            = [v]
-    subExpressions (Class _ _ v)           = [v]
-    subExpressions (Interface _ _ v)       = [v]
-    subExpressions (EntryPoint _ e)        = [e]
     subExpressions (Call op args)          = op:args
-    subExpressions (Lambda _ a)            = [a]
-    subExpressions (If a b c)              = [a, b, c]
-    subExpressions (While e1 e2)           = [e1, e2]
-    subExpressions (Repeat e1 e2)          = [e1, e2]
-    subExpressions (Switch e1 list)        = e1 : concatMap (\(x,y) -> [x,y]) list
-    subExpressions (Match e1 equations)    = e1:equationExpressions equations
+    subExpressions (Class _ _ v)           = [v]
+    subExpressions (Clause _ _ es)         = es
     subExpressions (Comprehension a _)     = [a] --TODO
-    subExpressions (Not e)                 = [e]
+    subExpressions (EntryPoint _ e)        = [e]
     subExpressions (Forall e1 e2)          = [e1, e2]
-    subExpressions (Return v)              = [v]
-    subExpressions (Sequence es)           = es
+    subExpressions (If a b c)              = [a, b, c]
+    subExpressions (Interface _ _ v)       = [v]
+    subExpressions (Lambda _ a)            = [a]
+    subExpressions (Match e1 equations)    = e1:equationExpressions equations
+    subExpressions (MuList as)             = as
     subExpressions (MuObject es)           = [es]
     subExpressions (MuTuple as)            = as
-    subExpressions (MuList as)             = as
+    subExpressions (New _ es)              = es
+    subExpressions (Not e)                 = [e]
+    subExpressions (Object _ v)            = [v]
+    subExpressions (Repeat e1 e2)          = [e1, e2]
+    subExpressions (Return v)              = [v]
+    subExpressions (Sequence es)           = es
+    subExpressions (Subroutine _ es)       = equationExpressions es
+    subExpressions (Switch e1 list)        = e1 : concatMap (\(x,y) -> [x,y]) list
     subExpressions (Try t cs f)            = t : map snd cs ++ [f]
+    subExpressions (Variable _ v)          = [v]
+    subExpressions (While e1 e2)           = [e1, e2]
     subExpressions _                       = []
 
 
@@ -126,6 +127,9 @@ declarationsOf b = boundDeclarations (named b)
 extractReference :: Expression -> Maybe Identifier
 extractReference (Reference n)        = Just n
 extractReference (Exist n _)          = Just n
+extractReference (New n _)            = Just n
+extractReference (Implement n)        = Just n
+extractReference (Include n)          = Just n
 extractReference _                    = Nothing
 
 equationExpressions = concatMap (\(Equation _ body) -> bodyExpressions body)
