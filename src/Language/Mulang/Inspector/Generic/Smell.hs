@@ -18,7 +18,7 @@ module Language.Mulang.Inspector.Generic.Smell (
 
 import Language.Mulang.Ast
 import Language.Mulang.Inspector
-
+import Language.Mulang.Generator(identifierReferences)
 
 -- | Inspection that tells whether an identifier has expressions like 'x == True'
 hasRedundantBooleanComparison :: Inspection
@@ -82,9 +82,11 @@ hasRedundantLambda = containsExpression f
 -- can be avoided using point-free
 hasRedundantParameter :: Inspection
 hasRedundantParameter = containsExpression f
-  where f (SimpleFunction _ params (Return (Application _ args))) | (VariablePattern param) <- last params,
-                                                                    (Reference arg) <- last args = param == arg
+  where f function@(SimpleFunction _ params (Return (Application _ args))) | (VariablePattern param) <- last params,
+                                                                             (Reference arg) <- last args = param == arg && showsUpOnlyOnce param (identifierReferences function)
         f _ = False
+        showsUpOnlyOnce p = (==1).countElem p
+        countElem p = length.filter (==p)
 
 isBooleanLiteral (MuBool _) = True
 isBooleanLiteral _          = False
