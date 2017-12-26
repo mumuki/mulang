@@ -52,6 +52,7 @@ expressions :: Generator Expression
 expressions expr = expr : concatMap expressions (subExpressions expr)
   where
     subExpressions :: Generator Expression
+    subExpressions (Assignment _ e)        = [e]
     subExpressions (Attribute _ v)         = [v]
     subExpressions (Call op args)          = op:args
     subExpressions (Class _ _ v)           = [v]
