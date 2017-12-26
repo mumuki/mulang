@@ -7,6 +7,7 @@ module Language.Mulang.Generator (
   equationBodies,
   expressions,
   referencedIdentifiers,
+  identifierReferences,
   transitiveReferencedIdentifiers,
   Generator,
   Expression(..)) where
@@ -81,7 +82,10 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
 -- | Returns all the referenced identifiers
 -- For example, in 'f (x + 1)', it returns 'f' and 'x'
 referencedIdentifiers :: Generator Identifier
-referencedIdentifiers = nub . mapMaybe extractReference . expressions
+referencedIdentifiers = nub . identifierReferences
+
+identifierReferences :: Generator Identifier
+identifierReferences = mapMaybe extractReference . expressions
 
 
 -- | Returns all the identifiers transitively referenced by the given one
