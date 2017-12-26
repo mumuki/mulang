@@ -45,7 +45,6 @@ spec = describe "ExpectationsAnalyzer" $ do
       let notDeclaresY = Expectation "*" "Not:Declares:y"
       (run Haskell "x = \"¡\"" [notDeclaresY, notDeclaresX]) `shouldReturn` (result [
                                                                           passed notDeclaresY, failed notDeclaresX] [])
-
     it "works with Declares" $ do
       let xdeclares = Expectation "*" "Declares:x"
       let ydeclares = Expectation "*" "Declares:y"
@@ -55,6 +54,11 @@ spec = describe "ExpectationsAnalyzer" $ do
       let usesy = Expectation "x" "Uses:y"
       let usesz = Expectation "x" "Uses:z"
       (run Haskell "x = y * 10" [usesy, usesz]) `shouldReturn` (result [passed usesy, failed usesz] [])
+
+    it "works with Uses and an infix partially applied function" $ do
+      let usesy = Expectation "x" "Uses:y"
+      let usesz = Expectation "x" "Uses:z"
+      (run Haskell "x = (*y) 10" [usesy, usesz]) `shouldReturn` (result [passed usesy, failed usesz] [])
 
     it "works with DeclaresComputationWithArity" $ do
       let hasArity2 = Expectation "*" "DeclaresComputationWithArity2:foo"
@@ -130,6 +134,6 @@ spec = describe "ExpectationsAnalyzer" $ do
       (run Prolog "foo(X) :- bar(X)." [hasNot]) `shouldReturn` (result [failed hasNot] [])
       (run Prolog "foo(X) :- not(bar(X))." [hasNot]) `shouldReturn` (result [passed hasNot] [])
 
-    it "proerly reports parsing errors" $ do
+    it "properly reports parsing errors" $ do
       let hasNot = Expectation "foo" "UsesNot"
       (run Haskell " foo " [hasNot]) `shouldReturn` (AnalysisFailed "Parse error")
