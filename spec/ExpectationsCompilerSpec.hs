@@ -130,6 +130,7 @@ spec = do
     run (hs "f a b = g") "m" "Uses:g" `shouldBe` False
     run (hs "f a b = h") "f" "Uses:g" `shouldBe` False
     run (hs "f a b = g") "f" "Uses:g" `shouldBe` True
+    run (hs "x = (*y) 10") "x" "Uses:y" `shouldBe` True
     run (java "class Foo{ void a(){ try{ b(); } } }") "a" "Uses:b" `shouldBe` True
     run (java "class Foo{ void a(){ try{} catch(Exception e) { b(); } } }") "a" "Uses:b" `shouldBe` True
     run (java "class Foo{ void a(){ try{} catch(Exception e) {} finally { b(); } } }") "a" "Uses:b" `shouldBe` True

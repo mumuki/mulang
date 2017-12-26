@@ -55,11 +55,6 @@ spec = describe "ExpectationsAnalyzer" $ do
       let usesz = Expectation "x" "Uses:z"
       (run Haskell "x = y * 10" [usesy, usesz]) `shouldReturn` (result [passed usesy, failed usesz] [])
 
-    it "works with Uses and an infix partially applied function" $ do
-      let usesy = Expectation "x" "Uses:y"
-      let usesz = Expectation "x" "Uses:z"
-      (run Haskell "x = (*y) 10" [usesy, usesz]) `shouldReturn` (result [passed usesy, failed usesz] [])
-
     it "works with DeclaresComputationWithArity" $ do
       let hasArity2 = Expectation "*" "DeclaresComputationWithArity2:foo"
       let hasArity3 = Expectation "*" "DeclaresComputationWithArity3:foo"
