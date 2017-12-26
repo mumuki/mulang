@@ -165,6 +165,8 @@ spec = do
     it "is False when parameter is not avoidable" $ do
       hasRedundantParameter (hs "foo x y = foo y x") `shouldBe` False
 
+    it "is False when parameter appears more than once in the function" $ do
+      hasRedundantParameter (hs "foo a = bar a a") `shouldBe` False
 
   describe "hasRedundantGuards" $ do
     it "is True when present and both branches are boolean literals" $ do
