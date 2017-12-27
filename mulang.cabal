@@ -1,7 +1,7 @@
 name:                mulang
 version:             3.5.1
-synopsis:            The Mu Language, a non-computable extended Lambda Calculus
--- description:
+synopsis:            An intermediate language designed to perform advanced code analysis
+description:         Mulang is an intermediate language, a combinators library for static code analysis and a multilanguage comand line tool
 license:             GPL
 license-file:        LICENSE.txt
 author:              Franco Leonardo Bulgarelli
@@ -25,7 +25,6 @@ library
     -fno-warn-missing-pattern-synonym-signatures
     -fwarn-tabs
     -funbox-strict-fields
-    -O
 
   exposed-modules:
     Control.Fallible
@@ -64,7 +63,7 @@ library
     Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.SmellsAnalyzer
   build-depends:
-    base                      ,
+    base                      <= 5,
     bytestring                ,
     text                      ,
     unordered-containers      ,
@@ -91,7 +90,7 @@ executable mulang
   default-language:    Haskell2010
 
   build-depends:
-    base                      ,
+    base                      <= 5,
     bytestring                ,
     text                      ,
     aeson                     ,
@@ -113,7 +112,6 @@ executable mulang
     -fwarn-tabs
     -funbox-strict-fields
     -threaded
-    -O
 
 test-suite spec
   type: exitcode-stdio-1.0
@@ -128,11 +126,10 @@ test-suite spec
     -fwarn-tabs
     -funbox-strict-fields
     -threaded
-    -O
   hs-source-dirs: spec
   main-is:        Spec.hs
   build-depends:
-    base                      ,
+    base                      <= 5,
     bytestring                ,
     text                      ,
     aeson                     ,
