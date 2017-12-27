@@ -39,7 +39,7 @@ Mulang is three different  - but thighly related - things:
       - [Syntax](#syntax)
       - [C Example](#c-example)
       - [Caveats](#caveats)
-    + [TypeAlias](#typealias)
+    + [`TypeAlias`](#typealias)
       - [Syntax](#syntax-1)
       - [Haskell Example](#haskell-example)
       - [Caveats](#caveats-1)
@@ -56,70 +56,71 @@ Mulang is three different  - but thighly related - things:
       - [Example](#example)
     + [`Procedure`](#procedure)
       - [Syntax](#syntax-5)
-      - [Example](#example-1)
     + [`Method`](#method)
       - [Syntax](#syntax-6)
+      - [Ruby Example](#ruby-example)
+      - [Java Example](#java-example-2)
     + [`EqualMethod` and `HashMethod`](#equalmethod-and-hashmethod)
       - [Syntax](#syntax-7)
-      - [Ruby Example](#ruby-example)
+      - [Ruby Example](#ruby-example-1)
     + [`Variable`](#variable)
       - [Syntax](#syntax-8)
-      - [Example](#example-2)
+      - [Example](#example-1)
     + [`Assignment`](#assignment)
       - [Syntax](#syntax-9)
-      - [Example](#example-3)
+      - [Example](#example-2)
     + [`Attribute`](#attribute)
       - [Syntax](#syntax-10)
-      - [Example](#example-4)
+      - [Example](#example-3)
     + [`Object`](#object)
       - [Syntax](#syntax-11)
-      - [Example](#example-5)
+      - [Example](#example-4)
     + [`Class`](#class)
       - [Syntax](#syntax-12)
-      - [Ruby Example](#ruby-example-1)
+      - [Ruby Example](#ruby-example-2)
       - [Java Examples](#java-examples)
     + [`Enumeration`](#enumeration)
       - [Syntax](#syntax-13)
-      - [Java Example](#java-example-2)
+      - [Java Example](#java-example-3)
     + [`Interface`](#interface)
       - [Syntax](#syntax-14)
-      - [Java Example](#java-example-3)
+      - [Java Example](#java-example-4)
     + [`Rule`](#rule)
       - [Syntax](#syntax-15)
-      - [Example](#example-6)
+      - [Example](#example-5)
     + [`Fact`](#fact)
       - [Syntax](#syntax-16)
-      - [Example](#example-7)
+      - [Example](#example-6)
     + [`Exist`](#exist)
       - [Syntax](#syntax-17)
-      - [Example](#example-8)
+      - [Example](#example-7)
     + [`Not`](#not)
       - [Syntax](#syntax-18)
-      - [Example](#example-9)
+      - [Example](#example-8)
     + [`Findall`](#findall)
       - [Syntax](#syntax-19)
-      - [Example](#example-10)
+      - [Example](#example-9)
     + [`Forall`](#forall)
       - [Syntax](#syntax-20)
-      - [Example](#example-11)
+      - [Example](#example-10)
     + [`Reference`](#reference)
       - [Syntax](#syntax-21)
-      - [Example](#example-12)
+      - [Example](#example-11)
     + [`Application`](#application)
       - [Syntax](#syntax-22)
-      - [Example](#example-13)
+      - [Example](#example-12)
     + [`Send`](#send)
       - [Syntax](#syntax-23)
-      - [Ruby Example](#ruby-example-2)
+      - [Ruby Example](#ruby-example-3)
     + [`New`](#new)
       - [Syntax](#syntax-24)
-      - [Example](#example-14)
+      - [Example](#example-13)
     + [`Implement`](#implement)
       - [Syntax](#syntax-25)
-      - [Example](#example-15)
+      - [Example](#example-14)
     + [`Include`](#include)
       - [Syntax](#syntax-26)
-      - [Example](#example-16)
+      - [Example](#example-15)
     + [`If`](#if)
       - [Syntax](#syntax-27)
     + [`Lambda`](#lambda)
@@ -128,29 +129,27 @@ Mulang is three different  - but thighly related - things:
       - [Syntax](#syntax-29)
     + [`While`](#while)
       - [Syntax](#syntax-30)
-      - [Example](#example-17)
+      - [Example](#example-16)
     + [`Repeat`](#repeat)
       - [Syntax](#syntax-31)
-      - [Example](#example-18)
+      - [Example](#example-17)
     + [`Match`](#match)
       - [Syntax](#syntax-32)
     + [`Switch`](#switch)
       - [Syntax](#syntax-33)
     + [`Try`](#try)
       - [Syntax](#syntax-34)
-      - [Example](#example-19)
+      - [Example](#example-18)
     + [`Raise`](#raise)
       - [Syntax](#syntax-35)
-      - [Example](#example-20)
+      - [Example](#example-19)
     + [`Print`](#print)
       - [Syntax](#syntax-36)
-      - [Ruby Example](#ruby-example-3)
-    + [`Comprehension`](#comprehension)
-      - [Syntax](#syntax-37)
+      - [Ruby Example](#ruby-example-4)
       - [Caveats](#caveats-3)
     + [`Sequence`](#sequence)
       - [Syntax](#syntax-38)
-      - [Example](#example-21)
+      - [Example](#example-20)
     + [`Other`](#other)
       - [Syntax](#syntax-39)
     + [`Equal` and `NotEqual`](#equal-and-notequal)
@@ -159,13 +158,13 @@ Mulang is three different  - but thighly related - things:
       - [Syntax](#syntax-41)
     + [`MuNull`](#munull)
       - [Syntax](#syntax-42)
-      - [Example](#example-22)
+      - [Example](#example-21)
     + [`MuObject`](#muobject)
       - [Syntax](#syntax-43)
       - [JavaScript Example](#javascript-example)
     + [`MuNumber`, `MuBool`, `MuString` and `MuSymbol`](#munumber-mubool-mustring-and-musymbol)
       - [Syntax](#syntax-44)
-      - [Ruby Example](#ruby-example-4)
+      - [Ruby Example](#ruby-example-5)
     + [`MuTuple` and `MuList`](#mutuple-and-mulist)
       - [Syntax](#syntax-45)
   * [Patterns](#patterns)
@@ -174,28 +173,28 @@ Mulang is three different  - but thighly related - things:
         * [JavaScript Example](#javascript-example-1)
     + [`LiteralPattern`](#literalpattern)
       - [Syntax](#syntax-47)
-        * [Example](#example-23)
+        * [Example](#example-22)
     + [`InfixApplicationPattern`](#infixapplicationpattern)
       - [Syntax](#syntax-48)
         * [Caveats](#caveats-4)
     + [`ApplicationPattern`](#applicationpattern)
       - [Syntax](#syntax-49)
-        * [Example](#example-24)
+        * [Example](#example-23)
     + [`TuplePattern`](#tuplepattern)
       - [Syntax](#syntax-50)
-        * [Example](#example-25)
+        * [Example](#example-24)
     + [`ListPattern`](#listpattern)
       - [Syntax](#syntax-51)
-        * [Example](#example-26)
+        * [Example](#example-25)
     + [`FunctorPattern`](#functorpattern)
       - [Syntax](#syntax-52)
-        * [Example](#example-27)
+        * [Example](#example-26)
     + [`AsPattern`](#aspattern)
       - [Syntax](#syntax-53)
-        * [Example](#example-28)
+        * [Example](#example-27)
     + [`TypePattern`](#typepattern)
       - [Syntax](#syntax-54)
-        * [Example](#example-29)
+        * [Example](#example-28)
     + [`WildcardPattern`](#wildcardpattern)
       - [Syntax](#syntax-55)
     + [`UnionPattern`](#unionpattern)
@@ -479,7 +478,7 @@ In order to pass expectations to the Command Line Tool, you must use a simple DS
 |             | `* DeclaresClass:=Foo`      | `(declaresClass (named "Foo"))`
 |             | `* DeclaresClass:~Foo`      | `(declaresClass (like "Foo"))`
 |             | `* DeclaresClass:^Foo`      | `(declaresClass (except "Foo"))`
-|             | `* DeclaresClass:[Foo|Bar]` | `(declaresClass (anyOf ["Foo", "Bar"]))`
+|             | `* DeclaresClass:[Foo\|Bar]` | `(declaresClass (anyOf ["Foo", "Bar"]))`
 |             | `* DeclaresClass:*`         | `(declaresClass anyone)`
 |             | `* DeclaresClass`           | `(declaresClass anyone)`
 | Transitive  | `foo UsesLambda`            | `(transitive usesLambda "foo")`
@@ -926,7 +925,7 @@ struct Point {
 Currently, the `Record` expression does not hold information about the record contents.
 
 
-### TypeAlias
+### `TypeAlias`
 
 > A `TypeAlias` represents a synonym for a type, like the `type` declaration in Haskell and Scala or C's `typedef`.
 > It is a typical statically typed functional programming feature.
@@ -1031,8 +1030,6 @@ public static main(String[] args) {}
 (Procedure Identifier [Equation])
 ```
 
-#### Example
-
 ### `Method`
 
 > Object oriented programming method declaration. It is composed by an identifier and one or more equations
@@ -1043,6 +1040,45 @@ public static main(String[] args) {}
 ```haskell
 (Method Identifier [Equation])
 ```
+
+#### Ruby Example
+
+```ruby
+class Bird
+  def sing!
+    puts "singing in the dead of night"
+  end
+end
+```
+
+```haskell
+(Class
+  "Bird" Nothing
+  (Method
+      "sing!"
+      (Equation []
+          (UnguardedBody (Print (MuString "singing in the dead of night"))))))
+```
+
+#### Java Example
+
+```java
+public class Bird {
+  public void sing() {
+    System.out.println("singing in the dead of night");
+  }
+}
+```
+
+```haskell
+(Class
+  "Bird" Nothing
+  (Method
+      "sing"
+      (Equation []
+          (UnguardedBody (Print (MuString "singing in the dead of night"))))))
+```
+
 
 ### `EqualMethod` and `HashMethod`
 
