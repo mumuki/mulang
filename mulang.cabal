@@ -114,6 +114,9 @@ executable mulang
     -threaded
 
 test-suite spec
+  hs-source-dirs: spec
+  default-language:    Haskell2010
+
   type: exitcode-stdio-1.0
   ghc-options:
     -Wall
@@ -126,7 +129,6 @@ test-suite spec
     -fwarn-tabs
     -funbox-strict-fields
     -threaded
-  hs-source-dirs: spec
   main-is:        Spec.hs
   build-depends:
     base                      <= 5,
