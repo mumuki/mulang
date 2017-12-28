@@ -146,6 +146,8 @@ Mulang is three different  - but thighly related - things:
     + [`Print`](#print)
       - [Syntax](#syntax-36)
       - [Ruby Example](#ruby-example-4)
+    + [`Comprehension`](#comprehension)
+      - [Syntax](#syntax-37)
       - [Caveats](#caveats-3)
     + [`Sequence`](#sequence)
       - [Syntax](#syntax-38)
@@ -170,31 +172,31 @@ Mulang is three different  - but thighly related - things:
   * [Patterns](#patterns)
     + [`VariablePattern`](#variablepattern)
       - [Syntax](#syntax-46)
-        * [JavaScript Example](#javascript-example-1)
+      - [JavaScript Example](#javascript-example-1)
     + [`LiteralPattern`](#literalpattern)
       - [Syntax](#syntax-47)
-        * [Example](#example-22)
+      - [Example](#example-22)
     + [`InfixApplicationPattern`](#infixapplicationpattern)
       - [Syntax](#syntax-48)
         * [Caveats](#caveats-4)
     + [`ApplicationPattern`](#applicationpattern)
       - [Syntax](#syntax-49)
-        * [Example](#example-23)
+      - [Example](#example-23)
     + [`TuplePattern`](#tuplepattern)
       - [Syntax](#syntax-50)
-        * [Example](#example-24)
+      - [Example](#example-24)
     + [`ListPattern`](#listpattern)
       - [Syntax](#syntax-51)
-        * [Example](#example-25)
+      - [Example](#example-25)
     + [`FunctorPattern`](#functorpattern)
       - [Syntax](#syntax-52)
-        * [Example](#example-26)
+      - [Example](#example-26)
     + [`AsPattern`](#aspattern)
       - [Syntax](#syntax-53)
-        * [Example](#example-27)
+      - [Example](#example-27)
     + [`TypePattern`](#typepattern)
       - [Syntax](#syntax-54)
-        * [Example](#example-28)
+      - [Example](#example-28)
     + [`WildcardPattern`](#wildcardpattern)
       - [Syntax](#syntax-55)
     + [`UnionPattern`](#unionpattern)
@@ -1690,7 +1692,7 @@ patterns in imperative `case` or `switch` statements, functional pattern matchin
 (VariablePattern String)
 ```
 
-##### JavaScript Example
+#### JavaScript Example
 
 ```javascript
 function foo(x, y) { }
@@ -1714,7 +1716,7 @@ function foo(x, y) { }
 (LiteralPattern String)
 ```
 
-##### Example
+#### Example
 
 ### `InfixApplicationPattern`
 
@@ -1741,7 +1743,7 @@ function foo(x, y) { }
 (ApplicationPattern String [Pattern])
 ```
 
-##### Example
+#### Example
 
 ### `TuplePattern`
 
@@ -1754,7 +1756,7 @@ function foo(x, y) { }
 (TuplePattern [Pattern])
 ```
 
-##### Example
+#### Example
 
 ### `ListPattern`
 
@@ -1767,7 +1769,7 @@ function foo(x, y) { }
 (ListPattern [Pattern])
 ```
 
-##### Example
+#### Example
 
 ### `FunctorPattern`
 
@@ -1779,7 +1781,7 @@ function foo(x, y) { }
 (FunctorPattern Identifier [Pattern])
 ```
 
-##### Example
+#### Example
 
 ### `AsPattern`
 
@@ -1789,7 +1791,7 @@ function foo(x, y) { }
 (AsPattern Identifier Pattern)
 ```
 
-##### Example
+#### Example
 
 ### `TypePattern`
 
@@ -1801,7 +1803,7 @@ function foo(x, y) { }
 (TypePattern Identifier)
 ```
 
-##### Example
+#### Example
 
 ### `WildcardPattern`
 
