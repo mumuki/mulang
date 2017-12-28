@@ -7,6 +7,6 @@ extra-deps:
 - aeson-1.2.1.0
 # Using older javascript dep, compatible with
 # current AST
-- language-javascript-0.5.14.7
+- language-javascript-0.6.0.10
 flags: {}
 extra-package-dbs: []

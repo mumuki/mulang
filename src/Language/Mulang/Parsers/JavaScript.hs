@@ -18,147 +18,204 @@ parseJavaScript :: MaybeParser
 parseJavaScript = orNothing . parseJavaScript'
 
 parseJavaScript' :: String -> Either String Expression
-parseJavaScript' = fmap (normalize . mu) . (`parse` "src")
+parseJavaScript' = fmap (normalize . muJSAST) . (`parse` "src")
 
-mu :: JSNode -> Expression
-mu = compact . muNode . gc
-  where
-    muNode (JSSourceElementsTop statements)                  = [compactMapMu statements]
-    muNode (JSIdentifier "undefined")                        = [MuNull]
-    muNode (JSIdentifier n)                                  = [Reference n]
-    muNode (JSDecimal val)                                   = [MuNumber (read val)]
-    muNode (JSExpression xs)                                 = [compactMapMu xs]
-    muNode (JSLiteral "null")                                = [MuNull]
-    muNode (JSLiteral "true")                                = [MuTrue]
-    muNode (JSLiteral "false")                               = [MuFalse]
-    muNode (JSLiteral _)                                     = []
-    muNode (JSElision _)                                     = []
-    muNode (JSHexInteger v)                                  = muNode (JSStringLiteral '\'' v)
-    muNode (JSOctal v)                                       = muNode (JSStringLiteral '"' v)
-    muNode (JSExpressionPostfix "++" [var] _)                = [muVarAssignment var (muPlus var (MuNumber 1))]
-    muNode (JSExpressionPostfix "--" [var] _)                = [muVarAssignment var (muMinus var (MuNumber 1))]
-    muNode (JSStringLiteral _ v)                             = [MuString v]
-    muNode (JSVariables _ decls _)                           = mapMu decls
-    muNode (JSArrayLiteral _ es _)                           = [MuList (mapMu es)]
-    muNode (JSVarDecl var initial)                           = [muVarDeclaration var initial]
-    muNode (JSWith _ _ _ _ _)                                = [Other]
-    muNode (JSExpressionTernary cond _ true _ false)         = [muIf cond   true false]
-    muNode (JSIf _ _ cond _ true false)                      = [muIf [cond] true false]
-    muNode (JSWhile _ _ cond _ action)                       = [muWhile cond action]
-    muNode (JSBlock _ exps _)                                = [compactMapMu exps]
-    muNode (JSFunctionExpression _ [] _ params _ body)       = [Lambda (muParams params) (mu body)]
-    muNode (JSFunctionExpression _ [name] _ params _ body)   = [muFunction  name params body]
-    muNode (JSReturn _ e _)                                  = [Return (compactMapMu e)]
-    muNode (JSExpressionParen _ e _)                         = [mu e]
-    muNode (JSObjectLiteral _ es _)                          = [MuObject (compactMapMu es)]
-    muNode (JSLabelled _ _ e)                                = [mu e]
-    muNode (JSPropertyNameandValue var _ initial)            = [muVarDeclaration var initial]
-    muNode (JSFunction _ name _ params _ body)               = [muFunction name params body]
-    muNode (JSExpressionBinary op l _ r)                     = [Application (muOp op) [compactMapMu l, compactMapMu r]]
-    muNode (JSMemberDot receptor _ selector)                 = [Send (compactMapMu receptor) (mu selector) []]
-    muNode (JSThrow _ e)                                     = [Raise (mu e)]
-    muNode e                                                 = [Other]
+muJSAST:: JSAST -> Expression
+muJSAST (JSAstProgram statements _) 		= compactMap muJSStatement statements
+muJSAST (JSAstStatement statement _) 		= muJSStatement statement
+muJSAST (JSAstExpression expression _) 	= muJSExpression expression
+muJSAST (JSAstLiteral expression _) 		= muJSExpression expression
+muJSAST _ 															= Other
 
 
-
-    mapMu :: [JSNode] -> [Expression]
-    mapMu [] = []
-    mapMu (x:y:xs)   | (JSArguments _ args _) <- gc y =  [Application (mu x) (mapMu args)] ++ mapMu xs
-    mapMu (x:y:z:xs) | (JSOperator (NT (JSLiteral "=") _ _))  <- gc y =  [muVarAssignment x (mu z)] ++ mapMu xs
-                     | (JSOperator (NT (JSLiteral "+=") _ _))  <- gc y =  [muVarAssignment x (muPlus x (mu z))] ++ mapMu xs
-    mapMu (x:xs) = (muNode.gc) x ++ mapMu xs
-
-    muParams :: [JSNode] -> [Pattern]
-    muParams params = concatMap (muPattern.gc) params
-
-    muOp :: String -> Expression
-    muOp "=="  = Equal
-    muOp "===" = Equal
-    muOp "!="  = NotEqual
-    muOp "!==" = NotEqual
-    muOp v    = Reference v
-
-    muPattern (JSLiteral _)    = []
-    muPattern (JSIdentifier i) = [VariablePattern i]
-    muPattern e                = error (show e)
-
-    gc (NN n) = n
-    gc (NT n _ _) = n
-
-    muId = f.gc
-           where f (JSIdentifier id) = id
+muJSStatement:: JSStatement -> Expression
+muJSStatement (JSStatementBlock _ statements _ _)                           = compactMap muJSStatement statements
+--muJSStatement (JSConstant _ (JSCommaList JSExpression) _) -- ^const, decl, autosemi
+muJSStatement (JSDoWhile _ statement _ _ expression _ _)                    = While (muJSExpression expression) (muJSStatement statement)
+--muJSStatement (JSFor _ _ (JSCommaList JSExpression) _ (JSCommaList JSExpression) _ (JSCommaList JSExpression) _ JSStatement) -- ^for,lb,expr,semi,expr,semi,expr,rb.stmt
+--muJSStatement (JSForIn _ _ (JSIdentifier _ name) _ JSExpression _ JSStatement)       = For [muJSExpression ]
+--muJSStatement (JSForVar _ _ _ (JSCommaList JSExpression) _ (JSCommaList JSExpression) _ (JSCommaList JSExpression) _ JSStatement) -- ^for,lb,var,vardecl,semi,expr,semi,expr,rb,stmt
+--muJSStatement (JSForVarIn _ _ _ JSExpression _ JSExpression _ JSStatement) -- ^for,lb,var,vardecl,in,expr,rb,stmt
+muJSStatement (JSFunction _ ident _ params _ body _)                        = muComputation ident params body
+muJSStatement (JSIf _ _ expression _ statement)                             = If (muJSExpression expression) (muJSStatement statement) MuNull
+muJSStatement (JSIfElse _ _ expression _ ifStatement _ elseStatement)       = If (muJSExpression expression) (muJSStatement ifStatement) (muJSStatement elseStatement)
+muJSStatement (JSLabelled _ _ statement) 																		= muJSStatement statement 
+muJSStatement (JSEmptyStatement _)                                          = MuNull
+muJSStatement (JSExpressionStatement (JSIdentifier _ val) _)                = Reference val
+muJSStatement (JSExpressionStatement expression _)                          = muJSExpression expression
+muJSStatement (JSAssignStatement (JSIdentifier _ name) op value _)          = Assignment name (muJSAssignOp op name (muJSExpression value))
+muJSStatement (JSMethodCall (JSMemberDot receptor _ message) _ params _ _)  = Send (muJSExpression receptor) (muJSExpression message) (map muJSExpression (muJSCommaList params))
+muJSStatement (JSMethodCall ident _ params _ _)                             = Application (muJSExpression ident) (map muJSExpression (muJSCommaList params))
+muJSStatement (JSReturn _ maybeExpression _)                                = Return (maybe MuNull muJSExpression maybeExpression)
+muJSStatement (JSSwitch _ _ expression _ _ cases _ _)                       = Switch (muJSExpression expression) (map muJSSwitchParts cases)
+muJSStatement (JSThrow _ expression _)                                      = Raise (muJSExpression expression)
+muJSStatement (JSTry _ block catches finally)                               = Try (muJSBlock block) (map muJSTryCatch catches) (muJSTryFinally finally)
+muJSStatement (JSVariable _ list _)                                         = compactMap muJSExpression.muJSCommaList $ list
+muJSStatement (JSWhile _ _ expression _ statement)                          = While (muJSExpression expression) (muJSStatement statement)
+muJSStatement _                                                             = Other
 
 
-    muEquation params body = [SimpleEquation params body]
+muComputation JSIdentNone params body = Lambda (map muPattern (muJSCommaList params)) (muJSBlock body)
+muComputation (JSIdentName _ name) params body = (computationFor (muJSBlock body)) name (muEquation (map muPattern (muJSCommaList params)) (muJSBlock body))
 
-    compactMapMu :: [JSNode] -> Expression
-    compactMapMu  = compact . mapMu
+isDefault:: (Expression, Expression) -> Bool
+isDefault (MuNull, _) = True
+isDefault _ = False
 
-    muIf :: [JSNode] -> [JSNode] -> [JSNode] -> Expression
-    muIf cond true false = If (compactMapMu cond) (compactMapMu true) (compactMapMu false)
+muPattern:: JSIdent -> Pattern
+muPattern (JSIdentName _ name) = VariablePattern name
 
-    muWhile cond action  = While (mu cond) (mu action)
+muEquation params body = [SimpleEquation params body]
 
-    muVarDeclaration var initial = Variable (muId var) (compactMapMu initial)
-    muVarAssignment  var value  = Assignment (muId var)  value
+computationFor :: Expression -> Identifier -> [Equation] -> Expression
+computationFor body | containsReturn body = Function
+                    | otherwise 					= Procedure
 
-    muPlus var delta = (Application (Reference "+") [Reference (muId var), delta])
-    muMinus var delta = (Application (Reference "-") [Reference (muId var), delta])
+containsReturn :: Expression -> Bool
+containsReturn (Return _)    = True
+containsReturn (Sequence xs) = any containsReturn xs
+containsReturn _             = False
 
-    muFunction :: JSNode -> [JSNode] -> JSNode -> Expression
-    muFunction name params body = muComputation (muId name) (muParams params) (mu body)
-                            where
-                                muComputation name params body = (computationFor body) name (muEquation params body)
 
-                                computationFor :: Expression -> Identifier -> [Equation] -> Expression
-                                computationFor body | containsReturn body = Function
-                                                    | otherwise = Procedure
+muJSExpression:: JSExpression -> Expression
+muJSExpression (JSIdentifier _ "undefined") 												= MuNull
+muJSExpression (JSIdentifier _ name) 																= Reference name
+muJSExpression (JSDecimal _ val) 																		= MuNumber (read val)
+muJSExpression (JSLiteral _ "null") 																= MuNull
+muJSExpression (JSLiteral _ "true") 																= MuTrue
+muJSExpression (JSLiteral _ "false") 																= MuFalse
+--muJSExpression (JSHexInteger _ String)
+--muJSExpression (JSOctal _ String)
+muJSExpression (JSStringLiteral _ val) 															= MuString (removeQuotes val)
+--muJSExpression (JSRegEx _ String)
+muJSExpression (JSArrayLiteral _ list _) 														= MuList (muJSArrayList list)
+muJSExpression (JSAssignExpression (JSIdentifier _ name) op value) 	= Assignment name (muJSAssignOp op name.muJSExpression $ value)
+--muJSExpression (JSCallExpression expression _ params _) = Application (muJSExpression expression) (map muJSExpression.muJSCommaList $ expressionList)
+--muJSExpression (JSCallExpressionDot JSExpression _ JSExpression)  -- ^expr, dot, expr
+--muJSExpression (JSCallExpressionSquare JSExpression _ JSExpression _)  -- ^expr, [, expr, ]
+--muJSExpression (JSCommaExpression JSExpression _ JSExpression)          -- ^expression components
+muJSExpression (JSExpressionBinary firstVal op secondVal) 					= Application (muJSBinOp op) [muJSExpression firstVal, muJSExpression secondVal]
+muJSExpression (JSExpressionParen _ expression _) 									= muJSExpression expression
+muJSExpression (JSExpressionPostfix (JSIdentifier _ name) op) 			= Assignment name (muJSUnaryOp op name)
+muJSExpression (JSExpressionTernary condition _ trueVal _ falseVal) = If (muJSExpression condition) (muJSExpression trueVal) (muJSExpression falseVal)
+muJSExpression (JSFunctionExpression _ ident _ params _ body) 			= muComputation ident params body
+--muJSExpression (JSMemberDot JSExpression _ JSExpression) -- ^firstpart, dot, name
+muJSExpression (JSMemberExpression id _ params _) 									= Application (muJSExpression id) (map muJSExpression.muJSCommaList $ params)
+muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _) 			= New name (map muJSExpression.muJSCommaList $ args)
+--muJSExpression (JSMemberSquare JSExpression _ JSExpression _) -- ^firstpart, lb, expr, rb
+muJSExpression (JSNewExpression _ (JSIdentifier _ name)) 						= New name []
+muJSExpression (JSObjectLiteral _ propertyList _) 									= MuObject (compactMap id.map muJSObjectProperty.muJSCommaTrailingList $ propertyList)
+muJSExpression (JSUnaryExpression op (JSIdentifier _ name)) 				= Assignment name (muJSUnaryOp op name)
+muJSExpression (JSVarInitExpression (JSIdentifier _ name) initial) 	= Variable name (muJSVarInitializer initial)
+muJSExpression _ = Other
 
-                                containsReturn :: Expression -> Bool
-                                containsReturn (Return _)    = True
-                                containsReturn (Sequence xs) = any containsReturn xs
-                                containsReturn _             = False
+removeQuotes = filter (flip notElem quoteMarks)
+  where quoteMarks = "\"'"
 
-{-JSRegEx String
-optional lb,optional block statements,optional rb
-JSBreak JSNode [JSNode] JSNode
-break, optional identifier, autosemi
-JSCallExpression String [JSNode] [JSNode] [JSNode]
-type : ., (), []; opening [ or ., contents, closing
-JSCase JSNode JSNode JSNode [JSNode]
-case,expr,colon,stmtlist
-JSCatch JSNode JSNode JSNode [JSNode] JSNode JSNode
-catch,lb,ident,[if,expr],rb,block
-JSContinue JSNode [JSNode] JSNode
-continue,optional identifier,autosemi
-JSDefault JSNode JSNode [JSNode]
-default,colon,stmtlist
-JSDoWhile JSNode JSNode JSNode JSNode JSNode JSNode JSNode
-do,stmt,while,lb,expr,rb,autosemi
-JSExpressionPostfix String [JSNode] JSNode
-type, expression, operator
-JSExpressionTernary [JSNode] JSNode [JSNode] JSNode [JSNode]
-cond, ?, trueval, :, falseval
-JSFinally JSNode JSNode
-finally,block
-JSFor JSNode JSNode [JSNode] JSNode [JSNode] JSNode [JSNode] JSNode JSNode
-for,lb,expr,semi,expr,semi,expr,rb.stmt
-JSForIn JSNode JSNode [JSNode] JSNode JSNode JSNode JSNode
-for,lb,expr,in,expr,rb,stmt
-JSForVar JSNode JSNode JSNode [JSNode] JSNode [JSNode] JSNode [JSNode] JSNode JSNode
-for,lb,var,vardecl,semi,expr,semi,expr,rb,stmt
-JSForVarIn JSNode JSNode JSNode JSNode JSNode JSNode JSNode JSNode
-for,lb,var,vardecl,in,expr,rb,stmt
-JSMemberSquare [JSNode] JSNode JSNode JSNode
-firstpart, lb, expr, rb
-JSPropertyAccessor JSNode JSNode JSNode [JSNode] JSNode JSNode
-(get|set), name, lb, params, rb, block
-JSSwitch JSNode JSNode JSNode JSNode JSNode
-switch,lb,expr,rb,caseblock
-JSThrow JSNode JSNode
-throw val
-JSTry JSNode JSNode [JSNode]
-try,block,rest
-JSUnary String JSNode
-type, operator
- -}
+muJSBinOp:: JSBinOp -> Expression
+muJSBinOp (JSBinOpAnd _) 				= Reference "&&"
+muJSBinOp (JSBinOpBitAnd _) 		= Reference "&"
+muJSBinOp (JSBinOpBitOr _) 			= Reference "|"
+muJSBinOp (JSBinOpBitXor _) 		= Reference "^"
+muJSBinOp (JSBinOpDivide _) 		= Reference "/"
+muJSBinOp (JSBinOpEq _) 				= Equal
+muJSBinOp (JSBinOpGe _) 				= Reference ">="
+muJSBinOp (JSBinOpGt _) 				= Reference ">"
+muJSBinOp (JSBinOpInstanceOf _) = Reference "instanceof"
+muJSBinOp (JSBinOpLe _) 				= Reference "<="
+muJSBinOp (JSBinOpLsh _) 				= Reference "<<"
+muJSBinOp (JSBinOpLt _) 				= Reference "<"
+muJSBinOp (JSBinOpMinus _) 			= Reference "-"
+muJSBinOp (JSBinOpMod _) 				= Reference "%"
+muJSBinOp (JSBinOpNeq _) 				= NotEqual
+muJSBinOp (JSBinOpOr _) 				= Reference "||"
+muJSBinOp (JSBinOpPlus _) 			= Reference "+"
+muJSBinOp (JSBinOpRsh _) 				= Reference ">>"
+muJSBinOp (JSBinOpStrictEq _) 	= Equal
+muJSBinOp (JSBinOpStrictNeq _) 	= NotEqual
+muJSBinOp (JSBinOpTimes _) 			= Reference "*"
+
+
+muJSUnaryOp:: JSUnaryOp -> Identifier -> Expression
+muJSUnaryOp (JSUnaryOpDecr _) r = (Application (Reference "-") [Reference r, MuNumber 1])
+--muJSUnaryOp (JSUnaryOpDelete _)
+muJSUnaryOp (JSUnaryOpIncr _) r = (Application (Reference "+") [Reference r, MuNumber 1])
+--muJSUnaryOp (JSUnaryOpMinus _)
+--muJSUnaryOp (JSUnaryOpNot _)
+--muJSUnaryOp (JSUnaryOpPlus _)
+--muJSUnaryOp (JSUnaryOpTilde _)
+--muJSUnaryOp (JSUnaryOpTypeof _)
+--muJSUnaryOp (JSUnaryOpVoid _)
+muJSUnaryOp _ _ 								= Other
+
+muJSAssignOp:: JSAssignOp -> Identifier -> Expression -> Expression
+muJSAssignOp (JSAssign _) _ v = v
+muJSAssignOp op r v 					= (Application (muJSAssignOp' op) [Reference r, v])
+
+muJSAssignOp':: JSAssignOp -> Expression
+muJSAssignOp' (JSTimesAssign _) 	= Reference "*"
+muJSAssignOp' (JSDivideAssign _) 	= Reference "/"
+--muJSAssignOp' (JSModAssign _)
+muJSAssignOp' (JSPlusAssign _) 		= Reference "+"
+muJSAssignOp' (JSMinusAssign _) 	= Reference "-"
+--muJSAssignOp' (JSLshAssign _)
+--muJSAssignOp' (JSRshAssign _)
+--muJSAssignOp' (JSUrshAssign _)
+muJSAssignOp' (JSBwAndAssign _) 	= Reference "&"
+muJSAssignOp' (JSBwXorAssign _) 	= Reference "^"
+muJSAssignOp' (JSBwOrAssign _) 		= Reference "|"
+muJSAssignOp' _ 									= Other
+
+muJSTryCatch:: JSTryCatch -> (Pattern, Expression)
+--muJSTryCatch JSCatch _ _ JSExpression _ JSBlock -- ^catch,lb,ident,rb,block
+--muJSTryCatch JSCatchIf _ _ JSExpression _ JSExpression _ JSBlock -- ^catch,lb,ident,if,expr,rb,block
+muJSTryCatch _ = (WildcardPattern, Other)
+
+muJSTryFinally:: JSTryFinally -> Expression
+muJSTryFinally (JSFinally _ block) 	= muJSBlock block
+muJSTryFinally JSNoFinally 					= MuNull
+
+muJSBlock:: JSBlock -> Expression
+muJSBlock (JSBlock _ statements _) 	= compactMap muJSStatement statements
+
+muJSSwitchParts:: JSSwitchParts -> (Expression, Expression)
+muJSSwitchParts (JSCase _ expression _ statements)  = (muJSExpression expression, compactMap muJSStatement statements)
+muJSSwitchParts (JSDefault _ _ statements)          = (MuNull, compactMap muJSStatement statements)
+
+muJSVarInitializer:: JSVarInitializer -> Expression
+muJSVarInitializer (JSVarInit _ expression) = muJSExpression expression
+--muJSVarInitializer JSVarInitNone
+muJSVarInitializer _ 												= Other
+
+
+muJSObjectProperty:: JSObjectProperty -> Expression
+--muJSObjectProperty JSPropertyAccessor JSAccessor JSPropertyName _ [JSExpression] _ JSBlock -- ^(get|set), name, lb, params, rb, block
+muJSObjectProperty (JSPropertyNameandValue id _ [JSFunctionExpression _ _ _ params _ block]) 	= Method (muJSPropertyName id) (muEquation (map muPattern (muJSCommaList params)) (muJSBlock block))
+muJSObjectProperty (JSPropertyNameandValue id _ [expression]) 																= Variable (muJSPropertyName id) (muJSExpression expression)
+muJSObjectProperty _ = Other
+
+muJSPropertyName:: JSPropertyName -> Identifier
+muJSPropertyName = removeQuotes.muJSPropertyName'
+
+muJSPropertyName':: JSPropertyName -> Identifier
+muJSPropertyName' (JSPropertyIdent _ name)   = name
+muJSPropertyName' (JSPropertyString _ name)  = name
+muJSPropertyName' (JSPropertyNumber _ name)  = name
+
+muJSAccessor:: JSAccessor -> Expression
+--muJSAccessor JSAccessorGet _
+--muJSAccessor JSAccessorSet _
+muJSAccessor _ = Other
+
+muJSArrayList:: [JSArrayElement] -> [Expression]
+muJSArrayList list = [muJSExpression expression | (JSArrayElement expression) <- list] 
+
+muJSCommaList:: JSCommaList a -> [a]
+muJSCommaList (JSLCons xs _ x) 	= muJSCommaList xs ++ [x]
+muJSCommaList (JSLOne x) 				= [x]
+muJSCommaList JSLNil 						= []
+
+muJSCommaTrailingList:: JSCommaTrailingList a -> [a]
+muJSCommaTrailingList (JSCTLComma list _) = muJSCommaList list
+muJSCommaTrailingList (JSCTLNone list) 		= muJSCommaList list
+

@@ -23,7 +23,7 @@ spec = do
       js "x" `shouldBe` Reference "x"
 
     it "simple function application in var declaration" $ do
-      hs "x = m 1 2" `shouldBe` js "var x = m(1, 2)"
+      js "var x = m(1, 2)" `shouldBe` hs "x = m 1 2"
 
     it "differentiates procedures and functions" $ do
       (js "function f() { return 1 }" /= js "function f() { 1 }") `shouldBe` True
@@ -32,7 +32,7 @@ spec = do
       js "var m = function(x) { return 1 }" `shouldBe` hs "m = \\x -> 1"
 
     it "simple function declaration" $ do
-      hs "f x = 1" `shouldBe` js "function f(x) { return 1 }"
+      js "function f(x) { return 1 }" `shouldBe` hs "f x = 1" 
 
     it "simple procedure declaration" $ do
       js "function f(x) { console.log('fruit') }" `shouldBe` (
@@ -42,10 +42,10 @@ spec = do
                     (Send (Reference "console") (Reference "log") [MuString "fruit"]))
 
     it "multiple params function declaration" $ do
-      hs "f x y = 1" `shouldBe` js "function f(x, y) { return 1 }"
+      js "function f(x, y) { return 1 }" `shouldBe` hs "f x y = 1"
 
     it "constant function declaration" $ do
-      hs "f = \\x -> x + 1" `shouldBe` js "var f = function(x) { return x + 1 }"
+      js "var f = function(x) { return x + 1 }" `shouldBe` hs "f = \\x -> x + 1"
 
     it "numeric top level expression" $ do
       js "8" `shouldBe` MuNumber 8
@@ -104,6 +104,12 @@ spec = do
     it "handles objects" $ do
       js "({x: 6})" `shouldBe` MuObject (Variable "x" (MuNumber 6))
 
+    it "handles objects with numeric keys" $ do
+      js "({3: 6})" `shouldBe` MuObject (Variable "3" (MuNumber 6))
+
+    it "handles objects with string keys" $ do
+      js "({\"asd\": 6})" `shouldBe` MuObject (Variable "asd" (MuNumber 6))
+
     it "handles empty objects" $ do
       js "({})" `shouldBe` MuObject MuNull
 
@@ -118,6 +124,12 @@ spec = do
                                                             Attribute "y" (MuNumber 2.0),
                                                             SimpleMethod "z" [] MuNull])
 
+    it "handles new paretheses-less" $ do
+      js "new Foo" `shouldBe` New "Foo" []
 
+    it "handles new with parentheses" $ do
+      js "new Foo()" `shouldBe` New "Foo" []
 
+    it "handles new with args" $ do
+      js "new Foo(1, 2)" `shouldBe` New "Foo" [MuNumber 1, MuNumber 2]
 
