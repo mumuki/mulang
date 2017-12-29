@@ -1585,13 +1585,22 @@ puts "Hello World"
 
 ### `MuNull`
 
-> Generic nothing value literal - `nil`, `null`, `undefined`, `()` or `unit`.
-> It is also used as a placeholder for empty bodies.
+> Used as a placeholder for empty bodies.
 
 #### Syntax
 
 ```haskell
 (MuNull)
+```
+
+### `MuNil`
+
+> Generic nothing value literal - `nil`, `null`, `()` or `unit`.
+
+#### Syntax
+
+```haskell
+(MuNil)
 ```
 
 #### Example
