@@ -8,7 +8,6 @@ import Language.JavaScript.Parser.Parser (parse)
 import Language.JavaScript.Parser.AST
 
 import Data.Either ()
-import Data.Maybe (listToMaybe)
 import Data.List (partition)
 
 import Control.Fallible
@@ -48,13 +47,18 @@ muJSStatement (JSAssignStatement (JSIdentifier _ name) op value _)          = As
 muJSStatement (JSMethodCall (JSMemberDot receptor _ message) _ params _ _)  = Send (muJSExpression receptor) (muJSExpression message) (map muJSExpression (muJSCommaList params))
 muJSStatement (JSMethodCall ident _ params _ _)                             = Application (muJSExpression ident) (map muJSExpression (muJSCommaList params))
 muJSStatement (JSReturn _ maybeExpression _)                                = Return (maybe MuNull muJSExpression maybeExpression)
-muJSStatement (JSSwitch _ _ expression _ _ cases _ _)                       = (\(def, cases) -> Switch (muJSExpression expression) cases (headOrElse (MuNull).map snd $ def)).partition isDefault $ (map muJSSwitchParts cases)
+muJSStatement (JSSwitch _ _ expression _ _ cases _ _)                       = muSwitch expression . partition isDefault $ cases
 muJSStatement (JSThrow _ expression _)                                      = Raise (muJSExpression expression)
 muJSStatement (JSTry _ block catches finally)                               = Try (muJSBlock block) (map muJSTryCatch catches) (muJSTryFinally finally)
 muJSStatement (JSVariable _ list _)                                         = compactMap muJSExpression.muJSCommaList $ list
 muJSStatement (JSWhile _ _ expression _ statement)                          = While (muJSExpression expression) (muJSStatement statement)
 muJSStatement _                                                             = Other
 
+muSwitch expression (def, cases) = Switch (muJSExpression expression) (map muCase cases) (headOrElse MuNull . map muDefault $ def)
+
+muCase (JSCase _ expression _ statements) = (muJSExpression expression, compactMap muJSStatement statements)
+
+muDefault (JSDefault _ _ statements) = compactMap muJSStatement statements
 
 headOrElse x []  		= x
 headOrElse _ (x:_)	= x
@@ -62,9 +66,9 @@ headOrElse _ (x:_)	= x
 muComputation JSIdentNone params body = Lambda (map muPattern (muJSCommaList params)) (muJSBlock body)
 muComputation (JSIdentName _ name) params body = (computationFor (muJSBlock body)) name (muEquation (map muPattern (muJSCommaList params)) (muJSBlock body))
 
-isDefault:: (Expression, Expression) -> Bool
-isDefault (MuNull, _) = True
-isDefault _ = False
+isDefault:: JSSwitchParts -> Bool
+isDefault (JSDefault _ _ _) = True
+isDefault _ 								= False
 
 muPattern:: JSIdent -> Pattern
 muPattern (JSIdentName _ name) = VariablePattern name
@@ -181,10 +185,6 @@ muJSTryFinally JSNoFinally           = MuNull
 
 muJSBlock:: JSBlock -> Expression
 muJSBlock (JSBlock _ statements _)   = compactMap muJSStatement statements
-
-muJSSwitchParts:: JSSwitchParts -> (Expression, Expression)
-muJSSwitchParts (JSCase _ expression _ statements)  = (muJSExpression expression, compactMap muJSStatement statements)
-muJSSwitchParts (JSDefault _ _ statements)          = (MuNull, compactMap muJSStatement statements)
 
 muJSVarInitializer:: JSVarInitializer -> Expression
 muJSVarInitializer (JSVarInit _ expression) = muJSExpression expression
