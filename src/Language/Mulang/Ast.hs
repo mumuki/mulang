@@ -135,9 +135,9 @@ data Expression
     | NotEqual
     | Self
     | MuNull
-    -- ^ Generic value indicating an absent expression, such as when there is no finally in a try or default in a switch
+    -- ^ Generic value indicating an absent expression, such as when there is no finally in a try or default in a switch or js' undefined
     | MuNil
-    -- ^ Generic nothing value literal - nil, null, undefined or unit
+    -- ^ Generic nothing value literal - nil, null or unit
     | MuObject Expression
     -- ^ Object oriented unnamed object literal
     | MuNumber Double
