@@ -24,7 +24,7 @@ usesWhile = containsExpression f
 -- in its definition
 usesSwitch :: Inspection
 usesSwitch = containsExpression f
-  where f (Switch _ _) = True
+  where f (Switch _ _ _) = True
         f _ = False
 
 -- | Inspection that tells whether an expression uses reoeat

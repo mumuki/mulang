@@ -120,7 +120,7 @@ data Expression
     | Repeat Expression Expression
     -- ^ Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
     | Match Expression [Equation]
-    | Switch Expression [(Expression, Expression)]
+    | Switch Expression [(Expression, Expression)] Expression
     | Try Expression [(Pattern, Expression)] Expression
     -- ^ Generic try expression, composed by a body, a list of exception-handling patterns and statments, and a finally expression
     | Raise Expression

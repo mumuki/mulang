@@ -8,6 +8,8 @@ import Language.JavaScript.Parser.Parser (parse)
 import Language.JavaScript.Parser.AST
 
 import Data.Either ()
+import Data.Maybe (listToMaybe)
+import Data.List (partition)
 
 import Control.Fallible
 
@@ -25,7 +27,6 @@ muJSAST (JSAstProgram statements _)     = compactMap muJSStatement statements
 muJSAST (JSAstStatement statement _)    = muJSStatement statement
 muJSAST (JSAstExpression expression _)  = muJSExpression expression
 muJSAST (JSAstLiteral expression _)     = muJSExpression expression
-muJSAST _                               = Other
 
 
 muJSStatement:: JSStatement -> Expression
@@ -47,13 +48,16 @@ muJSStatement (JSAssignStatement (JSIdentifier _ name) op value _)          = As
 muJSStatement (JSMethodCall (JSMemberDot receptor _ message) _ params _ _)  = Send (muJSExpression receptor) (muJSExpression message) (map muJSExpression (muJSCommaList params))
 muJSStatement (JSMethodCall ident _ params _ _)                             = Application (muJSExpression ident) (map muJSExpression (muJSCommaList params))
 muJSStatement (JSReturn _ maybeExpression _)                                = Return (maybe MuNull muJSExpression maybeExpression)
-muJSStatement (JSSwitch _ _ expression _ _ cases _ _)                       = Switch (muJSExpression expression) (map muJSSwitchParts cases)
+muJSStatement (JSSwitch _ _ expression _ _ cases _ _)                       = (\(def, cases) -> Switch (muJSExpression expression) cases (headOrElse (MuNull).map snd $ def)).partition isDefault $ (map muJSSwitchParts cases)
 muJSStatement (JSThrow _ expression _)                                      = Raise (muJSExpression expression)
 muJSStatement (JSTry _ block catches finally)                               = Try (muJSBlock block) (map muJSTryCatch catches) (muJSTryFinally finally)
 muJSStatement (JSVariable _ list _)                                         = compactMap muJSExpression.muJSCommaList $ list
 muJSStatement (JSWhile _ _ expression _ statement)                          = While (muJSExpression expression) (muJSStatement statement)
 muJSStatement _                                                             = Other
 
+
+headOrElse x []  		= x
+headOrElse _ (x:_)	= x
 
 muComputation JSIdentNone params body = Lambda (map muPattern (muJSCommaList params)) (muJSBlock body)
 muComputation (JSIdentName _ name) params body = (computationFor (muJSBlock body)) name (muEquation (map muPattern (muJSCommaList params)) (muJSBlock body))
