@@ -122,7 +122,7 @@ muLit (Int i)     = MuNumber (fromIntegral i)
 muLit (Float d)   = MuNumber d
 muLit (Double d)  = MuNumber d
 muLit (Boolean b) = MuBool   b
-muLit Null        = MuNull
+muLit Null        = MuNil
 muLit _           = Other
 
 muOp Mult   = Reference "*"
