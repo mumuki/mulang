@@ -111,7 +111,7 @@ spec = do
       returnsNull (js "function x(m) { return null }") `shouldBe` True
 
     it "is True when returns undefined" $ do
-      returnsNull (js "function x(m) { return undefined }") `shouldBe` True
+      returnsNull (js "function x(m) { return undefined }") `shouldBe` False
 
     it "is False when returns a number" $ do
       returnsNull (js "function x(m) { return 1 }") `shouldBe` False

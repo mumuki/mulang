@@ -81,7 +81,7 @@ muJSExpression:: JSExpression -> Expression
 muJSExpression (JSIdentifier _ "undefined")                         = MuNull
 muJSExpression (JSIdentifier _ name)                                = Reference name
 muJSExpression (JSDecimal _ val)                                    = MuNumber (read val)
-muJSExpression (JSLiteral _ "null")                                 = MuNull
+muJSExpression (JSLiteral _ "null")                                 = MuNil
 muJSExpression (JSLiteral _ "true")                                 = MuTrue
 muJSExpression (JSLiteral _ "false")                                = MuFalse
 --muJSExpression (JSHexInteger _ String)

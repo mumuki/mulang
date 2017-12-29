@@ -26,8 +26,8 @@ hasRedundantBooleanComparison = compares isBooleanLiteral
 
 doesNullTest :: Inspection
 doesNullTest = compares f
-  where f MuNull = True
-        f _      = False
+  where f MuNil = True
+        f _     = False
 
 doesTypeTest :: Inspection
 doesTypeTest = compares f
@@ -48,8 +48,8 @@ comparisonOperands _                          = []
 
 returnsNull :: Inspection
 returnsNull = containsExpression f
-  where f (Return MuNull) = True
-        f _               = False
+  where f (Return MuNil) = True
+        f _              = False
 
 -- | Inspection that tells whether an identifier has an if expression where both branches return
 -- boolean literals
