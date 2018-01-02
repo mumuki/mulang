@@ -52,6 +52,7 @@ detectionFor "DoesNullTest"                    = simple doesNullTest
 detectionFor "DoesTypeTest"                    = simple doesTypeTest
 detectionFor "HasAssignmentReturn"             = simple hasAssignmentReturn
 detectionFor "HasCodeDuplication"              = unsupported
+detectionFor "HasEmptyIfBranches"              = simple hasEmptyIfBranches
 detectionFor "HasLongParameterList"            = simple hasLongParameterList
 detectionFor "HasMisspelledIdentifiers"        = withLanguage hasMisspelledIdentifiers
 detectionFor "HasMisspelledBindings"           = withLanguage hasMisspelledIdentifiers

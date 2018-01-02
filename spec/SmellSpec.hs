@@ -235,3 +235,10 @@ spec = do
 
     it "is False when both are overriden" $ do
       overridesEqualOrHashButNotBoth (java "public class A{ public void equals(){}\npublic void hashCode(){} }") `shouldBe` False
+
+  describe "hasEmptyIfBranches" $ do
+    it "is True when if branch is empty but else isn't" $ do
+      hasEmptyIfBranches (javaStatement "if(true) { } else { i++; }") `shouldBe` True
+
+    it "is False when if branch is not empty" $ do
+      hasEmptyIfBranches (javaStatement "if(true) { j++; } else { i++; }") `shouldBe` False

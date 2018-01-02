@@ -393,6 +393,7 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `doesTypeTest`                    |
 | `hasAssignmentReturn`             |
 | `hasCodeDuplication`              |  any               | has the given code simple literal code duplication?
+| `hasEmptyIfBranches`              |  any               | has the given code an empty if branch?
 | `hasLongParameterList`            |  any               | does a given method/function/predicate take too many parameters?
 | `hasMisspelledIdentifiers`        |  any               | an identifier is not a domain language dictionary's word and not part of its jargon
 | `hasRedundantBooleanComparison`   |
