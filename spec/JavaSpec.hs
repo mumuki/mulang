@@ -205,3 +205,14 @@ spec = do
              public Foo hello() { return new Bar(3); }
           }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
                            Return (New "Bar" [MuNumber 3])))
+
+    it "parses switch" $ do
+      run [text|class Foo {
+            public Foo hello() { 
+              switch(a){
+                case 1: return 1;
+                default: return 3;
+              }
+            }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
+                           Switch (Reference "a") [(MuNumber 1, Return (MuNumber 1))] (Return (MuNumber 3.0))))

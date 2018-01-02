@@ -9,6 +9,7 @@ import Language.JavaScript.Parser.AST
 
 import Data.Either ()
 import Data.List (partition)
+import Data.List.Extra (headOrElse)
 
 import Control.Fallible
 
@@ -60,15 +61,12 @@ muCase (JSCase _ expression _ statements) = (muJSExpression expression, compactM
 
 muDefault (JSDefault _ _ statements) = compactMap muJSStatement statements
 
-headOrElse x []  		= x
-headOrElse _ (x:_)	= x
-
 muComputation JSIdentNone params body = Lambda (map muPattern (muJSCommaList params)) (muJSBlock body)
 muComputation (JSIdentName _ name) params body = (computationFor (muJSBlock body)) name (muEquation (map muPattern (muJSCommaList params)) (muJSBlock body))
 
 isDefault:: JSSwitchParts -> Bool
 isDefault (JSDefault _ _ _) = True
-isDefault _ 								= False
+isDefault _                 = False
 
 muPattern:: JSIdent -> Pattern
 muPattern (JSIdentName _ name) = VariablePattern name
@@ -221,5 +219,5 @@ muJSCommaList JSLNil             = []
 
 muJSCommaTrailingList:: JSCommaTrailingList a -> [a]
 muJSCommaTrailingList (JSCTLComma list _) = muJSCommaList list
-muJSCommaTrailingList (JSCTLNone list)     = muJSCommaList list
+muJSCommaTrailingList (JSCTLNone list)    = muJSCommaList list
 
