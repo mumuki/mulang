@@ -6,6 +6,7 @@ module Language.Mulang.Inspector.Generic.Smell (
   hasRedundantParameter,
   hasRedundantLocalVariableReturn,
   hasAssignmentReturn,
+  hasEmptyIfBranches,
   doesNullTest,
   doesTypeTest,
   isLongCode,
@@ -140,3 +141,8 @@ overridesEqualOrHashButNotBoth = containsExpression f
         
         isHash (HashMethod _) = True
         isHash _ = False
+
+hasEmptyIfBranches :: Inspection
+hasEmptyIfBranches = containsExpression f
+  where f (If _ MuNull elseBranch) = elseBranch /= MuNull
+        f _                        = False
