@@ -206,7 +206,7 @@ spec = do
           }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
                            Return (New "Bar" [MuNumber 3])))
 
-    it "parses switch" $ do
+    it "parses switch with default" $ do
       run [text|class Foo {
             public Foo hello() { 
               switch(a){
@@ -216,3 +216,14 @@ spec = do
             }
           }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
                            Switch (Reference "a") [(MuNumber 1, Return (MuNumber 1))] (Return (MuNumber 3.0))))
+
+    it "parses switch with no default" $ do
+      run [text|class Foo {
+            public Foo hello() { 
+              switch(a){
+                case 1: return 1;
+                case 2: return 2;
+              }
+            }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
+                           Switch (Reference "a") [(MuNumber 1,Return (MuNumber 1)), (MuNumber 2, Return (MuNumber 2))] MuNull))
