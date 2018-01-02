@@ -3,8 +3,8 @@
 
 module Language.Mulang.Parsers.Java (java, parseJava) where
 
-import Language.Mulang.Ast hiding (While, Return, Equal, Lambda, Try)
-import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda, Try))
+import Language.Mulang.Ast hiding (While, Return, Equal, Lambda, Try, Switch)
+import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda, Try, Switch))
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compact, compactMap, compactConcatMap)
 
@@ -14,7 +14,8 @@ import Language.Java.Syntax
 import Control.Fallible
 
 import Data.Maybe (fromMaybe)
-import Data.List (intercalate)
+import Data.List (intercalate, partition)
+import Data.List.Extra (headOrElse)
 import Data.Char (toLower)
 
 java :: Parser
@@ -86,7 +87,7 @@ muStmt (Labeled _ stmt)                = muStmt stmt
 muStmt (Throw exp)                     = Raise $ muExp exp
 muStmt (Try block catches finally)     = M.Try (muBlock block) (map muCatch catches) (fmapOrNull muBlock finally)
 --muStmt (EnhancedFor _ _ name gen body) = Other
---Switch Exp [SwitchBlock]
+muStmt (Switch exp cases)              = muSwitch exp . partition isDefault $ cases 
 muStmt _                               = Other
 
 muExp (Lit lit)                         = muLit lit
@@ -160,6 +161,15 @@ muRefType (ClassRefType clazz) = r clazz
 muRefType (ArrayType t)        = (muType t) ++ "[]"
 
 muPrimType = map toLower . dropLast 1 . show
+
+muSwitch exp (def, cases) =  M.Switch (muExp exp) (map muCase cases) (headOrElse MuNull . map muDefault $ def)
+
+muCase (SwitchBlock (SwitchCase exp) block) = (muExp exp, compactConcatMap muBlockStmt block)
+
+muDefault (SwitchBlock Default block) = compactConcatMap muBlockStmt block
+
+isDefault (SwitchBlock Default _) = True
+isDefault _                       = False
 
 -- Combinators
 

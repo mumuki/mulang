@@ -51,7 +51,7 @@ spec = do
 
   describe "usesSwitch" $ do
     it "is True when present in function" $ do
-      let code = Switch (Reference "x") [(MuNull, MuNumber 0)]
+      let code = Switch (Reference "x") [(MuNull, MuNumber 0)] MuNull
 
       usesSwitch code  `shouldBe` True
 

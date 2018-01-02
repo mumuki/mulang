@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
 
 module JavaScriptSpec (spec) where
 
@@ -6,6 +6,12 @@ import           Test.Hspec
 import           Language.Mulang
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
+
+import           Data.Text (Text, unpack)
+import           NeatInterpolation (text)
+
+run :: Text -> Expression
+run = js . unpack
 
 spec :: Spec
 spec = do
@@ -133,3 +139,19 @@ spec = do
     it "handles new with args" $ do
       js "new Foo(1, 2)" `shouldBe` New "Foo" [MuNumber 1, MuNumber 2]
 
+    it "handles new with args" $ do
+      js "new Foo(1, 2)" `shouldBe` New "Foo" [MuNumber 1, MuNumber 2]
+
+    it "handles switch" $ do
+      run [text|
+      switch(a){
+        case 1: return 1;
+        case 2: return 2;
+      }|] `shouldBe` Switch (Reference "a") [(MuNumber 1, Return (MuNumber 1)), (MuNumber 2, Return (MuNumber 2))] (MuNull)
+
+    it "handles new with args" $ do
+      run [text|
+      switch(a){
+        case 1: return 1;
+        default: return 3;
+      }|] `shouldBe` Switch (Reference "a") [(MuNumber 1, Return (MuNumber 1))] (Return (MuNumber 3))
