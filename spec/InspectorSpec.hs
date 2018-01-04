@@ -516,6 +516,13 @@ spec = do
     it "is True when do syntax is used" $ do
       usesForComprehension (hs "y = do { x <- xs; return x }") `shouldBe` True
 
+  describe "usesComprehension" $ do
+    it "is True when list comprehension exists" $ do
+      usesComprehension (hs "x = [m|m<-t]") `shouldBe` True
+
+    it "is False when comprehension doesnt exists" $ do
+      usesComprehension (hs "x = []") `shouldBe` False
+
   describe "parses" $ do
     it "is True when similar" $ do
       parses hs "x = map f . map g" (hs "x = map f.map g") `shouldBe` True
