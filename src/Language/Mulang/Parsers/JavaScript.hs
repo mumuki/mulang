@@ -34,9 +34,9 @@ muJSStatement (JSStatementBlock _ statements _ _)                           = co
 --muJSStatement (JSConstant _ (JSCommaList JSExpression) _) -- ^const, decl, autosemi
 muJSStatement (JSDoWhile _ statement _ _ expression _ _)                    = While (muJSExpression expression) (muJSStatement statement)
 --muJSStatement (JSFor _ _ (JSCommaList JSExpression) _ (JSCommaList JSExpression) _ (JSCommaList JSExpression) _ JSStatement) -- ^for,lb,expr,semi,expr,semi,expr,rb.stmt
---muJSStatement (JSForIn _ _ (JSIdentifier _ name) _ JSExpression _ JSStatement)       = For [muJSExpression ]
+muJSStatement (JSForIn _ _ id _ gen _ body)                                 = muForIn id gen body
 --muJSStatement (JSForVar _ _ _ (JSCommaList JSExpression) _ (JSCommaList JSExpression) _ (JSCommaList JSExpression) _ JSStatement) -- ^for,lb,var,vardecl,semi,expr,semi,expr,rb,stmt
---muJSStatement (JSForVarIn _ _ _ JSExpression _ JSExpression _ JSStatement) -- ^for,lb,var,vardecl,in,expr,rb,stmt
+muJSStatement (JSForVarIn _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForIn id gen body
 muJSStatement (JSFunction _ ident _ params _ body _)                        = muComputation ident params body
 muJSStatement (JSIf _ _ expression _ statement)                             = If (muJSExpression expression) (muJSStatement statement) MuNull
 muJSStatement (JSIfElse _ _ expression _ ifStatement _ elseStatement)       = If (muJSExpression expression) (muJSStatement ifStatement) (muJSStatement elseStatement)
@@ -54,6 +54,8 @@ muJSStatement (JSTry _ block catches finally)                               = Tr
 muJSStatement (JSVariable _ list _)                                         = compactMap muJSExpression.muJSCommaList $ list
 muJSStatement (JSWhile _ _ expression _ statement)                          = While (muJSExpression expression) (muJSStatement statement)
 muJSStatement _                                                             = Other
+
+muForIn (JSIdentifier _ id) generator body = For [Generator (VariablePattern id) (muJSExpression generator)] (muJSStatement body)
 
 muSwitch expression (def, cases) = Switch (muJSExpression expression) (map muCase cases) (headOrElse MuNull . map muDefault $ def)
 

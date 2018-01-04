@@ -161,3 +161,9 @@ spec = do
         case 1: return 1;
         default: return 3;
       }|] `shouldBe` Switch (Reference "a") [(MuNumber 1, Return (MuNumber 1))] (Return (MuNumber 3))
+
+    it "handles for in" $ do
+      run "for(i in [1,2]) i;" `shouldBe` For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
+      
+    it "handles for var in" $ do
+      run "for(var i in [1,2]) i;" `shouldBe` For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
