@@ -89,7 +89,7 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muExp (HsEnumFromThenTo from thn to) = Application (Reference "enumFromThenTo") [(muExp from), (muExp thn), (muExp to)]
     muExp (HsListComp exp stmts)         = For (map muStmt stmts) (Yield (muExp exp))
     muExp (HsDo stmts) | (HsQualifier exp) <- last stmts  = For (map muStmt stmts)  (Yield (muExp exp))
-    muExp _ = Other
+    muExp e = debug e
 
     muLit (HsCharPrim    v) = MuString [v]
     muLit (HsStringPrim  v) = MuString v

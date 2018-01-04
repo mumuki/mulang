@@ -70,6 +70,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (New _ es)              = es
     subExpressions (Not e)                 = [e]
     subExpressions (Object _ v)            = [v]
+    subExpressions (OtherBody e)           = [e]
     subExpressions (Repeat e1 e2)          = [e1, e2]
     subExpressions (Return v)              = [v]
     subExpressions (Sequence es)           = es
