@@ -38,7 +38,7 @@ spec = do
       js "var m = function(x) { return 1 }" `shouldBe` hs "m = \\x -> 1"
 
     it "simple function declaration" $ do
-      js "function f(x) { return 1 }" `shouldBe` hs "f x = 1" 
+      js "function f(x) { return 1 }" `shouldBe` hs "f x = 1"
 
     it "simple procedure declaration" $ do
       js "function f(x) { console.log('fruit') }" `shouldBe` (
@@ -82,6 +82,12 @@ spec = do
 
     it "handles booleans" $ do
       js "true" `shouldBe` MuTrue
+
+    it "handles negation" $ do
+      js "!true" `shouldBe` (Application (Reference "!") [MuTrue])
+
+    it "handles boolean binary operations" $ do
+      js "true || false " `shouldBe` (Application (Reference "||") [MuTrue, MuFalse])
 
     it "handles lambdas" $ do
       js "(function(x, y) { 1 })" `shouldBe` (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1))

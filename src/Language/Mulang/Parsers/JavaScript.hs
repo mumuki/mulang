@@ -111,6 +111,7 @@ muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _)       = New name (
 --muJSExpression (JSMemberSquare JSExpression _ JSExpression _) -- ^firstpart, lb, expr, rb
 muJSExpression (JSNewExpression _ (JSIdentifier _ name))            = New name []
 muJSExpression (JSObjectLiteral _ propertyList _)                   = MuObject (compactMap id.map muJSObjectProperty.muJSCommaTrailingList $ propertyList)
+muJSExpression (JSUnaryExpression (JSUnaryOpNot _) e)               = Application (Reference "!") [muJSExpression e]
 muJSExpression (JSUnaryExpression op (JSIdentifier _ name))         = Assignment name (muJSUnaryOp op name)
 muJSExpression (JSVarInitExpression (JSIdentifier _ name) initial)  = Variable name (muJSVarInitializer initial)
 muJSExpression _ = Other
@@ -147,7 +148,6 @@ muJSUnaryOp (JSUnaryOpDecr _) r = (Application (Reference "-") [Reference r, MuN
 --muJSUnaryOp (JSUnaryOpDelete _)
 muJSUnaryOp (JSUnaryOpIncr _) r = (Application (Reference "+") [Reference r, MuNumber 1])
 --muJSUnaryOp (JSUnaryOpMinus _)
---muJSUnaryOp (JSUnaryOpNot _)
 --muJSUnaryOp (JSUnaryOpPlus _)
 --muJSUnaryOp (JSUnaryOpTilde _)
 --muJSUnaryOp (JSUnaryOpTypeof _)
