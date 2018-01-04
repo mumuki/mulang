@@ -90,6 +90,7 @@ compileInspectionPrimitive = f
   f "UsesAnonymousVariable"          = simple usesAnonymousVariable
   f "UsesComposition"                = simple usesComposition
   f "UsesForComprehension"           = simple usesForComprehension
+  f "UsesComprehension"              = f "UsesForComprehension"
   f "UsesConditional"                = simple usesConditional
   f "UsesExceptionHandling"          = simple usesExceptionHandling
   f "UsesExceptions"                 = simple usesExceptions

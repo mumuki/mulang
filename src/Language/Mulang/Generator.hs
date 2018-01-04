@@ -138,3 +138,8 @@ equationExpressions = concatMap (\(Equation _ body) -> bodyExpressions body)
   where
     bodyExpressions (UnguardedBody e)      = [e]
     bodyExpressions (GuardedBody b)        = b >>= \(es1, es2) -> [es1, es2]
+
+statementExpressions = map expression
+  where
+    expression (Generator _ e) = e
+    expression (Guard e)       = e

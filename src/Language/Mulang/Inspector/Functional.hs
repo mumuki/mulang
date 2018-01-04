@@ -4,6 +4,7 @@ module Language.Mulang.Inspector.Functional (
   usesLambda,
   usesPatternMatching,
   usesForComprehension,
+  usesComprehension,
   usesConditional) where
 
 import Language.Mulang.Ast
@@ -42,6 +43,10 @@ usesForComprehension :: Inspection
 usesForComprehension = containsExpression f
   where f (For _ e) = usesYield e
         f _         = False
+
+-- alias for usesForComprehension inspection
+usesComprehension :: Inspection
+usesComprehension = usesForComprehension
 
 -- | Inspection that tells whether an expression uses a lambda expression
 -- in its definition
