@@ -43,7 +43,7 @@ muInterfaceTypeDecl (InterfaceDecl _ name _ interfaces (InterfaceBody body)) =
 
 muDecl :: Decl -> [Expression]
 muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
-muDecl (InitDecl _ _)          = return Other
+muDecl e                       = return . debug $ e
 
 muMemberDecl :: MemberDecl -> [Expression]
 muMemberDecl (FieldDecl _ _type varDecls)                            = map (variableToAttribute.muVarDecl) varDecls
@@ -53,7 +53,7 @@ muMemberDecl (MethodDecl (elem Static -> True) _ Nothing (Ident "main") [_] _ bo
 muMemberDecl (MethodDecl _ _ _ (Ident "equals") params _ body)       = return $ EqualMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
 muMemberDecl (MethodDecl _ _ _ (Ident "hashCode") params _ body)     = return $ HashMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
 muMemberDecl (MethodDecl _ _ _ name params _ body)                   = return $ SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)
-muMemberDecl (ConstructorDecl _ _ _ _params _ _constructorBody)      = return $ Other
+muMemberDecl e@(ConstructorDecl _ _ _ _params _ _constructorBody)    = return . debug $ e
 muMemberDecl (MemberClassDecl decl)                                  = return $ muClassTypeDecl decl
 muMemberDecl (MemberInterfaceDecl decl)                              = return $ muInterfaceTypeDecl decl
 
@@ -86,9 +86,9 @@ muStmt (Synchronized _ block)          = muBlock block
 muStmt (Labeled _ stmt)                = muStmt stmt
 muStmt (Throw exp)                     = Raise $ muExp exp
 muStmt (Try block catches finally)     = M.Try (muBlock block) (map muCatch catches) (fmapOrNull muBlock finally)
-muStmt (EnhancedFor _ _ name gen body) = For [Generator (VariablePattern (i name)) (muExp gen)] (muStmt body) 
-muStmt (Switch exp cases)              = muSwitch exp . partition isDefault $ cases 
-muStmt _                               = Other
+muStmt (EnhancedFor _ _ name gen body) = For [Generator (VariablePattern (i name)) (muExp gen)] (muStmt body)
+muStmt (Switch exp cases)              = muSwitch exp . partition isDefault $ cases
+muStmt e                               = debug e
 
 muExp (Lit lit)                         = muLit lit
 muExp (MethodInv invoke)                = muMethodInvocation invoke
@@ -101,7 +101,7 @@ muExp (InstanceCreation _ clazz args _) = New (r clazz) (map muExp args)
 muExp (PreNot exp)                      = SimpleSend (muExp exp) "!" []
 muExp (Lambda params exp)               = M.Lambda (muLambdaParams params) (muLambdaExp exp)
 muExp (MethodRef _ message)             = M.Lambda [VariablePattern "it"] (SimpleSend (Reference "it") (i message) [])
-muExp _                                 = Other
+muExp e                                 = debug e
 
 muLambdaExp (LambdaExpression exp) = muExp exp
 muLambdaExp (LambdaBlock block) = muBlock block
@@ -124,7 +124,7 @@ muLit (Float d)   = MuNumber d
 muLit (Double d)  = MuNumber d
 muLit (Boolean b) = MuBool   b
 muLit Null        = MuNil
-muLit _           = Other
+muLit e           = debug e
 
 muOp Mult   = Reference "*"
 muOp Div    = Reference "/"
@@ -139,14 +139,14 @@ muOp And    = Reference "&&"
 muOp Or     = Reference "||"
 muOp Equal  = M.Equal
 muOp NotEq  = NotEqual
-muOp _      = Other
+muOp e      = debug e
 
 muVarDecl (VarDecl id init) = Variable (v id) (fmapOrNull muVarInit init)
 
 muMethodBody (MethodBody (Just block)) = muBlock block
 
 muVarInit (InitExp exp) = muExp exp
-muVarInit (InitArray _ArrayInit) = Other
+muVarInit e             = debug e
 
 muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "println"]) [expr])  = Print (muExp expr)
 muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "print"]) [expr])    = Print (muExp expr)
@@ -155,7 +155,7 @@ muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "printf
 muMethodInvocation (MethodCall (Name [message]) args)           =  SimpleSend Self (i message) (map muExp args)
 muMethodInvocation (MethodCall (Name receptorAndMessage) args)  =  SimpleSend (Reference  (ns . init $ receptorAndMessage)) (i . last $ receptorAndMessage) (map muExp args)
 muMethodInvocation (PrimaryMethodCall receptor _ selector args) =  SimpleSend (muExp receptor) (i selector) (map muExp args)
-muMethodInvocation _ = Other
+muMethodInvocation e = debug e
 
 muRefType (ClassRefType clazz) = r clazz
 muRefType (ArrayType t)        = (muType t) ++ "[]"

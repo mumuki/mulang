@@ -20,6 +20,9 @@ module Language.Mulang.Ast (
     Statement(..),
     Pattern(..),
     Identifier,
+    debug,
+    pattern Other,
+    pattern OtherBody,
     pattern SimpleEquation,
     pattern SimpleFunction,
     pattern SimpleProcedure,
@@ -131,7 +134,8 @@ data Expression
     | For [Statement] Expression
     | Sequence [Expression]
     -- ^ Generic sequence of statements
-    | Other
+    | Unknown (Maybe String) (Maybe Expression)
+    -- ^ Unrecognized expression, with optional description and body
     | Equal
     | NotEqual
     | Self
@@ -185,6 +189,12 @@ data Statement
   | Guard Expression
   deriving (Eq, Show, Read, Generic)
 
+
+debug :: Show a => a -> Expression
+debug a = Unknown (Just (show a)) Nothing
+
+pattern Other = Unknown Nothing Nothing
+pattern OtherBody body <- Unknown _ (Just body)
 
 pattern SimpleEquation params body = Equation params (UnguardedBody body)
 

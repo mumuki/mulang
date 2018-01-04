@@ -53,7 +53,7 @@ muJSStatement (JSThrow _ expression _)                                      = Ra
 muJSStatement (JSTry _ block catches finally)                               = Try (muJSBlock block) (map muJSTryCatch catches) (muJSTryFinally finally)
 muJSStatement (JSVariable _ list _)                                         = compactMap muJSExpression.muJSCommaList $ list
 muJSStatement (JSWhile _ _ expression _ statement)                          = While (muJSExpression expression) (muJSStatement statement)
-muJSStatement _                                                             = Other
+muJSStatement e                                                             = debug e
 
 muForIn (JSIdentifier _ id) generator body = For [Generator (VariablePattern id) (muJSExpression generator)] (muJSStatement body)
 
@@ -116,7 +116,7 @@ muJSExpression (JSObjectLiteral _ propertyList _)                   = MuObject (
 muJSExpression (JSUnaryExpression (JSUnaryOpNot _) e)               = Application (Reference "!") [muJSExpression e]
 muJSExpression (JSUnaryExpression op (JSIdentifier _ name))         = Assignment name (muJSUnaryOp op name)
 muJSExpression (JSVarInitExpression (JSIdentifier _ name) initial)  = Variable name (muJSVarInitializer initial)
-muJSExpression _ = Other
+muJSExpression e                                                    = debug e
 
 removeQuotes = filter (flip notElem quoteMarks)
   where quoteMarks = "\"'"
@@ -154,7 +154,7 @@ muJSUnaryOp (JSUnaryOpIncr _) r = (Application (Reference "+") [Reference r, MuN
 --muJSUnaryOp (JSUnaryOpTilde _)
 --muJSUnaryOp (JSUnaryOpTypeof _)
 --muJSUnaryOp (JSUnaryOpVoid _)
-muJSUnaryOp _ _                 = Other
+muJSUnaryOp e _                 = debug e
 
 muJSAssignOp:: JSAssignOp -> Identifier -> Expression -> Expression
 muJSAssignOp (JSAssign _) _ v = v
@@ -172,12 +172,12 @@ muJSAssignOp' (JSMinusAssign _)   = Reference "-"
 muJSAssignOp' (JSBwAndAssign _)   = Reference "&"
 muJSAssignOp' (JSBwXorAssign _)   = Reference "^"
 muJSAssignOp' (JSBwOrAssign _)    = Reference "|"
-muJSAssignOp' _                   = Other
+muJSAssignOp' e                   = debug e
 
 muJSTryCatch:: JSTryCatch -> (Pattern, Expression)
 --muJSTryCatch JSCatch _ _ JSExpression _ JSBlock -- ^catch,lb,ident,rb,block
 --muJSTryCatch JSCatchIf _ _ JSExpression _ JSExpression _ JSBlock -- ^catch,lb,ident,if,expr,rb,block
-muJSTryCatch _ = (WildcardPattern, Other)
+muJSTryCatch e = (WildcardPattern, debug e)
 
 muJSTryFinally:: JSTryFinally -> Expression
 muJSTryFinally (JSFinally _ block)   = muJSBlock block
@@ -189,14 +189,14 @@ muJSBlock (JSBlock _ statements _)   = compactMap muJSStatement statements
 muJSVarInitializer:: JSVarInitializer -> Expression
 muJSVarInitializer (JSVarInit _ expression) = muJSExpression expression
 --muJSVarInitializer JSVarInitNone
-muJSVarInitializer _                        = Other
+muJSVarInitializer e                        = debug e
 
 
 muJSObjectProperty:: JSObjectProperty -> Expression
 --muJSObjectProperty JSPropertyAccessor JSAccessor JSPropertyName _ [JSExpression] _ JSBlock -- ^(get|set), name, lb, params, rb, block
 muJSObjectProperty (JSPropertyNameandValue id _ [JSFunctionExpression _ _ _ params _ block])   = Method (muJSPropertyName id) (muEquation (map muPattern (muJSCommaList params)) (muJSBlock block))
 muJSObjectProperty (JSPropertyNameandValue id _ [expression])                                  = Variable (muJSPropertyName id) (muJSExpression expression)
-muJSObjectProperty _ = Other
+muJSObjectProperty e                                                                           = debug e
 
 muJSPropertyName:: JSPropertyName -> Identifier
 muJSPropertyName = removeQuotes.muJSPropertyName'
@@ -209,7 +209,7 @@ muJSPropertyName' (JSPropertyNumber _ name)  = name
 muJSAccessor:: JSAccessor -> Expression
 --muJSAccessor JSAccessorGet _
 --muJSAccessor JSAccessorSet _
-muJSAccessor _ = Other
+muJSAccessor e = debug e
 
 muJSArrayList:: [JSArrayElement] -> [Expression]
 muJSArrayList list = [muJSExpression expression | (JSArrayElement expression) <- list]
