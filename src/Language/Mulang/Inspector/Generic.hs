@@ -29,6 +29,7 @@ module Language.Mulang.Inspector.Generic (
   typesReturnAs,
   typesParameterAs,
   typesAs,
+  usesType,
   Inspection,
   IdentifierInspection) where
 
@@ -54,6 +55,11 @@ typesParameterAs predicate = containsDeclaration f
 typesAs :: IdentifierInspection
 typesAs predicate = containsDeclaration f
   where f (TypeSignature _ Nothing name)   = predicate name
+        f _                                = False
+
+usesType :: IdentifierInspection
+usesType predicate = containsDeclaration f
+  where f (TypeSignature _ _ name)         | predicate name = True
         f (TypeSignature _ (Just names) _) = any predicate names
         f _                                = False
 
