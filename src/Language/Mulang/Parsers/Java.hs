@@ -46,7 +46,7 @@ muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
 muDecl e                       = return . debug $ e
 
 muMemberDecl :: MemberDecl -> [Expression]
-muMemberDecl (FieldDecl _ _type varDecls)                            = map (variableToAttribute.muVarDecl) varDecls
+muMemberDecl (FieldDecl _ typ varDecls)                              = concatMap (variableToAttribute.muVarDecl typ) varDecls
 muMemberDecl (MethodDecl _ _ typ name params _ (MethodBody Nothing)) = return $ muMethodSignature name params typ
 muMemberDecl (MethodDecl (elem Static -> True) _ Nothing (Ident "main") [_] _ body)
                                                                      = return $ EntryPoint "main" (muMethodBody body)
@@ -68,10 +68,7 @@ muBlock (Block statements) = compactConcatMap muBlockStmt statements
 
 muBlockStmt (BlockStmt stmt) = [muStmt stmt]
 muBlockStmt (LocalClass decl) = [muClassTypeDecl decl]
-muBlockStmt (LocalVars _ _type vars) = map muVarDecl vars
-
-muMaybeType Nothing    = "void"
-muMaybeType (Just typ) = muType typ
+muBlockStmt (LocalVars _ typ vars) = concatMap (muVarDecl typ) vars
 
 muType (PrimType t) = muPrimType t
 muType (RefType t)  = muRefType t
@@ -144,7 +141,7 @@ muOp Equal  = M.Equal
 muOp NotEq  = NotEqual
 muOp e      = debug e
 
-muVarDecl (VarDecl id init) = Variable (v id) (fmapOrNull muVarInit init)
+muVarDecl typ (VarDecl id init) = [TypeSignature (v id) Nothing (muType typ), Variable (v id) (fmapOrNull muVarInit init)]
 
 muMethodBody (MethodBody (Just block)) = muBlock block
 
@@ -180,7 +177,7 @@ fmapOrNull f = fromMaybe MuNull . fmap f
 
 -- Helpers
 
-variableToAttribute (Variable id init) = Attribute id init
+variableToAttribute [typ, (Variable id init)] = [typ, Attribute id init]
 
 v (VarId name) = i name
 v (VarDeclArray id) =  (v id) ++ "[]"
