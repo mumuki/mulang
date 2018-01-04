@@ -419,6 +419,12 @@ spec = do
     it "is True on direct usage in function" $ do
       uses (named "m") (js "function f(x) { m }") `shouldBe` True
 
+    it "is True on direct call in function" $ do
+      uses (named "m") (js "function f(x) { m() }") `shouldBe` True
+
+    it "is True on negated call in function" $ do
+      uses (named "m") (js "function f(x) { !m() }") `shouldBe` True
+
     it "is True on direct usage of something like it in function" $ do
       uses (like "m") (js "function f(x) { m2 }") `shouldBe` True
 
