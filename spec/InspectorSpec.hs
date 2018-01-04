@@ -283,8 +283,8 @@ spec = do
       scoped (declaresMethod (named "x")) "p"  (js "var f = {x: function(){}}")  `shouldBe` False
 
   describe "typesReturnAs" $ do
-    it "is True when typed, in hs" $ do
-      typesReturnAs (named "Int") (hs "f :: Int\nf = 4")  `shouldBe` True
+    it "is False when not a function, in hs" $ do
+      typesReturnAs (named "Int") (hs "f :: Int\nf = 4")  `shouldBe` False
 
     it "is False when not explicitly typed, in hs" $ do
       typesReturnAs (named "Int") (hs "f = 4")  `shouldBe` False
@@ -309,33 +309,42 @@ spec = do
       typesParameterAs (named "int") (java "class Foo { bool f(double n) { return n > 4; } }")  `shouldBe` False
 
   describe "typesAs" $ do
-    it "is True when param typed, in hs" $ do
-      typesAs (named "Int") (hs "f :: Int -> Bool\nf n = n > 4 ")  `shouldBe` True
-
     it "is True when constant typed, in hs" $ do
       typesAs (named "Int") (hs "f :: Int\nf = 4 ")  `shouldBe` True
 
-    it "is False when nothing is explicitly typed, in hs" $ do
-      typesAs (named "Int") (hs "f n = n > 4 ")  `shouldBe` False
+    it "is False when not explicitly typed, in hs" $ do
+      typesAs (named "Int") (hs "f = 4 ")  `shouldBe` False
+
+    it "is False when it is a function, in hs" $ do
+      typesAs (named "Int") (hs "f :: () -> Int\nf () = 4 ")  `shouldBe` False
+
+  describe "usesType" $ do
+    it "is True when param typed, in hs" $ do
+      usesType (named "Int") (hs "f :: Int -> Bool\nf n = n > 4 ")  `shouldBe` True
+
+    it "is True when constant typed, in hs" $ do
+      usesType (named "Int") (hs "f :: Int\nf = 4 ")  `shouldBe` True
+
+    it "is False when not explicitly typed, in hs" $ do
+      usesType (named "Int") (hs "f n = n > 4 ")  `shouldBe` False
 
     it "is True when attribute typed, in java" $ do
-      typesAs (named "int") (java "class Foo { int x; }")  `shouldBe` True
+      usesType (named "int") (java "class Foo { int x; }")  `shouldBe` True
 
-    it "is False when attribute typed with nother type, in java" $ do
-      typesAs (named "int") (java "class Foo { double x; }")  `shouldBe` False
+    it "is False when attribute typed with another type, in java" $ do
+      usesType (named "int") (java "class Foo { double x; }")  `shouldBe` False
 
     it "is True when param typed, in java" $ do
-      typesAs (named "int") (java "class Foo { bool f(int n) { return n > 4; } }")  `shouldBe` True
+      usesType (named "int") (java "class Foo { bool f(int n) { return n > 4; } }")  `shouldBe` True
 
     it "is True when local variable typed, in java" $ do
-      typesAs (named "int") (java "class Foo { bool f() { int x = 3; return x > 4; } }")  `shouldBe` True
+      usesType (named "int") (java "class Foo { bool f() { int x = 3; return x > 4; } }")  `shouldBe` True
 
     it "is False when param typed with another type, in java" $ do
-      typesAs (named "int") (java "class Foo { bool f(double n) { return n > 4; } }")  `shouldBe` False
+      usesType (named "int") (java "class Foo { bool f(double n) { return n > 4; } }")  `shouldBe` False
 
     it "is False when local variable typed with another type, in java" $ do
-      typesAs (named "int") (java "class Foo { bool f() { double n = 0; return n > 4; } }")  `shouldBe` False
-
+      usesType (named "int") (java "class Foo { bool f() { double n = 0; return n > 4; } }")  `shouldBe` False
 
   describe "declaresAttribute" $ do
     it "is True when present" $ do
