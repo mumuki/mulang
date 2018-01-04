@@ -227,3 +227,11 @@ spec = do
             }
           }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] (
                            Switch (Reference "a") [(MuNumber 1,Return (MuNumber 1)), (MuNumber 2, Return (MuNumber 2))] MuNull))
+
+    it "parses for" $ do
+      run [text|class Foo {
+            public Foo hello() { 
+              for(int i : ints) a();
+            }
+          }|] `shouldBe` Class "Foo" Nothing (SimpleMethod "hello" [] 
+            (For [Generator (VariablePattern "i") (Reference "ints")] (Send Self (Reference "a") [])))

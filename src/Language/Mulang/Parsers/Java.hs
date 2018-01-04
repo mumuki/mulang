@@ -86,7 +86,7 @@ muStmt (Synchronized _ block)          = muBlock block
 muStmt (Labeled _ stmt)                = muStmt stmt
 muStmt (Throw exp)                     = Raise $ muExp exp
 muStmt (Try block catches finally)     = M.Try (muBlock block) (map muCatch catches) (fmapOrNull muBlock finally)
---muStmt (EnhancedFor _ _ name gen body) = Other
+muStmt (EnhancedFor _ _ name gen body) = For [Generator (VariablePattern (i name)) (muExp gen)] (muStmt body) 
 muStmt (Switch exp cases)              = muSwitch exp . partition isDefault $ cases 
 muStmt _                               = Other
 
