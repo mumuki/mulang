@@ -407,12 +407,16 @@ spec = do
     it "is True when an identifier is used within an Implement expression" $ do
       uses (named "Iterator") (Implement "Iterator") `shouldBe` True
 
-    it "is False when there is variable hiding in list comprehension" $ do
-      --uses (named "m") "y x = [ g m | m <- ms  ]") `shouldBe` False
+    it "is False when variable is defined within scope" $ do
+      --uses (named "m") (hs "y x = [ g m | m <- ms  ]") `shouldBe` False
       pending
 
     it "is False when there is variable hiding in list comprehension generator" $ do
-      uses (named "m") (hs "y x = [ g x | m <- ms, x <- f m]") `shouldBe` False
+      --uses (named "m") (hs "y x = [ g x | m <- ms, x <- f m]") `shouldBe` False
+      pending
+
+    it "is True when a function is used in a list comprehension generator" $ do
+      uses (named "f") (hs "y x = [ g x | m <- ms, x <- f m]") `shouldBe` True
 
   describe "uses, js" $ do
 
