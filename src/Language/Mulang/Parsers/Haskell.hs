@@ -124,8 +124,11 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muStmt (HsGenerator _ pat exp) = Generator (muPat pat) (muExp exp)
     muStmt (HsQualifier exp)       = Guard (muExp exp)
 
-    muTypeSignature t name = TypeSignature (muName name) (Just $ init topTypes) (last topTypes)
+    muTypeSignature t name = TypeSignature (muName name) (listToMaybe $ init topTypes) (last topTypes)
       where topTypes = muTopTypes t
+
+    listToMaybe [] = Nothing
+    listToMaybe xs = Just xs 
 
     muTopTypes (HsTyFun i o) = muType i : muTopTypes o
     muTopTypes t             = [muType t]
