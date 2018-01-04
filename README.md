@@ -418,6 +418,9 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `raises`                          |  any               | is the given _exception type_ raised?
 | `rescues`                         |  any               | is the given _exception type_ rescued?
 | `returnsNull`                     |
+| `typesReturnAs`                   |  any               | is a return typed as a given type?
+| `typesParameterAs`                |  any               | is a parameter typed as a given type?
+| `typesAs`                         |  any               | is something typed as a given type?
 | `uses`                            |  any               | is there any reference to the given element?
 | `usesAnonymousVariable`           |
 | `usesComposition`                 |
@@ -440,6 +443,7 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `usesPatternMatching`             |
 | `usesRepeat`                      |
 | `usesSwitch`                      |
+| `usesType`                        |  any               | is a given type used?
 | `usesUnificationOperator`         |  logic             | is the logic unification operator `=` used?
 | `usesWhile`                       |  imperative        | is a `while` control structure used?
 | `usesYield`                       |  functional        | is an expression yielded within a comprehension?
