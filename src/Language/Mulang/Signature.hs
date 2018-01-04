@@ -52,11 +52,12 @@ signaturesOf :: Expression -> [Signature]
 signaturesOf = nub . mapMaybe (signatureOf.snd) . declarations
 
 signatureOf :: Expression -> Maybe Signature
-signatureOf (Subroutine name es)          = Just $ NamedSignature name (parameterNamesOf es)
-signatureOf (Clause name args _)          = Just $ AritySignature name (length args)
-signatureOf (TypeSignature name (Just args) ret) = Just $ TypedSignature name args ret
-signatureOf (Variable name _)             = Just $ AritySignature name 0
-signatureOf _                             = Nothing
+signatureOf (Subroutine name es)                  = Just $ NamedSignature name (parameterNamesOf es)
+signatureOf (Clause name args _)                  = Just $ AritySignature name (length args)
+signatureOf (TypeSignature name (Just args) ret)  = Just $ TypedSignature name args ret
+signatureOf (TypeSignature name Nothing ret)      = Just $ TypedSignature name [] ret
+signatureOf (Variable name _)                     = Just $ AritySignature name 0
+signatureOf _                                     = Nothing
 
 parameterNamesOf :: [Equation] -> [Maybe Identifier]
 parameterNamesOf = map msum . transpose . map (map parameterNameOf . equationPatterns)

@@ -116,7 +116,9 @@ spec = do
              public void hello() { int x = 1; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             TypeSignature "hello" (Just []) "void",
-                            (SimpleMethod "hello" [] (Variable "x" (MuNumber 1)))])
+                            (SimpleMethod "hello" [] (Sequence [
+                              TypeSignature "x" Nothing "int",
+                              Variable "x" (MuNumber 1)]))])
 
     it "parses Variables And Ints" $ do
       run [text|
@@ -124,7 +126,9 @@ spec = do
              public void hello() { Foo x = this; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                            TypeSignature "hello" (Just []) "void",
-                           (SimpleMethod "hello" [] (Variable "x" Self))])
+                           (SimpleMethod "hello" [] (Sequence [
+                              TypeSignature "x" Nothing "Foo",
+                              Variable "x" Self]))])
 
     it "parses Variables And ternaries" $ do
       run [text|
@@ -132,7 +136,9 @@ spec = do
              public void hello() { Foo x = true ? this : this; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             TypeSignature "hello" (Just []) "void",
-                            (SimpleMethod "hello" [] (Variable "x" (If MuTrue Self Self)))])
+                            (SimpleMethod "hello" [] (Sequence [
+                              TypeSignature "x" Nothing "Foo",
+                              Variable "x" (If MuTrue Self Self)]))])
 
     it "parses Variables without initialization" $ do
       run [text|
@@ -140,7 +146,9 @@ spec = do
              public void hello() { int x; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             TypeSignature "hello" (Just []) "void",
-                            (SimpleMethod "hello" [] (Variable "x" MuNull))])
+                            (SimpleMethod "hello" [] (Sequence [
+                              TypeSignature "x" Nothing "int",
+                              Variable "x" MuNull]))])
 
 
     it "parses self-send" $ do
@@ -240,6 +248,7 @@ spec = do
                             TypeSignature "hello" (Just []) "void",
                             (SimpleMethod "hello" [] (
                                                      Sequence [
+                                                       TypeSignature "m" Nothing "double",
                                                        Variable "m" (MuNumber 1.0),
                                                        Assignment "m" (MuNumber 3.4)]))])
 
