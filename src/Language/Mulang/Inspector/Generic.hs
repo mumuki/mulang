@@ -44,13 +44,13 @@ type IdentifierInspection = IdentifierPredicate -> Inspection
 
 typesReturnAs :: IdentifierInspection
 typesReturnAs predicate = containsDeclaration f
-  where f (TypeSignature _ (Just _) name)  = predicate name
-        f _                                = False
+  where f (SubroutineTypeSignature _ _ name)  = predicate name
+        f _                                   = False
 
 typesParameterAs :: IdentifierInspection
 typesParameterAs predicate = containsDeclaration f
-  where f (TypeSignature _ (Just names) _)  = any predicate names
-        f _                                 = False
+  where f (SubroutineTypeSignature _ names _)  = any predicate names
+        f _                                    = False
 
 typesAs :: IdentifierInspection
 typesAs predicate = containsDeclaration f
@@ -59,9 +59,9 @@ typesAs predicate = containsDeclaration f
 
 usesType :: IdentifierInspection
 usesType predicate = containsDeclaration f
-  where f (TypeSignature _ _ name)         | predicate name = True
-        f (TypeSignature _ (Just names) _) = any predicate names
-        f _                                = False
+  where f (TypeSignature _ _ name)            | predicate name = True
+        f (SubroutineTypeSignature _ names _) = any predicate names
+        f _                                   = False
 
 -- | Inspection that tells whether an expression is equal to a given piece of code after being parsed
 parses :: (String -> Expression) -> String -> Inspection

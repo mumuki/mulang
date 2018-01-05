@@ -32,6 +32,7 @@ module Language.Mulang.Ast (
     pattern SimpleSend,
     pattern MuTrue,
     pattern MuFalse,
+    pattern SubroutineTypeSignature,
     pattern Subroutine,
     pattern Clause,
     pattern Call,
@@ -192,7 +193,6 @@ data Statement
   | Guard Expression
   deriving (Eq, Show, Read, Generic)
 
-
 debug :: Show a => a -> Expression
 debug a = Unknown (Just (show a)) Nothing
 
@@ -209,6 +209,8 @@ pattern SimpleMethod name params body    = Method    name [SimpleEquation params
 
 pattern MuTrue  = MuBool True
 pattern MuFalse = MuBool False
+
+pattern SubroutineTypeSignature name params return = TypeSignature name (Just params) return
 
 pattern Subroutine name body <- (extractSubroutine -> Just (name, body))
 pattern Clause name patterns expressions <- (extractClause -> Just (name, patterns, expressions))
