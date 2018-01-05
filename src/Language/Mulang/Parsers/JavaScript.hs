@@ -206,11 +206,6 @@ muJSPropertyName' (JSPropertyIdent _ name)   = name
 muJSPropertyName' (JSPropertyString _ name)  = name
 muJSPropertyName' (JSPropertyNumber _ name)  = name
 
-muJSAccessor:: JSAccessor -> Expression
---muJSAccessor JSAccessorGet _
---muJSAccessor JSAccessorSet _
-muJSAccessor e = debug e
-
 muJSArrayList:: [JSArrayElement] -> [Expression]
 muJSArrayList list = [muJSExpression expression | (JSArrayElement expression) <- list]
 
