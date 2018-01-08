@@ -1,4 +1,4 @@
-{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes, OverloadedStrings, ViewPatterns #-}
 
 module Language.Mulang.JSCompiler (toJS) where
 
@@ -144,8 +144,19 @@ instance Compilable Expression where
   -- (this does not mean there has to be many MuNull instances, the constructor can just return a singleton).
   compile MuNull = do return [text| new MuNull() |]
 
+  compile (Sequence []) = do return [text| null |]
+  compile (Sequence _expressions) = let _lastExpression = last _expressions in do
+    initialExpressions <- compileAll (init _expressions) "; "
+    lastExpression <- compile _lastExpression
+    return $ case _lastExpression of
+      (Return _) -> [text| return function(){ $initialExpressions; $lastExpression }() |]
+      _          -> [text| function(){ $initialExpressions; return $lastExpression }() |]
   -- TypeSignatures are ignored.
   compile (TypeSignature _ _ _)  = do return empty
+
+  -- Interfaces are ignored.
+  compile (Interface _ _ _)  = do return empty
+  compile (Implement _)  = do return empty
 
   -- TypeAliases are ignored (we can't do anything without the aliased type).
   compile (TypeAlias _)  = do return empty
@@ -155,41 +166,23 @@ instance Compilable Expression where
 
   compile _ = Nothing
 
-{-
-data Expression
+{- PENDING
     | Method Identifier [Equation]
     | EqualMethod [Equation]
     | HashMethod [Equation]
     | Attribute Identifier Expression
-
     | Object Identifier Expression
     -- ^ Object oriented programming global, named object declaration,
     --   composed by a name and a body
-
     | Class Identifier (Maybe Identifier) Expression
     -- ^ Object oriented programming global, class declaration,
     --   composed by a name, an optional superclass, implemented interfaces and a body
- 
     | Enumeration Identifier [Identifier]
     -- ^ Imperative named enumeration of values
- 
-    | Interface Identifier [Identifier] Expression
-    -- ^ Object oriented programming global interface or contract declaration,
-    --   composed by a name, superinterfaces and a body
- 
-
-    | Implement Identifier
-    -- ^ Object oriented instantiation, interface implementation
     | Include Identifier
     -- ^ Object oriented instantiation, mixin inclusion
-
-    | Sequence [Expression]
-    -- ^ Generic sequence of statements
-
-
     | Lambda [Pattern] Expression
     | If Expression Expression Expression
-
     | While Expression Expression
     -- ^ Imperative programming conditional repetition control structure, composed by a condition and a body
     | Repeat Expression Expression
@@ -243,8 +236,8 @@ instance Compilable Equation where
         let name = pack _name
         return [text| var $name = arguments[$n]; |]
       compileParameterNameAssignation (_, (LiteralPattern _literal)) = Just [text| |]
-      compileParameterNameAssignation (_, (WildcardPattern)) = Just [text| |]
-      compileParameterNameAssignation (_, (TypePattern _typeName)) = Just [text|  |] --TODO: The variable name is missing. How do you identify the parameter in the body?
+      compileParameterNameAssignation (_, (WildcardPattern))         = Just [text| |]
+      compileParameterNameAssignation (_, (TypePattern _typeName))   = Just [text| |] --TODO: The variable name is missing. How do you identify the parameter in the body?
       compileParameterNameAssignation _ = Nothing
 
       -- | Compiles a Mulang EquationBody to a JS code fragment. The generated code is intended to be contained within an

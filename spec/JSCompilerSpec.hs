@@ -94,3 +94,5 @@ module JSCompilerSpec (spec) where
 
       it "MuNull" $ do
         toJS MuNull `shouldBe` Just "new MuNull()\n"
+
+      it "Sequence" $ do pending
