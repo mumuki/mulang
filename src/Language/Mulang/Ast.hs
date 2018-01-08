@@ -38,7 +38,7 @@ import           Language.Mulang.Identifier (Identifier)
 
 type Code = String
 
--- | An equation. See @Function@ and @Procedure@ above
+-- | An equation. See @Function@ and @Procedure@ below
 data Equation = Equation [Pattern] EquationBody deriving (Eq, Show, Read, Generic)
 
 data EquationBody
