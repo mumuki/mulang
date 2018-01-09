@@ -3,7 +3,7 @@
 module Language.Mulang.JSCompiler (toJS) where
 
 import           Language.Mulang.Ast
-import           Data.Text(pack, unpack, intercalate, empty, toLower, isPrefixOf, Text)
+import           Data.Text(pack, unpack, intercalate, empty, toLower, Text)
 import           NeatInterpolation
 
 -- | Compiles a Mulang AST to an executable JS source.
@@ -60,27 +60,36 @@ instance Compilable Expression where
   -- Generates a named JS function with the EntryPoint's body.
   compile (EntryPoint _name _body) = do
     let name = pack _name
-    body <- fmap toFunctionResult $ compile _body
-    return [text| function $name() { $body } |]
+    body <- compile _body
+    return [text| function $name() { return $body } |]
 
-  compile (Return _expression) = do
-    expression <- compile _expression
-    return [text| return $expression |]
+  -- Generates a JS direct application of an anonymous function that throws an instance of MuReturn primitive class.
+  -- This is done to ensure that the return forces the exit of the contexts of abstractions represented with functions.
+  compile (Return _result) = do
+    result <- compile _result
+    return [text| function(){ throw new MuReturn($result) }() |]
 
   -- Generates a named JS function that dynamically dispatches the Function's Equations based on the received arguments.
   -- A primitive MuPatternMatchError exception is raised if no equation matches the cases.
+  -- The MuReturn primitive error is catched to allow inner expressions to exit this context eagerly.
   compile (Function _name _equations) = do
     let name = pack _name
     equations <- compileAll _equations " else "
-    return [text| function $name() { $equations throw new MuPatternMatchError() } |]
+    return [text| function $name() {
+                    try { $equations throw new MuPatternMatchError() }
+                    catch($$error) { if($$error.constructor === MuReturn) { return $$error.value } else { throw $$error } } }
+           |]
 
   -- Generates a named JS function that dynamically dispatches the Function's Equations based on the received arguments.
   -- A primitive MuPatternMatchError exception is raised if no equation matches the cases.
+  -- The MuReturn primitive error is catched to allow inner expressions to exit this context eagerly.
   compile (Procedure _name _equations) = do
     let name = pack _name
     equations <- compileAll _equations " else "
-    return [text| function $name() { $equations throw new MuPatternMatchError() } |]
-
+    return [text| function $name() {
+                    try { $equations throw new MuPatternMatchError() }
+                    catch($$error) { if($$error.constructor === MuReturn) { return $$error.value } else { throw $$error } } }
+           |]
   -- Generates a JS variable initializing it to the Variables value.
   compile (Variable _name _value) = do
     let name = pack _name
@@ -150,8 +159,14 @@ instance Compilable Expression where
   compile (Sequence []) = do return [text| undefined |]
   compile (Sequence _expressions) = let _lastExpression = last _expressions in do
     initialExpressions <- compileAll (init _expressions) "; "
-    lastExpression <- fmap toFunctionResult $ compile _lastExpression
-    return $ [text| function(){ $initialExpressions; $lastExpression }() |]
+    lastExpression <- compile _lastExpression
+    return [text| function(){ $initialExpressions; return $lastExpression }() |]
+
+  compile (If _condition _positiveCase _negativeCase) = do
+    condition <- compile _condition
+    positiveCase <- compile _positiveCase
+    negativeCase <- compile _negativeCase
+    return [text| function(){ if($condition) { return $positiveCase } else { return $negativeCase } }() |]
 
   -- TypeSignatures are ignored.
   compile (TypeSignature _ _ _)  = do return empty
@@ -184,7 +199,6 @@ instance Compilable Expression where
     | Include Identifier
     -- ^ Object oriented instantiation, mixin inclusion
     | Lambda [Pattern] Expression
-    | If Expression Expression Expression
     | While Expression Expression
     -- ^ Imperative programming conditional repetition control structure, composed by a condition and a body
     | Repeat Expression Expression
@@ -215,7 +229,7 @@ instance Compilable Equation where
     where
 
       -- Compiles a pattern and applies the resulting JS function with the pattern's position argument.
-      compileCondition (n, pattern) = do
+      applyConditions (n, pattern) = do
         cond <- compile pattern
         return [text| $cond(arguments[$n]) |]
 
@@ -250,7 +264,7 @@ instance Compilable Pattern where
 instance Compilable EquationBody where
   compile (UnguardedBody _result) = do
     result <- compile _result
-    return $ toFunctionResult result
+    return [text| return $result |]
 
   compile (GuardedBody _cases) = do
     cases <- compileAll _cases " else "
@@ -260,12 +274,5 @@ type Guard = (Expression, Expression)
 instance Compilable Guard where
   compile (_condition, _expression) = do
     condition <- compile _condition
-    result <- fmap toFunctionResult $ compile _expression
-    return [text| if($condition) { $result } |]
-
------------------------------------------------------------------------------------------------------------------------
--- COMMONS
------------------------------------------------------------------------------------------------------------------------
-
-toFunctionResult :: Text -> Text
-toFunctionResult value = if pack "return " `isPrefixOf` value then value else [text| return $value |]
+    result <- compile _expression
+    return [text| if($condition) { return $result } |]
