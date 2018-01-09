@@ -162,11 +162,18 @@ instance Compilable Expression where
     lastExpression <- compile _lastExpression
     return [text| function(){ $initialExpressions; return $lastExpression }() |]
 
+  -- Generates a JS if statement wrapped in an anonymous function application in order to make it an expression.
   compile (If _condition _positiveCase _negativeCase) = do
     condition <- compile _condition
     positiveCase <- compile _positiveCase
     negativeCase <- compile _negativeCase
     return [text| function(){ if($condition) { return $positiveCase } else { return $negativeCase } }() |]
+
+  -- Generates a JS while statement wrapped in an anonymous function application in order to make it an expression.
+  compile (While _condition _body) = do
+    condition <- compile _condition
+    body <- compile _body
+    return [text| function(){ while($condition) { $body } }() |]
 
   -- TypeSignatures are ignored.
   compile (TypeSignature _ _ _)  = do return empty
@@ -199,8 +206,6 @@ instance Compilable Expression where
     | Include Identifier
     -- ^ Object oriented instantiation, mixin inclusion
     | Lambda [Pattern] Expression
-    | While Expression Expression
-    -- ^ Imperative programming conditional repetition control structure, composed by a condition and a body
     | Repeat Expression Expression
     -- ^ Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
     | Match Expression [Equation]

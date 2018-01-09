@@ -112,4 +112,7 @@ module JSCompilerSpec (spec) where
       it "If" $ do
         (If (Reference "c") (Reference "x") (Reference "y")) `shouldBeCompiledTo` "function(){ if(c) { return x } else { return y } }()"
 
+      it "While" $ do
+        (While (Reference "c") (Reference "x")) `shouldBeCompiledTo` "function(){ while(c) { x } }()"
+
   shouldBeCompiledTo expression expected = (fmap (filter (/='\n')) . toJS) expression `shouldBe` Just expected
