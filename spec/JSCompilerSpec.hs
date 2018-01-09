@@ -44,22 +44,23 @@ module JSCompilerSpec (spec) where
         toJS (Function "f" []) `shouldBe` Just "function f() {  throw new MuPatternMatchError() }\n"
         toJS (Function "f" [Equation [] (UnguardedBody (Return (MuNumber 5)))]) `shouldBe` Just (
           "function f() { " ++
-            "if(arguments.length === 0 && true){  return new MuNumber(5.0) } " ++
+            "if(arguments.length === 0){  return new MuNumber(5.0) } " ++
             "throw new MuPatternMatchError() " ++
           "}\n"
           )
         toJS (Function "f" [Equation [VariablePattern "x"] (UnguardedBody (Return (MuNumber 5)))]) `shouldBe` Just (
           "function f() { " ++
-            "if(arguments.length === 1 && true && true){ var x = arguments[0]; return new MuNumber(5.0) } " ++
+            "if(arguments.length === 1\n && function(){ return true }(arguments[0])){ var x = arguments[0]; return new MuNumber(5.0) } " ++
             "throw new MuPatternMatchError() " ++
           "}\n"
           )
         toJS (Function "f" [Equation [VariablePattern "x", VariablePattern "y"] (UnguardedBody (Return (MuNumber 5)))]) `shouldBe` Just (
           "function f() { " ++
-            "if(arguments.length === 2 && true && true\n && true){ var x = arguments[0];\nvar y = arguments[1]; return new MuNumber(5.0) } " ++
+            "if(arguments.length === 2\n && function(){ return true }(arguments[0])\n && function(){ return true }(arguments[1])){ var x = arguments[0];\nvar y = arguments[1]; return new MuNumber(5.0) } " ++
             "throw new MuPatternMatchError() " ++
           "}\n"
           )
+        pending
       
       it "Procedures" $ do pending
 

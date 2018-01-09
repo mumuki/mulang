@@ -1,9 +1,9 @@
-{-# LANGUAGE QuasiQuotes, OverloadedStrings, ViewPatterns #-}
+{-# LANGUAGE QuasiQuotes, OverloadedStrings, ViewPatterns, TypeSynonymInstances, FlexibleInstances #-}
 
 module Language.Mulang.JSCompiler (toJS) where
 
 import           Language.Mulang.Ast
-import           Data.Text(pack, unpack, intercalate, empty, toLower, Text)
+import           Data.Text(pack, unpack, intercalate, empty, toLower, isPrefixOf, Text)
 import           NeatInterpolation
 
 -- | Compiles a Mulang AST to an executable JS source.
@@ -60,8 +60,8 @@ instance Compilable Expression where
   -- Generates a named JS function with the EntryPoint's body.
   compile (EntryPoint _name _body) = do
     let name = pack _name
-    body <- compile _body
-    return [text| function $name() { return $body } |]
+    body <- fmap toFunctionResult $ compile _body
+    return [text| function $name() { $body } |]
 
   compile (Return _expression) = do
     expression <- compile _expression
@@ -144,13 +144,15 @@ instance Compilable Expression where
   -- (this does not mean there has to be many MuNull instances, the constructor can just return a singleton).
   compile MuNull = do return [text| new MuNull() |]
 
-  compile (Sequence []) = do return [text| null |]
+  -- Generates a JS undefined value if the sequence is empty.
+  -- If the sequence is not empty, generates an invocation to an anonymous function where each line is one sequence member.
+  -- The last element of the sequence is returned as the function response, ignoring any intermediate result, but applying effects.
+  compile (Sequence []) = do return [text| undefined |]
   compile (Sequence _expressions) = let _lastExpression = last _expressions in do
     initialExpressions <- compileAll (init _expressions) "; "
-    lastExpression <- compile _lastExpression
-    return $ case _lastExpression of
-      (Return _) -> [text| return function(){ $initialExpressions; $lastExpression }() |]
-      _          -> [text| function(){ $initialExpressions; return $lastExpression }() |]
+    lastExpression <- fmap toFunctionResult $ compile _lastExpression
+    return $ [text| function(){ $initialExpressions; $lastExpression }() |]
+
   -- TypeSignatures are ignored.
   compile (TypeSignature _ _ _)  = do return empty
 
@@ -202,52 +204,68 @@ instance Compilable Equation where
   -- | is available. The if condition will test the context's arguments against the expected patterns and either execute
   -- | and exit the context or avoid execution and continue context as is.
   -- | The context is expected to fail after all equations are tested unsuccessfully.
-  -- | The Equation body is expected to explicitly contain a Return expression.
   compile (Equation argumentPatterns _body) = do
     let argumentCount = pack . show . length $ argumentPatterns
-    let indexedPatterns = zip [0..] argumentPatterns
-    matchesPatterns <- fmap (intercalate (pack " && ")) . sequence $ Just (pack "true") : map compilePatternCondition indexedPatterns
-    argumentNames <- fmap (intercalate (pack "")) . sequence $ map compileParameterNameAssignation indexedPatterns
-    body <- compileBody _body
-    return [text| if(arguments.length === $argumentCount && $matchesPatterns){ $argumentNames $body } |]
+    let indexedPatterns = zip (map (pack . show) [0..]) argumentPatterns
+    let conditions = Just [text| arguments.length === $argumentCount |] : map applyConditions indexedPatterns
+    matchesPatterns <- fmap (intercalate (pack " && ")) . sequence $ conditions
+    argumentNames   <- fmap (intercalate (pack "")) . sequence $ map nameAssignation indexedPatterns
+    body            <- compile _body
+    return [text| if($matchesPatterns){ $argumentNames $body } |]
     where
-      -- | Compiles a pair (Index, Mulang Pattern) to a JS boolean expression over the arguments variable.
-      -- | A primitive function isInstanceOf is called for TypePatterns.
-      -- | TODO: Complete missing scenarios.
-      compilePatternCondition :: (Int, Pattern) -> Maybe Text
-      compilePatternCondition (_, (VariablePattern _)) = Just [text| true |]
-      compilePatternCondition (_, (WildcardPattern)) = Just [text| true |]
-      compilePatternCondition (_n, (LiteralPattern _literal)) =  do
-       let n = pack . show $ _n
-       let literal = pack . show $ _literal
-       return [text| arguments[$n] === $literal |]
-      compilePatternCondition (_n, (TypePattern _typeName)) = do
-       let n = pack . show $ _n
-       let typeName = pack _typeName
-       return [text| isInstanceOf(arguments[$n], $typeName) |]
-      compilePatternCondition _ = Nothing
 
-      -- | Compiles a pair (Index, Mulang Pattern) to a JS code fragment that assigns arguments to the name the body uses
-      -- | to reference them.
-      -- | TODO: Complete missing scenarios.
-      compileParameterNameAssignation :: (Int, Pattern) -> Maybe Text
-      compileParameterNameAssignation (_n, (VariablePattern _name)) = do
-        let n = pack . show $ _n
-        let name = pack _name
-        return [text| var $name = arguments[$n]; |]
-      compileParameterNameAssignation (_, (LiteralPattern _literal)) = Just [text| |]
-      compileParameterNameAssignation (_, (WildcardPattern))         = Just [text| |]
-      compileParameterNameAssignation (_, (TypePattern _typeName))   = Just [text| |] --TODO: The variable name is missing. How do you identify the parameter in the body?
-      compileParameterNameAssignation _ = Nothing
+      -- Compiles a pattern and applies the resulting JS function with the pattern's position argument.
+      compileCondition (n, pattern) = do
+        cond <- compile pattern
+        return [text| $cond(arguments[$n]) |]
 
-      -- | Compiles a Mulang EquationBody to a JS code fragment. The generated code is intended to be contained within an
-      -- | Equation and should only be evaluated once the pattern has been checked.
-      compileBody :: EquationBody -> Maybe Text
-      compileBody (UnguardedBody expression) = compile expression
-      compileBody (GuardedBody _cases) = do
-        cases <- fmap (intercalate (pack " else ")) . sequence $ map (\(_condition, _expression)-> do
-                   condition <- compile _condition
-                   expression <- compile _expression
-                   return [text| if($condition) { $expression } |]
-                 ) _cases
-        return [text| $cases throw new MuPatternMatchError() |]
+      -- Converts a pair (Index, Mulang Pattern) to a JS code fragment that assigns arguments to the name the body uses
+      -- to reference them.
+      nameAssignation :: (Text, Pattern) -> Maybe Text
+      nameAssignation (n, pattern) = case pattern of
+        (VariablePattern _name) -> let name = pack _name in Just [text| var $name = arguments[$n]; |]
+        (TypePattern _)         -> Just [text| |] --TODO: The variable name is missing. How do you identify the parameter in the body?
+        (LiteralPattern _)      -> Just [text| |]
+        WildcardPattern         -> Just [text| |]
+        _                       -> Nothing -- TODO: Complete missing scenarios.
+
+
+-- | Compiles a Mulang Pattern to a JS function that returns wheter it's argument matches the pattern or not.
+-- | the arguments JS variable is used instead of parameters to avoid name collisions with user's code.
+-- | A primitive function isInstanceOf is called for TypePatterns.
+instance Compilable Pattern where
+  compile (LiteralPattern _literal) = do
+    let literal = pack . show $ _literal
+    return [text| function(){ return arguments[0] === $literal } |]
+  compile (TypePattern _typeName)   = do
+    let typeName = pack _typeName
+    return [text| function(){ return isInstanceOf(arguments[0], $typeName) } |]
+  compile (VariablePattern _)       = return [text| function(){ return true } |]
+  compile WildcardPattern           = return [text| function(){ return true } |]
+  compile _                         = Nothing -- TODO: Complete missing scenarios.
+
+
+-- | Compiles a Mulang EquationBody to a JS code fragment. The generated code is intended to be contained within an
+-- | Equation and should only be evaluated once the pattern has been checked.
+instance Compilable EquationBody where
+  compile (UnguardedBody _result) = do
+    result <- compile _result
+    return $ toFunctionResult result
+
+  compile (GuardedBody _cases) = do
+    cases <- compileAll _cases " else "
+    return [text| $cases throw new MuPatternMatchError() |]
+
+type Guard = (Expression, Expression)
+instance Compilable Guard where
+  compile (_condition, _expression) = do
+    condition <- compile _condition
+    result <- fmap toFunctionResult $ compile _expression
+    return [text| if($condition) { $result } |]
+
+-----------------------------------------------------------------------------------------------------------------------
+-- COMMONS
+-----------------------------------------------------------------------------------------------------------------------
+
+toFunctionResult :: Text -> Text
+toFunctionResult value = if pack "return " `isPrefixOf` value then value else [text| return $value |]
