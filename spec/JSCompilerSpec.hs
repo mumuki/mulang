@@ -7,93 +7,109 @@ module JSCompilerSpec (spec) where
   spec :: Spec
   spec = do
     -- It would be much better to test this by running the JS code instead of checking the string output...
-    -- Also, I don't care about output format right now, so all \n are there because they want to.
+    -- Also, I don't care about output format right now, so all \n are ignored.
     describe "JS Compilation" $ do
 
       it "MuNumber" $ do
-        toJS (MuNumber 5) `shouldBe` Just "new MuNumber(5.0)\n"
+        (MuNumber 5) `shouldBeCompiledTo` "new MuNumber(5.0)"
 
       it "MuNumber" $ do
-        toJS (MuBool True) `shouldBe` Just "new MuBool(true)\n"
+        (MuBool True) `shouldBeCompiledTo` "new MuBool(true)"
         
       it "MuString" $ do
-        toJS (MuString "foo") `shouldBe` Just "new MuString(\"foo\")\n"
+        (MuString "foo") `shouldBeCompiledTo` "new MuString(\"foo\")"
 
       it "MuSymbol" $ do
-        toJS (MuSymbol "foo") `shouldBe` Just "new MuSymbol(\"foo\")\n"
+        (MuSymbol "foo") `shouldBeCompiledTo` "new MuSymbol(\"foo\")"
 
       it "MuTuple" $ do
-        toJS (MuTuple [MuNumber 1, MuNumber 2, MuNumber 3]) `shouldBe` Just "new MuTuple([new MuNumber(1.0)\n, new MuNumber(2.0)\n, new MuNumber(3.0)])\n"
+        (MuTuple [MuNumber 1, MuNumber 2, MuNumber 3]) `shouldBeCompiledTo` "new MuTuple([new MuNumber(1.0), new MuNumber(2.0), new MuNumber(3.0)])"
 
       it "MuList" $ do
-        toJS (MuList [MuNumber 1, MuNumber 2, MuNumber 3]) `shouldBe` Just "new MuList([new MuNumber(1.0)\n, new MuNumber(2.0)\n, new MuNumber(3.0)])\n"
+        (MuList [MuNumber 1, MuNumber 2, MuNumber 3]) `shouldBeCompiledTo` "new MuList([new MuNumber(1.0), new MuNumber(2.0), new MuNumber(3.0)])"
 
       it "EntryPoint" $ do
-        toJS (EntryPoint "foo" (MuBool True)) `shouldBe` Just "function foo() { return new MuBool(true) }\n"
+        (EntryPoint "foo" (MuBool True)) `shouldBeCompiledTo` "function foo() { return new MuBool(true) }"
         
       it "TypeSignature" $ do
-        toJS (TypeSignature "foo" [] "bar") `shouldBe` Just ""
+        (TypeSignature "foo" [] "bar") `shouldBeCompiledTo` ""
 
       it "TypeAlias" $ do
-        toJS (TypeAlias "foo") `shouldBe` Just ""
+        (TypeAlias "foo") `shouldBeCompiledTo` ""
 
       it "Record" $ do
-        toJS (Record "foo") `shouldBe` Just ""
+        (Record "foo") `shouldBeCompiledTo` ""
 
       it "Function" $ do
-        toJS (Function "f" []) `shouldBe` Just "function f() {  throw new MuPatternMatchError() }\n"
-        toJS (Function "f" [Equation [] (UnguardedBody (Return (MuNumber 5)))]) `shouldBe` Just (
-          "function f() { " ++
-            "if(arguments.length === 0){  return new MuNumber(5.0) } " ++
+        (Function "f" []) `shouldBeCompiledTo` "function f() {try {  throw new MuPatternMatchError() }catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }"
+        (Function "f" [Equation [] (UnguardedBody (Return (MuNumber 5)))]) `shouldBeCompiledTo` (
+          "function f() {try { " ++
+            "if(arguments.length === 0){  return function(){ throw new MuReturn(new MuNumber(5.0)) }() } " ++
             "throw new MuPatternMatchError() " ++
-          "}\n"
+          "}catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }"
           )
-        toJS (Function "f" [Equation [VariablePattern "x"] (UnguardedBody (Return (MuNumber 5)))]) `shouldBe` Just (
-          "function f() { " ++
-            "if(arguments.length === 1\n && function(){ return true }(arguments[0])){ var x = arguments[0]; return new MuNumber(5.0) } " ++
+        (Function "f" [Equation [VariablePattern "x"] (UnguardedBody $ MuNumber 5)]) `shouldBeCompiledTo` (
+          "function f() {try { " ++
+            "if(arguments.length === 1 && function(){ return true }(arguments[0])){ var x = arguments[0]; return new MuNumber(5.0) } " ++
             "throw new MuPatternMatchError() " ++
-          "}\n"
+          "}catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }"
           )
-        toJS (Function "f" [Equation [VariablePattern "x", VariablePattern "y"] (UnguardedBody (Return (MuNumber 5)))]) `shouldBe` Just (
-          "function f() { " ++
-            "if(arguments.length === 2\n && function(){ return true }(arguments[0])\n && function(){ return true }(arguments[1])){ var x = arguments[0];\nvar y = arguments[1]; return new MuNumber(5.0) } " ++
+        (Function "f" [Equation [VariablePattern "x", VariablePattern "y"] (UnguardedBody $ MuNumber 5)]) `shouldBeCompiledTo` (
+          "function f() {try { " ++
+            "if(arguments.length === 2 && function(){ return true }(arguments[0]) && function(){ return true }(arguments[1])){ var x = arguments[0];var y = arguments[1]; return new MuNumber(5.0) } " ++
             "throw new MuPatternMatchError() " ++
-          "}\n"
+          "}catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }"
           )
-        pending
-      
+        (Function "f" [Equation [] (UnguardedBody (Sequence [If (Reference "c") (Return (Reference "x")) (Sequence []), Reference "y"]))]) `shouldBeCompiledTo` (
+          "function f() {try { " ++
+            "if(arguments.length === 0){  " ++
+              "return function(){ " ++
+                "function(){ if(c) { return function(){ throw new MuReturn(x) }() } else { return undefined } }(); " ++
+                "return y " ++
+              "}() " ++
+            "} " ++
+            "throw new MuPatternMatchError() " ++
+          "}catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }"
+          )
+        pending --TODO: Other cases
+
       it "Procedures" $ do pending
 
       it "Variable" $ do
-        toJS (Variable "x" $ Reference "y") `shouldBe` Just "var x = y\n"
+        (Variable "x" $ Reference "y") `shouldBeCompiledTo` "var x = y"
 
       it "Assignment" $ do
-        toJS (Assignment "x" $ Reference "y") `shouldBe` Just "x = y\n"
+        (Assignment "x" $ Reference "y") `shouldBeCompiledTo` "x = y"
 
       it "Reference" $ do
-        toJS (Reference "x") `shouldBe` Just "x\n"
+        (Reference "x") `shouldBeCompiledTo` "x"
 
       it "Application" $ do
-        toJS (Application (Reference "f") []) `shouldBe` Just "f()\n"
-        toJS (Application (Reference "f") [Reference "x", Reference "y"]) `shouldBe` Just "f(x\n, y)\n"
-        toJS (Application (Application (Reference "f") [Reference "x"]) [Application (Reference "g") [Reference "y"]]) `shouldBe` Just "f(x)(g(y))\n"
+        (Application (Reference "f") []) `shouldBeCompiledTo` "f()"
+        (Application (Reference "f") [Reference "x", Reference "y"]) `shouldBeCompiledTo` "f(x, y)"
+        (Application (Application (Reference "f") [Reference "x"]) [Application (Reference "g") [Reference "y"]]) `shouldBeCompiledTo` "f(x)(g(y))"
 
       it "Send" $ do
-        toJS (Send (Reference "o") (Reference "m") []) `shouldBe` Just "o['m']()\n"
-        toJS (Send (Reference "o") (Reference "m") [Reference "x", Reference "y"]) `shouldBe` Just "o['m'](x\n, y)\n"
-        toJS (Send (Send (Reference "o") (Reference "m") [Reference "x"]) (Reference "n") [Reference "y"]) `shouldBe` Just "o['m'](x)['n'](y)\n"
+        (Send (Reference "o") (Reference "m") []) `shouldBeCompiledTo` "o['m']()"
+        (Send (Reference "o") (Reference "m") [Reference "x", Reference "y"]) `shouldBeCompiledTo` "o['m'](x, y)"
+        (Send (Send (Reference "o") (Reference "m") [Reference "x"]) (Reference "n") [Reference "y"]) `shouldBeCompiledTo` "o['m'](x)['n'](y)"
 
       it "New" $ do
-        toJS (New "C" []) `shouldBe` Just "new C()\n"
-        toJS (New "C" [Reference "x", Reference "y"]) `shouldBe` Just "new C(x\n, y)\n"
+        (New "C" []) `shouldBeCompiledTo` "new C()"
+        (New "C" [Reference "x", Reference "y"]) `shouldBeCompiledTo` "new C(x, y)"
 
       it "Raise" $ do
-        toJS (Raise $ New "E" []) `shouldBe` Just "function(){ throw new E() }()\n"
+        (Raise $ New "E" []) `shouldBeCompiledTo` "function(){ throw new E() }()"
 
       it "Print" $ do
-        toJS (Print $ Reference "x") `shouldBe` Just "console.log(x)\n"
+        (Print $ Reference "x") `shouldBeCompiledTo` "console.log(x)"
 
       it "MuNull" $ do
-        toJS MuNull `shouldBe` Just "new MuNull()\n"
+        MuNull `shouldBeCompiledTo` "new MuNull()"
 
       it "Sequence" $ do pending
+
+      it "If" $ do
+        (If (Reference "c") (Reference "x") (Reference "y")) `shouldBeCompiledTo` "function(){ if(c) { return x } else { return y } }()"
+
+  shouldBeCompiledTo expression expected = (fmap (filter (/='\n')) . toJS) expression `shouldBe` Just expected
