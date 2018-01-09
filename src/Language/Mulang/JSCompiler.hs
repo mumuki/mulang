@@ -175,6 +175,11 @@ instance Compilable Expression where
     body <- compile _body
     return [text| function(){ while($condition) { $body } }() |]
 
+  compile (Repeat _amount _body) = do
+    amount <- compile _amount
+    body <- compile _body
+    return [text| function(){ for(var $$$$i=0; $$$$i < $amount; $$$$i++) { $body } }() |]
+
   -- TypeSignatures are ignored.
   compile (TypeSignature _ _ _)  = do return empty
 
@@ -206,8 +211,6 @@ instance Compilable Expression where
     | Include Identifier
     -- ^ Object oriented instantiation, mixin inclusion
     | Lambda [Pattern] Expression
-    | Repeat Expression Expression
-    -- ^ Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
     | Match Expression [Equation]
     | Switch Expression [(Expression, Expression)]
     | Try Expression [(Pattern, Expression)] Expression
