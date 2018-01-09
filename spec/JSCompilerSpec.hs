@@ -115,4 +115,7 @@ module JSCompilerSpec (spec) where
       it "While" $ do
         (While (Reference "c") (Reference "x")) `shouldBeCompiledTo` "function(){ while(c) { x } }()"
 
+      it "Repeat" $ do
+        (Repeat (Reference "c") (Reference "x")) `shouldBeCompiledTo` "function(){ for(var $$i=0; $$i < c; $$i++) { x } }()"
+
   shouldBeCompiledTo expression expected = (fmap (filter (/='\n')) . toJS) expression `shouldBe` Just expected
