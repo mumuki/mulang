@@ -1921,6 +1921,24 @@ $ stack test --fast --file-watch
 
 ## Loading mulang in the REPL
 
-```
+```bash
 stack ghci
+```
+
+# Gem wrapper
+
+This module can also be deployed a ruby gem. `mulang` works with Ruby 2.3.1
+
+```bash
+cd gem
+rake wrapper:wrap
+bundle install
+bundle exec rspec
+```
+
+
+# Tagging and releasing
+
+```bash
+./tag.sh
 ```
