@@ -29,3 +29,9 @@ deploy:
   on:
     tags: true
     repo: mumuki/mulang
+- provider: hackage
+  username: TODO
+  password:
+    secure: TODO
+  on:
+    repo: mumuki/mulang
