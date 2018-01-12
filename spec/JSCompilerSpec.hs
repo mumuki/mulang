@@ -28,6 +28,14 @@ module JSCompilerSpec (spec) where
       it "MuList" $ do
         (MuList [MuNumber 1, MuNumber 2, MuNumber 3]) `shouldBeCompiledTo` "new MuList([new MuNumber(1.0), new MuNumber(2.0), new MuNumber(3.0)])"
 
+      it "Enumeration" $ do
+        (Enumeration "E" ["A", "B", "C"]) `shouldBeCompiledTo` (
+          "var E = { A: 0, B: 1, C: 2 }; " ++
+          "var A = E['A'];" ++
+          "var B = E['B'];" ++
+          "var C = E['C'];"
+          )
+
       it "EntryPoint" $ do
         (EntryPoint "foo" (MuBool True)) `shouldBeCompiledTo` "function foo() { return new MuBool(true) }"
         
@@ -117,5 +125,49 @@ module JSCompilerSpec (spec) where
 
       it "Repeat" $ do
         (Repeat (Reference "c") (Reference "x")) `shouldBeCompiledTo` "function(){ for(var $$i=0; $$i < c; $$i++) { x } }()"
+
+      it "Class" $ do
+        (Class "C" Nothing MuNull) `shouldBeCompiledTo` (
+          "function C() {  " ++
+            "this.constructor.prototype = Object.create(MuObject.prototype);  MuObject.call(this);  " ++
+          "}"
+          )
+
+        (Class "C" (Just "S") MuNull) `shouldBeCompiledTo` (
+          "function C() {  " ++
+            "this.constructor.prototype = Object.create(S.prototype);  S.call(this);  " ++
+          "}"
+          )
+
+        (Class "C" Nothing $ Sequence [Method "m" [Equation [] (UnguardedBody $ Reference "x")]]) `shouldBeCompiledTo` (
+          "function C() {  " ++
+            "this.constructor.prototype = Object.create(MuObject.prototype);  MuObject.call(this);  " ++
+            "this.constructor.prototype['m'] = function () {  " ++
+              "try { if(arguments.length === 0){  return x } throw new MuPatternMatchError() }  " ++
+              "catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } " ++
+            "}" ++
+          "}"
+          )
+
+        (Class "C" Nothing $ Sequence [Attribute "f" $ Reference "x"]) `shouldBeCompiledTo` (
+          "function C() {  " ++
+            "this.constructor.prototype = Object.create(MuObject.prototype);  MuObject.call(this);  " ++
+            "this['f'] = x" ++
+          "}"
+          )
+
+        (Class "C" Nothing $ Sequence [Include "M"]) `shouldBeCompiledTo` (
+          "function C() {  " ++
+            "this.constructor.prototype = Object.create(MuObject.prototype);  MuObject.call(this);  " ++
+            "this.constructor.prototype = Object.assign(this.constructor.prototype, Object.create(M.prototype));  M.call(this)" ++
+          "}"
+          )
+
+      it "Object" $ do
+        (Object "o" MuNull) `shouldBeCompiledTo` (
+          "var o = new function () {  " ++
+            "this.constructor.prototype = Object.create(MuObject.prototype);  MuObject.call(this);  " ++
+          "}()"
+          )
 
   shouldBeCompiledTo expression expected = (fmap (filter (/='\n')) . toJS) expression `shouldBe` Just expected

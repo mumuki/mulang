@@ -4,6 +4,7 @@ module Language.Mulang.JSCompiler (toJS) where
 
 import           Language.Mulang.Ast
 import           Data.Text(pack, unpack, intercalate, empty, toLower, Text)
+import           Data.Maybe
 import           NeatInterpolation
 
 -- | Compiles a Mulang AST to an executable JS source.
@@ -80,16 +81,9 @@ instance Compilable Expression where
                     catch($$error) { if($$error.constructor === MuReturn) { return $$error.value } else { throw $$error } } }
            |]
 
-  -- Generates a named JS function that dynamically dispatches the Function's Equations based on the received arguments.
-  -- A primitive MuPatternMatchError exception is raised if no equation matches the cases.
-  -- The MuReturn primitive error is catched to allow inner expressions to exit this context eagerly.
-  compile (Procedure _name _equations) = do
-    let name = pack _name
-    equations <- compileAll _equations " else "
-    return [text| function $name() {
-                    try { $equations throw new MuPatternMatchError() }
-                    catch($$error) { if($$error.constructor === MuReturn) { return $$error.value } else { throw $$error } } }
-           |]
+  compile (Procedure _name _equations) = compile $ Function _name _equations
+  compile (Lambda _argumentPatterns _body) = compile $ Function "" [Equation _argumentPatterns $ UnguardedBody _body]
+
   -- Generates a JS variable initializing it to the Variables value.
   compile (Variable _name _value) = do
     let name = pack _name
@@ -162,6 +156,16 @@ instance Compilable Expression where
     lastExpression <- compile _lastExpression
     return [text| function(){ $initialExpressions; return $lastExpression }() |]
 
+  -- Generates a sequence of JS variable definitions, one for each Enum member (assigning each to an integer value) and
+  -- one for the Enum itself, pointed to a trivial JS map where each Enum member is a key.
+  compile (Enumeration _name _members) = do
+    let name    = pack _name
+    let members = map pack _members
+    let values  = zip (map (pack.show) [0..length members]) members
+    let compiledValues  = intercalate (pack ", ") $ map (\(i, member) -> [text| $member: $i |]) values
+    let compiledMembers = intercalate (pack ";\n") $ map (\member -> [text| var $member = $name['${member}'] |]) members
+    return [text| var $name = { $compiledValues }; $compiledMembers; |]
+
   -- Generates a JS if statement wrapped in an anonymous function application in order to make it an expression.
   compile (If _condition _positiveCase _negativeCase) = do
     condition <- compile _condition
@@ -175,10 +179,70 @@ instance Compilable Expression where
     body <- compile _body
     return [text| function(){ while($condition) { $body } }() |]
 
+  -- Generates a JS for statement wrapped in an anonymous function application in order to make it an expression.
   compile (Repeat _amount _body) = do
     amount <- compile _amount
     body <- compile _body
     return [text| function(){ for(var $$$$i=0; $$$$i < $amount; $$$$i++) { $body } }() |]
+
+  -- Generates a JS function for the class. The superclass assignation is lazily applied to compensate for the lack of
+  -- hoisting.
+  compile (Class _name _superclassName _body) = do
+    let name = pack _name
+    let superclassName = pack $ fromMaybe "MuObject" _superclassName
+    body <- compileBody _body
+    return [text| function $name() {
+                    this.constructor.prototype = Object.create($superclassName.prototype);
+                    $superclassName.call(this);
+                    $body
+                  }
+           |]
+    where compileBody :: Expression -> Maybe Text
+          compileBody (Sequence expressions) = compileAll expressions ";\n"
+          compileBody MuNull                 = Just [text| |]
+          compileBody expression             = compile expression
+
+  -- Generates a JS new of an instance of an anonymous class.
+  -- I'm not sure how object's superclass is supposed to be represented, but Include of classes should work.
+  compile (MuObject _body) = do
+    singletonClass <- compile $ Class "" Nothing _body
+    return[text| new $singletonClass() |]
+
+  -- Generates a JS variable assignation pointing to an anonymous instance.
+  compile (Object _name _body) = do
+    let name = pack _name
+    object <- compile $ MuObject _body
+    return [text| var $name = $object |]
+
+  -- Generates a JS assignation statement that overrides the context's constructor's prototype slot named as the method
+  -- with a new function for the method.
+  -- By-name access is used in order to support invalid JS selectors.
+  -- The generated code is meant to be evaluated in the context of a container "class" function.
+  compile (Method _name _equations) = do
+    let name = pack _name
+    body <- compile $ Function "" _equations
+    return [text| this.constructor.prototype['${name}'] = $body |]
+
+  compile (EqualMethod _equations) = compile $ Method "===" _equations
+  compile (HashMethod _equations) = compile $ Method "hash" _equations
+
+  -- Generates a JS assignation statement that overrides the context's slot named as the attribute.
+  -- By-name access is used in order to support invalid JS selectors.
+  -- The generated code is meant to be evaluated in the context of a container "class" function.
+  compile (Attribute _name _value) = do
+    let name = pack _name
+    value <- compile _value
+    return [text| this['${name}'] = $value |]
+
+  -- Generates a JS assignation statement that replaces the current context's constructor's prototype with a copy of
+  -- itself merged with the mixin's prototype.
+  -- It also calls the mixin initialization on the new instance.
+  compile (Include _name) = do
+    let name = pack _name
+    return [text|
+             this.constructor.prototype = Object.assign(this.constructor.prototype, Object.create($name.prototype));
+             $name.call(this)
+           |]
 
   -- TypeSignatures are ignored.
   compile (TypeSignature _ _ _)  = do return empty
@@ -196,27 +260,10 @@ instance Compilable Expression where
   compile _ = Nothing
 
 {- PENDING
-    | Method Identifier [Equation]
-    | EqualMethod [Equation]
-    | HashMethod [Equation]
-    | Attribute Identifier Expression
-    | Object Identifier Expression
-    -- ^ Object oriented programming global, named object declaration,
-    --   composed by a name and a body
-    | Class Identifier (Maybe Identifier) Expression
-    -- ^ Object oriented programming global, class declaration,
-    --   composed by a name, an optional superclass, implemented interfaces and a body
-    | Enumeration Identifier [Identifier]
-    -- ^ Imperative named enumeration of values
-    | Include Identifier
-    -- ^ Object oriented instantiation, mixin inclusion
-    | Lambda [Pattern] Expression
-    | Match Expression [Equation]
+
     | Switch Expression [(Expression, Expression)]
     | Try Expression [(Pattern, Expression)] Expression
     -- ^ Generic try expression, composed by a body, a list of exception-handling patterns and statments, and a finally expression
-    | MuObject Expression
-    -- ^ Object oriented unnamed object literal
 
 -}
 
@@ -228,7 +275,7 @@ instance Compilable Equation where
   -- | The context is expected to fail after all equations are tested unsuccessfully.
   compile (Equation argumentPatterns _body) = do
     let argumentCount = pack . show . length $ argumentPatterns
-    let indexedPatterns = zip (map (pack . show) [0..]) argumentPatterns
+    let indexedPatterns = zip (map (pack . show) [0::Int ..]) argumentPatterns
     let conditions = Just [text| arguments.length === $argumentCount |] : map applyConditions indexedPatterns
     matchesPatterns <- fmap (intercalate (pack " && ")) . sequence $ conditions
     argumentNames   <- fmap (intercalate (pack "")) . sequence $ map nameAssignation indexedPatterns
