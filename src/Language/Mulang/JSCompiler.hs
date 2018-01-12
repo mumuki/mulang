@@ -185,6 +185,34 @@ instance Compilable Expression where
     body <- compile _body
     return [text| function(){ for(var $$$$i=0; $$$$i < $amount; $$$$i++) { $body } }() |]
 
+  -- Generates a JS try statement wrapped in an anonymous function application in order to make it an expression.
+  -- The code tries to emulate the most common behaviour of try clauses (being this that body, catches and always execute
+  -- on isolated contexts and, always gets evaluated before catches).
+  compile (Try _body _catches _always) = do
+    body <- compile _body
+    catches <- compileAll _catches " else "
+    always <- compile _always
+    return [text|
+             function(){
+               var $$response;
+               try { $$response = $body }
+               catch($$error){ function(){ $always }(); arguments = [$$error]; $catches; throw $$error }
+               function{ $always }();
+               return $$response
+             }()
+           |]
+
+  -- Generates a JS if-else if statement wrapped in an anonymous function application in order to make it an expression.
+  compile (Switch _value _cases) = do
+    value <- compile _value
+    cases <- fmap (intercalate $ pack " else ") . sequence $ map compileCase _cases
+    return [text| function(){ $cases }($value) |]
+
+    where compileCase (_target, _body) = do
+            target <- compile _target
+            body   <- compile _body
+            return [text| if(arguments[0] === $target) { return $body } |]
+
   -- Generates a JS function for the class. The superclass assignation is lazily applied to compensate for the lack of
   -- hoisting.
   compile (Class _name _superclassName _body) = do
@@ -259,13 +287,6 @@ instance Compilable Expression where
 
   compile _ = Nothing
 
-{- PENDING
-
-    | Switch Expression [(Expression, Expression)]
-    | Try Expression [(Pattern, Expression)] Expression
-    -- ^ Generic try expression, composed by a body, a list of exception-handling patterns and statments, and a finally expression
-
--}
 
 instance Compilable Equation where
   -- | Compiles a Mulang Equation to a JS if statement.
@@ -331,3 +352,7 @@ instance Compilable Guard where
     condition <- compile _condition
     result <- compile _expression
     return [text| if($condition) { return $result } |]
+
+type Catch = (Pattern, Expression)
+instance Compilable Catch where
+ compile (_pattern, _body) = compile $ Equation [_pattern] (UnguardedBody _body)
