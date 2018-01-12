@@ -13,6 +13,6 @@ namespace :wrapper do
   end
 
   task :clean do
-    rm 'bin/mulang'
+    rm_rf 'bin/mulang'
   end
 end
