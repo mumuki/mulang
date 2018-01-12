@@ -12,7 +12,7 @@ install:
 script:
 - stack --no-terminal --skip-ghc-check test
 - stack --no-terminal --skip-ghc-check install
-- cd gem && rake wrapper:wrap && bundle install && bundle exec rspec
+- cd gem && bundle exec rake wrapper:wrap && bundle install && bundle exec rake
 deploy:
 - provider: releases
   api_key:
