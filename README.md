@@ -212,6 +212,8 @@ Mulang is three different  - but thighly related - things:
   * [Running tests](#running-tests)
   * [Watching changes](#watching-changes)
   * [Loading mulang in the REPL](#loading-mulang-in-the-repl)
+- [Gem wrapper](#gem-wrapper)
+- [Tagging and releasing](#tagging-and-releasing)
 
 
 # Combinators Crash course
