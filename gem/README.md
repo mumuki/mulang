@@ -1,10 +1,4 @@
-[![Build Status](https://travis-ci.org/mumuki/mulang.rb.svg?branch=master)](https://travis-ci.org/mumuki/mulang.rb)
-[![Code Climate](https://codeclimate.com/github/mumuki/mulang.rb/badges/gpa.svg)](https://codeclimate.com/github/mumuki/mulang.rb)
-[![Test Coverage](https://codeclimate.com/github/mumuki/mulang.rb/badges/coverage.svg)](https://codeclimate.com/github/mumuki/mulang.rb)
-[![Issue Count](https://codeclimate.com/github/mumuki/mulang.rb/badges/issue_count.svg)](https://codeclimate.com/github/mumuki/mulang.rb)
-
-
-# Mulang
+# Mulang Gem
 
 > Ruby Gem Wrapper for the [mulang](github.com/mumuki/mulang) code anayzer.
 
@@ -69,22 +63,17 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
-### Updating Mulang version
+### Locally updating Mulang version
 
 Edit `version.rb` with a new Mulang version, and then run `bin/setup` again.
 
 ### Releasing a new version
 
-To release a new version:
-
-1. update `VERSION` in `version.rb`
-2. ensure the `MULANG_VERSION` in `version.rb` points to an existing mulang tag
-3. commit the version change and tag the repository as `v$VERSION`
-4. push the repository and travis will do the rest :smile: - including pushing the gem file to [rubygems.org](https://rubygems.org).
+This gem is automatically released with each mulang version.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/mulang. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/mumumuki/mulang. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 

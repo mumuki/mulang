@@ -1938,6 +1938,8 @@ bundle install
 bundle exec rspec
 ```
 
+See `gem/README` for more details.
+
 
 # Tagging and releasing
 
