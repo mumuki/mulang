@@ -1,0 +1,17 @@
+require "bundler/gem_tasks"
+require "rspec/core/rake_task"
+
+RSpec::Core::RakeTask.new(:spec)
+
+task :default => :spec
+
+namespace :wrapper do
+  desc 'Wrap mulang into this gem'
+  task wrap: :clean do
+    cp '../.stack-work/install/x86_64-linux/lts-7.24/8.0.1/bin/mulang', 'bin/mulang'
+  end
+
+  task :clean do
+    rm_rf 'bin/mulang'
+  end
+end

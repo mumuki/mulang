@@ -3,28 +3,18 @@ language: generic
 cache:
   directories:
   - $HOME/.stack
-env:
-  - CXX=g++-4.8
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - libgmp-dev
-      - g++-4.8
 before_install:
-# Install Stack
 - mkdir -p ~/.local/bin
 - export PATH=$HOME/.local/bin:$PATH
 - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
-# Install Rungs
 install:
 - stack --no-terminal --install-ghc test --only-dependencies
 script:
 - stack --no-terminal --skip-ghc-check test
 - stack --no-terminal --skip-ghc-check install
+- cd gem && ./bin/setup && bundle exec rake
 deploy:
-  provider: releases
+- provider: releases
   api_key:
     secure: YRjvQF6PtWGgHJ3c/klwnnswT+/4Bs1xZB9JnTqB9S8wcq0APN/DFx4c3sRTsknezZy0xb6raOvvTskTIghvYnukdrtUsI4qpJM9fERr9tAxNUPzrhybgzWNhgNzDfGL02mqQ1WFaqFnQtbQnuxEHKFBA3VYv41EchtOAlx7ZWt1LJADdCgXQolY7c8TChx9j0Pbgf/0FtUMu49nOpYwGMcZmjyZcuKgYfq7oFGU4nIp/emjA8MfZ9AiygKyV49WuptjAMAxPbbv3KzZH6zpwnXDnYRieapuaNrzjBhxJsC6h8YBUV0dGeccFyBsRCcUq2sf9Kk3McxcFlBBGxLlynbrfsR6GhWoD3RZlE/sWAgR9My2lhhq2h0SJH46YC15ccjnYrW1OgbqmkZDtsvSvgAam7eeeojAazW8c29kPe0s9prj46ZPpRIy3mRlctW8e+QA8nJ+nbQPMmxjdfzP2pqna39Rrircdbp7+MukRQM7ZV6XxJvCzAKxhJCB+ZJlXnbCTwWATfFKRR6OSKfiM8ZAhIxVbdx5DIDt46dZ4MkOiNk/FbguE6QxEKyQA4UtwMT8Wz3eLT8wWMod1WsMpsH6B0T//adu9c3cYO39TwBtzcs5EeyBp/TXhdOhEYiV/S0F/f420WPUGBsscJCdBe7NwjPVmiGY0Wy7b04sKno=
   file: /home/travis/.local/bin/mulang
@@ -32,3 +22,17 @@ deploy:
   on:
     repo: mumuki/mulang
     tags: true
+- provider: rubygems
+  api_key:
+    secure: FRmgQtyIWWaHlw5NMJ2G284gAQml0uhUzC91vjDQGuK3rFu4cr3v9fEAK9CDNnGOVn/f64JAz6YipqsXEadVScs+1koBnlZTLjhXZIsqvsa5Ek7/YUkHSjWArARXwW9avV9baJuPz1XDAgB492CpcVlkS9nI0r1Gl4iV206x+gRwyCrAvNJW+ya540qZTbZ7VzFVGD68pQbSyhGJyK8m0ZSukRI67H+eLYdsVABf5TpEzzXygkkoA84zN1sIJ8zP5+Z/3D8SVTM0HmBaP5VCMxw1KAXNmymktzwwo0IYlcBIf8QNaGeB1DK1OBRY5PtKCi0zTgxFyxRd4yGB7++worgM6HPjX/L6AZl7Cr+ed5zVv3Hi9LWqEK712dmCuIvl5Jb8ftUocmvp/Aw1jtlIDsI2lI8abGiuQ0gqx30LjoR+IDkmyvAInJMEXgRz+htQMjtv5UKVJkFVp+cgtmfXBohQRUY/LmWCG4vLo/BzuTaMVIlpsbkBjM1wAy7tlaZY0ILPuqoCobsWn5FaVYTozfeq1NMaJB/eK42PDSM96oykWgwyRwkPUfdzuT+Y2rYhBnj1J3RWeBCnMm1QX7wBjab+yz9zuGZwyclmJ0da6yUEqe2qn8i862JuoAHKyE01MVk0q7UdvTwea+YKN80qe2XszD1juDKlnXU+I3dhD08=
+  skip_cleanup: true
+  gem: mulang
+  on:
+    tags: true
+    repo: mumuki/mulang
+- provider: hackage
+  username: TODO
+  password:
+    secure: TODO
+  on:
+    repo: mumuki/mulang

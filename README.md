@@ -212,6 +212,8 @@ Mulang is three different  - but thighly related - things:
   * [Running tests](#running-tests)
   * [Watching changes](#watching-changes)
   * [Loading mulang in the REPL](#loading-mulang-in-the-repl)
+- [Gem wrapper](#gem-wrapper)
+- [Tagging and releasing](#tagging-and-releasing)
 
 
 # Combinators Crash course
@@ -1921,6 +1923,26 @@ $ stack test --fast --file-watch
 
 ## Loading mulang in the REPL
 
-```
+```bash
 stack ghci
+```
+
+# Gem wrapper
+
+This module can also be deployed a ruby gem. `mulang` works with Ruby 2.3.1
+
+```bash
+cd gem
+rake wrapper:wrap
+bundle install
+bundle exec rspec
+```
+
+See `gem/README` for more details.
+
+
+# Tagging and releasing
+
+```bash
+./tag.sh
 ```
