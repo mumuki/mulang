@@ -78,6 +78,7 @@ muStmt (StmtBlock block)               = muBlock block
 muStmt (IfThen exp ifTrue)             = If (muExp exp) (muStmt ifTrue) MuNull
 muStmt (IfThenElse exp ifTrue ifFalse) = If (muExp exp) (muStmt ifTrue) (muStmt ifFalse)
 muStmt (While cond body)               = M.While (muExp cond) (muStmt body)
+muStmt (Do body cond)                  = M.While (muStmt body) (muExp cond)
 muStmt (Return exp)                    = M.Return $ fmapOrNull muExp exp
 muStmt (ExpStmt exp)                   = muExp exp
 muStmt Empty                           = MuNull
