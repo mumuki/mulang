@@ -13,7 +13,7 @@ import Language.Java.Syntax
 
 import Control.Fallible
 
-import Data.Maybe (fromMaybe, maybeToList)
+import Data.Maybe (fromMaybe)
 import Data.List (intercalate, partition)
 import Data.List.Extra (headOrElse)
 import Data.Char (toLower)
