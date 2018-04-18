@@ -1606,10 +1606,18 @@ for (Integer i : ints) {
 
 #### Example
 
-```java
-for (int i = 0; i < 10; i++) {
-  System.out.println(i);
+```javascript
+for (var i = 0; i < 10; i++) {
+  console.log(i);
 }
+```
+
+```haskell
+(ForLoop 
+  (Variable "i" (MuNumber 0.0)) 
+  (Application (Reference "<") [Reference "i",MuNumber 10.0]) 
+  (Assignment "i" (Application (Reference "+") [Reference "i",MuNumber 1.0])) 
+  (Send (Reference "console") (Reference "log") [Reference "i"]))
 ```
 
 ### `Sequence`
