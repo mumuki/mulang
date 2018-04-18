@@ -33,9 +33,9 @@ muJSStatement:: JSStatement -> Expression
 muJSStatement (JSStatementBlock _ statements _ _)                           = compactMap muJSStatement statements
 --muJSStatement (JSConstant _ (JSCommaList JSExpression) _) -- ^const, decl, autosemi
 muJSStatement (JSDoWhile _ statement _ _ expression _ _)                    = While (muJSExpression expression) (muJSStatement statement)
---muJSStatement (JSFor _ _ (JSCommaList JSExpression) _ (JSCommaList JSExpression) _ (JSCommaList JSExpression) _ JSStatement) -- ^for,lb,expr,semi,expr,semi,expr,rb.stmt
+muJSStatement (JSFor _ _ inits _ conds _ progs _ body)                      = muFor inits conds progs body
 muJSStatement (JSForIn _ _ id _ gen _ body)                                 = muForIn id gen body
---muJSStatement (JSForVar _ _ _ (JSCommaList JSExpression) _ (JSCommaList JSExpression) _ (JSCommaList JSExpression) _ JSStatement) -- ^for,lb,var,vardecl,semi,expr,semi,expr,rb,stmt
+muJSStatement (JSForVar _ _ _ inits _ conds _ progs _ body)                 = muFor inits conds progs body
 muJSStatement (JSForVarIn _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForIn id gen body
 muJSStatement (JSFunction _ ident _ params _ body _)                        = muComputation ident params body
 muJSStatement (JSIf _ _ expression _ statement)                             = If (muJSExpression expression) (muJSStatement statement) MuNull
@@ -54,6 +54,10 @@ muJSStatement (JSTry _ block catches finally)                               = Tr
 muJSStatement (JSVariable _ list _)                                         = compactMap muJSExpression.muJSCommaList $ list
 muJSStatement (JSWhile _ _ expression _ statement)                          = While (muJSExpression expression) (muJSStatement statement)
 muJSStatement e                                                             = debug e
+
+muJSExpressionFromList = compactMap muJSExpression . muJSCommaList
+
+muFor inits conds progs body = ForLoop (muJSExpressionFromList inits) (muJSExpressionFromList conds) (muJSExpressionFromList progs) (muJSStatement body)
 
 muForIn (JSIdentifier _ id) generator body = For [Generator (VariablePattern id) (muJSExpression generator)] (muJSStatement body)
 

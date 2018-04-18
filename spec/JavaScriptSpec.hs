@@ -136,7 +136,7 @@ spec = do
                                                             Attribute "y" (MuNumber 2.0),
                                                             SimpleMethod "z" [] MuNull])
 
-    it "handles new paretheses-less" $ do
+    it "handles new parentheses-less" $ do
       js "new Foo" `shouldBe` New "Foo" []
 
     it "handles new with parentheses" $ do
@@ -162,6 +162,12 @@ spec = do
         default: return 3;
       }|] `shouldBe` Switch (Reference "a") [(MuNumber 1, Return (MuNumber 1))] (Return (MuNumber 3))
 
+    it "handles c-style for" $ do
+      run "for(i = 0; i < 3; i++) i;" `shouldBe` ForLoop (Assignment "i" (MuNumber 0)) (js "i < 3") (js "i++") (Reference "i")
+      
+    it "handles c-style for with var" $ do
+      run "for(var i = 0; i < 3; i++) i;" `shouldBe` ForLoop (Variable "i" (MuNumber 0)) (js "i < 3") (js "i++") (Reference "i")
+      
     it "handles for in" $ do
       run "for(i in [1,2]) i;" `shouldBe` For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
       
