@@ -150,62 +150,65 @@ Mulang is three different  - but thighly related - things:
       - [Syntax](#syntax-37)
       - [Haskell Example](#haskell-example-2)
       - [Java Example](#java-example-5)
-    + [`Sequence`](#sequence)
+    + [`ForLoop`](#forloop)
       - [Syntax](#syntax-38)
       - [Example](#example-20)
-    + [`Other`](#other)
+    + [`Sequence`](#sequence)
       - [Syntax](#syntax-39)
-    + [`Equal` and `NotEqual`](#equal-and-notequal)
-      - [Syntax](#syntax-40)
-    + [`Self`](#self)
-      - [Syntax](#syntax-41)
-    + [`MuNull`](#munull)
-      - [Syntax](#syntax-42)
-    + [`MuNil`](#munil)
-      - [Syntax](#syntax-43)
       - [Example](#example-21)
-    + [`MuObject`](#muobject)
+    + [`Other`](#other)
+      - [Syntax](#syntax-40)
+    + [`Equal` and `NotEqual`](#equal-and-notequal)
+      - [Syntax](#syntax-41)
+    + [`Self`](#self)
+      - [Syntax](#syntax-42)
+    + [`MuNull`](#munull)
+      - [Syntax](#syntax-43)
+    + [`MuNil`](#munil)
       - [Syntax](#syntax-44)
+      - [Example](#example-22)
+    + [`MuObject`](#muobject)
+      - [Syntax](#syntax-45)
       - [JavaScript Example](#javascript-example)
     + [`MuNumber`, `MuBool`, `MuString` and `MuSymbol`](#munumber-mubool-mustring-and-musymbol)
-      - [Syntax](#syntax-45)
+      - [Syntax](#syntax-46)
       - [Ruby Example](#ruby-example-5)
     + [`MuTuple` and `MuList`](#mutuple-and-mulist)
-      - [Syntax](#syntax-46)
+      - [Syntax](#syntax-47)
   * [Patterns](#patterns)
     + [`VariablePattern`](#variablepattern)
-      - [Syntax](#syntax-47)
+      - [Syntax](#syntax-48)
       - [JavaScript Example](#javascript-example-1)
     + [`LiteralPattern`](#literalpattern)
-      - [Syntax](#syntax-48)
-      - [Example](#example-22)
-    + [`InfixApplicationPattern`](#infixapplicationpattern)
       - [Syntax](#syntax-49)
+      - [Example](#example-23)
+    + [`InfixApplicationPattern`](#infixapplicationpattern)
+      - [Syntax](#syntax-50)
         * [Caveats](#caveats-3)
     + [`ApplicationPattern`](#applicationpattern)
-      - [Syntax](#syntax-50)
-      - [Example](#example-23)
-    + [`TuplePattern`](#tuplepattern)
       - [Syntax](#syntax-51)
       - [Example](#example-24)
-    + [`ListPattern`](#listpattern)
+    + [`TuplePattern`](#tuplepattern)
       - [Syntax](#syntax-52)
       - [Example](#example-25)
-    + [`FunctorPattern`](#functorpattern)
+    + [`ListPattern`](#listpattern)
       - [Syntax](#syntax-53)
       - [Example](#example-26)
-    + [`AsPattern`](#aspattern)
+    + [`FunctorPattern`](#functorpattern)
       - [Syntax](#syntax-54)
       - [Example](#example-27)
-    + [`TypePattern`](#typepattern)
+    + [`AsPattern`](#aspattern)
       - [Syntax](#syntax-55)
       - [Example](#example-28)
-    + [`WildcardPattern`](#wildcardpattern)
+    + [`TypePattern`](#typepattern)
       - [Syntax](#syntax-56)
-    + [`UnionPattern`](#unionpattern)
+      - [Example](#example-29)
+    + [`WildcardPattern`](#wildcardpattern)
       - [Syntax](#syntax-57)
-    + [`OtherPattern`](#otherpattern)
+    + [`UnionPattern`](#unionpattern)
       - [Syntax](#syntax-58)
+    + [`OtherPattern`](#otherpattern)
+      - [Syntax](#syntax-59)
 - [Building mulang from source](#building-mulang-from-source)
   * [Setup](#setup)
   * [Installing and creating an executable](#installing-and-creating-an-executable)
@@ -436,6 +439,7 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `usesForall`                      |  logic             | is the logic `forall` consult used?
 | `usesForComprehension`            |  functional        | is the functional for/do/list comprehension used?
 | `usesForEach`                     |  procedural        | is the procedural indexed repetition used?
+| `usesForLoop`                     |  procedural        | is a c-style for loop used?
 | `usesGuards`                      |
 | `usesIf`                          |  any               | is an `if` control structure used?
 | `usesInheritance`                 |  object oriented   | is any superclass explicitly declared?
@@ -1588,6 +1592,24 @@ for (Integer i : ints) {
       (VariablePattern "i")
       (Reference "ints"))]
   (Print (Reference "i")))
+```
+
+### `ForLoop`
+
+> `ForLoop` represents the imperative programming c-style for loop:
+
+#### Syntax
+
+```haskell
+(ForLoop Expression Expression Expression Expression)
+```
+
+#### Example
+
+```java
+for (int i = 0; i < 10; i++) {
+  System.out.println(i);
+}
 ```
 
 ### `Sequence`
