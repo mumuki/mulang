@@ -13,7 +13,7 @@ import Language.Java.Syntax
 
 import Control.Fallible
 
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, maybeToList)
 import Data.List (intercalate, partition)
 import Data.List.Extra (headOrElse)
 import Data.Char (toLower)
@@ -87,6 +87,7 @@ muStmt (Synchronized _ block)          = muBlock block
 muStmt (Labeled _ stmt)                = muStmt stmt
 muStmt (Throw exp)                     = Raise $ muExp exp
 muStmt (Try block catches finally)     = M.Try (muBlock block) (map muCatch catches) (fmapOrNull muBlock finally)
+muStmt (BasicFor init cond prog stmt)  = ForLoop (fmapOrNull muForInit init) (fmapOrNull muExp cond) (fmapOrNull (compactMap muExp) prog) (muStmt stmt)
 muStmt (EnhancedFor _ _ name gen body) = For [Generator (VariablePattern (i name)) (muExp gen)] (muStmt body)
 muStmt (Switch exp cases)              = muSwitch exp . partition isDefault $ cases
 muStmt e                               = debug e
@@ -168,6 +169,10 @@ muSwitch exp (def, cases) =  M.Switch (muExp exp) (map muCase cases) (headOrElse
 muCase (SwitchBlock (SwitchCase exp) block) = (muExp exp, compactConcatMap muBlockStmt block)
 
 muDefault (SwitchBlock Default block) = compactConcatMap muBlockStmt block
+
+muForInit:: ForInit -> Expression
+muForInit (ForLocalVars _ typ varDecls) = compactConcatMap (muVarDecl typ) varDecls 
+muForInit (ForInitExps exps) = compactMap muExp exps
 
 isDefault (SwitchBlock Default _) = True
 isDefault _                       = False

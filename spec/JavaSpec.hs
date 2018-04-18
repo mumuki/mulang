@@ -302,3 +302,16 @@ spec = do
                           TypeSignature "hello" (Just []) "Foo",
                           SimpleMethod "hello" [] 
                             (For [Generator (VariablePattern "i") (Reference "ints")] (Send Self (Reference "a") []))])
+
+    it "parses c-style for" $ do
+      run [text|class Foo {
+            public Foo hello() { 
+              for(int i = 0; true; a()) b();
+            }
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          TypeSignature "hello" (Just []) "Foo",
+                          SimpleMethod "hello" [] 
+                            (ForLoop 
+                              (Sequence [TypeSignature "i" Nothing "int", Variable "i" (MuNumber 0)])
+                              MuTrue 
+                              (Send Self (Reference "a") []) (Send Self (Reference "b") []))])
