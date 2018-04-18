@@ -96,6 +96,7 @@ compileInspectionPrimitive = f
   f "UsesExceptions"                 = simple usesExceptions
   f "UsesFindall"                    = simple usesFindall
   f "UsesFor"                        = simple usesFor
+  f "UsesForLoop"                    = simple usesForLoop
   f "UsesForall"                     = simple usesForall
   f "UsesForeach"                    = simple usesForEach
   f "UsesGuards"                     = simple usesGuards

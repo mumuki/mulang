@@ -95,6 +95,10 @@ spec = describe "ExpectationsAnalyzer" $ do
       let hasComprehension = Expectation "x" "UsesForComprehension"
       (run Haskell "x = [m | m <- t]" [hasComprehension]) `shouldReturn` (result [passed hasComprehension] [])
 
+    it "works with UsesForLoop" $ do
+      let hasForLoop = Expectation "f" "UsesForLoop"
+      (run JavaScript "function f() { var x; for (x = 0; x < 10; x++) { x; } }" [hasForLoop]) `shouldReturn` (result [passed hasForLoop] [])
+
     it "works with UsesConditional" $ do
       let hasConditional = Expectation "min" "UsesConditional"
       (run JavaScript "function min(x, y) { if (x < y) { return x } else { return y } }" [hasConditional]) `shouldReturn` (result [

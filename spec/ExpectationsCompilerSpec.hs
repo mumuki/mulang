@@ -179,6 +179,9 @@ spec = do
   it "works with UsesForComprehension" $ do
     run (hs "f :: Int") "f" "UsesForComprehension" `shouldBe` False
 
+  it "works with UsesForLoop" $ do
+    run (hs "f x = 2") "*" "UsesForLoop" `shouldBe` False
+
   it "works with DeclaresRecursively" $ do
     run (hs "f :: Int") "f" "DeclaresRecursively" `shouldBe` False
 
