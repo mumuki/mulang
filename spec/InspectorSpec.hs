@@ -591,6 +591,22 @@ spec = do
     it "is False when comprehension doesnt exists" $ do
       usesComprehension (hs "x = []") `shouldBe` False
 
+  describe "usesForLoop" $ do
+    it "is True when present in function" $ do
+      usesForLoop (js "function f() { for(;;) { console.log('foo') }  }")  `shouldBe` True
+
+    it "is True when present in lambda" $ do
+      usesForLoop (js "var f = function() { for(;;) { console.log('foo') }  }")  `shouldBe` True
+
+    it "is True when present in object" $ do
+      usesForLoop (js "var x = {f: function() { for(;;) { console.log('foo') } }}")  `shouldBe` True
+
+    it "is True when present in method" $ do
+      usesForLoop (js "var o = {f: function() { for(;;) { console.log('foo') }  }}")  `shouldBe` True
+
+    it "is False when not present in function" $ do
+      usesForLoop (js "function f() {}")  `shouldBe` False
+
   describe "parses" $ do
     it "is True when similar" $ do
       parses hs "x = map f . map g" (hs "x = map f.map g") `shouldBe` True

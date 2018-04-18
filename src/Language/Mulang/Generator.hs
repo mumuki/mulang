@@ -59,6 +59,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Clause _ _ es)         = es
     subExpressions (EntryPoint _ e)        = [e]
     subExpressions (For stmts a)           = statementExpressions stmts ++ [a]
+    subExpressions (ForLoop i c p s)       = [i, c, p, s]
     subExpressions (Forall e1 e2)          = [e1, e2]
     subExpressions (If a b c)              = [a, b, c]
     subExpressions (Interface _ _ v)       = [v]

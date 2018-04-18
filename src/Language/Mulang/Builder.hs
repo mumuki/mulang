@@ -32,6 +32,7 @@ normalize (If e1 e2 e3)                    = If (normalize e1) (normalize e2) (n
 normalize (While e1 e2)                    = While (normalize e1) (normalize e2)
 normalize (Match e1 equations)             = Match (normalize e1) (map normalizeEquation equations)
 normalize (For stms e1)                    = For stms (normalize e1)
+normalize (ForLoop init cond prog stmt)    = ForLoop (normalize init) (normalize cond) (normalize prog) (normalize stmt)
 normalize (Return e)                       = Return (normalize e)
 normalize (Not e)                          = Not (normalize e)
 normalize (Forall e1 e2)                   = Forall (normalize e1) (normalize e2)

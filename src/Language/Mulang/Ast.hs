@@ -136,6 +136,8 @@ data Expression
     | Print Expression
     -- ^ Generic print expression
     | For [Statement] Expression
+    | ForLoop Expression Expression Expression Expression
+    -- ^ Imperative / OOP programming c-style for loop
     | Sequence [Expression]
     -- ^ Generic sequence of statements
     | Unknown (Maybe String) (Maybe Expression)
