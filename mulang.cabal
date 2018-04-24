@@ -53,6 +53,7 @@ library
     Language.Mulang.Parsers.Prolog
     Language.Mulang.Parsers.Java
     Language.Mulang.Parsers.JavaScript
+    Language.Mulang.Parsers.Python
     Language.Mulang.Analyzer
     Language.Mulang.Analyzer.Analysis
     Language.Mulang.Analyzer.Analysis.Json
@@ -74,6 +75,7 @@ library
     haskell-src               ,
     language-java             ,
     language-javascript       ,
+    language-python           ,
     aeson                     ,
     inflections               <= 0.2.0.1,
     parsec                    ,
