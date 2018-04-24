@@ -7,6 +7,7 @@ import        Language.Mulang.Parsers.Haskell
 import        Language.Mulang.Parsers.JavaScript (parseJavaScript)
 import        Language.Mulang.Parsers.Prolog (parseProlog)
 import        Language.Mulang.Parsers.Java (parseJava)
+import        Language.Mulang.Parsers.Python (parsePython)
 import        Language.Mulang.Analyzer.Analysis (Sample(..), Language(..))
 
 parseSample :: Sample -> Either String Expression
@@ -18,3 +19,4 @@ parserFor Haskell        = parseHaskell
 parserFor Java           = parseJava
 parserFor JavaScript     = maybeToEither parseJavaScript
 parserFor Prolog         = parseProlog
+parserFor Python         = parsePython

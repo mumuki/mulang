@@ -85,7 +85,8 @@ data Language
   |  Java
   |  JavaScript
   |  Prolog
-  |  Haskell deriving (Show, Eq, Generic)
+  |  Haskell
+  |  Python deriving (Show, Eq, Generic)
 
 --
 -- Analysis Output structures
