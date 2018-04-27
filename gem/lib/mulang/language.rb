@@ -5,7 +5,7 @@ module Mulang::Language
     end
 
     def ast(content)
-      Mulang.analyse(ast_analysis(content))['intermediateLanguage']
+      Mulang.analyse(ast_analysis(content))['intermediateLanguage'] rescue nil
     end
 
     def ast_analysis(content)
