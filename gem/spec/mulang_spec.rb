@@ -32,9 +32,15 @@ describe Mulang::Code do
     it { expect(code.ast).to eq ast }
   end
 
-
   context 'when code is ill-formed' do
     let(:code) { Mulang::Code.native('Haskell', '= 1') }
+
+    it { expect(code.ast).to be nil }
+  end
+
+  context 'when code is well-formed but mulang does not support it' do
+    before { allow(JSON).to receive(:parse).and_raise(JSON::ParserError) }
+    let(:code) { Mulang::Code.native('Java', 'something that causes a non exhaustive pattern match error in mulang') }
 
     it { expect(code.ast).to be nil }
   end
