@@ -12,3 +12,7 @@ spec = do
 
     it "parses right infix partial application" $ do
       hs "f = (+1)" `shouldBe` Variable "f" (Application (Reference "+") [MuNumber 1.0])
+
+    it "parses type alias" $ do
+      hs "type String = [Char]" `shouldBe` TypeAlias "String" "[Char]"
+

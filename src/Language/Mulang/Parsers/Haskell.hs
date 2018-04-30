@@ -29,7 +29,7 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
   where
     mergeDecls decls exp = compact (decls ++ [exp])
 
-    muDecls (HsTypeDecl _ name _ _)      = [TypeAlias (muName name)]
+    muDecls (HsTypeDecl _ name _ t)      = [TypeAlias (muName name) (muType t)]
     muDecls (HsDataDecl _ _ name _ _ _ ) = [Record (muName name)]
     muDecls (HsTypeSig _ names (HsQualType _ t)) = map (muTypeSignature t) names
     muDecls (HsFunBind equations) | (HsMatch _ name _ _ _) <- head equations =
@@ -128,7 +128,7 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
       where topTypes = muTopTypes t
 
     listToMaybe [] = Nothing
-    listToMaybe xs = Just xs 
+    listToMaybe xs = Just xs
 
     muTopTypes (HsTyFun i o) = muType i : muTopTypes o
     muTopTypes t             = [muType t]

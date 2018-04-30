@@ -61,7 +61,7 @@ type SubroutineBody = [Equation]
 -- | However, although all those elements can be used as subexpressions and have an dohave an associated value,
 -- | Mulang does not state WHICH is that value.
 data Expression
-    = TypeAlias Identifier
+    = TypeAlias Identifier Identifier
     -- ^ Functional programming type alias.
     --   Only the type alias identifier is parsed
     | Record Identifier

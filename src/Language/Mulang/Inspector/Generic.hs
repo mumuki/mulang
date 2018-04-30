@@ -154,8 +154,8 @@ declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
 
 declaresTypeAlias :: IdentifierInspection
 declaresTypeAlias = containsBoundDeclaration f
-  where f (TypeAlias _) = True
-        f _             = False
+  where f (TypeAlias _ _) = True
+        f _               = False
 
 declaresTypeSignature :: IdentifierInspection
 declaresTypeSignature = containsBoundDeclaration f
