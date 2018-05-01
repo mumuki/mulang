@@ -44,23 +44,23 @@ type IdentifierInspection = IdentifierPredicate -> Inspection
 
 typesReturnAs :: IdentifierInspection
 typesReturnAs predicate = containsDeclaration f
-  where f (SubroutineTypeSignature _ _ name)  = predicate name
-        f _                                   = False
+  where f (SubroutineSignature _ _ name _)  = predicate name
+        f _                                 = False
 
 typesParameterAs :: IdentifierInspection
 typesParameterAs predicate = containsDeclaration f
-  where f (SubroutineTypeSignature _ names _)  = any predicate names
-        f _                                    = False
+  where f (SubroutineSignature _ names _ _)  = any predicate names
+        f _                                  = False
 
 typesAs :: IdentifierInspection
 typesAs predicate = containsDeclaration f
-  where f (TypeSignature _ Nothing name)   = predicate name
-        f _                                = False
+  where f (VariableSignature _ name _)   = predicate name
+        f _                              = False
 
 usesType :: IdentifierInspection
 usesType predicate = containsDeclaration f
-  where f (TypeSignature _ _ name)            | predicate name = True
-        f (SubroutineTypeSignature _ names _) = any predicate names
+  where f (VariableSignature _ name _)        = predicate name
+        f (SubroutineSignature _ args ret _)  = any predicate (ret:args)
         f _                                   = False
 
 -- | Inspection that tells whether an expression is equal to a given piece of code after being parsed
@@ -107,8 +107,8 @@ usesFor = containsExpression f
 -- | Inspection that tells whether a top level declaration exists
 declares :: IdentifierInspection
 declares = containsBoundDeclaration f
-  where f (TypeSignature _ _ _) = False
-        f _                     = True
+  where f (TypeSignature _ _) = False
+        f _                   = True
 
 -- | Inspection that tells whether an expression is direct recursive
 declaresRecursively :: IdentifierInspection
@@ -159,8 +159,8 @@ declaresTypeAlias = containsBoundDeclaration f
 
 declaresTypeSignature :: IdentifierInspection
 declaresTypeSignature = containsBoundDeclaration f
-  where f (TypeSignature _ _ _) = True
-        f _                     = False
+  where f (TypeSignature _ _) = True
+        f _                   = False
 
 raises :: IdentifierInspection
 raises predicate = containsExpression f

@@ -29,9 +29,10 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
   where
     mergeDecls decls exp = compact (decls ++ [exp])
 
-    muDecls (HsTypeDecl _ name _ t)      = [TypeAlias (muName name) (muType t)]
+    muDecls (HsTypeDecl _ name _ t)      = [TypeAlias (muName name) (muTypeId t)]
     muDecls (HsDataDecl _ _ name _ _ _ ) = [Record (muName name)]
-    muDecls (HsTypeSig _ names (HsQualType _ t)) = map (muTypeSignature t) names
+    muDecls (HsTypeSig _ names (HsQualType constraints t))
+                                         = map (muTypeSignature constraints t) names
     muDecls (HsFunBind equations) | (HsMatch _ name _ _ _) <- head equations =
                                         [Function (muName name) (map muEquation equations)]
     muDecls (HsPatBind _ (HsPVar name) (HsUnGuardedRhs exp) _) = [Variable (muName name) (muExp exp)]
@@ -124,19 +125,30 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muStmt (HsGenerator _ pat exp) = Generator (muPat pat) (muExp exp)
     muStmt (HsQualifier exp)       = Guard (muExp exp)
 
-    muTypeSignature t name = TypeSignature (muName name) (listToMaybe $ init topTypes) (last topTypes)
-      where topTypes = muTopTypes t
+    muTypeSignature :: [HsAsst] -> HsType -> HsName -> Expression
+    muTypeSignature cs t name = TypeSignature (muName name) (muType t cs)
 
-    listToMaybe [] = Nothing
-    listToMaybe xs = Just xs
+    muType :: HsType -> [HsAsst] -> Type
+    muType t cs | null initTypes = SimpleType lastType constraints
+                | otherwise      = ParameterizedType initTypes lastType constraints
+      where
+        initTypes   = init topTypes
+        lastType    = last topTypes
+        topTypes    = muTopTypes t
+        constraints = map muConstraint cs
 
-    muTopTypes (HsTyFun i o) = muType i : muTopTypes o
-    muTopTypes t             = [muType t]
+    muConstraint :: HsAsst -> Identifier
+    muConstraint (constraint, targets) =
+        intercalate " " (muQName constraint : map muTypeId targets)
 
-    muType (HsTyFun i o)                              = muType i ++ " -> " ++ muType o
-    muType (HsTyCon name)                             = muQName name
-    muType (HsTyVar name)                             = muName name
-    muType (HsTyTuple ts)                             = "(" ++ (intercalate ", " . map muType $ ts) ++ ")"
-    muType (HsTyApp (HsTyCon (Special HsListCon)) t2) = "[" ++ muType t2 ++ "]"
-    muType (HsTyApp t1 t2)                            = muType t1 ++ " " ++ muType t2
+    muTopTypes (HsTyFun i o) = muTypeId i : muTopTypes o
+    muTopTypes t             = [muTypeId t]
+
+    muTypeId :: HsType -> Identifier
+    muTypeId (HsTyFun i o)                              = muTypeId i ++ " -> " ++ muTypeId o
+    muTypeId (HsTyCon name)                             = muQName name
+    muTypeId (HsTyVar name)                             = muName name
+    muTypeId (HsTyTuple ts)                             = "(" ++ (intercalate ", " . map muTypeId $ ts) ++ ")"
+    muTypeId (HsTyApp (HsTyCon (Special HsListCon)) t2) = "[" ++ muTypeId t2 ++ "]"
+    muTypeId (HsTyApp t1 t2)                            = muTypeId t1 ++ " " ++ muTypeId t2
 

@@ -896,14 +896,15 @@ $ mulang '
 
 # Mulang AST spec
 
-In this section, we will get into the technical details of the Mulang AST. It is built around 4 core elements:
+In this section, we will get into the technical details of the Mulang AST. It is built around 5 core elements:
 
 * [Expressions](#expressions)
 * [Patterns](#patterns)
+* [Types](#types)
 * Equations
 * Generators
 
-All the AST elements fall within any of this 4 categories.
+All the AST elements fall within any of this 5 categories.
 
 ## Expressions
 
@@ -944,67 +945,11 @@ struct Point {
 Currently, the `Record` expression does not hold information about the record contents.
 
 
-### `TypeAlias`
+### `TypeAlias`, `TypeSignature` and `TypeCast`
 
-> A `TypeAlias` represents a synonym for a type, like the `type` declaration in Haskell and Scala or C's `typedef`.
-> It is a typical statically typed functional programming feature.
+Mulang AST support for type analysis is quite limited, and it is mostly focused on expressions and declarations analysis. However, for sake of completness and in order to provide some limited type-information in Mulang AST, `TypeAlias`, `TypeSignature` and `TypeCast` expressions are provided.
 
-#### Syntax
-
-```haskell
-(TypeAlias Identifier)
-```
-
-#### Haskell Example
-
-```haskell
-type Point = (Point, Int)
-```
-
-```haskell
-(TypeAlias "Point")
-```
-
-#### Caveats
-
-Currently, the `TypeAlias` expression does not hold information about the aliased type.
-
-### TypeSignature
-
-> A `TypeSignature` represents an explicit type annotation for a computation,
-> variable or constant, as you can find in Java or Haskell.
-
-#### Syntax
-
-```haskell
-(TypeSignature Identifier [Identifier] Identifier)
-```
-
-#### Haskell Example
-
-```haskell
-name :: String
-```
-
-```haskell
-(TypeSignature "name" [] "String")
-```
-
-#### Java Example
-
-In Java, as in most typed C-like languages, type signature and variable declartions are bound. This means that, for example, a local variable declaration will produce both a `TypeSignature` and a `Variable` expression.
-
-```java
-String name;
-```
-
-```haskell
-(TypeSignature "name" [] "String")
-```
-
-#### Caveats
-
-`TypeSignature`s of zero-args computation and variables are identical.
+See [types section](#types) for more details.
 
 ### `EntryPoint`
 
@@ -1613,10 +1558,10 @@ for (var i = 0; i < 10; i++) {
 ```
 
 ```haskell
-(ForLoop 
-  (Variable "i" (MuNumber 0.0)) 
-  (Application (Reference "<") [Reference "i",MuNumber 10.0]) 
-  (Assignment "i" (Application (Reference "+") [Reference "i",MuNumber 1.0])) 
+(ForLoop
+  (Variable "i" (MuNumber 0.0))
+  (Application (Reference "<") [Reference "i",MuNumber 10.0])
+  (Assignment "i" (Application (Reference "+") [Reference "i",MuNumber 1.0]))
   (Send (Reference "console") (Reference "log") [Reference "i"]))
 ```
 
@@ -1916,6 +1861,202 @@ function foo(x, y) { }
 
 ```haskell
 (OtherPattern)
+```
+
+## Types
+
+When processing statically-typed languages, all type-information - regardless we are typing a function, a variable or a class - is represented with the `Type` ADT, can be one of:
+
+  * `SimpleType`: composed by a type identifier and zero or type more constraints
+  * `ParameterizedType`: composed by input type parmaters, an output type, and type constratins
+  * `ConstrainedType`: composed by just type constraints.
+  * `OtherType`: an unrecognized type
+
+`Type`s can be introduced in the Mulang AST using the following elements:
+
+### `TypeAlias`
+
+> A `TypeAlias` represents a synonym for a type, like the `type` declaration in Haskell and Scala or C's `typedef`.
+> It is a typical statically typed functional programming feature.
+
+#### Syntax
+
+```haskell
+(TypeAlias Identifier Identifier)
+```
+
+#### Haskell Example
+
+```haskell
+type Point = (Point, Int)
+```
+
+```haskell
+(TypeAlias "Point" "(Point, Int")
+```
+
+### TypeSignature
+
+> A `TypeSignature` represents an explicit type annotation for a computation,
+> variable or module, as you can find in Java or Haskell.
+
+#### Syntax
+
+```haskell
+(TypeSignature Identifier Type)
+```
+
+#### Haskell Examples
+
+Simple types:
+
+```haskell
+name :: String
+```
+
+```haskell
+(TypeSignature "name" (SimpleType "String" []))
+```
+
+Simple types and constraints:
+
+```haskell
+f :: Num a => a
+````
+
+```haskell
+(TypeSignature "f" (SimpleType "a" ["Num a"]))
+```
+
+Parameterized types:
+
+
+```haskell
+elem :: (Eq a, Foldable t) => a -> t a -> Bool
+````
+
+```haskell
+(TypeSignature "elem" (ParameterizedType ["a", "t a"] "Bool" ["Eq a", "Foldable t"]))
+```
+
+#### Java Examples
+
+In Java, as in most typed C-like languages, type signature and variable declartions are bound. This means that, for example, a local variable declaration will produce both a `TypeSignature` and a `Variable` expression.
+
+Variable and attribute types:
+
+```java
+String name;
+```
+
+```haskell
+(TypeSignature "name" (SimpleType "String" []))
+```
+
+Method types:
+
+```java
+void String f() { return null; }
+```
+
+```haskell
+(TypeSignature "f" (ParameterizedType [] "String" []))
+```
+
+Method types with type parameters:
+
+```java
+void <A> A f() { return null; }
+```
+
+```haskell
+(TypeSignature "f" (ParameterizedType [] "A" ["A"]))
+```
+
+Method types with type parameters and constraints:
+
+```java
+void <A super B> void f(A a) {}
+```
+
+```haskell
+(TypeSignature "f" (ParameterizedType ["A"] "void" ["A super B"]))
+```
+
+Class or interfaces types:
+
+```java
+class A<B extends C, D extends C> { }
+```
+
+```haskell
+(TypeSignature "A" (ConstrainedType ["B extends C", "D extends C"]))
+```
+
+
+### `TypeCast`
+
+> A `TypeCast` represent explictly giving a type to an expression
+> which may have static or dynamic impact on the program. It is aimed to represent
+> type-casts in c-like languages and inline type signatures in funcional languages.
+
+#### Syntax
+
+```haskell
+(TypeCast Expression Type)
+```
+
+#### Haskell Examples
+
+Simple types:
+
+```haskell
+... = 4 :: Num a => a
+```
+
+```haskell
+(TypeCast (MuNumber 4) (SimpleType "a" ["Num a"]))
+```
+
+#### Java Examples
+
+Variable and attribute types:
+
+```java
+(Integer) 4;
+```
+
+```haskell
+(TypeCast (MuNumber 4) (SimpleType "Integer" []))
+```
+
+```java
+(Option<Integer>) something;
+```
+
+```haskell
+(TypeCast (Reference "something") (SimpleType "Option<Integer>" []))
+```
+
+##### Caveats
+
+The type constraints refer to type-constrained parametrizations that the cast introduces, and
+not any other kind of constraints the cast uses. That is whay the following Java code:
+
+```java
+(Num<A>) something;
+```
+
+produces:
+
+```haskell
+(TypeCast (Reference "something") (SimpleType "Num<A>" []))
+```
+
+instead of:
+
+```haskell
+(TypeCast (Reference "something") (SimpleType "Num" ["A"]))
 ```
 
 # Building mulang from source

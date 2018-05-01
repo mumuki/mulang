@@ -58,7 +58,7 @@ muMemberDecl e@(ConstructorDecl _ _ _ _params _ _constructorBody)    = return . 
 muMemberDecl (MemberClassDecl decl)                                  = return $ muClassTypeDecl decl
 muMemberDecl (MemberInterfaceDecl decl)                              = return $ muInterfaceTypeDecl decl
 
-muMethodSignature name params returnType = TypeSignature (i name) (Just $ map muFormalParamType params) (muReturnType returnType)
+muMethodSignature name params returnType = SubroutineSignature (i name) (map muFormalParamType params) (muReturnType returnType) []
 muEnumConstant (EnumConstant name _ _) = i name
 
 muFormalParam (FormalParam _ _ _ id)      = VariablePattern (v id)
@@ -143,7 +143,9 @@ muOp Equal  = M.Equal
 muOp NotEq  = NotEqual
 muOp e      = debug e
 
-muVarDecl typ (VarDecl id init) = [TypeSignature (v id) Nothing (muType typ), Variable (v id) (fmapOrNull muVarInit init)]
+muVarDecl typ (VarDecl id init) = [
+      TypeSignature (v id) (SimpleType (muType typ) []),
+      Variable (v id) (fmapOrNull muVarInit init)]
 
 muMethodBody (MethodBody (Just block)) = muBlock block
 
@@ -171,7 +173,7 @@ muCase (SwitchBlock (SwitchCase exp) block) = (muExp exp, compactConcatMap muBlo
 muDefault (SwitchBlock Default block) = compactConcatMap muBlockStmt block
 
 muForInit:: ForInit -> Expression
-muForInit (ForLocalVars _ typ varDecls) = compactConcatMap (muVarDecl typ) varDecls 
+muForInit (ForLocalVars _ typ varDecls) = compactConcatMap (muVarDecl typ) varDecls
 muForInit (ForInitExps exps) = compactMap muExp exps
 
 isDefault (SwitchBlock Default _) = True

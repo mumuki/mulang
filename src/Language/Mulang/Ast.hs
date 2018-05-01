@@ -17,6 +17,7 @@ module Language.Mulang.Ast (
     Code,
     Equation(..),
     EquationBody(..),
+    Type(..),
     Expression(..),
     Statement(..),
     Pattern(..),
@@ -30,9 +31,11 @@ module Language.Mulang.Ast (
     pattern SimpleProcedure,
     pattern SimpleMethod,
     pattern SimpleSend,
+    pattern SubroutineSignature,
+    pattern VariableSignature,
+    pattern ModuleSignature,
     pattern MuTrue,
     pattern MuFalse,
-    pattern SubroutineTypeSignature,
     pattern Subroutine,
     pattern Clause,
     pattern Call,
@@ -48,11 +51,28 @@ type Code = String
 data Equation = Equation [Pattern] EquationBody deriving (Eq, Show, Read, Generic)
 
 data EquationBody
-         = UnguardedBody Expression
-         | GuardedBody  [(Expression, Expression)]
-  deriving (Eq, Show, Read, Generic)
+        = UnguardedBody Expression
+        | GuardedBody  [(Expression, Expression)]
+        deriving (Eq, Show, Read, Generic)
 
 type SubroutineBody = [Equation]
+
+-- A Generic Type, that can be used for typing expressions,
+-- classes, functions, variables and so on, using a @TypeSignature@
+-- or a @TypeCast@
+data Type
+        = SimpleType Identifier [Identifier]
+        -- ^ simple types, with a type identifier and type constraints
+        -- Useful for modelling variable types
+        | ParameterizedType [Identifier] Identifier [Identifier]
+        -- ^ parameterized types, with type inputs, type identifier and type constraints
+        -- Useful for modelling functions, methods and procedures types
+        | ConstrainedType [Identifier]
+        -- ^ constrained type, with just type constraints.
+        -- Usefull for modelling classes and interfaces types
+        | OtherType (Maybe String) (Maybe Type)
+        -- ^ unrecognized type, with optional code and nested type
+        deriving (Eq, Show, Read, Generic)
 
 -- | Expression is the root element of a Mulang program.
 -- | With the exception of Patterns, nearly everything is an Expression: variable declarations, literals,
@@ -67,9 +87,13 @@ data Expression
     | Record Identifier
     -- ^ Imperative / Functional programming struct declaration.
     --   Only the record name is parsed
-    | TypeSignature Identifier (Maybe [Identifier]) Identifier
+    | TypeSignature Identifier Type
     -- ^ Generic type signature for a computation,
-    --   composed by a name, parameter types and return type
+    --   composed by a name and its type
+    | TypeCast Expression Type
+    -- ^ Generic type annotation for an expression. For example,
+    -- a Java cast: (String) anObject => TypeAnnotation (Variable "anObject") "String"
+    -- a Haskell inline type declaration: ... = x :: Int => TypeAnnotation (Variable "x") "Int"
     | EntryPoint Identifier Expression
     -- ^ Entry point with its body
     | Function Identifier SubroutineBody
@@ -198,6 +222,10 @@ data Statement
 debug :: Show a => a -> Expression
 debug a = Unknown (Just (show a)) Nothing
 
+pattern VariableSignature name t cs        = TypeSignature name (SimpleType t cs)
+pattern SubroutineSignature name args t cs = TypeSignature name (ParameterizedType args t cs)
+pattern ModuleSignature name cs            = TypeSignature name (ConstrainedType cs)
+
 pattern Other = Unknown Nothing Nothing
 pattern OtherBody body <- Unknown _ (Just body)
 
@@ -211,8 +239,6 @@ pattern SimpleMethod name params body    = Method    name [SimpleEquation params
 
 pattern MuTrue  = MuBool True
 pattern MuFalse = MuBool False
-
-pattern SubroutineTypeSignature name params return = TypeSignature name (Just params) return
 
 pattern Subroutine name body <- (extractSubroutine -> Just (name, body))
 pattern Clause name patterns expressions <- (extractClause -> Just (name, patterns, expressions))
