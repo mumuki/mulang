@@ -24,6 +24,8 @@ module Language.Mulang.Ast (
     Identifier,
     SubroutineBody,
     debug,
+    debugType,
+    debugPattern,
     pattern Other,
     pattern OtherBody,
     pattern SimpleEquation,
@@ -210,8 +212,8 @@ data Pattern
     | WildcardPattern
     -- ^ wildcard pattern @_@
     | UnionPattern [Pattern]
-    | OtherPattern
-    -- ^ Other unrecognized pattern
+    | OtherPattern (Maybe String) (Maybe Pattern)
+    -- ^ Other unrecognized pattern with optional code and nested pattern
   deriving (Eq, Show, Read, Generic)
 
 data Statement
@@ -221,6 +223,12 @@ data Statement
 
 debug :: Show a => a -> Expression
 debug a = Unknown (Just (show a)) Nothing
+
+debugType :: Show a => a -> Type
+debugType a = OtherType (Just (show a)) Nothing
+
+debugPattern :: Show a => a -> Pattern
+debugPattern a = OtherPattern (Just (show a)) Nothing
 
 pattern VariableSignature name t cs        = TypeSignature name (SimpleType t cs)
 pattern SubroutineSignature name args t cs = TypeSignature name (ParameterizedType args t cs)

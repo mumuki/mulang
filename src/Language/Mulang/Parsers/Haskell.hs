@@ -58,7 +58,7 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muPat (HsPParen pattern) = muPat pattern
     muPat (HsPAsPat name pattern) = AsPattern (muName name) (muPat pattern)
     muPat HsPWildCard = WildcardPattern
-    muPat _ = OtherPattern
+    muPat p = debugPattern p
 
     muExp (HsVar (UnQual (HsIdent "undefined"))) = Raise (MuString "undefined")
 
