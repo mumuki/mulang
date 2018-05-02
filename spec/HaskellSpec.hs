@@ -30,3 +30,6 @@ spec = do
 
     it "parses inline type annotations" $ do
       hs "x = 1 :: Int" `shouldBe` Variable "x" (TypeCast (MuNumber 1) (SimpleType "Int" []))
+
+    it "parses inline type annotations with restrictions" $ do
+      hs "x = 1 :: (Num a, Foldable t) => t a" `shouldBe` Variable "x" (TypeCast (MuNumber 1) (SimpleType "t a" ["Num a", "Foldable t"]))

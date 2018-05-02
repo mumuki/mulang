@@ -29,7 +29,7 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
   where
     mergeDecls decls exp = compact (decls ++ [exp])
 
-    muDecls (HsTypeDecl _ name _ t)      = [TypeAlias (muName name) (muTypeId t)]
+    muDecls (HsTypeDecl _ name args t)   = [TypeAlias (unwords . map muName $ name : args) (muTypeId t)]
     muDecls (HsDataDecl _ _ name _ _ _ ) = [Record (muName name)]
     muDecls (HsTypeSig _ names (HsQualType constraints t))
                                          = map (muTypeSignature constraints t) names
@@ -90,6 +90,7 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muExp (HsEnumFromThenTo from thn to) = Application (Reference "enumFromThenTo") [(muExp from), (muExp thn), (muExp to)]
     muExp (HsListComp exp stmts)         = For (map muStmt stmts) (Yield (muExp exp))
     muExp (HsDo stmts) | (HsQualifier exp) <- last stmts  = For (map muStmt stmts)  (Yield (muExp exp))
+    muExp (HsExpTypeSig _ exp (HsQualType cs t))          = TypeCast (muExp exp) (muType t cs)
     muExp e = debug e
 
     muLit (HsCharPrim    v) = MuString [v]
