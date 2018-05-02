@@ -909,7 +909,7 @@ In this section, we will get into the technical details of the Mulang AST. It is
 * Equations
 * Generators
 
-All the AST elements fall within any of this 5 categories.
+All the AST elements fall within any of these 5 categories.
 
 ## Expressions
 
@@ -952,7 +952,7 @@ Currently, the `Record` expression does not hold information about the record co
 
 ### `TypeAlias`, `TypeSignature` and `TypeCast`
 
-Mulang AST support for type analysis is quite limited, and it is mostly focused on expressions and declarations analysis. However, for sake of completness and in order to provide some limited type-information in Mulang AST, `TypeAlias`, `TypeSignature` and `TypeCast` expressions are provided.
+Mulang AST support for type analysis is quite limited, and it is mostly focused on expressions and declarations analysis. However, for sake of completeness and in order to provide some limited type-information in Mulang AST, `TypeAlias`, `TypeSignature` and `TypeCast` expressions are provided.
 
 See [types section](#types) for more details.
 
@@ -1893,11 +1893,11 @@ When processing statically-typed languages, all type-information - regardless we
 #### Haskell Example
 
 ```haskell
-type Point = (Point, Int)
+type Point = (Int, Int)
 ```
 
 ```haskell
-(TypeAlias "Point" "(Point, Int")
+(TypeAlias "Point" "(Int, Int)")
 ```
 
 ### TypeSignature
@@ -1946,7 +1946,7 @@ elem :: (Eq a, Foldable t) => a -> t a -> Bool
 
 #### Java Examples
 
-In Java, as in most typed C-like languages, type signature and variable declartions are bound. This means that, for example, a local variable declaration will produce both a `TypeSignature` and a `Variable` expression.
+In Java, as in most typed C-like languages, type signature and variable declarations are bound. This means that, for example, a local variable declaration will produce both a `TypeSignature` and a `Variable` expression.
 
 Variable and attribute types:
 
@@ -1961,7 +1961,7 @@ String name;
 Method types:
 
 ```java
-void String f() { return null; }
+String f() { return null; }
 ```
 
 ```haskell
@@ -1971,7 +1971,7 @@ void String f() { return null; }
 Method types with type parameters:
 
 ```java
-void <A> A f() { return null; }
+<A> A f() { return null; }
 ```
 
 ```haskell
@@ -1981,7 +1981,7 @@ void <A> A f() { return null; }
 Method types with type parameters and constraints:
 
 ```java
-void <A super B> void f(A a) {}
+<A super B> void f(A a) {}
 ```
 
 ```haskell
@@ -2003,7 +2003,7 @@ class A<B extends C, D extends C> { }
 
 > A `TypeCast` represent explictly giving a type to an expression
 > which may have static or dynamic impact on the program. It is aimed to represent
-> type-casts in c-like languages and inline type signatures in funcional languages.
+> type-casts in c-like languages and inline type signatures in functional languages.
 
 #### Syntax
 
