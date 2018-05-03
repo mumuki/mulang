@@ -26,8 +26,6 @@ module Language.Mulang.Ast (
     debug,
     debugType,
     debugPattern,
-    pattern Other,
-    pattern OtherBody,
     pattern SimpleEquation,
     pattern SimpleFunction,
     pattern SimpleProcedure,
@@ -166,7 +164,7 @@ data Expression
     -- ^ Imperative / OOP programming c-style for loop
     | Sequence [Expression]
     -- ^ Generic sequence of statements
-    | Unknown (Maybe String) (Maybe Expression)
+    | Other (Maybe String) (Maybe Expression)
     -- ^ Unrecognized expression, with optional description and body
     | Equal
     | NotEqual
@@ -222,7 +220,7 @@ data Statement
   deriving (Eq, Show, Read, Generic)
 
 debug :: Show a => a -> Expression
-debug a = Unknown (Just (show a)) Nothing
+debug a = Other (Just (show a)) Nothing
 
 debugType :: Show a => a -> Type
 debugType a = OtherType (Just (show a)) Nothing
@@ -233,9 +231,6 @@ debugPattern a = OtherPattern (Just (show a)) Nothing
 pattern VariableSignature name t cs        = TypeSignature name (SimpleType t cs)
 pattern SubroutineSignature name args t cs = TypeSignature name (ParameterizedType args t cs)
 pattern ModuleSignature name cs            = TypeSignature name (ConstrainedType cs)
-
-pattern Other = Unknown Nothing Nothing
-pattern OtherBody body <- Unknown _ (Just body)
 
 pattern SimpleEquation params body = Equation params (UnguardedBody body)
 
