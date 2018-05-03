@@ -35,15 +35,12 @@ muTypeDecl (InterfaceTypeDecl decl) = muInterfaceTypeDecl decl
 muClass (ClassDecl _ name _ superclass interfaces (ClassBody body)) =
   Class (i name) (fmap muRefType superclass) (compact (map muImplements interfaces ++ concatMap muDecl body))
 
-muEnum (EnumDecl _ name _ (EnumBody constants _)) =
-  Enumeration (i name) (map muEnumConstant constants)
-
 muInterface (InterfaceDecl _ name _ interfaces (InterfaceBody body)) =
   Interface (i name) (map muRefType interfaces) (compactConcatMap muMemberDecl body)
 
 muClassTypeDecl clazz@(ClassDecl _ name args _ _ _) = muDeclaration name args $ muClass clazz
 
-muClassTypeDecl enum@(EnumDecl _ name _ (EnumBody constants _)) =
+muClassTypeDecl (EnumDecl _ name _ (EnumBody constants _)) =
   Enumeration (i name) (map muEnumConstant constants)
   
 muImplements interface = Implement $ muRefType interface
