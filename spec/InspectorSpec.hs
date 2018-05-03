@@ -94,7 +94,7 @@ spec = do
 
     it "is False otherwise" $ do
       assigns (named "x") (Assignment "y" (MuTrue)) `shouldBe` False
-      assigns (named "x") (Other) `shouldBe` False
+      assigns (named "x") (Other Nothing Nothing) `shouldBe` False
       assigns (named "x") (MuFalse) `shouldBe` False
 
   describe "declaresFunction" $ do

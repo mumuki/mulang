@@ -39,176 +39,181 @@ Mulang is three different  - but thighly related - things:
       - [Syntax](#syntax)
       - [C Example](#c-example)
       - [Caveats](#caveats)
-    + [`TypeAlias`](#typealias)
-      - [Syntax](#syntax-1)
-      - [Haskell Example](#haskell-example)
-      - [Caveats](#caveats-1)
-    + [TypeSignature](#typesignature)
-      - [Syntax](#syntax-2)
-      - [Haskell Example](#haskell-example-1)
-      - [Java Example](#java-example)
-      - [Caveats](#caveats-2)
+    + [`TypeAlias`, `TypeSignature` and `TypeCast`](#typealias-typesignature-and-typecast)
     + [`EntryPoint`](#entrypoint)
-      - [Syntax](#syntax-3)
-      - [Java Example](#java-example-1)
+      - [Syntax](#syntax-1)
+      - [Java Example](#java-example)
     + [`Function`](#function)
-      - [Syntax](#syntax-4)
+      - [Syntax](#syntax-2)
       - [Example](#example)
     + [`Procedure`](#procedure)
-      - [Syntax](#syntax-5)
+      - [Syntax](#syntax-3)
     + [`Method`](#method)
-      - [Syntax](#syntax-6)
+      - [Syntax](#syntax-4)
       - [Ruby Example](#ruby-example)
-      - [Java Example](#java-example-2)
+      - [Java Example](#java-example-1)
     + [`EqualMethod` and `HashMethod`](#equalmethod-and-hashmethod)
-      - [Syntax](#syntax-7)
+      - [Syntax](#syntax-5)
       - [Ruby Example](#ruby-example-1)
     + [`Variable`](#variable)
-      - [Syntax](#syntax-8)
+      - [Syntax](#syntax-6)
       - [Example](#example-1)
     + [`Assignment`](#assignment)
-      - [Syntax](#syntax-9)
+      - [Syntax](#syntax-7)
       - [Example](#example-2)
     + [`Attribute`](#attribute)
-      - [Syntax](#syntax-10)
+      - [Syntax](#syntax-8)
       - [Example](#example-3)
     + [`Object`](#object)
-      - [Syntax](#syntax-11)
+      - [Syntax](#syntax-9)
       - [Example](#example-4)
     + [`Class`](#class)
-      - [Syntax](#syntax-12)
+      - [Syntax](#syntax-10)
       - [Ruby Example](#ruby-example-2)
       - [Java Examples](#java-examples)
     + [`Enumeration`](#enumeration)
-      - [Syntax](#syntax-13)
-      - [Java Example](#java-example-3)
+      - [Syntax](#syntax-11)
+      - [Java Example](#java-example-2)
     + [`Interface`](#interface)
-      - [Syntax](#syntax-14)
-      - [Java Example](#java-example-4)
+      - [Syntax](#syntax-12)
+      - [Java Example](#java-example-3)
     + [`Rule`](#rule)
-      - [Syntax](#syntax-15)
+      - [Syntax](#syntax-13)
       - [Example](#example-5)
     + [`Fact`](#fact)
-      - [Syntax](#syntax-16)
+      - [Syntax](#syntax-14)
       - [Example](#example-6)
     + [`Exist`](#exist)
-      - [Syntax](#syntax-17)
+      - [Syntax](#syntax-15)
       - [Example](#example-7)
     + [`Not`](#not)
-      - [Syntax](#syntax-18)
+      - [Syntax](#syntax-16)
       - [Example](#example-8)
     + [`Findall`](#findall)
-      - [Syntax](#syntax-19)
+      - [Syntax](#syntax-17)
       - [Example](#example-9)
     + [`Forall`](#forall)
-      - [Syntax](#syntax-20)
+      - [Syntax](#syntax-18)
       - [Example](#example-10)
     + [`Reference`](#reference)
-      - [Syntax](#syntax-21)
+      - [Syntax](#syntax-19)
       - [Example](#example-11)
     + [`Application`](#application)
-      - [Syntax](#syntax-22)
+      - [Syntax](#syntax-20)
       - [Example](#example-12)
     + [`Send`](#send)
-      - [Syntax](#syntax-23)
+      - [Syntax](#syntax-21)
       - [Ruby Example](#ruby-example-3)
     + [`New`](#new)
-      - [Syntax](#syntax-24)
+      - [Syntax](#syntax-22)
       - [Example](#example-13)
     + [`Implement`](#implement)
-      - [Syntax](#syntax-25)
+      - [Syntax](#syntax-23)
       - [Example](#example-14)
     + [`Include`](#include)
-      - [Syntax](#syntax-26)
+      - [Syntax](#syntax-24)
       - [Example](#example-15)
     + [`If`](#if)
-      - [Syntax](#syntax-27)
+      - [Syntax](#syntax-25)
     + [`Lambda`](#lambda)
-      - [Syntax](#syntax-28)
+      - [Syntax](#syntax-26)
     + [`Return`](#return)
-      - [Syntax](#syntax-29)
+      - [Syntax](#syntax-27)
     + [`While`](#while)
-      - [Syntax](#syntax-30)
+      - [Syntax](#syntax-28)
       - [Example](#example-16)
     + [`Repeat`](#repeat)
-      - [Syntax](#syntax-31)
+      - [Syntax](#syntax-29)
       - [Example](#example-17)
     + [`Match`](#match)
-      - [Syntax](#syntax-32)
+      - [Syntax](#syntax-30)
     + [`Switch`](#switch)
-      - [Syntax](#syntax-33)
+      - [Syntax](#syntax-31)
     + [`Try`](#try)
-      - [Syntax](#syntax-34)
+      - [Syntax](#syntax-32)
       - [Example](#example-18)
     + [`Raise`](#raise)
-      - [Syntax](#syntax-35)
+      - [Syntax](#syntax-33)
       - [Example](#example-19)
     + [`Print`](#print)
-      - [Syntax](#syntax-36)
+      - [Syntax](#syntax-34)
       - [Ruby Example](#ruby-example-4)
     + [`For`](#for)
-      - [Syntax](#syntax-37)
-      - [Haskell Example](#haskell-example-2)
-      - [Java Example](#java-example-5)
+      - [Syntax](#syntax-35)
+      - [Haskell Example](#haskell-example)
+      - [Java Example](#java-example-4)
     + [`ForLoop`](#forloop)
-      - [Syntax](#syntax-38)
+      - [Syntax](#syntax-36)
       - [Example](#example-20)
     + [`Sequence`](#sequence)
-      - [Syntax](#syntax-39)
+      - [Syntax](#syntax-37)
       - [Example](#example-21)
     + [`Other`](#other)
-      - [Syntax](#syntax-40)
+      - [Syntax](#syntax-38)
     + [`Equal` and `NotEqual`](#equal-and-notequal)
-      - [Syntax](#syntax-41)
+      - [Syntax](#syntax-39)
     + [`Self`](#self)
-      - [Syntax](#syntax-42)
+      - [Syntax](#syntax-40)
     + [`MuNull`](#munull)
-      - [Syntax](#syntax-43)
+      - [Syntax](#syntax-41)
     + [`MuNil`](#munil)
-      - [Syntax](#syntax-44)
+      - [Syntax](#syntax-42)
       - [Example](#example-22)
     + [`MuObject`](#muobject)
-      - [Syntax](#syntax-45)
+      - [Syntax](#syntax-43)
       - [JavaScript Example](#javascript-example)
     + [`MuNumber`, `MuBool`, `MuString` and `MuSymbol`](#munumber-mubool-mustring-and-musymbol)
-      - [Syntax](#syntax-46)
+      - [Syntax](#syntax-44)
       - [Ruby Example](#ruby-example-5)
     + [`MuTuple` and `MuList`](#mutuple-and-mulist)
-      - [Syntax](#syntax-47)
+      - [Syntax](#syntax-45)
   * [Patterns](#patterns)
     + [`VariablePattern`](#variablepattern)
-      - [Syntax](#syntax-48)
+      - [Syntax](#syntax-46)
       - [JavaScript Example](#javascript-example-1)
     + [`LiteralPattern`](#literalpattern)
-      - [Syntax](#syntax-49)
+      - [Syntax](#syntax-47)
       - [Example](#example-23)
     + [`InfixApplicationPattern`](#infixapplicationpattern)
-      - [Syntax](#syntax-50)
-        * [Caveats](#caveats-3)
+      - [Syntax](#syntax-48)
+        * [Caveats](#caveats-1)
     + [`ApplicationPattern`](#applicationpattern)
-      - [Syntax](#syntax-51)
+      - [Syntax](#syntax-49)
       - [Example](#example-24)
     + [`TuplePattern`](#tuplepattern)
-      - [Syntax](#syntax-52)
+      - [Syntax](#syntax-50)
       - [Example](#example-25)
     + [`ListPattern`](#listpattern)
-      - [Syntax](#syntax-53)
+      - [Syntax](#syntax-51)
       - [Example](#example-26)
     + [`FunctorPattern`](#functorpattern)
-      - [Syntax](#syntax-54)
+      - [Syntax](#syntax-52)
       - [Example](#example-27)
     + [`AsPattern`](#aspattern)
-      - [Syntax](#syntax-55)
+      - [Syntax](#syntax-53)
       - [Example](#example-28)
     + [`TypePattern`](#typepattern)
-      - [Syntax](#syntax-56)
+      - [Syntax](#syntax-54)
       - [Example](#example-29)
     + [`WildcardPattern`](#wildcardpattern)
-      - [Syntax](#syntax-57)
+      - [Syntax](#syntax-55)
     + [`UnionPattern`](#unionpattern)
-      - [Syntax](#syntax-58)
+      - [Syntax](#syntax-56)
     + [`OtherPattern`](#otherpattern)
+      - [Syntax](#syntax-57)
+  * [Types](#types)
+    + [`TypeAlias`](#typealias)
+      - [Syntax](#syntax-58)
+      - [Haskell Example](#haskell-example-1)
+    + [TypeSignature](#typesignature)
       - [Syntax](#syntax-59)
+      - [Haskell Examples](#haskell-examples)
+      - [Java Examples](#java-examples-1)
+    + [`TypeCast`](#typecast)
+      - [Syntax](#syntax-60)
+      - [Haskell Examples](#haskell-examples-1)
+      - [Java Examples](#java-examples-2)
+        * [Caveats](#caveats-2)
 - [Building mulang from source](#building-mulang-from-source)
   * [Setup](#setup)
   * [Installing and creating an executable](#installing-and-creating-an-executable)
@@ -896,14 +901,15 @@ $ mulang '
 
 # Mulang AST spec
 
-In this section, we will get into the technical details of the Mulang AST. It is built around 4 core elements:
+In this section, we will get into the technical details of the Mulang AST. It is built around 5 core elements:
 
 * [Expressions](#expressions)
 * [Patterns](#patterns)
+* [Types](#types)
 * Equations
 * Generators
 
-All the AST elements fall within any of this 4 categories.
+All the AST elements fall within any of these 5 categories.
 
 ## Expressions
 
@@ -944,67 +950,11 @@ struct Point {
 Currently, the `Record` expression does not hold information about the record contents.
 
 
-### `TypeAlias`
+### `TypeAlias`, `TypeSignature` and `TypeCast`
 
-> A `TypeAlias` represents a synonym for a type, like the `type` declaration in Haskell and Scala or C's `typedef`.
-> It is a typical statically typed functional programming feature.
+Mulang AST support for type analysis is quite limited, and it is mostly focused on expressions and declarations analysis. However, for sake of completeness and in order to provide some limited type-information in Mulang AST, `TypeAlias`, `TypeSignature` and `TypeCast` expressions are provided.
 
-#### Syntax
-
-```haskell
-(TypeAlias Identifier)
-```
-
-#### Haskell Example
-
-```haskell
-type Point = (Point, Int)
-```
-
-```haskell
-(TypeAlias "Point")
-```
-
-#### Caveats
-
-Currently, the `TypeAlias` expression does not hold information about the aliased type.
-
-### TypeSignature
-
-> A `TypeSignature` represents an explicit type annotation for a computation,
-> variable or constant, as you can find in Java or Haskell.
-
-#### Syntax
-
-```haskell
-(TypeSignature Identifier [Identifier] Identifier)
-```
-
-#### Haskell Example
-
-```haskell
-name :: String
-```
-
-```haskell
-(TypeSignature "name" [] "String")
-```
-
-#### Java Example
-
-In Java, as in most typed C-like languages, type signature and variable declartions are bound. This means that, for example, a local variable declaration will produce both a `TypeSignature` and a `Variable` expression.
-
-```java
-String name;
-```
-
-```haskell
-(TypeSignature "name" [] "String")
-```
-
-#### Caveats
-
-`TypeSignature`s of zero-args computation and variables are identical.
+See [types section](#types) for more details.
 
 ### `EntryPoint`
 
@@ -1613,10 +1563,10 @@ for (var i = 0; i < 10; i++) {
 ```
 
 ```haskell
-(ForLoop 
-  (Variable "i" (MuNumber 0.0)) 
-  (Application (Reference "<") [Reference "i",MuNumber 10.0]) 
-  (Assignment "i" (Application (Reference "+") [Reference "i",MuNumber 1.0])) 
+(ForLoop
+  (Variable "i" (MuNumber 0.0))
+  (Application (Reference "<") [Reference "i",MuNumber 10.0])
+  (Assignment "i" (Application (Reference "+") [Reference "i",MuNumber 1.0]))
   (Send (Reference "console") (Reference "log") [Reference "i"]))
 ```
 
@@ -1916,6 +1866,202 @@ function foo(x, y) { }
 
 ```haskell
 (OtherPattern)
+```
+
+## Types
+
+When processing statically-typed languages, all type-information - regardless we are typing a function, a variable or a class - is represented with the `Type` ADT, can be one of:
+
+  * `SimpleType`: composed by a type identifier and zero or type more constraints
+  * `ParameterizedType`: composed by input type parmaters, an output type, and type constratins
+  * `ConstrainedType`: composed by just type constraints.
+  * `OtherType`: an unrecognized type
+
+`Type`s can be introduced in the Mulang AST using the following elements:
+
+### `TypeAlias`
+
+> A `TypeAlias` represents a synonym for a type, like the `type` declaration in Haskell and Scala or C's `typedef`.
+> It is a typical statically typed functional programming feature.
+
+#### Syntax
+
+```haskell
+(TypeAlias Identifier Identifier)
+```
+
+#### Haskell Example
+
+```haskell
+type Point = (Int, Int)
+```
+
+```haskell
+(TypeAlias "Point" "(Int, Int)")
+```
+
+### TypeSignature
+
+> A `TypeSignature` represents an explicit type annotation for a computation,
+> variable or module, as you can find in Java or Haskell.
+
+#### Syntax
+
+```haskell
+(TypeSignature Identifier Type)
+```
+
+#### Haskell Examples
+
+Simple types:
+
+```haskell
+name :: String
+```
+
+```haskell
+(TypeSignature "name" (SimpleType "String" []))
+```
+
+Simple types and constraints:
+
+```haskell
+f :: Num a => a
+````
+
+```haskell
+(TypeSignature "f" (SimpleType "a" ["Num a"]))
+```
+
+Parameterized types:
+
+
+```haskell
+elem :: (Eq a, Foldable t) => a -> t a -> Bool
+````
+
+```haskell
+(TypeSignature "elem" (ParameterizedType ["a", "t a"] "Bool" ["Eq a", "Foldable t"]))
+```
+
+#### Java Examples
+
+In Java, as in most typed C-like languages, type signature and variable declarations are bound. This means that, for example, a local variable declaration will produce both a `TypeSignature` and a `Variable` expression.
+
+Variable and attribute types:
+
+```java
+String name;
+```
+
+```haskell
+(TypeSignature "name" (SimpleType "String" []))
+```
+
+Method types:
+
+```java
+String f() { return null; }
+```
+
+```haskell
+(TypeSignature "f" (ParameterizedType [] "String" []))
+```
+
+Method types with type parameters:
+
+```java
+<A> A f() { return null; }
+```
+
+```haskell
+(TypeSignature "f" (ParameterizedType [] "A" ["A"]))
+```
+
+Method types with type parameters and constraints:
+
+```java
+<A super B> void f(A a) {}
+```
+
+```haskell
+(TypeSignature "f" (ParameterizedType ["A"] "void" ["A super B"]))
+```
+
+Class or interfaces types:
+
+```java
+class A<B extends C, D extends C> { }
+```
+
+```haskell
+(TypeSignature "A" (ConstrainedType ["B extends C", "D extends C"]))
+```
+
+
+### `TypeCast`
+
+> A `TypeCast` represent explictly giving a type to an expression
+> which may have static or dynamic impact on the program. It is aimed to represent
+> type-casts in c-like languages and inline type signatures in functional languages.
+
+#### Syntax
+
+```haskell
+(TypeCast Expression Type)
+```
+
+#### Haskell Examples
+
+Simple types:
+
+```haskell
+... = 4 :: Num a => a
+```
+
+```haskell
+(TypeCast (MuNumber 4) (SimpleType "a" ["Num a"]))
+```
+
+#### Java Examples
+
+Variable and attribute types:
+
+```java
+(Integer) 4;
+```
+
+```haskell
+(TypeCast (MuNumber 4) (SimpleType "Integer" []))
+```
+
+```java
+(Option<Integer>) something;
+```
+
+```haskell
+(TypeCast (Reference "something") (SimpleType "Option<Integer>" []))
+```
+
+##### Caveats
+
+The type constraints refer to type-constrained parametrizations that the cast introduces, and
+not any other kind of constraints the cast uses. That is whay the following Java code:
+
+```java
+(Num<A>) something;
+```
+
+produces:
+
+```haskell
+(TypeCast (Reference "something") (SimpleType "Num<A>" []))
+```
+
+instead of:
+
+```haskell
+(TypeCast (Reference "something") (SimpleType "Num" ["A"]))
 ```
 
 # Building mulang from source

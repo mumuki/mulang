@@ -10,6 +10,7 @@ import Language.Mulang.Builder (compact, compactMap, compactConcatMap)
 
 import Language.Java.Parser
 import Language.Java.Syntax
+import Language.Java.Pretty (prettyPrint)
 
 import Control.Fallible
 
@@ -28,18 +29,29 @@ parseJava' = fmap m . j
 
 m (CompilationUnit _ _ typeDecls) = compactMap muTypeDecl $ typeDecls
 
-muTypeDecl (ClassTypeDecl decl)    = muClassTypeDecl decl
+muTypeDecl (ClassTypeDecl decl)     = muClassTypeDecl decl
 muTypeDecl (InterfaceTypeDecl decl) = muInterfaceTypeDecl decl
 
-muClassTypeDecl (ClassDecl _ name _ superclass interfaces (ClassBody body)) =
+muClass (ClassDecl _ name _ superclass interfaces (ClassBody body)) =
   Class (i name) (fmap muRefType superclass) (compact (map muImplements interfaces ++ concatMap muDecl body))
-muClassTypeDecl (EnumDecl _ name _ (EnumBody constants _))                   =
+
+muEnum (EnumDecl _ name _ (EnumBody constants _)) =
   Enumeration (i name) (map muEnumConstant constants)
 
+muInterface (InterfaceDecl _ name _ interfaces (InterfaceBody body)) =
+  Interface (i name) (map muRefType interfaces) (compactConcatMap muMemberDecl body)
+
+muClassTypeDecl clazz@(ClassDecl _ name args _ _ _) = muDeclaration name args $ muClass clazz
+
+muClassTypeDecl enum@(EnumDecl _ name _ (EnumBody constants _)) =
+  Enumeration (i name) (map muEnumConstant constants)
+  
 muImplements interface = Implement $ muRefType interface
 
-muInterfaceTypeDecl (InterfaceDecl _ name _ interfaces (InterfaceBody body)) =
-  Interface (i name) (map muRefType interfaces) (compactConcatMap muMemberDecl body )
+muInterfaceTypeDecl interface@(InterfaceDecl _ name args _ _) = muDeclaration name args $ muInterface interface
+
+muDeclaration _ [] decl = decl
+muDeclaration name args decl = Sequence [ModuleSignature (i name) (map prettyPrint args), decl]
 
 muDecl :: Decl -> [Expression]
 muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
@@ -58,7 +70,7 @@ muMemberDecl e@(ConstructorDecl _ _ _ _params _ _constructorBody)    = return . 
 muMemberDecl (MemberClassDecl decl)                                  = return $ muClassTypeDecl decl
 muMemberDecl (MemberInterfaceDecl decl)                              = return $ muInterfaceTypeDecl decl
 
-muMethodSignature name params returnType = TypeSignature (i name) (Just $ map muFormalParamType params) (muReturnType returnType)
+muMethodSignature name params returnType = SubroutineSignature (i name) (map muFormalParamType params) (muReturnType returnType) []
 muEnumConstant (EnumConstant name _ _) = i name
 
 muFormalParam (FormalParam _ _ _ id)      = VariablePattern (v id)
@@ -143,7 +155,9 @@ muOp Equal  = M.Equal
 muOp NotEq  = NotEqual
 muOp e      = debug e
 
-muVarDecl typ (VarDecl id init) = [TypeSignature (v id) Nothing (muType typ), Variable (v id) (fmapOrNull muVarInit init)]
+muVarDecl typ (VarDecl id init) = [
+      TypeSignature (v id) (SimpleType (muType typ) []),
+      Variable (v id) (fmapOrNull muVarInit init)]
 
 muMethodBody (MethodBody (Just block)) = muBlock block
 
@@ -171,7 +185,7 @@ muCase (SwitchBlock (SwitchCase exp) block) = (muExp exp, compactConcatMap muBlo
 muDefault (SwitchBlock Default block) = compactConcatMap muBlockStmt block
 
 muForInit:: ForInit -> Expression
-muForInit (ForLocalVars _ typ varDecls) = compactConcatMap (muVarDecl typ) varDecls 
+muForInit (ForLocalVars _ typ varDecls) = compactConcatMap (muVarDecl typ) varDecls
 muForInit (ForInitExps exps) = compactMap muExp exps
 
 isDefault (SwitchBlock Default _) = True
