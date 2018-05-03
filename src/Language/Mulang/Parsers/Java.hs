@@ -10,6 +10,7 @@ import Language.Mulang.Builder (compact, compactMap, compactConcatMap)
 
 import Language.Java.Parser
 import Language.Java.Syntax
+import Language.Java.Pretty (prettyPrint)
 
 import Control.Fallible
 
@@ -28,18 +29,29 @@ parseJava' = fmap m . j
 
 m (CompilationUnit _ _ typeDecls) = compactMap muTypeDecl $ typeDecls
 
-muTypeDecl (ClassTypeDecl decl)    = muClassTypeDecl decl
+muTypeDecl (ClassTypeDecl decl)     = muClassTypeDecl decl
 muTypeDecl (InterfaceTypeDecl decl) = muInterfaceTypeDecl decl
 
-muClassTypeDecl (ClassDecl _ name _ superclass interfaces (ClassBody body)) =
+muClass (ClassDecl _ name _ superclass interfaces (ClassBody body)) =
   Class (i name) (fmap muRefType superclass) (compact (map muImplements interfaces ++ concatMap muDecl body))
-muClassTypeDecl (EnumDecl _ name _ (EnumBody constants _))                   =
+
+muEnum (EnumDecl _ name _ (EnumBody constants _)) =
   Enumeration (i name) (map muEnumConstant constants)
 
+muInterface (InterfaceDecl _ name _ interfaces (InterfaceBody body)) =
+  Interface (i name) (map muRefType interfaces) (compactConcatMap muMemberDecl body)
+
+muClassTypeDecl clazz@(ClassDecl _ name args _ _ _) = muDeclaration name args $ muClass clazz
+
+muClassTypeDecl enum@(EnumDecl _ name _ (EnumBody constants _)) =
+  Enumeration (i name) (map muEnumConstant constants)
+  
 muImplements interface = Implement $ muRefType interface
 
-muInterfaceTypeDecl (InterfaceDecl _ name _ interfaces (InterfaceBody body)) =
-  Interface (i name) (map muRefType interfaces) (compactConcatMap muMemberDecl body )
+muInterfaceTypeDecl interface@(InterfaceDecl _ name args _ _) = muDeclaration name args $ muInterface interface
+
+muDeclaration _ [] decl = decl
+muDeclaration name args decl = Sequence [ModuleSignature (i name) (map prettyPrint args), decl]
 
 muDecl :: Decl -> [Expression]
 muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl

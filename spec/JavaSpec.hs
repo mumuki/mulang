@@ -30,10 +30,15 @@ spec = do
           ModuleSignature "Foo" ["A"],
           Interface "Foo" [] MuNull]
 
-    it "parses Simple Interface with type args and constraints" $ do
-      run "public interface Foo<A extends B> {}" `shouldBe` Sequence [
-          ModuleSignature "Foo" ["A extends B"],
+    it "parses Simple Interface with complex type parametrization" $ do
+      run "public interface Foo<A extends Comparable<? super T>> {}" `shouldBe` Sequence [
+          ModuleSignature "Foo" ["A extends Comparable<? super T>"],
           Interface "Foo" [] MuNull]
+
+    it "parses Simple Class with type args" $ do
+      run "public class Foo<A> {}" `shouldBe` Sequence [
+          ModuleSignature "Foo" ["A"],
+          Class "Foo" Nothing MuNull]
 
     it "parses Simple Interface With Messages" $ do
       run "public interface Foo { void foo(); }" `shouldBe` Interface "Foo" [] (SubroutineSignature "foo" [] "void" [])
