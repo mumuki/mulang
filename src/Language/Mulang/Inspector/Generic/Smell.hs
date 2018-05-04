@@ -84,11 +84,13 @@ hasRedundantLambda = containsExpression f
 -- can be avoided using point-free
 hasRedundantParameter :: Inspection
 hasRedundantParameter = containsExpression f
-  where f function@(SimpleFunction _ params (Return (Application _ args))) | (VariablePattern param) <- last params,
-                                                                             (Reference arg) <- last args = param == arg && showsUpOnlyOnce param (identifierReferences function)
+  where f function@(SimpleFunction _ params (Return (Application _ args))) | Just (VariablePattern param) <- safeLast params,
+                                                                             Just (Reference arg) <- safeLast args = param == arg && showsUpOnlyOnce param (identifierReferences function)
         f _ = False
         showsUpOnlyOnce p = (==1).countElem p
         countElem p = length.filter (==p)
+        safeLast [] = Nothing
+        safeLast l = Just $ last l
 
 isBooleanLiteral (MuBool _) = True
 isBooleanLiteral _          = False

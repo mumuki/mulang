@@ -168,6 +168,9 @@ spec = do
     it "is False when parameter appears more than once in the function" $ do
       hasRedundantParameter (hs "foo a = bar a a") `shouldBe` False
 
+    it "is does not break when return is an argument-less application" $ do
+      hasRedundantParameter (js "function a() { return b(); }") `shouldBe` False
+
   describe "hasRedundantGuards" $ do
     it "is True when present and both branches are boolean literals" $ do
       hasRedundantGuards (hs "f x | c x = True\n\
