@@ -37,21 +37,6 @@ usesStaticPolymorphism expression = inspect $ do
   guard (typesAs (named interfaceId) expression)
   guardCount (>1) (implementorsOf interfaceId expression)
 
-{-
-usesStaticStrategy :: Inspection
-usesStaticStrategy expression = exists $ do
-  interface@(Interface _ _)    <- declarations expression
-  guardCount (>1) (implementorsOf interface expression)
-
-  klass@(Class _ _ _)          <- declarations expression
-  attribute@(Attribute name1 _) <- declarations klass
-
-  guard (typedAs interface attribute)
-
-  (Send (Reference name2) _ _) <- expressions klass
-  guard (name1 == name2)
--}
-
 -- private
 
 inspect :: [a] -> Bool

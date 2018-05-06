@@ -15,6 +15,72 @@ java = J.java . unpack
 
 spec :: Spec
 spec = do
+  describe "usesTemplateMethod" $ do
+    it "is true when an abstract method is uses in an abstract class" $ do
+      usesTemplateMethod (java [text|
+          abstract class Account {
+            double balance;
+            void extract(double amount) {
+              checkBalance();
+              balance -= amount;
+            }
+            abstract void checkBalance();
+          }
+          class NormalAccount {
+            void checkBalance() {}
+          }
+          class PremiumAccount {
+            void checkBalance() {}
+          }
+        |]) `shouldBe` True
+
+    it "is false when no abstract method is used" $ do
+      usesTemplateMethod (java [text|
+          abstract class Account {
+            double balance;
+            void extract(double amount) {
+              balance -= amount;
+            }
+            abstract void checkBalance();
+          }
+          class NormalAccount {
+            void checkBalance() {}
+          }
+          class PremiumAccount {
+            void checkBalance() {}
+          }
+        |]) `shouldBe` False
+
+  describe "usesObjectComposition" $ do
+    it "is true an interface attribute is declared" $ do
+      usesObjectComposition (java [text|
+          interface Light {
+            void on();
+          }
+          class Room {
+            Light light;
+            void enter() {
+              light.on();
+            }
+          }|]) `shouldBe` True
+
+    it "is no attribute is declared" $ do
+      usesObjectComposition (java [text|
+          interface Light {
+            void on();
+          }
+          class Room {
+          }|]) `shouldBe` False
+
+    it "is a primitive attribute is declared" $ do
+      usesObjectComposition (java [text|
+          interface Light {
+            void on();
+          }
+          class Room {
+            int size;
+          }|]) `shouldBe` False
+
   describe "usesDyamicPolymorphism" $ do
     it "is True when uses" $ do
       usesDyamicPolymorphism (java [text|
