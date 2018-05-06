@@ -13,24 +13,6 @@ import Language.Mulang.Inspector.Typed (typesAs)
 import Control.Monad (MonadPlus, guard)
 import Language.Mulang.Generator (Generator, declarations, expressions)
 
-inspect :: [a] -> Bool
-inspect = not.null
-
-guardCount :: MonadPlus m => (Int -> Bool) -> [a] -> m ()
-guardCount condition list = guard (condition . length $ list)
-
-methodDeclarationsOf :: Identifier -> Generator Expression
-methodDeclarationsOf selector e = do
-  m@(Method s _) <- declarations e
-  guard (s == selector)
-  return m
-
-implementorsOf :: Identifier -> Generator Expression
-implementorsOf id e = do
-  m@(Class _ _ _) <- declarations e
-  guard (implements (named id) m)
-  return m
-
 usesObjectComposition :: Inspection
 usesObjectComposition expression = inspect $ do
   klass@(Class _ _ _)          <- declarations expression
@@ -69,3 +51,23 @@ usesStaticStrategy expression = exists $ do
   (Send (Reference name2) _ _) <- expressions klass
   guard (name1 == name2)
 -}
+
+-- private
+
+inspect :: [a] -> Bool
+inspect = not.null
+
+guardCount :: MonadPlus m => (Int -> Bool) -> [a] -> m ()
+guardCount condition list = guard (condition . length $ list)
+
+methodDeclarationsOf :: Identifier -> Generator Expression
+methodDeclarationsOf selector e = do
+  m@(Method s _) <- declarations e
+  guard (s == selector)
+  return m
+
+implementorsOf :: Identifier -> Generator Expression
+implementorsOf id e = do
+  m@(Class _ _ _) <- declarations e
+  guard (implements (named id) m)
+  return m
