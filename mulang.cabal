@@ -44,6 +44,7 @@ library
     Language.Mulang.Inspector.Generic
     Language.Mulang.Inspector.Typed
     Language.Mulang.Inspector.ObjectOriented
+    Language.Mulang.Inspector.ObjectOriented.Polymorphism
     Language.Mulang.Inspector.Functional
     Language.Mulang.Inspector.Logic
     Language.Mulang.Inspector.Procedural
