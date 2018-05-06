@@ -17,28 +17,28 @@ spec :: Spec
 spec = do
   describe "parse" $ do
     it "parses Simple Class" $ do
-      run "public class Foo {}" `shouldBe` Class "Foo" Nothing MuNull
+      run "public class Foo {}" `shouldBe` Class "Foo" Nothing None
 
     it "parsers Class With Superclass" $ do
-      run "public class Foo extends Bar {}" `shouldBe` Class "Foo" (Just "Bar") MuNull
+      run "public class Foo extends Bar {}" `shouldBe` Class "Foo" (Just "Bar") None
 
     it "parses Simple Interface" $ do
-      run "public interface Foo {}" `shouldBe` Interface "Foo" [] MuNull
+      run "public interface Foo {}" `shouldBe` Interface "Foo" [] None
 
     it "parses Simple Interface with type args" $ do
       run "public interface Foo<A> {}" `shouldBe` Sequence [
           ModuleSignature "Foo" ["A"],
-          Interface "Foo" [] MuNull]
+          Interface "Foo" [] None]
 
     it "parses Simple Interface with complex type parametrization" $ do
       run "public interface Foo<A extends Comparable<? super T>> {}" `shouldBe` Sequence [
           ModuleSignature "Foo" ["A extends Comparable<? super T>"],
-          Interface "Foo" [] MuNull]
+          Interface "Foo" [] None]
 
     it "parses Simple Class with type args" $ do
       run "public class Foo<A> {}" `shouldBe` Sequence [
           ModuleSignature "Foo" ["A"],
-          Class "Foo" Nothing MuNull]
+          Class "Foo" Nothing None]
 
     it "parses Simple Interface With Messages" $ do
       run "public interface Foo { void foo(); }" `shouldBe` Interface "Foo" [] (SubroutineSignature "foo" [] "void" [])
@@ -50,7 +50,7 @@ spec = do
       run "public interface Foo { void foo(String x, int y); }" `shouldBe` Interface "Foo" [] (SubroutineSignature "foo" ["String", "int"] "void" [])
 
     it "parses Interface with superinterfaces" $ do
-      run "public interface Foo extends Bar, Baz {}" `shouldBe` Interface "Foo" ["Bar", "Baz"] MuNull
+      run "public interface Foo extends Bar, Baz {}" `shouldBe` Interface "Foo" ["Bar", "Baz"] None
 
     it "parses Class With Methods" $ do
       run [text|
@@ -58,7 +58,7 @@ spec = do
                public void hello() {}
             }|] `shouldBe` Class "Foo" Nothing (Sequence [
                               SubroutineSignature "hello" [] "void" [],
-                              (SimpleMethod "hello" [] MuNull)])
+                              (SimpleMethod "hello" [] None)])
 
     it "parses Methods with type arguments" $ do
       run [text|
@@ -66,7 +66,7 @@ spec = do
                public <A> A hello(A a) {}
             }|] `shouldBe` Class "Foo" Nothing (Sequence [
                               SubroutineSignature "hello" ["A"] "A" [],
-                              (SimpleMethod "hello" [VariablePattern "a"] MuNull)])
+                              (SimpleMethod "hello" [VariablePattern "a"] None)])
 
     it "parses Methods with type arguments and type constraints" $ do
       run [text|
@@ -74,14 +74,14 @@ spec = do
                public <A extends Serializable> A hello(A a) {}
             }|] `shouldBe` Class "Foo" Nothing (Sequence [
                               SubroutineSignature "hello" ["A"] "A" [],
-                              (SimpleMethod "hello" [VariablePattern "a"] MuNull)])
+                              (SimpleMethod "hello" [VariablePattern "a"] None)])
 
     it "parses Empty Returns" $ do
         run [text|class Foo {
                public void hello() { return; }
             }|] `shouldBe` Class "Foo" Nothing (Sequence [
                               SubroutineSignature "hello" [] "void" [],
-                              (SimpleMethod "hello" [] (Return MuNull))])
+                              (SimpleMethod "hello" [] (Return None))])
 
     it "parses Strings In Returns" $ do
       run [text|class Foo {
@@ -130,7 +130,7 @@ spec = do
     it "parses Parameters" $ do
       run "public class Foo extends Bar { int succ(int y) {} }" `shouldBe` Class "Foo" (Just "Bar") (Sequence [
                                                                               SubroutineSignature "succ" ["int"] "int" [],
-                                                                              (SimpleMethod "succ" [VariablePattern "y"] MuNull)])
+                                                                              (SimpleMethod "succ" [VariablePattern "y"] None)])
 
     it "parses Enums" $ do
       run "public enum Foo { A, B }" `shouldBe` Enumeration "Foo" ["A", "B"]
@@ -139,7 +139,7 @@ spec = do
       run [text|
           public class MyMain {
              public static void main(String[] args) { }
-          }|] `shouldBe` Class "MyMain" Nothing (EntryPoint "main" MuNull)
+          }|] `shouldBe` Class "MyMain" Nothing (EntryPoint "main" None)
 
     it "parses Variables And Ints" $ do
       run [text|
@@ -179,7 +179,7 @@ spec = do
                             SubroutineSignature "hello" [] "void" [],
                             (SimpleMethod "hello" [] (Sequence [
                               VariableSignature "x" "int" [],
-                              Variable "x" MuNull]))])
+                              Variable "x" None]))])
 
     it "parses self-send" $ do
       run [text|
@@ -239,7 +239,7 @@ spec = do
              public void hello() { if (true) { } }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "void" [],
-                          (SimpleMethod "hello" [] (If MuTrue MuNull MuNull))])
+                          (SimpleMethod "hello" [] (If MuTrue None None))])
 
     it "parses Ifs with return in braces" $ do
       run [text|
@@ -257,8 +257,8 @@ spec = do
                            SubroutineSignature "hello" ["String"] "void" [],
                            SimpleMethod "hello" [VariablePattern "x"] (
                              If (Send (Reference "x") Equal [MuString "foo"])
-                              MuNull
-                              MuNull)])
+                              None
+                              None)])
 
     it "parses Ifs with not-equal comparisons on conditions" $ do
       run [text|
@@ -268,8 +268,8 @@ spec = do
                             SubroutineSignature "hello" ["String"] "void" [],
                             (SimpleMethod "hello" [VariablePattern "x"] (
                             If (Send (Reference "x") NotEqual [MuString "foo"])
-                              MuNull
-                              MuNull))])
+                              None
+                              None))])
 
     it "parsesAssignmentsAndDoubles" $ do
       run [text|class Foo {
@@ -322,7 +322,7 @@ spec = do
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "Foo" [],
                           SimpleMethod "hello" [] (
-                           Switch (Reference "a") [(MuNumber 1,Return (MuNumber 1)), (MuNumber 2, Return (MuNumber 2))] MuNull)])
+                           Switch (Reference "a") [(MuNumber 1,Return (MuNumber 1)), (MuNumber 2, Return (MuNumber 2))] None)])
 
     it "parses for" $ do
       run [text|class Foo {

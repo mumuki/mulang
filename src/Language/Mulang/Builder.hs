@@ -9,7 +9,7 @@ compactMap :: (a -> Expression) -> [a] -> Expression
 compactMap f = compact . map f
 
 compact :: [Expression] -> Expression
-compact []  = MuNull
+compact []  = None
 compact [e] = e
 compact es  = Sequence es
 

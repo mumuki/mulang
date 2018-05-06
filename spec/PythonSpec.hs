@@ -63,10 +63,10 @@ spec = do
       py "not True" `shouldBe` (Application (Reference "not") [MuBool True])
 
     it "parses classes" $ do
-      py "class DerivedClassName: pass" `shouldBe` Class "DerivedClassName" Nothing MuNull
+      py "class DerivedClassName: pass" `shouldBe` Class "DerivedClassName" Nothing None
 
     it "parses inheritance" $ do
-      py "class DerivedClassName(BaseClassName): pass" `shouldBe` Class "DerivedClassName" (Just "BaseClassName") MuNull
+      py "class DerivedClassName(BaseClassName): pass" `shouldBe` Class "DerivedClassName" (Just "BaseClassName") None
 
     it "parses if, elif and else" $ do
       run [text|if True: 1
@@ -75,16 +75,16 @@ spec = do
 
     it "parses functions" $ do
       py "def foo(): return 1" `shouldBe` SimpleFunction "foo" [] (Return (MuNumber 1.0))
-    
+
     it "parses procedures" $ do
       py "def foo(param): print(param)" `shouldBe` SimpleProcedure "foo" [VariablePattern "param"] (Application (Reference "print") [Reference "param"])
-   
+
     it "parses whiles" $ do
-      py "while True: pass" `shouldBe` While (MuBool True) MuNull
-    
+      py "while True: pass" `shouldBe` While (MuBool True) None
+
     it "parses fors" $ do
-      py "for x in range(0, 3): pass" `shouldBe` For [Generator (TuplePattern [VariablePattern "x"]) (Application (Reference "range") [MuNumber 0, MuNumber 3])] MuNull
-    
+      py "for x in range(0, 3): pass" `shouldBe` For [Generator (TuplePattern [VariablePattern "x"]) (Application (Reference "range") [MuNumber 0, MuNumber 3])] None
+
     it "parses tries" $ do
       run [text|
 try:
@@ -97,19 +97,19 @@ except:
     4|] `shouldBe` Try (MuNumber 1) [
                     (AsPattern "e" (TypePattern "IOError"), MuNumber 2),
                     (TypePattern "ValueError", MuNumber 3),
-                    (WildcardPattern, MuNumber 4)] MuNull
+                    (WildcardPattern, MuNumber 4)] None
 
     it "parses raise expressions" $ do
-      py "raise" `shouldBe` Raise MuNull
-    
+      py "raise" `shouldBe` Raise None
+
     it "parses raise expressions with exception" $ do
       py "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
-    
+
     it "parses lambdas" $ do
       py "lambda x: 1" `shouldBe` Lambda [VariablePattern "x"] (MuNumber 1)
-    
+
     it "parses tuples" $ do
       py "(1, \"something\")" `shouldBe` MuTuple [MuNumber 1, MuString "\"something\""]
-    
+
     it "parses yields" $ do
       py "yield 1" `shouldBe` Yield (MuNumber 1)

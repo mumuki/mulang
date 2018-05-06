@@ -1,6 +1,6 @@
 module Language.Mulang.Parsers.Python (py, parsePython) where
 
-import qualified Language.Mulang.Ast as M 
+import qualified Language.Mulang.Ast as M
 import Language.Mulang.Builder
 import Language.Mulang.Parsers
 
@@ -36,36 +36,36 @@ muStatement (Class name parents body _)       = M.Class (muIdent name) (listToMa
 muStatement (Conditional guards els _ )       = foldr muIf (muSuite els) guards
 muStatement (Assign [to] from _)              = M.Assignment (muVariable to) (muExpr from)
 muStatement (AugmentedAssign to op from _)    = M.Assignment (muVariable to) (M.Application (M.Reference . muAssignOp $ op) [M.Reference . muVariable $ to, muExpr from])
---muStatement (Decorated 
+--muStatement (Decorated
 --     { decorated_decorators :: [Decorator annot] -- ^ Decorators.
 --     , decorated_def :: Statement annot -- ^ Function or class definition to be decorated.
---     , stmt_annot :: annot 
+--     , stmt_annot :: annot
 --     }
 muStatement (Return expr _)                   = M.Return $ fmapOrNull muExpr expr
 muStatement (Try body handlers _ finally _)   = M.Try (muSuite body) (map muHandler handlers) (muSuite finally)
 muStatement (Raise expr _)                    = M.Raise $ muRaiseExpr expr
---muStatement (With 
+--muStatement (With
 --     { with_context :: [(Expr annot, Maybe (Expr annot))] -- ^ Context expression(s) (yields a context manager).
 --     , with_body :: Suite annot -- ^ Suite to be managed.
 --     , stmt_annot :: annot
 --     }
-muStatement (Pass _)                          = M.MuNull
+muStatement (Pass _)                          = M.None
 --muStatement (Break { stmt_annot :: annot }
 --muStatement (Continue { stmt_annot :: annot }
---muStatement (Delete 
+--muStatement (Delete
 --     { del_exprs :: [Expr annot] -- ^ Items to delete.
---     , stmt_annot :: annot 
+--     , stmt_annot :: annot
 --     }
 muStatement (StmtExpr expr _)                 = muExpr expr
---muStatement (Global 
+--muStatement (Global
 --     { global_vars :: [Ident annot] -- ^ Variables declared global in the current block.
 --     , stmt_annot :: annot
 --     }
---muStatement (NonLocal 
+--muStatement (NonLocal
 --     { nonLocal_vars :: [Ident annot] -- ^ Variables declared nonlocal in the current block (their binding comes from bound the nearest enclosing scope).
 --     , stmt_annot :: annot
 --     }
---muStatement (Assert 
+--muStatement (Assert
 --     { assert_exprs :: [Expr annot] -- ^ Expressions being asserted.
 --     , stmt_annot :: annot
 --     }
@@ -102,7 +102,7 @@ muExpr (Var ident _)              = M.Reference (muIdent ident)
 muExpr (Int value _ _)            = muNumberFromInt value
 muExpr (LongInt value _ _)        = muNumberFromInt value
 muExpr (Float value _ _)          = M.MuNumber value
---muExpr (Imaginary { imaginary_value :: Double, expr_literal :: String, expr_annot :: annot } 
+--muExpr (Imaginary { imaginary_value :: Double, expr_literal :: String, expr_annot :: annot }
 muExpr (Bool value _)             = M.MuBool value
 muExpr (None _)                   = M.MuNil
 --muExpr (Ellipsis { expr_annot :: annot }
@@ -111,8 +111,8 @@ muExpr (Strings strings _)        = muString strings
 muExpr (UnicodeStrings strings _) = muString strings
 muExpr (Call fun args _)          = muCallType fun (map muArgument args)
 --muExpr (Subscript { subscriptee :: Expr annot, subscript_expr :: Expr annot, expr_annot :: annot }
---muExpr (SlicedExpr { slicee :: Expr annot, slices :: [Slice annot], expr_annot :: annot } 
---muExpr (CondExpr 
+--muExpr (SlicedExpr { slicee :: Expr annot, slices :: [Slice annot], expr_annot :: annot }
+--muExpr (CondExpr
 --     { ce_true_branch :: Expr annot -- ^ Expression to evaluate if condition is True.
 --     , ce_condition :: Expr annot -- ^ Boolean condition.
 --     , ce_false_branch :: Expr annot -- ^ Expression to evaluate if condition is False.
@@ -139,7 +139,7 @@ muExpr e                          = M.debug e
 
 muList = M.MuList . map muExpr
 
-muCallType (Dot receiver ident _) = muCall (M.Send $ muExpr receiver) ident 
+muCallType (Dot receiver ident _) = muCall (M.Send $ muExpr receiver) ident
 muCallType (Var ident _)          = muCall M.Application ident
 
 muCall callType ident = callType (M.Reference $ muIdent ident)
@@ -157,7 +157,7 @@ muVariable (Var ident _) = muIdent ident
 muArgument (ArgExpr expr _)             = muExpr expr
 muArgument (ArgVarArgsPos expr _ )      = muExpr expr
 muArgument (ArgVarArgsKeyword expr _ )  = muExpr expr
---muArgument ArgKeyword 
+--muArgument ArgKeyword
 --     { arg_keyword :: Ident annot -- ^ Keyword name.
 --     , arg_expr :: Expr annot -- ^ Argument expression.
 --     , arg_annot :: annot
@@ -203,7 +203,7 @@ muAssignOp (ModAssign _)        = "%"
 muAssignOp (PowAssign _)        = "**"
 muAssignOp (BinAndAssign _)     = "&"
 muAssignOp (BinOrAssign _)      = "|"
-muAssignOp (BinXorAssign _)     = "^" 
+muAssignOp (BinXorAssign _)     = "^"
 muAssignOp (LeftShiftAssign _)  = "<"
 muAssignOp (RightShiftAssign _) = ">"
 muAssignOp (FloorDivAssign _)   = "/"
@@ -216,12 +216,12 @@ muExceptClause (Just (except, maybeVar))  = muPattern maybeVar (M.TypePattern $ 
 muPattern Nothing = id
 muPattern (Just var) = M.AsPattern (muVarToId var)
 
-muRaiseExpr (RaiseV3 Nothing)           = M.MuNull
+muRaiseExpr (RaiseV3 Nothing)           = M.None
 muRaiseExpr (RaiseV3 (Just (expr, _)))  = muExpr expr
 --muRaiseExpr RaiseV2 (Maybe (Expr annot, (Maybe (Expr annot, Maybe (Expr annot))))) -- ^ /Version 2 only/.
 
 -- Helpers
 
-fmapOrNull f = fromMaybe M.MuNull . fmap f
+fmapOrNull f = fromMaybe M.None . fmap f
 
 muVarToId (Var ident _) = muIdent ident

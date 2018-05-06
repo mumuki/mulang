@@ -38,16 +38,16 @@ muJSStatement (JSForIn _ _ id _ gen _ body)                                 = mu
 muJSStatement (JSForVar _ _ _ inits _ conds _ progs _ body)                 = muFor inits conds progs body
 muJSStatement (JSForVarIn _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForIn id gen body
 muJSStatement (JSFunction _ ident _ params _ body _)                        = muComputation ident params body
-muJSStatement (JSIf _ _ expression _ statement)                             = If (muJSExpression expression) (muJSStatement statement) MuNull
+muJSStatement (JSIf _ _ expression _ statement)                             = If (muJSExpression expression) (muJSStatement statement) None
 muJSStatement (JSIfElse _ _ expression _ ifStatement _ elseStatement)       = If (muJSExpression expression) (muJSStatement ifStatement) (muJSStatement elseStatement)
 muJSStatement (JSLabelled _ _ statement)                                    = muJSStatement statement
-muJSStatement (JSEmptyStatement _)                                          = MuNull
+muJSStatement (JSEmptyStatement _)                                          = None
 muJSStatement (JSExpressionStatement (JSIdentifier _ val) _)                = Reference val
 muJSStatement (JSExpressionStatement expression _)                          = muJSExpression expression
 muJSStatement (JSAssignStatement (JSIdentifier _ name) op value _)          = Assignment name (muJSAssignOp op name (muJSExpression value))
 muJSStatement (JSMethodCall (JSMemberDot receptor _ message) _ params _ _)  = Send (muJSExpression receptor) (muJSExpression message) (map muJSExpression (muJSCommaList params))
 muJSStatement (JSMethodCall ident _ params _ _)                             = Application (muJSExpression ident) (map muJSExpression (muJSCommaList params))
-muJSStatement (JSReturn _ maybeExpression _)                                = Return (maybe MuNull muJSExpression maybeExpression)
+muJSStatement (JSReturn _ maybeExpression _)                                = Return (maybe None muJSExpression maybeExpression)
 muJSStatement (JSSwitch _ _ expression _ _ cases _ _)                       = muSwitch expression . partition isDefault $ cases
 muJSStatement (JSThrow _ expression _)                                      = Raise (muJSExpression expression)
 muJSStatement (JSTry _ block catches finally)                               = Try (muJSBlock block) (map muJSTryCatch catches) (muJSTryFinally finally)
@@ -61,7 +61,7 @@ muFor inits conds progs body = ForLoop (muJSExpressionFromList inits) (muJSExpre
 
 muForIn (JSIdentifier _ id) generator body = For [Generator (VariablePattern id) (muJSExpression generator)] (muJSStatement body)
 
-muSwitch expression (def, cases) = Switch (muJSExpression expression) (map muCase cases) (headOrElse MuNull . map muDefault $ def)
+muSwitch expression (def, cases) = Switch (muJSExpression expression) (map muCase cases) (headOrElse None . map muDefault $ def)
 
 muCase (JSCase _ expression _ statements) = (muJSExpression expression, compactMap muJSStatement statements)
 
@@ -90,7 +90,7 @@ containsReturn _             = False
 
 
 muJSExpression:: JSExpression -> Expression
-muJSExpression (JSIdentifier _ "undefined")                         = MuNull
+muJSExpression (JSIdentifier _ "undefined")                         = None
 muJSExpression (JSIdentifier _ name)                                = Reference name
 muJSExpression (JSDecimal _ val)                                    = MuNumber (read val)
 muJSExpression (JSLiteral _ "null")                                 = MuNil
@@ -185,7 +185,7 @@ muJSTryCatch e = (WildcardPattern, debug e)
 
 muJSTryFinally:: JSTryFinally -> Expression
 muJSTryFinally (JSFinally _ block)   = muJSBlock block
-muJSTryFinally JSNoFinally           = MuNull
+muJSTryFinally JSNoFinally           = None
 
 muJSBlock:: JSBlock -> Expression
 muJSBlock (JSBlock _ statements _)   = compactMap muJSStatement statements

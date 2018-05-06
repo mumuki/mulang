@@ -154,7 +154,7 @@ Mulang is three different  - but thighly related - things:
       - [Syntax](#syntax-39)
     + [`Self`](#self)
       - [Syntax](#syntax-40)
-    + [`MuNull`](#munull)
+    + [`MuNil`](#munil)
       - [Syntax](#syntax-41)
     + [`MuNil`](#munil)
       - [Syntax](#syntax-42)
@@ -355,16 +355,16 @@ let e = js "var bar = {baz: function(){ return g }, foo: function(){ return null
 We could manually check if it is the `foo` method in `bar` or the `baz` method in `bar`:
 
 ```haskell
-> scopedList returnsNull ["bar", "foo"] e
+> scopedList returnsNil ["bar", "foo"] e
 True
-> scopedList returnsNull ["bar", "baz"] e
+> scopedList returnsNil ["bar", "baz"] e
 False
 ```
 
 But instead of asking one by one, we could use `detect` :
 
 ```haskell
-> detect returnsNull e
+> detect returnsNil e
 ["bar","foo"]
 -- This means that there are null returns within  `bar` and also within `foo`.
 ```
@@ -427,7 +427,7 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `overridesEqualsOrHashButNotBoth` |  object oriented   | does a given class override equals but not hash? or hash but not equals?
 | `raises`                          |  any               | is the given _exception type_ raised?
 | `rescues`                         |  any               | is the given _exception type_ rescued?
-| `returnsNull`                     |
+| `returnsNill`                     |
 | `typesAs`                         |  any             | is the given type used to type a variable?
 | `typesParameterAs`                |  any               | is a parameter typed as a given type?
 | `typesReturnAs`                   |  any               | is the given type used to type a return?
@@ -714,7 +714,7 @@ $ mulang '
       "smellsSet" : {
         "tag" : "NoSmells",
         "include" : [
-          "ReturnsNull",
+          "ReturnsNil",
           "DoesNullTest"
         ]
       },
@@ -734,7 +734,7 @@ $ mulang '
    "smells" : [
       {
          "binding" : "foo",
-         "inspection" : "ReturnsNull"
+         "inspection" : "ReturnsNil"
       }
    ]
 }
@@ -755,7 +755,7 @@ $ mulang '
       "smellsSet" : {
         "tag" : "AllSmells",
         "exclude" : [
-          "ReturnsNull"
+          "ReturnsNil"
         ]
       },
       "signatureAnalysisType" : {
@@ -837,7 +837,7 @@ $ mulang  '
    "signatures" : [],
    "smells" : [
       {
-         "inspection" : "ReturnsNull",
+         "inspection" : "ReturnsNil",
          "binding" : "foo"
       },
       {
@@ -891,7 +891,7 @@ $ mulang '
                   "tag" : "UnguardedBody",
                   "contents" : {
                      "contents" : {
-                        "tag" : "MuNull"
+                        "tag" : "MuNil"
                      },
                      "tag" : "Return"
                   }
@@ -979,7 +979,7 @@ public static main(String[] args) {}
 ```
 
 ```haskell
-(EntryPoint "main" MuNull)
+(EntryPoint "main" MuNil)
 ```
 
 ### `Function`
@@ -1084,10 +1084,10 @@ end
 (Sequence [
   (EqualMethod (Equation
                 [VariablePatten "other"]
-                (UnguardedBody MuNull))),
+                (UnguardedBody MuNil))),
   (HashMethod (Equation
               []
-              (UnguardedBody MuNull)))]
+              (UnguardedBody MuNil)))]
 
 ```
 
@@ -1156,7 +1156,7 @@ end
 ```
 
 ```haskell
-(Class "Bird" (Just "Animal") MuNull)
+(Class "Bird" (Just "Animal") MuNil)
 ```
 
 #### Java Examples
@@ -1166,7 +1166,7 @@ public class Bird extends Animal {}
 ```
 
 ```haskell
-(Class "Bird" (Just "Animal") MuNull)
+(Class "Bird" (Just "Animal") MuNil)
 ```
 
 ### `Enumeration`
@@ -1615,14 +1615,14 @@ for (var i = 0; i < 10; i++) {
 (Self)
 ```
 
-### `MuNull`
+### `MuNil`
 
 > Used as a placeholder for empty bodies.
 
 #### Syntax
 
 ```haskell
-(MuNull)
+(MuNil)
 ```
 
 ### `MuNil`
@@ -1656,7 +1656,7 @@ for (var i = 0; i < 10; i++) {
 ```
 
 ```haskell
-(MuObject MuNull)
+(MuObject MuNil)
 (MuObject (Attribute "foo" (MuNumber 1)))
 (MuObject (Sequence [
             (Attribute "foo" (MuNumber 1)),
@@ -1743,7 +1743,7 @@ function foo(x, y) { }
 (Function "foo"
   [(Equation
       [(VariablePattern "x"), (VariablePattern "y")]
-      (UnguardedBody MuNull))])
+      (UnguardedBody MuNil))])
 ```
 
 ### `LiteralPattern`

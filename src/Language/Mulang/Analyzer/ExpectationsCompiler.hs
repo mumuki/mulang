@@ -124,3 +124,4 @@ compileInspectionPrimitive = f
 
   simple i _ = Just i
   binded i b = Just $ i b
+

@@ -7,10 +7,10 @@ module Language.Mulang.Inspector.Generic.Smell (
   hasRedundantLocalVariableReturn,
   hasAssignmentReturn,
   hasEmptyIfBranches,
-  doesNullTest,
+  doesNilTest,
   doesTypeTest,
   isLongCode,
-  returnsNull,
+  returnsNil,
   discardsExceptions,
   doesConsolePrint,
   hasLongParameterList,
@@ -25,8 +25,8 @@ import Language.Mulang.Inspector.Primitive
 hasRedundantBooleanComparison :: Inspection
 hasRedundantBooleanComparison = compares isBooleanLiteral
 
-doesNullTest :: Inspection
-doesNullTest = compares f
+doesNilTest :: Inspection
+doesNilTest = compares f
   where f MuNil = True
         f _     = False
 
@@ -47,8 +47,8 @@ comparisonOperands (Call Equal    [a1, a2])   = [a1, a2]
 comparisonOperands (Call NotEqual [a1, a2])   = [a1, a2]
 comparisonOperands _                          = []
 
-returnsNull :: Inspection
-returnsNull = containsExpression f
+returnsNil :: Inspection
+returnsNil = containsExpression f
   where f (Return MuNil) = True
         f _              = False
 
@@ -109,7 +109,7 @@ hasAssignmentReturn = containsExpression f
 
 discardsExceptions :: Inspection
 discardsExceptions = containsExpression f
-  where f (Try _ [(_, MuNull)] _)  = True
+  where f (Try _ [(_, None)] _)  = True
         f (Try _ [(_, Print _)] _) = True
         f _                        = False
 
@@ -147,5 +147,5 @@ overridesEqualOrHashButNotBoth = containsExpression f
 
 hasEmptyIfBranches :: Inspection
 hasEmptyIfBranches = containsExpression f
-  where f (If _ MuNull elseBranch) = elseBranch /= MuNull
+  where f (If _ None elseBranch) = elseBranch /= None
         f _                        = False
