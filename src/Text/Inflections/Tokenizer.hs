@@ -8,20 +8,20 @@ module Text.Inflections.Tokenizer (
 
 import Data.Char (toLower, isDigit, isLower)
 import Data.Either (isRight)
+import Data.Bifunctor (first)
 
-import Text.Inflections
+import Text.Inflections (parseCamelCase, parseSnakeCase)
 import Text.Inflections.Parse.Types
-import Text.Parsec.Error (ParseError)
 
 import Control.Fallible
 
-type CaseStyle = String -> Either Text.Parsec.Error.ParseError [Text.Inflections.Parse.Types.Word]
+type CaseStyle = String -> Either String [Text.Inflections.Parse.Types.Word]
 
 camelCase      :: CaseStyle
-camelCase      = parseCamelCase [] . filter (not.isDigit)
+camelCase      = first show . parseCamelCase [] . filter (not.isDigit)
 
 snakeCase      :: CaseStyle
-snakeCase      = parseSnakeCase []
+snakeCase      = first show . parseSnakeCase []
 
 rubyCase       :: CaseStyle
 rubyCase  word | (isLower.head) word = snakeCase baseWord
