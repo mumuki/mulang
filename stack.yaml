@@ -1,4 +1,4 @@
-resolver: lts-7.24
+resolver: lts-10.2
 packages:
 - '.'
 extra-deps:
@@ -6,5 +6,6 @@ extra-deps:
 # unions with nullary constructors
 - aeson-1.2.1.0
 - language-javascript-0.6.0.10
+- language-python-0.5.4
 flags: {}
 extra-package-dbs: []

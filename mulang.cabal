@@ -77,7 +77,7 @@ library
     language-javascript       ,
     language-python           ,
     aeson                     ,
-    inflections               <= 0.2.0.1,
+    inflections               ,
     parsec                    ,
     ParsecTools               ,
     split                     ,
