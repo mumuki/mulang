@@ -37,7 +37,7 @@ spec = do
         class Sample { void aMethod() { throw new Exception(); } }|]) `shouldBe` False
 
   describe "usesStaticPolymorphism" $ do
-    it "is True when there is an usage of an interface implemented by two or more classes" $ do
+    it "is True when there is an usage of an interface in an attribute implemented by two or more classes" $ do
       usesStaticPolymorphism (java [text|
             interface Singer {
               void sing();
@@ -52,6 +52,22 @@ spec = do
               Singer o;
               void run() { o.sing(); }
             }|]) `shouldBe` True
+
+    it "is True when there is an usage of an interface in a parameter implemented by two or more classes" $ do
+      usesStaticPolymorphism (java [text|
+            interface Singer {
+              void sing();
+            }
+            class Bird implements Singer {
+              void sing() {}
+            }
+            class Performer implements Singer {
+              void sing() {}
+            }
+            class Festival {
+              void run(Singer o) { o.sing(); }
+            }|]) `shouldBe` True
+
 
     it "is False when there is an usage of an interface implemented by just one class" $ do
       usesStaticPolymorphism (java [text|
@@ -79,22 +95,44 @@ spec = do
 
     it "is False when there is no polymorphic message send" $ do
       usesStaticPolymorphism (java [text|
-            class Bird {
+            interface Singer {
+              void sing();
+            }
+            class Bird implements Singer {
               void sing() {}
             }
-            class Performer {
+            class Performer implements Singer {
               void sing() {}
             }
             class Festival {
               void run(Singer o) { o.toString(); }
             }|]) `shouldBe` False
 
-    it "is False when there is no message is sent" $ do
+    it "is False when there is no message is sent to an attribute" $ do
       usesStaticPolymorphism (java [text|
-            class Bird {
+            interface Singer {
+              void sing();
+            }
+            class Bird implements Singler {
               void sing() {}
             }
-            class Performer {
+            class Performer implements Singer {
+              void sing() {}
+            }
+            class Festival {
+              Singer o = new Bird();
+              void run() {}
+            }|]) `shouldBe` False
+
+    it "is False when there is no message is sent to a paramter" $ do
+      usesStaticPolymorphism (java [text|
+            interface Singer {
+              void sing();
+            }
+            class Bird implements Singer {
+              void sing() {}
+            }
+            class Performer implements Singer{
               void sing() {}
             }
             class Festival {
@@ -103,9 +141,12 @@ spec = do
 
     it "is False when there are no methods defined" $ do
       usesStaticPolymorphism (java [text|
-            class Bird {
+            interface Singer {
+              void sing();
             }
-            class Performer {
+            class Bird implements Singer {
+            }
+            class Performer implements Singer {
             }
             class Festival {
               void run(Singer o) {}
@@ -121,4 +162,8 @@ spec = do
             }
             class Performer implements Singer {
               void sing() {}
+            }
+            class Festival {
+              Singer o;
+              void run() { }
             }|]) `shouldBe` False
