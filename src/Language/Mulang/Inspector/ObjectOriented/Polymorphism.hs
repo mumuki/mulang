@@ -46,7 +46,7 @@ usesTemplateMethod expression = inspect $ do
 
 usesDyamicPolymorphism :: Inspection
 usesDyamicPolymorphism expression = inspect $ do
-  (Send _ (Reference selector) _) <- expressions expression
+  (SimpleSend _ selector _) <- expressions expression
   guardCount (>1) (methodDeclarationsOf selector expression)
 
 usesStaticPolymorphism :: Inspection
