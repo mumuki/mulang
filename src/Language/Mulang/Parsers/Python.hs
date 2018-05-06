@@ -1,0 +1,227 @@
+module Language.Mulang.Parsers.Python (py, parsePython) where
+
+import qualified Language.Mulang.Ast as M 
+import Language.Mulang.Builder
+import Language.Mulang.Parsers
+
+import Language.Python.Version3.Parser (parseModule)
+import Language.Python.Common.Token (Token)
+import Language.Python.Common.AST
+
+import Data.List (intercalate)
+import Data.Maybe (fromMaybe, listToMaybe)
+
+import Control.Fallible
+
+py:: Parser
+py = orFail . parsePython'
+
+parsePython:: EitherParser
+parsePython = orLeft . parsePython'
+
+parsePython' = fmap (normalize . muPyAST) . (`parseModule` "")
+
+muPyAST:: (ModuleSpan, [Token]) -> M.Expression
+muPyAST (modul, _) = muModule modul
+
+muModule:: ModuleSpan -> M.Expression
+muModule (Module statements) = compactMap muStatement statements
+
+
+muStatement:: StatementSpan -> M.Expression
+muStatement (While cond body _ _)             = M.While (muExpr cond) (muSuite body)
+muStatement (For targets generator body _ _)  = M.For [M.Generator (M.TuplePattern (map (M.VariablePattern . muVariable) targets)) (muExpr generator)] (muSuite body)
+muStatement (Fun name args _ body _)          = muComputation (muIdent name) (map muParameter args) (muSuite body)
+muStatement (Class name parents body _)       = M.Class (muIdent name) (listToMaybe . map muParent $ parents) (muSuite body)
+muStatement (Conditional guards els _ )       = foldr muIf (muSuite els) guards
+muStatement (Assign [to] from _)              = M.Assignment (muVariable to) (muExpr from)
+muStatement (AugmentedAssign to op from _)    = M.Assignment (muVariable to) (M.Application (M.Reference . muAssignOp $ op) [M.Reference . muVariable $ to, muExpr from])
+--muStatement (Decorated 
+--     { decorated_decorators :: [Decorator annot] -- ^ Decorators.
+--     , decorated_def :: Statement annot -- ^ Function or class definition to be decorated.
+--     , stmt_annot :: annot 
+--     }
+muStatement (Return expr _)                   = M.Return $ fmapOrNull muExpr expr
+muStatement (Try body handlers _ finally _)   = M.Try (muSuite body) (map muHandler handlers) (muSuite finally)
+muStatement (Raise expr _)                    = M.Raise $ muRaiseExpr expr
+--muStatement (With 
+--     { with_context :: [(Expr annot, Maybe (Expr annot))] -- ^ Context expression(s) (yields a context manager).
+--     , with_body :: Suite annot -- ^ Suite to be managed.
+--     , stmt_annot :: annot
+--     }
+muStatement (Pass _)                          = M.MuNull
+--muStatement (Break { stmt_annot :: annot }
+--muStatement (Continue { stmt_annot :: annot }
+--muStatement (Delete 
+--     { del_exprs :: [Expr annot] -- ^ Items to delete.
+--     , stmt_annot :: annot 
+--     }
+muStatement (StmtExpr expr _)                 = muExpr expr
+--muStatement (Global 
+--     { global_vars :: [Ident annot] -- ^ Variables declared global in the current block.
+--     , stmt_annot :: annot
+--     }
+--muStatement (NonLocal 
+--     { nonLocal_vars :: [Ident annot] -- ^ Variables declared nonlocal in the current block (their binding comes from bound the nearest enclosing scope).
+--     , stmt_annot :: annot
+--     }
+--muStatement (Assert 
+--     { assert_exprs :: [Expr annot] -- ^ Expressions being asserted.
+--     , stmt_annot :: annot
+--     }
+muStatement (Print _ exprs _ _)               = M.Print $ compactMap muExpr exprs
+muStatement (Exec expr _ _)                   = muExpr expr
+muStatement e                                 = M.debug e
+
+
+muIf (condition, body) otherwise = M.If (muExpr condition) (muSuite body) otherwise
+
+muParent (ArgExpr (Var ident _) _) = muIdent ident
+
+muComputation name params body | containsReturn body = M.SimpleFunction name params body
+                               | otherwise           = M.SimpleProcedure name params body
+
+
+containsReturn :: M.Expression -> Bool
+containsReturn (M.Return _)    = True
+containsReturn (M.Sequence xs) = any containsReturn xs
+containsReturn _               = False
+
+muParameter:: ParameterSpan -> M.Pattern
+muParameter (Param name _ _ _) = M.VariablePattern (muIdent name)
+
+muIdent:: IdentSpan -> String
+muIdent (Ident id _) = id
+
+muSuite:: SuiteSpan -> M.Expression
+muSuite = compactMap muStatement
+
+
+muExpr:: ExprSpan -> M.Expression
+muExpr (Var ident _)              = M.Reference (muIdent ident)
+muExpr (Int value _ _)            = muNumberFromInt value
+muExpr (LongInt value _ _)        = muNumberFromInt value
+muExpr (Float value _ _)          = M.MuNumber value
+--muExpr (Imaginary { imaginary_value :: Double, expr_literal :: String, expr_annot :: annot } 
+muExpr (Bool value _)             = M.MuBool value
+muExpr (None _)                   = M.MuNil
+--muExpr (Ellipsis { expr_annot :: annot }
+--muExpr (ByteStrings { byte_string_strings :: [String], expr_annot :: annot }
+muExpr (Strings strings _)        = muString strings
+muExpr (UnicodeStrings strings _) = muString strings
+muExpr (Call fun args _)          = muCallType fun (map muArgument args)
+--muExpr (Subscript { subscriptee :: Expr annot, subscript_expr :: Expr annot, expr_annot :: annot }
+--muExpr (SlicedExpr { slicee :: Expr annot, slices :: [Slice annot], expr_annot :: annot } 
+--muExpr (CondExpr 
+--     { ce_true_branch :: Expr annot -- ^ Expression to evaluate if condition is True.
+--     , ce_condition :: Expr annot -- ^ Boolean condition.
+--     , ce_false_branch :: Expr annot -- ^ Expression to evaluate if condition is False.
+--     , expr_annot :: annot
+--     }
+muExpr (BinaryOp op left right _) = muApplication op [left, right]
+muExpr (UnaryOp op arg _)         = muApplication op [arg]
+--muExpr (Dot { dot_expr :: Expr annot, dot_attribute :: Ident annot, expr_annot :: annot }
+muExpr (Lambda args body _)       = M.Lambda (map muParameter args) (muExpr body)
+muExpr (Tuple exprs _)            = M.MuTuple $ map muExpr exprs
+muExpr (Yield arg _)              = M.Yield $ fmapOrNull muYieldArg arg
+--muExpr (Generator { gen_comprehension :: Comprehension annot, expr_annot :: annot }
+--muExpr (ListComp { list_comprehension :: Comprehension annot, expr_annot :: annot }
+muExpr (List exprs _)             = muList exprs
+--muExpr (Dictionary { dict_mappings :: [DictMappingPair annot], expr_annot :: annot }
+--muExpr (DictComp { dict_comprehension :: Comprehension annot, expr_annot :: annot }
+muExpr (Set exprs _)              = muList exprs
+--muExpr (SetComp { set_comprehension :: Comprehension annot, expr_annot :: annot }
+--muExpr (Starred { starred_expr :: Expr annot, expr_annot :: annot }
+muExpr (Paren expr _)             = muExpr expr
+--muExpr (StringConversion { backquoted_expr :: Expr annot, expr_anot :: annot }
+muExpr e                          = M.debug e
+
+
+muList = M.MuList . map muExpr
+
+muCallType (Dot receiver ident _) = muCall (M.Send $ muExpr receiver) ident 
+muCallType (Var ident _)          = muCall M.Application ident
+
+muCall callType ident = callType (M.Reference $ muIdent ident)
+
+
+muApplication op args = M.Application (M.Reference (muOp op)) (map muExpr args)
+
+muString = M.MuString . intercalate "\n"
+
+muNumberFromInt = M.MuNumber . fromInteger
+
+muVariable:: ExprSpan -> M.Identifier
+muVariable (Var ident _) = muIdent ident
+
+muArgument (ArgExpr expr _)             = muExpr expr
+muArgument (ArgVarArgsPos expr _ )      = muExpr expr
+muArgument (ArgVarArgsKeyword expr _ )  = muExpr expr
+--muArgument ArgKeyword 
+--     { arg_keyword :: Ident annot -- ^ Keyword name.
+--     , arg_expr :: Expr annot -- ^ Argument expression.
+--     , arg_annot :: annot
+--     }
+muArgument e                            = M.debug e
+
+--muYieldArg (YieldFrom expr _)(Expr annot) annot -- ^ Yield from a generator (Version 3 only)
+muYieldArg (YieldExpr expr) = muExpr expr
+
+muOp (And _)                = "and"
+muOp (Or _)                 = "or"
+muOp (Not _)                = "not"
+muOp (Exponent _)           = "**"
+muOp (LessThan _)           = "<"
+muOp (GreaterThan _)        = ">"
+muOp (Equality _)           = "=="
+muOp (GreaterThanEquals _)  = ">="
+muOp (LessThanEquals _)     = "<="
+muOp (NotEquals _)          = "!="
+muOp (NotEqualsV2 _)        = "<>" -- Version 2 only.
+muOp (In _)                 = "in"
+muOp (Is _)                 = "is"
+muOp (IsNot _)              = "is not"
+muOp (NotIn _)              = "not in"
+muOp (BinaryOr _)           = "|"
+muOp (Xor _)                = "^"
+muOp (BinaryAnd _)          = "&"
+muOp (ShiftLeft _)          = "<<"
+muOp (ShiftRight _)         = ">>"
+muOp (Multiply _)           = "*"
+muOp (Plus _)               = "+"
+muOp (Minus _)              = "-"
+muOp (Divide _)             = "/"
+muOp (FloorDivide _)        = "//"
+muOp (Invert _)             = "~"
+muOp (Modulo _)             = "%"
+
+muAssignOp (PlusAssign _)       = "+"
+muAssignOp (MinusAssign _)      = "-"
+muAssignOp (MultAssign _)       = "*"
+muAssignOp (DivAssign _)        = "/"
+muAssignOp (ModAssign _)        = "%"
+muAssignOp (PowAssign _)        = "**"
+muAssignOp (BinAndAssign _)     = "&"
+muAssignOp (BinOrAssign _)      = "|"
+muAssignOp (BinXorAssign _)     = "^" 
+muAssignOp (LeftShiftAssign _)  = "<"
+muAssignOp (RightShiftAssign _) = ">"
+muAssignOp (FloorDivAssign _)   = "/"
+
+muHandler (Handler (ExceptClause clause _) suite _) = (muExceptClause clause, muSuite suite)
+
+muExceptClause Nothing                    = M.WildcardPattern
+muExceptClause (Just (except, maybeVar))  = muPattern maybeVar (M.TypePattern $ muVarToId except)
+
+muPattern Nothing = id
+muPattern (Just var) = M.AsPattern (muVarToId var)
+
+muRaiseExpr (RaiseV3 Nothing)           = M.MuNull
+muRaiseExpr (RaiseV3 (Just (expr, _)))  = muExpr expr
+--muRaiseExpr RaiseV2 (Maybe (Expr annot, (Maybe (Expr annot, Maybe (Expr annot))))) -- ^ /Version 2 only/.
+
+-- Helpers
+
+fmapOrNull f = fromMaybe M.MuNull . fmap f
+
+muVarToId (Var ident _) = muIdent ident
