@@ -11,17 +11,18 @@ import Data.Either (isRight)
 import Data.Bifunctor (first)
 
 import Text.Inflections (parseCamelCase, parseSnakeCase)
-import Text.Inflections.Parse.Types
+import Text.Inflections (SomeWord, unSomeWord)
+import Data.Text (pack, unpack)
 
 import Control.Fallible
 
-type CaseStyle = String -> Either String [Text.Inflections.Parse.Types.Word]
+type CaseStyle = String -> Either String [SomeWord]
 
 camelCase      :: CaseStyle
-camelCase      = first show . parseCamelCase [] . filter (not.isDigit)
+camelCase      = first show . parseCamelCase [] . pack . filter (not.isDigit)
 
 snakeCase      :: CaseStyle
-snakeCase      = first show . parseSnakeCase []
+snakeCase      = first show . parseSnakeCase [] . pack
 
 rubyCase       :: CaseStyle
 rubyCase  word | (isLower.head) word = snakeCase baseWord
@@ -37,7 +38,5 @@ tokenize style s | Just words <- (wordsOrNothing . style) s = concatMap toToken 
                  | otherwise = []
                   where toToken = return . map toLower
 
-
-wordsOrNothing = fmap (concatMap c) . orNothing
-                where c (Word w) = [w]
-                      c _        = []
+wordsOrNothing = fmap (map c) . orNothing
+                where c t        = unpack (unSomeWord id t)
