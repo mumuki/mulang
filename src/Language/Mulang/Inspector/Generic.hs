@@ -14,54 +14,20 @@ module Language.Mulang.Inspector.Generic (
   declaresComputation,
   declaresComputationWithArity,
   declaresComputationWithArity',
-  declaresTypeAlias,
-  declaresTypeSignature,
   usesAnonymousVariable,
   raises,
   rescues,
   usesExceptions,
-  usesExceptionHandling,
-  containsExpression,
-  containsDeclaration,
-  containsBoundDeclaration,
-  containsBody,
-  matchesType,
-  typesReturnAs,
-  typesParameterAs,
-  typesAs,
-  usesType,
-  Inspection,
-  IdentifierInspection) where
+  usesExceptionHandling) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
-import Language.Mulang.Generator (expressions, boundDeclarations, equationBodies, declarations, referencedIdentifiers)
+import Language.Mulang.Inspector.Primitive
+import Language.Mulang.Generator (declarations, referencedIdentifiers)
 
 import Data.Maybe (listToMaybe)
+import Data.List.Extra (has)
 
-type Inspection = Expression  -> Bool
-type IdentifierInspection = IdentifierPredicate -> Inspection
-
-typesReturnAs :: IdentifierInspection
-typesReturnAs predicate = containsDeclaration f
-  where f (SubroutineSignature _ _ name _)  = predicate name
-        f _                                 = False
-
-typesParameterAs :: IdentifierInspection
-typesParameterAs predicate = containsDeclaration f
-  where f (SubroutineSignature _ names _ _)  = any predicate names
-        f _                                  = False
-
-typesAs :: IdentifierInspection
-typesAs predicate = containsDeclaration f
-  where f (VariableSignature _ name _)   = predicate name
-        f _                              = False
-
-usesType :: IdentifierInspection
-usesType predicate = containsDeclaration f
-  where f (VariableSignature _ name _)        = predicate name
-        f (SubroutineSignature _ args ret _)  = any predicate (ret:args)
-        f _                                   = False
 
 -- | Inspection that tells whether an expression is equal to a given piece of code after being parsed
 parses :: (String -> Expression) -> String -> Inspection
@@ -152,16 +118,6 @@ declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
 
         argsHaveArity = arityPredicate.length
 
-declaresTypeAlias :: IdentifierInspection
-declaresTypeAlias = containsBoundDeclaration f
-  where f (TypeAlias _ _) = True
-        f _               = False
-
-declaresTypeSignature :: IdentifierInspection
-declaresTypeSignature = containsBoundDeclaration f
-  where f (TypeSignature _ _) = True
-        f _                   = False
-
 raises :: IdentifierInspection
 raises predicate = containsExpression f
   where f (Raise (New n _))     = predicate n
@@ -200,29 +156,3 @@ usesAnonymousVariable = containsExpression f
         isOrContainsWildcard (AsPattern _ p)                   = isOrContainsWildcard p
         isOrContainsWildcard WildcardPattern                   = True
         isOrContainsWildcard _                                 = False
-
-
-containsExpression :: (Expression -> Bool) -> Inspection
-containsExpression f = has f expressions
-
-containsBody :: (EquationBody -> Bool)-> Inspection
-containsBody f = has f equationBodies
-
-containsBoundDeclaration :: (Expression -> Bool) -> IdentifierInspection
-containsBoundDeclaration f b  = has f (boundDeclarations b)
-
-containsDeclaration :: (Expression -> Bool) -> Inspection
-containsDeclaration f = has f (map snd . declarations)
-
-matchesType :: IdentifierPredicate -> Pattern -> Bool
-matchesType predicate (TypePattern n)               = predicate n
-matchesType predicate (AsPattern _ (TypePattern n)) = predicate n
-matchesType predicate (UnionPattern patterns)       = any (matchesType predicate) patterns
-matchesType _         _                             = False
-
--- private
-
-has f g = any f . g
-
-
-

@@ -8,8 +8,9 @@ module Language.Mulang.Inspector.Functional (
   usesConditional) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Inspector.Generic
-import Language.Mulang.Inspector.Combiner
+import Language.Mulang.Inspector.Primitive (Inspection, containsExpression, containsBody)
+import Language.Mulang.Inspector.Generic (usesIf, usesYield)
+import Language.Mulang.Inspector.Combiner (alternative)
 
 usesConditional :: Inspection
 usesConditional = alternative usesIf usesGuards

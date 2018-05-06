@@ -15,7 +15,9 @@ module Language.Mulang.Inspector.ObjectOriented (
 
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
-import Language.Mulang.Inspector.Generic
+import Language.Mulang.Inspector.Primitive (
+  Inspection, IdentifierInspection,
+  containsExpression, containsDeclaration, containsBoundDeclaration)
 
 implements :: IdentifierInspection
 implements predicate = containsExpression f
