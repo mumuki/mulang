@@ -15,6 +15,56 @@ java = J.java . unpack
 
 spec :: Spec
 spec = do
+  describe "usesStaticMethodOverload" $ do
+    it "is true when two methods with the same name and different arity exist on the same class" $ do
+      usesStaticMethodOverload (java [text|
+          class Wallet {
+            void deposit(BitcoinMoney amount) {}
+            void deposit(RegularMoney amount, double conversion) {}
+          }
+        |]) `shouldBe` True
+
+    it "is true when two methods with the same name and different types exist on the same class" $ do
+      usesStaticMethodOverload (java [text|
+          class Wallet {
+            void deposit(BitcoinMoney amount) {}
+            void deposit(RegularMoney amount) {}
+          }
+        |]) `shouldBe` True
+
+    it "is false when there are no duplicated methods" $ do
+      usesStaticMethodOverload (java [text|
+          class Wallet {
+            void deposit(BitcoinMoney amount) {}
+            void withdraw(BitcoinMoney amount) {}
+          }
+        |]) `shouldBe` False
+
+  describe "usesDynamicMethodOverload" $ do
+    it "is true when two methods with the same name and different arity exist on the same class" $ do
+      usesDynamicMethodOverload (java [text|
+          class Wallet {
+            void deposit(BitcoinMoney amount) {}
+            void deposit(RegularMoney amount, double conversion) {}
+          }
+        |]) `shouldBe` True
+
+    it "is false when two methods with the same name and different types exist on the same class" $ do
+      usesDynamicMethodOverload (java [text|
+          class Wallet {
+            void deposit(BitcoinMoney amount) {}
+            void deposit(RegularMoney amount) {}
+          }
+        |]) `shouldBe` False
+
+    it "is false when there are no duplicated methods" $ do
+      usesDynamicMethodOverload (java [text|
+          class Wallet {
+            void deposit(BitcoinMoney amount) {}
+            void withdraw(BitcoinMoney amount) {}
+          }
+        |]) `shouldBe` False
+
   describe "usesTemplateMethod" $ do
     it "is true when an abstract method is uses in an abstract class" $ do
       usesTemplateMethod (java [text|
@@ -159,27 +209,12 @@ spec = do
               void run(Singer o) { o.sing(); }
             }|]) `shouldBe` False
 
-    it "is False when there is no polymorphic message send" $ do
+    it "is True even when there no message is sent to an attribute" $ do
       usesStaticPolymorphism (java [text|
             interface Singer {
               void sing();
             }
             class Bird implements Singer {
-              void sing() {}
-            }
-            class Performer implements Singer {
-              void sing() {}
-            }
-            class Festival {
-              void run(Singer o) { o.toString(); }
-            }|]) `shouldBe` False
-
-    it "is False when there is no message is sent to an attribute" $ do
-      usesStaticPolymorphism (java [text|
-            interface Singer {
-              void sing();
-            }
-            class Bird implements Singler {
               void sing() {}
             }
             class Performer implements Singer {
@@ -188,40 +223,26 @@ spec = do
             class Festival {
               Singer o = new Bird();
               void run() {}
-            }|]) `shouldBe` False
+            }|]) `shouldBe` True
 
-    it "is False when there is no message is sent to a paramter" $ do
+    it "is True even when there is no message is sent to a paramter" $ do
       usesStaticPolymorphism (java [text|
             interface Singer {
               void sing();
             }
             class Bird implements Singer {
               void sing() {}
-            }
-            class Performer implements Singer{
-              void sing() {}
-            }
-            class Festival {
-              void run(Singer o) {}
-            }|]) `shouldBe` False
-
-    it "is False when there are no methods defined" $ do
-      usesStaticPolymorphism (java [text|
-            interface Singer {
-              void sing();
-            }
-            class Bird implements Singer {
             }
             class Performer implements Singer {
+              void sing() {}
             }
             class Festival {
               void run(Singer o) {}
-            }|]) `shouldBe` False
+            }|]) `shouldBe` True
 
-    it "is False when there is no usage" $ do
+    it "is False when interface declares no method" $ do
       usesStaticPolymorphism (java [text|
             interface Singer {
-              void sing();
             }
             class Bird implements Singer {
               void sing() {}

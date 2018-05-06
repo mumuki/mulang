@@ -11,6 +11,7 @@ module Language.Mulang.Generator (
   identifierReferences,
   transitiveReferencedIdentifiers,
   Generator,
+  Declarator,
   Expression(..)) where
 
 import Language.Mulang.Ast
@@ -26,7 +27,7 @@ type Declarator = (Identifier, Expression)
 -- | classes, methods, functions, records, local and global variables, and so on
 -- |
 -- | For example, in 'f x = g x where x = y', it returns '(f, f x = ...)' and '(x, x = y)'
-declarators :: Generator (Identifier, Expression)
+declarators :: Generator Declarator
 declarators (Sequence es)          = concatMap declarators es
 declarators e@(Attribute n _)      = [(n, e)]
 declarators e@(Class n _ b)        = (n, e) : declarators b

@@ -9,9 +9,6 @@ import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Java (java)
 import           Language.Mulang.Inspector.Generic.Smell
 
-import           Data.Text (Text, unpack)
-import           NeatInterpolation (text)
-
 spec :: Spec
 spec = do
   describe "declaresEntryPoint" $ do

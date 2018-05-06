@@ -1,17 +1,35 @@
+{-# LANGUAGE ViewPatterns #-}
+
 module Language.Mulang.Inspector.ObjectOriented.Polymorphism (
   usesDyamicPolymorphism,
   usesStaticPolymorphism,
   usesTemplateMethod,
-  usesObjectComposition)  where
+  usesObjectComposition,
+  usesDynamicMethodOverload,
+  usesStaticMethodOverload)  where
 
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Primitive (Inspection)
 import Language.Mulang.Inspector.ObjectOriented (implements, declaresMethod)
-import Language.Mulang.Inspector.Typed (typesAs)
+import Language.Mulang.Inspector.Typed (usesType)
 
 import Control.Monad (MonadPlus, guard)
 import Language.Mulang.Generator (Generator, declarations, expressions)
+
+usesDynamicMethodOverload :: Inspection
+usesDynamicMethodOverload expression = inspect $ do
+  klass@(Class _ _ _)                 <- declarations expression
+  (SimpleMethod n1 (length -> a1) _)  <- declarations klass
+  (SimpleMethod n2 (length -> a2) _)  <- declarations klass
+  guard (n1 == n2 && a1 /= a2)
+
+usesStaticMethodOverload :: Inspection
+usesStaticMethodOverload expression = inspect $ do
+  klass@(Class _ _ _)               <- declarations expression
+  s1@(SubroutineSignature n1 _ _ _) <- declarations klass
+  s2@(SubroutineSignature n2 _ _ _) <- declarations klass
+  guard (n1 == n2 && s1 /= s2)
 
 usesObjectComposition :: Inspection
 usesObjectComposition expression = inspect $ do
@@ -33,8 +51,9 @@ usesDyamicPolymorphism expression = inspect $ do
 
 usesStaticPolymorphism :: Inspection
 usesStaticPolymorphism expression = inspect $ do
-  (Interface interfaceId _ _) <- declarations expression
-  guard (typesAs (named interfaceId) expression)
+  interface@(Interface interfaceId _ _) <- declarations expression
+  (SubroutineSignature _ _ _ _)         <- declarations interface
+  guard (usesType (named interfaceId) expression)
   guardCount (>1) (implementorsOf interfaceId expression)
 
 -- private
