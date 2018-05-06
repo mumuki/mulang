@@ -3,7 +3,7 @@
 module PolymorphismSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang
+import           Language.Mulang.Ast
 import           Language.Mulang.Inspector.ObjectOriented.Polymorphism
 import qualified Language.Mulang.Parsers.Java as J (java)
 
