@@ -22,7 +22,7 @@ allSmells :: [Smell]
 allSmells = [
   "DiscardsExceptions",
   "DoesConsolePrint",
-  "DoesNullTest",
+  "DoesNilTest",
   "DoesTypeTest",
   "HasAssignmentReturn",
   "HasCodeDuplication",
@@ -40,7 +40,7 @@ allSmells = [
   "HasWrongCaseIdentifiers",
   "IsLongCode",
   "OverridesEqualOrHashButNotBoth",
-  "ReturnsNull",
+  "ReturnsNil",
   "UsesCut",
   "UsesFail",
   "UsesUnificationOperator" ]
@@ -48,7 +48,7 @@ allSmells = [
 detectionFor :: Smell -> Detection
 detectionFor "DiscardsExceptions"              = simple discardsExceptions
 detectionFor "DoesConsolePrint"                = simple doesConsolePrint
-detectionFor "DoesNullTest"                    = simple doesNullTest
+detectionFor "DoesNilTest"                    = simple doesNilTest
 detectionFor "DoesTypeTest"                    = simple doesTypeTest
 detectionFor "HasAssignmentReturn"             = simple hasAssignmentReturn
 detectionFor "HasCodeDuplication"              = unsupported
@@ -70,7 +70,7 @@ detectionFor "HasWrongCaseIdentifiers"         = withLanguage hasWrongCaseIdenti
 detectionFor "HasWrongCaseBinding"             = withLanguage hasWrongCaseIdentifiers
 detectionFor "IsLongCode"                      = unsupported
 detectionFor "OverridesEqualOrHashButNotBoth"  = simple overridesEqualOrHashButNotBoth
-detectionFor "ReturnsNull"                     = simple returnsNull
+detectionFor "ReturnsNil"                      = simple returnsNil
 detectionFor "UsesCut"                         = simple usesCut
 detectionFor "UsesFail"                        = simple usesFail
 detectionFor "UsesUnificationOperator"         = simple usesUnificationOperator

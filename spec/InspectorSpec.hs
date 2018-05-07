@@ -14,7 +14,7 @@ spec = do
   describe "declaresEntryPoint" $ do
     describe "with program declarations" $ do
       it "is True when program is declared" $ do
-        let code = EntryPoint "main" MuNull
+        let code = EntryPoint "main" None
 
         declaresEntryPoint anyone code `shouldBe` True
 
@@ -53,7 +53,7 @@ spec = do
 
   describe "usesSwitch" $ do
     it "is True when present in function" $ do
-      let code = Switch (Reference "x") [(MuNull, MuNumber 0)] MuNull
+      let code = Switch (Reference "x") [(None, MuNumber 0)] None
 
       usesSwitch code  `shouldBe` True
 
@@ -64,7 +64,7 @@ spec = do
 
   describe "usesRepeat" $ do
     it "is True when present in function" $ do
-      let code = SimpleFunction "f" [] (Sequence [Repeat (MuNumber 2) MuNull, Return (MuNumber 2)])
+      let code = SimpleFunction "f" [] (Sequence [Repeat (MuNumber 2) None, Return (MuNumber 2)])
 
       usesRepeat code  `shouldBe` True
 
@@ -206,7 +206,7 @@ spec = do
       declaresEnumeration (named "Direction") (Enumeration "Direction" ["SOUTH", "EAST", "WEST", "NORTH"]) `shouldBe` True
 
     it "is False when not present" $ do
-      declaresEnumeration (named "Bird") (Class "Bird" (Just "Animal") MuNull) `shouldBe` False
+      declaresEnumeration (named "Bird") (Class "Bird" (Just "Animal") None) `shouldBe` False
 
   describe "declaresInterface" $ do
     it "is True when present" $ do
@@ -234,16 +234,16 @@ spec = do
 
   describe "usesInheritance" $ do
     it "is True when present" $ do
-      usesInheritance (Class "Bird" (Just "Animal") MuNull) `shouldBe` True
+      usesInheritance (Class "Bird" (Just "Animal") None) `shouldBe` True
 
     it "is False when not present" $ do
-      usesInheritance (Class "Bird" Nothing MuNull) `shouldBe` False
+      usesInheritance (Class "Bird" Nothing None) `shouldBe` False
 
     it "is True when present, scoped" $ do
-      (scoped usesInheritance "Bird") (Sequence [Class "Bird" (Just "Animal") MuNull, Class "Fox" (Just "Animal") MuNull])  `shouldBe` True
+      (scoped usesInheritance "Bird") (Sequence [Class "Bird" (Just "Animal") None, Class "Fox" (Just "Animal") None])  `shouldBe` True
 
     it "is True when present, scoped" $ do
-      (scoped usesInheritance "Hercules") (Sequence [Class "Hercules" Nothing MuNull, Class "Fox" (Just "Animal") MuNull])  `shouldBe` False
+      (scoped usesInheritance "Hercules") (Sequence [Class "Hercules" Nothing None, Class "Fox" (Just "Animal") None])  `shouldBe` False
 
   describe "usesMixins" $ do
     it "is True when include present" $ do

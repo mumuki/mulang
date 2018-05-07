@@ -84,19 +84,19 @@ muType (RefType t)  = muRefType t
 muReturnType = fromMaybe "void" . fmap muType
 
 muStmt (StmtBlock block)               = muBlock block
-muStmt (IfThen exp ifTrue)             = If (muExp exp) (muStmt ifTrue) MuNull
+muStmt (IfThen exp ifTrue)             = If (muExp exp) (muStmt ifTrue) None
 muStmt (IfThenElse exp ifTrue ifFalse) = If (muExp exp) (muStmt ifTrue) (muStmt ifFalse)
 muStmt (While cond body)               = M.While (muExp cond) (muStmt body)
 muStmt (Do body cond)                  = M.While (muStmt body) (muExp cond)
-muStmt (Return exp)                    = M.Return $ fmapOrNull muExp exp
+muStmt (Return exp)                    = M.Return $ fmapOrNone muExp exp
 muStmt (ExpStmt exp)                   = muExp exp
-muStmt Empty                           = MuNull
+muStmt Empty                           = None
 muStmt (Assert exp _)                  = SimpleSend Self "assert" [muExp exp]
 muStmt (Synchronized _ block)          = muBlock block
 muStmt (Labeled _ stmt)                = muStmt stmt
 muStmt (Throw exp)                     = Raise $ muExp exp
-muStmt (Try block catches finally)     = M.Try (muBlock block) (map muCatch catches) (fmapOrNull muBlock finally)
-muStmt (BasicFor init cond prog stmt)  = ForLoop (fmapOrNull muForInit init) (fmapOrNull muExp cond) (fmapOrNull (compactMap muExp) prog) (muStmt stmt)
+muStmt (Try block catches finally)     = M.Try (muBlock block) (map muCatch catches) (fmapOrNone muBlock finally)
+muStmt (BasicFor init cond prog stmt)  = ForLoop (fmapOrNone muForInit init) (fmapOrNone muExp cond) (fmapOrNone (compactMap muExp) prog) (muStmt stmt)
 muStmt (EnhancedFor _ _ name gen body) = For [Generator (VariablePattern (i name)) (muExp gen)] (muStmt body)
 muStmt (Switch exp cases)              = muSwitch exp . partition isDefault $ cases
 muStmt e                               = debug e
@@ -154,7 +154,7 @@ muOp e      = debug e
 
 muVarDecl typ (VarDecl id init) = [
       TypeSignature (v id) (SimpleType (muType typ) []),
-      Variable (v id) (fmapOrNull muVarInit init)]
+      Variable (v id) (fmapOrNone muVarInit init)]
 
 muMethodBody (MethodBody (Just block)) = muBlock block
 
@@ -175,7 +175,7 @@ muRefType (ArrayType t)        = (muType t) ++ "[]"
 
 muPrimType = map toLower . dropLast 1 . show
 
-muSwitch exp (def, cases) =  M.Switch (muExp exp) (map muCase cases) (headOrElse MuNull . map muDefault $ def)
+muSwitch exp (def, cases) =  M.Switch (muExp exp) (map muCase cases) (headOrElse None . map muDefault $ def)
 
 muCase (SwitchBlock (SwitchCase exp) block) = (muExp exp, compactConcatMap muBlockStmt block)
 
@@ -190,7 +190,7 @@ isDefault _                       = False
 
 -- Combinators
 
-fmapOrNull f = fromMaybe MuNull . fmap f
+fmapOrNone f = fromMaybe None . fmap f
 
 -- Helpers
 

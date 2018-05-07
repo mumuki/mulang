@@ -105,7 +105,7 @@ spec = do
       js "if(x) y else z" `shouldBe` If (Reference "x") (Reference "y") (Reference "z")
 
     it "handles partial ifs" $ do
-      js "if(x) y" `shouldBe` If (Reference "x") (Reference "y") MuNull
+      js "if(x) y" `shouldBe` If (Reference "x") (Reference "y") None
 
     it "handles ternarys as ifs" $ do
       js "x ? y : z " `shouldBe` js "if (x) { y } else { z }"
@@ -123,18 +123,18 @@ spec = do
       js "({\"asd\": 6})" `shouldBe` MuObject (Variable "asd" (MuNumber 6))
 
     it "handles empty objects" $ do
-      js "({})" `shouldBe` MuObject MuNull
+      js "({})" `shouldBe` MuObject None
 
     it "handles object declarations" $ do
-      js "var x = {}" `shouldBe` (Object "x" MuNull)
+      js "var x = {}" `shouldBe` (Object "x" None)
 
     it "handles function declarations as vars" $ do
-      js "var x = function(){}" `shouldBe` (SimpleFunction "x" [] MuNull)
+      js "var x = function(){}" `shouldBe` (SimpleFunction "x" [] None)
 
     it "handles attribute and method declarations" $ do
       js "var x = {y: 2, z: function(){}}" `shouldBe` Object "x" (Sequence [
                                                             Attribute "y" (MuNumber 2.0),
-                                                            SimpleMethod "z" [] MuNull])
+                                                            SimpleMethod "z" [] None])
 
     it "handles new parentheses-less" $ do
       js "new Foo" `shouldBe` New (Reference "Foo") []
@@ -153,7 +153,7 @@ spec = do
       switch(a){
         case 1: return 1;
         case 2: return 2;
-      }|] `shouldBe` Switch (Reference "a") [(MuNumber 1, Return (MuNumber 1)), (MuNumber 2, Return (MuNumber 2))] (MuNull)
+      }|] `shouldBe` Switch (Reference "a") [(MuNumber 1, Return (MuNumber 1)), (MuNumber 2, Return (MuNumber 2))] (None)
 
     it "handles new with args" $ do
       run [text|

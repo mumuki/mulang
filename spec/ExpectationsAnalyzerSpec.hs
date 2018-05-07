@@ -15,7 +15,7 @@ failed e = ExpectationResult e False
 spec = describe "ExpectationsAnalyzer" $ do
   it "works with Mulang input" $ do
     let ydeclares = Expectation "*" "Declares:y"
-    (runAst MuNull [ydeclares]) `shouldReturn` (result [failed ydeclares] [])
+    (runAst None [ydeclares]) `shouldReturn` (result [failed ydeclares] [])
 
   describe "Advanced expectations" $ do
     it "evaluates unknown basic expectations" $ do

@@ -30,7 +30,7 @@ spec = do
       (length $ declarations code) `shouldBe` 5
 
     it "programs" $ do
-      let es = [SimpleFunction "foo" [] MuNull, EntryPoint "main" (Application (Reference "foo") [])]
+      let es = [SimpleFunction "foo" [] None, EntryPoint "main" (Application (Reference "foo") [])]
       let code = Sequence es
       (declarations code) `shouldBe` es
       (declaredIdentifiers code) `shouldBe` ["foo", "main"]

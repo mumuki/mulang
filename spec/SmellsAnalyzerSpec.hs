@@ -15,10 +15,10 @@ spec = describe "SmellsAnalyzer" $ do
     it "works with empty set" $ do
       (runRuby (Sequence [
         (Object "Foo_Bar" (Sequence [
-          (SimpleMethod "y" [] MuNull),
-          (SimpleMethod "aB" [] MuNull),
-          (SimpleMethod "fooBar" [] MuNull)])),
-        (Object "Foo" MuNull)])) `shouldReturn` (result [
+          (SimpleMethod "y" [] None),
+          (SimpleMethod "aB" [] None),
+          (SimpleMethod "fooBar" [] None)])),
+        (Object "Foo" None)])) `shouldReturn` (result [
                                                     Expectation "y" "HasTooShortIdentifiers",
                                                     Expectation "aB" "HasTooShortIdentifiers",
                                                     Expectation "Foo_Bar" "HasWrongCaseIdentifiers",

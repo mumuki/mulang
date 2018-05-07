@@ -106,25 +106,25 @@ spec = do
     it "is False when return does not contain assignment" $ do
       hasAssignmentReturn (js "function x(m) { return x == 4 }") `shouldBe` False
 
-  describe "returnsNull" $ do
+  describe "returnsNil" $ do
     it "is True when returns null" $ do
-      returnsNull (js "function x(m) { return null }") `shouldBe` True
+      returnsNil (js "function x(m) { return null }") `shouldBe` True
 
     it "is True when returns undefined" $ do
-      returnsNull (js "function x(m) { return undefined }") `shouldBe` False
+      returnsNil (js "function x(m) { return undefined }") `shouldBe` False
 
     it "is False when returns a number" $ do
-      returnsNull (js "function x(m) { return 1 }") `shouldBe` False
+      returnsNil (js "function x(m) { return 1 }") `shouldBe` False
 
-  describe "doesNullTest" $ do
+  describe "doesNilTest" $ do
     it "is True when tests for null" $ do
-      doesNullTest (js "function x(m) { if ( m == null) 1 else 2 } ") `shouldBe` True
+      doesNilTest (js "function x(m) { if ( m == null) 1 else 2 } ") `shouldBe` True
 
     it "is True when tests for null with ===" $ do
-      doesNullTest (js "function x(m) { if ( m === null) 1 else 2 } ") `shouldBe` True
+      doesNilTest (js "function x(m) { if ( m === null) 1 else 2 } ") `shouldBe` True
 
     it "is False when not does null test" $ do
-      doesNullTest (js "function x(m) { return 1 }") `shouldBe` False
+      doesNilTest (js "function x(m) { return 1 }") `shouldBe` False
 
   describe "doesTypeTest" $ do
     it "is True when tests for string" $ do
