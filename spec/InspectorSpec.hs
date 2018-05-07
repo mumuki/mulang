@@ -1,3 +1,5 @@
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+
 module InspectorSpec (spec) where
 
 import           Test.Hspec
@@ -245,10 +247,10 @@ spec = do
 
   describe "usesMixins" $ do
     it "is True when include present" $ do
-      usesMixins (Class "Dragon" Nothing (Include "FlyingCreature")) `shouldBe` True
+      usesMixins (Class "Dragon" Nothing (Include (Reference "FlyingCreature"))) `shouldBe` True
 
     it "is False when include not present" $ do
-      usesMixins (Class "Dragon" Nothing (Implement "FlyingCreature")) `shouldBe` False
+      usesMixins (Class "Dragon" Nothing (Implement (Reference "FlyingCreature"))) `shouldBe` False
 
   describe "declaresMethod" $ do
     it "is True when present" $ do
@@ -350,7 +352,6 @@ spec = do
     it "is False when raises an unexpected exception" $ do
       raises (named "RuntimeException") (java "class Sample { void aMethod() { throw new Exception(); } }") `shouldBe` False
 
-
   describe "rescues" $ do
     it "is True when rescues an expected exception" $ do
       rescues (named "RuntimeException") (java "class Sample { void aMethod() { try { foo(); } catch (RuntimeException e) { } } }") `shouldBe` True
@@ -399,13 +400,13 @@ spec = do
       uses (named "f") (hs "y x = [ g m | m <- ms  ]") `shouldBe` False
 
     it "is True when an identifier is used within a New expression" $ do
-      uses (named "LinkedList") (New "LinkedList" []) `shouldBe` True
+      uses (named "LinkedList") (New (Reference "LinkedList") []) `shouldBe` True
 
     it "is True when an identifier is used within an Include expression" $ do
-      uses (named "Enumerable") (Include "Enumerable") `shouldBe` True
+      uses (named "Enumerable") (Include (Reference "Enumerable")) `shouldBe` True
 
     it "is True when an identifier is used within an Implement expression" $ do
-      uses (named "Iterator") (Implement "Iterator") `shouldBe` True
+      uses (named "Iterator") (Implement (Reference  "Iterator")) `shouldBe` True
 
     it "is False when variable is defined within scope" $ do
       --uses (named "m") (hs "y x = [ g m | m <- ms  ]") `shouldBe` False

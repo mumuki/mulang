@@ -26,7 +26,7 @@ containsBoundDeclaration :: (Expression -> Bool) -> IdentifierInspection
 containsBoundDeclaration f b  = has f (boundDeclarations b)
 
 containsDeclaration :: (Expression -> Bool) -> Inspection
-containsDeclaration f = has f (map snd . declarations)
+containsDeclaration f = has f declarations
 
 matchesType :: IdentifierPredicate -> Pattern -> Bool
 matchesType predicate (TypePattern n)               = predicate n

@@ -49,7 +49,7 @@ parameterNames (TypedSignature _ types _) = map (const Nothing) types
 parameterNames (NamedSignature _ names)   = names
 
 signaturesOf :: Expression -> [Signature]
-signaturesOf = nub . mapMaybe (signatureOf.snd) . declarations
+signaturesOf = nub . mapMaybe signatureOf . declarations
 
 signatureOf :: Expression -> Maybe Signature
 signatureOf (Subroutine name es)                  = Just $ NamedSignature name (parameterNamesOf es)

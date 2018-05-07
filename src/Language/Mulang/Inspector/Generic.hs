@@ -23,7 +23,7 @@ module Language.Mulang.Inspector.Generic (
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Primitive
-import Language.Mulang.Generator (declarations, referencedIdentifiers)
+import Language.Mulang.Generator (declaredIdentifiers, referencedIdentifiers)
 
 import Data.Maybe (listToMaybe)
 import Data.List.Extra (has)
@@ -83,7 +83,7 @@ declaresRecursively = containsBoundDeclaration f
             | otherwise = False
 
         nameOf :: Expression -> Maybe Identifier
-        nameOf = fmap fst . listToMaybe . declarations
+        nameOf = listToMaybe . declaredIdentifiers
 
 
 declaresFunction :: IdentifierInspection
@@ -120,9 +120,9 @@ declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
 
 raises :: IdentifierInspection
 raises predicate = containsExpression f
-  where f (Raise (New n _))     = predicate n
-        f (Raise (Reference n)) = predicate n
-        f _                     = False
+  where f (Raise (New (Reference n) _)) = predicate n
+        f (Raise (Reference n))         = predicate n
+        f _                             = False
 
 usesExceptions :: Inspection
 usesExceptions = containsExpression f

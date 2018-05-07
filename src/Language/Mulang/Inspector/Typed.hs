@@ -7,7 +7,6 @@ module Language.Mulang.Inspector.Typed (
   usesType) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Primitive (IdentifierInspection, containsDeclaration, containsBoundDeclaration)
 
 declaresTypeAlias :: IdentifierInspection

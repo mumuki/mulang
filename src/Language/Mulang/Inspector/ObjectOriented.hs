@@ -21,13 +21,13 @@ import Language.Mulang.Inspector.Primitive (
 
 implements :: IdentifierInspection
 implements predicate = containsExpression f
-  where f (Implement name) = predicate name
-        f _                = False
+  where f (Implement (Reference name)) = predicate name
+        f _                            = False
 
 includes :: IdentifierInspection
 includes predicate = containsExpression f
-  where f (Include name) = predicate name
-        f _              = False
+  where f (Include (Reference name)) = predicate name
+        f _                          = False
 
 inherits :: IdentifierInspection
 inherits predicate = containsDeclaration f
@@ -36,8 +36,8 @@ inherits predicate = containsDeclaration f
 
 instantiates :: IdentifierInspection
 instantiates predicate = containsExpression f
-  where f (New name _) = predicate name
-        f _            = False
+  where f (New (Reference name) _) = predicate name
+        f _                        = False
 
 usesInheritance :: Inspection
 usesInheritance = declaresSuperclass anyone
@@ -77,3 +77,4 @@ declaresMethod :: IdentifierInspection
 declaresMethod =  containsBoundDeclaration f
   where f (Method _ _) = True
         f _            = False
+

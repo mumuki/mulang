@@ -296,7 +296,7 @@ spec = do
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "Foo" [],
                           SimpleMethod "hello" [] (
-                           Return (New "Bar" [MuNumber 3]))])
+                           Return (New (Reference "Bar") [MuNumber 3]))])
 
     it "parses switch with default" $ do
       run [text|class Foo {
@@ -346,3 +346,10 @@ spec = do
                               (Sequence [VariableSignature "i" "int" [], Variable "i" (MuNumber 0)])
                               MuTrue
                               (Send Self (Reference "a") []) (Send Self (Reference "b") []))])
+
+    it "parses attributes" $ do
+      run [text|class Foo {
+             private int foo = 4;
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            VariableSignature "foo" "int" [],
+                            Attribute "foo" (MuNumber 4)])

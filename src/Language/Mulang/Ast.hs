@@ -137,11 +137,11 @@ data Expression
     -- ^ Generic, non-curried application of a function or procedure, composed by the applied element itself, and the application arguments
     | Send Expression Expression [Expression]
     -- ^ Object oriented programming message send, composed by the reciever, selector and arguments
-    | New Identifier [Expression]
+    | New Expression [Expression]
     -- ^ Object oriented instantiation, composed by the class reference and instantiation arguments
-    | Implement Identifier
+    | Implement Expression
     -- ^ Object oriented instantiation, interface implementation
-    | Include Identifier
+    | Include Expression
     -- ^ Object oriented instantiation, mixin inclusion
     | Lambda [Pattern] Expression
     | If Expression Expression Expression

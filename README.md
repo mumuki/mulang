@@ -428,14 +428,16 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `raises`                          |  any               | is the given _exception type_ raised?
 | `rescues`                         |  any               | is the given _exception type_ rescued?
 | `returnsNull`                     |
-| `typesReturnAs`                   |  any               | is a return typed as a given type?
+| `typesAs`                         |  any             | is the given type used to type a variable?
 | `typesParameterAs`                |  any               | is a parameter typed as a given type?
-| `typesAs`                         |  any               | is something typed as a given type?
+| `typesReturnAs`                   |  any               | is the given type used to type a return?
 | `uses`                            |  any               | is there any reference to the given element?
 | `usesAnonymousVariable`           |
 | `usesComposition`                 |
 | `usesConditional`                 |
 | `usesCut`                         |  logic             | is the logic `!` consult used?
+| `usesDyamicPolymorphism`          |  object oriented | are there two or more methods definitions for some sent selector?
+| `usesDynamicMethodOverload`       |  object oriented | is there a class that defined two methods with different arity but with the same name?
 | `usesExceptionHandling`           |  any               | is any _exception_ handlded?
 | `usesExceptions`                  |  any               | is any _exception_ raised?
 | `usesFail`                        |  logic             | is the logic `fail` consult used?
@@ -451,10 +453,14 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `usesLambda`                      |
 | `usesMixins`                      |  object oriented   | is any mixins explicitly included?
 | `usesNot`                         |
+| `usesObjectComposition`           |  object oriented | is there a class that declares an attributes and sends a message to it?
 | `usesPatternMatching`             |
 | `usesRepeat`                      |
+| `usesStaticMethodOverload`        |  object oriented | is there a class that defined two method signatures but with the same name?
+| `usesStaticPolymorphism`          |  object oriented | is there an interface with at least a method signature that is implemented by two or more classes and used in the code?
 | `usesSwitch`                      |
-| `usesType`                        |  any               | is a given type used?
+| `usesTemplateMethod`              |  object oriented | is there a class that sends a message whose corresonding method is not declared?
+| `usesType`                        |  any             | is the given typed used in a signature?
 | `usesUnificationOperator`         |  logic             | is the logic unification operator `=` used?
 | `usesWhile`                       |  imperative        | is a `while` control structure used?
 | `usesYield`                       |  functional        | is an expression yielded within a comprehension?
