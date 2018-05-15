@@ -55,3 +55,7 @@ spec = describe "SmellsAnalyzer" $ do
   describe "Using inclusion" $ do
     it "works with empty set" $ do
       (runOnly Haskell "f x = if x then True else False" []) `shouldReturn` (result [])
+
+  describe "Using inclusion" $ do
+    it "works with empty set" $ do
+      (runExcept Python "def funcion():\n  if True:\n    pass\n  else:\n    return 1" []) `shouldReturn` (result [Expectation "funcion" "HasEmptyIfBranches"])

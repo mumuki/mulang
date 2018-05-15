@@ -26,6 +26,7 @@ allSmells = [
   "DoesTypeTest",
   "HasAssignmentReturn",
   "HasCodeDuplication",
+  "HasEmptyIfBranches",
   "HasLongParameterList",
   "HasMisspelledIdentifiers",
   "HasRedundantBooleanComparison",
