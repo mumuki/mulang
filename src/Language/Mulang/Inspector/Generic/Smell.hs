@@ -129,7 +129,8 @@ hasTooManyMethods = containsExpression f
   where f (Sequence expressions) = (>15).length.filter isMethod $ expressions
         f _ = False
 
-        isMethod (Method _ _) = True
+        isMethod (InstanceMethod _ _) = True
+        isMethod (ClassMethod _ _)    = True
         isMethod _ = False
 
 overridesEqualOrHashButNotBoth :: Inspection

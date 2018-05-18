@@ -29,7 +29,7 @@ module Language.Mulang.Ast (
     pattern SimpleEquation,
     pattern SimpleFunction,
     pattern SimpleProcedure,
-    pattern SimpleMethod,
+    pattern SimpleInstanceMethod,
     pattern SimpleSend,
     pattern SubroutineSignature,
     pattern VariableSignature,
@@ -101,7 +101,8 @@ data Expression
     --   It is is composed by an identifier and one or more equations
     | Procedure Identifier SubroutineBody
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
-    | Method Identifier SubroutineBody
+    | InstanceMethod Identifier SubroutineBody
+    | ClassMethod Identifier SubroutineBody
     | EqualMethod SubroutineBody
     | HashMethod SubroutineBody
     | Variable Identifier Expression
@@ -236,9 +237,9 @@ pattern SimpleEquation params body = Equation params (UnguardedBody body)
 
 pattern SimpleSend receptor selector args = Send receptor (Reference selector) args
 
-pattern SimpleFunction name params body  = Function  name [SimpleEquation params body]
-pattern SimpleProcedure name params body = Procedure name [SimpleEquation params body]
-pattern SimpleMethod name params body    = Method    name [SimpleEquation params body]
+pattern SimpleFunction name params body       = Function  name [SimpleEquation params body]
+pattern SimpleProcedure name params body      = Procedure name [SimpleEquation params body]
+pattern SimpleInstanceMethod name params body = InstanceMethod name [SimpleEquation params body]
 
 pattern MuTrue  = MuBool True
 pattern MuFalse = MuBool False
@@ -260,10 +261,11 @@ equationPatterns :: Equation -> [Pattern]
 equationPatterns (Equation p _) = p
 
 extractSubroutine :: Expression -> Maybe (Identifier, SubroutineBody)
-extractSubroutine (Function name body)  = Just (name, body)
-extractSubroutine (Procedure name body) = Just (name, body)
-extractSubroutine (Method name body)    = Just (name, body)
-extractSubroutine _                     = Nothing
+extractSubroutine (Function name body)       = Just (name, body)
+extractSubroutine (Procedure name body)      = Just (name, body)
+extractSubroutine (InstanceMethod name body) = Just (name, body)
+extractSubroutine (ClassMethod name body)    = Just (name, body)
+extractSubroutine _                          = Nothing
 
 extractParams :: Expression -> Maybe ([Pattern])
 extractParams (Subroutine _ equations) = Just (equationParams.head $ equations)

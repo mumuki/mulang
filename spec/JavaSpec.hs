@@ -58,7 +58,7 @@ spec = do
                public void hello() {}
             }|] `shouldBe` Class "Foo" Nothing (Sequence [
                               SubroutineSignature "hello" [] "void" [],
-                              (SimpleMethod "hello" [] None)])
+                              (SimpleInstanceMethod "hello" [] None)])
 
     it "parses Methods with type arguments" $ do
       run [text|
@@ -66,7 +66,7 @@ spec = do
                public <A> A hello(A a) {}
             }|] `shouldBe` Class "Foo" Nothing (Sequence [
                               SubroutineSignature "hello" ["A"] "A" [],
-                              (SimpleMethod "hello" [VariablePattern "a"] None)])
+                              (SimpleInstanceMethod "hello" [VariablePattern "a"] None)])
 
     it "parses Methods with type arguments and type constraints" $ do
       run [text|
@@ -74,28 +74,28 @@ spec = do
                public <A extends Serializable> A hello(A a) {}
             }|] `shouldBe` Class "Foo" Nothing (Sequence [
                               SubroutineSignature "hello" ["A"] "A" [],
-                              (SimpleMethod "hello" [VariablePattern "a"] None)])
+                              (SimpleInstanceMethod "hello" [VariablePattern "a"] None)])
 
     it "parses Empty Returns" $ do
         run [text|class Foo {
                public void hello() { return; }
             }|] `shouldBe` Class "Foo" Nothing (Sequence [
                               SubroutineSignature "hello" [] "void" [],
-                              (SimpleMethod "hello" [] (Return None))])
+                              (SimpleInstanceMethod "hello" [] (Return None))])
 
     it "parses Strings In Returns" $ do
       run [text|class Foo {
              public String hello() { return "hello"; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                                                 SubroutineSignature "hello" [] "String" [],
-                                                (SimpleMethod "hello" [] (Return (MuString "hello")))])
+                                                (SimpleInstanceMethod "hello" [] (Return (MuString "hello")))])
 
     it "parses Int In Returns" $ do
       run [text|class Foo {
              public int hello() { return 1; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "int" [],
-                          (SimpleMethod "hello" [] (Return (MuNumber 1)))])
+                          (SimpleInstanceMethod "hello" [] (Return (MuNumber 1)))])
 
 
     it "parses Double In Returns" $ do
@@ -103,7 +103,7 @@ spec = do
              public double hello() { return 453.2; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "double" [],
-                          (SimpleMethod "hello" [] (Return (MuNumber 453.2)))])
+                          (SimpleInstanceMethod "hello" [] (Return (MuNumber 453.2)))])
 
 
     it "parses Bools In Returns" $ do
@@ -111,26 +111,26 @@ spec = do
              public boolean hello() { return true; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             SubroutineSignature "hello" [] "boolean" [],
-                            (SimpleMethod "hello" [] (Return MuTrue))])
+                            (SimpleInstanceMethod "hello" [] (Return MuTrue))])
 
     it "parses Negation In Returns" $ do
       run [text|class Foo {
              public boolean hello() { return !true; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "boolean" [],
-                          (SimpleMethod "hello" [] (Return (SimpleSend MuTrue "!" [])))])
+                          (SimpleInstanceMethod "hello" [] (Return (SimpleSend MuTrue "!" [])))])
 
     it "parses Chars In Returns" $ do
       run [text|class Foo {
              public char hello() { return 'f'; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "char" [],
-                          (SimpleMethod "hello" [] (Return (MuString "f")))])
+                          (SimpleInstanceMethod "hello" [] (Return (MuString "f")))])
 
     it "parses Parameters" $ do
       run "public class Foo extends Bar { int succ(int y) {} }" `shouldBe` Class "Foo" (Just "Bar") (Sequence [
                                                                               SubroutineSignature "succ" ["int"] "int" [],
-                                                                              (SimpleMethod "succ" [VariablePattern "y"] None)])
+                                                                              (SimpleInstanceMethod "succ" [VariablePattern "y"] None)])
 
     it "parses Enums" $ do
       run "public enum Foo { A, B }" `shouldBe` Enumeration "Foo" ["A", "B"]
@@ -147,7 +147,7 @@ spec = do
              public void hello() { int x = 1; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             SubroutineSignature "hello" [] "void" [],
-                            (SimpleMethod "hello" [] (Sequence [
+                            (SimpleInstanceMethod "hello" [] (Sequence [
                               VariableSignature "x" "int" [],
                               Variable "x" (MuNumber 1)]))])
 
@@ -157,7 +157,7 @@ spec = do
              public void hello() { Foo x = this; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                            SubroutineSignature "hello" [] "void" [],
-                           (SimpleMethod "hello" [] (Sequence [
+                           (SimpleInstanceMethod "hello" [] (Sequence [
                               VariableSignature "x" "Foo" [],
                               Variable "x" Self]))])
 
@@ -167,7 +167,7 @@ spec = do
              public void hello() { Foo x = true ? this : this; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             SubroutineSignature "hello" [] "void" [],
-                            (SimpleMethod "hello" [] (Sequence [
+                            (SimpleInstanceMethod "hello" [] (Sequence [
                               VariableSignature "x" "Foo" [],
                               Variable "x" (If MuTrue Self Self)]))])
 
@@ -177,7 +177,7 @@ spec = do
              public void hello() { int x; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             SubroutineSignature "hello" [] "void" [],
-                            (SimpleMethod "hello" [] (Sequence [
+                            (SimpleInstanceMethod "hello" [] (Sequence [
                               VariableSignature "x" "int" [],
                               Variable "x" None]))])
 
@@ -187,7 +187,7 @@ spec = do
              public void hello() { f(); }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             SubroutineSignature "hello" [] "void" [],
-                            (SimpleMethod "hello" [] (SimpleSend Self "f" []))])
+                            (SimpleInstanceMethod "hello" [] (SimpleSend Self "f" []))])
 
     it "parses self-send" $ do
       run [text|
@@ -195,7 +195,7 @@ spec = do
              public void hello() { f(2); }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             SubroutineSignature "hello" [] "void" [],
-                            (SimpleMethod "hello" [] (SimpleSend Self "f" [MuNumber 2]))])
+                            (SimpleInstanceMethod "hello" [] (SimpleSend Self "f" [MuNumber 2]))])
 
     it "parses explict self-send" $ do
       run [text|
@@ -203,7 +203,7 @@ spec = do
              public void hello() { this.f(); }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "void" [],
-                          (SimpleMethod "hello" [] (SimpleSend Self "f" []))])
+                          (SimpleInstanceMethod "hello" [] (SimpleSend Self "f" []))])
 
     it "parses nested send" $ do
       run [text|
@@ -213,7 +213,7 @@ spec = do
             }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             SubroutineSignature "foo" [] "void" [],
-                            (SimpleMethod "foo" [] (SimpleSend  (Reference "System.err") "println" [MuString "hello"]))])
+                            (SimpleInstanceMethod "foo" [] (SimpleSend  (Reference "System.err") "println" [MuString "hello"]))])
 
     it "parses argument-send" $ do
       run [text|
@@ -221,7 +221,7 @@ spec = do
              public void hello(String g) { g.toString(); }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" ["String"] "void" [],
-                          (SimpleMethod "hello" [VariablePattern "g"] (SimpleSend (Reference "g") "toString" []))])
+                          (SimpleInstanceMethod "hello" [VariablePattern "g"] (SimpleSend (Reference "g") "toString" []))])
 
 
     it "parses expression-send" $ do
@@ -230,7 +230,7 @@ spec = do
              public void hello(String g) { g.size().toString(); }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" ["String"] "void" [],
-                          (SimpleMethod "hello" [VariablePattern "g"] (SimpleSend (SimpleSend (Reference "g") "size" []) "toString" []))])
+                          (SimpleInstanceMethod "hello" [VariablePattern "g"] (SimpleSend (SimpleSend (Reference "g") "size" []) "toString" []))])
 
 
     it "parses Ifs with empty braces" $ do
@@ -239,7 +239,7 @@ spec = do
              public void hello() { if (true) { } }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "void" [],
-                          (SimpleMethod "hello" [] (If MuTrue None None))])
+                          (SimpleInstanceMethod "hello" [] (If MuTrue None None))])
 
     it "parses Ifs with return in braces" $ do
       run [text|
@@ -247,7 +247,7 @@ spec = do
              public void hello() { if (true) { return true; } else { return false; } }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "void" [],
-                          (SimpleMethod "hello" [] (If MuTrue (Return MuTrue) (Return MuFalse)))])
+                          (SimpleInstanceMethod "hello" [] (If MuTrue (Return MuTrue) (Return MuFalse)))])
 
     it "parses Ifs with equal comparisons on conditions" $ do
       run [text|
@@ -255,7 +255,7 @@ spec = do
              public void hello(String x) { if (x == "foo") { } }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                            SubroutineSignature "hello" ["String"] "void" [],
-                           SimpleMethod "hello" [VariablePattern "x"] (
+                           SimpleInstanceMethod "hello" [VariablePattern "x"] (
                              If (Send (Reference "x") Equal [MuString "foo"])
                               None
                               None)])
@@ -266,7 +266,7 @@ spec = do
              public void hello(String x) { if (x != "foo") { } }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             SubroutineSignature "hello" ["String"] "void" [],
-                            (SimpleMethod "hello" [VariablePattern "x"] (
+                            (SimpleInstanceMethod "hello" [VariablePattern "x"] (
                             If (Send (Reference "x") NotEqual [MuString "foo"])
                               None
                               None))])
@@ -276,7 +276,7 @@ spec = do
              public void hello() { double m = 1.0; m = 3.4; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             SubroutineSignature "hello" [] "void" [],
-                            (SimpleMethod "hello" [] (
+                            (SimpleInstanceMethod "hello" [] (
                                                      Sequence [
                                                        VariableSignature "m" "double" [],
                                                        Variable "m" (MuNumber 1.0),
@@ -287,7 +287,7 @@ spec = do
              public Object hello() { return (int x) -> x + 1; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             SubroutineSignature "hello" [] "Object" [],
-                            (SimpleMethod "hello" [] (
+                            (SimpleInstanceMethod "hello" [] (
                             Return (Lambda [VariablePattern "x"] (SimpleSend (Reference "x") "+" [MuNumber 1]))))])
 
     it "parses News" $ do
@@ -295,7 +295,7 @@ spec = do
              public Foo hello() { return new Bar(3); }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "Foo" [],
-                          SimpleMethod "hello" [] (
+                          SimpleInstanceMethod "hello" [] (
                            Return (New (Reference "Bar") [MuNumber 3]))])
 
     it "parses switch with default" $ do
@@ -308,7 +308,7 @@ spec = do
             }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "Foo" [],
-                          SimpleMethod "hello" [] (
+                          SimpleInstanceMethod "hello" [] (
                            Switch (Reference "a") [(MuNumber 1, Return (MuNumber 1))] (Return (MuNumber 3.0)))])
 
     it "parses switch with no default" $ do
@@ -321,7 +321,7 @@ spec = do
             }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "Foo" [],
-                          SimpleMethod "hello" [] (
+                          SimpleInstanceMethod "hello" [] (
                            Switch (Reference "a") [(MuNumber 1,Return (MuNumber 1)), (MuNumber 2, Return (MuNumber 2))] None)])
 
     it "parses for" $ do
@@ -331,7 +331,7 @@ spec = do
             }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "Foo" [],
-                          SimpleMethod "hello" []
+                          SimpleInstanceMethod "hello" []
                             (For [Generator (VariablePattern "i") (Reference "ints")] (Send Self (Reference "a") []))])
 
     it "parses c-style for" $ do
@@ -341,7 +341,7 @@ spec = do
             }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "Foo" [],
-                          SimpleMethod "hello" []
+                          SimpleInstanceMethod "hello" []
                             (ForLoop
                               (Sequence [VariableSignature "i" "int" [], Variable "i" (MuNumber 0)])
                               MuTrue

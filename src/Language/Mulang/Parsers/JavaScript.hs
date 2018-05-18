@@ -198,7 +198,7 @@ muJSVarInitializer e                        = debug e
 
 muJSObjectProperty:: JSObjectProperty -> Expression
 --muJSObjectProperty JSPropertyAccessor JSAccessor JSPropertyName _ [JSExpression] _ JSBlock -- ^(get|set), name, lb, params, rb, block
-muJSObjectProperty (JSPropertyNameandValue id _ [JSFunctionExpression _ _ _ params _ block])   = Method (muJSPropertyName id) (muEquation (map muPattern (muJSCommaList params)) (muJSBlock block))
+muJSObjectProperty (JSPropertyNameandValue id _ [JSFunctionExpression _ _ _ params _ block])   = InstanceMethod (muJSPropertyName id) (muEquation (map muPattern (muJSCommaList params)) (muJSBlock block))
 muJSObjectProperty (JSPropertyNameandValue id _ [expression])                                  = Variable (muJSPropertyName id) (muJSExpression expression)
 muJSObjectProperty e                                                                           = debug e
 

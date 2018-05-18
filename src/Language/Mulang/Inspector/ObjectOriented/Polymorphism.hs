@@ -20,8 +20,8 @@ import Language.Mulang.Generator (Generator, declarations, expressions)
 usesDynamicMethodOverload :: Inspection
 usesDynamicMethodOverload expression = inspect $ do
   klass@(Class _ _ _)                 <- declarations expression
-  (SimpleMethod n1 (length -> a1) _)  <- declarations klass
-  (SimpleMethod n2 (length -> a2) _)  <- declarations klass
+  (SimpleInstanceMethod n1 (length -> a1) _)  <- declarations klass
+  (SimpleInstanceMethod n2 (length -> a2) _)  <- declarations klass
   guard (n1 == n2 && a1 /= a2)
 
 usesStaticMethodOverload :: Inspection
@@ -66,7 +66,7 @@ guardCount condition list = guard (condition . length $ list)
 
 methodDeclarationsOf :: Identifier -> Generator Expression
 methodDeclarationsOf selector e = do
-  m@(Method s _) <- declarations e
+  m@(InstanceMethod s _) <- declarations e
   guard (s == selector)
   return m
 

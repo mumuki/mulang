@@ -134,7 +134,7 @@ spec = do
     it "handles attribute and method declarations" $ do
       js "var x = {y: 2, z: function(){}}" `shouldBe` Object "x" (Sequence [
                                                             Attribute "y" (MuNumber 2.0),
-                                                            SimpleMethod "z" [] None])
+                                                            SimpleInstanceMethod "z" [] None])
 
     it "handles new parentheses-less" $ do
       js "new Foo" `shouldBe` New (Reference "Foo") []

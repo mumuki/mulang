@@ -11,7 +11,9 @@ module Language.Mulang.Inspector.ObjectOriented (
   declaresInterface,
   declaresEnumeration,
   declaresAttribute,
-  declaresMethod)  where
+  declaresMethod,
+  declaresInstanceMethod,
+  declaresClassMethod)  where
 
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
@@ -74,7 +76,17 @@ declaresAttribute =  containsBoundDeclaration f
         f _               = False
 
 declaresMethod :: IdentifierInspection
-declaresMethod =  containsBoundDeclaration f
-  where f (Method _ _) = True
-        f _            = False
+declaresMethod = containsBoundDeclaration f
+  where f (ClassMethod _ _)    = True
+        f (InstanceMethod _ _) = True
+        f _                    = False
 
+declaresClassMethod :: IdentifierInspection
+declaresClassMethod =  containsBoundDeclaration f
+  where f (ClassMethod _ _)    = True
+        f _                    = False
+
+declaresInstanceMethod :: IdentifierInspection
+declaresInstanceMethod =  containsBoundDeclaration f
+  where f (InstanceMethod _ _) = True
+        f _                    = False
