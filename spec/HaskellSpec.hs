@@ -7,6 +7,15 @@ import           Language.Mulang.Parsers.Haskell
 spec :: Spec
 spec = do
   describe "parse" $ do
+    it "parses literal character patterns" $ do
+      hs "f 'a' = 1" `shouldBe` (Function "f" [Equation [LiteralPattern "'a'"] (UnguardedBody (Return (MuNumber 1.0)))])
+
+    it "parses literal string patterns" $ do
+      hs "f \"hello world\" = 1" `shouldBe` (Function "f" [Equation [LiteralPattern "\"hello world\""] (UnguardedBody (Return (MuNumber 1.0)))])
+
+    it "parses literal number patterns" $ do
+      hs "f 1 = 1" `shouldBe` (Function "f" [Equation [LiteralPattern "1"] (UnguardedBody (Return (MuNumber 1.0)))])
+
     it "parses left infix partial application" $ do
       hs "f = (1+)" `shouldBe` Variable "f" (Application (Reference "+") [MuNumber 1.0])
 
