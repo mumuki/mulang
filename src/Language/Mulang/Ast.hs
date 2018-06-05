@@ -70,7 +70,7 @@ data Type
         | ConstrainedType [Identifier]
         -- ^ constrained type, with just type constraints.
         -- Usefull for modelling classes and interfaces types
-        | OtherType (Maybe String) (Maybe Type)
+        | OtherType (Maybe Code) (Maybe Type)
         -- ^ unrecognized type, with optional code and nested type
         deriving (Eq, Show, Read, Generic)
 
@@ -164,7 +164,7 @@ data Expression
     -- ^ Imperative / OOP programming c-style for loop
     | Sequence [Expression]
     -- ^ Generic sequence of statements
-    | Other (Maybe String) (Maybe Expression)
+    | Other (Maybe Code) (Maybe Expression)
     -- ^ Unrecognized expression, with optional description and body
     | Equal
     | NotEqual
@@ -190,13 +190,13 @@ data Expression
 -- | Mulang Patterns are not expressions, but are aimed to match them.
 -- | They are modeled after Haskell, Prolog, Elixir, Scala and Erlang patterns
 data Pattern
-    = VariablePattern String
+    = VariablePattern Identifier
     -- ^ variable pattern like @X@
-    | LiteralPattern String
+    | LiteralPattern Code
     -- ^ literal constant pattern like @4@
-    | InfixApplicationPattern Pattern String Pattern
+    | InfixApplicationPattern Pattern Identifier Pattern
     -- ^ infix application pattern like @4:X@
-    | ApplicationPattern String [Pattern]
+    | ApplicationPattern Identifier [Pattern]
     -- ^ prefix application pattern like @f _@
     | TuplePattern [Pattern]
     -- ^ tuple pattern like @(3, _)@
@@ -210,7 +210,7 @@ data Pattern
     | WildcardPattern
     -- ^ wildcard pattern @_@
     | UnionPattern [Pattern]
-    | OtherPattern (Maybe String) (Maybe Pattern)
+    | OtherPattern (Maybe Code) (Maybe Pattern)
     -- ^ Other unrecognized pattern with optional code and nested pattern
   deriving (Eq, Show, Read, Generic)
 
