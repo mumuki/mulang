@@ -1,4 +1,4 @@
 module Mulang
-  VERSION = "4.0.0"
-  MULANG_VERSION = "4.0.0"
+  VERSION = "4.0.1"
+  MULANG_VERSION = "4.0.1"
 end
