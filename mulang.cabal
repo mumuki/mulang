@@ -51,6 +51,7 @@ library
     Language.Mulang.Inspector.Combiner
     Language.Mulang.Inspector.Generic.Duplication
     Language.Mulang.Inspector.Generic.Smell
+    Language.Mulang.JSCompiler
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Prolog
@@ -71,6 +72,7 @@ library
     base                      <= 5,
     bytestring                ,
     text                      ,
+    neat-interpolation        ,
     unordered-containers      ,
     containers                ,
     scientific                ,
