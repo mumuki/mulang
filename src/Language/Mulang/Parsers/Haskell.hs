@@ -6,6 +6,7 @@ import Language.Mulang.Parsers
 
 import Language.Haskell.Syntax
 import Language.Haskell.Parser
+import Language.Haskell.Pretty (prettyPrint)
 
 import Data.List (intercalate)
 
@@ -50,7 +51,7 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muBody = Return . muExp
 
     muPat (HsPVar name) = VariablePattern (muName name)
-    muPat (HsPLit _) = LiteralPattern ""
+    muPat (HsPLit literal) = LiteralPattern (prettyPrint literal)
     muPat (HsPInfixApp e1 name e2) = InfixApplicationPattern (muPat e1) (muQName name) (muPat e2)
     muPat (HsPApp name elements) = ApplicationPattern (muQName name) (map muPat elements)
     muPat (HsPTuple elements) = TuplePattern (map muPat elements)
