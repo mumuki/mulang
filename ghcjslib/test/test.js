@@ -1,25 +1,35 @@
-describe("cambore", () => {
-  it("ukaraa", () => {
-    cambore.ukaraaIO().should.be.eql(undefined)
+describe("mulang", () => {
+  it("can do basic analyis", () => {
+    mulang.analyse({
+      "sample" : {
+         "tag" : "CodeSample",
+         "language" : "Haskell",
+         "content" : "x = 1"
+      },
+      "spec" : {
+         "expectations" : [
+            {
+               "binding" : ":Intransitive:x",
+               "inspection" : "Uses:*"
+            }
+         ],
+         "smellsSet" : { "tag" : "NoSmells" }
+      }
+   })
   })
 
-  it("kemeroon", () => {
-    cambore.kemeroonIO(4).should.be.eql(undefined)
-  })
-
-  it("xinaiu", () => {
-    cambore.xinaiuIO("una montaña").should.be.eql(undefined)
-  })
-
-  it("laimaDaraa", () => {
-    cambore.laimaDaraaIO().should.be.eql("Y yo estoy volando dese el alto cielo")
-  })
-
-  it("volvioBelixaMelicaan", () => {
-    cambore.volvioBelixaMelicaanIO().should.be.eql(false)
-  })
-
-  it("cantidadDeSupremos", () => {
-    cambore.cantidadDeSupremosIO().should.be.eql(7)
+  it("it can generate ast", () => {
+    mulang.analyse({
+      "sample" : {
+          "tag" : "CodeSample",
+          "language" : "JavaScript",
+          "content" : "function foo(x, y) { return null; }"
+      },
+      "spec" : {
+          "expectations" : [],
+          "smellsSet" : { "tag" : "NoSmells" },
+          "includeIntermediateLanguage" : true
+      }
+    })
   })
 })

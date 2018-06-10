@@ -1,9 +1,8 @@
 
-  if (typeof module !== 'undefined') {
-    module.exports = ghcjsExports;
-  } else {
-    var module = ghcjsExports;
-  }
 
-  return module;
+  return ghcjsExports;
 })();
+
+if (typeof module !== 'undefined') {
+  module.exports = mulang;
+}

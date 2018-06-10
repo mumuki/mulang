@@ -1,24 +1,27 @@
 #!/bin/bash
 set -e
 
-GHCJS_EXECUTABLE=mulang
+GHCJSLIB_BUNDLE_NAME=mulang
+
 GHCJSLIB_PATH=./ghcjslib
 GHCJSLIB_BUILD_PATH=$GHCJSLIB_PATH/build
 GHCJSLIB_SRC_PATH=$GHCJSLIB_PATH/src
-STACK_BUILD_PATH=./.stack-work/dist/x86_64-linux/Cabal-1.24.2.0_ghcjs/build/$GHCJS_EXECUTABLE/$GHCJS_EXECUTABLE.jsexe/
+GHCJSLIB_BUNDLE=$GHCJSLIB_BUILD_PATH/$GHCJSLIB_BUNDLE_NAME.js
+
+STACK_BUILD_PATH=./.stack-work/dist/x86_64-linux/Cabal-1.24.2.0_ghcjs/build/$GHCJSLIB_BUNDLE_NAME/$GHCJSLIB_BUNDLE_NAME.jsexe/
 
 function append2Lib() {
   echo ">> Appending $(basename $1)..."
-  cat $1 >> $GHCJSLIB_BUILD_PATH/ghcjslib.js
+  cat $1 >> $GHCJSLIB_BUNDLE
 }
 
 echo 'Building project...'
 stack build
 
-echo 'Building ghcjslib.js...'
+echo "Building $GHCJSLIB_BUNDLE..."
 
-echo '>> Cleaning ghcjslib.js'
-rm $GHCJSLIB_BUILD_PATH/ghcjslib.js
+echo ">> Cleaning $GHCJSLIB_BUNDLE"
+rm -f $GHCJSLIB_BUNDLE
 
 append2Lib $GHCJSLIB_SRC_PATH/header.js.part
 append2Lib $STACK_BUILD_PATH/rts.js
