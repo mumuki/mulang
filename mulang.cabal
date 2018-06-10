@@ -53,10 +53,8 @@ library
     Language.Mulang.Inspector.Generic.Smell
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
-    Language.Mulang.Parsers.Prolog
     Language.Mulang.Parsers.Java
     Language.Mulang.Parsers.JavaScript
-    Language.Mulang.Parsers.Python
     Language.Mulang.Analyzer
     Language.Mulang.Analyzer.Analysis
     Language.Mulang.Analyzer.Analysis.Json
@@ -78,11 +76,9 @@ library
     haskell-src               ,
     language-java             ,
     language-javascript       ,
-    language-python           ,
     aeson                     ,
     inflections               <= 0.2.0.1,
     parsec                    ,
-    ParsecTools               ,
     split                     ,
     hashable                  ,
     process

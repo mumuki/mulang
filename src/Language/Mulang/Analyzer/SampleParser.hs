@@ -5,9 +5,7 @@ import        Language.Mulang
 import        Language.Mulang.Parsers (EitherParser, maybeToEither)
 import        Language.Mulang.Parsers.Haskell
 import        Language.Mulang.Parsers.JavaScript (parseJavaScript)
-import        Language.Mulang.Parsers.Prolog (parseProlog)
 import        Language.Mulang.Parsers.Java (parseJava)
-import        Language.Mulang.Parsers.Python (parsePython)
 import        Language.Mulang.Analyzer.Analysis (Sample(..), Language(..))
 
 parseSample :: Sample -> Either String Expression
@@ -18,5 +16,5 @@ parserFor :: Language -> EitherParser
 parserFor Haskell        = parseHaskell
 parserFor Java           = parseJava
 parserFor JavaScript     = maybeToEither parseJavaScript
-parserFor Prolog         = parseProlog
-parserFor Python         = parsePython
+parserFor Prolog         = error "unsupported"
+parserFor Python         = error "unsupported"
