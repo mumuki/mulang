@@ -102,7 +102,9 @@ executable mulang
     aeson                     ,
     process                   ,
     neat-interpolation        ,
-    mulang
+    mulang                    ,
+    ghcjs-base
+
   build-tools:
     happy,
     alex
