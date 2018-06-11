@@ -10,7 +10,7 @@ function swap2ghc() {
 function swap2ghcjs() {
   echo ">> Swapping $1...."
   mv $1 $1.ghc
-  mv $1.ghcjs $1
+  cp $1.ghcjs $1
 }
 
 echo 'Going to swap compilers....'
