@@ -221,6 +221,7 @@ Mulang is three different  - but thighly related - things:
   * [Watching changes](#watching-changes)
   * [Loading mulang in the REPL](#loading-mulang-in-the-repl)
 - [Gem wrapper](#gem-wrapper)
+- [JavaScript library](#javascript-library)
 - [Tagging and releasing](#tagging-and-releasing)
 
 
@@ -2122,6 +2123,21 @@ bundle exec rspec
 
 See `gem/README` for more details.
 
+# JavaScript library
+
+`mulang` can also be compiled to JavaScript library using [ghcjs](https://github.com/ghcjs/ghcjs) and [ghcjslib](https://github.com/flbulgarelli/ghcjslib), which allows you to use it from `node` or the browser.
+
+1. Run `ghcjslib/swap.sh` for swapping to GHCJS compiler
+2. Run `stack build` for building the ghcjs version. This will take a while depending on your computer
+3. Run `stack test` for running the tests
+4. Run `ghcjslib/build.sh` for building the `ghcjslib` release. It will be placed on `ghcjslib/build/mulang.js`
+5. Load it
+   1. in the browser: `google-chrome ghcjslib/index.html`
+   2. in `node`:
+      1.`cd ghcjslib && nvm use && node`.
+      2. Then, within the interpreter, run: `let mulang = require('./build/mulang.js');`
+6. Try it: `mulang.analyse(...pass here a spec as described in the README....)`
+7. Run `ghcjslib/swap.sh` again for swapping back to ghc
 
 # Tagging and releasing
 
