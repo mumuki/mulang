@@ -1,27 +1,57 @@
 module Main where
 
 import Test.Hspec
-import qualified UnfoldSpec
-import qualified TokenizerSpec
-import qualified JavaSpec
-import qualified ExpectationsCompilerSpec
-import qualified CombinerSpec
-import qualified InspectorSpec
 import qualified AnalysisJsonSpec
+import qualified CombinerSpec
+import qualified DomainLanguageSpec
+import qualified DuplicationSpec
+import qualified ExpectationsAnalyzerSpec
+import qualified ExpectationsCompilerSpec
+import qualified ExplorerSpec
+import qualified FunctionalInspectorSpec
+import qualified HaskellSpec
+import qualified InspectorSpec
 import qualified JavaScriptSpec
+import qualified JavaSpec
 import qualified LogicSpec
+import qualified PolymorphismSpec
+import qualified PrologSpec
+import qualified PythonSpec
+import qualified SampleParserSpec
+import qualified SignaturesAnalyzerSpec
+import qualified SignatureSpec
+import qualified SmellsAnalyzerSpec
+import qualified SmellSpec
+import qualified TokenizerSpec
+import qualified TypedInspectorSpec
+import qualified UnfoldSpec
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = do
-  describe "UnfoldSpec"     UnfoldSpec.spec
-  describe "CombinerSpec"     CombinerSpec.spec
-  describe "InspectorSpec"     InspectorSpec.spec
-  describe "ExpectationsCompilerSpec"     ExpectationsCompilerSpec.spec
-  describe "JavaSpec"     JavaSpec.spec
-  describe "TokenizerSpec"     TokenizerSpec.spec
-  describe "AnalysisJsonSpec"     AnalysisJsonSpec.spec
-  describe "LogicSpec"     LogicSpec.spec
-  describe "JavaScriptSpec"     JavaScriptSpec.spec
+  describe "AnalysisJsonSpec" AnalysisJsonSpec.spec
+  describe "CombinerSpec" CombinerSpec.spec
+  describe "DomainLanguageSpec" DomainLanguageSpec.spec
+  describe "DuplicationSpec" DuplicationSpec.spec
+  describe "ExpectationsAnalyzerSpec" ExpectationsAnalyzerSpec.spec
+  describe "ExpectationsCompilerSpec" ExpectationsCompilerSpec.spec
+  describe "ExplorerSpec" ExplorerSpec.spec
+  describe "FunctionalInspectorSpec" FunctionalInspectorSpec.spec
+  describe "HaskellSpec" HaskellSpec.spec
+  describe "InspectorSpec" InspectorSpec.spec
+  describe "JavaScriptSpec" JavaScriptSpec.spec
+  describe "JavaSpec" JavaSpec.spec
+  describe "LogicSpec" LogicSpec.spec
+  describe "PolymorphismSpec" PolymorphismSpec.spec
+  describe "PrologSpec" PrologSpec.spec
+  describe "PythonSpec" PythonSpec.spec
+  describe "SampleParserSpec" SampleParserSpec.spec
+  describe "SignaturesAnalyzerSpec" SignaturesAnalyzerSpec.spec
+  describe "SignatureSpec" SignatureSpec.spec
+  describe "SmellsAnalyzerSpec" SmellsAnalyzerSpec.spec
+  describe "SmellSpec" SmellSpec.spec
+  describe "TokenizerSpec" TokenizerSpec.spec
+  describe "TypedInspectorSpec" TypedInspectorSpec.spec
+  describe "UnfoldSpec" UnfoldSpec.spec
