@@ -1,9 +1,0 @@
-module PythonSpec (spec) where
-
-import           Test.Hspec
-
-spec :: Spec
-spec = do
-  describe "parse" $ do
-    it "python is not supported" $ do
-      True `shouldBe` True

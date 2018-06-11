@@ -20,16 +20,12 @@ if grep ghcjs stack.yaml -q; then
   swap2ghc mulang.cabal
   swap2ghc app/Main.hs
   swap2ghc spec/Spec.hs
-  swap2ghc spec/PythonSpec.hs
-  swap2ghc src/Language/Mulang/Analyzer/SampleParser.hs
 else
   echo 'GHC compiler detected. Swapping to GHCJS...'
   swap2ghcjs stack.yaml
   swap2ghcjs mulang.cabal
   swap2ghcjs app/Main.hs
   swap2ghcjs spec/Spec.hs
-  swap2ghcjs spec/PythonSpec.hs
-  swap2ghcjs src/Language/Mulang/Analyzer/SampleParser.hs
 fi
 
 echo 'Done'

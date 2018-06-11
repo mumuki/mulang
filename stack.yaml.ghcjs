@@ -11,5 +11,6 @@ setup-info:
 compiler-check: match-exact
 extra-deps:
   - ParsecTools-0.0.2.0
+  - language-python-0.5.4
 compiler: ghcjs-0.2.1.9007019_ghc-8.0.1
 resolver: lts-7.19
