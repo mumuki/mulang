@@ -16,6 +16,10 @@ function ghcjsWrapper(code) {
 
 // Wrappers
 
+// * Main
+//   f :: IO ()
+const ghcjsWrapperMain = ghcjsWrapper((fun) => () => { h$main(fun) });
+
 // * Any
 //    f :: IO (JSVal | JSString)
 const ghcjsWrapperUnit = ghcjsWrapper((fun) => () => { h$runSync(fun)});
