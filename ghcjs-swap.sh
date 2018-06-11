@@ -17,13 +17,11 @@ echo 'Going to swap compilers....'
 if grep ghcjs stack.yaml -q; then
   echo 'GHCJS compiler detected. Swapping to GHC...'
   swap2ghc stack.yaml
-  swap2ghc mulang.cabal
   swap2ghc app/Main.hs
   swap2ghc spec/Spec.hs
 else
   echo 'GHC compiler detected. Swapping to GHCJS...'
   swap2ghcjs stack.yaml
-  swap2ghcjs mulang.cabal
   swap2ghcjs app/Main.hs
   swap2ghcjs spec/Spec.hs
 fi
