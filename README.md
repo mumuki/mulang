@@ -7,7 +7,7 @@ Mulang
 Mulang is three different  - but thighly related - things:
 
   * an intermediate language, known as the [Mulang AST](#mulang-ast-spec);
-  * a [command line tool](#command-line-tool) for analysing the Mulang AST and [some popular languages](#supported-languages) by transforming to it
+  * a [command line tool](#command-line-tool) for analysing the Mulang AST and [some popular languages](#supported-languages) by transforming to it. This tool is distributed as both a linux amd64 binary and a JavaScript pacakge. See [downloads section](https://github.com/mumuki/mulang/releases).
   * a Haskell composable [combinators library]((#combinators-crash-course)) for analysing the Mulang AST;
 
 # Table of contents
