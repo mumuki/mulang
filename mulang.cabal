@@ -103,6 +103,10 @@ executable mulang
     process                   ,
     neat-interpolation        ,
     mulang
+  if impl(ghcjs)
+    build-depends:
+      ghcjs-base
+
   build-tools:
     happy,
     alex

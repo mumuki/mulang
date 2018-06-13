@@ -1,0 +1,36 @@
+{
+  "name": "mulang",
+  "version": "1.0.0",
+  "description": "An intermediate language designed to perform advanced code analysis",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mumuki/mulang.git"
+  },
+  "keywords": [
+    "ast",
+    "code-analysis",
+    "java",
+    "javascript",
+    "python",
+    "prolog",
+    "ruby",
+    "haskell"
+  ],
+  "author": "Franco Leonardo Bulgarelli",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mumuki/mulang/issues"
+  },
+  "homepage": "https://github.com/mumuki/mulang#readme",
+  "devDependencies": {
+    "mocha": "^5.2.0",
+    "should": "^13.2.1"
+  }
+}
