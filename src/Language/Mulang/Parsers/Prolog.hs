@@ -44,6 +44,7 @@ pattern = buildExpressionParser optable (term <* spaces)
     otherToPattern ("mod", [p1, p2])      = ApplicationPattern "mod" [p1, p2]
     otherToPattern ("div", [p1, p2])      = ApplicationPattern "div" [p1, p2]
     otherToPattern ("rem", [p1, p2])      = ApplicationPattern "rem" [p1, p2]
+    otherToPattern ("round", [p1])        = ApplicationPattern "round" [p1]
     otherToPattern (name, args)           = FunctorPattern name args
 
 op :: String -> ParsecParser (Pattern -> Pattern -> Pattern)
