@@ -175,6 +175,13 @@ spec = do
                                                   VariablePattern "X",
                                                   FunctorPattern "f" [VariablePattern "Y"]]])
 
+    it "rule/1 with round function" $ do
+      pl "baz(X, Y):- X is round(3.5)." `shouldBe` (Rule "baz"
+                                                [VariablePattern "X",VariablePattern "Y"]
+                                                [Exist "is" [
+                                                  VariablePattern "X",
+                                                  ApplicationPattern "round" [LiteralPattern "3.5"]]])
+
     it "rule/1 with > and math" $ do
       pl "baz(X):- X + 50 > x * 2." `shouldBe` (Rule "baz"
                                                   [VariablePattern "X"]
