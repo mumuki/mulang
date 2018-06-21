@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Language.Mulang.Builder (
     compact,
     compactMap,
@@ -5,6 +7,8 @@ module Language.Mulang.Builder (
     normalize,
     normalizeWith,
     NormalizationOptions (..)) where
+
+import           GHC.Generics
 
 import Language.Mulang.Ast
 
@@ -16,7 +20,7 @@ data NormalizationOptions = NormalizationOptions {
   convertObjectLevelVariableIntoAttribute :: Bool,
   sortTopLevelDeclarations :: Bool,
   sortObjectLevelDeclarations :: Bool
-} deriving (Eq, Show)
+} deriving (Eq, Show, Read, Generic)
 
 compactConcatMap :: (a -> [Expression]) -> [a] -> Expression
 compactConcatMap f = compact . concat . map f

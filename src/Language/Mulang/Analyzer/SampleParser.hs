@@ -9,10 +9,11 @@ import        Language.Mulang.Parsers.Prolog (parseProlog)
 import        Language.Mulang.Parsers.Java (parseJava)
 import        Language.Mulang.Parsers.Python (parsePython)
 import        Language.Mulang.Analyzer.Analysis (Sample(..), Language(..))
+import        Language.Mulang.Builder (normalize, normalizeWith, NormalizationOptions)
 
 parseSample :: Sample -> Either String Expression
 parseSample (CodeSample language content) = (parserFor language) content
-parseSample (MulangSample ast)            = Right ast
+parseSample (MulangSample ast options)    = Right . (normalizerFor options) $ ast
 
 parserFor :: Language -> EitherParser
 parserFor Haskell        = parseHaskell
@@ -20,3 +21,7 @@ parserFor Java           = parseJava
 parserFor JavaScript     = maybeToEither parseJavaScript
 parserFor Prolog         = parseProlog
 parserFor Python         = parsePython
+
+normalizerFor :: (Maybe NormalizationOptions) -> (Expression -> Expression)
+normalizerFor Nothing        = normalize
+normalizerFor (Just options) = normalizeWith options
