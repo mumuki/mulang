@@ -10,16 +10,17 @@ module Language.Mulang.Builder (
 
 import           GHC.Generics
 
+import Data.List (sort)
 import Language.Mulang.Ast
+import Language.Mulang.Generator (declarators)
 
 data NormalizationOptions = NormalizationOptions {
-  convertTopLevelObjectVariableIntoObject :: Bool,
-  convertTopLevelLambdaVariableIntoFunction :: Bool,
+  convertObjectVariableIntoObject :: Bool,
+  convertLambdaVariableIntoFunction :: Bool,
   convertObjectLevelFunctionIntoMethod :: Bool,
   convertObjectLevelLambdaVariableIntoMethod :: Bool,
   convertObjectLevelVariableIntoAttribute :: Bool,
-  sortTopLevelDeclarations :: Bool,
-  sortObjectLevelDeclarations :: Bool
+  sortSequenceDeclarations :: Bool
 } deriving (Eq, Show, Read, Generic)
 
 compactConcatMap :: (a -> [Expression]) -> [a] -> Expression
@@ -35,21 +36,20 @@ compact es  = Sequence es
 
 normalizeAllOptions :: NormalizationOptions
 normalizeAllOptions = NormalizationOptions {
-  convertTopLevelObjectVariableIntoObject = True,
-  convertTopLevelLambdaVariableIntoFunction = True,
+  convertObjectVariableIntoObject = True,
+  convertLambdaVariableIntoFunction = True,
   convertObjectLevelFunctionIntoMethod = True,
   convertObjectLevelLambdaVariableIntoMethod = True,
   convertObjectLevelVariableIntoAttribute = True,
-  sortTopLevelDeclarations = True,
-  sortObjectLevelDeclarations = True
+  sortSequenceDeclarations = True
 }
 
 normalize :: Expression -> Expression
 normalize = normalizeWith normalizeAllOptions
 
 normalizeWith :: NormalizationOptions -> Expression -> Expression
-normalizeWith ops (Variable n (MuObject e))        | convertTopLevelObjectVariableIntoObject ops = Object n (normalizeObjectLevelWith ops e)
-normalizeWith ops (Variable n (Lambda vars e))     | convertTopLevelLambdaVariableIntoFunction ops = SimpleFunction n vars (normalizeWith ops e)
+normalizeWith ops (Variable n (MuObject e))        | convertObjectVariableIntoObject ops = Object n (normalizeObjectLevelWith ops e)
+normalizeWith ops (Variable n (Lambda vars e))     | convertLambdaVariableIntoFunction ops = SimpleFunction n vars (normalizeWith ops e)
 normalizeWith ops (Variable n e)                   = Variable n (normalizeWith ops e)
 normalizeWith ops (Function n equations)           = Function n (mapNormalizeEquationWith ops equations)
 normalizeWith ops (Procedure n equations)          = Procedure n (mapNormalizeEquationWith ops equations)
@@ -70,7 +70,7 @@ normalizeWith ops (ForLoop init cond prog stmt)    = ForLoop (normalizeWith ops 
 normalizeWith ops (Return e)                       = Return (normalizeWith ops e)
 normalizeWith ops (Not e)                          = Not (normalizeWith ops e)
 normalizeWith ops (Forall e1 e2)                   = Forall (normalizeWith ops e1) (normalizeWith ops e2)
-normalizeWith ops (Sequence es)                    = Sequence (mapNormalizeWith ops es)
+normalizeWith ops (Sequence es)                    = Sequence . sortDeclarationsWith ops .  mapNormalizeWith ops $ es
 normalizeWith ops (MuObject e)                     = MuObject (normalizeWith ops e)
 normalizeWith ops (MuTuple es)                     = MuTuple (mapNormalizeWith ops es)
 normalizeWith ops (MuList es)                      = MuList (mapNormalizeWith ops es)
@@ -78,7 +78,6 @@ normalizeWith _ e = e
 
 mapNormalizeWith ops = map (normalizeWith ops)
 mapNormalizeEquationWith ops = map (normalizeEquationWith ops)
-
 
 normalizeObjectLevelWith :: NormalizationOptions -> Expression -> Expression
 normalizeObjectLevelWith ops (Function n eqs)             | convertObjectLevelFunctionIntoMethod ops       = Method n (mapNormalizeEquationWith ops eqs)
@@ -90,3 +89,15 @@ normalizeObjectLevelWith ops e                            = normalizeWith ops e
 normalizeEquationWith :: NormalizationOptions -> Equation -> Equation
 normalizeEquationWith ops (Equation ps (UnguardedBody e))   = Equation ps (UnguardedBody (normalizeWith ops e))
 normalizeEquationWith ops (Equation ps (GuardedBody b))     = Equation ps (GuardedBody (map (\(c, e) -> (normalizeWith ops c, normalizeWith ops e)) b))
+
+isSortableDeclaration :: Expression -> Bool
+isSortableDeclaration (Attribute _ _) = False
+isSortableDeclaration (Variable _ _)  = False
+isSortableDeclaration e = isDeclaration e
+
+isDeclaration :: Expression -> Bool
+isDeclaration = not.null.declarators
+
+sortDeclarationsWith :: NormalizationOptions -> [Expression] -> [Expression]
+sortDeclarationsWith ops expressions | sortSequenceDeclarations ops && all isSortableDeclaration expressions = sort expressions
+                                     | otherwise = expressions

@@ -48,12 +48,12 @@ import           Language.Mulang.Identifier (Identifier)
 type Code = String
 
 -- | An equation. See @Function@ and @Procedure@ above
-data Equation = Equation [Pattern] EquationBody deriving (Eq, Show, Read, Generic)
+data Equation = Equation [Pattern] EquationBody deriving (Eq, Show, Read, Generic, Ord)
 
 data EquationBody
         = UnguardedBody Expression
         | GuardedBody  [(Expression, Expression)]
-        deriving (Eq, Show, Read, Generic)
+        deriving (Eq, Show, Read, Generic, Ord)
 
 type SubroutineBody = [Equation]
 
@@ -72,7 +72,7 @@ data Type
         -- Usefull for modelling classes and interfaces types
         | OtherType (Maybe Code) (Maybe Type)
         -- ^ unrecognized type, with optional code and nested type
-        deriving (Eq, Show, Read, Generic)
+        deriving (Eq, Show, Read, Generic, Ord)
 
 -- | Expression is the root element of a Mulang program.
 -- | With the exception of Patterns, nearly everything is an Expression: variable declarations, literals,
@@ -185,7 +185,7 @@ data Expression
     -- ^ Generic symbol/atom literal
     | MuTuple [Expression]
     | MuList [Expression]
-  deriving (Eq, Show, Read, Generic)
+  deriving (Eq, Show, Read, Generic, Ord)
 
 -- | Mulang Patterns are not expressions, but are aimed to match them.
 -- | They are modeled after Haskell, Prolog, Elixir, Scala and Erlang patterns
@@ -212,12 +212,12 @@ data Pattern
     | UnionPattern [Pattern]
     | OtherPattern (Maybe Code) (Maybe Pattern)
     -- ^ Other unrecognized pattern with optional code and nested pattern
-  deriving (Eq, Show, Read, Generic)
+  deriving (Eq, Show, Read, Generic, Ord)
 
 data Statement
   = Generator Pattern Expression
   | Guard Expression
-  deriving (Eq, Show, Read, Generic)
+  deriving (Eq, Show, Read, Generic, Ord)
 
 debug :: Show a => a -> Expression
 debug a = Other (Just (show a)) Nothing
