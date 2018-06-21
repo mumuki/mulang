@@ -6,6 +6,7 @@ module Language.Mulang.Builder (
     compactConcatMap,
     normalize,
     normalizeWith,
+    defaultNormalizationOptions,
     NormalizationOptions (..)) where
 
 import           GHC.Generics
@@ -20,7 +21,8 @@ data NormalizationOptions = NormalizationOptions {
   convertObjectLevelFunctionIntoMethod :: Bool,
   convertObjectLevelLambdaVariableIntoMethod :: Bool,
   convertObjectLevelVariableIntoAttribute :: Bool,
-  sortSequenceDeclarations :: Bool
+  sortSafeSequenceDeclarations :: Bool,
+  sortAllSequenceDeclarations :: Bool
 } deriving (Eq, Show, Read, Generic)
 
 compactConcatMap :: (a -> [Expression]) -> [a] -> Expression
@@ -34,18 +36,19 @@ compact []  = None
 compact [e] = e
 compact es  = Sequence es
 
-normalizeAllOptions :: NormalizationOptions
-normalizeAllOptions = NormalizationOptions {
+defaultNormalizationOptions :: NormalizationOptions
+defaultNormalizationOptions = NormalizationOptions {
   convertObjectVariableIntoObject = True,
   convertLambdaVariableIntoFunction = True,
   convertObjectLevelFunctionIntoMethod = True,
   convertObjectLevelLambdaVariableIntoMethod = True,
   convertObjectLevelVariableIntoAttribute = True,
-  sortSequenceDeclarations = True
+  sortSafeSequenceDeclarations = True,
+  sortAllSequenceDeclarations = False
 }
 
 normalize :: Expression -> Expression
-normalize = normalizeWith normalizeAllOptions
+normalize = normalizeWith defaultNormalizationOptions
 
 normalizeWith :: NormalizationOptions -> Expression -> Expression
 normalizeWith ops (Variable n (MuObject e))        | convertObjectVariableIntoObject ops = Object n (normalizeObjectLevelWith ops e)
@@ -90,14 +93,15 @@ normalizeEquationWith :: NormalizationOptions -> Equation -> Equation
 normalizeEquationWith ops (Equation ps (UnguardedBody e))   = Equation ps (UnguardedBody (normalizeWith ops e))
 normalizeEquationWith ops (Equation ps (GuardedBody b))     = Equation ps (GuardedBody (map (\(c, e) -> (normalizeWith ops c, normalizeWith ops e)) b))
 
-isSortableDeclaration :: Expression -> Bool
-isSortableDeclaration (Attribute _ _) = False
-isSortableDeclaration (Variable _ _)  = False
-isSortableDeclaration e = isDeclaration e
+isSafeDeclaration :: Expression -> Bool
+isSafeDeclaration (Attribute _ _) = False
+isSafeDeclaration (Variable _ _)  = False
+isSafeDeclaration e = isDeclaration e
 
 isDeclaration :: Expression -> Bool
 isDeclaration = not.null.declarators
 
 sortDeclarationsWith :: NormalizationOptions -> [Expression] -> [Expression]
-sortDeclarationsWith ops expressions | sortSequenceDeclarations ops && all isSortableDeclaration expressions = sort expressions
-                                     | otherwise = expressions
+sortDeclarationsWith ops expressions | sortSafeSequenceDeclarations ops && all isSafeDeclaration expressions = sort expressions
+                                     | sortAllSequenceDeclarations ops && all isDeclaration expressions      = sort expressions
+                                     | otherwise                                                             = expressions

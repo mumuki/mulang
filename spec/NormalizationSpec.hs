@@ -1,16 +1,23 @@
 module NormalizationSpec (spec) where
 
   import           Test.Hspec
+  import           Language.Mulang.Parsers.Java (java)
   import           Language.Mulang.Parsers.Haskell (hs)
   import           Language.Mulang.Parsers.JavaScript (js)
 
   spec :: Spec
   spec = do
     describe "sorts declarations by default" $ do
-      it "sorts declarations on haskell" $ do
+      it "sorts classes on Java" $ do
+        java "class Foo {} class Bar {}" `shouldBe` java "class Bar {} class Foo {}"
+
+      it "sorts functions on haskell" $ do
         hs "f 1 = 1\ng 2 = 2" `shouldBe` hs "g 2 = 2\nf 1 = 1"
 
-      it "sorts declarations on javascript if there are only declarations" $ do
+      it "sorts declarations on haskell even when there are variables" $ do
+        hs "n = 1\nf 1 = 1\ng 2 = 2" `shouldBe` hs "g 2 = 2\nf 1 = 1\nn = 1"
+
+      it "sorts functions on javascript if there are only functions" $ do
         js "function f() {} function g() {}" `shouldBe` js "function g() {} function f() {}"
 
       it "doesn't sort declarations on javascript if there are also statements" $ do

@@ -1,7 +1,7 @@
 module Language.Mulang.Parsers.Haskell (hs, parseHaskell) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Builder
+import Language.Mulang.Builder (compact, normalizeWith, defaultNormalizationOptions, NormalizationOptions(..))
 import Language.Mulang.Parsers
 
 import Language.Haskell.Syntax
@@ -24,6 +24,7 @@ parseHaskell = orLeft . parseHaskell'
 
 parseHaskell' :: String -> ParseResult Expression
 parseHaskell' = fmap (normalize . mu) . parseModule . (++"\n")
+    where normalize = normalizeWith (defaultNormalizationOptions { sortAllSequenceDeclarations = True })
 
 mu :: HsModule -> Expression
 mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
