@@ -9,6 +9,8 @@ module Language.Mulang.Builder (
 import Language.Mulang.Ast
 
 data NormalizationOptions = NormalizationOptions {
+  convertTopLevelObjectVariableIntoObject :: Bool,
+  convertTopLevelLambdaVariableIntoFunction :: Bool,
   convertObjectLevelFunctionIntoMethod :: Bool,
   convertObjectLevelLambdaVariableIntoMethod :: Bool,
   convertObjectLevelVariableIntoAttribute :: Bool,
@@ -29,17 +31,21 @@ compact es  = Sequence es
 
 normalizeAllOptions :: NormalizationOptions
 normalizeAllOptions = NormalizationOptions {
+  convertTopLevelObjectVariableIntoObject = True,
+  convertTopLevelLambdaVariableIntoFunction = True,
   convertObjectLevelFunctionIntoMethod = True,
   convertObjectLevelLambdaVariableIntoMethod = True,
-  convertObjectLevelVariableIntoAttribute = True
+  convertObjectLevelVariableIntoAttribute = True,
+  sortTopLevelDeclarations = True,
+  sortObjectLevelDeclarations = True
 }
 
 normalize :: Expression -> Expression
 normalize = normalizeWith normalizeAllOptions
 
 normalizeWith :: NormalizationOptions -> Expression -> Expression
-normalizeWith ops (Variable n (MuObject e))        = Object n (normalizeObjectLevelWith ops e)
-normalizeWith ops (Variable n (Lambda vars e))     = SimpleFunction n vars (normalizeWith ops e)
+normalizeWith ops (Variable n (MuObject e))        | convertTopLevelObjectVariableIntoObject ops = Object n (normalizeObjectLevelWith ops e)
+normalizeWith ops (Variable n (Lambda vars e))     | convertTopLevelLambdaVariableIntoFunction ops = SimpleFunction n vars (normalizeWith ops e)
 normalizeWith ops (Variable n e)                   = Variable n (normalizeWith ops e)
 normalizeWith ops (Function n equations)           = Function n (mapNormalizeEquationWith ops equations)
 normalizeWith ops (Procedure n equations)          = Procedure n (mapNormalizeEquationWith ops equations)
