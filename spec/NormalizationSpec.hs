@@ -2,12 +2,16 @@ module NormalizationSpec (spec) where
 
   import           Test.Hspec
   import           Language.Mulang.Parsers.Java (java)
+  import           Language.Mulang.Parsers.Python (py)
   import           Language.Mulang.Parsers.Haskell (hs)
   import           Language.Mulang.Parsers.JavaScript (js)
 
   spec :: Spec
   spec = do
     describe "sorts declarations by default" $ do
+      it "sorts classes on Python" $ do
+        py "def foo():\n  return 2\n\ndef bar():\n  return 1\n\n" `shouldBe` py "def bar():\n  return 1\n\ndef foo():\n  return 2\n\n"
+
       it "sorts classes on Java" $ do
         java "class Foo {} class Bar {}" `shouldBe` java "class Bar {} class Foo {}"
 
