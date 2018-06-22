@@ -969,6 +969,48 @@ $  mulang '
 }
 ```
 
+## CLI input spec
+
+This is a comprehensive spec of the options available to the CLI used in the previous samples:
+
+```
+{
+  "sample" : {
+               "tag" : "MulangSample",
+               "ast" : <expression>,
+               "normalizationOptions" : {
+                  "convertObjectVariableIntoObject" : Bool
+                  "convertLambdaVariableIntoFunction" : Bool
+                  "convertObjectLevelFunctionIntoMethod" : Bool
+                  "convertObjectLevelLambdaVariableIntoMethod" : Bool
+                  "convertObjectLevelVariableIntoAttribute" : Bool
+                  "sortSafeSequenceDeclarations" : Bool
+                  "sortAllSequenceDeclarations" : Bool
+               }
+             }
+           | {
+               "tag" : "CodeSample",
+               "content" : String
+             },
+  "spec" : {
+    "expectations" : { "binding" : String, "inspection" : String }*,
+    "smellsSet" : { "tag" : "NoSmells", "include" : String*  }
+                | { "tag" : "AllSmells", "exclude" : String* },
+    "signatureAnalysisType"? : { "tag" : "NoSignatures" }
+                             | { "tag" : "DefaultSignatures" }
+                             | { "tag" : "StyledSignatures",
+                                "style" : "MulangStyle" | "UntypedCStyle" | "HaskellStyle" | "PrologStyle" },
+    "domainLanguage"? : {
+      "dictionaryFilePath"? : String
+      "caseStyle"? : "CamelCase" | "SnakeCase" | "RubyCase"
+      "minimumIdentifierSize"? : Int
+      "jargon"? : String*
+    },
+    "astsGenerationType"? : "NoAst" | "RootExpressionAst" | "AllExpressionsAsts"
+  }
+}
+```
+
 
 # Mulang AST spec
 
