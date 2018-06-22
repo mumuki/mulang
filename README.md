@@ -32,7 +32,7 @@ Mulang is three different  - but thighly related - things:
     + [With Smell Analysis, by inclusion](#with-smell-analysis-by-inclusion)
     + [With Smell Analysis, by exclusion](#with-smell-analysis-by-exclusion)
     + [With expressiveness smells](#with-expressiveness-smells)
-    + [With Intermediate Language Generation](#with-intermediate-language-generation)
+    + [With Abstract Syntax Tree Generation](#with-intermediate-language-generation)
 - [Mulang AST spec](#mulang-ast-spec)
   * [Expressions](#expressions)
     + [`Record`](#record)
@@ -495,7 +495,7 @@ You can also use Mulang from the Command Line, without having to interact with H
 
 1. **Expectation analysis**: you can pass _inspections_ that will be tested against the provied program. Expectations answer questions like: _does the function X call the function Y?_ or _does the program use if's?_.
 4. **Smell analysis**: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched.
-2. **Intermediate Language analysis**: you can ask the tool to generate the Mulang AST for a given source code.
+2. **Abstract syntax tree generation analysis**: you can ask the tool to generate the Mulang AST for a given source code.
 3. **Signature analysis**: report the signatures of the computations present in source code.
 
 ## The expectations DSL
@@ -851,9 +851,10 @@ $ mulang  '
 ```
 
 
-### With Intermediate Language Generation
+### With Abstract Syntax Tree Generation
 
 ```bash
+# If you want generate only the root expression abstract syntax tree
 $ mulang '
 {
    "sample" : {
@@ -864,7 +865,7 @@ $ mulang '
    "spec" : {
       "expectations" : [],
       "smellsSet" : { "tag" : "NoSmells" },
-      "includeIntermediateLanguage" : true
+      "astsGenerationType" : "RootExpressionAst"
    }
 }
 ' | json_pp
@@ -873,7 +874,7 @@ $ mulang '
    "smells" : [],
    "tag" : "AnalysisCompleted",
    "signatures" : [],
-   "intermediateLanguage" : {
+   "generatedAsts" : [{
       "tag" : "Function",
       "contents" : [
          "foo",
@@ -901,9 +902,71 @@ $ mulang '
             ]
          ]
       ]
-   }
+   }]
 }
 
+# If you want generate the root expression abstract syntax tree,
+# and all it subexpressions trees
+$  mulang '
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "JavaScript",
+      "content" : "function foo(x, y) { return null; }"
+   },
+   "spec" : {
+      "expectations" : [],
+      "smellsSet" : { "tag" : "NoSmells" },
+      "astsGenerationType" : "AllExpressionsAsts"
+   }
+}
+' | json_pp
+{
+   "signatures" : [],
+   "smells" : [],
+   "generatedAsts" : [
+      {
+         "tag" : "Function",
+         "contents" : [
+            "foo",
+            [
+               [
+                  [
+                     {
+                        "contents" : "x",
+                        "tag" : "VariablePattern"
+                     },
+                     {
+                        "contents" : "y",
+                        "tag" : "VariablePattern"
+                     }
+                  ],
+                  {
+                     "tag" : "UnguardedBody",
+                     "contents" : {
+                        "tag" : "Return",
+                        "contents" : {
+                           "tag" : "MuNil"
+                        }
+                     }
+                  }
+               ]
+            ]
+         ]
+      },
+      {
+         "tag" : "Return",
+         "contents" : {
+            "tag" : "MuNil"
+         }
+      },
+      {
+         "tag" : "MuNil"
+      }
+   ],
+   "expectationResults" : [],
+   "tag" : "AnalysisCompleted"
+}
 ```
 
 

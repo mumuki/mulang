@@ -16,10 +16,11 @@ $ node index.js '{
               "inspection" : "Uses:*"
            }
         ],
-        "smellsSet" : { "tag" : "NoSmells" }
+        "smellsSet" : { "tag" : "NoSmells" },
+        "astsGenerationType" : "NoAst"
      }
   }'
-{"signatures":[],"smells":[],"expectationResults":[{"expectation":{"binding":":Intransitive:x","inspection":"Uses:*"},"result":true}],"tag":"AnalysisCompleted","intermediateLanguage":null}
+{"signatures":[],"smells":[],"expectationResults":[{"expectation":{"binding":":Intransitive:x","inspection":"Uses:*"},"result":true}],"tag":"AnalysisCompleted","generatedAsts":[]}
 ```
 
 ### As a node library
@@ -39,7 +40,8 @@ mulang.analyse({
                       "inspection": "Uses:*"
                     }
                   ],
-                  "smellsSet": { "tag": "NoSmells" }
+                  "smellsSet": { "tag": "NoSmells" },
+                  "astsGenerationType" : "NoAst"
                 });
 ```
 

@@ -65,6 +65,7 @@ main = do
                       "inspection" : "Uses:*"
                    }
                 ],
-                "smellsSet" : { "tag" : "NoSmells" }
+                "smellsSet" : { "tag" : "NoSmells" },
+                "astsGenerationType" : "NoAst"
              }
           }'|]

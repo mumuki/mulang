@@ -28,7 +28,7 @@ describe("mulang", () => {
           "result": true
         },
       ],
-      "intermediateLanguage": null,
+      "generatedAsts": [],
       "signatures": [],
       "smells": [],
       "tag": "AnalysisCompleted"
@@ -45,11 +45,11 @@ describe("mulang", () => {
       "spec": {
         "expectations": [],
         "smellsSet": { "tag": "NoSmells" },
-        "includeIntermediateLanguage": true
+        "astsGenerationType": "RootExpressionAst"
       }
     })).be.eql({
       "expectationResults": [],
-      "intermediateLanguage": {
+      "generatedAsts": [{
         "contents": [
           "foo",
           [
@@ -78,7 +78,7 @@ describe("mulang", () => {
           ]
         ],
         "tag": "Function"
-      },
+      }],
       "signatures": [],
       "smells": [],
       "tag": "AnalysisCompleted"

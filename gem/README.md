@@ -32,11 +32,10 @@ Mulang.analyse sample: {
                },
                spec: {
                 expectations: [],
-                smellsSet: {
-                  tag: 'NoSmells'
-                }
+                astsGenerationType: 'NoAst',
+                smellsSet: { tag: 'NoSmells' }
               }
-# => {"tag"=>"AnalysisCompleted", "intermediateLanguage"=>nil, "signatures"=>[], "smells"=>[], "expectationResults"=>[]}
+# => {"tag"=>"AnalysisCompleted", "generatedAsts"=>[], "signatures"=>[], "smells"=>[], "expectationResults"=>[]}
 ```
 
 ### Code manipulation
@@ -52,7 +51,7 @@ code.analysis expectations: [], smellsSet: { tag: 'NoSmells' }
 # => {:sample=>{:tag=>"CodeSample", :language=>"JavaScript", :content=>"var x = 1"}, :spec=>{:expectations=>[], :smellsSet=>{:tag=>"NoSmells"}}}
 
 code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }
-# => {"tag"=>"AnalysisCompleted", "intermediateLanguage"=>nil, "signatures"=>[], "smells"=>[], "expectationResults"=>[]}
+# => {"tag"=>"AnalysisCompleted", "generatedAsts"=>[], "signatures"=>[], "smells"=>[], "expectationResults"=>[]}
 ```
 
 ## Development
