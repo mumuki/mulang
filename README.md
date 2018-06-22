@@ -979,13 +979,12 @@ This is a comprehensive spec of the options available to the CLI used in the pre
                "tag" : "MulangSample",
                "ast" : <expression>,
                "normalizationOptions" : {
-                  "convertObjectVariableIntoObject" : Bool
-                  "convertLambdaVariableIntoFunction" : Bool
-                  "convertObjectLevelFunctionIntoMethod" : Bool
-                  "convertObjectLevelLambdaVariableIntoMethod" : Bool
-                  "convertObjectLevelVariableIntoAttribute" : Bool
-                  "sortSafeSequenceDeclarations" : Bool
-                  "sortAllSequenceDeclarations" : Bool
+                  "convertObjectVariableIntoObject" : Bool,
+                  "convertLambdaVariableIntoFunction" : Bool,
+                  "convertObjectLevelFunctionIntoMethod" : Bool,
+                  "convertObjectLevelLambdaVariableIntoMethod" : Bool,
+                  "convertObjectLevelVariableIntoAttribute" : Bool,
+                  "sortSequenceDeclarations" : "SortNothing" | "SortUniqueNonVariables" | "SortAllNonVarables" | "SortAll"
                }
              }
            | {
