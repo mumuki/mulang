@@ -12,8 +12,8 @@ Mulang is three different  - but thighly related - things:
 
 # Table of contents
 
-- [Mulang](#mulang)
-- [Table of contents](#table-of-contents)
+<!-- toc -->
+
 - [Combinators Crash course](#combinators-crash-course)
   * [Inspections](#inspections)
   * [Inspection Combinators](#inspection-combinators)
@@ -154,7 +154,7 @@ Mulang is three different  - but thighly related - things:
       - [Syntax](#syntax-39)
     + [`Self`](#self)
       - [Syntax](#syntax-40)
-    + [`MuNil`](#munil)
+    + [`None`](#none)
       - [Syntax](#syntax-41)
     + [`MuNil`](#munil)
       - [Syntax](#syntax-42)
@@ -220,10 +220,11 @@ Mulang is three different  - but thighly related - things:
   * [Running tests](#running-tests)
   * [Watching changes](#watching-changes)
   * [Loading mulang in the REPL](#loading-mulang-in-the-repl)
-- [Ruby wrapper](#Ruby-wrapper)
+- [Ruby wrapper](#ruby-wrapper)
 - [JavaScript library](#javascript-library)
 - [Tagging and releasing](#tagging-and-releasing)
 
+<!-- tocstop -->
 
 # Combinators Crash course
 
@@ -1616,14 +1617,14 @@ for (var i = 0; i < 10; i++) {
 (Self)
 ```
 
-### `MuNil`
+### `None`
 
 > Used as a placeholder for empty bodies.
 
 #### Syntax
 
 ```haskell
-(MuNil)
+(None)
 ```
 
 ### `MuNil`
