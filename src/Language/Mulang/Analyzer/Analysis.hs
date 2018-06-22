@@ -11,6 +11,7 @@ module Language.Mulang.Analyzer.Analysis (
   Smell,
   SignatureAnalysisType(..),
   SignatureStyle(..),
+  AstsGenerationType(..),
   Sample(..),
   Language(..),
 
@@ -46,7 +47,7 @@ data AnalysisSpec = AnalysisSpec {
   smellsSet :: SmellsSet,
   signatureAnalysisType :: Maybe SignatureAnalysisType,
   domainLanguage :: Maybe DomainLanguage,
-  includeIntermediateLanguage :: Maybe Bool
+  astsGenerationType :: Maybe AstsGenerationType
 } deriving (Show, Eq, Generic)
 
 data DomainLanguage
@@ -77,6 +78,11 @@ data SignatureStyle
   | HaskellStyle
   | PrologStyle deriving (Show, Eq, Generic)
 
+data AstsGenerationType
+    = NoAst
+    | RootExpressionAst
+    | AllExpressionsAsts deriving (Show, Eq, Generic)
+
 data Sample
   = MulangSample { ast :: Expression, normalizationOptions :: Maybe NormalizationOptions }
   | CodeSample { language :: Language, content :: Code } deriving (Show, Eq, Generic)
@@ -97,7 +103,7 @@ data AnalysisResult
   = AnalysisCompleted { expectationResults :: [ExpectationResult],
                         smells :: [Expectation],
                         signatures :: [Code],
-                        intermediateLanguage :: Maybe Expression }
+                        generatedAsts :: [Expression] }
   | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
 data ExpectationResult = ExpectationResult {

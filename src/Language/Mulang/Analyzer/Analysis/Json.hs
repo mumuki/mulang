@@ -16,7 +16,7 @@ instance FromJSON CaseStyle
 
 instance FromJSON SignatureAnalysisType
 instance FromJSON SignatureStyle
-
+instance FromJSON AstsGenerationType
 instance FromJSON NormalizationOptions
 instance FromJSON SequenceSortMode
 

@@ -10,12 +10,14 @@ module Language.Mulang.Analyzer (
   expectationsAnalysis,
   smellsAnalysis,
   signaturesAnalysis,
+  astsGenerationAnalysis,
 
   analyse,
 
   module Language.Mulang.Analyzer.Analysis) where
 
 import Language.Mulang
+import Language.Mulang.Generator (expressions)
 import Language.Mulang.Analyzer.Analysis
 import Language.Mulang.Analyzer.SampleParser (parseSample)
 import Language.Mulang.Analyzer.SignaturesAnalyzer  (analyseSignatures)
@@ -50,6 +52,8 @@ smellsAnalysis code set = Analysis code (emptyAnalysisSpec { smellsSet = set })
 signaturesAnalysis :: Sample -> SignatureStyle -> Analysis
 signaturesAnalysis code style = Analysis code (emptyAnalysisSpec { signatureAnalysisType = Just (StyledSignatures style) })
 
+astsGenerationAnalysis :: Sample -> AstsGenerationType -> Analysis
+astsGenerationAnalysis code generationType = Analysis code (emptyAnalysisSpec { astsGenerationType = Just generationType })
 --
 -- Analysis running
 --
@@ -64,9 +68,11 @@ analyseAst ast spec = do
   return $ AnalysisCompleted (analyseExpectations ast (expectations spec))
                              (analyseSmells ast language (smellsSet spec))
                              (analyseSignatures ast (signatureAnalysisType spec))
-                             (analyzeIntermediateLanguage ast spec)
+                             (generateAsts ast spec)
 
-analyzeIntermediateLanguage :: Expression -> AnalysisSpec -> Maybe Expression
-analyzeIntermediateLanguage ast spec
-  | fromMaybe False (includeIntermediateLanguage spec) = Just ast
-  | otherwise = Nothing
+generateAsts :: Expression -> AnalysisSpec -> [Expression]
+generateAsts ast spec = generateAsts (fromMaybe NoAst (astsGenerationType spec))
+  where
+    generateAsts NoAst              = []
+    generateAsts RootExpressionAst  = [ast]
+    generateAsts AllExpressionsAsts = expressions ast
