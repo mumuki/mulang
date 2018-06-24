@@ -117,7 +117,7 @@ instance Compilable Expression where
     return [text| $receiver['${selector}']($arguments) |]
 
   -- Generates a JS object instantiation with the given arguments.
-  compile (New _name _arguments) = do
+  compile (New (Reference _name) _arguments) = do
     let name = pack _name
     arguments <- compileAll _arguments ", "
     return [text| new $name($arguments) |]
@@ -143,9 +143,9 @@ instance Compilable Expression where
   -- Generates the JS this meta-reference.
   compile Self = do return [text| this |]
 
-  -- Generates a call the the MuNull primitive class' constructor.
-  -- (this does not mean there has to be many MuNull instances, the constructor can just return a singleton).
-  compile MuNull = do return [text| new MuNull() |]
+  -- Generates a call the the MuNil primitive class' constructor.
+  -- (this does not mean there has to be many MuNil instances, the constructor can just return a singleton).
+  compile MuNil = do return [text| new MuNil() |]
 
   -- Generates a JS undefined value if the sequence is empty.
   -- If the sequence is not empty, generates an invocation to an anonymous function where each line is one sequence member.
@@ -203,7 +203,7 @@ instance Compilable Expression where
            |]
 
   -- Generates a JS if-else if statement wrapped in an anonymous function application in order to make it an expression.
-  compile (Switch _value _cases) = do
+  compile (Switch _value _cases _default) = do
     value <- compile _value
     cases <- fmap (intercalate $ pack " else ") . sequence $ map compileCase _cases
     return [text| function(){ $cases }($value) |]
@@ -227,7 +227,7 @@ instance Compilable Expression where
            |]
     where compileBody :: Expression -> Maybe Text
           compileBody (Sequence expressions) = compileAll expressions ";\n"
-          compileBody MuNull                 = Just [text| |]
+          compileBody MuNil                 = Just [text| |]
           compileBody expression             = compile expression
 
   -- Generates a JS new of an instance of an anonymous class.
@@ -265,7 +265,7 @@ instance Compilable Expression where
   -- Generates a JS assignation statement that replaces the current context's constructor's prototype with a copy of
   -- itself merged with the mixin's prototype.
   -- It also calls the mixin initialization on the new instance.
-  compile (Include _name) = do
+  compile (Include (Reference _name)) = do
     let name = pack _name
     return [text|
              this.constructor.prototype = Object.assign(this.constructor.prototype, Object.create($name.prototype));
@@ -273,14 +273,14 @@ instance Compilable Expression where
            |]
 
   -- TypeSignatures are ignored.
-  compile (TypeSignature _ _ _)  = do return empty
+  compile (TypeSignature _ _)  = do return empty
 
   -- Interfaces are ignored.
   compile (Interface _ _ _)  = do return empty
   compile (Implement _)  = do return empty
 
   -- TypeAliases are ignored (we can't do anything without the aliased type).
-  compile (TypeAlias _)  = do return empty
+  compile (TypeAlias _ _)  = do return empty
 
   -- Records are ignored (we can't do anything without the body).
   compile (Record _)  = do return empty

@@ -3,7 +3,7 @@ module JSCompilerSpec (spec) where
   import           Test.Hspec
   import           Language.Mulang.Ast
   import           Language.Mulang.JSCompiler
-  
+
   spec :: Spec
   spec = do
     -- It would be much better to test this by running the JS code instead of checking the string output...
@@ -15,7 +15,7 @@ module JSCompilerSpec (spec) where
 
       it "MuNumber" $ do
         (MuBool True) `shouldBeCompiledTo` "new MuBool(true)"
-        
+
       it "MuString" $ do
         (MuString "foo") `shouldBeCompiledTo` "new MuString(\"foo\")"
 
@@ -38,12 +38,12 @@ module JSCompilerSpec (spec) where
 
       it "EntryPoint" $ do
         (EntryPoint "foo" (MuBool True)) `shouldBeCompiledTo` "function foo() { return new MuBool(true) }"
-        
+
       it "TypeSignature" $ do
-        (TypeSignature "foo" [] "bar") `shouldBeCompiledTo` ""
+        (VariableSignature "foo" "bar" []) `shouldBeCompiledTo` ""
 
       it "TypeAlias" $ do
-        (TypeAlias "foo") `shouldBeCompiledTo` ""
+        (TypeAlias "foo" "bar") `shouldBeCompiledTo` ""
 
       it "Record" $ do
         (Record "foo") `shouldBeCompiledTo` ""
@@ -103,17 +103,17 @@ module JSCompilerSpec (spec) where
         (Send (Send (Reference "o") (Reference "m") [Reference "x"]) (Reference "n") [Reference "y"]) `shouldBeCompiledTo` "o['m'](x)['n'](y)"
 
       it "New" $ do
-        (New "C" []) `shouldBeCompiledTo` "new C()"
-        (New "C" [Reference "x", Reference "y"]) `shouldBeCompiledTo` "new C(x, y)"
+        (New (Reference "C") []) `shouldBeCompiledTo` "new C()"
+        (New (Reference "C") [Reference "x", Reference "y"]) `shouldBeCompiledTo` "new C(x, y)"
 
       it "Raise" $ do
-        (Raise $ New "E" []) `shouldBeCompiledTo` "function(){ throw new E() }()"
+        (Raise $ New (Reference "E") []) `shouldBeCompiledTo` "function(){ throw new E() }()"
 
       it "Print" $ do
         (Print $ Reference "x") `shouldBeCompiledTo` "console.log(x)"
 
-      it "MuNull" $ do
-        MuNull `shouldBeCompiledTo` "new MuNull()"
+      it "MuNil" $ do
+        MuNil `shouldBeCompiledTo` "new MuNil()"
 
       it "Sequence" $ do pending
 
@@ -127,13 +127,13 @@ module JSCompilerSpec (spec) where
         (Repeat (Reference "c") (Reference "x")) `shouldBeCompiledTo` "function(){ for(var $$i=0; $$i < c; $$i++) { x } }()"
 
       it "Class" $ do
-        (Class "C" Nothing MuNull) `shouldBeCompiledTo` (
+        (Class "C" Nothing MuNil) `shouldBeCompiledTo` (
           "function C() {  " ++
             "this.constructor.prototype = Object.create(MuObject.prototype);  MuObject.call(this);  " ++
           "}"
           )
 
-        (Class "C" (Just "S") MuNull) `shouldBeCompiledTo` (
+        (Class "C" (Just "S") MuNil) `shouldBeCompiledTo` (
           "function C() {  " ++
             "this.constructor.prototype = Object.create(S.prototype);  S.call(this);  " ++
           "}"
@@ -156,7 +156,7 @@ module JSCompilerSpec (spec) where
           "}"
           )
 
-        (Class "C" Nothing $ Sequence [Include "M"]) `shouldBeCompiledTo` (
+        (Class "C" Nothing $ Sequence [Include (Reference "M")]) `shouldBeCompiledTo` (
           "function C() {  " ++
             "this.constructor.prototype = Object.create(MuObject.prototype);  MuObject.call(this);  " ++
             "this.constructor.prototype = Object.assign(this.constructor.prototype, Object.create(M.prototype));  M.call(this)" ++
@@ -164,7 +164,7 @@ module JSCompilerSpec (spec) where
           )
 
       it "Object" $ do
-        (Object "o" MuNull) `shouldBeCompiledTo` (
+        (Object "o" MuNil) `shouldBeCompiledTo` (
           "var o = new function () {  " ++
             "this.constructor.prototype = Object.create(MuObject.prototype);  MuObject.call(this);  " ++
           "}()"
