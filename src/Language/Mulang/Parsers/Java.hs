@@ -3,7 +3,7 @@
 
 module Language.Mulang.Parsers.Java (java, parseJava) where
 
-import Language.Mulang.Ast hiding (While, Return, Equal, Lambda, Try, Switch)
+import Language.Mulang.Ast hiding (While, Return, Equal, Lambda, Try, Switch, Catch)
 import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda, Try, Switch))
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compact, compactMap, compactConcatMap)

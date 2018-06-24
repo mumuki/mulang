@@ -348,13 +348,11 @@ instance Compilable EquationBody where
     cases <- compileAll _cases " else "
     return [text| $cases throw new MuPatternMatchError() |]
 
-type Guard = (Expression, Expression)
 instance Compilable Guard where
   compile (_condition, _expression) = do
     condition <- compile _condition
     result <- compile _expression
     return [text| if($condition) { return $result } |]
 
-type Catch = (Pattern, Expression)
 instance Compilable Catch where
  compile (_pattern, _body) = compile $ Equation [_pattern] (UnguardedBody _body)

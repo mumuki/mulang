@@ -15,6 +15,8 @@ module Language.Mulang.Ast (
     subroutineBodyPatterns,
     equationPatterns,
     Code,
+    Guard,
+    Catch,
     Equation(..),
     EquationBody(..),
     Type(..),
@@ -46,13 +48,15 @@ import           GHC.Generics
 import           Language.Mulang.Identifier (Identifier)
 
 type Code = String
+type Guard = (Expression, Expression)
+type Catch = (Pattern, Expression)
 
 -- | An equation. See @Function@ and @Procedure@ below
 data Equation = Equation [Pattern] EquationBody deriving (Eq, Show, Read, Generic)
 
 data EquationBody
         = UnguardedBody Expression
-        | GuardedBody  [(Expression, Expression)]
+        | GuardedBody  [Guard]
         deriving (Eq, Show, Read, Generic)
 
 type SubroutineBody = [Equation]
@@ -152,8 +156,8 @@ data Expression
     | Repeat Expression Expression
     -- ^ Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
     | Match Expression [Equation]
-    | Switch Expression [(Expression, Expression)] Expression
-    | Try Expression [(Pattern, Expression)] Expression
+    | Switch Expression [Guard] Expression
+    | Try Expression [Catch] Expression
     -- ^ Generic try expression, composed by a body, a list of exception-handling patterns and statments, and a finally expression
     | Raise Expression
     -- ^ Generic raise expression, like a throw or raise statament, composed by the raised expression
