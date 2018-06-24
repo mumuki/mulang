@@ -22,6 +22,8 @@ import           NeatInterpolation
 toJS :: Expression -> Maybe Code
 toJS = fmap unpack . compile
 
+ignore = Just empty
+
 class Compilable a where
   compile :: a -> Maybe Text
   compileAll :: [a] -> String -> Maybe Text
@@ -273,17 +275,17 @@ instance Compilable Expression where
            |]
 
   -- TypeSignatures are ignored.
-  compile (TypeSignature _ _)  = do return empty
+  compile (TypeSignature _ _)  = ignore
 
   -- Interfaces are ignored.
-  compile (Interface _ _ _)  = do return empty
-  compile (Implement _)  = do return empty
+  compile (Interface _ _ _)  = ignore
+  compile (Implement _)  = ignore
 
   -- TypeAliases are ignored (we can't do anything without the aliased type).
-  compile (TypeAlias _ _)  = do return empty
+  compile (TypeAlias _ _)  = ignore
 
   -- Records are ignored (we can't do anything without the body).
-  compile (Record _)  = do return empty
+  compile (Record _)  = ignore
 
   compile _ = Nothing
 
