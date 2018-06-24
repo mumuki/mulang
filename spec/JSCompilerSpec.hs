@@ -48,38 +48,45 @@ module JSCompilerSpec (spec) where
       it "Record" $ do
         (Record "foo") `shouldBeCompiledTo` ""
 
-      it "Function" $ do
-        (Function "f" []) `shouldBeCompiledTo` "function f() {try {  throw new MuPatternMatchError() }catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }"
-        (Function "f" [Equation [] (UnguardedBody (Return (MuNumber 5)))]) `shouldBeCompiledTo` (
-          "function f() {try { " ++
-            "if(arguments.length === 0){  return function(){ throw new MuReturn(new MuNumber(5.0)) }() } " ++
-            "throw new MuPatternMatchError() " ++
-          "}catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }"
-          )
-        (Function "f" [Equation [VariablePattern "x"] (UnguardedBody $ MuNumber 5)]) `shouldBeCompiledTo` (
-          "function f() {try { " ++
-            "if(arguments.length === 1 && function(){ return true }(arguments[0])){ var x = arguments[0]; return new MuNumber(5.0) } " ++
-            "throw new MuPatternMatchError() " ++
-          "}catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }"
-          )
-        (Function "f" [Equation [VariablePattern "x", VariablePattern "y"] (UnguardedBody $ MuNumber 5)]) `shouldBeCompiledTo` (
-          "function f() {try { " ++
-            "if(arguments.length === 2 && function(){ return true }(arguments[0]) && function(){ return true }(arguments[1])){ var x = arguments[0];var y = arguments[1]; return new MuNumber(5.0) } " ++
-            "throw new MuPatternMatchError() " ++
-          "}catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }"
-          )
-        (Function "f" [Equation [] (UnguardedBody (Sequence [If (Reference "c") (Return (Reference "x")) (Sequence []), Reference "y"]))]) `shouldBeCompiledTo` (
-          "function f() {try { " ++
-            "if(arguments.length === 0){  " ++
-              "return function(){ " ++
-                "function(){ if(c) { return function(){ throw new MuReturn(x) }() } else { return undefined } }(); " ++
-                "return y " ++
-              "}() " ++
-            "} " ++
-            "throw new MuPatternMatchError() " ++
-          "}catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }"
-          )
-        pending --TODO: Other cases
+      describe "Function" $ do
+        it "Function with no equations" $ do
+          (Function "f" []) `shouldBeCompiledTo` "function f() {try {  throw new MuPatternMatchError() }catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }"
+
+        it "Simple Function that returns 5" $ do
+          (Function "f" [Equation [] (UnguardedBody (Return (MuNumber 5)))]) `shouldBeCompiledTo` (
+            "function f() {try { " ++
+              "if(arguments.length === 0){  return function(){ throw new MuReturn(new MuNumber(5.0)) }() } " ++
+              "throw new MuPatternMatchError() " ++
+            "}catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }")
+
+        it "Function with arguments" $ do
+          (Function "f" [Equation [VariablePattern "x"] (UnguardedBody $ MuNumber 5)]) `shouldBeCompiledTo` (
+            "function f() {try { " ++
+              "if(arguments.length === 1 && function(){ return true }(arguments[0])){ var x = arguments[0]; return new MuNumber(5.0) } " ++
+              "throw new MuPatternMatchError() " ++
+            "}catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }")
+
+        it "Function two arguments" $ do
+          (Function "f" [Equation [VariablePattern "x", VariablePattern "y"] (UnguardedBody $ MuNumber 5)]) `shouldBeCompiledTo` (
+            "function f() {try { " ++
+              "if(arguments.length === 2 && function(){ return true }(arguments[0]) && function(){ return true }(arguments[1])){ var x = arguments[0];var y = arguments[1]; return new MuNumber(5.0) } " ++
+              "throw new MuPatternMatchError() " ++
+            "}catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }")
+
+        it "Function with an if" $ do
+          (Function "f" [Equation [] (UnguardedBody (Sequence [If (Reference "c") (Return (Reference "x")) (Sequence []), Reference "y"]))]) `shouldBeCompiledTo` (
+            "function f() {try { " ++
+              "if(arguments.length === 0){  " ++
+                "return function(){ " ++
+                  "function(){ if(c) { return function(){ throw new MuReturn(x) }() } else { return undefined } }(); " ++
+                  "return y " ++
+                "}() " ++
+              "} " ++
+              "throw new MuPatternMatchError() " ++
+            "}catch($error) { if($error.constructor === MuReturn) { return $error.value } else { throw $error } } }")
+
+        it "Other scenarios" $ do
+          pending --TODO: Other cases
 
       it "Procedures" $ do pending
 
