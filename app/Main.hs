@@ -17,7 +17,11 @@ import qualified Data.Text.Lazy as T (pack)
 import           Data.Text (unpack)
 import           NeatInterpolation (text)
 
+
 #ifdef ghcjs_HOST_OS
+import           Language.Mulang.Parsers.Haskell (hs)
+import           Language.Mulang.JSCompiler (toJS)
+import           Data.Maybe (fromMaybe)
 import           Data.JSString (JSString)
 import qualified Data.JSString as JSS (pack, unpack)
 
@@ -25,6 +29,9 @@ import qualified Data.ByteString.Lazy.Char8 as C8 (unpack)
 
 analyseIO :: JSString -> IO JSString
 analyseIO = fmap  (JSS.pack . C8.unpack) . analyseJson . JSS.unpack
+
+transpileHaskellIO :: JSString -> IO JSString
+transpileHaskellIO = return . JSS.pack . fromMaybe "" . toJS . hs . JSS.unpack
 #endif
 
 analyseJson :: String -> IO ByteString
