@@ -1,7 +1,7 @@
 module Language.Mulang.Parsers.JavaScript (js, parseJavaScript) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Builder
+import Language.Mulang.Builder (compactMap, normalizeWith, defaultNormalizationOptions, NormalizationOptions(..), SequenceSortMode(..))
 import Language.Mulang.Parsers
 
 import Language.JavaScript.Parser.Parser (parse)
@@ -21,6 +21,7 @@ parseJavaScript = orNothing . parseJavaScript'
 
 parseJavaScript' :: String -> Either String Expression
 parseJavaScript' = fmap (normalize . muJSAST) . (`parse` "src")
+  where normalize = normalizeWith (defaultNormalizationOptions { sortSequenceDeclarations = SortUniqueNonVariables })
 
 muJSAST:: JSAST -> Expression
 muJSAST (JSAstProgram statements _)     = compactMap muJSStatement statements

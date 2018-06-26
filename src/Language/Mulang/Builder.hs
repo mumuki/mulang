@@ -7,13 +7,14 @@ module Language.Mulang.Builder (
     normalize,
     normalizeWith,
     defaultNormalizationOptions,
-    NormalizationOptions (..)) where
+    NormalizationOptions (..),
+    SequenceSortMode (..)) where
 
 import           GHC.Generics
 
-import Data.List (sort)
+import Data.List (sort, nub)
 import Language.Mulang.Ast
-import Language.Mulang.Generator (declarators)
+import Language.Mulang.Generator (declarators, declaredIdentifiers)
 
 data NormalizationOptions = NormalizationOptions {
   convertObjectVariableIntoObject :: Bool,
@@ -21,9 +22,14 @@ data NormalizationOptions = NormalizationOptions {
   convertObjectLevelFunctionIntoMethod :: Bool,
   convertObjectLevelLambdaVariableIntoMethod :: Bool,
   convertObjectLevelVariableIntoAttribute :: Bool,
-  sortSafeSequenceDeclarations :: Bool,
-  sortAllSequenceDeclarations :: Bool
+  sortSequenceDeclarations :: SequenceSortMode
 } deriving (Eq, Show, Read, Generic)
+
+data SequenceSortMode
+  = SortNothing
+  | SortUniqueNonVariables
+  | SortAllNonVarables
+  | SortAll deriving (Eq, Show, Read, Generic)
 
 compactConcatMap :: (a -> [Expression]) -> [a] -> Expression
 compactConcatMap f = compact . concat . map f
@@ -43,8 +49,7 @@ defaultNormalizationOptions = NormalizationOptions {
   convertObjectLevelFunctionIntoMethod = True,
   convertObjectLevelLambdaVariableIntoMethod = True,
   convertObjectLevelVariableIntoAttribute = True,
-  sortSafeSequenceDeclarations = True,
-  sortAllSequenceDeclarations = False
+  sortSequenceDeclarations = SortAllNonVarables
 }
 
 normalize :: Expression -> Expression
@@ -102,6 +107,15 @@ isDeclaration :: Expression -> Bool
 isDeclaration = not.null.declarators
 
 sortDeclarationsWith :: NormalizationOptions -> [Expression] -> [Expression]
-sortDeclarationsWith ops expressions | sortSafeSequenceDeclarations ops && all isSafeDeclaration expressions = sort expressions
-                                     | sortAllSequenceDeclarations ops && all isDeclaration expressions      = sort expressions
-                                     | otherwise                                                             = expressions
+sortDeclarationsWith ops expressions | shouldSort (sortSequenceDeclarations ops) = sort expressions
+                                     | otherwise                                 = expressions
+  where
+    shouldSort :: SequenceSortMode -> Bool
+    shouldSort SortNothing             = False
+    shouldSort SortUniqueNonVariables  = all isSafeDeclaration expressions && identifiersAreUnique expressions
+    shouldSort SortAllNonVarables      = all isSafeDeclaration expressions
+    shouldSort SortAll                 = all isDeclaration expressions
+
+    identifiersAreUnique = unique . map declaredIdentifiers
+
+    unique xs = nub xs == xs
