@@ -19,6 +19,7 @@ echo 'Building project...'
 stack build
 
 echo "Building $GHCJSLIB_BUNDLE..."
+mkdir -p $GHCJSLIB_BUILD_PATH
 
 echo ">> Cleaning $GHCJSLIB_BUNDLE"
 rm -f $GHCJSLIB_BUNDLE
