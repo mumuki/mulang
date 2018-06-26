@@ -9,7 +9,7 @@ module NormalizationSpec (spec) where
   spec :: Spec
   spec = do
     describe "sorts declarations by default" $ do
-      it "sorts classes on Python" $ do
+      it "sorts functions on Python" $ do
         py "def foo():\n  return 2\n\ndef bar():\n  return 1\n\n" `shouldBe` py "def bar():\n  return 1\n\ndef foo():\n  return 2\n\n"
 
       it "sorts classes on Java" $ do
