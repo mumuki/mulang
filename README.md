@@ -2127,9 +2127,15 @@ See `gem/README` for more details.
 
 `mulang` can also be compiled to JavaScript library using [ghcjs](https://github.com/ghcjs/ghcjs) and [ghcjslib](https://github.com/flbulgarelli/ghcjslib), which allows you to use it from `node` or the browser.
 
+> :warning: you will need `node >= 7` installed on your system. If you have `nvm`, before starting run the following:
+>
+> ```sh
+> $ nvm use $(cat ghcjslib/.nvmrc)
+>```
+
 1. Run `ghcjslib/swap.sh` for swapping to GHCJS compiler
 2. Run `ghcjslib/build.sh` for building the `ghcjslib` release. It will be placed on `ghcjslib/build/mulang.js`
-3. Run `ghcjslib/tests.sh` for running both mocha and hspec tests.
+3. Run `ghcjslib/test.sh` for running both mocha and hspec tests.
 4. Load it:
    1. in the browser: `google-chrome ghcjslib/index.html`
    2. in `node`: run `node`, and then, within the interpreter, run: `let mulang = require('./ghcjslib/build/mulang.js');`
