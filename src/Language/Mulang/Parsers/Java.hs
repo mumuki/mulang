@@ -6,7 +6,7 @@ module Language.Mulang.Parsers.Java (java, parseJava) where
 import Language.Mulang.Ast hiding (While, Return, Equal, Lambda, Try, Switch)
 import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda, Try, Switch))
 import Language.Mulang.Parsers
-import Language.Mulang.Builder (compact, compactMap, compactConcatMap)
+import Language.Mulang.Builder (compact, compactMap, compactConcatMap, normalize)
 
 import Language.Java.Parser
 import Language.Java.Syntax
@@ -25,7 +25,7 @@ java = orFail . parseJava'
 parseJava :: EitherParser
 parseJava = orLeft . parseJava'
 
-parseJava' = fmap m . j
+parseJava' = fmap (normalize . m) . j
 
 m (CompilationUnit _ _ typeDecls) = compactMap muTypeDecl $ typeDecls
 

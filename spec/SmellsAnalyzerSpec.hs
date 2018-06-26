@@ -11,7 +11,7 @@ runOnly language content smells = analyse (smellsAnalysis (CodeSample language c
 
 spec = describe "SmellsAnalyzer" $ do
   describe "Using domain language and nested structures" $ do
-    let runRuby sample = analyse (domainLanguageAnalysis (MulangSample sample) (DomainLanguage Nothing (Just RubyCase) (Just 3) Nothing))
+    let runRuby sample = analyse (domainLanguageAnalysis (MulangSample sample Nothing) (DomainLanguage Nothing (Just RubyCase) (Just 3) Nothing))
     it "works with empty set" $ do
       (runRuby (Sequence [
         (Object "Foo_Bar" (Sequence [

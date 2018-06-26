@@ -7,7 +7,7 @@ import           Test.Hspec
 result expectationsResults smellResults = AnalysisCompleted expectationsResults smellResults [] Nothing
 
 run language content expectations = analyse (expectationsAnalysis (CodeSample language content) expectations)
-runAst ast expectations = analyse (expectationsAnalysis (MulangSample ast) expectations)
+runAst ast expectations = analyse (expectationsAnalysis (MulangSample ast Nothing) expectations)
 
 passed e = ExpectationResult e True
 failed e = ExpectationResult e False

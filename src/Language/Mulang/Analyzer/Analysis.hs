@@ -20,6 +20,7 @@ module Language.Mulang.Analyzer.Analysis (
 import GHC.Generics
 
 import Language.Mulang.Ast
+import Language.Mulang.Builder (NormalizationOptions)
 
 ---
 -- Common structures
@@ -77,7 +78,7 @@ data SignatureStyle
   | PrologStyle deriving (Show, Eq, Generic)
 
 data Sample
-  = MulangSample { ast :: Expression }
+  = MulangSample { ast :: Expression, normalizationOptions :: Maybe NormalizationOptions }
   | CodeSample { language :: Language, content :: Code } deriving (Show, Eq, Generic)
 
 data Language
