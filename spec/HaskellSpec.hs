@@ -20,7 +20,7 @@ spec = do
       hs "f = (1+)" `shouldBe` Variable "f" (Application (Reference "+") [MuNumber 1.0])
 
     it "parses right infix partial application" $ do
-      hs "f = (+1)" `shouldBe` Variable "f" (Application (Reference "+") [MuNumber 1.0])
+      hs "f = (+1)" `shouldBe` Variable "f" (Application (Reference "flip") [Reference "+", MuNumber 1.0])
 
     it "parses type restrictions" $ do
       hs "f :: Num a => [a] -> [a]" `shouldBe` SubroutineSignature "f" ["[a]"] "[a]" ["Num a"]
