@@ -21,8 +21,9 @@ stack build
 echo "Building $GHCJSLIB_BUNDLE..."
 mkdir -p $GHCJSLIB_BUILD_PATH
 
-echo ">> Cleaning $GHCJSLIB_BUNDLE"
+echo ">> Cleaning $GHCJSLIB_BUNDLE and $GHCJSLIB_BUNDLE.zip"
 rm -f $GHCJSLIB_BUNDLE
+rm -f $GHCJSLIB_BUNDLE.zip
 
 append2Lib $GHCJSLIB_SRC_PATH/header.js.part
 append2Lib $STACK_BUILD_PATH/rts.js
@@ -31,5 +32,8 @@ append2Lib $STACK_BUILD_PATH/out.js
 append2Lib $GHCJSLIB_SRC_PATH/binding.js
 append2Lib $GHCJSLIB_SRC_PATH/exports.js
 append2Lib $GHCJSLIB_SRC_PATH/footer.js.part
+
+echo "Generating compressed bundle... $GHCJSLIB_BUNDLE.zip"
+zip -r $GHCJSLIB_BUNDLE.zip $GHCJSLIB_BUNDLE
 
 echo "Done"
