@@ -33,7 +33,7 @@ append2Lib $GHCJSLIB_SRC_PATH/binding.js
 append2Lib $GHCJSLIB_SRC_PATH/exports.js
 append2Lib $GHCJSLIB_SRC_PATH/footer.js.part
 
-echo "Generating compressed bundle... $GHCJSLIB_BUNDLE.zip"
-zip -r $GHCJSLIB_BUNDLE.zip $GHCJSLIB_BUNDLE
+echo "Generating compressed bundle $GHCJSLIB_BUNDLE.zip..."
+pushd $GHCJSLIB_BUILD_PATH && zip $GHCJSLIB_BUNDLE_NAME.js.zip $GHCJSLIB_BUNDLE_NAME.js ; popd
 
 echo "Done"
