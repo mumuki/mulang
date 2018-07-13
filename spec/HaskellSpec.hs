@@ -42,3 +42,6 @@ spec = do
 
     it "parses inline type annotations with restrictions" $ do
       hs "x = 1 :: (Num a, Foldable t) => t a" `shouldBe` Variable "x" (TypeCast (MuNumber 1) (SimpleType "t a" ["Num a", "Foldable t"]))
+
+    it "parses chars and single char strings differently" $ do
+      hs "x = \"a\"" `shouldNotBe` hs "x = 'a'"
