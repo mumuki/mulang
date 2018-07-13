@@ -95,9 +95,9 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muExp (HsExpTypeSig _ exp (HsQualType cs t))          = TypeCast (muExp exp) (muType t cs)
     muExp e = debug e
 
-    muLit (HsCharPrim    v) = MuString [v]
+    muLit (HsCharPrim    v) = MuChar v
     muLit (HsStringPrim  v) = MuString v
-    muLit (HsChar        v) = MuString [v]
+    muLit (HsChar        v) = MuChar v
     muLit (HsString      v) = MuString v
     muLit (HsIntPrim     v) = MuNumber . fromIntegral $ v
     muLit (HsInt         v) = MuNumber . fromIntegral $ v
