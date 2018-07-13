@@ -45,3 +45,6 @@ spec = do
 
     it "parses chars and single char strings differently" $ do
       hs "x = \"a\"" `shouldNotBe` hs "x = 'a'"
+
+    it "parses chars as MuChars" $ do
+      hs "x = 'a'" `shouldBe` Variable "x" (MuChar 'a')
