@@ -15,7 +15,8 @@ module Language.Mulang.Inspector.Generic.Smell (
   doesConsolePrint,
   hasLongParameterList,
   hasTooManyMethods,
-  overridesEqualOrHashButNotBoth) where
+  overridesEqualOrHashButNotBoth,
+  hasUnreachableCode) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (identifierReferences)
@@ -149,3 +150,12 @@ hasEmptyIfBranches :: Inspection
 hasEmptyIfBranches = containsExpression f
   where f (If _ None elseBranch) = elseBranch /= None
         f _                        = False
+
+hasUnreachableCode :: Inspection
+hasUnreachableCode = containsExpression f
+  where f subroutine@(Subroutine _ equations) = any (all catchesAnyValue) . init . map equationPatterns $ equations 
+        f _                                   = False
+        
+        catchesAnyValue WildcardPattern = True
+        catchesAnyValue (VariablePattern _) = True
+        catchesAnyValue _ = False

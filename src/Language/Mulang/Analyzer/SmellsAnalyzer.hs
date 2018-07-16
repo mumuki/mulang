@@ -38,6 +38,7 @@ allSmells = [
   "HasRedundantReduction",
   "HasTooManyMethods",
   "HasTooShortIdentifiers",
+  "HasUnreachableCode",
   "HasWrongCaseIdentifiers",
   "IsLongCode",
   "OverridesEqualOrHashButNotBoth",
@@ -67,6 +68,7 @@ detectionFor "HasRedundantReduction"           = simple hasRedundantReduction
 detectionFor "HasTooManyMethods"               = simple hasTooManyMethods
 detectionFor "HasTooShortIdentifiers"          = withLanguage hasTooShortIdentifiers
 detectionFor "HasTooShortBindings"             = withLanguage hasTooShortIdentifiers
+detectionFor "HasUnreachableCode"              = simple hasUnreachableCode
 detectionFor "HasWrongCaseIdentifiers"         = withLanguage hasWrongCaseIdentifiers
 detectionFor "HasWrongCaseBinding"             = withLanguage hasWrongCaseIdentifiers
 detectionFor "IsLongCode"                      = unsupported
