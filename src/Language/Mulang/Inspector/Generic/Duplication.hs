@@ -12,10 +12,11 @@ hasCodeDuplication e =  hasDuplicates $ map hash $ filter (not . isLightweight) 
 isLightweight :: Inspection
 isLightweight (MuNumber _)              = True
 isLightweight (MuString _)              = True
+isLightweight (MuChar _)                = True
 isLightweight (MuBool _)                = True
 isLightweight (Reference _)             = True
 isLightweight Self                      = True
-isLightweight None                    = True
+isLightweight None                      = True
 isLightweight MuNil                     = True
 isLightweight Equal                     = True
 isLightweight (Application _ es)        = not $ any isApplication es
@@ -43,6 +44,7 @@ hash (SimpleFunction _ _ body)     = 13 * (37 + hash body)
 hash Self                          = 15
 hash (SimpleProcedure _ _ body)    = 17 * (37 + hash body)
 hash (Sequence es)                 = 19 * (37 + positionalHash es)
+hash (MuChar e)                    = 23 * H.hash e
 hash _                             = 1
 
 positionalHash :: [Expression] -> Int

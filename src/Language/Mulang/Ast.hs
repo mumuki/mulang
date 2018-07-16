@@ -181,6 +181,8 @@ data Expression
     -- ^ Generic boolean literal
     | MuString String
     -- ^ Generic string literal
+    | MuChar Char
+    -- ^ Generic char literal
     | MuSymbol String
     -- ^ Generic symbol/atom literal
     | MuTuple [Expression]

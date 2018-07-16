@@ -129,7 +129,7 @@ muLhs (NameLhs (Name names)) = ns names
 muName (Name names) = Reference . ns $ names
 
 muLit (String s)  = MuString s
-muLit (Char c)    = MuString [c]
+muLit (Char c)    = MuChar c
 muLit (Int i)     = MuNumber (fromIntegral i)
 muLit (Float d)   = MuNumber d
 muLit (Double d)  = MuNumber d

@@ -162,7 +162,7 @@ Mulang is three different  - but thighly related - things:
     + [`MuObject`](#muobject)
       - [Syntax](#syntax-43)
       - [JavaScript Example](#javascript-example)
-    + [`MuNumber`, `MuBool`, `MuString` and `MuSymbol`](#munumber-mubool-mustring-and-musymbol)
+    + [`MuNumber`, `MuBool`, `MuString`, `MuSymbol` and `MuChar`](#munumber-mubool-mustring-musymbol-and-muchar)
       - [Syntax](#syntax-44)
       - [Ruby Example](#ruby-example-5)
     + [`MuTuple` and `MuList`](#mutuple-and-mulist)
@@ -1666,9 +1666,9 @@ for (var i = 0; i < 10; i++) {
             (Attribute "bar" (MuNumber 2))]))
 ```
 
-### `MuNumber`, `MuBool`, `MuString` and `MuSymbol`
+### `MuNumber`, `MuBool`, `MuString`, `MuSymbol` and `MuChar`
 
-> Generic number, boolean, string and symbol (atoms) literals
+> Generic number, boolean, string, symbol (atoms) and char literals
 
 #### Syntax
 
@@ -1686,6 +1686,10 @@ for (var i = 0; i < 10; i++) {
 
 ```haskell
 (MuSymbol String)
+```
+
+```haskell
+(MuChar Char)
 ```
 
 #### Ruby Example
