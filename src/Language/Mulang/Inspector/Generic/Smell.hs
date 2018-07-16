@@ -153,9 +153,9 @@ hasEmptyIfBranches = containsExpression f
 
 hasUnreachableCode :: Inspection
 hasUnreachableCode = containsExpression f
-  where f subroutine@(Subroutine _ equations) = any (all catchesAnyValue) . init . map equationPatterns $ equations 
+  where f subroutine@(Subroutine _ equations) = any (all matchesAnyValue) . init . map equationPatterns $ equations 
         f _                                   = False
         
-        catchesAnyValue WildcardPattern = True
-        catchesAnyValue (VariablePattern _) = True
-        catchesAnyValue _ = False
+        matchesAnyValue WildcardPattern = True
+        matchesAnyValue (VariablePattern _) = True
+        matchesAnyValue _ = False
