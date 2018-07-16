@@ -125,7 +125,7 @@ spec = do
              public char hello() { return 'f'; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "char" [],
-                          (SimpleMethod "hello" [] (Return (MuString "f")))])
+                          (SimpleMethod "hello" [] (Return (MuChar 'f')))])
 
     it "parses Parameters" $ do
       run "public class Foo extends Bar { int succ(int y) {} }" `shouldBe` Class "Foo" (Just "Bar") (Sequence [
