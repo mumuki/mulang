@@ -420,6 +420,7 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `hasRedundantReduction`           |  logic             | is a is-operator used to unify individuals that don't require a reduction, like `X is 4`
 | `hasTooManyMethods`               |  object oriented   | does a given class/object/interface have too many methods?
 | `hasTooShortIdentifiers`          |  any               | whether an identifier is too short and not part of domain language's jargon
+| `hasUnreachableCode`              |  any               | is there unreachable code?
 | `hasWrongCaseIdentifiers`         |  any               | whether an identifier does not match the domain language's case style
 | `implements`                      |  object oriented   | is the given interface implemented?
 | `includes`                        |  object oriented   | is a given mixins included?

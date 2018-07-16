@@ -1,3 +1,5 @@
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+
 module SmellSpec (spec) where
 
 import           Test.Hspec
@@ -8,8 +10,13 @@ import           Language.Mulang.Parsers.JavaScript (js)
 import           Language.Mulang.Parsers.Java (java)
 import           Language.Mulang.Parsers.Prolog (pl)
 
+import           Data.Text (Text, unpack)
+import           NeatInterpolation (text)
 
 javaStatement m = java ("class Foo { void bar() { " ++ m ++ " } }")
+
+runHaskell :: Text -> Expression
+runHaskell = hs . unpack
 
 spec :: Spec
 spec = do
@@ -245,3 +252,21 @@ spec = do
 
     it "is False when if branch is not empty" $ do
       hasEmptyIfBranches (javaStatement "if(true) { j++; } else { i++; }") `shouldBe` False
+
+  describe "hasUnreachableCode" $ do
+    it "is True when there's an equation following one which matches any values" $ do
+      hasUnreachableCode (runHaskell [text|
+        foo _ _ = 1
+        foo 2 3 = 3
+        |]) `shouldBe` True
+
+    it "is False when no equation follows " $ do
+      hasUnreachableCode (runHaskell [text|
+        foo _ = 1
+        |]) `shouldBe` False      
+
+    it "is False when not all patterns match any value" $ do
+      hasUnreachableCode (runHaskell [text|
+        foo _ 4 _ = 1
+        foo 1 2 3 = 3
+        |]) `shouldBe` False
