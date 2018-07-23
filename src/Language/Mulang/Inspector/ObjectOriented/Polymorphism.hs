@@ -44,11 +44,13 @@ usesTemplateMethod expression = inspect $ do
   (SimpleSend Self selector _) <- expressions klass
   guard (not . declaresMethod (named selector) $ klass)
 
+-- uncontextualizable
 usesDyamicPolymorphism :: Inspection
 usesDyamicPolymorphism expression = inspect $ do
   (SimpleSend _ selector _) <- expressions expression
   guardCount (>1) (methodDeclarationsOf selector expression)
 
+-- uncontextualizable
 usesStaticPolymorphism :: Inspection
 usesStaticPolymorphism expression = inspect $ do
   interface@(Interface interfaceId _ _) <- declarations expression

@@ -2,6 +2,7 @@ module Language.Mulang.Inspector.Generic (
   parses,
   assigns,
   calls,
+  delegates,
   uses,
   usesIf,
   usesYield,
@@ -23,7 +24,9 @@ module Language.Mulang.Inspector.Generic (
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Primitive
-import Language.Mulang.Generator (declaredIdentifiers, referencedIdentifiers)
+import Language.Mulang.Generator (declaredIdentifiers, referencedIdentifiers, declarations, expressions)
+import Control.Monad (MonadPlus, guard)
+
 
 import Data.Maybe (listToMaybe)
 import Data.List.Extra (has)
@@ -51,6 +54,17 @@ calls p = containsExpression f
   where f (Call (Reference id) _ ) = p id
         f _                        = False
 
+-- uncontextualizable
+delegates :: IdentifierInspection
+delegates p expression = inspect $ do
+  (Subroutine name1 _)       <- declarations expression
+  (Call (Reference name2) _) <- expressions expression
+  guard (name1 == name2)
+  guard (p name1)
+
+-- TODO extract and move
+inspect :: [a] -> Bool
+inspect = not.null
 
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
