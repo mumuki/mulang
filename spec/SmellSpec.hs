@@ -270,3 +270,18 @@ spec = do
         foo _ 4 _ = 1
         foo 1 2 3 = 3
         |]) `shouldBe` False
+
+    it "is False when guarded equation body that does not catch all values" $ do
+      hasUnreachableCode (runHaskell [text|
+        foo n _
+          | n < 0 = 5
+        foo 1 2 = 3
+        |]) `shouldBe` False
+
+    it "is True when guarded equation body that catches all values" $ do
+      hasUnreachableCode (runHaskell [text|
+        foo n _
+          | n < 0 = 5
+          | otherwise = 5
+        foo 1 2 = 3
+        |]) `shouldBe` True
