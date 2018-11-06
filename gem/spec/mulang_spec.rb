@@ -44,4 +44,12 @@ describe Mulang::Code do
 
     it { expect(code.ast).to be nil }
   end
+
+  context 'when input is really long' do
+    let(:input) { { tag: :Other, contents: ['something' * 100000, nil] } }
+    let(:code) { Mulang::Code.external(input) }
+    let(:spec) { { expectations: [], smellsSet: { tag: 'NoSmells' } } }
+
+    it { expect { code.analyse(spec) }.not_to raise_error }
+  end
 end
