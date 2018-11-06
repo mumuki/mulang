@@ -1,4 +1,5 @@
 require 'active_support/all'
+require 'open3'
 
 require_relative './mulang/version'
 
@@ -7,7 +8,11 @@ module Mulang
     File.join(__dir__, '..', 'bin', 'mulang')
   end
   def self.analyse(analysis)
-    IO.popen([bin_path, analysis.to_json]) { |f| JSON.parse f.read }
+    Open3.popen2(bin_path, '-s') do |input, output, _thread|
+      input.puts analysis.to_json
+      input.close
+      JSON.parse output.read
+    end
   end
 end
 
