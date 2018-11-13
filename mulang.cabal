@@ -67,6 +67,8 @@ library
     Language.Mulang.Analyzer.SignatureStyleCompiler
     Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.SmellsAnalyzer
+    Interpreter.Mulang
+
   build-depends:
     base                      <= 5,
     bytestring                ,
@@ -85,6 +87,7 @@ library
     ParsecTools               ,
     split                     ,
     hashable                  ,
+    mtl                       ,
     process
   build-tools:
     happy,
