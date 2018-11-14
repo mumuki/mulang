@@ -103,6 +103,7 @@ muJSExpression (JSStringLiteral _ val)                              = MuString (
 --muJSExpression (JSRegEx _ String)
 muJSExpression (JSArrayLiteral _ list _)                            = MuList (muJSArrayList list)
 muJSExpression (JSAssignExpression (JSIdentifier _ name) op value)  = Assignment name (muJSAssignOp op name.muJSExpression $ value)
+muJSExpression (JSMemberExpression (JSMemberDot receptor _ message) _ params _)  = Send (muJSExpression receptor) (muJSExpression message) (map muJSExpression (muJSCommaList params))
 --muJSExpression (JSCallExpression expression _ params _) = Application (muJSExpression expression) (map muJSExpression.muJSCommaList $ expressionList)
 --muJSExpression (JSCallExpressionDot JSExpression _ JSExpression)  -- ^expr, dot, expr
 --muJSExpression (JSCallExpressionSquare JSExpression _ JSExpression _)  -- ^expr, [, expr, ]
@@ -112,10 +113,10 @@ muJSExpression (JSExpressionParen _ expression _)                   = muJSExpres
 muJSExpression (JSExpressionPostfix (JSIdentifier _ name) op)       = Assignment name (muJSUnaryOp op name)
 muJSExpression (JSExpressionTernary condition _ trueVal _ falseVal) = If (muJSExpression condition) (muJSExpression trueVal) (muJSExpression falseVal)
 muJSExpression (JSFunctionExpression _ ident _ params _ body)       = muComputation ident params body
---muJSExpression (JSMemberDot JSExpression _ JSExpression) -- ^firstpart, dot, name
+muJSExpression (JSMemberDot receptor _ (JSIdentifier _ message))    = Send (muJSExpression receptor) (Reference message) []
 muJSExpression (JSMemberExpression id _ params _)                   = Application (muJSExpression id) (map muJSExpression.muJSCommaList $ params)
 muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _)       = New (Reference name) (map muJSExpression.muJSCommaList $ args)
---muJSExpression (JSMemberSquare JSExpression _ JSExpression _) -- ^firstpart, lb, expr, rb
+muJSExpression (JSMemberSquare receptor _ index _)                  = Send (muJSExpression receptor) (Reference "[]") [muJSExpression index]
 muJSExpression (JSNewExpression _ (JSIdentifier _ name))            = New (Reference name) []
 muJSExpression (JSObjectLiteral _ propertyList _)                   = MuObject (compactMap id.map muJSObjectProperty.muJSCommaTrailingList $ propertyList)
 muJSExpression (JSUnaryExpression (JSUnaryOpNot _) e)               = Application (Reference "!") [muJSExpression e]
@@ -180,7 +181,7 @@ muJSAssignOp' (JSBwOrAssign _)    = Reference "|"
 muJSAssignOp' e                   = debug e
 
 muJSTryCatch:: JSTryCatch -> (Pattern, Expression)
---muJSTryCatch JSCatch _ _ JSExpression _ JSBlock -- ^catch,lb,ident,rb,block
+muJSTryCatch (JSCatch _ _ (JSIdentifier _ name) _ block) = (VariablePattern name, muJSBlock block)
 --muJSTryCatch JSCatchIf _ _ JSExpression _ JSExpression _ JSBlock -- ^catch,lb,ident,if,expr,rb,block
 muJSTryCatch e = (WildcardPattern, debug e)
 

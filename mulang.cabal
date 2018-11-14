@@ -68,6 +68,8 @@ library
     Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.SmellsAnalyzer
     Interpreter.Mulang
+    Interpreter.Runner
+    Interpreter.Mulang.Tests
 
   build-depends:
     base                      <= 5,
@@ -88,6 +90,7 @@ library
     split                     ,
     hashable                  ,
     mtl                       ,
+    monad-loops               ,
     process
   build-tools:
     happy,
