@@ -1,4 +1,4 @@
-module Language.Mulang.Parsers.JavaScript (js, parseJavaScript) where
+module Language.Mulang.Parsers.JavaScript (js, parseJavaScript, parseJavaScript') where
 
 import Language.Mulang.Ast
 import Language.Mulang.Builder (compactMap, normalizeWith, defaultNormalizationOptions, NormalizationOptions(..), SequenceSortMode(..))
@@ -44,8 +44,11 @@ muJSStatement (JSIfElse _ _ expression _ ifStatement _ elseStatement)       = If
 muJSStatement (JSLabelled _ _ statement)                                    = muJSStatement statement
 muJSStatement (JSEmptyStatement _)                                          = None
 muJSStatement (JSExpressionStatement (JSIdentifier _ val) _)                = Reference val
-muJSStatement (JSExpressionStatement expression _)                          = muJSExpression expression
-muJSStatement (JSAssignStatement (JSIdentifier _ name) op value _)          = Assignment name (muJSAssignOp op name (muJSExpression value))
+muJSStatement (JSAssignStatement assignee@(JSIdentifier _ name) op value _) = Assignment name (muJSAssignOp op (muJSExpression assignee) (muJSExpression value))
+muJSStatement (JSAssignStatement assignee@(JSMemberDot receptor _ (JSIdentifier _ name)) op expr _) =
+  Application (Reference "primitive_assign_prop") [muJSExpression receptor, MuString name, muJSAssignOp op (muJSExpression assignee) (muJSExpression expr)]
+muJSStatement (JSAssignStatement assignee@(JSMemberSquare receptor _ prop _) op expr _) =
+  Application (Reference "primitive_assign_prop") [muJSExpression receptor, muJSExpression prop, muJSAssignOp op (muJSExpression assignee) (muJSExpression expr)]
 muJSStatement (JSMethodCall (JSMemberDot receptor _ message) _ params _ _)  = Send (muJSExpression receptor) (muJSExpression message) (map muJSExpression (muJSCommaList params))
 muJSStatement (JSMethodCall ident _ params _ _)                             = Application (muJSExpression ident) (map muJSExpression (muJSCommaList params))
 muJSStatement (JSReturn _ maybeExpression _)                                = Return (maybe None muJSExpression maybeExpression)
@@ -97,12 +100,13 @@ muJSExpression (JSDecimal _ val)                                    = MuNumber (
 muJSExpression (JSLiteral _ "null")                                 = MuNil
 muJSExpression (JSLiteral _ "true")                                 = MuTrue
 muJSExpression (JSLiteral _ "false")                                = MuFalse
+muJSExpression (JSLiteral _ "this")                                 = Self
 --muJSExpression (JSHexInteger _ String)
 --muJSExpression (JSOctal _ String)
 muJSExpression (JSStringLiteral _ val)                              = MuString (removeQuotes val)
 --muJSExpression (JSRegEx _ String)
 muJSExpression (JSArrayLiteral _ list _)                            = MuList (muJSArrayList list)
-muJSExpression (JSAssignExpression (JSIdentifier _ name) op value)  = Assignment name (muJSAssignOp op name.muJSExpression $ value)
+muJSExpression (JSAssignExpression assignee@(JSIdentifier _ name) op value)  = Assignment name (muJSAssignOp op (muJSExpression assignee) . muJSExpression $ value)
 muJSExpression (JSMemberExpression (JSMemberDot receptor _ message) _ params _)  = Send (muJSExpression receptor) (muJSExpression message) (map muJSExpression (muJSCommaList params))
 --muJSExpression (JSCallExpression expression _ params _) = Application (muJSExpression expression) (map muJSExpression.muJSCommaList $ expressionList)
 --muJSExpression (JSCallExpressionDot JSExpression _ JSExpression)  -- ^expr, dot, expr
@@ -162,9 +166,9 @@ muJSUnaryOp (JSUnaryOpIncr _) r = (Application (Reference "+") [Reference r, MuN
 --muJSUnaryOp (JSUnaryOpVoid _)
 muJSUnaryOp e _                 = debug e
 
-muJSAssignOp:: JSAssignOp -> Identifier -> Expression -> Expression
+muJSAssignOp:: JSAssignOp -> Expression -> Expression -> Expression
 muJSAssignOp (JSAssign _) _ v = v
-muJSAssignOp op r v           = (Application (muJSAssignOp' op) [Reference r, v])
+muJSAssignOp op r v           = (Application (muJSAssignOp' op) [r, v])
 
 muJSAssignOp':: JSAssignOp -> Expression
 muJSAssignOp' (JSTimesAssign _)   = Reference "*"

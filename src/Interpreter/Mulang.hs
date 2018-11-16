@@ -91,10 +91,69 @@ evalExpr (Mu.Subroutine name body) = do
     setLocalVariable name ref
   return ref
 
+evalExpr (Mu.Send receptor (Mu.Reference msg) paramExprs) = do
+  receptorRef <- evalExpr receptor
+  propRef <- getAttribute receptorRef
+  dereference propRef >>= \case
+    (MuFunction locals ([Mu.SimpleEquation params body])) -> do
+
+      parameters :: [Reference] <- mapM evalExpr paramExprs
+      let localsAfterParameters = Map.fromList $ zipWith
+            (\name ref -> (name, ref))
+            (getParamNames params)
+            (parameters ++ repeat nullRef)
+
+      contextRef <- createReference $ MuObject localsAfterParameters
+
+      returnValue <- runFunction (contextRef:locals) body
+      return returnValue
+    _ -> return propRef
+
+  where
+    getAttribute ref = do
+      dereference ref >>= \case
+        (MuObject o) -> do
+          maybe (raiseString $ "MNU: " ++ msg) return $ Map.lookup msg o
+        v -> raiseString $ "Expected an object but got: " ++ show v
+
 evalExpr (Mu.Application (Mu.Reference "print") expressions) = do
   parameters :: [Value] <- forM expressions (\e -> evalExpr e >>= dereference)
   liftIO $ print parameters
   return $ nullRef
+
+evalExpr (Mu.Application (Mu.Reference "primitive_list_length") expressions) = do
+  vals <- mapM (evalExpr >=> dereference) expressions
+  case vals of
+    [MuList l] ->
+      createReference $ MuNumber $ fromIntegral $  length l
+    v -> raiseString $ "primitive_list_length expects a primitive array but got: " ++ show v
+
+evalExpr (Mu.Application (Mu.Reference "primitive_assign_prop") expressions) = do
+  (refs@[objRef, _propRef, valRef]) <- mapM evalExpr expressions
+  [obj, prop, val] <- mapM dereference refs
+  case (obj, prop, val) of
+    (MuObject _, MuString prop, _) -> do
+      updateRef objRef (addAttrToObject prop valRef)
+      return valRef
+    (_, _, _) -> raiseString $ "Expected assign but got: " ++ show val
+
+evalExpr (Mu.Application (Mu.Reference "primitive_create_list") expressions) = do
+  content <- mapM evalExpr expressions
+  createReference $ MuList content
+evalExpr (Mu.Application (Mu.Reference "primitive_list_push") expressions) = do
+  (refs@[listRef, elemRef]) <- mapM evalExpr expressions
+  mapM dereference refs >>= \case
+    [MuList l, _] -> do
+      updateRef listRef $ const (MuList $ l ++ [elemRef])
+      return listRef
+    ps -> raiseString $ "Expected list and a value but got: " ++ show ps
+
+
+
+evalExpr (Mu.Application (Mu.Reference "primitive_list_index") expressions) = do
+  mapM (evalExpr >=> dereference) expressions >>= \case
+    [MuList l, MuNumber n] -> do
+      return $ l !! round n
 
 evalExpr (Mu.Application (Mu.Reference "assert") expressions) = do
   params <- mapM (\e -> evalExpr e >>= dereference) expressions
@@ -186,15 +245,12 @@ evalExpr (Mu.Application (Mu.Reference "-") expressions) = do
   let [MuNumber n1, MuNumber n2] = params
   createReference $ MuNumber $ n1 - n2
 
-evalExpr (Mu.Send (Mu.Reference "assert") (Mu.Reference "equals") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  -- liftIO $ print params
-  let [MuNumber n1, MuNumber n2] = params
-  createReference $ MuBool $ n1 /= n2
-
 evalExpr (Mu.MuList expressions) = do
   refs <- forM expressions evalExpr
-  createReference $ MuList $ refs
+  list <- createReference $ MuList $ refs
+  arrayRef <- evalExpr $ Mu.New (Mu.Reference "Array") []
+  updateRef arrayRef $ addAttrToObject "_elements" list
+  return arrayRef
 
 evalExpr (Mu.New klass expressions) = do
   (MuFunction locals ([Mu.SimpleEquation params body])) <- evalExpr klass >>= dereference
@@ -293,6 +349,7 @@ evalExpr (Mu.Raise expr) = do
   raiseInternal =<< evalExpr expr
 
 evalExpr (Mu.Reference name) = findReferenceForName name
+evalExpr (Mu.Self) = findReferenceForName "this"
 evalExpr (Mu.None) = return nullRef
 evalExpr e = raiseString $ "Unkown expression: " ++ show e
 
