@@ -78,6 +78,11 @@ eval ctx expr = (`runStateT` ctx) $ (`runContT` return) $ (evalExpr expr)
 
 evalExpr :: forall m. (ExecutionMonad m) => Mu.Expression -> m Reference
 evalExpr (Mu.Sequence expressions) = last <$> forM expressions evalExpr
+evalExpr (Mu.Lambda params body) = do
+  executionFrames <- gets scopes
+  createReference $
+    MuFunction executionFrames $ [Mu.Equation params (Mu.UnguardedBody body)]
+
 evalExpr (Mu.Subroutine name body) = do
   executionFrames <- gets scopes
   let function = MuFunction executionFrames body
@@ -93,22 +98,18 @@ evalExpr (Mu.Application (Mu.Reference "print") expressions) = do
 
 evalExpr (Mu.Application (Mu.Reference "assert") expressions) = do
   params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  -- liftIO $ print params
   case params of
-    [MuBool True] -> do
-      return nullRef
-    [v] -> do
-      exceptionRef <- createReference $ MuString $ "Expected true but got: " ++ show v
-      raiseInternal exceptionRef
+    [MuBool True] -> return nullRef
+    [v] -> raiseString $ "Expected true but got: " ++ show v
 
 evalExpr (Mu.Application (Mu.Reference ">=") expressions) = do
   params <- mapM (\e -> evalExpr e >>= dereference) expressions
   -- liftIO $ print params
   let [MuNumber n1, MuNumber n2] = params
-  createReference $ MuBool $ n1 > n2
+  createReference $ MuBool $ n1 >= n2
 
 evalExpr (Mu.Application (Mu.Reference "%") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
+  params <- mapM (evalExpr >=> dereference) expressions
   -- liftIO $ print params
   case params of
     [MuNumber n1, MuNumber n2] -> createReference $ MuNumber $ n1 `mod'` n2
@@ -164,14 +165,14 @@ evalExpr (Mu.Application (Mu.Reference "<=") expressions) = do
   -- liftIO $ print params
   case params of
     [MuNumber n1, MuNumber n2] -> createReference $ MuBool $ n1 <= n2
-    _ -> error $ "Bad parameters, expected two numbers but got " ++ show params
+    _ -> raiseString $ "Bad parameters, expected two numbers but got " ++ show params
 
 evalExpr (Mu.Application (Mu.Reference "<") expressions) = do
   params <- mapM (\e -> evalExpr e >>= dereference) expressions
   -- liftIO $ print params
   case params of
     [MuNumber n1, MuNumber n2] -> createReference $ MuBool $ n1 < n2
-    _ -> error $ "Bad parameters, expected two numbers but got " ++ show params
+    _ -> raiseString $ "Bad parameters, expected two numbers but got " ++ show params
 
 evalExpr (Mu.Application (Mu.Reference "+") expressions) = do
   params <- mapM (\e -> evalExpr e >>= dereference) expressions
@@ -230,7 +231,7 @@ evalExpr (Mu.If cond thenBranch elseBranch) = do
   case v of
     MuBool True ->  evalExpr thenBranch
     MuBool False -> evalExpr elseBranch
-    _ -> error $ "Got a non boolean on an if: " ++ show v
+    _ -> raiseString $ "Got a non boolean on an if: " ++ show v
 
 evalExpr (Mu.MuNumber n) = createReference $ MuNumber n
 evalExpr (Mu.MuNil) = return nullRef
@@ -293,14 +294,18 @@ evalExpr (Mu.Raise expr) = do
 
 evalExpr (Mu.Reference name) = findReferenceForName name
 evalExpr (Mu.None) = return nullRef
-evalExpr e = error $ "Unkown expression: " ++ show e
+evalExpr e = raiseString $ "Unkown expression: " ++ show e
 
 raiseInternal :: ExecutionMonad m => Reference -> m b
 raiseInternal exceptionRef = do
   raiseCallback <- gets currentRaiseCallback
   modify' (\c -> c {currentException = Just exceptionRef})
   raiseCallback exceptionRef
-  error "Unreachable" -- the callback above should never allow this to execute
+  raiseString "Unreachable" -- the callback above should never allow this to execute
+
+raiseString :: ExecutionMonad m => String -> m a
+raiseString s = do
+  raiseInternal =<< (createReference $ MuString s)
 
 muEquals r1 r2
   | r1 == r2 = createReference $ MuBool $ True
@@ -333,8 +338,9 @@ runFunction functionEnv body = do
   return returnValue
 
 findFrameForName :: ExecutionMonad m => String -> m Reference
-findFrameForName name =
-  fromMaybe (error $ "Reference not found for name '" ++ name ++ "'") <$> findFrameForName' name
+findFrameForName name = do
+  maybe (raiseString $ "Reference not found for name '" ++ name ++ "'") return
+    =<< findFrameForName' name
 
 findFrameForName' :: ExecutionMonad m => String -> m (Maybe Reference)
 findFrameForName' name = do
