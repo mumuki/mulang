@@ -66,17 +66,17 @@ defaultContext = ExecutionContext
   }
 
 eval' :: ExecutionMonad m => ExecutionContext -> m Reference -> IO (Reference, ExecutionContext)
-eval' ctx elCoso = (`runStateT` ctx) $ (`runContT` return) $ elCoso
+eval' ctx elCoso = (`runStateT` ctx) $ elCoso `runContT` return
 
 eval :: ExecutionContext -> Mu.Expression -> IO (Reference, ExecutionContext)
-eval ctx expr = (`runStateT` ctx) $ (`runContT` return) $ (evalExpr expr)
+eval ctx expr = (`runStateT` ctx) $ evalExpr expr `runContT` return
 
 evalExpr :: ExecutionMonad m => Mu.Expression -> m Reference
 evalExpr (Mu.Sequence expressions) = last <$> forM expressions evalExpr
 evalExpr (Mu.Lambda params body) = do
   executionFrames <- gets scopes
   createReference $
-    MuFunction executionFrames $ [Mu.Equation params (Mu.UnguardedBody body)]
+    MuFunction executionFrames [Mu.Equation params (Mu.UnguardedBody body)]
 
 evalExpr (Mu.Subroutine name body) = do
   executionFrames <- gets scopes
@@ -89,7 +89,7 @@ evalExpr (Mu.Subroutine name body) = do
 evalExpr (Mu.Application (Mu.Reference "print") expressions) = do
   parameters :: [Value] <- forM expressions (\e -> evalExpr e >>= dereference)
   liftIO $ print parameters
-  return $ nullRef
+  return nullRef
 
 evalExpr (Mu.Application (Mu.Reference "assert") expressions) = do
   params <- mapM (\e -> evalExpr e >>= dereference) expressions
@@ -189,7 +189,7 @@ evalExpr (Mu.Send (Mu.Reference "assert") (Mu.Reference "equals") expressions) =
 
 evalExpr (Mu.MuList expressions) = do
   refs <- forM expressions evalExpr
-  createReference $ MuList $ refs
+  createReference $ MuList refs
 
 evalExpr (Mu.New klass expressions) = do
   (MuFunction locals ([Mu.SimpleEquation params body])) <- evalExpr klass >>= dereference
@@ -197,8 +197,7 @@ evalExpr (Mu.New klass expressions) = do
   thisContext <- createReference $ MuObject $ Map.singleton "this" objReference
 
   parameters :: [Reference] <- forM expressions evalExpr
-  let localsAfterParameters = Map.fromList $ zipWith
-        (\name ref -> (name, ref))
+  let localsAfterParameters = Map.fromList $ zip
         (getParamNames params)
         (parameters ++ repeat nullRef)
   -- change this
@@ -211,8 +210,7 @@ evalExpr (Mu.Application function expressions) = do
   (MuFunction locals ([Mu.SimpleEquation params body])) <- evalExpr function >>= dereference
 
   parameters :: [Reference] <- forM expressions evalExpr
-  let localsAfterParameters = Map.fromList $ zipWith
-        (\name ref -> (name, ref))
+  let localsAfterParameters = Map.fromList $ zip
         (getParamNames params)
         (parameters ++ repeat nullRef)
   -- change this
@@ -312,7 +310,7 @@ muEquals r1 r2
         (MuNumber n1, MuNumber n2) -> MuBool $ n1 == n2
         (MuString s1, MuString s2) -> MuBool $ s1 == s2
         (MuNull, MuNull) -> MuBool True
-        (_, _) -> MuBool $ False
+        _ -> MuBool False
 
 getParamNames :: [Mu.Pattern] -> [String]
 getParamNames params =
