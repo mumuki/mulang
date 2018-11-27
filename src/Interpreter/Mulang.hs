@@ -2,7 +2,6 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE ExplicitForAll #-}
@@ -346,7 +345,7 @@ findFrameForName' :: ExecutionMonad m => String -> m (Maybe Reference)
 findFrameForName' name = do
   framesRefs <- gets scopes
   frames :: [(Reference, Map String Reference)] <- forM framesRefs $ \ref -> do
-    dereference ref >>= \case
+    dereference ref >>= \value -> case value of
       (MuObject context) -> return (ref, context)
       v -> error $ "Finding '" ++ name ++ "' the frame I got a non object " ++ show v
 
