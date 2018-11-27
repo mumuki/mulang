@@ -1,7 +1,6 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE ExplicitForAll #-}
 
 module Interpreter.Mulang where
 
@@ -72,7 +71,7 @@ eval' ctx elCoso = (`runStateT` ctx) $ (`runContT` return) $ elCoso
 eval :: ExecutionContext -> Mu.Expression -> IO (Reference, ExecutionContext)
 eval ctx expr = (`runStateT` ctx) $ (`runContT` return) $ (evalExpr expr)
 
-evalExpr :: forall m. (ExecutionMonad m) => Mu.Expression -> m Reference
+evalExpr :: ExecutionMonad m => Mu.Expression -> m Reference
 evalExpr (Mu.Sequence expressions) = last <$> forM expressions evalExpr
 evalExpr (Mu.Lambda params body) = do
   executionFrames <- gets scopes
