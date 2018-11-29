@@ -156,7 +156,8 @@ test-suite spec
     aeson                     ,
     hspec                     ,
     neat-interpolation        ,
-    mulang
+    mulang                    ,
+    containers
   build-tools:
     happy,
     alex
