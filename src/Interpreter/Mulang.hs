@@ -282,16 +282,16 @@ raiseString s = do
   raiseInternal =<< (createReference $ MuString s)
 
 muEquals r1 r2
-  | r1 == r2 = createReference $ MuBool $ True
+  | r1 == r2 = createReference $ MuBool True
   | otherwise = do
       v1 <- dereference r1
       v2 <- dereference r2
       createReference $ case (v1, v2) of
-        (MuBool b1, MuBool b2) -> MuBool $ b1 == b2
+        (MuBool b1, MuBool b2)     -> MuBool $ b1 == b2
         (MuNumber n1, MuNumber n2) -> MuBool $ n1 == n2
         (MuString s1, MuString s2) -> MuBool $ s1 == s2
-        (MuNull, MuNull) -> MuBool True
-        _ -> MuBool False
+        (MuNull, MuNull)           -> MuBool True
+        _                          -> MuBool False
 
 getParamNames :: [Mu.Pattern] -> [String]
 getParamNames params =
