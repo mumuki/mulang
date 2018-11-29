@@ -86,9 +86,9 @@ evalExpr (Mu.Subroutine name body) = do
     setLocalVariable name ref
   return ref
 
-evalExpr (Mu.Application (Mu.Reference "print") expressions) = do
-  parameters :: [Value] <- forM expressions (\e -> evalExpr e >>= dereference)
-  liftIO $ print parameters
+evalExpr (Mu.Print expression) = do
+  parameter :: Value <- evalExpr expression >>= dereference
+  liftIO $ print parameter
   return nullRef
 
 evalExpr (Mu.Application (Mu.Reference "assert") expressions) = do
