@@ -108,7 +108,7 @@ evalExpr (Mu.Application (Mu.Reference "%") expressions) = do
   -- liftIO $ print params
   case params of
     [MuNumber n1, MuNumber n2] -> createReference $ MuNumber $ n1 `mod'` n2
-    _ -> error $ "Bad parameters, expected two bools but got " ++ show params
+    _ -> error $ "Bad parameters, expected two numbers but got " ++ show params
 
 evalExpr (Mu.Application (Mu.Reference ">") expressions) = do
   params <- mapM (\e -> evalExpr e >>= dereference) expressions
