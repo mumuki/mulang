@@ -71,6 +71,12 @@ eval' ctx elCoso = (`runStateT` ctx) $ elCoso `runContT` return
 eval :: ExecutionContext -> Mu.Expression -> IO (Reference, ExecutionContext)
 eval ctx expr = (`runStateT` ctx) $ evalExpr expr `runContT` return
 
+-- can't come up with a better name for this
+evalExpressionsWith :: (ExecutionMonad m) => [Mu.Expression] -> ([Value] -> m Reference) -> m Reference
+evalExpressionsWith expressions f = do
+  params <- mapM (\e -> evalExpr e >>= dereference) expressions
+  f params
+
 evalExpr :: ExecutionMonad m => Mu.Expression -> m Reference
 evalExpr (Mu.Sequence expressions) = last <$> forM expressions evalExpr
 evalExpr (Mu.Lambda params body) = do
@@ -91,63 +97,48 @@ evalExpr (Mu.Print expression) = do
   liftIO $ print parameter
   return nullRef
 
-evalExpr (Mu.Application (Mu.Reference "assert") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  case params of
-    [MuBool True] -> return nullRef
-    [v] -> raiseString $ "Expected true but got: " ++ show v
+evalExpr (Mu.Application (Mu.Reference "assert") expressions) =
+  evalExpressionsWith expressions f
+  where f [MuBool True] = return nullRef
+        f [v]           = raiseString $ "Expected true but got: " ++ show v
 
-evalExpr (Mu.Application (Mu.Reference ">=") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  -- liftIO $ print params
-  let [MuNumber n1, MuNumber n2] = params
-  createReference $ MuBool $ n1 >= n2
+evalExpr (Mu.Application (Mu.Reference ">=") expressions) =
+  evalExpressionsWith expressions f
+  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 >= n2
 
-evalExpr (Mu.Application (Mu.Reference "%") expressions) = do
-  params <- mapM (evalExpr >=> dereference) expressions
-  -- liftIO $ print params
-  case params of
-    [MuNumber n1, MuNumber n2] -> createReference $ MuNumber $ n1 `mod'` n2
-    _ -> error $ "Bad parameters, expected two numbers but got " ++ show params
+evalExpr (Mu.Application (Mu.Reference "%") expressions) =
+  evalExpressionsWith expressions f
+  where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 `mod'` n2
+        f params                     = error $ "Bad parameters, expected two numbers but got " ++ show params
 
-evalExpr (Mu.Application (Mu.Reference ">") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  -- liftIO $ print params
-  case params of
-    [MuNumber n1, MuNumber n2] -> createReference $ MuBool $ n1 > n2
-    _ -> error $ "Bad parameters, expected two bools but got " ++ show params
+evalExpr (Mu.Application (Mu.Reference ">") expressions) =
+  evalExpressionsWith expressions f
+  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 > n2
+        f params                          = error $ "Bad parameters, expected two bools but got " ++ show params
 
 -- TODO make this evaluation non strict on both parameters
-evalExpr (Mu.Application (Mu.Reference "||") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  -- liftIO $ print params
-  case params of
-    [MuBool b1, MuBool b2] -> createReference $ MuBool $ b1 || b2
-    _ -> error $ "Bad parameters, expected two bools but got " ++ show params
+evalExpr (Mu.Application (Mu.Reference "||") expressions) =
+  evalExpressionsWith expressions f
+  where f [MuBool b1, MuBool b2] = createReference $ MuBool $ b1 || b2
+        f params                 = error $ "Bad parameters, expected two bools but got " ++ show params
 
 -- TODO make this evaluation non strict on both parameters
-evalExpr (Mu.Application (Mu.Reference "&&") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  -- liftIO $ print params
-  case params of
-    [MuBool b1, MuBool b2] -> createReference $ MuBool $ b1 && b2
-    _ -> error $ "Bad parameters, expected two bools but got " ++ show params
+evalExpr (Mu.Application (Mu.Reference "&&") expressions) =
+  evalExpressionsWith expressions f
+  where f [MuBool b1, MuBool b2] = createReference $ MuBool $ b1 && b2
+        f params                 = error $ "Bad parameters, expected two bools but got " ++ show params
 
-evalExpr (Mu.Application (Mu.Reference "!") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  -- liftIO $ print params
-  case params of
-    [MuBool b] -> createReference $ MuBool $ not b
-    _ -> error $ "Bad parameters, expected one bool but got " ++ show params
+evalExpr (Mu.Application (Mu.Reference "!") expressions) =
+  evalExpressionsWith expressions f
+  where f [MuBool b] = createReference $ MuBool $ not b
+        f params     = error $ "Bad parameters, expected one bool but got " ++ show params
 
-evalExpr (Mu.Application (Mu.Reference "*") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  -- liftIO $ print params
-  let [MuNumber n1, MuNumber n2] = params
-  createReference $ MuNumber $ n1 * n2
+evalExpr (Mu.Application (Mu.Reference "*") expressions) =
+  evalExpressionsWith expressions f
+  where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 * n2
 
 evalExpr (Mu.Application Mu.Equal expressions) = do
-  params <- mapM (evalExpr) expressions
+  params <- mapM evalExpr expressions
   -- liftIO $ print params
   let [r1, r2] = params
   muEquals r1 r2
@@ -155,37 +146,27 @@ evalExpr (Mu.Application Mu.Equal expressions) = do
 evalExpr (Mu.Application Mu.NotEqual expressions) = do
   evalExpr $ Mu.Application (Mu.Reference "!") [Mu.Application Mu.Equal expressions]
 
-evalExpr (Mu.Application (Mu.Reference "<=") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  -- liftIO $ print params
-  case params of
-    [MuNumber n1, MuNumber n2] -> createReference $ MuBool $ n1 <= n2
-    _ -> raiseString $ "Bad parameters, expected two numbers but got " ++ show params
+evalExpr (Mu.Application (Mu.Reference "<=") expressions) =
+  evalExpressionsWith expressions f
+  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 <= n2
+        f params                     = raiseString $ "Bad parameters, expected two numbers but got " ++ show params
 
-evalExpr (Mu.Application (Mu.Reference "<") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  -- liftIO $ print params
-  case params of
-    [MuNumber n1, MuNumber n2] -> createReference $ MuBool $ n1 < n2
-    _ -> raiseString $ "Bad parameters, expected two numbers but got " ++ show params
+evalExpr (Mu.Application (Mu.Reference "<") expressions) =
+  evalExpressionsWith expressions f
+  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 < n2
+        f params                     = raiseString $ "Bad parameters, expected two numbers but got " ++ show params
 
-evalExpr (Mu.Application (Mu.Reference "+") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  -- liftIO $ print params
-  let [MuNumber n1, MuNumber n2] = params
-  createReference $ MuNumber $ n1 + n2
+evalExpr (Mu.Application (Mu.Reference "+") expressions) =
+  evalExpressionsWith expressions f
+  where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 + n2
 
-evalExpr (Mu.Application (Mu.Reference "-") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  -- liftIO $ print params
-  let [MuNumber n1, MuNumber n2] = params
-  createReference $ MuNumber $ n1 - n2
+evalExpr (Mu.Application (Mu.Reference "-") expressions) =
+  evalExpressionsWith expressions f
+  where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 - n2
 
-evalExpr (Mu.Send (Mu.Reference "assert") (Mu.Reference "equals") expressions) = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
-  -- liftIO $ print params
-  let [MuNumber n1, MuNumber n2] = params
-  createReference $ MuBool $ n1 /= n2
+evalExpr (Mu.Send (Mu.Reference "assert") (Mu.Reference "equals") expressions) =
+  evalExpressionsWith expressions f
+  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 /= n2
 
 evalExpr (Mu.MuList expressions) = do
   refs <- forM expressions evalExpr
