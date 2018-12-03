@@ -454,6 +454,7 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `usesIf`                          |  any               | is an `if` control structure used?
 | `usesInheritance`                 |  object oriented   | is any superclass explicitly declared?
 | `usesLambda`                      |
+| `usesLoop`                        |  procedural        | are any of: repeat / for loop / foreach / while used?
 | `usesMixins`                      |  object oriented   | is any mixins explicitly included?
 | `usesNot`                         |
 | `usesObjectComposition`           |  object oriented | is there a class that declares an attributes and sends a message to it?
