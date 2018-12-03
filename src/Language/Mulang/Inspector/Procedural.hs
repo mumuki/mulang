@@ -4,6 +4,7 @@ module Language.Mulang.Inspector.Procedural (
   usesSwitch,
   usesForEach,
   usesForLoop,
+  usesLoop,
   declaresProcedure) where
 
 import Language.Mulang.Ast
@@ -45,3 +46,6 @@ usesForLoop :: Inspection
 usesForLoop = containsExpression f
   where f (ForLoop _ _ _ _) = True
         f _                 = False
+
+usesLoop :: Inspection
+usesLoop e = usesRepeat e || usesWhile e || usesForLoop e || usesForEach e
