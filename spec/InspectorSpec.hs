@@ -73,6 +73,32 @@ spec = do
 
       usesRepeat code  `shouldBe` False
 
+  describe "usesLoop" $ do
+    it "is True when repeat is present" $ do
+      let code = SimpleFunction "f" [] (Sequence [Repeat (MuNumber 2) None, Return (MuNumber 2)])
+
+      usesLoop code `shouldBe` True
+
+    it "is True when foreach is present" $ do
+      let code = SimpleFunction "f" [] (Sequence [For [] None, Return (MuNumber 2)])
+
+      usesLoop code `shouldBe` True
+
+    it "is True when for is present" $ do
+      let code = js "function f() { for(;;); }"
+
+      usesLoop code `shouldBe` True
+
+    it "is True when while is present" $ do
+      let code = js "function f() { while(true); }"
+
+      usesLoop code `shouldBe` True
+
+    it "is False when none of the aforementioned are present" $ do
+      let code = js "function f(x){return 1;}"
+
+      usesLoop code `shouldBe` False
+
   describe "declaresVariable" $ do
     it "is True when declare a variable" $ do
       let code = js "function f(){ var x = 2}"

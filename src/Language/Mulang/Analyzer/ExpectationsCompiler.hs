@@ -108,6 +108,7 @@ compileInspectionPrimitive = f
   f "UsesIf"                         = simple usesIf
   f "UsesInheritance"                = simple usesInheritance
   f "UsesLambda"                     = simple usesLambda
+  f "UsesLoop"                       = simple usesLoop
   f "UsesMixins"                     = simple usesMixins
   f "UsesNot"                        = simple usesNot
   f "UsesObjectComposition"          = simple usesObjectComposition

@@ -96,6 +96,9 @@ spec = do
   it "works with UsesRepeat" $ do
     run (hs "f x = 2") "*" "UsesRepeat" `shouldBe` False
 
+  it "works with UsesLoop" $ do
+    run (js "function a() { a() }") "*" "UsesLoop" `shouldBe` False
+
   it "works with UsesPatternMatching" $ do
     run (hs "f x = 2") "*" "UsesPatternMatching" `shouldBe` False
     run (hs "f [] = 2\nf _ = 3") "*" "UsesPatternMatching" `shouldBe` True
