@@ -1,54 +1,50 @@
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+
 module InterpreterSpec (spec) where
 
 import           Test.Hspec
 import           Interpreter.Mulang
-import qualified Language.Mulang.Ast as Mu
 import qualified Data.Map.Strict as Map
+import           Language.Mulang.Parsers.JavaScript
+
+import           Data.Text (Text, unpack)
+import           NeatInterpolation (text)
 
 lastRef result = (\(ref, ctx) -> (Map.! ref) . globalObjects $ ctx) <$> result
 
-run expression = eval defaultContext expression
+run expression = eval defaultContext $ js expression
+run' = run . unpack
 
 spec :: Spec
 spec = do
   describe "evalExpr" $ do
     it "evals addition" $ do
-      let expression = Mu.Application (Mu.Reference "+") [Mu.MuNumber 1, Mu.MuNumber 2]
-      lastRef (run expression) `shouldReturn` MuNumber 3
+      lastRef (run "1 + 2") `shouldReturn` MuNumber 3
 
     it "evals subtraction" $ do
-      let expression = Mu.Application (Mu.Reference "-") [Mu.MuNumber 2, Mu.MuNumber 1]
-      lastRef (run expression) `shouldReturn` MuNumber 1
+      lastRef (run "2 - 1") `shouldReturn` MuNumber 1
 
     it "evals multiplication" $ do
-      let expression = Mu.Application (Mu.Reference "*") [Mu.MuNumber 2, Mu.MuNumber 3]
-      lastRef (run expression) `shouldReturn` MuNumber 6
+      lastRef (run "2 * 3") `shouldReturn` MuNumber 6
 
     it "evals mod" $ do
-      let expression = Mu.Application (Mu.Reference "%") [Mu.MuNumber 7, Mu.MuNumber 4]
-      lastRef (run expression) `shouldReturn` MuNumber 3
+      lastRef (run "7 % 4") `shouldReturn` MuNumber 3
 
     it "evals and" $ do
-      let expression = Mu.Application (Mu.Reference "&&") [Mu.MuBool True, Mu.MuBool True]
-      lastRef (run expression) `shouldReturn` MuBool True
+      lastRef (run "true && true") `shouldReturn` MuBool True
 
     it "evals or" $ do
-      let expression = Mu.Application (Mu.Reference "||") [Mu.MuBool False, Mu.MuBool False]
-      lastRef (run expression) `shouldReturn` MuBool False
+      lastRef (run "false || false") `shouldReturn` MuBool False
 
     it "evals comparison" $ do
-      let expression = Mu.Application (Mu.Reference ">") [Mu.MuNumber 7, Mu.MuNumber 4]
-      lastRef (run expression) `shouldReturn` MuBool True
+      lastRef (run "7 > 4") `shouldReturn` MuBool True
 
     context "evals equal" $ do
       it "is false when values are different" $ do
-        let expression = Mu.Application Mu.Equal [Mu.MuString "123", Mu.MuString "321"]
-        lastRef (run expression) `shouldReturn` MuBool False
+        lastRef (run "123 == 321") `shouldReturn` MuBool False
 
       it "is true when values are the same" $ do
-        let expression = Mu.Application Mu.Equal [Mu.MuString "123", Mu.MuString "123"]
-        lastRef (run expression) `shouldReturn` MuBool True
+        lastRef (run "'123' == '123'") `shouldReturn` MuBool True
 
       it "is false when values are of different types" $ do
-        let expression = Mu.Application Mu.Equal [Mu.MuString "123", Mu.MuNumber 123]
-        lastRef (run expression) `shouldReturn` MuBool False
+        lastRef (run "'123' == 123") `shouldReturn` MuBool False
