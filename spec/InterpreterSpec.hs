@@ -48,3 +48,42 @@ spec = do
 
       it "is false when values are of different types" $ do
         lastRef (run "'123' == 123") `shouldReturn` MuBool False
+
+    context "evals if" $ do
+      it "condition is true then evals first branch" $ do
+        lastRef (run' [text|
+          if(true){
+            123
+          } else {
+            456
+          }|]) `shouldReturn` MuNumber 123
+
+      it "condition is false then evals second branch" $ do
+        lastRef (run' [text|
+          if(false){
+            123
+          } else {
+            456
+          }|]) `shouldReturn` MuNumber 456
+
+    it "condition is false then evals second branch" $ do
+      lastRef (run' [text|
+        if(false){
+          123
+        } else {
+          456
+        }|]) `shouldReturn` MuNumber 456
+
+    it "evals functions" $ do
+      lastRef (run' [text|
+        function a() {
+          return 123;
+        }
+        a()|]) `shouldReturn` MuNumber 123
+
+    it "handles scopes" $ do
+      lastRef (run' [text|
+        function a() {
+          function b(){}
+        }
+        b()|]) `shouldThrow` (errorCall "Exception thrown outside try: MuString \"Reference not found for name 'b'\"")
