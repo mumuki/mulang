@@ -1,4 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
 module Interpreter.Runner where
 
 import           Data.Map.Strict (Map)
@@ -28,7 +27,7 @@ runTestsForDir dirPath = do
   solution <- fromJust <$> parseJavaScript <$> readFile (dirPath ++ "/solution.js")
   tests <- getTests <$> fromJust <$> parseJavaScript <$> readFile (dirPath ++ "/test.js")
   results <- runTests solution tests
-  forM_ results $ \case
+  forM_ results $ \result -> case result of
     (desc, Success) -> do
       putStrLn $ "PASS : " ++ intercalate " > " desc
     (desc, Failure reason) -> do
