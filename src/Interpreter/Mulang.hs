@@ -141,7 +141,7 @@ evalExpr (Mu.Application Mu.Equal expressions) = do
   params <- mapM evalExpr expressions
   -- liftIO $ print params
   let [r1, r2] = params
-  muEquals r1 r2
+  muValuesEqual r1 r2
 
 evalExpr (Mu.Application Mu.NotEqual expressions) = do
   evalExpr $ Mu.Application (Mu.Reference "!") [Mu.Application Mu.Equal expressions]
@@ -166,7 +166,9 @@ evalExpr (Mu.Application (Mu.Reference "-") expressions) =
 
 evalExpr (Mu.Send (Mu.Reference "assert") (Mu.Reference "equals") expressions) =
   evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 /= n2
+  where f [v1, v2] = case muEquals v1 v2 of
+                        (MuBool True) -> return nullRef
+                        _             -> raiseString $ "Expected " ++ show v1 ++ " but got: " ++ show v2
 
 evalExpr (Mu.MuList expressions) = do
   refs <- forM expressions evalExpr
@@ -281,17 +283,18 @@ raiseString :: ExecutionMonad m => String -> m a
 raiseString s = do
   raiseInternal =<< (createReference $ MuString s)
 
-muEquals r1 r2
+muValuesEqual r1 r2
   | r1 == r2 = createReference $ MuBool True
   | otherwise = do
       v1 <- dereference r1
       v2 <- dereference r2
-      createReference $ case (v1, v2) of
-        (MuBool b1, MuBool b2)     -> MuBool $ b1 == b2
-        (MuNumber n1, MuNumber n2) -> MuBool $ n1 == n2
-        (MuString s1, MuString s2) -> MuBool $ s1 == s2
-        (MuNull, MuNull)           -> MuBool True
-        _                          -> MuBool False
+      createReference $ muEquals v1 v2
+
+muEquals (MuBool b1)   (MuBool b2)   = MuBool $ b1 == b2
+muEquals (MuNumber n1) (MuNumber n2) = MuBool $ n1 == n2
+muEquals (MuString s1) (MuString s2) = MuBool $ s1 == s2
+muEquals MuNull        MuNull        = MuBool True
+muEquals _             _             = MuBool False
 
 getParamNames :: [Mu.Pattern] -> [String]
 getParamNames params =
