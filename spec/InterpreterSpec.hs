@@ -87,3 +87,18 @@ spec = do
           function b(){}
         }
         b()|]) `shouldThrow` (errorCall "Exception thrown outside try: MuString \"Reference not found for name 'b'\"")
+
+    it "handles whiles" $ do
+      lastRef (run' [text|
+        var a = 0;
+
+        while(a < 10) a = a + 1;
+        a;|]) `shouldReturn` MuNumber 10
+
+    it "handles fors" $ do
+      lastRef (run' [text|
+        var a = 0;
+        var i = 0;
+
+        for(i = 0; i <= 10; i++) a = a + i;
+        a;|]) `shouldReturn` MuNumber 55
