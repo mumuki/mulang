@@ -25,6 +25,25 @@ spec = do
       |]
       run code suite `shouldReturn` [(["is true"], Success)]
 
+    context "assert.equals" $ do
+      it "passes if values are equal" $ do
+        let code = [text||]
+        let suite = [text|
+          it("passes", function() {
+            assert.equals(1, 1)
+          })
+        |]
+        run code suite `shouldReturn` [(["passes"], Success)]
+
+      it "fails if values are not equal" $ do
+        let code = [text||]
+        let suite = [text|
+          it("fails", function() {
+            assert.equals(1, 2)
+          })
+        |]
+        run code suite `shouldReturn` [(["fails"], Failure "MuString \"Expected MuNumber 1.0 but got: MuNumber 2.0\"")]
+
     it "can handle failed tests" $ do
       let code = [text||]
       let suite = [text|
