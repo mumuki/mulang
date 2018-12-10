@@ -353,3 +353,26 @@ spec = do
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             VariableSignature "foo" "int" [],
                             Attribute "foo" (MuNumber 4)])
+
+    context "assertions" $ do
+      let wrapped expression =  Class "Foo" Nothing (Sequence [
+                                  TypeSignature "test" (ParameterizedType [] "void" []),
+                                  SimpleMethod "test" [] expression])
+
+      it "parses assertions" $ do
+        run [text|
+            class Foo {
+              @Test
+              void test(){
+                assertTrue(true);
+              }
+            }|] `shouldBe` wrapped (Assert False (Truth (MuBool True)))
+
+      it "parses assertions" $ do
+        run [text|
+            class Foo {
+              @Test
+              void test(){
+                assertEquals(2, 2);
+              }
+            }|] `shouldBe` wrapped (Assert False (Equality (MuNumber 2) (MuNumber 2)))
