@@ -97,10 +97,18 @@ evalExpr (Mu.Print expression) = do
   liftIO $ print parameter
   return nullRef
 
-evalExpr (Mu.Assert (Mu.Truth expression)) =
+
+evalExpr (Mu.Assert negated (Mu.Truth expression)) =
   evalExpressionsWith [expression] f
-  where f [MuBool True] = return nullRef
-        f [v]           = raiseString $ "Expected true but got: " ++ show v
+  where f [MuBool result]  
+          | result /= negated = return nullRef
+          | otherwise         = raiseString $ "Expected " ++ (show . not $ negated) ++ " but got: " ++ show result
+
+evalExpr (Mu.Assert negated (Mu.Equality expected actual)) =
+  evalExpressionsWith [expected, actual] f
+  where f [v1, v2] 
+          | muEquals v1 v2 /= negated = return nullRef
+          | otherwise                 = raiseString $ "Expected " ++ show v1 ++ " but got: " ++ show v2
 
 evalExpr (Mu.Application (Mu.Reference ">=") expressions) =
   evalExpressionsWith expressions f
@@ -114,7 +122,7 @@ evalExpr (Mu.Application (Mu.Reference "%") expressions) =
 evalExpr (Mu.Application (Mu.Reference ">") expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 > n2
-        f params                          = error $ "Bad parameters, expected two bools but got " ++ show params
+        f params                     = error $ "Bad parameters, expected two bools but got " ++ show params
 
 -- TODO make this evaluation non strict on both parameters
 evalExpr (Mu.Application (Mu.Reference "||") expressions) =
@@ -163,12 +171,6 @@ evalExpr (Mu.Application (Mu.Reference "+") expressions) =
 evalExpr (Mu.Application (Mu.Reference "-") expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 - n2
-
-evalExpr (Mu.Assert (Mu.Equality expected actual)) =
-  evalExpressionsWith [expected, actual] f
-  where f [v1, v2] = case muEquals v1 v2 of
-                        (MuBool True) -> return nullRef
-                        _             -> raiseString $ "Expected " ++ show v1 ++ " but got: " ++ show v2
 
 evalExpr (Mu.MuList expressions) = do
   refs <- forM expressions evalExpr
@@ -288,13 +290,13 @@ muValuesEqual r1 r2
   | otherwise = do
       v1 <- dereference r1
       v2 <- dereference r2
-      createReference $ muEquals v1 v2
+      createReference $ MuBool $ muEquals v1 v2
 
-muEquals (MuBool b1)   (MuBool b2)   = MuBool $ b1 == b2
-muEquals (MuNumber n1) (MuNumber n2) = MuBool $ n1 == n2
-muEquals (MuString s1) (MuString s2) = MuBool $ s1 == s2
-muEquals MuNull        MuNull        = MuBool True
-muEquals _             _             = MuBool False
+muEquals (MuBool b1)   (MuBool b2)   = b1 == b2
+muEquals (MuNumber n1) (MuNumber n2) = n1 == n2
+muEquals (MuString s1) (MuString s2) = s1 == s2
+muEquals MuNull        MuNull        = True
+muEquals _             _             = False
 
 getParamNames :: [Mu.Pattern] -> [String]
 getParamNames params =

@@ -56,13 +56,14 @@ muJSStatement (JSVariable _ list _)                                         = mu
 muJSStatement (JSWhile _ _ expression _ statement)                          = While (muJSExpression expression) (muJSStatement statement)
 muJSStatement e                                                             = debug e
 
-normalizeReference (SimpleSend  (Reference "assert") "equals" [expected, actual])        = Assert $ Equality expected actual
-normalizeReference (SimpleSend  (Reference "assert") "throws" [block, error])            = Assert $ Failure block error
-normalizeReference (Application (Reference "assert")          [expression])              = Assert $ Truth expression
-normalizeReference (Application (Reference "describe")        [description, expression]) = TestGroup description expression
-normalizeReference (Application (Reference "context")         [description, expression]) = TestGroup description expression
-normalizeReference (Application (Reference "it")              [description, expression]) = Test description expression
-normalizeReference e                                                                     = e
+normalizeReference (SimpleSend  (Reference "assert") "equals"    [expected, actual])        = Assert False $ Equality expected actual
+normalizeReference (SimpleSend  (Reference "assert") "notEquals" [expected, actual])        = Assert True $ Equality expected actual
+normalizeReference (SimpleSend  (Reference "assert") "throws"    [block, error])            = Assert False $ Failure block error
+normalizeReference (Application (Reference "assert")             [expression])              = Assert False $ Truth expression
+normalizeReference (Application (Reference "describe")           [description, expression]) = TestGroup description expression
+normalizeReference (Application (Reference "context")            [description, expression]) = TestGroup description expression
+normalizeReference (Application (Reference "it")                 [description, expression]) = Test description expression
+normalizeReference e                                                                        = e
 
 mapJSList :: (a -> b) -> JSCommaList a -> [b]
 mapJSList f = map f . muJSCommaList

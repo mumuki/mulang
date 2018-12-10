@@ -176,10 +176,13 @@ spec = do
 
     context "handles assertions" $ do
       it "handles truth assertions" $ do
-        run "assert(true)" `shouldBe` Assert (Truth $ MuBool True)
+        run "assert(true)" `shouldBe` Assert False (Truth $ MuBool True)
       
       it "handles equality assertions" $ do
-        run "assert.equals(123, 321)" `shouldBe` Assert (Equality (MuNumber 123) (MuNumber 321))
+        run "assert.equals(123, 321)" `shouldBe` Assert False (Equality (MuNumber 123) (MuNumber 321))
       
+      it "handles equality assertions" $ do
+        run "assert.notEquals(123, 321)" `shouldBe` Assert True (Equality (MuNumber 123) (MuNumber 321))
+
       it "handles failure assertions" $ do
-        run "assert.throws(function() { throw('abc') }, 'abc')" `shouldBe` Assert (Failure (Lambda [] (Raise (MuString "abc"))) (MuString "abc"))
+        run "assert.throws(function() { throw('abc') }, 'abc')" `shouldBe` Assert False (Failure (Lambda [] (Raise (MuString "abc"))) (MuString "abc"))

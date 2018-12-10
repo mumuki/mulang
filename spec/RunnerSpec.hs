@@ -51,7 +51,7 @@ spec = do
           assert(false)
         })
       |]
-      run code suite `shouldReturn` [(["fails"], Failure "MuString \"Expected true but got: MuBool False\"")]
+      run code suite `shouldReturn` [(["fails"], Failure "MuString \"Expected True but got: False\"")]
 
     it "can handle errored tests" $ do
       let code = [text||]

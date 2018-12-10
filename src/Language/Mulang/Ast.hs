@@ -192,8 +192,8 @@ data Expression
     -- ^ Generic test grouping expression such as describe, context, etc.
     | Test Expression Expression
     -- ^ Generic test expression such as it, etc.
-    | Assert Assertion
-    -- ^ Generic assertion expression such as assert, expect, etc.
+    | Assert Bool Assertion
+    -- ^ Generic assertion expression such as assert, expect, etc. The first parameter indicates whether the assertion is negated or not
   deriving (Eq, Show, Read, Generic, Ord)
 
 data Assertion
@@ -203,8 +203,6 @@ data Assertion
     -- ^ assert truthfulness of boolean expression. e.g.: assert(4 > 3)
     | Failure Expression Expression
     -- ^ assert expression fails with an error. e.g.: assert.throws(function () { throw("this breaks") }, "this breaks")
-    | Negated Assertion
-    -- ^ negation of any other assertion. e.g.: assert.notEquals(3, 4)
   deriving (Eq, Show, Read, Generic, Ord)
 
 -- | Mulang Patterns are not expressions, but are aimed to match them.
