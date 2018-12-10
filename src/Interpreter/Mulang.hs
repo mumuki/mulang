@@ -97,8 +97,8 @@ evalExpr (Mu.Print expression) = do
   liftIO $ print parameter
   return nullRef
 
-evalExpr (Mu.Application (Mu.Reference "assert") expressions) =
-  evalExpressionsWith expressions f
+evalExpr (Mu.Assert (Mu.Truth expression)) =
+  evalExpressionsWith [expression] f
   where f [MuBool True] = return nullRef
         f [v]           = raiseString $ "Expected true but got: " ++ show v
 
@@ -164,8 +164,8 @@ evalExpr (Mu.Application (Mu.Reference "-") expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 - n2
 
-evalExpr (Mu.Send (Mu.Reference "assert") (Mu.Reference "equals") expressions) =
-  evalExpressionsWith expressions f
+evalExpr (Mu.Assert (Mu.Equality expected actual)) =
+  evalExpressionsWith [expected, actual] f
   where f [v1, v2] = case muEquals v1 v2 of
                         (MuBool True) -> return nullRef
                         _             -> raiseString $ "Expected " ++ show v1 ++ " but got: " ++ show v2
@@ -327,7 +327,7 @@ findFrameForName' name = do
       (MuObject context) -> return (ref, context)
       v -> error $ "Finding '" ++ name ++ "' the frame I got a non object " ++ show v
 
-  return $ fmap fst <$> find (Map.member name . snd) $ frames
+  return $ fmap fst . find (Map.member name . snd) $ frames
 
 
 findReferenceForName :: ExecutionMonad m => String -> m Reference
