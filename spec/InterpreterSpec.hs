@@ -12,8 +12,7 @@ import           NeatInterpolation (text)
 
 lastRef result = (\(ref, ctx) -> (Map.! ref) . globalObjects $ ctx) <$> result
 
-run expression = eval defaultContext $ js expression
-run' = run . unpack
+run code = eval defaultContext  . js . unpack $ code
 
 spec :: Spec
 spec = do
@@ -51,7 +50,7 @@ spec = do
 
     context "evals if" $ do
       it "condition is true then evals first branch" $ do
-        lastRef (run' [text|
+        lastRef (run [text|
           if(true){
             123
           } else {
@@ -59,7 +58,7 @@ spec = do
           }|]) `shouldReturn` MuNumber 123
 
       it "condition is false then evals second branch" $ do
-        lastRef (run' [text|
+        lastRef (run [text|
           if(false){
             123
           } else {
@@ -67,28 +66,28 @@ spec = do
           }|]) `shouldReturn` MuNumber 456
 
     it "evals functions" $ do
-      lastRef (run' [text|
+      lastRef (run [text|
         function a() {
           return 123;
         }
         a()|]) `shouldReturn` MuNumber 123
 
     it "handles scopes" $ do
-      lastRef (run' [text|
+      lastRef (run [text|
         function a() {
           function b(){}
         }
         b()|]) `shouldThrow` (errorCall "Exception thrown outside try: MuString \"Reference not found for name 'b'\"")
 
     it "handles whiles" $ do
-      lastRef (run' [text|
+      lastRef (run [text|
         var a = 0;
 
         while(a < 10) a = a + 1;
         a;|]) `shouldReturn` MuNumber 10
 
     it "handles fors" $ do
-      lastRef (run' [text|
+      lastRef (run [text|
         var a = 0;
         var i = 0;
 
