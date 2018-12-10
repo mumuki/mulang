@@ -29,6 +29,7 @@ instance FromJSON Expression
 instance FromJSON Pattern
 instance FromJSON Statement
 instance FromJSON Type
+instance FromJSON Assertion
 
 instance ToJSON AnalysisResult
 instance ToJSON ExpectationResult
@@ -41,4 +42,4 @@ instance ToJSON Expression
 instance ToJSON Pattern
 instance ToJSON Statement
 instance ToJSON Type
-
+instance ToJSON Assertion
