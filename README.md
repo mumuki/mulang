@@ -1638,8 +1638,6 @@ for (var i = 0; i < 10; i++) {
 (MuNil)
 ```
 
-#### Example
-
 ### `MuObject`
 
 > Object oriented unnamed object literal
@@ -1722,6 +1720,92 @@ true
 
 ```haskell
 (MuList [Expression])
+```
+
+### `TestGroup`, `Test` and `Assert`
+
+> Generic test framework expressions used to represent unit tests.
+> TestGroup represents a test grouping expression such as `describe`, `context`, etc
+> Test represents a test expression such as `it`, etc
+> Assert represents a test's assertion, such as `assert.equals(...)`, etc. It receives a boolean that represents whether the assertion is negated or not.
+
+#### Syntax
+
+```haskell
+(TestGroup Expression Expression)
+```
+
+```haskell
+(Test Expression Expression)
+```
+
+```haskell
+(Assert Bool Assertion)
+```
+
+#### Javascript Example
+
+```javascript
+describe("succ", function() {
+  it("succ of 3 is 4", function() {
+    assert.equals(succ(3), 4)
+  })
+})
+```
+
+```haskell
+TestGroup (MuString "succ") (Lambda [] (
+  Test (MuString "succ of 3 is 4") (Lambda [] (
+    Assert False (Equality (Application (Reference "succ") [MuNumber 3.0]) (MuNumber 4.0))))))
+```
+
+## Assertion
+
+Assertions used within tests to dynamically ascertain the code's validity.
+
+An assertion can be one of:
+ * `Truth`: Assert the truthfulness of a given expression.
+ * `Equality`: Assert the equality of two given expressions.
+ * `Failure`: Assert a given expression fails with a given error.
+
+#### Syntax
+
+```haskell
+(Truth Expression)
+```
+
+```haskell
+(Equality Expression Expression)
+```
+
+```haskell
+(Failure Expression Expression)
+```
+
+#### Javascript Examples
+
+```javascript
+assert(true)
+```
+
+```haskell
+Assert False (Truth (MuBool True))
+```
+
+```javascript
+assert.equals(3, 3)
+```
+
+```haskell
+Assert False (Equality (MuNumber 3) (MuNumber 3))
+```
+
+```javascript
+assert.throws(function() { throw('error!') }, 'error!')
+```
+
+```haskell
+Assert False (Failure (Lambda [] (Raise (MuString "error!"))) (MuString "error!"))
 ```
 
 ## Patterns
