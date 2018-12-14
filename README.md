@@ -1754,9 +1754,23 @@ describe("succ", function() {
 ```
 
 ```haskell
-TestGroup (MuString "succ") (Lambda [] (
-  Test (MuString "succ of 3 is 4") (Lambda [] (
-    Assert False (Equality (Application (Reference "succ") [MuNumber 3.0]) (MuNumber 4.0))))))
+TestGroup (MuString "succ")
+  (Test (MuString "succ of 3 is 4")
+    (Assert False (Equality (Application (Reference "succ") [MuNumber 3.0]) (MuNumber 4.0))))
+```
+
+#### Python Example
+
+```python
+class TestGroup(unittest.TestCase):
+  def test_succ_of_3_is_4():
+    self.assertEqual(succ(3), 4)
+```
+
+```haskell
+TestGroup (MuString "TestGroup")
+  (Test (MuString "test_succ_of_3_is_4")
+    (Assert False (Equality (Application (Reference "succ") [MuNumber 3.0]) (MuNumber 4.0))))
 ```
 
 ## Assertion
