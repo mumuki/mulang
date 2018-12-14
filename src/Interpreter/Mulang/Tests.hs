@@ -20,11 +20,11 @@ getTests expr = execWriter $ getAllTestsFromExpr [] expr
 type TestsMonad a = Writer [MuTest] a
 
 getAllTestsFromExpr :: [String] -> Mu.Expression -> Writer [MuTest] ()
-getAllTestsFromExpr s (Mu.TestGroup (Mu.MuString desc) (Mu.Lambda [] f)) = do
+getAllTestsFromExpr s (Mu.TestGroup (Mu.MuString desc) f) = do
   getAllTestsFromExpr (s ++ [desc]) f
 getAllTestsFromExpr s (Mu.Sequence expressions) =
   void $ forM expressions (getAllTestsFromExpr s)
-getAllTestsFromExpr s (Mu.Test (Mu.MuString desc) (Mu.Lambda [] f)) = do
+getAllTestsFromExpr s (Mu.Test (Mu.MuString desc) f) = do
   tell $ [ MuTest { description = s ++ [desc]
                   , body = f
                   }

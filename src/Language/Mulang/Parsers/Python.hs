@@ -73,14 +73,14 @@ muStatement (Print _ exprs _ _)               = M.Print $ compactMap muExpr expr
 muStatement (Exec expr _ _)                   = muExpr expr
 muStatement e                                 = M.debug e
 
-muClass (Just "unittest.TestCase") name body = M.TestGroup (M.MuString name) $ M.Lambda [] $ normalizeTests body
+muClass (Just "unittest.TestCase") name body = M.TestGroup (M.MuString name) $ normalizeTests body
 muClass parent name                     body = M.Class name parent body
 
 normalizeTests (M.Sequence exprs) = M.Sequence $ map normalizeTest exprs
 normalizeTests expr               = normalizeTest expr
 
 normalizeTest func@(M.SimpleProcedure name _ body) = case isPrefixOf "test_" name of
-                                                      True  -> M.Test (M.MuString name) $ M.Lambda [] body
+                                                      True  -> M.Test (M.MuString name) body
                                                       False -> func
 normalizeTest e                                   = e
 
