@@ -15,16 +15,10 @@ import           Control.Monad.State.Strict
 import           Control.Monad.Cont
 import           Data.Fixed (mod')
 
-import qualified Language.Mulang as Mu
+import qualified Language.Mulang as Mu 
 
-
-
-type ExecutionMonad m =
+type Executable m =
   ((ContT Reference (StateT ExecutionContext IO)) ~ m)
-  -- ( MonadIO m
-  -- , MonadState ExecutionContext m
-  -- , MonadCont m
-  -- )
 
 type Callback = Reference -> (ContT Reference (StateT ExecutionContext IO)) ()
 
@@ -65,19 +59,19 @@ defaultContext = ExecutionContext
   , currentReturnCallback = \_r -> error "Called return from outside a function"
   }
 
-eval' :: ExecutionMonad m => ExecutionContext -> m Reference -> IO (Reference, ExecutionContext)
+eval' :: Executable m => ExecutionContext -> m Reference -> IO (Reference, ExecutionContext)
 eval' ctx elCoso = (`runStateT` ctx) $ elCoso `runContT` return
 
 eval :: ExecutionContext -> Mu.Expression -> IO (Reference, ExecutionContext)
 eval ctx expr = (`runStateT` ctx) $ evalExpr expr `runContT` return
 
 -- can't come up with a better name for this
-evalExpressionsWith :: (ExecutionMonad m) => [Mu.Expression] -> ([Value] -> m Reference) -> m Reference
+evalExpressionsWith :: (Executable m) => [Mu.Expression] -> ([Value] -> m Reference) -> m Reference
 evalExpressionsWith expressions f = do
   params <- mapM (\e -> evalExpr e >>= dereference) expressions
   f params
 
-evalExpr :: ExecutionMonad m => Mu.Expression -> m Reference
+evalExpr :: Executable m => Mu.Expression -> m Reference
 evalExpr (Mu.Sequence expressions) = last <$> forM expressions evalExpr
 evalExpr (Mu.Lambda params body) = do
   executionFrames <- gets scopes
@@ -274,14 +268,14 @@ evalExpr (Mu.Reference name) = findReferenceForName name
 evalExpr (Mu.None) = return nullRef
 evalExpr e = raiseString $ "Unkown expression: " ++ show e
 
-raiseInternal :: ExecutionMonad m => Reference -> m b
+raiseInternal :: Executable m => Reference -> m b
 raiseInternal exceptionRef = do
   raiseCallback <- gets currentRaiseCallback
   modify' (\c -> c {currentException = Just exceptionRef})
   raiseCallback exceptionRef
   raiseString "Unreachable" -- the callback above should never allow this to execute
 
-raiseString :: ExecutionMonad m => String -> m a
+raiseString :: Executable m => String -> m a
 raiseString s = do
   raiseInternal =<< (createReference $ MuString s)
 
@@ -302,7 +296,7 @@ getParamNames :: [Mu.Pattern] -> [String]
 getParamNames params =
   fmap (\(Mu.VariablePattern n) -> n) params
 
-runFunction :: (ExecutionMonad m) => [Reference] -> Mu.Expression -> m Reference
+runFunction :: (Executable m) => [Reference] -> Mu.Expression -> m Reference
 runFunction functionEnv body = do
   context <- get
   returnValue <- callCC $ \(returnCallback) -> do
@@ -316,12 +310,12 @@ runFunction functionEnv body = do
                    })
   return returnValue
 
-findFrameForName :: ExecutionMonad m => String -> m Reference
+findFrameForName :: Executable m => String -> m Reference
 findFrameForName name = do
   maybe (raiseString $ "Reference not found for name '" ++ name ++ "'") return
     =<< findFrameForName' name
 
-findFrameForName' :: ExecutionMonad m => String -> m (Maybe Reference)
+findFrameForName' :: Executable m => String -> m (Maybe Reference)
 findFrameForName' name = do
   framesRefs <- gets scopes
   frames :: [(Reference, Map String Reference)] <- forM framesRefs $ \ref -> do
@@ -332,7 +326,7 @@ findFrameForName' name = do
   return $ fmap fst . find (Map.member name . snd) $ frames
 
 
-findReferenceForName :: ExecutionMonad m => String -> m Reference
+findReferenceForName :: Executable m => String -> m Reference
 findReferenceForName name = do
   ref <- findFrameForName name
   (MuObject context) <- dereference ref
@@ -352,7 +346,7 @@ dereference' objectSpace ref = do
     Map.lookup ref $
     objectSpace
 
-dereference :: ExecutionMonad m => Reference -> m Value
+dereference :: Executable m => Reference -> m Value
 dereference ref = do
   objectSpace <- gets globalObjects
   return $ dereference' objectSpace ref
@@ -367,17 +361,17 @@ updateLocalVariables f context =
 
 incrementRef (Reference n) = Reference $ n + 1
 
-createReference :: (ExecutionMonad m) => Value -> m Reference
+createReference :: (Executable m) => Value -> m Reference
 createReference value = do
   nextReferenceId :: Reference <- gets (fromMaybe (Reference 10) . fmap incrementRef . getMaxKey . globalObjects)
   modify (updateGlobalObjects $ Map.insert nextReferenceId value)
   return nextReferenceId
 
-currentFrame :: ExecutionMonad m => m Reference
+currentFrame :: Executable m => m Reference
 currentFrame = do
   gets (head . scopes)
 
-setLocalVariable :: (ExecutionMonad m) => String -> Reference -> m ()
+setLocalVariable :: (Executable m) => String -> Reference -> m ()
 setLocalVariable name ref = do
   frame <- currentFrame
   updateRef frame (addAttrToObject name ref)
@@ -386,11 +380,11 @@ addAttrToObject :: String -> Reference -> Value -> Value
 addAttrToObject k r (MuObject map) = MuObject $ Map.insert k r map
 addAttrToObject k _r v = error $ "Tried adding " ++ k ++ " to a non object: " ++ show v
 
-putRef :: ExecutionMonad m => Reference -> Value -> m ()
+putRef :: Executable m => Reference -> Value -> m ()
 putRef ref val = do
   modify $ updateGlobalObjects $ Map.insert ref val
 
-updateRef :: ExecutionMonad m => Reference -> (Value -> Value) -> m ()
+updateRef :: Executable m => Reference -> (Value -> Value) -> m ()
 updateRef ref f = do
   val <- dereference ref
   putRef ref (f val)
