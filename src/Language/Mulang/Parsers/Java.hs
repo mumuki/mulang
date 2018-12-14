@@ -91,7 +91,6 @@ muStmt (Do body cond)                  = M.While (muStmt body) (muExp cond)
 muStmt (Return exp)                    = M.Return $ fmapOrNone muExp exp
 muStmt (ExpStmt exp)                   = muExp exp
 muStmt Empty                           = None
---muStmt (Assert exp _)                  = muAssertion $ muExp exp
 muStmt (Synchronized _ block)          = muBlock block
 muStmt (Labeled _ stmt)                = muStmt stmt
 muStmt (Throw exp)                     = Raise $ muExp exp
