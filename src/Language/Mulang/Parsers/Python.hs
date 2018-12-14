@@ -79,10 +79,10 @@ muClass parent name                     body = M.Class name parent body
 normalizeTests (M.Sequence exprs) = M.Sequence $ map normalizeTest exprs
 normalizeTests expr               = normalizeTest expr
 
-normalizeTest func@(M.SimpleProcedure name _ body) = case isPrefixOf "test_" name of
-                                                      True  -> M.Test (M.MuString name) body
-                                                      False -> func
-normalizeTest e                                   = e
+normalizeTest func@(M.SimpleProcedure name _ body) =  if isPrefixOf "test_" name
+                                                      then M.Test (M.MuString name) body
+                                                      else func
+normalizeTest e                                    = e
 
 muIf (condition, body) otherwise = M.If (muExpr condition) (muSuite body) otherwise
 
