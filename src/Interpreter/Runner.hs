@@ -22,10 +22,10 @@ data TestResult = Success
                 | Failure String
                 deriving (Show, Eq)
 
-runTestsForDir :: String -> IO ()
-runTestsForDir dirPath = do
-  solution <- fromJust <$> parseJavaScript <$> readFile (dirPath ++ "/solution.js")
-  tests <- getTests <$> fromJust <$> parseJavaScript <$> readFile (dirPath ++ "/test.js")
+runTestsForDir :: String -> String -> IO ()
+runTestsForDir solutionPath testPath = do
+  solution <- fromJust <$> parseJavaScript <$> readFile solutionPath
+  tests <- getTests <$> fromJust <$> parseJavaScript <$> readFile testPath
   results <- runTests solution tests
   forM_ results $ \result -> case result of
     (desc, Success) -> do
