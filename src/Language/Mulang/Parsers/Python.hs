@@ -160,7 +160,7 @@ muCallType (Var ident _)                     x      = muCall M.Application ident
 muCall callType ident = callType (M.Reference $ muIdent ident)
 
 
-muApplication op args = M.Application (M.Reference (muOp op)) (map muExpr args)
+muApplication op args = M.Application (muOp op) (map muExpr args)
 
 muString = M.MuString . intercalate "\n"
 
@@ -182,33 +182,35 @@ muArgument e                            = M.debug e
 --muYieldArg (YieldFrom expr _)(Expr annot) annot -- ^ Yield from a generator (Version 3 only)
 muYieldArg (YieldExpr expr) = muExpr expr
 
-muOp (And _)                = "and"
-muOp (Or _)                 = "or"
-muOp (Not _)                = "not"
-muOp (Exponent _)           = "**"
-muOp (LessThan _)           = "<"
-muOp (GreaterThan _)        = ">"
-muOp (Equality _)           = "=="
-muOp (GreaterThanEquals _)  = ">="
-muOp (LessThanEquals _)     = "<="
-muOp (NotEquals _)          = "!="
-muOp (NotEqualsV2 _)        = "<>" -- Version 2 only.
-muOp (In _)                 = "in"
-muOp (Is _)                 = "is"
-muOp (IsNot _)              = "is not"
-muOp (NotIn _)              = "not in"
-muOp (BinaryOr _)           = "|"
-muOp (Xor _)                = "^"
-muOp (BinaryAnd _)          = "&"
-muOp (ShiftLeft _)          = "<<"
-muOp (ShiftRight _)         = ">>"
-muOp (Multiply _)           = "*"
-muOp (Plus _)               = "+"
-muOp (Minus _)              = "-"
-muOp (Divide _)             = "/"
-muOp (FloorDivide _)        = "//"
-muOp (Invert _)             = "~"
-muOp (Modulo _)             = "%"
+muOp (Equality _)           = M.Equal
+muOp (NotEquals _)          = M.NotEqual
+muOp op                     = M.Reference $ muOpReference op
+
+muOpReference (And _)                = "and"
+muOpReference (Or _)                 = "or"
+muOpReference (Not _)                = "not"
+muOpReference (Exponent _)           = "**"
+muOpReference (LessThan _)           = "<"
+muOpReference (GreaterThan _)        = ">"
+muOpReference (GreaterThanEquals _)  = ">="
+muOpReference (LessThanEquals _)     = "<="
+muOpReference (NotEqualsV2 _)        = "<>" -- Version 2 only.
+muOpReference (In _)                 = "in"
+muOpReference (Is _)                 = "is"
+muOpReference (IsNot _)              = "is not"
+muOpReference (NotIn _)              = "not in"
+muOpReference (BinaryOr _)           = "|"
+muOpReference (Xor _)                = "^"
+muOpReference (BinaryAnd _)          = "&"
+muOpReference (ShiftLeft _)          = "<<"
+muOpReference (ShiftRight _)         = ">>"
+muOpReference (Multiply _)           = "*"
+muOpReference (Plus _)               = "+"
+muOpReference (Minus _)              = "-"
+muOpReference (Divide _)             = "/"
+muOpReference (FloorDivide _)        = "//"
+muOpReference (Invert _)             = "~"
+muOpReference (Modulo _)             = "%"
 
 muAssignOp (PlusAssign _)       = "+"
 muAssignOp (MinusAssign _)      = "-"
