@@ -113,3 +113,12 @@ except:
 
     it "parses yields" $ do
       py "yield 1" `shouldBe` Yield (MuNumber 1)
+
+    it "parses test groups" $ do
+      run [text|
+        class TestGroup(unittest.TestCase):
+          def test_something():
+            self.assertTrue(True)
+      |] `shouldBe` TestGroup (MuString "TestGroup") (Lambda [] 
+                      (Test (MuString "test_something") (Lambda [] 
+                        (Assert False $ Truth (MuBool True)))))
