@@ -67,6 +67,10 @@ library
     Language.Mulang.Analyzer.SignatureStyleCompiler
     Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.SmellsAnalyzer
+    Language.Mulang.Interpreter
+    Language.Mulang.Interpreter.Runner
+    Language.Mulang.Interpreter.Tests
+
   build-depends:
     base                      <= 5,
     bytestring                ,
@@ -85,6 +89,8 @@ library
     ParsecTools               ,
     split                     ,
     hashable                  ,
+    mtl                       ,
+    monad-loops               ,
     process
   build-tools:
     happy,
@@ -150,7 +156,8 @@ test-suite spec
     aeson                     ,
     hspec                     ,
     neat-interpolation        ,
-    mulang
+    mulang                    ,
+    containers
   build-tools:
     happy,
     alex

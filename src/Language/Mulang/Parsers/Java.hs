@@ -3,8 +3,8 @@
 
 module Language.Mulang.Parsers.Java (java, parseJava) where
 
-import Language.Mulang.Ast hiding (While, Return, Equal, Lambda, Try, Switch)
-import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda, Try, Switch))
+import Language.Mulang.Ast hiding (While, Return, Equal, Lambda, Try, Switch, Assert)
+import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda, Try, Switch, Assert))
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compact, compactMap, compactConcatMap, normalize)
 
@@ -91,7 +91,6 @@ muStmt (Do body cond)                  = M.While (muStmt body) (muExp cond)
 muStmt (Return exp)                    = M.Return $ fmapOrNone muExp exp
 muStmt (ExpStmt exp)                   = muExp exp
 muStmt Empty                           = None
-muStmt (Assert exp _)                  = SimpleSend Self "assert" [muExp exp]
 muStmt (Synchronized _ block)          = muBlock block
 muStmt (Labeled _ stmt)                = muStmt stmt
 muStmt (Throw exp)                     = Raise $ muExp exp
@@ -165,10 +164,15 @@ muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "printl
 muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "print"]) [expr])    = Print (muExp expr)
 muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "printf"]) (expr:_)) = Print (muExp expr)
 
-muMethodInvocation (MethodCall (Name [message]) args)           =  SimpleSend Self (i message) (map muExp args)
+muMethodInvocation (MethodCall (Name [message]) args)           = muNormalizeReference $ SimpleSend Self (i message) (map muExp args)
 muMethodInvocation (MethodCall (Name receptorAndMessage) args)  =  SimpleSend (Reference  (ns . init $ receptorAndMessage)) (i . last $ receptorAndMessage) (map muExp args)
 muMethodInvocation (PrimaryMethodCall receptor _ selector args) =  SimpleSend (muExp receptor) (i selector) (map muExp args)
 muMethodInvocation e = debug e
+
+muNormalizeReference (SimpleSend Self "assertTrue" [expression])         = M.Assert False $ Truth expression
+muNormalizeReference (SimpleSend Self "assertFalse" [expression])        = M.Assert True $ Truth expression
+muNormalizeReference (SimpleSend Self "assertEquals" [expected, actual]) = M.Assert False $ Equality expected actual
+muNormalizeReference e = e
 
 muRefType (ClassRefType clazz) = r clazz
 muRefType (ArrayType t)        = (muType t) ++ "[]"

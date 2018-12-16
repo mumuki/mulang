@@ -158,7 +158,6 @@ Mulang is three different  - but thighly related - things:
       - [Syntax](#syntax-41)
     + [`MuNil`](#munil)
       - [Syntax](#syntax-42)
-      - [Example](#example-22)
     + [`MuObject`](#muobject)
       - [Syntax](#syntax-43)
       - [JavaScript Example](#javascript-example)
@@ -167,50 +166,57 @@ Mulang is three different  - but thighly related - things:
       - [Ruby Example](#ruby-example-5)
     + [`MuTuple` and `MuList`](#mutuple-and-mulist)
       - [Syntax](#syntax-45)
+    + [`TestGroup`, `Test` and `Assert`](#testgroup-test-and-assert)
+      - [Syntax](#syntax-46)
+      - [Javascript Example](#javascript-example)
+      - [Python Example](#python-example)
+  * [Assertion](#assertion)
+      - [Syntax](#syntax-47)
+      - [Javascript Examples](#javascript-examples)
   * [Patterns](#patterns)
     + [`VariablePattern`](#variablepattern)
-      - [Syntax](#syntax-46)
+      - [Syntax](#syntax-48)
       - [JavaScript Example](#javascript-example-1)
     + [`LiteralPattern`](#literalpattern)
-      - [Syntax](#syntax-47)
-      - [Example](#example-23)
+      - [Syntax](#syntax-49)
+      - [Example](#example-22)
     + [`InfixApplicationPattern`](#infixapplicationpattern)
-      - [Syntax](#syntax-48)
+      - [Syntax](#syntax-50)
         * [Caveats](#caveats-1)
     + [`ApplicationPattern`](#applicationpattern)
-      - [Syntax](#syntax-49)
-      - [Example](#example-24)
-    + [`TuplePattern`](#tuplepattern)
-      - [Syntax](#syntax-50)
-      - [Example](#example-25)
-    + [`ListPattern`](#listpattern)
       - [Syntax](#syntax-51)
-      - [Example](#example-26)
-    + [`FunctorPattern`](#functorpattern)
+      - [Example](#example-23)
+    + [`TuplePattern`](#tuplepattern)
       - [Syntax](#syntax-52)
-      - [Example](#example-27)
-    + [`AsPattern`](#aspattern)
+      - [Example](#example-24)
+    + [`ListPattern`](#listpattern)
       - [Syntax](#syntax-53)
-      - [Example](#example-28)
-    + [`TypePattern`](#typepattern)
+      - [Example](#example-25)
+    + [`FunctorPattern`](#functorpattern)
       - [Syntax](#syntax-54)
-      - [Example](#example-29)
-    + [`WildcardPattern`](#wildcardpattern)
+      - [Example](#example-26)
+    + [`AsPattern`](#aspattern)
       - [Syntax](#syntax-55)
-    + [`UnionPattern`](#unionpattern)
+      - [Example](#example-27)
+    + [`TypePattern`](#typepattern)
       - [Syntax](#syntax-56)
-    + [`OtherPattern`](#otherpattern)
+      - [Example](#example-28)
+    + [`WildcardPattern`](#wildcardpattern)
       - [Syntax](#syntax-57)
+    + [`UnionPattern`](#unionpattern)
+      - [Syntax](#syntax-58)
+    + [`OtherPattern`](#otherpattern)
+      - [Syntax](#syntax-59)
   * [Types](#types)
     + [`TypeAlias`](#typealias)
-      - [Syntax](#syntax-58)
+      - [Syntax](#syntax-60)
       - [Haskell Example](#haskell-example-1)
     + [TypeSignature](#typesignature)
-      - [Syntax](#syntax-59)
+      - [Syntax](#syntax-61)
       - [Haskell Examples](#haskell-examples)
       - [Java Examples](#java-examples-1)
     + [`TypeCast`](#typecast)
-      - [Syntax](#syntax-60)
+      - [Syntax](#syntax-62)
       - [Haskell Examples](#haskell-examples-1)
       - [Java Examples](#java-examples-2)
         * [Caveats](#caveats-2)
@@ -1639,8 +1645,6 @@ for (var i = 0; i < 10; i++) {
 (MuNil)
 ```
 
-#### Example
-
 ### `MuObject`
 
 > Object oriented unnamed object literal
@@ -1723,6 +1727,106 @@ true
 
 ```haskell
 (MuList [Expression])
+```
+
+### `TestGroup`, `Test` and `Assert`
+
+> Generic test framework expressions used to represent unit tests.
+> TestGroup represents a test grouping expression such as `describe`, `context`, etc
+> Test represents a test expression such as `it`, etc
+> Assert represents a test's assertion, such as `assert.equals(...)`, etc. It receives a boolean that represents whether the assertion is negated or not.
+
+#### Syntax
+
+```haskell
+(TestGroup Expression Expression)
+```
+
+```haskell
+(Test Expression Expression)
+```
+
+```haskell
+(Assert Bool Assertion)
+```
+
+#### Javascript Example
+
+```javascript
+describe("succ", function() {
+  it("succ of 3 is 4", function() {
+    assert.equals(succ(3), 4)
+  })
+})
+```
+
+```haskell
+TestGroup (MuString "succ")
+  (Test (MuString "succ of 3 is 4")
+    (Assert False (Equality (Application (Reference "succ") [MuNumber 3.0]) (MuNumber 4.0))))
+```
+
+#### Python Example
+
+```python
+class TestGroup(unittest.TestCase):
+  def test_succ_of_3_is_4():
+    self.assertEqual(succ(3), 4)
+```
+
+```haskell
+TestGroup (MuString "TestGroup")
+  (Test (MuString "test_succ_of_3_is_4")
+    (Assert False (Equality (Application (Reference "succ") [MuNumber 3.0]) (MuNumber 4.0))))
+```
+
+## Assertion
+
+Assertions used within tests to dynamically ascertain the code's validity.
+
+An assertion can be one of:
+ * `Truth`: Assert the truthfulness of a given expression.
+ * `Equality`: Assert the equality of two given expressions.
+ * `Failure`: Assert a given expression fails with a given error.
+
+#### Syntax
+
+```haskell
+(Truth Expression)
+```
+
+```haskell
+(Equality Expression Expression)
+```
+
+```haskell
+(Failure Expression Expression)
+```
+
+#### Javascript Examples
+
+```javascript
+assert(true)
+```
+
+```haskell
+Assert False (Truth (MuBool True))
+```
+
+```javascript
+assert.equals(3, 3)
+```
+
+```haskell
+Assert False (Equality (MuNumber 3) (MuNumber 3))
+```
+
+```javascript
+assert.throws(function() { throw('error!') }, 'error!')
+```
+
+```haskell
+Assert False (Failure (Lambda [] (Raise (MuString "error!"))) (MuString "error!"))
 ```
 
 ## Patterns

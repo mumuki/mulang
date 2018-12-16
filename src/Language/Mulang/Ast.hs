@@ -19,6 +19,7 @@ module Language.Mulang.Ast (
     EquationBody(..),
     Type(..),
     Expression(..),
+    Assertion(..),
     Statement(..),
     Pattern(..),
     Identifier,
@@ -187,6 +188,21 @@ data Expression
     -- ^ Generic symbol/atom literal
     | MuTuple [Expression]
     | MuList [Expression]
+    | TestGroup Expression Expression
+    -- ^ Generic test grouping expression such as describe, context, etc.
+    | Test Expression Expression
+    -- ^ Generic test expression such as it, etc.
+    | Assert Bool Assertion
+    -- ^ Generic assertion expression such as assert, expect, etc. The first parameter indicates whether the assertion is negated or not
+  deriving (Eq, Show, Read, Generic, Ord)
+
+data Assertion
+    = Equality Expression Expression
+    -- ^ assert equality between two expressions. e.g.: assert.equals(succ(3), 4)
+    | Truth Expression
+    -- ^ assert truthfulness of boolean expression. e.g.: assert(4 > 3)
+    | Failure Expression Expression
+    -- ^ assert expression fails with an error. e.g.: assert.throws(function () { throw("this breaks") }, "this breaks")
   deriving (Eq, Show, Read, Generic, Ord)
 
 -- | Mulang Patterns are not expressions, but are aimed to match them.

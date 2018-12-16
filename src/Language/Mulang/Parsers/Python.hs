@@ -8,7 +8,7 @@ import Language.Python.Version3.Parser (parseModule)
 import Language.Python.Common.Token (Token)
 import Language.Python.Common.AST
 
-import Data.List (intercalate)
+import Data.List (intercalate, isPrefixOf)
 import Data.Maybe (fromMaybe, listToMaybe)
 
 import Control.Fallible
@@ -32,7 +32,7 @@ muStatement:: StatementSpan -> M.Expression
 muStatement (While cond body _ _)             = M.While (muExpr cond) (muSuite body)
 muStatement (For targets generator body _ _)  = M.For [M.Generator (M.TuplePattern (map (M.VariablePattern . muVariable) targets)) (muExpr generator)] (muSuite body)
 muStatement (Fun name args _ body _)          = muComputation (muIdent name) (map muParameter args) (muSuite body)
-muStatement (Class name parents body _)       = M.Class (muIdent name) (listToMaybe . map muParent $ parents) (muSuite body)
+muStatement (Class name parents body _)       = muClass (listToMaybe . map muParent $ parents) (muIdent name) (muSuite body)
 muStatement (Conditional guards els _ )       = foldr muIf (muSuite els) guards
 muStatement (Assign [to] from _)              = M.Assignment (muVariable to) (muExpr from)
 muStatement (AugmentedAssign to op from _)    = M.Assignment (muVariable to) (M.Application (M.Reference . muAssignOp $ op) [M.Reference . muVariable $ to, muExpr from])
@@ -73,10 +73,22 @@ muStatement (Print _ exprs _ _)               = M.Print $ compactMap muExpr expr
 muStatement (Exec expr _ _)                   = muExpr expr
 muStatement e                                 = M.debug e
 
+muClass (Just "unittest.TestCase") name body = M.TestGroup (M.MuString name) $ normalizeTests body
+muClass parent name                     body = M.Class name parent body
+
+normalizeTests (M.Sequence exprs) = M.Sequence $ map normalizeTest exprs
+normalizeTests expr               = normalizeTest expr
+
+normalizeTest func@(M.SimpleProcedure name _ body) =  if isPrefixOf "test_" name
+                                                      then M.Test (M.MuString name) body
+                                                      else func
+normalizeTest e                                    = e
 
 muIf (condition, body) otherwise = M.If (muExpr condition) (muSuite body) otherwise
 
-muParent (ArgExpr (Var ident _) _) = muIdent ident
+muParent (ArgExpr (Var ident _) _)            = muIdent ident
+muParent (ArgExpr (Dot (Var var _) attr _) _) = muIdent var ++ "." ++ muIdent attr
+muParent _                                    = undefined
 
 muComputation name params body | containsReturn body = M.SimpleFunction name params body
                                | otherwise           = M.SimpleProcedure name params body
@@ -139,13 +151,16 @@ muExpr e                          = M.debug e
 
 muList = M.MuList . map muExpr
 
-muCallType (Dot receiver ident _) = muCall (M.Send $ muExpr receiver) ident
-muCallType (Var ident _)          = muCall M.Application ident
+muCallType (Dot _ (Ident "assertEqual" _) _) [a, b] = M.Assert False $ M.Equality a b 
+muCallType (Dot _ (Ident "assertTrue" _) _)  [a]    = M.Assert False $ M.Truth a 
+muCallType (Dot _ (Ident "assertFalse" _) _) [a]    = M.Assert True $ M.Truth a
+muCallType (Dot receiver ident _)            x      = muCall (M.Send $ muExpr receiver) ident x
+muCallType (Var ident _)                     x      = muCall M.Application ident x
 
 muCall callType ident = callType (M.Reference $ muIdent ident)
 
 
-muApplication op args = M.Application (M.Reference (muOp op)) (map muExpr args)
+muApplication op args = M.Application (muOp op) (map muExpr args)
 
 muString = M.MuString . intercalate "\n"
 
@@ -167,33 +182,35 @@ muArgument e                            = M.debug e
 --muYieldArg (YieldFrom expr _)(Expr annot) annot -- ^ Yield from a generator (Version 3 only)
 muYieldArg (YieldExpr expr) = muExpr expr
 
-muOp (And _)                = "and"
-muOp (Or _)                 = "or"
-muOp (Not _)                = "not"
-muOp (Exponent _)           = "**"
-muOp (LessThan _)           = "<"
-muOp (GreaterThan _)        = ">"
-muOp (Equality _)           = "=="
-muOp (GreaterThanEquals _)  = ">="
-muOp (LessThanEquals _)     = "<="
-muOp (NotEquals _)          = "!="
-muOp (NotEqualsV2 _)        = "<>" -- Version 2 only.
-muOp (In _)                 = "in"
-muOp (Is _)                 = "is"
-muOp (IsNot _)              = "is not"
-muOp (NotIn _)              = "not in"
-muOp (BinaryOr _)           = "|"
-muOp (Xor _)                = "^"
-muOp (BinaryAnd _)          = "&"
-muOp (ShiftLeft _)          = "<<"
-muOp (ShiftRight _)         = ">>"
-muOp (Multiply _)           = "*"
-muOp (Plus _)               = "+"
-muOp (Minus _)              = "-"
-muOp (Divide _)             = "/"
-muOp (FloorDivide _)        = "//"
-muOp (Invert _)             = "~"
-muOp (Modulo _)             = "%"
+muOp (Equality _)           = M.Equal
+muOp (NotEquals _)          = M.NotEqual
+muOp op                     = M.Reference $ muOpReference op
+
+muOpReference (And _)                = "and"
+muOpReference (Or _)                 = "or"
+muOpReference (Not _)                = "not"
+muOpReference (Exponent _)           = "**"
+muOpReference (LessThan _)           = "<"
+muOpReference (GreaterThan _)        = ">"
+muOpReference (GreaterThanEquals _)  = ">="
+muOpReference (LessThanEquals _)     = "<="
+muOpReference (NotEqualsV2 _)        = "<>" -- Version 2 only.
+muOpReference (In _)                 = "in"
+muOpReference (Is _)                 = "is"
+muOpReference (IsNot _)              = "is not"
+muOpReference (NotIn _)              = "not in"
+muOpReference (BinaryOr _)           = "|"
+muOpReference (Xor _)                = "^"
+muOpReference (BinaryAnd _)          = "&"
+muOpReference (ShiftLeft _)          = "<<"
+muOpReference (ShiftRight _)         = ">>"
+muOpReference (Multiply _)           = "*"
+muOpReference (Plus _)               = "+"
+muOpReference (Minus _)              = "-"
+muOpReference (Divide _)             = "/"
+muOpReference (FloorDivide _)        = "//"
+muOpReference (Invert _)             = "~"
+muOpReference (Modulo _)             = "%"
 
 muAssignOp (PlusAssign _)       = "+"
 muAssignOp (MinusAssign _)      = "-"

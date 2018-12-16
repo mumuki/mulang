@@ -173,3 +173,16 @@ spec = do
 
     it "handles for var in" $ do
       run "for(var i in [1,2]) i;" `shouldBe` For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
+
+    context "handles assertions" $ do
+      it "handles truth assertions" $ do
+        run "assert(true)" `shouldBe` Assert False (Truth $ MuBool True)
+      
+      it "handles equality assertions" $ do
+        run "assert.equals(123, 321)" `shouldBe` Assert False (Equality (MuNumber 123) (MuNumber 321))
+      
+      it "handles equality assertions" $ do
+        run "assert.notEquals(123, 321)" `shouldBe` Assert True (Equality (MuNumber 123) (MuNumber 321))
+
+      it "handles failure assertions" $ do
+        run "assert.throws(function() { throw('abc') }, 'abc')" `shouldBe` Assert False (Failure (Lambda [] (Raise (MuString "abc"))) (MuString "abc"))
