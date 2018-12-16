@@ -78,8 +78,7 @@ evalExpr (Mu.Subroutine name body) = do
   executionFrames <- gets scopes
   let function = MuFunction executionFrames body
   ref <- createReference function
-  unless (null name) $ do -- if function has no name we avoid registering it
-    setLocalVariable name ref
+  unless (null name) (setLocalVariable name ref) -- if function has no name we avoid registering it
   return ref
 
 evalExpr (Mu.Print expression) = do
@@ -364,8 +363,7 @@ createReference value = do
   return nextReferenceId
 
 currentFrame :: Executable Reference
-currentFrame = do
-  gets (head . scopes)
+currentFrame = gets (head . scopes)
 
 setLocalVariable :: String -> Reference -> Executable ()
 setLocalVariable name ref = do
@@ -377,8 +375,7 @@ addAttrToObject k r (MuObject map) = MuObject $ Map.insert k r map
 addAttrToObject k _r v = error $ "Tried adding " ++ k ++ " to a non object: " ++ show v
 
 putRef :: Reference -> Value -> Executable ()
-putRef ref val = do
-  modify $ updateGlobalObjects $ Map.insert ref val
+putRef ref = modify . updateGlobalObjects . Map.insert ref
 
 updateRef :: Reference -> (Value -> Value) -> Executable ()
 updateRef ref f = do

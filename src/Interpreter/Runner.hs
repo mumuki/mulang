@@ -18,8 +18,8 @@ data TestResult = Success
 
 runTestsForDir :: String -> String -> MaybeParser -> IO ()
 runTestsForDir solutionPath testPath parse = do
-  solution <- fromJust <$> parse <$> readFile solutionPath
-  tests <- getTests <$> fromJust <$> parse <$> readFile testPath
+  solution <- fromJust . parse <$> readFile solutionPath
+  tests <- getTests . fromJust . parse <$> readFile testPath
   results <- runTests solution tests
   forM_ results $ \result -> case result of
     (desc, Success) -> do
