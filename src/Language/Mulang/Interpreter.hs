@@ -177,11 +177,8 @@ evalExpr (Mu.Application function expressions) = do
   return returnValue
 
 evalExpr (Mu.If cond thenBranch elseBranch) = do
-  v <- evalExpr cond >>= dereference
-  case v of
-    MuBool True ->  evalExpr thenBranch
-    MuBool False -> evalExpr elseBranch
-    _ -> raiseString $ "Got a non boolean on an if: " ++ show v
+  v <- evalCondition cond
+  if v then evalExpr thenBranch else evalExpr elseBranch
 
 evalExpr (Mu.MuNumber n) = createReference $ MuNumber n
 evalExpr (Mu.MuNil) = return nullRef
@@ -243,7 +240,10 @@ evalExpr (Mu.None) = return nullRef
 evalExpr e = raiseString $ "Unkown expression: " ++ show e
 
 evalCondition :: Mu.Expression -> Executable Bool
-evalCondition cond = evalExpr cond >>= dereference >>= \v -> return (v == MuBool True)
+evalCondition cond = evalExpr cond >>= dereference >>= muBool
+  where
+    muBool (MuBool value) = return value
+    muBool v              = raiseString $ "Boolean expected, got: " ++ show v
 
 evalParams :: [Mu.Pattern] -> [Mu.Expression] -> Executable Reference
 evalParams params arguments = do

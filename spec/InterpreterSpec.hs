@@ -72,6 +72,9 @@ spec = do
               456
             }|]) `shouldReturn` MuNumber 456
 
+        it "condition is non bool, fails" $ do
+          lastRef (runjs "if (6) { 123 } else { 456 }") `shouldThrow` (errorCall "Exception thrown outside try: MuString \"Boolean expected, got: MuNumber 6.0\"")
+
       it "evals functions" $ do
         lastRef (runjs [text|
           function a() {
@@ -146,6 +149,11 @@ spec = do
           lastRef (runpy [text|
             if False: 123
             else: 456|]) `shouldReturn` MuNumber 456
+
+        it "condition is non bool, fails" $ do
+          lastRef (runpy [text|
+            if 6: 123
+            else: 456|]) `shouldThrow` (errorCall "Exception thrown outside try: MuString \"Boolean expected, got: MuNumber 6.0\"")
 
       it "evals functions" $ do
         lastRef (runpy [text|
