@@ -13,7 +13,7 @@ import           Control.Monad.State.Strict
 import           Control.Monad.Cont
 import           Data.Fixed (mod')
 
-import qualified Language.Mulang as Mu 
+import qualified Language.Mulang as Mu
 
 type Executable m = ContT Reference (StateT ExecutionContext IO) m
 
@@ -56,12 +56,11 @@ defaultContext = ExecutionContext
   }
 
 eval' :: ExecutionContext -> Executable Reference -> IO (Reference, ExecutionContext)
-eval' ctx elCoso = (`runStateT` ctx) $ elCoso `runContT` return
+eval' ctx ref = runStateT (runContT ref return) ctx
 
 eval :: ExecutionContext -> Mu.Expression -> IO (Reference, ExecutionContext)
-eval ctx expr = (`runStateT` ctx) $ evalExpr expr `runContT` return
+eval ctx expr = eval' ctx (evalExpr expr)
 
--- can't come up with a better name for this
 evalExpressionsWith :: [Mu.Expression] -> ([Value] -> Executable Reference) -> Executable Reference
 evalExpressionsWith expressions f = do
   params <- mapM (\e -> evalExpr e >>= dereference) expressions
@@ -86,16 +85,15 @@ evalExpr (Mu.Print expression) = do
   liftIO $ print parameter
   return nullRef
 
-
 evalExpr (Mu.Assert negated (Mu.Truth expression)) =
   evalExpressionsWith [expression] f
-  where f [MuBool result]  
+  where f [MuBool result]
           | result /= negated = return nullRef
           | otherwise         = raiseString $ "Expected " ++ (show . not $ negated) ++ " but got: " ++ show result
 
 evalExpr (Mu.Assert negated (Mu.Equality expected actual)) =
   evalExpressionsWith [expected, actual] f
-  where f [v1, v2] 
+  where f [v1, v2]
           | muEquals v1 v2 /= negated = return nullRef
           | otherwise                 = raiseString $ "Expected " ++ show v1 ++ " but got: " ++ show v2
 
@@ -136,7 +134,6 @@ evalExpr (Mu.Application (Mu.Reference "*") expressions) =
 
 evalExpr (Mu.Application Mu.Equal expressions) = do
   params <- mapM evalExpr expressions
-  -- liftIO $ print params
   let [r1, r2] = params
   muValuesEqual r1 r2
 
@@ -169,28 +166,14 @@ evalExpr (Mu.New klass expressions) = do
   (MuFunction locals ([Mu.SimpleEquation params body])) <- evalExpr klass >>= dereference
   objReference <- createReference $ MuObject Map.empty
   thisContext <- createReference $ MuObject $ Map.singleton "this" objReference
-
-  parameters :: [Reference] <- forM expressions evalExpr
-  let localsAfterParameters = Map.fromList $ zip
-        (getParamNames params)
-        (parameters ++ repeat nullRef)
-  -- change this
-  paramsContext <- createReference $ MuObject localsAfterParameters
-
+  paramsContext <- evalParams params expressions
   runFunction (thisContext:paramsContext:locals) body
   return objReference
 
 evalExpr (Mu.Application function expressions) = do
   (MuFunction locals ([Mu.SimpleEquation params body])) <- evalExpr function >>= dereference
-
-  parameters :: [Reference] <- forM expressions evalExpr
-  let localsAfterParameters = Map.fromList $ zip
-        (getParamNames params)
-        (parameters ++ repeat nullRef)
-  -- change this
-  contextRef <- createReference $ MuObject localsAfterParameters
-
-  returnValue <- runFunction (contextRef:locals) (body)
+  paramsContext <- evalParams params expressions
+  returnValue <- runFunction (paramsContext:locals) (body)
   return returnValue
 
 evalExpr (Mu.If cond thenBranch elseBranch) = do
@@ -215,13 +198,12 @@ evalExpr (Mu.Variable name expr) = do
   return r
 
 evalExpr (Mu.While cond expr) = do
-  whileM (evalExpr cond >>= dereference >>= \v -> return (v == MuBool True)) $ do
-    evalExpr expr
+  whileM (evalCondition cond) (evalExpr expr)
   return nullRef
 
-evalExpr (Mu.ForLoop beforeExpr condExpr afterExpr expr) = do
+evalExpr (Mu.ForLoop beforeExpr cond afterExpr expr) = do
   evalExpr beforeExpr
-  whileM (evalExpr condExpr >>= dereference >>= \v -> return (v == MuBool True)) $ do
+  whileM (evalCondition cond) $ do
     evalExpr expr
     evalExpr afterExpr
   return nullRef
@@ -230,10 +212,8 @@ evalExpr (Mu.Assignment name expr) = do
   valueRef <- evalExpr expr
   frameRef <- findFrameForName' name
   case frameRef of
-    Just ref -> do
-      updateRef ref (addAttrToObject name valueRef)
-    Nothing -> do
-      setLocalVariable name valueRef
+    Just ref -> updateRef ref (addAttrToObject name valueRef)
+    Nothing -> setLocalVariable name valueRef
   return valueRef
 
 evalExpr (Mu.Try expr [( Mu.VariablePattern exName, catchExpr)] finallyExpr) = do
@@ -256,12 +236,20 @@ evalExpr (Mu.Try expr [( Mu.VariablePattern exName, catchExpr)] finallyExpr) = d
 
   evalExpr finallyExpr
 
-evalExpr (Mu.Raise expr) = do
-  raiseInternal =<< evalExpr expr
+evalExpr (Mu.Raise expr) = raiseInternal =<< evalExpr expr
 
 evalExpr (Mu.Reference name) = findReferenceForName name
 evalExpr (Mu.None) = return nullRef
 evalExpr e = raiseString $ "Unkown expression: " ++ show e
+
+evalCondition :: Mu.Expression -> Executable Bool
+evalCondition cond = evalExpr cond >>= dereference >>= \v -> return (v == MuBool True)
+
+evalParams :: [Mu.Pattern] -> [Mu.Expression] -> Executable Reference
+evalParams params arguments = do
+  evaluatedParams <- forM arguments evalExpr
+  let localsAfterParameters = Map.fromList $ zip (getParamNames params) (evaluatedParams ++ repeat nullRef)
+  createReference $ MuObject localsAfterParameters
 
 raiseInternal :: Reference -> Executable b
 raiseInternal exceptionRef = do
@@ -288,8 +276,7 @@ muEquals MuNull        MuNull        = True
 muEquals _             _             = False
 
 getParamNames :: [Mu.Pattern] -> [String]
-getParamNames params =
-  fmap (\(Mu.VariablePattern n) -> n) params
+getParamNames = fmap (\(Mu.VariablePattern n) -> n)
 
 runFunction :: [Reference] -> Mu.Expression -> Executable Reference
 runFunction functionEnv body = do
@@ -320,7 +307,6 @@ findFrameForName' name = do
 
   return $ fmap fst . find (Map.member name . snd) $ frames
 
-
 findReferenceForName :: String -> Executable Reference
 findReferenceForName name = do
   ref <- findFrameForName name
@@ -347,12 +333,10 @@ dereference ref = do
   return $ dereference' objectSpace ref
 
 updateGlobalObjects f context =
-  context { globalObjects = f $ globalObjects context
-          }
+  context { globalObjects = f $ globalObjects context }
 
 updateLocalVariables f context =
-  context { scopes = f $ scopes context
-          }
+  context { scopes = f $ scopes context }
 
 incrementRef (Reference n) = Reference $ n + 1
 

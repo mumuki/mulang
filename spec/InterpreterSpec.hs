@@ -8,7 +8,7 @@ import qualified Data.Map.Strict as Map
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Python
 
-import           Data.Text (Text, unpack)
+import           Data.Text (unpack)
 import           NeatInterpolation (text)
 
 lastRef result = (\(ref, ctx) -> (Map.! ref) . globalObjects $ ctx) <$> result
