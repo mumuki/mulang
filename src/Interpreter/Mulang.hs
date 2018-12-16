@@ -3,7 +3,7 @@
 module Interpreter.Mulang where
 
 import           Data.Map.Strict (Map)
-import           Data.Maybe (fromMaybe)
+import           Data.Maybe (fromMaybe, fromJust)
 import           Data.List (find)
 import qualified Data.Map.Strict as Map
 import           Control.Monad (forM)
@@ -359,7 +359,7 @@ incrementRef (Reference n) = Reference $ n + 1
 
 createReference :: Value -> Executable Reference
 createReference value = do
-  nextReferenceId :: Reference <- gets (fromMaybe (Reference 10) . fmap incrementRef . getMaxKey . globalObjects)
+  nextReferenceId :: Reference <- gets (fromJust . fmap incrementRef . getMaxKey . globalObjects)
   modify (updateGlobalObjects $ Map.insert nextReferenceId value)
   return nextReferenceId
 
