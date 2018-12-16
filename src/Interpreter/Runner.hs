@@ -1,14 +1,9 @@
 module Interpreter.Runner where
 
-import           Data.Map.Strict (Map)
-import           Data.Maybe (fromMaybe)
-import           Data.List (find)
-import qualified Data.Map.Strict as Map
 import           Control.Monad (forM)
 import           Control.Monad.State.Class
-import           Control.Monad.Loops
 import           Control.Monad.State.Strict
-import           Control.Monad.Cont
+import           Control.Monad.Cont (callCC)
 import           Data.Maybe (fromMaybe, fromJust)
 import           Data.List (intercalate)
 
