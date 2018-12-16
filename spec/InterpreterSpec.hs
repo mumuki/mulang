@@ -3,7 +3,7 @@
 module InterpreterSpec (spec) where
 
 import           Test.Hspec
-import           Interpreter.Mulang
+import           Language.Mulang.Interpreter
 import qualified Data.Map.Strict as Map
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Python

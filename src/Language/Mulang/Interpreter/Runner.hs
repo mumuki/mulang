@@ -1,4 +1,4 @@
-module Interpreter.Runner where
+module Language.Mulang.Interpreter.Runner where
 
 import           Control.Monad (forM)
 import           Control.Monad.State.Class
@@ -9,8 +9,8 @@ import           Data.List (intercalate)
 
 import qualified Language.Mulang as Mu
 import Language.Mulang.Parsers (MaybeParser)
-import Interpreter.Mulang
-import Interpreter.Mulang.Tests
+import Language.Mulang.Interpreter
+import Language.Mulang.Interpreter.Tests
 
 data TestResult = Success
                 | Failure String

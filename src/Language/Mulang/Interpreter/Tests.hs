@@ -1,4 +1,4 @@
-module Interpreter.Mulang.Tests
+module Language.Mulang.Interpreter.Tests
   ( getTests
   , TestsMonad
   , MuTest(..)

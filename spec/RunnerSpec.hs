@@ -5,10 +5,10 @@ module RunnerSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Python
-import           Interpreter.Runner
-import           Interpreter.Mulang.Tests
+import           Language.Mulang.Interpreter.Runner
+import           Language.Mulang.Interpreter.Tests
 
-import           Data.Text (Text, unpack)
+import           Data.Text (unpack)
 import           NeatInterpolation (text)
 
 parse language = language . unpack

@@ -1,6 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Interpreter.Mulang where
+module Language.Mulang.Interpreter where
 
 import           Data.Map.Strict (Map)
 import           Data.Maybe (fromMaybe, fromJust)

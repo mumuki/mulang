@@ -67,9 +67,9 @@ library
     Language.Mulang.Analyzer.SignatureStyleCompiler
     Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.SmellsAnalyzer
-    Interpreter.Mulang
-    Interpreter.Runner
-    Interpreter.Mulang.Tests
+    Language.Mulang.Interpreter
+    Language.Mulang.Interpreter.Runner
+    Language.Mulang.Interpreter.Tests
 
   build-depends:
     base                      <= 5,
