@@ -8,19 +8,18 @@ import           Data.Maybe (fromMaybe, fromJust)
 import           Data.List (intercalate)
 
 import qualified Language.Mulang as Mu
-import Language.Mulang.Parsers.JavaScript (parseJavaScript)
+import Language.Mulang.Parsers (MaybeParser)
 import Interpreter.Mulang
 import Interpreter.Mulang.Tests
-
 
 data TestResult = Success
                 | Failure String
                 deriving (Show, Eq)
 
-runTestsForDir :: String -> String -> IO ()
-runTestsForDir solutionPath testPath = do
-  solution <- fromJust <$> parseJavaScript <$> readFile solutionPath
-  tests <- getTests <$> fromJust <$> parseJavaScript <$> readFile testPath
+runTestsForDir :: String -> String -> MaybeParser -> IO ()
+runTestsForDir solutionPath testPath parse = do
+  solution <- fromJust <$> parse <$> readFile solutionPath
+  tests <- getTests <$> fromJust <$> parse <$> readFile testPath
   results <- runTests solution tests
   forM_ results $ \result -> case result of
     (desc, Success) -> do
