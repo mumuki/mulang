@@ -480,15 +480,16 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 
 Mulang is an universal tool which can work with many different programming languages. it natively supports:
 
-  * JS (ES5)
-  * Java
   * Haskell
+  * Java
+  * JavaScript (ES5)
+  * Python
   * Prolog
 
 In addition, through external tools, it offers support for the following languages:
 
   * Ruby, using [mulang-ruby](https://github.com/mumuki/mulang-ruby)
-  * Python, using [mulang-python](https://github.com/mumuki/mulang-python)
+  * PHP, using [mulang-php](https://github.com/mumuki/mulang-php)
   * Gobstones, using [gs-weblang-cli](https://github.com/gobstones/gs-weblang-cli)
 
 So in order to use it with a particular language, you have to:
