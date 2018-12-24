@@ -1,0 +1,2254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <link rel="canonical" href="https://mumuki.io/userguide/">
+    <link rel="shortcut icon" href="../img/favicon.ico">
+
+    
+    <title>User Guide - Mulang</title>
+    
+
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/3.003/css/hack.min.css">
+    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../css/base.min.css" rel="stylesheet">
+    <link href="../css/cinder.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.min.css">
+    <link href="../css/mumuki-styles.css" rel="stylesheet">
+    <link href="../css/jquery.json-viewer.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+        <![endif]-->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.28/webfont.js"></script>
+    <script>
+    WebFont.load({
+        google: {
+            families: ['Open Sans', 'PT Sans']
+        }
+    });
+    </script>
+
+    
+
+     
+</head>
+
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+
+            <a class="navbar-brand" href="..">Mulang</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../try/">Try it!</a>
+                    </li>
+                
+                
+                
+                    <li class="active">
+                        <a href="./">User Guide</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../build/">Build</a>
+                    </li>
+                
+                
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../try/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../build/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/mumuki/mulang/edit/master/docs/userguide.md"><i class="fab fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#combinators-crash-course">Combinators Crash course</a></li>
+            <li class="second-level"><a href="#inspections">Inspections</a></li>
+                
+            <li class="second-level"><a href="#inspection-combinators">Inspection Combinators</a></li>
+                
+            <li class="second-level"><a href="#identifier-predicates">Identifier predicates</a></li>
+                
+            <li class="second-level"><a href="#detections">Detections</a></li>
+                
+        <li class="first-level "><a href="#supported-inspections">Supported inspections</a></li>
+        <li class="first-level "><a href="#supported-languages">Supported languages</a></li>
+        <li class="first-level "><a href="#command-line-tool">Command Line Tool</a></li>
+            <li class="second-level"><a href="#the-expectations-dsl">The expectations DSL</a></li>
+                
+            <li class="second-level"><a href="#examples">Examples</a></li>
+                
+                <li class="third-level"><a href="#with-intransitive-expectations">With intransitive expectations</a></li>
+                <li class="third-level"><a href="#with-unscoped-expectations">With unscoped expectations</a></li>
+                <li class="third-level"><a href="#with-signature-analysis">With signature analysis</a></li>
+                <li class="third-level"><a href="#with-broken-input">With broken input</a></li>
+                <li class="third-level"><a href="#with-ast-as-input">With AST as input</a></li>
+                <li class="third-level"><a href="#with-smell-analysis-by-inclusion">With Smell Analysis, by inclusion</a></li>
+                <li class="third-level"><a href="#with-smell-analysis-by-exclusion">With Smell Analysis, by exclusion</a></li>
+                <li class="third-level"><a href="#with-expressiveness-smells">With expressiveness smells</a></li>
+                <li class="third-level"><a href="#with-intermediate-language-generation">With Intermediate Language Generation</a></li>
+        <li class="first-level "><a href="#mulang-ast-spec">Mulang AST spec</a></li>
+            <li class="second-level"><a href="#expressions">Expressions</a></li>
+                
+                <li class="third-level"><a href="#record">Record</a></li>
+                <li class="third-level"><a href="#typealias-typesignature-and-typecast">TypeAlias, TypeSignature and TypeCast</a></li>
+                <li class="third-level"><a href="#entrypoint">EntryPoint</a></li>
+                <li class="third-level"><a href="#function">Function</a></li>
+                <li class="third-level"><a href="#procedure">Procedure</a></li>
+                <li class="third-level"><a href="#method">Method</a></li>
+                <li class="third-level"><a href="#equalmethod-and-hashmethod">EqualMethod and HashMethod</a></li>
+                <li class="third-level"><a href="#variable">Variable</a></li>
+                <li class="third-level"><a href="#assignment">Assignment</a></li>
+                <li class="third-level"><a href="#attribute">Attribute</a></li>
+                <li class="third-level"><a href="#object">Object</a></li>
+                <li class="third-level"><a href="#class">Class</a></li>
+                <li class="third-level"><a href="#enumeration">Enumeration</a></li>
+                <li class="third-level"><a href="#interface">Interface</a></li>
+                <li class="third-level"><a href="#rule">Rule</a></li>
+                <li class="third-level"><a href="#fact">Fact</a></li>
+                <li class="third-level"><a href="#exist">Exist</a></li>
+                <li class="third-level"><a href="#not">Not</a></li>
+                <li class="third-level"><a href="#findall">Findall</a></li>
+                <li class="third-level"><a href="#forall">Forall</a></li>
+                <li class="third-level"><a href="#reference">Reference</a></li>
+                <li class="third-level"><a href="#application">Application</a></li>
+                <li class="third-level"><a href="#send">Send</a></li>
+                <li class="third-level"><a href="#new">New</a></li>
+                <li class="third-level"><a href="#implement">Implement</a></li>
+                <li class="third-level"><a href="#include">Include</a></li>
+                <li class="third-level"><a href="#if">If</a></li>
+                <li class="third-level"><a href="#lambda">Lambda</a></li>
+                <li class="third-level"><a href="#return">Return</a></li>
+                <li class="third-level"><a href="#while">While</a></li>
+                <li class="third-level"><a href="#repeat">Repeat</a></li>
+                <li class="third-level"><a href="#match">Match</a></li>
+                <li class="third-level"><a href="#switch">Switch</a></li>
+                <li class="third-level"><a href="#try">Try</a></li>
+                <li class="third-level"><a href="#raise">Raise</a></li>
+                <li class="third-level"><a href="#print">Print</a></li>
+                <li class="third-level"><a href="#for">For</a></li>
+                <li class="third-level"><a href="#forloop">ForLoop</a></li>
+                <li class="third-level"><a href="#sequence">Sequence</a></li>
+                <li class="third-level"><a href="#other">Other</a></li>
+                <li class="third-level"><a href="#equal-and-notequal">Equal and NotEqual</a></li>
+                <li class="third-level"><a href="#self">Self</a></li>
+                <li class="third-level"><a href="#none">None</a></li>
+                <li class="third-level"><a href="#munil">MuNil</a></li>
+                <li class="third-level"><a href="#muobject">MuObject</a></li>
+                <li class="third-level"><a href="#munumber-mubool-mustring-musymbol-and-muchar">MuNumber, MuBool, MuString, MuSymbol and MuChar</a></li>
+                <li class="third-level"><a href="#mutuple-and-mulist">MuTuple and MuList</a></li>
+                <li class="third-level"><a href="#testgroup-test-and-assert">TestGroup, Test and Assert</a></li>
+            <li class="second-level"><a href="#assertion">Assertion</a></li>
+                
+                <li class="third-level"><a href="#syntax_47">Syntax</a></li>
+                <li class="third-level"><a href="#javascript-examples">Javascript Examples</a></li>
+            <li class="second-level"><a href="#patterns">Patterns</a></li>
+                
+                <li class="third-level"><a href="#variablepattern">VariablePattern</a></li>
+                <li class="third-level"><a href="#literalpattern">LiteralPattern</a></li>
+                <li class="third-level"><a href="#infixapplicationpattern">InfixApplicationPattern</a></li>
+                <li class="third-level"><a href="#applicationpattern">ApplicationPattern</a></li>
+                <li class="third-level"><a href="#tuplepattern">TuplePattern</a></li>
+                <li class="third-level"><a href="#listpattern">ListPattern</a></li>
+                <li class="third-level"><a href="#functorpattern">FunctorPattern</a></li>
+                <li class="third-level"><a href="#aspattern">AsPattern</a></li>
+                <li class="third-level"><a href="#typepattern">TypePattern</a></li>
+                <li class="third-level"><a href="#wildcardpattern">WildcardPattern</a></li>
+                <li class="third-level"><a href="#unionpattern">UnionPattern</a></li>
+                <li class="third-level"><a href="#otherpattern">OtherPattern</a></li>
+            <li class="second-level"><a href="#types">Types</a></li>
+                
+                <li class="third-level"><a href="#typealias">TypeAlias</a></li>
+                <li class="third-level"><a href="#typesignature">TypeSignature</a></li>
+                <li class="third-level"><a href="#typecast">TypeCast</a></li>
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<h1 id="combinators-crash-course">Combinators Crash course</h1>
+<p>Better than explaining what Mulang is, let's see what can do it for you.</p>
+<h2 id="inspections">Inspections</h2>
+<p>Let's suppose we have the following JS code...</p>
+<pre><code class="javascript">var aPlace = buenosAires;
+var aBird = {position: aPlace, weight: 20};
+</code></pre>
+
+<p>...and we want to recognize some code patterns on it. We will first load the expression into Mulang:</p>
+<pre><code>$ ghci
+&gt; :m Language.Mulang.All
+&gt; let e = js &quot;var aPlace = buenosAires; var aBird = {position: aPlace, weight: 20};&quot;
+</code></pre>
+
+<p>Now the magic begins. We want to know if the code expression <em>uses</em> - that is, contains any reference to - a given <em>identifier</em>. Such identifier could be a variable, function, or anything that has a name:</p>
+<pre><code class="haskell">&gt; uses (named &quot;buenosAires&quot;) e
+True -- because of the reference in `...aPlace = buenosAires...`
+&gt; uses (named &quot;rosario&quot;) e
+False -- no reference to the identifier `rosario` is found on the code
+</code></pre>
+
+<p><code>uses (named "buenosAires")</code> is our first <em>inspection</em>: a function that takes a Mulang AST and answers a boolan question about it. That <em>seems</em> easy, but just in case you are wondering: no, Mulang doesn't perform a <code>string.contains</code> or something like that :stuck_out_tongue: :</p>
+<pre><code class="haskell">&gt; uses (named &quot;buenos&quot;) e
+False -- no reference to the identifier `buenos` is found on the code
+</code></pre>
+
+<h2 id="inspection-combinators">Inspection Combinators</h2>
+<p>So let's ask something more interesting - does <code>aPlace</code> <em>use</em> the identifier <code>buenosAires</code>?</p>
+<pre><code class="haskell">&gt; scoped (uses (named &quot;buenosAires&quot;)) &quot;aPlace&quot;  e
+True -- again, because of the the reference in `...aPlace = buenosAires...`
+&gt; scoped (uses (named &quot;buenosAires&quot;)) &quot;aBird&quot;  e
+False -- because `...aBird = {position: aPlace, weight: 20}...` does not reference `buenosAires` directly...
+</code></pre>
+
+<p>Here we have used the our first <em>inspection combinator</em>, a function that takes an inspection - <code>uses (named "buenosAires")</code> - and returns a new one that is more powerful. In this case, <code>scoped</code> is capable of restricting the analysis to the given <em>context</em> - the <code>aPlace</code> identifier.</p>
+<p>Let's tray again: does <code>"aPlace"</code> it <em>use</em> <code>rosario</code>?</p>
+<pre><code class="haskell">&gt; scoped (uses (named &quot;rosario&quot;)) &quot;aPlace&quot;  e
+False
+</code></pre>
+
+<p>What about the object <code>aBird</code>? Does it use <code>aPlace</code> or <code>rosario</code>?</p>
+<pre><code class="haskell">&gt; scoped (uses (named &quot;aPlace&quot;)) &quot;aBird&quot;  e
+True
+&gt; scoped (uses (named &quot;rosario&quot;)) &quot;aBird&quot;  e
+False
+</code></pre>
+
+<p>Oh, wait! Let go back to <code>scoped (uses (named "buenosAires")) "aBird"  e</code>.  We know, it is true that it does not use <strong>exactly</strong> that variable, <code>aPlace</code> does use <code>buenosAires</code>! Wouldn't it be sweet to be transitive?</p>
+<pre><code class="haskell">&gt; transitive (uses (named &quot;buenosAires&quot;)) &quot;aBird&quot;  e
+True
+</code></pre>
+
+<p>Here we can see another <em>inspections combinator</em>: <code>transitive</code>, which inspects the given context and all the contexts that are refered from it.</p>
+<p><em>Contexts</em> can be nested, too: for example, if you want to know whether <code>aBird.position</code> <em>uses</em> <code>aPlace</code> - ignoring that <code>weight</code> attribute:</p>
+<pre><code class="haskell">&gt; scopedList (uses (named &quot;aPlace&quot;)) [&quot;aBird&quot;, &quot;position&quot;]  e
+True
+&gt; scopedList (uses (named &quot;aPlace&quot;)) [&quot;aBird&quot;, &quot;weight&quot;]  e
+False
+</code></pre>
+
+<p>Nice, we know. But not very awesome, it only can tell you if you are using a <em>identifier</em>, right? Eeer. Good news, it can tell you much much much more things. See the <a href="#supported-inspections">supported inspections list</a>.</p>
+<h2 id="identifier-predicates">Identifier predicates</h2>
+<p>In previous examples, we have always combined the <code>uses</code> inspection with the <code>named</code> function, but what does <code>named</code> mean?</p>
+<p>Many inspections support an <em>identifier predicate</em>, that is, a matcher for identifier. It can be one of the following:</p>
+<ul>
+<li><code>anyone</code>: true for all identifiers</li>
+<li><code>except</code>: true for any identifier different to the given one</li>
+<li><code>like</code>: true for any identifier that contains the given one</li>
+<li><code>named</code>: true for only the given identifier</li>
+<li><code>andAlso</code>: identifier predicates combiner. True when both predicates are True</li>
+<li><code>anyOf</code>: identifier predicates combiner. True when any of the predicates are True</li>
+</ul>
+<p>For example, does the former piece of code declare any attribute?</p>
+<pre><code class="haskell">&gt; declaresAttribute anyone e
+True
+</code></pre>
+
+<p>Does it declare an attribute like <code>eight</code>?</p>
+<pre><code class="haskell">&gt; declaresAttribute (like &quot;eight&quot;) e
+True
+</code></pre>
+
+<p>And does <code>aBird</code> use any if within its definition?</p>
+<pre><code class="haskell">&gt; scoped usesIf &quot;aBird&quot; e
+False
+</code></pre>
+
+<h2 id="detections">Detections</h2>
+<p>Let's suppose we want to knoe whether something returns null in the following code:</p>
+<pre><code class="haskell">let e = js &quot;var bar = {baz: function(){ return g }, foo: function(){ return null }}&quot;
+</code></pre>
+
+<p>We could manually check if it is the <code>foo</code> method in <code>bar</code> or the <code>baz</code> method in <code>bar</code>:</p>
+<pre><code class="haskell">&gt; scopedList returnsNil [&quot;bar&quot;, &quot;foo&quot;] e
+True
+&gt; scopedList returnsNil [&quot;bar&quot;, &quot;baz&quot;] e
+False
+</code></pre>
+
+<p>But instead of asking one by one, we could use <code>detect</code> :</p>
+<pre><code class="haskell">&gt; detect returnsNil e
+[&quot;bar&quot;,&quot;foo&quot;]
+-- This means that there are null returns within  `bar` and also within `foo`.
+</code></pre>
+
+<p><code>detect</code> converts an <em>inspection</em> into a <em>detection</em>: a function that tells which identifier match a given criteria.</p>
+<h1 id="supported-inspections">Supported inspections</h1>
+<p>The power of Mulang is grounded on more than 70 different kind of inspections:</p>
+<table>
+<thead>
+<tr>
+<th>Inspection</th>
+<th>Paradigm</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>assigns</code></td>
+<td>any</td>
+<td>the given variable or attribute assigned?</td>
+</tr>
+<tr>
+<td><code>calls</code></td>
+<td>any</td>
+<td>is the given method, function or procedure called?</td>
+</tr>
+<tr>
+<td><code>declares</code></td>
+<td>any</td>
+<td>is the given element declared?</td>
+</tr>
+<tr>
+<td><code>declaresAttribute</code></td>
+<td>object oriented</td>
+<td>is a given attribute declared?</td>
+</tr>
+<tr>
+<td><code>declaresClass</code></td>
+<td>object oriented</td>
+<td>is a given class declared?</td>
+</tr>
+<tr>
+<td><code>declaresComputation</code></td>
+<td>any</td>
+<td>that is, does the given computation  - method, predicate, function, etc - exist?</td>
+</tr>
+<tr>
+<td><code>declaresComputationWithArity</code></td>
+<td>any</td>
+<td>that is, does the given computation have the exact given arity?</td>
+</tr>
+<tr>
+<td><code>declaresEntryPoint</code></td>
+<td>any</td>
+<td>is there a program entry point, like a <code>main</code> procedure?</td>
+</tr>
+<tr>
+<td><code>declaresEnumeration</code></td>
+<td>imperative</td>
+<td>is a given enumeration declared?</td>
+</tr>
+<tr>
+<td><code>declaresFact</code></td>
+<td>logic</td>
+<td>is a given logic fact declared?</td>
+</tr>
+<tr>
+<td><code>declaresFunction</code></td>
+<td>functional/imperative</td>
+<td>is a given function declared?</td>
+</tr>
+<tr>
+<td><code>declaresInterface</code></td>
+<td>object oriented</td>
+<td>is a given interface declared?</td>
+</tr>
+<tr>
+<td><code>declaresMethod</code></td>
+<td>object oriented</td>
+<td>is a given method declared?</td>
+</tr>
+<tr>
+<td><code>declaresObject</code></td>
+<td>object oriented</td>
+<td>is a given named object declared?</td>
+</tr>
+<tr>
+<td><code>declaresPredicate</code></td>
+<td>logic</td>
+<td>is a given rule o fact declared?</td>
+</tr>
+<tr>
+<td><code>declaresProcedure</code></td>
+<td>imperative</td>
+<td>is a given procedure declared?</td>
+</tr>
+<tr>
+<td><code>declaresRecursively</code></td>
+<td>any</td>
+<td>is a given computation declared using recusion?</td>
+</tr>
+<tr>
+<td><code>declaresRule</code></td>
+<td>logic</td>
+<td>is a given logic rule declared?</td>
+</tr>
+<tr>
+<td><code>declaresSuperclass</code></td>
+<td>object oriented</td>
+<td>is a given class declared as superclass?</td>
+</tr>
+<tr>
+<td><code>declaresTypeAlias</code></td>
+<td>any</td>
+<td>is a given type synonym declared?</td>
+</tr>
+<tr>
+<td><code>declaresTypeSignature</code></td>
+<td>any</td>
+<td>is a given computation type signature declared?</td>
+</tr>
+<tr>
+<td><code>declaresVariable</code></td>
+<td>any</td>
+<td>is a given local o global variable declared?</td>
+</tr>
+<tr>
+<td><code>discardsExceptions</code></td>
+<td>any</td>
+<td>are exceptions discarded within an empty catch block?</td>
+</tr>
+<tr>
+<td><code>doesConsolePrint</code></td>
+<td>any</td>
+<td>is there any console-print-statement like <code>System.out.println</code>, <code>puts</code> or <code>console.log</code>?</td>
+</tr>
+<tr>
+<td><code>doesNullTest</code></td>
+<td>object oriented</td>
+<td>is there a test agains a null value, like <code>if x == nil then puts 'is nil'</code></td>
+</tr>
+<tr>
+<td><code>doesTypeTest</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasAssignmentReturn</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasCodeDuplication</code></td>
+<td>any</td>
+<td>has the given code simple literal code duplication?</td>
+</tr>
+<tr>
+<td><code>hasEmptyIfBranches</code></td>
+<td>any</td>
+<td>has the given code an empty if branch?</td>
+</tr>
+<tr>
+<td><code>hasLongParameterList</code></td>
+<td>any</td>
+<td>does a given method/function/predicate take too many parameters?</td>
+</tr>
+<tr>
+<td><code>hasMisspelledIdentifiers</code></td>
+<td>any</td>
+<td>an identifier is not a domain language dictionary's word and not part of its jargon</td>
+</tr>
+<tr>
+<td><code>hasRedundantBooleanComparison</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasRedundantGuards</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasRedundantIf</code></td>
+<td>any</td>
+<td>can a combination of <code>if</code>s, <code>assignment</code>s and <code>return</code>s be replaced by a boolean expression?</td>
+</tr>
+<tr>
+<td><code>hasRedundantLambda</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasRedundantLocalVariableReturn</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasRedundantParameter</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasRedundantReduction</code></td>
+<td>logic</td>
+<td>is a is-operator used to unify individuals that don't require a reduction, like <code>X is 4</code></td>
+</tr>
+<tr>
+<td><code>hasTooManyMethods</code></td>
+<td>object oriented</td>
+<td>does a given class/object/interface have too many methods?</td>
+</tr>
+<tr>
+<td><code>hasTooShortIdentifiers</code></td>
+<td>any</td>
+<td>whether an identifier is too short and not part of domain language's jargon</td>
+</tr>
+<tr>
+<td><code>hasUnreachableCode</code></td>
+<td>any</td>
+<td>is there unreachable code?</td>
+</tr>
+<tr>
+<td><code>hasWrongCaseIdentifiers</code></td>
+<td>any</td>
+<td>whether an identifier does not match the domain language's case style</td>
+</tr>
+<tr>
+<td><code>implements</code></td>
+<td>object oriented</td>
+<td>is the given interface implemented?</td>
+</tr>
+<tr>
+<td><code>includes</code></td>
+<td>object oriented</td>
+<td>is a given mixins included?</td>
+</tr>
+<tr>
+<td><code>inherits</code></td>
+<td>object oriented</td>
+<td>is a given class declared as superclass? - alias of <code>declaresSuperclass</code></td>
+</tr>
+<tr>
+<td><code>instantiates</code></td>
+<td>object oriented</td>
+<td>is the given class instantiated?</td>
+</tr>
+<tr>
+<td><code>isLongCode</code></td>
+<td>any</td>
+<td>has the code long sequences of statements?</td>
+</tr>
+<tr>
+<td><code>overridesEqualsOrHashButNotBoth</code></td>
+<td>object oriented</td>
+<td>does a given class override equals but not hash? or hash but not equals?</td>
+</tr>
+<tr>
+<td><code>raises</code></td>
+<td>any</td>
+<td>is the given <em>exception type</em> raised?</td>
+</tr>
+<tr>
+<td><code>rescues</code></td>
+<td>any</td>
+<td>is the given <em>exception type</em> rescued?</td>
+</tr>
+<tr>
+<td><code>returnsNill</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>typesAs</code></td>
+<td>any</td>
+<td>is the given type used to type a variable?</td>
+</tr>
+<tr>
+<td><code>typesParameterAs</code></td>
+<td>any</td>
+<td>is a parameter typed as a given type?</td>
+</tr>
+<tr>
+<td><code>typesReturnAs</code></td>
+<td>any</td>
+<td>is the given type used to type a return?</td>
+</tr>
+<tr>
+<td><code>uses</code></td>
+<td>any</td>
+<td>is there any reference to the given element?</td>
+</tr>
+<tr>
+<td><code>usesAnonymousVariable</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesComposition</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesConditional</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesCut</code></td>
+<td>logic</td>
+<td>is the logic <code>!</code> consult used?</td>
+</tr>
+<tr>
+<td><code>usesDyamicPolymorphism</code></td>
+<td>object oriented</td>
+<td>are there two or more methods definitions for some sent selector?</td>
+</tr>
+<tr>
+<td><code>usesDynamicMethodOverload</code></td>
+<td>object oriented</td>
+<td>is there a class that defined two methods with different arity but with the same name?</td>
+</tr>
+<tr>
+<td><code>usesExceptionHandling</code></td>
+<td>any</td>
+<td>is any <em>exception</em> handlded?</td>
+</tr>
+<tr>
+<td><code>usesExceptions</code></td>
+<td>any</td>
+<td>is any <em>exception</em> raised?</td>
+</tr>
+<tr>
+<td><code>usesFail</code></td>
+<td>logic</td>
+<td>is the logic <code>fail</code> consult used?</td>
+</tr>
+<tr>
+<td><code>usesFindall</code></td>
+<td>logic</td>
+<td>is the logic <code>findall</code> consult used?</td>
+</tr>
+<tr>
+<td><code>usesFor</code></td>
+<td>any</td>
+<td>is any kind of comprehension or indexed repetition used?</td>
+</tr>
+<tr>
+<td><code>usesForall</code></td>
+<td>logic</td>
+<td>is the logic <code>forall</code> consult used?</td>
+</tr>
+<tr>
+<td><code>usesForComprehension</code></td>
+<td>functional</td>
+<td>is the functional for/do/list comprehension used?</td>
+</tr>
+<tr>
+<td><code>usesForEach</code></td>
+<td>procedural</td>
+<td>is the procedural indexed repetition used?</td>
+</tr>
+<tr>
+<td><code>usesForLoop</code></td>
+<td>procedural</td>
+<td>is a c-style for loop used?</td>
+</tr>
+<tr>
+<td><code>usesGuards</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesIf</code></td>
+<td>any</td>
+<td>is an <code>if</code> control structure used?</td>
+</tr>
+<tr>
+<td><code>usesInheritance</code></td>
+<td>object oriented</td>
+<td>is any superclass explicitly declared?</td>
+</tr>
+<tr>
+<td><code>usesLambda</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesLoop</code></td>
+<td>procedural</td>
+<td>are any of: repeat / for loop / foreach / while used?</td>
+</tr>
+<tr>
+<td><code>usesMixins</code></td>
+<td>object oriented</td>
+<td>is any mixins explicitly included?</td>
+</tr>
+<tr>
+<td><code>usesNot</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesObjectComposition</code></td>
+<td>object oriented</td>
+<td>is there a class that declares an attributes and sends a message to it?</td>
+</tr>
+<tr>
+<td><code>usesPatternMatching</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesRepeat</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesStaticMethodOverload</code></td>
+<td>object oriented</td>
+<td>is there a class that defined two method signatures but with the same name?</td>
+</tr>
+<tr>
+<td><code>usesStaticPolymorphism</code></td>
+<td>object oriented</td>
+<td>is there an interface with at least a method signature that is implemented by two or more classes and used in the code?</td>
+</tr>
+<tr>
+<td><code>usesSwitch</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesTemplateMethod</code></td>
+<td>object oriented</td>
+<td>is there a class that sends a message whose corresonding method is not declared?</td>
+</tr>
+<tr>
+<td><code>usesType</code></td>
+<td>any</td>
+<td>is the given typed used in a signature?</td>
+</tr>
+<tr>
+<td><code>usesUnificationOperator</code></td>
+<td>logic</td>
+<td>is the logic unification operator <code>=</code> used?</td>
+</tr>
+<tr>
+<td><code>usesWhile</code></td>
+<td>imperative</td>
+<td>is a <code>while</code> control structure used?</td>
+</tr>
+<tr>
+<td><code>usesYield</code></td>
+<td>functional</td>
+<td>is an expression yielded within a comprehension?</td>
+</tr>
+</tbody>
+</table>
+<h1 id="supported-languages">Supported languages</h1>
+<p>Mulang is an universal tool which can work with many different programming languages. it natively supports:</p>
+<ul>
+<li>JS (ES5)</li>
+<li>Java</li>
+<li>Haskell</li>
+<li>Prolog</li>
+</ul>
+<p>In addition, through external tools, it offers support for the following languages:</p>
+<ul>
+<li>Ruby, using <a href="https://github.com/mumuki/mulang-ruby">mulang-ruby</a></li>
+<li>Python, using <a href="https://github.com/mumuki/mulang-python">mulang-python</a></li>
+<li>Gobstones, using <a href="https://github.com/gobstones/gs-weblang-cli">gs-weblang-cli</a></li>
+</ul>
+<p>So in order to use it with a particular language, you have to:</p>
+<ul>
+<li>either add explicit support in this repo, or</li>
+<li>translate your language into one of the natively supported ones, or</li>
+<li>translate your language to the Mulang JSON AST</li>
+</ul>
+<h1 id="command-line-tool">Command Line Tool</h1>
+<p>You can also use Mulang from the Command Line, without having to interact with Haskell code. This tool allows to perform most common analysis out of the box by using a JSON spec. It supports four different kinds of analysis:</p>
+<ol>
+<li><strong>Expectation analysis</strong>: you can pass <em>inspections</em> that will be tested against the provied program. Expectations answer questions like: <em>does the function X call the function Y?</em> or <em>does the program use if's?</em>.</li>
+<li><strong>Smell analysis</strong>: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched.</li>
+<li><strong>Intermediate Language analysis</strong>: you can ask the tool to generate the Mulang AST for a given source code.</li>
+<li><strong>Signature analysis</strong>: report the signatures of the computations present in source code.</li>
+</ol>
+<h2 id="the-expectations-dsl">The expectations DSL</h2>
+<p>In order to pass expectations to the Command Line Tool, you must use a simple DSL that builds the inspections for you.</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>DSL Sample</th>
+<th>Haskell Combinators Sample</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basic</td>
+<td><code>* UsesIf</code></td>
+<td><code>usesIf</code></td>
+</tr>
+<tr>
+<td>Negated</td>
+<td><code>* Not:UsesWhile</code></td>
+<td><code>(negative usesWhile)</code></td>
+</tr>
+<tr>
+<td>Predicated</td>
+<td><code>* DeclaresClass:Foo</code></td>
+<td><code>(declaresClass (named "Foo"))</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>* DeclaresClass:=Foo</code></td>
+<td><code>(declaresClass (named "Foo"))</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>* DeclaresClass:~Foo</code></td>
+<td><code>(declaresClass (like "Foo"))</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>* DeclaresClass:^Foo</code></td>
+<td><code>(declaresClass (except "Foo"))</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>* DeclaresClass:[Foo\|Bar]</code></td>
+<td><code>(declaresClass (anyOf ["Foo", "Bar"]))</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>* DeclaresClass:*</code></td>
+<td><code>(declaresClass anyone)</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>* DeclaresClass</code></td>
+<td><code>(declaresClass anyone)</code></td>
+</tr>
+<tr>
+<td>Transitive</td>
+<td><code>foo UsesLambda</code></td>
+<td><code>(transitive usesLambda "foo")</code></td>
+</tr>
+<tr>
+<td>Scoped</td>
+<td><code>Intransitive:foo UsesIf</code></td>
+<td><code>(scoped usesIf "foo")</code></td>
+</tr>
+<tr>
+<td>Scoped List</td>
+<td><code>foo.bar UsesIf</code></td>
+<td><code>(scopedList usesIf ["foo", "bar"])</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="examples">Examples</h2>
+<p>Let's see some usage samples:</p>
+<h3 id="with-intransitive-expectations">With intransitive expectations</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;Haskell&quot;,
+      &quot;content&quot; : &quot;x = 1&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;expectations&quot; : [
+         {
+            &quot;binding&quot; : &quot;:Intransitive:x&quot;,
+            &quot;inspection&quot; : &quot;Uses:*&quot;
+         }
+      ],
+      &quot;smellsSet&quot; : { &quot;tag&quot; : &quot;NoSmells&quot; }
+   }
+}
+' | json_pp
+{
+   &quot;expectationResults&quot; : [
+      {
+         &quot;expectation&quot; : {
+            &quot;binding&quot; : &quot;:Intransitive:x&quot;,
+            &quot;inspection&quot; : &quot;Uses:*&quot;
+         },
+         &quot;result&quot; : false
+      }
+   ],
+   &quot;smells&quot; : [],
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;signatures&quot; : []
+}
+</code></pre>
+
+<h3 id="with-unscoped-expectations">With unscoped expectations</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;Haskell&quot;,
+      &quot;content&quot; : &quot;x = 1&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;smellsSet&quot; : { &quot;tag&quot; : &quot;NoSmells&quot; },
+      &quot;expectations&quot; : [
+         {
+            &quot;binding&quot; : &quot;*&quot;,
+            &quot;inspection&quot; : &quot;Declares:x&quot;
+         }
+      ]
+   }
+}
+' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;smells&quot; : [],
+   &quot;expectationResults&quot; : [
+      {
+         &quot;result&quot; : true,
+         &quot;expectation&quot; : {
+            &quot;binding&quot; : &quot;*&quot;,
+            &quot;inspection&quot; : &quot;Declares:x&quot;
+         }
+      }
+   ],
+   &quot;signatures&quot; : []
+}
+</code></pre>
+
+<h3 id="with-signature-analysis">With signature analysis</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;JavaScript&quot;,
+      &quot;content&quot; : &quot;function foo(x, y) { return x + y; }&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;expectations&quot; : [],
+      &quot;smellsSet&quot; : { &quot;tag&quot; : &quot;NoSmells&quot; },
+      &quot;signatureAnalysisType&quot; : {
+        &quot;tag&quot; : &quot;StyledSignatures&quot;,
+        &quot;style&quot; : &quot;HaskellStyle&quot;
+      }
+   }
+}
+' | json_pp
+{
+   &quot;expectationResults&quot; : [],
+   &quot;smells&quot; : [],
+   &quot;signatures&quot; : [
+      &quot;-- foo x y&quot;
+   ],
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;
+}
+</code></pre>
+
+<h3 id="with-broken-input">With broken input</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;JavaScript&quot;,
+      &quot;content&quot; : &quot;function foo(x, y { return x + y; }&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;expectations&quot; : [],
+      &quot;smellsSet&quot; : { &quot;tag&quot; : &quot;NoSmells&quot; },
+      &quot;signatureAnalysisType&quot; : {
+        &quot;tag&quot; : &quot;StyledSignatures&quot;,
+        &quot;style&quot; : &quot;HaskellStyle&quot;
+      }
+   }
+}' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisFailed&quot;,
+   &quot;reason&quot; : &quot;Sample code parsing error&quot;
+}
+</code></pre>
+
+<h3 id="with-ast-as-input">With AST as input</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;MulangSample&quot;,
+      &quot;ast&quot; : {
+         &quot;tag&quot; : &quot;Sequence&quot;,
+         &quot;contents&quot; : [
+            {
+              &quot;tag&quot; : &quot;Variable&quot;,
+              &quot;contents&quot; : [
+                &quot;x&quot;,
+                { &quot;tag&quot; : &quot;MuNumber&quot;, &quot;contents&quot; : 1 }
+              ]
+            },
+            {
+              &quot;tag&quot; : &quot;Variable&quot;,
+              &quot;contents&quot; : [
+                &quot;y&quot;,
+                { &quot;tag&quot; : &quot;MuNumber&quot;, &quot;contents&quot; : 2 }
+              ]
+            }
+         ]
+      }
+   },
+   &quot;spec&quot; : {
+      &quot;smellsSet&quot; : {
+        &quot;tag&quot; : &quot;NoSmells&quot;
+      },
+      &quot;signatureAnalysisType&quot; : {
+         &quot;tag&quot; : &quot;StyledSignatures&quot;,
+         &quot;style&quot; : &quot;HaskellStyle&quot;
+      },
+      &quot;expectations&quot; : []
+   }
+}
+' | json_pp
+{
+   &quot;expectationResults&quot; : [],
+   &quot;smells&quot; : [],
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;signatures&quot; : [
+      &quot;-- x&quot;,
+      &quot;-- y&quot;
+   ]
+}
+</code></pre>
+
+<h3 id="with-smell-analysis-by-inclusion">With Smell Analysis, by inclusion</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;JavaScript&quot;,
+      &quot;content&quot; : &quot;function foo(x, y) { return null; }&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;expectations&quot; : [],
+      &quot;smellsSet&quot; : {
+        &quot;tag&quot; : &quot;NoSmells&quot;,
+        &quot;include&quot; : [
+          &quot;ReturnsNil&quot;,
+          &quot;DoesNullTest&quot;
+        ]
+      },
+      &quot;signatureAnalysisType&quot; : {
+        &quot;tag&quot; : &quot;StyledSignatures&quot;,
+        &quot;style&quot; : &quot;HaskellStyle&quot;
+      }
+   }
+}
+' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;expectationResults&quot; : [],
+   &quot;signatures&quot; : [
+      &quot;-- foo x y&quot;
+   ],
+   &quot;smells&quot; : [
+      {
+         &quot;binding&quot; : &quot;foo&quot;,
+         &quot;inspection&quot; : &quot;ReturnsNil&quot;
+      }
+   ]
+}
+</code></pre>
+
+<h3 id="with-smell-analysis-by-exclusion">With Smell Analysis, by exclusion</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;JavaScript&quot;,
+      &quot;content&quot; : &quot;function foo(x, y) { return null; }&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;expectations&quot; : [],
+      &quot;smellsSet&quot; : {
+        &quot;tag&quot; : &quot;AllSmells&quot;,
+        &quot;exclude&quot; : [
+          &quot;ReturnsNil&quot;
+        ]
+      },
+      &quot;signatureAnalysisType&quot; : {
+        &quot;tag&quot; : &quot;StyledSignatures&quot;,
+        &quot;style&quot; : &quot;HaskellStyle&quot;
+      }
+   }
+}
+' | json_pp
+{
+   &quot;smells&quot; : [],
+   &quot;signatures&quot; : [
+      &quot;-- foo x y&quot;
+   ],
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;expectationResults&quot; : []
+}
+</code></pre>
+
+<h3 id="with-expressiveness-smells">With expressiveness smells</h3>
+<p>Expressivnes smells are like other smells - they can be included or excluded using the <code>smellsSet</code> settings. However, their behaviour is also controlled
+by the <code>domainLanguage</code> setting, which you <em>can</em> configure:</p>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;Prolog&quot;,
+      &quot;content&quot; : &quot;son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer).&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;expectations&quot; : [],
+      &quot;smellsSet&quot; : { &quot;tag&quot; : &quot;AllSmells&quot; },
+      &quot;domainLanguage&quot; : {
+         &quot;caseStyle&quot; : &quot;SnakeCase&quot;,
+         &quot;minimumIdentifierSize&quot; : 4,
+         &quot;jargon&quot; : [&quot;id&quot;]
+      }
+   }
+}' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;signatures&quot; : [],
+   &quot;smells&quot; : [
+      {
+         &quot;inspection&quot; : &quot;HasTooShortIdentifiers&quot;,
+         &quot;binding&quot; : &quot;son&quot;
+      },
+      {
+         &quot;binding&quot; : &quot;parentOf&quot;,
+         &quot;inspection&quot; : &quot;HasWrongCaseIdentifiers&quot;
+      }
+   ],
+   &quot;expectationResults&quot; : []
+}
+</code></pre>
+
+<p>Also, if you want to use <code>HasMisspelledIdentifiers</code> smell, you <em>need</em> to specify a dictionary - with must be ordered, downcased and with unique words only:</p>
+<pre><code class="bash">$ mulang  '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;JavaScript&quot;,
+      &quot;content&quot; : &quot;function foo(x, y) { return null; }&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;expectations&quot; : [],
+      &quot;smellsSet&quot; : { &quot;tag&quot; : &quot;AllSmells&quot; },
+      &quot;domainLanguage&quot; : { &quot;dictionaryFilePath&quot; : &quot;/usr/share/dict/words&quot; }
+   }
+}' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;expectationResults&quot; : [],
+   &quot;signatures&quot; : [],
+   &quot;smells&quot; : [
+      {
+         &quot;inspection&quot; : &quot;ReturnsNil&quot;,
+         &quot;binding&quot; : &quot;foo&quot;
+      },
+      {
+         &quot;inspection&quot; : &quot;HasMisspelledIdentifiers&quot;,
+         &quot;binding&quot; : &quot;foo&quot;
+      }
+   ]
+}
+</code></pre>
+
+<h3 id="with-intermediate-language-generation">With Intermediate Language Generation</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;JavaScript&quot;,
+      &quot;content&quot; : &quot;function foo(x, y) { return null; }&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;expectations&quot; : [],
+      &quot;smellsSet&quot; : { &quot;tag&quot; : &quot;NoSmells&quot; },
+      &quot;includeIntermediateLanguage&quot; : true
+   }
+}
+' | json_pp
+{
+   &quot;expectationResults&quot; : [],
+   &quot;smells&quot; : [],
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;signatures&quot; : [],
+   &quot;intermediateLanguage&quot; : {
+      &quot;tag&quot; : &quot;Function&quot;,
+      &quot;contents&quot; : [
+         &quot;foo&quot;,
+         [
+            [
+               [
+                  {
+                     &quot;tag&quot; : &quot;VariablePattern&quot;,
+                     &quot;contents&quot; : &quot;x&quot;
+                  },
+                  {
+                     &quot;tag&quot; : &quot;VariablePattern&quot;,
+                     &quot;contents&quot; : &quot;y&quot;
+                  }
+               ],
+               {
+                  &quot;tag&quot; : &quot;UnguardedBody&quot;,
+                  &quot;contents&quot; : {
+                     &quot;contents&quot; : {
+                        &quot;tag&quot; : &quot;MuNil&quot;
+                     },
+                     &quot;tag&quot; : &quot;Return&quot;
+                  }
+               }
+            ]
+         ]
+      ]
+   }
+}
+
+</code></pre>
+
+<h1 id="mulang-ast-spec">Mulang AST spec</h1>
+<p>In this section, we will get into the technical details of the Mulang AST. It is built around 5 core elements:</p>
+<ul>
+<li><a href="#expressions">Expressions</a></li>
+<li><a href="#patterns">Patterns</a></li>
+<li><a href="#types">Types</a></li>
+<li>Equations</li>
+<li>Generators</li>
+</ul>
+<p>All the AST elements fall within any of these 5 categories.</p>
+<h2 id="expressions">Expressions</h2>
+<p>Expressions are the most important element kind, since contain most of the information of a Mulang program and are always the root element of it. In fact, this implementation does not contain an <code>AST</code> or <code>Program</code> datatype - it is instead types as <code>Expression</code>.</p>
+<p>Expression in Mulang model what you will normally spec in a language as a expression, that is something that holds a value and a type. For example, <code>4 + 5</code> and <code>[2, 3].toString()</code> are typical expresion.</p>
+<p>However, Mulang extends this concept to most kind of elements in a program, regadless they are have an actual value in the original language. For example, class declarations and while statements are modeled as expression, although in many languages they aren't.</p>
+<p>As a rule of thumb if something is or can be represented as an statement, declararion or expression, the it is modeled as <code>Expression</code> in Mulang AST.</p>
+<h3 id="record"><code>Record</code></h3>
+<blockquote>
+<p>A <code>Record</code> represents a record, data or struct declaration,
+as found in most procedural and functional languages, like the C-like <code>struct</code> declaration</p>
+</blockquote>
+<h4 id="syntax">Syntax</h4>
+<pre><code class="haskell">(Record Identifier)
+</code></pre>
+
+<h4 id="c-example">C Example</h4>
+<pre><code class="c">struct Point {
+  int x;
+  int y;
+}
+</code></pre>
+
+<pre><code class="haskell">(Record &quot;Point&quot;)
+</code></pre>
+
+<h4 id="caveats">Caveats</h4>
+<p>Currently, the <code>Record</code> expression does not hold information about the record contents.</p>
+<h3 id="typealias-typesignature-and-typecast"><code>TypeAlias</code>, <code>TypeSignature</code> and <code>TypeCast</code></h3>
+<p>Mulang AST support for type analysis is quite limited, and it is mostly focused on expressions and declarations analysis. However, for sake of completeness and in order to provide some limited type-information in Mulang AST, <code>TypeAlias</code>, <code>TypeSignature</code> and <code>TypeCast</code> expressions are provided.</p>
+<p>See <a href="#types">types section</a> for more details.</p>
+<h3 id="entrypoint"><code>EntryPoint</code></h3>
+<blockquote>
+<p>Entry point with its name and body. It typically correspond to C-like <code>main</code> procedures, or <code>program</code> declarations.</p>
+</blockquote>
+<h4 id="syntax_1">Syntax</h4>
+<pre><code class="haskell">(EntryPoint Identifier Expression)
+</code></pre>
+
+<h4 id="java-example">Java Example</h4>
+<pre><code class="java">public static main(String[] args) {}
+</code></pre>
+
+<pre><code class="haskell">(EntryPoint &quot;main&quot; MuNil)
+</code></pre>
+
+<h3 id="function"><code>Function</code></h3>
+<blockquote>
+<p>Functional / Imperative programming function declaration.
+It is is composed by an identifier and one or more equations</p>
+</blockquote>
+<h4 id="syntax_2">Syntax</h4>
+<pre><code class="haskell">(Function Identifier [Equation])
+</code></pre>
+
+<h4 id="example">Example</h4>
+<h3 id="procedure"><code>Procedure</code></h3>
+<blockquote>
+<p>Imperative programming procedure declaration. It is composed by an identifier and one or more equations</p>
+</blockquote>
+<h4 id="syntax_3">Syntax</h4>
+<pre><code class="haskell">(Procedure Identifier [Equation])
+</code></pre>
+
+<h3 id="method"><code>Method</code></h3>
+<blockquote>
+<p>Object oriented programming method declaration. It is composed by an identifier and one or more equations</p>
+</blockquote>
+<h4 id="syntax_4">Syntax</h4>
+<pre><code class="haskell">(Method Identifier [Equation])
+</code></pre>
+
+<h4 id="ruby-example">Ruby Example</h4>
+<pre><code class="ruby">class Bird
+  def sing!
+    puts &quot;singing in the dead of night&quot;
+  end
+end
+</code></pre>
+
+<pre><code class="haskell">(Class
+  &quot;Bird&quot; Nothing
+  (Method
+      &quot;sing!&quot;
+      (Equation []
+          (UnguardedBody (Print (MuString &quot;singing in the dead of night&quot;))))))
+</code></pre>
+
+<h4 id="java-example_1">Java Example</h4>
+<pre><code class="java">public class Bird {
+  public void sing() {
+    System.out.println(&quot;singing in the dead of night&quot;);
+  }
+}
+</code></pre>
+
+<pre><code class="haskell">(Class
+  &quot;Bird&quot; Nothing
+  (Method
+      &quot;sing&quot;
+      (Equation []
+          (UnguardedBody (Print (MuString &quot;singing in the dead of night&quot;))))))
+</code></pre>
+
+<h3 id="equalmethod-and-hashmethod"><code>EqualMethod</code> and <code>HashMethod</code></h3>
+<blockquote>
+<p>Declaration of custom equivalance and <em>hash code</em> operations. <code>EqualMethod</code> typically corresponds to <code>equals</code> or <code>==</code> method declarations, while <code>HashMethod</code>, typically corresponds
+to <code>hash</code> or <code>hashCode</code>- like methods.</p>
+</blockquote>
+<h4 id="syntax_5">Syntax</h4>
+<pre><code class="haskell">(EqualMethod [Equation])
+</code></pre>
+
+<pre><code class="haskell">(HashMethod [Equation])
+</code></pre>
+
+<h4 id="ruby-example_1">Ruby Example</h4>
+<pre><code class="ruby">def ==(other)
+end
+
+def hash
+end
+</code></pre>
+
+<pre><code class="haskell">(Sequence [
+  (EqualMethod (Equation
+                [VariablePatten &quot;other&quot;]
+                (UnguardedBody MuNil))),
+  (HashMethod (Equation
+              []
+              (UnguardedBody MuNil)))]
+
+</code></pre>
+
+<h3 id="variable"><code>Variable</code></h3>
+<blockquote>
+<p>Generic variable declaration, composed by an identifier and an initializer</p>
+</blockquote>
+<h4 id="syntax_6">Syntax</h4>
+<pre><code class="haskell">(Variable Identifier Expression)
+</code></pre>
+
+<h4 id="example_1">Example</h4>
+<h3 id="assignment"><code>Assignment</code></h3>
+<h4 id="syntax_7">Syntax</h4>
+<pre><code class="haskell">(Assignment Identifier Expression)
+</code></pre>
+
+<h4 id="example_2">Example</h4>
+<h3 id="attribute"><code>Attribute</code></h3>
+<blockquote>
+<p>Object oriented programming attribute declaration, composed by an identifier and an initializer</p>
+</blockquote>
+<h4 id="syntax_8">Syntax</h4>
+<pre><code class="haskell">(Attribute Identifier Expression)
+</code></pre>
+
+<h4 id="example_3">Example</h4>
+<h3 id="object"><code>Object</code></h3>
+<blockquote>
+<p>Object oriented programming global, named object declaration, like Scala's <code>object</code>, composed by a name and a body.</p>
+</blockquote>
+<h4 id="syntax_9">Syntax</h4>
+<pre><code class="haskell">(Object Identifier Expression)
+</code></pre>
+
+<h4 id="example_4">Example</h4>
+<h3 id="class"><code>Class</code></h3>
+<blockquote>
+<p>Object oriented programming global, class declaration,
+composed by a name, an optional superclass and a body</p>
+</blockquote>
+<h4 id="syntax_10">Syntax</h4>
+<pre><code class="haskell">(Class Identifier (Maybe Identifier) Expression)
+</code></pre>
+
+<h4 id="ruby-example_2">Ruby Example</h4>
+<pre><code class="ruby">class Bird &lt; Animal
+end
+</code></pre>
+
+<pre><code class="haskell">(Class &quot;Bird&quot; (Just &quot;Animal&quot;) MuNil)
+</code></pre>
+
+<h4 id="java-examples">Java Examples</h4>
+<pre><code class="java">public class Bird extends Animal {}
+</code></pre>
+
+<pre><code class="haskell">(Class &quot;Bird&quot; (Just &quot;Animal&quot;) MuNil)
+</code></pre>
+
+<h3 id="enumeration"><code>Enumeration</code></h3>
+<blockquote>
+<p>Imperative named enumeration of values</p>
+</blockquote>
+<h4 id="syntax_11">Syntax</h4>
+<pre><code class="haskell">(Enumeration Identifier [Identifier])
+</code></pre>
+
+<h4 id="java-example_2">Java Example</h4>
+<pre><code class="java">public enum Fuzzy {
+  YES, NO, MAYBE
+}
+</code></pre>
+
+<pre><code class="haskell">(Enumeration &quot;Fuzzy&quot; [&quot;YES&quot;, &quot;NO&quot;, &quot;MAYBE&quot;])
+</code></pre>
+
+<h3 id="interface"><code>Interface</code></h3>
+<blockquote>
+<p>Object oriented programming global interface or contract declaration, composed by a name, superinterfaces and a body.</p>
+</blockquote>
+<h4 id="syntax_12">Syntax</h4>
+<pre><code class="haskell">(Interface Identifier [Identifier] Expression)
+</code></pre>
+
+<h4 id="java-example_3">Java Example</h4>
+<pre><code class="java">public interface Foo extends Bar, Baz {
+  void foo();
+}
+</code></pre>
+
+<pre><code class="haskell">(Interface
+    &quot;Foo&quot;
+    [&quot;Bar&quot;, &quot;Baz&quot;]
+    (TypeSignature &quot;foo&quot; [] &quot;void&quot;))
+</code></pre>
+
+<h3 id="rule"><code>Rule</code></h3>
+<blockquote>
+<p>Logic programming declaration of rule fact, composed by the rule name, rule arguments, and rule body</p>
+</blockquote>
+<h4 id="syntax_13">Syntax</h4>
+<pre><code class="haskell">(Rule Identifier [Pattern] [Expression])
+</code></pre>
+
+<h4 id="example_5">Example</h4>
+<pre><code class="prolog">baz(bar) :- foo(bar)
+</code></pre>
+
+<pre><code class="haskell">(Rule &quot;baz&quot;
+    [(LiteralPattern &quot;bar&quot;)]
+    [(Exist &quot;foo&quot;
+        [(LiteralPattern &quot;bar&quot;)])])
+</code></pre>
+
+<h3 id="fact"><code>Fact</code></h3>
+<blockquote>
+<p>Logic programming declaration of a fact , composed by the fact name and fact arguments</p>
+</blockquote>
+<h4 id="syntax_14">Syntax</h4>
+<pre><code class="haskell">(Fact Identifier [Pattern])
+</code></pre>
+
+<h4 id="example_6">Example</h4>
+<pre><code class="prolog">foo(bar).
+</code></pre>
+
+<pre><code class="haskell">(Fact &quot;foo&quot; [(LiteralPattern &quot;bar&quot;)])
+</code></pre>
+
+<h3 id="exist"><code>Exist</code></h3>
+<blockquote>
+<p>Logic programming existential cuantification / consult</p>
+</blockquote>
+<h4 id="syntax_15">Syntax</h4>
+<pre><code class="haskell">(Exist Identifier [Pattern])
+</code></pre>
+
+<h4 id="example_7">Example</h4>
+<h3 id="not"><code>Not</code></h3>
+<blockquote>
+<p>Logic programming negation</p>
+</blockquote>
+<h4 id="syntax_16">Syntax</h4>
+<pre><code class="haskell">(Not Expression)
+</code></pre>
+
+<h4 id="example_8">Example</h4>
+<h3 id="findall"><code>Findall</code></h3>
+<blockquote>
+<p>Logic programming findall</p>
+</blockquote>
+<h4 id="syntax_17">Syntax</h4>
+<pre><code class="haskell">(Findall Expression Expression Expression)
+</code></pre>
+
+<h4 id="example_9">Example</h4>
+<h3 id="forall"><code>Forall</code></h3>
+<blockquote>
+<p>Logic programming universal cuantification</p>
+</blockquote>
+<h4 id="syntax_18">Syntax</h4>
+<pre><code class="haskell">(Forall Expression Expression)
+</code></pre>
+
+<h4 id="example_10">Example</h4>
+<h3 id="reference"><code>Reference</code></h3>
+<blockquote>
+<p>Generic variable</p>
+</blockquote>
+<h4 id="syntax_19">Syntax</h4>
+<pre><code class="haskell">(Reference Identifier)
+</code></pre>
+
+<h4 id="example_11">Example</h4>
+<h3 id="application"><code>Application</code></h3>
+<blockquote>
+<p>Generic, non-curried application of a function or procedure,
+composed by the applied element itself, and the application arguments</p>
+</blockquote>
+<h4 id="syntax_20">Syntax</h4>
+<pre><code class="haskell">(Application Expression [Expression])
+</code></pre>
+
+<h4 id="example_12">Example</h4>
+<h3 id="send"><code>Send</code></h3>
+<blockquote>
+<p>Object oriented programming message send, composed by the reciever,
+selector and arguments</p>
+</blockquote>
+<h4 id="syntax_21">Syntax</h4>
+<pre><code class="haskell">(Send Expression Expression [Expression])
+</code></pre>
+
+<h4 id="ruby-example_3">Ruby Example</h4>
+<pre><code class="ruby">1 + 5
+</code></pre>
+
+<pre><code class="haskell">(Send (MuNumber 1) (Reference &quot;+&quot;) [MuNumber 5])
+</code></pre>
+
+<h3 id="new"><code>New</code></h3>
+<blockquote>
+<p>Object oriented instantiation, composed by the class reference and instantiation arguments</p>
+</blockquote>
+<h4 id="syntax_22">Syntax</h4>
+<pre><code class="haskell">(New Identifier [Expression])
+</code></pre>
+
+<h4 id="example_13">Example</h4>
+<h3 id="implement"><code>Implement</code></h3>
+<blockquote>
+<p>Object oriented instantiation, interface implementation</p>
+</blockquote>
+<h4 id="syntax_23">Syntax</h4>
+<pre><code class="haskell">(Implement Identifier)
+</code></pre>
+
+<h4 id="example_14">Example</h4>
+<h3 id="include"><code>Include</code></h3>
+<blockquote>
+<p>Object oriented instantiation, mixin inclusion</p>
+</blockquote>
+<h4 id="syntax_24">Syntax</h4>
+<pre><code class="haskell">(Include Identifier)
+</code></pre>
+
+<h4 id="example_15">Example</h4>
+<h3 id="if"><code>If</code></h3>
+<h4 id="syntax_25">Syntax</h4>
+<pre><code class="haskell">(If Expression Expression Expression)
+</code></pre>
+
+<h3 id="lambda"><code>Lambda</code></h3>
+<h4 id="syntax_26">Syntax</h4>
+<pre><code class="haskell">(Lambda [Pattern] Expression)
+</code></pre>
+
+<h3 id="return"><code>Return</code></h3>
+<h4 id="syntax_27">Syntax</h4>
+<pre><code class="haskell">(Return Expression)
+</code></pre>
+
+<h3 id="while"><code>While</code></h3>
+<blockquote>
+<p>Imperative programming conditional repetition control structure, composed by a condition and a body</p>
+</blockquote>
+<h4 id="syntax_28">Syntax</h4>
+<pre><code class="haskell">(While Expression Expression)
+</code></pre>
+
+<h4 id="example_16">Example</h4>
+<h3 id="repeat"><code>Repeat</code></h3>
+<blockquote>
+<p>Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body</p>
+</blockquote>
+<h4 id="syntax_29">Syntax</h4>
+<pre><code class="haskell">(Repeat Expression Expression)
+</code></pre>
+
+<h4 id="example_17">Example</h4>
+<h3 id="match"><code>Match</code></h3>
+<h4 id="syntax_30">Syntax</h4>
+<pre><code class="haskell">(Match Expression [Equation])
+</code></pre>
+
+<h3 id="switch"><code>Switch</code></h3>
+<h4 id="syntax_31">Syntax</h4>
+<pre><code class="haskell">(Switch Expression [(Expression, Expression)])
+</code></pre>
+
+<h3 id="try"><code>Try</code></h3>
+<blockquote>
+<p>Generic try expression, composed by a body, a list of exception-handling patterns and statments, and a finally expression</p>
+</blockquote>
+<h4 id="syntax_32">Syntax</h4>
+<pre><code class="haskell">(Try Expression [(Pattern, Expression)] Expression)
+</code></pre>
+
+<h4 id="example_18">Example</h4>
+<h3 id="raise"><code>Raise</code></h3>
+<blockquote>
+<p>Generic raise expression, like a throw or raise statament, composed by the raised expression</p>
+</blockquote>
+<h4 id="syntax_33">Syntax</h4>
+<pre><code class="haskell">(Raise Expression)
+</code></pre>
+
+<h4 id="example_19">Example</h4>
+<h3 id="print"><code>Print</code></h3>
+<blockquote>
+<p>Generic print expression</p>
+</blockquote>
+<h4 id="syntax_34">Syntax</h4>
+<pre><code class="haskell">(Print Expression)
+</code></pre>
+
+<h4 id="ruby-example_4">Ruby Example</h4>
+<pre><code class="ruby">puts &quot;Hello World&quot;
+</code></pre>
+
+<pre><code class="haskell">(Print (MuString &quot;Hello World&quot;))
+</code></pre>
+
+<h3 id="for"><code>For</code></h3>
+<blockquote>
+<p><code>For</code>s generalices the concept of comprehensions an indexed repetition. With a <code>For</code> you can build:</p>
+<ul>
+<li><code>ForComprehension</code>, when the for expression is a yield. Scala's <code>for</code> comprehensions, Erlang's and Haskell's list comprehensions, and Haskell's <code>do-syntaxt</code> map to it.</li>
+<li><code>ForEach</code>, when the for expression is not a yield.  Java's <code>for:</code>, or some scenarios of scala's <code>for</code> map to it.</li>
+</ul>
+</blockquote>
+<h4 id="syntax_35">Syntax</h4>
+<pre><code class="haskell">(For [Statment] Expression)
+</code></pre>
+
+<h4 id="haskell-example">Haskell Example</h4>
+<pre><code class="haskell">m = [ f x | x &lt;- [1, 2, 3, 4] ]
+</code></pre>
+
+<pre><code class="haskell">(Variable &quot;m&quot;
+  (For
+    [(Generator
+      (VariablePattern &quot;x&quot;)
+      (MuList [(MuNumber 1), (MuNumber 2), (MuNumber 3), (MuNumber 4)]))]
+    (Yield
+      (Application (Reference &quot;f&quot;) [(Reference &quot;x&quot;)]))))
+</code></pre>
+
+<h4 id="java-example_4">Java Example</h4>
+<pre><code class="java">for (Integer i : ints) {
+  System.out.println(i);
+}
+</code></pre>
+
+<pre><code class="haskell">(For
+  [(Generator
+      (VariablePattern &quot;i&quot;)
+      (Reference &quot;ints&quot;))]
+  (Print (Reference &quot;i&quot;)))
+</code></pre>
+
+<h3 id="forloop"><code>ForLoop</code></h3>
+<blockquote>
+<p><code>ForLoop</code> represents the imperative programming c-style for loop:</p>
+</blockquote>
+<h4 id="syntax_36">Syntax</h4>
+<pre><code class="haskell">(ForLoop Expression Expression Expression Expression)
+</code></pre>
+
+<h4 id="example_20">Example</h4>
+<pre><code class="javascript">for (var i = 0; i &lt; 10; i++) {
+  console.log(i);
+}
+</code></pre>
+
+<pre><code class="haskell">(ForLoop
+  (Variable &quot;i&quot; (MuNumber 0.0))
+  (Application (Reference &quot;&lt;&quot;) [Reference &quot;i&quot;,MuNumber 10.0])
+  (Assignment &quot;i&quot; (Application (Reference &quot;+&quot;) [Reference &quot;i&quot;,MuNumber 1.0]))
+  (Send (Reference &quot;console&quot;) (Reference &quot;log&quot;) [Reference &quot;i&quot;]))
+</code></pre>
+
+<h3 id="sequence"><code>Sequence</code></h3>
+<blockquote>
+<p>Generic sequence of statements</p>
+</blockquote>
+<h4 id="syntax_37">Syntax</h4>
+<pre><code class="haskell">(Sequence [Expression])
+</code></pre>
+
+<h4 id="example_21">Example</h4>
+<h3 id="other"><code>Other</code></h3>
+<h4 id="syntax_38">Syntax</h4>
+<pre><code class="haskell">(Other)
+</code></pre>
+
+<h3 id="equal-and-notequal"><code>Equal</code> and <code>NotEqual</code></h3>
+<h4 id="syntax_39">Syntax</h4>
+<pre><code class="haskell">(Equal)
+(NotEqual)
+</code></pre>
+
+<h3 id="self"><code>Self</code></h3>
+<blockquote>
+<p>Object oriented self-reference, like  C-like <code>this</code> and Smalltalk-derived <code>self</code></p>
+</blockquote>
+<h4 id="syntax_40">Syntax</h4>
+<pre><code class="haskell">(Self)
+</code></pre>
+
+<h3 id="none"><code>None</code></h3>
+<blockquote>
+<p>Used as a placeholder for empty bodies.</p>
+</blockquote>
+<h4 id="syntax_41">Syntax</h4>
+<pre><code class="haskell">(None)
+</code></pre>
+
+<h3 id="munil"><code>MuNil</code></h3>
+<blockquote>
+<p>Generic nothing value literal - <code>nil</code>, <code>null</code>, <code>()</code> or <code>unit</code>.</p>
+</blockquote>
+<h4 id="syntax_42">Syntax</h4>
+<pre><code class="haskell">(MuNil)
+</code></pre>
+
+<h3 id="muobject"><code>MuObject</code></h3>
+<blockquote>
+<p>Object oriented unnamed object literal</p>
+</blockquote>
+<h4 id="syntax_43">Syntax</h4>
+<pre><code class="haskell">(MuObject Expression)
+</code></pre>
+
+<h4 id="javascript-example">JavaScript Example</h4>
+<pre><code class="javascript">{}
+{foo: 1}
+{foo: 1, bar: 2}
+</code></pre>
+
+<pre><code class="haskell">(MuObject MuNil)
+(MuObject (Attribute &quot;foo&quot; (MuNumber 1)))
+(MuObject (Sequence [
+            (Attribute &quot;foo&quot; (MuNumber 1)),
+            (Attribute &quot;bar&quot; (MuNumber 2))]))
+</code></pre>
+
+<h3 id="munumber-mubool-mustring-musymbol-and-muchar"><code>MuNumber</code>, <code>MuBool</code>, <code>MuString</code>, <code>MuSymbol</code> and <code>MuChar</code></h3>
+<blockquote>
+<p>Generic number, boolean, string, symbol (atoms) and char literals</p>
+</blockquote>
+<h4 id="syntax_44">Syntax</h4>
+<pre><code class="haskell">(MuNumber Double)
+</code></pre>
+
+<pre><code class="haskell">(MuBool Bool)
+</code></pre>
+
+<pre><code class="haskell">(MuString String)
+</code></pre>
+
+<pre><code class="haskell">(MuSymbol String)
+</code></pre>
+
+<pre><code class="haskell">(MuChar Char)
+</code></pre>
+
+<h4 id="ruby-example_5">Ruby Example</h4>
+<pre><code class="ruby">1
+true
+&quot;hello&quot;
+:hello
+</code></pre>
+
+<pre><code class="haskell">(Sequence [
+  (MuNumber 1),
+  (MuBool True),
+  (MuString &quot;hello&quot;),
+  (MuSymbol &quot;hello&quot;)])
+</code></pre>
+
+<h3 id="mutuple-and-mulist"><code>MuTuple</code> and <code>MuList</code></h3>
+<blockquote>
+<p>They represent tuples - generic non-uniform fixed-size collection of elements - and lists - generic uniform variable-size collection of elements.
+Lists typically map to arrays, lists or sequence-like structures.</p>
+</blockquote>
+<h4 id="syntax_45">Syntax</h4>
+<pre><code class="haskell">(MuTuple [Expression])
+</code></pre>
+
+<pre><code class="haskell">(MuList [Expression])
+</code></pre>
+
+<h3 id="testgroup-test-and-assert"><code>TestGroup</code>, <code>Test</code> and <code>Assert</code></h3>
+<blockquote>
+<p>Generic test framework expressions used to represent unit tests.
+TestGroup represents a test grouping expression such as <code>describe</code>, <code>context</code>, etc
+Test represents a test expression such as <code>it</code>, etc
+Assert represents a test's assertion, such as <code>assert.equals(...)</code>, etc. It receives a boolean that represents whether the assertion is negated or not.</p>
+</blockquote>
+<h4 id="syntax_46">Syntax</h4>
+<pre><code class="haskell">(TestGroup Expression Expression)
+</code></pre>
+
+<pre><code class="haskell">(Test Expression Expression)
+</code></pre>
+
+<pre><code class="haskell">(Assert Bool Assertion)
+</code></pre>
+
+<h4 id="javascript-example_1">Javascript Example</h4>
+<pre><code class="javascript">describe(&quot;succ&quot;, function() {
+  it(&quot;succ of 3 is 4&quot;, function() {
+    assert.equals(succ(3), 4)
+  })
+})
+</code></pre>
+
+<pre><code class="haskell">TestGroup (MuString &quot;succ&quot;)
+  (Test (MuString &quot;succ of 3 is 4&quot;)
+    (Assert False (Equality (Application (Reference &quot;succ&quot;) [MuNumber 3.0]) (MuNumber 4.0))))
+</code></pre>
+
+<h4 id="python-example">Python Example</h4>
+<pre><code class="python">class TestGroup(unittest.TestCase):
+  def test_succ_of_3_is_4():
+    self.assertEqual(succ(3), 4)
+</code></pre>
+
+<pre><code class="haskell">TestGroup (MuString &quot;TestGroup&quot;)
+  (Test (MuString &quot;test_succ_of_3_is_4&quot;)
+    (Assert False (Equality (Application (Reference &quot;succ&quot;) [MuNumber 3.0]) (MuNumber 4.0))))
+</code></pre>
+
+<h2 id="assertion">Assertion</h2>
+<p>Assertions used within tests to dynamically ascertain the code's validity.</p>
+<p>An assertion can be one of:
+ * <code>Truth</code>: Assert the truthfulness of a given expression.
+ * <code>Equality</code>: Assert the equality of two given expressions.
+ * <code>Failure</code>: Assert a given expression fails with a given error.</p>
+<h4 id="syntax_47">Syntax</h4>
+<pre><code class="haskell">(Truth Expression)
+</code></pre>
+
+<pre><code class="haskell">(Equality Expression Expression)
+</code></pre>
+
+<pre><code class="haskell">(Failure Expression Expression)
+</code></pre>
+
+<h4 id="javascript-examples">Javascript Examples</h4>
+<pre><code class="javascript">assert(true)
+</code></pre>
+
+<pre><code class="haskell">Assert False (Truth (MuBool True))
+</code></pre>
+
+<pre><code class="javascript">assert.equals(3, 3)
+</code></pre>
+
+<pre><code class="haskell">Assert False (Equality (MuNumber 3) (MuNumber 3))
+</code></pre>
+
+<pre><code class="javascript">assert.throws(function() { throw('error!') }, 'error!')
+</code></pre>
+
+<pre><code class="haskell">Assert False (Failure (Lambda [] (Raise (MuString &quot;error!&quot;))) (MuString &quot;error!&quot;))
+</code></pre>
+
+<h2 id="patterns">Patterns</h2>
+<p>Patterns are the second most important element of Mulang AST. They represent things that don't hold a value, but are instead used to match values, like
+patterns in imperative <code>case</code> or <code>switch</code> statements, functional pattern matching in <code>match</code> or <code>case</code> expressions, or exception matching in <code>try-catch</code> or <code>begin-rescue</code>-like statements in object oriented languages.</p>
+<h3 id="variablepattern"><code>VariablePattern</code></h3>
+<blockquote>
+<p>Variable pattern represent a variable match. It corresponds to normal formal parameters in precedural languages,
+and to simple pattern matching against a free identifier.</p>
+</blockquote>
+<h4 id="syntax_48">Syntax</h4>
+<pre><code class="haskell">(VariablePattern String)
+</code></pre>
+
+<h4 id="javascript-example_2">JavaScript Example</h4>
+<pre><code class="javascript">function foo(x, y) { }
+</code></pre>
+
+<pre><code class="haskell">(Function &quot;foo&quot;
+  [(Equation
+      [(VariablePattern &quot;x&quot;), (VariablePattern &quot;y&quot;)]
+      (UnguardedBody MuNil))])
+</code></pre>
+
+<h3 id="literalpattern"><code>LiteralPattern</code></h3>
+<blockquote>
+<p>Literal constant pattern</p>
+</blockquote>
+<h4 id="syntax_49">Syntax</h4>
+<pre><code class="haskell">(LiteralPattern String)
+</code></pre>
+
+<h4 id="example_22">Example</h4>
+<h3 id="infixapplicationpattern"><code>InfixApplicationPattern</code></h3>
+<blockquote>
+<p>Infix application pattern like <code>4:X</code></p>
+</blockquote>
+<h4 id="syntax_50">Syntax</h4>
+<pre><code class="haskell">(InfixApplicationPattern Pattern String Pattern)
+</code></pre>
+
+<h5 id="caveats_1">Caveats</h5>
+<p><code>InfixApplicationPattern</code> exposes the underying syntax and will be deprecated.</p>
+<h3 id="applicationpattern"><code>ApplicationPattern</code></h3>
+<blockquote>
+<p>prefix application pattern like <code>f _</code></p>
+</blockquote>
+<h4 id="syntax_51">Syntax</h4>
+<pre><code class="haskell">(ApplicationPattern String [Pattern])
+</code></pre>
+
+<h4 id="example_23">Example</h4>
+<h3 id="tuplepattern"><code>TuplePattern</code></h3>
+<blockquote>
+<p>tuple pattern like <code>(3, _)</code></p>
+</blockquote>
+<h4 id="syntax_52">Syntax</h4>
+<pre><code class="haskell">(TuplePattern [Pattern])
+</code></pre>
+
+<h4 id="example_24">Example</h4>
+<h3 id="listpattern"><code>ListPattern</code></h3>
+<blockquote>
+<p>list pattern like <code>[x, y, _]</code></p>
+</blockquote>
+<h4 id="syntax_53">Syntax</h4>
+<pre><code class="haskell">(ListPattern [Pattern])
+</code></pre>
+
+<h4 id="example_25">Example</h4>
+<h3 id="functorpattern"><code>FunctorPattern</code></h3>
+<blockquote>
+<p>Prolog-like functor pattern, like <code>f(X, 6)</code>.</p>
+</blockquote>
+<h4 id="syntax_54">Syntax</h4>
+<pre><code class="haskell">(FunctorPattern Identifier [Pattern])
+</code></pre>
+
+<h4 id="example_26">Example</h4>
+<h3 id="aspattern"><code>AsPattern</code></h3>
+<h4 id="syntax_55">Syntax</h4>
+<pre><code class="haskell">(AsPattern Identifier Pattern)
+</code></pre>
+
+<h4 id="example_27">Example</h4>
+<h3 id="typepattern"><code>TypePattern</code></h3>
+<blockquote>
+<p>A type pattern, like in exception handling constructs in most object-oriented languages</p>
+</blockquote>
+<h4 id="syntax_56">Syntax</h4>
+<pre><code class="haskell">(TypePattern Identifier)
+</code></pre>
+
+<h4 id="example_28">Example</h4>
+<h3 id="wildcardpattern"><code>WildcardPattern</code></h3>
+<blockquote>
+<p>Wildcard pattern, typically <code>_</code> in functional an logic programming languages.</p>
+</blockquote>
+<h4 id="syntax_57">Syntax</h4>
+<pre><code class="haskell">(WildcardPattern)
+</code></pre>
+
+<h3 id="unionpattern"><code>UnionPattern</code></h3>
+<h4 id="syntax_58">Syntax</h4>
+<pre><code class="haskell">(UnionPattern [Pattern])
+</code></pre>
+
+<h3 id="otherpattern"><code>OtherPattern</code></h3>
+<blockquote>
+<p>Other unrecognized pattern</p>
+</blockquote>
+<h4 id="syntax_59">Syntax</h4>
+<pre><code class="haskell">(OtherPattern)
+</code></pre>
+
+<h2 id="types">Types</h2>
+<p>When processing statically-typed languages, all type-information - regardless we are typing a function, a variable or a class - is represented with the <code>Type</code> ADT, can be one of:</p>
+<ul>
+<li><code>SimpleType</code>: composed by a type identifier and zero or type more constraints</li>
+<li><code>ParameterizedType</code>: composed by input type parmaters, an output type, and type constratins</li>
+<li><code>ConstrainedType</code>: composed by just type constraints.</li>
+<li><code>OtherType</code>: an unrecognized type</li>
+</ul>
+<p><code>Type</code>s can be introduced in the Mulang AST using the following elements:</p>
+<h3 id="typealias"><code>TypeAlias</code></h3>
+<blockquote>
+<p>A <code>TypeAlias</code> represents a synonym for a type, like the <code>type</code> declaration in Haskell and Scala or C's <code>typedef</code>.
+It is a typical statically typed functional programming feature.</p>
+</blockquote>
+<h4 id="syntax_60">Syntax</h4>
+<pre><code class="haskell">(TypeAlias Identifier Identifier)
+</code></pre>
+
+<h4 id="haskell-example_1">Haskell Example</h4>
+<pre><code class="haskell">type Point = (Int, Int)
+</code></pre>
+
+<pre><code class="haskell">(TypeAlias &quot;Point&quot; &quot;(Int, Int)&quot;)
+</code></pre>
+
+<h3 id="typesignature">TypeSignature</h3>
+<blockquote>
+<p>A <code>TypeSignature</code> represents an explicit type annotation for a computation,
+variable or module, as you can find in Java or Haskell.</p>
+</blockquote>
+<h4 id="syntax_61">Syntax</h4>
+<pre><code class="haskell">(TypeSignature Identifier Type)
+</code></pre>
+
+<h4 id="haskell-examples">Haskell Examples</h4>
+<p>Simple types:</p>
+<pre><code class="haskell">name :: String
+</code></pre>
+
+<pre><code class="haskell">(TypeSignature &quot;name&quot; (SimpleType &quot;String&quot; []))
+</code></pre>
+
+<p>Simple types and constraints:</p>
+<pre><code class="haskell">f :: Num a =&gt; a
+````
+
+```haskell
+(TypeSignature &quot;f&quot; (SimpleType &quot;a&quot; [&quot;Num a&quot;]))
+</code></pre>
+
+<p>Parameterized types:</p>
+<pre><code class="haskell">elem :: (Eq a, Foldable t) =&gt; a -&gt; t a -&gt; Bool
+````
+
+```haskell
+(TypeSignature &quot;elem&quot; (ParameterizedType [&quot;a&quot;, &quot;t a&quot;] &quot;Bool&quot; [&quot;Eq a&quot;, &quot;Foldable t&quot;]))
+</code></pre>
+
+<h4 id="java-examples_1">Java Examples</h4>
+<p>In Java, as in most typed C-like languages, type signature and variable declarations are bound. This means that, for example, a local variable declaration will produce both a <code>TypeSignature</code> and a <code>Variable</code> expression.</p>
+<p>Variable and attribute types:</p>
+<pre><code class="java">String name;
+</code></pre>
+
+<pre><code class="haskell">(TypeSignature &quot;name&quot; (SimpleType &quot;String&quot; []))
+</code></pre>
+
+<p>Method types:</p>
+<pre><code class="java">String f() { return null; }
+</code></pre>
+
+<pre><code class="haskell">(TypeSignature &quot;f&quot; (ParameterizedType [] &quot;String&quot; []))
+</code></pre>
+
+<p>Method types with type parameters:</p>
+<pre><code class="java">&lt;A&gt; A f() { return null; }
+</code></pre>
+
+<pre><code class="haskell">(TypeSignature &quot;f&quot; (ParameterizedType [] &quot;A&quot; [&quot;A&quot;]))
+</code></pre>
+
+<p>Method types with type parameters and constraints:</p>
+<pre><code class="java">&lt;A super B&gt; void f(A a) {}
+</code></pre>
+
+<pre><code class="haskell">(TypeSignature &quot;f&quot; (ParameterizedType [&quot;A&quot;] &quot;void&quot; [&quot;A super B&quot;]))
+</code></pre>
+
+<p>Class or interfaces types:</p>
+<pre><code class="java">class A&lt;B extends C, D extends C&gt; { }
+</code></pre>
+
+<pre><code class="haskell">(TypeSignature &quot;A&quot; (ConstrainedType [&quot;B extends C&quot;, &quot;D extends C&quot;]))
+</code></pre>
+
+<h3 id="typecast"><code>TypeCast</code></h3>
+<blockquote>
+<p>A <code>TypeCast</code> represent explictly giving a type to an expression
+which may have static or dynamic impact on the program. It is aimed to represent
+type-casts in c-like languages and inline type signatures in functional languages.</p>
+</blockquote>
+<h4 id="syntax_62">Syntax</h4>
+<pre><code class="haskell">(TypeCast Expression Type)
+</code></pre>
+
+<h4 id="haskell-examples_1">Haskell Examples</h4>
+<p>Simple types:</p>
+<pre><code class="haskell">... = 4 :: Num a =&gt; a
+</code></pre>
+
+<pre><code class="haskell">(TypeCast (MuNumber 4) (SimpleType &quot;a&quot; [&quot;Num a&quot;]))
+</code></pre>
+
+<h4 id="java-examples_2">Java Examples</h4>
+<p>Variable and attribute types:</p>
+<pre><code class="java">(Integer) 4;
+</code></pre>
+
+<pre><code class="haskell">(TypeCast (MuNumber 4) (SimpleType &quot;Integer&quot; []))
+</code></pre>
+
+<pre><code class="java">(Option&lt;Integer&gt;) something;
+</code></pre>
+
+<pre><code class="haskell">(TypeCast (Reference &quot;something&quot;) (SimpleType &quot;Option&lt;Integer&gt;&quot; []))
+</code></pre>
+
+<h5 id="caveats_2">Caveats</h5>
+<p>The type constraints refer to type-constrained parametrizations that the cast introduces, and
+not any other kind of constraints the cast uses. That is whay the following Java code:</p>
+<pre><code class="java">(Num&lt;A&gt;) something;
+</code></pre>
+
+<p>produces:</p>
+<pre><code class="haskell">(TypeCast (Reference &quot;something&quot;) (SimpleType &quot;Num&lt;A&gt;&quot; []))
+</code></pre>
+
+<p>instead of:</p>
+<pre><code class="haskell">(TypeCast (Reference &quot;something&quot;) (SimpleType &quot;Num&quot; [&quot;A&quot;]))
+</code></pre></div>
+        
+        
+    </div>
+
+    <footer class="col-md-12 text-center">
+        
+        <hr>
+        <p>
+        <small>© Copyright 2015-2018 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a><br></small>
+        
+        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
+        
+        
+    </footer>
+
+    <script src="../js/jquery-3.3.1.min.js"></script>
+    <script src="../js/bootstrap-3.0.3.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+    var base_url = '..';
+    </script>
+    <!-- <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script> -->
+    <script src="../js/base.js"></script>
+    <script src="../js/mumuki-styles.js"></script>
+    <script src="../js/mulang.js"></script>
+    <script src="../js/jquery.json-viewer.js"></script>
+    <script src="../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        From here you can search these documents. Enter your search terms below.
+                    </p>
+                    <form role="form">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                        </div>
+                    </form>
+                    <div id="mkdocs-search-results"></div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </body>
+
+</html>

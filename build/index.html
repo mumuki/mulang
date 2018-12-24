@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <link rel="canonical" href="https://mumuki.io/build/">
+    <link rel="shortcut icon" href="../img/favicon.ico">
+
+    
+    <title>Build - Mulang</title>
+    
+
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/3.003/css/hack.min.css">
+    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../css/base.min.css" rel="stylesheet">
+    <link href="../css/cinder.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.min.css">
+    <link href="../css/mumuki-styles.css" rel="stylesheet">
+    <link href="../css/jquery.json-viewer.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+        <![endif]-->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.28/webfont.js"></script>
+    <script>
+    WebFont.load({
+        google: {
+            families: ['Open Sans', 'PT Sans']
+        }
+    });
+    </script>
+
+    
+
+     
+</head>
+
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+
+            <a class="navbar-brand" href="..">Mulang</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../try/">Try it!</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../userguide/">User Guide</a>
+                    </li>
+                
+                
+                
+                    <li class="active">
+                        <a href="./">Build</a>
+                    </li>
+                
+                
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../userguide/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li class="disabled">
+                        <a rel="prev" >
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/mumuki/mulang/edit/master/docs/build.md"><i class="fab fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#building-mulang-from-source">Building mulang from source</a></li>
+            <li class="second-level"><a href="#setup">Setup</a></li>
+                
+            <li class="second-level"><a href="#installing-and-creating-an-executable">Installing and creating an executable</a></li>
+                
+            <li class="second-level"><a href="#running-tests">Running tests</a></li>
+                
+            <li class="second-level"><a href="#watching-changes">Watching changes</a></li>
+                
+            <li class="second-level"><a href="#loading-mulang-in-the-repl">Loading mulang in the REPL</a></li>
+                
+        <li class="first-level "><a href="#ruby-wrapper">Ruby wrapper</a></li>
+        <li class="first-level "><a href="#javascript-library">JavaScript library</a></li>
+        <li class="first-level "><a href="#tagging-and-releasing">Tagging and releasing</a></li>
+        <li class="first-level "><a href="#updating-docs">Updating docs</a></li>
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<h1 id="building-mulang-from-source">Building mulang from source</h1>
+<h2 id="setup">Setup</h2>
+<p>To generate <code>mulang</code> executable, you have to build the project using <a href="https://haskellstack.org">stack</a>:</p>
+<ol>
+<li>Install stack: <code>wget -qO- https://get.haskellstack.org/ | sh</code></li>
+<li>Go to the mulang project directory and setup it: <code>stack setup</code></li>
+<li>Build the project: <code>stack build</code></li>
+</ol>
+<h2 id="installing-and-creating-an-executable">Installing and creating an executable</h2>
+<pre><code class="bash">$ stack install
+$ mulang
+</code></pre>
+
+<p>That will generate a <code>mulang</code> executable in the folder <code>~/.local/bin</code>.</p>
+<h2 id="running-tests">Running tests</h2>
+<pre><code class="bash">$ stack test --fast
+</code></pre>
+
+<h2 id="watching-changes">Watching changes</h2>
+<pre><code class="bash">$ stack test --fast --file-watch
+</code></pre>
+
+<h2 id="loading-mulang-in-the-repl">Loading mulang in the REPL</h2>
+<pre><code class="bash">stack ghci
+</code></pre>
+
+<h1 id="ruby-wrapper">Ruby wrapper</h1>
+<p>This module can also be deployed a ruby gem. <code>mulang</code> works with Ruby 2.3.1</p>
+<pre><code class="bash">cd gem
+rake wrapper:wrap
+bundle install
+bundle exec rspec
+</code></pre>
+
+<p>See <code>gem/README</code> for more details.</p>
+<h1 id="javascript-library">JavaScript library</h1>
+<p><code>mulang</code> can also be compiled to JavaScript library using <a href="https://github.com/ghcjs/ghcjs">ghcjs</a> and <a href="https://github.com/flbulgarelli/ghcjslib">ghcjslib</a>, which allows you to use it from <code>node</code> or the browser.</p>
+<blockquote>
+<p>:warning: you will need <code>node &gt;= 7</code> installed on your system. If you have <code>nvm</code>, before starting run the following:</p>
+<p><code>sh
+$ nvm use $(cat ghcjslib/.nvmrc)</code></p>
+</blockquote>
+<ol>
+<li>Run <code>ghcjslib/swap.sh</code> for swapping to GHCJS compiler</li>
+<li>Run <code>ghcjslib/build.sh</code> for building the <code>ghcjslib</code> release. It will be placed on <code>ghcjslib/build/mulang.js</code></li>
+<li>Run <code>ghcjslib/test.sh</code> for running both mocha and hspec tests.</li>
+<li>Load it:</li>
+<li>in the browser: <code>google-chrome ghcjslib/index.html</code></li>
+<li>in <code>node</code>: run <code>node</code>, and then, within the interpreter, run: <code>let mulang = require('./ghcjslib/build/mulang.js');</code></li>
+<li>Try it: <code>mulang.analyse(...pass here a spec as described in the README....)</code></li>
+<li>Run <code>ghcjslib/swap.sh</code> again for swapping back to ghc</li>
+</ol>
+<h1 id="tagging-and-releasing">Tagging and releasing</h1>
+<pre><code class="bash">./tag.sh
+</code></pre>
+
+<h1 id="updating-docs">Updating docs</h1>
+<p>These site is build using <code>mkdocs &gt;= 0.17</code>. You can install it using  <code>pip</code>:</p>
+<pre><code class="bash">$ pip install mkdocs
+</code></pre>
+
+<p>From the project root folder, running <code>mkdocs serve</code> will serve the files in a local server, <code>mkdocs build</code> will build the static site to a foldes called <code>site</code>, and deploys to the <code>gh-pages</code> branch are done by running <code>mkdocs gh-deploy</code> directly.</p></div>
+        
+        
+    </div>
+
+    <footer class="col-md-12 text-center">
+        
+        <hr>
+        <p>
+        <small>© Copyright 2015-2018 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a><br></small>
+        
+        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
+        
+        
+    </footer>
+
+    <script src="../js/jquery-3.3.1.min.js"></script>
+    <script src="../js/bootstrap-3.0.3.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+    var base_url = '..';
+    </script>
+    <!-- <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script> -->
+    <script src="../js/base.js"></script>
+    <script src="../js/mumuki-styles.js"></script>
+    <script src="../js/mulang.js"></script>
+    <script src="../js/jquery.json-viewer.js"></script>
+    <script src="../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        From here you can search these documents. Enter your search terms below.
+                    </p>
+                    <form role="form">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                        </div>
+                    </form>
+                    <div id="mkdocs-search-results"></div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </body>
+
+</html>
