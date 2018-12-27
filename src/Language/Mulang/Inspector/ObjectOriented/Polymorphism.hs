@@ -10,11 +10,11 @@ module Language.Mulang.Inspector.ObjectOriented.Polymorphism (
 
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
-import Language.Mulang.Inspector.Primitive (Inspection)
+import Language.Mulang.Inspector.Primitive (Inspection, InspectionContext, inspect)
 import Language.Mulang.Inspector.ObjectOriented (implements, declaresMethod)
 import Language.Mulang.Inspector.Typed (usesType)
 
-import Control.Monad (MonadPlus, guard)
+import Control.Monad (guard)
 import Language.Mulang.Generator (Generator, declarations, expressions)
 
 usesDynamicMethodOverload :: Inspection
@@ -60,10 +60,7 @@ usesStaticPolymorphism expression = inspect $ do
 
 -- private
 
-inspect :: [a] -> Bool
-inspect = not.null
-
-guardCount :: MonadPlus m => (Int -> Bool) -> [a] -> m ()
+guardCount :: (Int -> Bool) -> [Expression] -> InspectionContext
 guardCount condition list = guard (condition . length $ list)
 
 methodDeclarationsOf :: Identifier -> Generator Expression

@@ -25,12 +25,11 @@ import Language.Mulang.Ast
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Generator (declaredIdentifiers, referencedIdentifiers, declarations, expressions)
-import Control.Monad (MonadPlus, guard)
+import Control.Monad (guard)
 
 
 import Data.Maybe (listToMaybe)
 import Data.List.Extra (has)
-
 
 -- | Inspection that tells whether an expression is equal to a given piece of code after being parsed
 parses :: (String -> Expression) -> String -> Inspection
@@ -61,10 +60,6 @@ delegates p expression = inspect $ do
   (Call (Reference name2) _) <- expressions expression
   guard (name1 == name2)
   guard (p name1)
-
--- TODO extract and move
-inspect :: [a] -> Bool
-inspect = not.null
 
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
