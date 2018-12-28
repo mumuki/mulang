@@ -11,21 +11,26 @@ module Language.Mulang.Analyzer (
   smellsAnalysis,
   signaturesAnalysis,
 
+  emptyCompletedAnalysisResult,
+
   analyse,
 
   module Language.Mulang.Analyzer.Analysis) where
 
 import Language.Mulang
 import Language.Mulang.Analyzer.Analysis
+import Language.Mulang.Analyzer.DomainLanguageCompiler (emptyDomainLanguage, compileDomainLanguage)
+import Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
 import Language.Mulang.Analyzer.SampleParser (parseSample)
 import Language.Mulang.Analyzer.SignaturesAnalyzer  (analyseSignatures)
-import Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
 import Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
-import Language.Mulang.Analyzer.DomainLanguageCompiler (emptyDomainLanguage, compileDomainLanguage)
+import Language.Mulang.Analyzer.TestsAnalyzer  (analyseTests)
 import Data.Maybe (fromMaybe)
+
 --
 -- Builder functions
 --
+
 noSmells :: SmellsSet
 noSmells = NoSmells Nothing
 
@@ -33,7 +38,7 @@ allSmells :: SmellsSet
 allSmells = AllSmells Nothing
 
 emptyAnalysisSpec :: AnalysisSpec
-emptyAnalysisSpec = AnalysisSpec [] noSmells Nothing Nothing Nothing
+emptyAnalysisSpec = AnalysisSpec [] noSmells Nothing Nothing Nothing Nothing
 
 emptyAnalysis :: Sample -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec
@@ -50,9 +55,13 @@ smellsAnalysis code set = Analysis code (emptyAnalysisSpec { smellsSet = set })
 signaturesAnalysis :: Sample -> SignatureStyle -> Analysis
 signaturesAnalysis code style = Analysis code (emptyAnalysisSpec { signatureAnalysisType = Just (StyledSignatures style) })
 
+emptyCompletedAnalysisResult :: AnalysisResult
+emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing
+
 --
 -- Analysis running
 --
+
 analyse :: Analysis -> IO AnalysisResult
 analyse (Analysis sample spec) = analyseSample (parseSample sample)
   where analyseSample (Right ast)    = analyseAst ast spec
@@ -61,9 +70,11 @@ analyse (Analysis sample spec) = analyseSample (parseSample sample)
 analyseAst :: Expression -> AnalysisSpec -> IO AnalysisResult
 analyseAst ast spec = do
   language <- compileDomainLanguage (domainLanguage spec)
+  testResults <- analyseTests ast (testAnalysisType spec)
   return $ AnalysisCompleted (analyseExpectations ast (expectations spec))
                              (analyseSmells ast language (smellsSet spec))
                              (analyseSignatures ast (signatureAnalysisType spec))
+                             testResults
                              (analyzeIntermediateLanguage ast spec)
 
 analyzeIntermediateLanguage :: Expression -> AnalysisSpec -> Maybe Expression

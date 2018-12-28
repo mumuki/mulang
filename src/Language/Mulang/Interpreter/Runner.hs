@@ -1,4 +1,12 @@
-module Language.Mulang.Interpreter.Runner where
+{-# LANGUAGE DeriveGeneric #-}
+
+module Language.Mulang.Interpreter.Runner (
+  runTests,
+  runTestsForDir,
+  TestResult(..),
+  TestStatus(..)) where
+
+import GHC.Generics
 
 import           Control.Monad (forM)
 import           Control.Monad.State.Class
@@ -12,9 +20,13 @@ import Language.Mulang.Parsers (MaybeParser)
 import Language.Mulang.Interpreter
 import Language.Mulang.Interpreter.Tests
 
-data TestResult = Success
-                | Failure String
-                deriving (Show, Eq)
+data TestResult
+  = TestResult { description :: String, status :: TestStatus } deriving (Generic, Show, Eq)
+
+data TestStatus
+  = Success
+  | Failure String
+  deriving (Generic, Show, Eq)
 
 runTestsForDir :: String -> String -> MaybeParser -> IO ()
 runTestsForDir solutionPath testPath parse = do
@@ -28,7 +40,7 @@ runTestsForDir solutionPath testPath parse = do
       putStrLn $ "FAIL : " ++ intercalate " > " desc
       putStrLn $ "       " ++ show reason
 
-runTests :: Mu.Expression -> [MuTest] -> IO [([String], TestResult)]
+runTests :: Mu.Expression -> [MuTest] -> IO [([String], TestStatus)]
 runTests expr tests = do
   (_ref, context) <- eval defaultContext expr
   forM tests $ \(MuTest desc testExpr) -> do

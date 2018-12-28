@@ -4,7 +4,8 @@ import           Language.Mulang.Analyzer hiding (result, spec)
 import           Language.Mulang.Ast
 import           Test.Hspec
 
-result smellResults = AnalysisCompleted [] smellResults [] Nothing
+result smells
+  = emptyCompletedAnalysisResult { smells = smells }
 
 runExcept language content smells = analyse (smellsAnalysis (CodeSample language content) allSmells { exclude = Just smells })
 runOnly language content smells = analyse (smellsAnalysis (CodeSample language content) noSmells { include = Just smells })
