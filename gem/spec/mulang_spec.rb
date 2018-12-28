@@ -9,7 +9,8 @@ describe Mulang::Code do
                                                                                       'intermediateLanguage'=>nil,
                                                                                       'signatures'=>[],
                                                                                       'smells'=>[],
-                                                                                      'expectationResults'=>[] }
+                                                                                      'expectationResults'=>[],
+                                                                                      'testResults' => [] }
 
   end
 
