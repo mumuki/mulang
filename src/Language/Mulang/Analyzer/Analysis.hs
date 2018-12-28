@@ -44,8 +44,8 @@ data Analysis = Analysis {
 } deriving (Show, Eq, Generic)
 
 data AnalysisSpec = AnalysisSpec {
-  expectations :: [Expectation],
-  smellsSet :: SmellsSet,
+  expectations :: Maybe [Expectation],
+  smellsSet :: Maybe SmellsSet,
   signatureAnalysisType :: Maybe SignatureAnalysisType,
   testAnalysisType :: Maybe TestAnalysisType,
   domainLanguage :: Maybe DomainLanguage,

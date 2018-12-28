@@ -8,8 +8,8 @@ import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage)
 import Data.List
 import Data.Maybe (fromMaybe)
 
-analyseSmells :: Expression -> DomainLanguage -> SmellsSet -> [Expectation]
-analyseSmells ast language set = concatMap (\smell -> detectSmell smell language ast) (smellsFor set)
+analyseSmells :: Expression -> DomainLanguage -> Maybe SmellsSet -> [Expectation]
+analyseSmells ast language = concatMap (\smell -> detectSmell smell language ast) . smellsFor . fromMaybe (NoSmells Nothing)
 
 detectSmell :: Smell -> DomainLanguage -> Expression -> [Expectation]
 detectSmell smell language =  map (exectationFor smell) . detectionFor smell language
