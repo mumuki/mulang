@@ -24,7 +24,7 @@ textToLazyByteString = pack . unpack
 spec = describe "AnalysisJson" $ do
   it "works with Intransitive expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
-                            (emptyAnalysisSpec { expectations = [Expectation "Intransitive:x" "Uses:*"] })
+                            (emptyAnalysisSpec { expectations = Just [Expectation "Intransitive:x" "Uses:*"] })
     let json = [text|
 {
    "sample" : {
@@ -38,15 +38,14 @@ spec = describe "AnalysisJson" $ do
             "binding" : "Intransitive:x",
             "inspection" : "Uses:*"
          }
-      ],
-      "smellsSet" : { "tag" : "NoSmells" }
+      ]
    }
 } |]
     run json `shouldBe` analysis
 
   it "works with transitive expectations" $ do
     let analysis = Analysis (CodeSample Haskell "x = 1")
-                            (emptyAnalysisSpec { expectations = [Expectation "x" "Declares"] })
+                            (emptyAnalysisSpec { expectations = Just [Expectation "x" "Declares"] })
     let json = [text|
 {
    "sample" : {
@@ -55,7 +54,6 @@ spec = describe "AnalysisJson" $ do
       "content" : "x = 1"
    },
    "spec" : {
-      "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
             "binding" : "x",
@@ -76,8 +74,6 @@ spec = describe "AnalysisJson" $ do
       "content" : "function foo(x, y) { return x + y; }"
    },
    "spec" : {
-      "expectations" : [],
-      "smellsSet" : { "tag" : "NoSmells" },
       "signatureAnalysisType" : {
         "tag" : "StyledSignatures",
         "style" : "HaskellStyle"
@@ -115,14 +111,10 @@ spec = describe "AnalysisJson" $ do
       }
    },
    "spec" : {
-      "smellsSet" : {
-        "tag" : "NoSmells"
-      },
       "signatureAnalysisType" : {
          "tag" : "StyledSignatures",
          "style" : "HaskellStyle"
-      },
-      "expectations" : []
+      }
    }
 }|]
     let analysis = Analysis (MulangSample (Sequence [Variable "x" (MuNumber 1), Variable "y" (MuNumber 2)]) Nothing)
@@ -139,7 +131,6 @@ spec = describe "AnalysisJson" $ do
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
-      "expectations" : [],
       "smellsSet" : {
         "tag" : "NoSmells",
         "include" : [
@@ -155,7 +146,7 @@ spec = describe "AnalysisJson" $ do
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
                             (emptyAnalysisSpec {
-                              smellsSet = noSmells { include = Just ["ReturnsNil", "DoesNilTest"]},
+                              smellsSet = (noSmellsBut ["ReturnsNil", "DoesNilTest"]),
                               signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
@@ -169,7 +160,6 @@ spec = describe "AnalysisJson" $ do
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
-      "expectations" : [],
       "smellsSet" : {
         "tag" : "AllSmells",
         "exclude" : [
@@ -184,7 +174,7 @@ spec = describe "AnalysisJson" $ do
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
                             (emptyAnalysisSpec {
-                              smellsSet = allSmells { exclude = Just ["ReturnsNil"]},
+                              smellsSet = allSmellsBut ["ReturnsNil"],
                               signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
@@ -198,7 +188,6 @@ spec = describe "AnalysisJson" $ do
       "content" : "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer)."
    },
    "spec" : {
-      "expectations" : [],
       "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : {
          "caseStyle" : "SnakeCase",
@@ -226,7 +215,6 @@ spec = describe "AnalysisJson" $ do
       "content" : "function f(x, y) { return null; }"
    },
    "spec" : {
-      "expectations" : [],
       "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" }
    }

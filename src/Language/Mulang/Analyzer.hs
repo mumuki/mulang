@@ -1,6 +1,8 @@
 module Language.Mulang.Analyzer (
   noSmells,
   allSmells,
+  noSmellsBut,
+  allSmellsBut,
 
   emptyDomainLanguage,
   emptyAnalysisSpec,
@@ -31,14 +33,20 @@ import Data.Maybe (fromMaybe)
 -- Builder functions
 --
 
-noSmells :: SmellsSet
-noSmells = NoSmells Nothing
+noSmells :: Maybe SmellsSet
+noSmells = Just $ NoSmells Nothing
 
-allSmells :: SmellsSet
-allSmells = AllSmells Nothing
+noSmellsBut :: [Smell] -> Maybe SmellsSet
+noSmellsBut = Just . NoSmells . Just
+
+allSmells :: Maybe SmellsSet
+allSmells = Just $ AllSmells Nothing
+
+allSmellsBut :: [Smell] -> Maybe SmellsSet
+allSmellsBut = Just . AllSmells . Just
 
 emptyAnalysisSpec :: AnalysisSpec
-emptyAnalysisSpec = AnalysisSpec [] noSmells Nothing Nothing Nothing Nothing
+emptyAnalysisSpec = AnalysisSpec Nothing Nothing Nothing Nothing Nothing Nothing
 
 emptyAnalysis :: Sample -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec
@@ -47,9 +55,9 @@ domainLanguageAnalysis :: Sample -> DomainLanguage -> Analysis
 domainLanguageAnalysis code domainLanguage = Analysis code (emptyAnalysisSpec { domainLanguage = Just domainLanguage, smellsSet = allSmells })
 
 expectationsAnalysis :: Sample -> [Expectation] -> Analysis
-expectationsAnalysis code es = Analysis code (emptyAnalysisSpec { expectations = es })
+expectationsAnalysis code es = Analysis code (emptyAnalysisSpec { expectations = Just es })
 
-smellsAnalysis :: Sample -> SmellsSet -> Analysis
+smellsAnalysis :: Sample -> Maybe SmellsSet -> Analysis
 smellsAnalysis code set = Analysis code (emptyAnalysisSpec { smellsSet = set })
 
 signaturesAnalysis :: Sample -> SignatureStyle -> Analysis
