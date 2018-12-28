@@ -3,7 +3,8 @@ module SignaturesAnalyzerSpec(spec) where
 import           Language.Mulang.Analyzer hiding (result, spec)
 import           Test.Hspec
 
-result signatures = AnalysisCompleted [] [] signatures Nothing
+result signatures
+  = emptyCompletedAnalysisResult { signatures = signatures }
 
 run language content style = analyse (signaturesAnalysis (CodeSample language content) style)
 

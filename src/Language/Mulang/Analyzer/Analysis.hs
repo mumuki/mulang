@@ -10,6 +10,7 @@ module Language.Mulang.Analyzer.Analysis (
   CaseStyle(..),
   Smell,
   SignatureAnalysisType(..),
+  TestAnalysisType(..),
   SignatureStyle(..),
   Sample(..),
   Language(..),
@@ -21,6 +22,7 @@ import GHC.Generics
 
 import Language.Mulang.Ast
 import Language.Mulang.Builder (NormalizationOptions)
+import Language.Mulang.Interpreter.Runner (TestResult)
 
 ---
 -- Common structures
@@ -45,6 +47,7 @@ data AnalysisSpec = AnalysisSpec {
   expectations :: [Expectation],
   smellsSet :: SmellsSet,
   signatureAnalysisType :: Maybe SignatureAnalysisType,
+  testAnalysisType :: Maybe TestAnalysisType,
   domainLanguage :: Maybe DomainLanguage,
   includeIntermediateLanguage :: Maybe Bool
 } deriving (Show, Eq, Generic)
@@ -81,6 +84,10 @@ data Sample
   = MulangSample { ast :: Expression, normalizationOptions :: Maybe NormalizationOptions }
   | CodeSample { language :: Language, content :: Code } deriving (Show, Eq, Generic)
 
+data TestAnalysisType
+  = IgnoreTests
+  | RunTests { strictReturns :: Maybe Bool, strictShortCircuit :: Maybe Bool } deriving (Show, Eq, Generic)
+
 data Language
   =  Json
   |  Java
@@ -97,6 +104,7 @@ data AnalysisResult
   = AnalysisCompleted { expectationResults :: [ExpectationResult],
                         smells :: [Expectation],
                         signatures :: [Code],
+                        testResults :: [TestResult],
                         intermediateLanguage :: Maybe Expression }
   | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
