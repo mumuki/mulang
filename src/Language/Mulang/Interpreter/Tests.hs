@@ -1,31 +1,21 @@
-module Language.Mulang.Interpreter.Tests
-  ( getTests
-  , TestsMonad
-  , MuTest(..)
-  ) where
+module Language.Mulang.Interpreter.Tests (
+  getTests,
+  MuTest(..)) where
 
-import           Control.Monad (forM)
-import           Control.Monad.Writer.Strict
 import           Data.List (intercalate)
 
 import  Language.Mulang.Ast (Expression(..))
 
-data MuTest = MuTest { description :: [String] , body :: Expression } deriving (Show)
+data MuTest = MuTest { description :: [String], body :: Expression } deriving (Show)
 
 getTests :: Expression -> [MuTest]
-getTests expr = execWriter $ getAllTestsFromExpr [] expr
+getTests expr = getAllTestsFromExpr [] expr
 
-type TestsMonad a = Writer [MuTest] a
-
-getAllTestsFromExpr :: [String] -> Expression -> Writer [MuTest] ()
-getAllTestsFromExpr s (TestGroup (MuString desc) f) = do
-  getAllTestsFromExpr (s ++ [desc]) f
-getAllTestsFromExpr s (Sequence expressions) =
-  void $ forM expressions (getAllTestsFromExpr s)
-getAllTestsFromExpr s (Test (MuString desc) f) = do
-  tell $ [ MuTest { description = s ++ [desc] , body = f } ]
-getAllTestsFromExpr s e =
-  error $ "Unknown expression: " ++ show e ++ "\nIn " ++ intercalate " > " s
+getAllTestsFromExpr :: [String] -> Expression -> [MuTest]
+getAllTestsFromExpr s (Test (MuString desc) f)      = [MuTest (s ++ [desc]) f]
+getAllTestsFromExpr s (TestGroup (MuString desc) f) = getAllTestsFromExpr (s ++ [desc]) f
+getAllTestsFromExpr s (Sequence expressions)        = concatMap (getAllTestsFromExpr s) expressions
+getAllTestsFromExpr s e                             = error $ "Unknown expression: " ++ show e ++ "\nIn " ++ intercalate " > " s
 
 
 
