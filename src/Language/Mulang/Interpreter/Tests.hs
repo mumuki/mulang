@@ -25,10 +25,7 @@ getAllTestsFromExpr s (Mu.TestGroup (Mu.MuString desc) f) = do
 getAllTestsFromExpr s (Mu.Sequence expressions) =
   void $ forM expressions (getAllTestsFromExpr s)
 getAllTestsFromExpr s (Mu.Test (Mu.MuString desc) f) = do
-  tell $ [ MuTest { description = s ++ [desc]
-                  , body = f
-                  }
-         ]
+  tell $ [ MuTest { description = s ++ [desc] , body = f } ]
 getAllTestsFromExpr s e =
   error $ "Unknown expression: " ++ show e ++ "\nIn " ++ intercalate " > " s
 

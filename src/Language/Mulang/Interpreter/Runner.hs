@@ -21,7 +21,7 @@ import Language.Mulang.Interpreter
 import Language.Mulang.Interpreter.Tests
 
 data TestResult
-  = TestResult { description :: String, status :: TestStatus } deriving (Generic, Show, Eq)
+  = TestResult { description :: [String], status :: TestStatus } deriving (Generic, Show, Eq)
 
 data TestStatus
   = Success
@@ -34,13 +34,13 @@ runTestsForDir solutionPath testPath parse = do
   tests <- getTests . fromJust . parse <$> readFile testPath
   results <- runTests solution tests
   forM_ results $ \result -> case result of
-    (desc, Success) -> do
+    (TestResult desc Success) -> do
       putStrLn $ "PASS : " ++ intercalate " > " desc
-    (desc, Failure reason) -> do
+    (TestResult desc (Failure reason)) -> do
       putStrLn $ "FAIL : " ++ intercalate " > " desc
       putStrLn $ "       " ++ show reason
 
-runTests :: Mu.Expression -> [MuTest] -> IO [([String], TestStatus)]
+runTests :: Mu.Expression -> [MuTest] -> IO [TestResult]
 runTests expr tests = do
   (_ref, context) <- eval defaultContext expr
   forM tests $ \(MuTest desc testExpr) -> do
@@ -52,6 +52,6 @@ runTests expr tests = do
       fromMaybe nullRef <$> gets currentException
     let exception = dereference' (globalObjects testContext) exceptionRef
     case exception of
-      MuNull -> return (desc, Success)
-      v -> return (desc, Failure $ show v)
+      MuNull -> return $ TestResult desc Success
+      v -> return $ TestResult desc (Failure $ show v)
 

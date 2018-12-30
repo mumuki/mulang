@@ -15,6 +15,4 @@ analyseTests e analysis = analyseTests' e (fromMaybe IgnoreTests analysis)
 analyseTests' _ IgnoreTests    = return []
 -- TODO: partition expression into test and main. Now original tests are passed alongside the main code
 -- TODO: create TestResult natively in runTests
-analyseTests' e (RunTests _ _) = fmap (map  makeTestResult) . runTests e . getTests $ e
-    where
-      makeTestResult (description, status) = TestResult (concat description) status
+analyseTests' e (RunTests _ _) = runTests e . getTests $ e

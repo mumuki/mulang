@@ -27,7 +27,7 @@ spec = do
             assert(true)
           })
         |]
-        runjs code suite `shouldReturn` [(["is true"], Success)]
+        runjs code suite `shouldReturn` [TestResult ["is true"] Success]
 
       context "assert.equals" $ do
         it "passes if values are equal" $ do
@@ -37,7 +37,7 @@ spec = do
               assert.equals(1, 1)
             })
           |]
-          runjs code suite `shouldReturn` [(["passes"], Success)]
+          runjs code suite `shouldReturn` [TestResult ["passes"] Success]
 
         it "fails if values are not equal" $ do
           let code = [text||]
@@ -46,7 +46,7 @@ spec = do
               assert.equals(1, 2)
             })
           |]
-          runjs code suite `shouldReturn` [(["fails"], Failure "MuString \"Expected MuNumber 1.0 but got: MuNumber 2.0\"")]
+          runjs code suite `shouldReturn` [TestResult ["fails"] (Failure "MuString \"Expected MuNumber 1.0 but got: MuNumber 2.0\"")]
 
       it "can handle failed tests" $ do
         let code = [text||]
@@ -55,7 +55,7 @@ spec = do
             assert(false)
           })
         |]
-        runjs code suite `shouldReturn` [(["fails"], Failure "MuString \"Expected True but got: False\"")]
+        runjs code suite `shouldReturn` [TestResult ["fails"] (Failure "MuString \"Expected True but got: False\"")]
 
       it "can handle errored tests" $ do
         let code = [text||]
@@ -64,7 +64,7 @@ spec = do
             assert.equals(succ(3), 4)
           })
         |]
-        runjs code suite `shouldReturn` [(["errors"], Failure "MuString \"Reference not found for name 'succ'\"")]
+        runjs code suite `shouldReturn` [TestResult ["errors"] (Failure "MuString \"Reference not found for name 'succ'\"")]
 
       it "can reference functions defined in code" $ do
         let code = [text|
@@ -77,7 +77,7 @@ spec = do
             assert.equals(succ(3), 4)
           })
         |]
-        runjs code suite `shouldReturn` [(["succ increments a given number by 1"], Success)]
+        runjs code suite `shouldReturn` [TestResult ["succ increments a given number by 1"] Success]
 
       it "accepts describes" $ do
         let code = [text|
@@ -92,7 +92,7 @@ spec = do
             })
           })
         |]
-        runjs code suite `shouldReturn` [(["succ", "increments a given number by 1"], Success)]
+        runjs code suite `shouldReturn` [TestResult ["succ", "increments a given number by 1"] Success]
 
       it "accepts multiple test cases" $ do
         let code = [text|
@@ -109,8 +109,8 @@ spec = do
             assert.equals(succ(10), 11)
           })
         |]
-        runjs code suite `shouldReturn` [ (["if I pass a 3 to succ it returns 4"], Success),
-                                          (["if I pass a 10 to succ it returns 11"], Success)]
+        runjs code suite `shouldReturn` [(TestResult ["if I pass a 3 to succ it returns 4"] Success),
+                                         (TestResult ["if I pass a 10 to succ it returns 11"] Success)]
 
 
     context "python" $ do
@@ -121,7 +121,7 @@ spec = do
             def test_is_true():
               self.assertTrue(True)
         |]
-        runpy code suite `shouldReturn` [(["TestPython", "test_is_true"], Success)]
+        runpy code suite `shouldReturn` [TestResult ["TestPython", "test_is_true"] Success]
 
       context "assert.equals" $ do
         it "passes if values are equal" $ do
@@ -131,7 +131,7 @@ spec = do
               def test_passes():
                 self.assertEqual(1, 1)
           |]
-          runpy code suite `shouldReturn` [(["TestPython", "test_passes"], Success)]
+          runpy code suite `shouldReturn` [(TestResult ["TestPython", "test_passes"] Success)]
 
         it "fails if values are not equal" $ do
           let code = [text||]
@@ -140,7 +140,7 @@ spec = do
               def test_fails():
                 self.assertEqual(1, 2)
           |]
-          runpy code suite `shouldReturn` [(["TestPython", "test_fails"], Failure "MuString \"Expected MuNumber 1.0 but got: MuNumber 2.0\"")]
+          runpy code suite `shouldReturn` [TestResult ["TestPython", "test_fails"] (Failure "MuString \"Expected MuNumber 1.0 but got: MuNumber 2.0\"")]
 
       it "can handle failed tests" $ do
         let code = [text||]
@@ -149,7 +149,7 @@ spec = do
             def test_fails():
               self.assertTrue(False)
         |]
-        runpy code suite `shouldReturn` [(["TestPython", "test_fails"], Failure "MuString \"Expected True but got: False\"")]
+        runpy code suite `shouldReturn` [TestResult ["TestPython", "test_fails"] (Failure "MuString \"Expected True but got: False\"")]
 
       it "can handle errored tests" $ do
         let code = [text||]
@@ -158,7 +158,7 @@ spec = do
             def test_errors():
               self.assertEqual(succ(3), 4)
         |]
-        runpy code suite `shouldReturn` [(["TestPython", "test_errors"], Failure "MuString \"Reference not found for name 'succ'\"")]
+        runpy code suite `shouldReturn` [TestResult ["TestPython", "test_errors"] (Failure "MuString \"Reference not found for name 'succ'\"")]
 
       it "can reference functions defined in code" $ do
         let code = [text|
@@ -170,7 +170,7 @@ spec = do
             def test_succ_increments_a_given_numer_by_1():
               self.assertEqual(succ(3), 4)
         |]
-        runpy code suite `shouldReturn` [(["TestPython", "test_succ_increments_a_given_numer_by_1"], Success)]
+        runpy code suite `shouldReturn` [TestResult ["TestPython", "test_succ_increments_a_given_numer_by_1"] Success]
 
       it "accepts multiple test cases" $ do
         let code = [text|
@@ -185,5 +185,5 @@ spec = do
             def test_if_I_pass_a_10_to_succ_it_returns_11():
               self.assertEqual(succ(10), 11)
         |]
-        runpy code suite `shouldReturn` [ (["TestSucc", "test_if_I_pass_a_3_to_succ_it_returns_4"], Success),
-                                          (["TestSucc", "test_if_I_pass_a_10_to_succ_it_returns_11"], Success)]
+        runpy code suite `shouldReturn` [(TestResult ["TestSucc", "test_if_I_pass_a_3_to_succ_it_returns_4"] Success),
+                                         (TestResult ["TestSucc", "test_if_I_pass_a_10_to_succ_it_returns_11"] Success)]
