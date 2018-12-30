@@ -8,23 +8,21 @@ import           Control.Monad (forM)
 import           Control.Monad.Writer.Strict
 import           Data.List (intercalate)
 
-import qualified Language.Mulang as Mu
+import  Language.Mulang.Ast (Expression(..))
 
-data MuTest = MuTest { description :: [String]
-                     , body :: Mu.Expression
-                     } deriving (Show)
+data MuTest = MuTest { description :: [String] , body :: Expression } deriving (Show)
 
-getTests :: Mu.Expression -> [MuTest]
+getTests :: Expression -> [MuTest]
 getTests expr = execWriter $ getAllTestsFromExpr [] expr
 
 type TestsMonad a = Writer [MuTest] a
 
-getAllTestsFromExpr :: [String] -> Mu.Expression -> Writer [MuTest] ()
-getAllTestsFromExpr s (Mu.TestGroup (Mu.MuString desc) f) = do
+getAllTestsFromExpr :: [String] -> Expression -> Writer [MuTest] ()
+getAllTestsFromExpr s (TestGroup (MuString desc) f) = do
   getAllTestsFromExpr (s ++ [desc]) f
-getAllTestsFromExpr s (Mu.Sequence expressions) =
+getAllTestsFromExpr s (Sequence expressions) =
   void $ forM expressions (getAllTestsFromExpr s)
-getAllTestsFromExpr s (Mu.Test (Mu.MuString desc) f) = do
+getAllTestsFromExpr s (Test (MuString desc) f) = do
   tell $ [ MuTest { description = s ++ [desc] , body = f } ]
 getAllTestsFromExpr s e =
   error $ "Unknown expression: " ++ show e ++ "\nIn " ++ intercalate " > " s
