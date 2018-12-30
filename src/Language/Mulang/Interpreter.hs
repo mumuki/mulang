@@ -237,6 +237,8 @@ evalExpr (Mu.Raise expr) = raiseInternal =<< evalExpr expr
 
 evalExpr (Mu.Reference name) = findReferenceForName name
 evalExpr (Mu.None) = return nullRef
+evalExpr (Mu.TestGroup _ _) = return nullRef
+evalExpr (Mu.Test _ _)  = return nullRef
 evalExpr e = raiseString $ "Unkown expression: " ++ show e
 
 evalCondition :: Mu.Expression -> Executable Bool

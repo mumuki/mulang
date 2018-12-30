@@ -8,11 +8,12 @@ import           Language.Mulang.Parsers.Python
 import           Language.Mulang.Interpreter.Runner
 import           Language.Mulang.Interpreter.Tests
 
-import           Data.Text (unpack)
+import           Data.Text (unpack, append)
 import           NeatInterpolation (text)
 
 parse language = language . unpack
-run language code testSuite = runTests (parse language code) (getTests $ parse language testSuite)
+run language code suite = runTests ast (getTests ast)
+  where ast = parse language (append code suite)
 runjs = run js
 runpy = run py
 
