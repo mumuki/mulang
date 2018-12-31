@@ -1,6 +1,20 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Language.Mulang.Interpreter where
+module Language.Mulang.Interpreter (
+  currentRaiseCallback,
+  defaultContext,
+  eval,
+  eval',
+  putRef,
+  updateLocalVariables,
+  currentException,
+  nullRef,
+  dereference,
+  globalObjects,
+  evalExpr,
+  dereference',
+  Value(..)
+) where
 
 import           Data.Map.Strict (Map)
 import           Data.Maybe (fromMaybe, fromJust)
@@ -22,7 +36,6 @@ type Callback = Reference -> Executable ()
 newtype Reference = Reference Int deriving (Show, Eq, Ord)
 
 type ObjectSpace = Map Reference Value
-type LocalVariables = Map String Reference
 
 instance Show ExecutionContext where
   show (ExecutionContext globalObjects scopes _ _ _) =

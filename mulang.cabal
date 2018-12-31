@@ -70,7 +70,6 @@ library
     Language.Mulang.Analyzer.TestsAnalyzer
     Language.Mulang.Interpreter
     Language.Mulang.Interpreter.Runner
-    Language.Mulang.Interpreter.Tests
 
   build-depends:
     base                      <= 5,

@@ -6,13 +6,12 @@ import           Test.Hspec
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Python
 import           Language.Mulang.Interpreter.Runner
-import           Language.Mulang.Interpreter.Tests
 
 import           Data.Text (unpack)
 import           NeatInterpolation (text)
 
 parse language = language . unpack
-run language code testSuite = runTests (parse language code) (getTests $ parse language testSuite)
+run language code testSuite = runTests (parse language code) (parse language testSuite)
 runjs = run js
 runpy = run py
 
