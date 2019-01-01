@@ -2,6 +2,8 @@ module        Language.Mulang.Analyzer.FragmentParser (
   parseFragment,
   parseFragment') where
 
+import        Control.Fallible (orFail)
+
 import        Language.Mulang
 import        Language.Mulang.Parsers (EitherParser, maybeToEither)
 import        Language.Mulang.Parsers.Haskell
@@ -13,9 +15,7 @@ import        Language.Mulang.Analyzer.Analysis (Fragment(..), Language(..))
 import        Language.Mulang.Builder (normalize, normalizeWith, NormalizationOptions)
 
 parseFragment' :: Fragment -> Expression
-parseFragment' fragment = case parseFragment fragment of
-                            (Left e) -> error e
-                            (Right v) -> v
+parseFragment' = orFail . parseFragment
 
 parseFragment :: Fragment -> Either String Expression
 parseFragment (CodeFragment language content) = (parserFor language) content
