@@ -58,7 +58,8 @@ getTests :: Mu.Expression -> [MuTest]
 getTests expr = getAllTestsFromExpr [] expr
 
 getAllTestsFromExpr :: [String] -> Mu.Expression -> [MuTest]
+getAllTestsFromExpr _ Mu.None                             = []
 getAllTestsFromExpr s (Mu.Test (Mu.MuString desc) f)      = [MuTest (s ++ [desc]) f]
 getAllTestsFromExpr s (Mu.TestGroup (Mu.MuString desc) f) = getAllTestsFromExpr (s ++ [desc]) f
-getAllTestsFromExpr s (Mu.Sequence expressions)        = concatMap (getAllTestsFromExpr s) expressions
-getAllTestsFromExpr s e                                = error $ "Unknown expression: " ++ show e ++ "\nIn " ++ intercalate " > " s
+getAllTestsFromExpr s (Mu.Sequence expressions)           = concatMap (getAllTestsFromExpr s) expressions
+getAllTestsFromExpr s e                                   = error $ "Unknown expression: " ++ show e ++ "\nIn " ++ intercalate " > " s

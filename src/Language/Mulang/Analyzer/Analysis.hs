@@ -93,11 +93,11 @@ data InterpreterOptions = InterpreterOptions {
 
 data TestAnalysisType
   = NoTests
-  | EmbeddedTests { interpreterOptions :: InterpreterOptions }
+  | EmbeddedTests { interpreterOptions :: Maybe InterpreterOptions }
   | ExternalTests {
       test :: Fragment,
       extra :: Maybe Fragment,
-      interpreterOptions :: InterpreterOptions
+      interpreterOptions :: Maybe InterpreterOptions
     } deriving (Show, Eq, Generic)
 
 data Language

@@ -12,6 +12,7 @@ module Language.Mulang.Analyzer (
   expectationsAnalysis,
   smellsAnalysis,
   signaturesAnalysis,
+  testsAnalysis,
 
   emptyCompletedAnalysisResult,
 
@@ -62,6 +63,9 @@ smellsAnalysis code set = Analysis code (emptyAnalysisSpec { smellsSet = set })
 
 signaturesAnalysis :: Fragment -> SignatureStyle -> Analysis
 signaturesAnalysis code style = Analysis code (emptyAnalysisSpec { signatureAnalysisType = Just (StyledSignatures style) })
+
+testsAnalysis :: Fragment -> TestAnalysisType -> Analysis
+testsAnalysis code testAnalysisType = Analysis code (emptyAnalysisSpec { testAnalysisType = Just testAnalysisType })
 
 emptyCompletedAnalysisResult :: AnalysisResult
 emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing

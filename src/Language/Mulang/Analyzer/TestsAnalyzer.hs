@@ -12,6 +12,9 @@ import Data.Maybe (fromMaybe)
 analyseTests :: Expression -> Maybe TestAnalysisType -> IO [TestResult]
 analyseTests e analysis = analyseTests' e (fromMaybe NoTests analysis)
 
-analyseTests' _ NoTests    = return []
-analyseTests' e (EmbeddedTests _) = runTests e e
-analyseTests' e (ExternalTests test extra _) = runTests (merge e (fromMaybe None (fmap parseFragment' extra))) (parseFragment' test)
+analyseTests' _ NoTests                      = return []
+analyseTests' e (EmbeddedTests _)            = runTests e e
+analyseTests' e (ExternalTests test extra _) = runTests (merge e extraFragment) testFragment
+    where
+      testFragment  = parseFragment' test
+      extraFragment = fromMaybe None . fmap parseFragment' $ extra
