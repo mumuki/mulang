@@ -408,6 +408,7 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `declaresTypeAlias`               |  any               | is a given type synonym declared?
 | `declaresTypeSignature`           |  any               | is a given computation type signature declared?
 | `declaresVariable`                |  any               | is a given local o global variable declared?
+| `delegates`                       |  delegates         | is a method, function or procedure declared AND called?
 | `discardsExceptions`              |  any               | are exceptions discarded within an empty catch block?
 | `doesConsolePrint`                |  any               | is there any console-print-statement like `System.out.println`, `puts` or `console.log`?
 | `doesNullTest`                    |  object oriented   | is there a test agains a null value, like `if x == nil then puts 'is nil'`
