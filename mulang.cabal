@@ -63,7 +63,7 @@ library
     Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.ExpectationsAnalyzer
     Language.Mulang.Analyzer.ExpectationsCompiler
-    Language.Mulang.Analyzer.SampleParser
+    Language.Mulang.Analyzer.FragmentParser
     Language.Mulang.Analyzer.SignaturesAnalyzer
     Language.Mulang.Analyzer.SignatureStyleCompiler
     Language.Mulang.Analyzer.SmellsAnalyzer

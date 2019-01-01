@@ -21,7 +21,7 @@ instance FromJSON SignatureStyle
 instance FromJSON NormalizationOptions
 instance FromJSON SequenceSortMode
 
-instance FromJSON Sample
+instance FromJSON Fragment
 instance FromJSON Language
 
 instance FromJSON Equation

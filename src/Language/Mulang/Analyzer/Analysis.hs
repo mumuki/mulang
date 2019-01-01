@@ -12,7 +12,7 @@ module Language.Mulang.Analyzer.Analysis (
   SignatureAnalysisType(..),
   TestAnalysisType(..),
   SignatureStyle(..),
-  Sample(..),
+  Fragment(..),
   Language(..),
 
   AnalysisResult(..),
@@ -39,7 +39,7 @@ data Expectation
 --
 
 data Analysis = Analysis {
-  sample :: Sample,
+  sample :: Fragment,
   spec :: AnalysisSpec
 } deriving (Show, Eq, Generic)
 
@@ -80,9 +80,9 @@ data SignatureStyle
   | HaskellStyle
   | PrologStyle deriving (Show, Eq, Generic)
 
-data Sample
-  = MulangSample { ast :: Expression, normalizationOptions :: Maybe NormalizationOptions }
-  | CodeSample { language :: Language, content :: Code } deriving (Show, Eq, Generic)
+data Fragment
+  = MulangFragment { ast :: Expression, normalizationOptions :: Maybe NormalizationOptions }
+  | CodeFragment { language :: Language, content :: Code } deriving (Show, Eq, Generic)
 
 data TestAnalysisType
   = IgnoreTests

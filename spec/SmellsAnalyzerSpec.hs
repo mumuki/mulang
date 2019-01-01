@@ -7,12 +7,12 @@ import           Test.Hspec
 result smells
   = emptyCompletedAnalysisResult { smells = smells }
 
-runExcept language content smells = analyse (smellsAnalysis (CodeSample language content) (allSmellsBut smells))
-runOnly language content smells = analyse (smellsAnalysis (CodeSample language content) (noSmellsBut smells))
+runExcept language content smells = analyse (smellsAnalysis (CodeFragment language content) (allSmellsBut smells))
+runOnly language content smells = analyse (smellsAnalysis (CodeFragment language content) (noSmellsBut smells))
 
 spec = describe "SmellsAnalyzer" $ do
   describe "Using domain language and nested structures" $ do
-    let runRuby sample = analyse (domainLanguageAnalysis (MulangSample sample Nothing) (DomainLanguage Nothing (Just RubyCase) (Just 3) Nothing))
+    let runRuby sample = analyse (domainLanguageAnalysis (MulangFragment sample Nothing) (DomainLanguage Nothing (Just RubyCase) (Just 3) Nothing))
     it "works with empty set" $ do
       (runRuby (Sequence [
         (Object "Foo_Bar" (Sequence [

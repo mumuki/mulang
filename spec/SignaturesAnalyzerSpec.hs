@@ -6,7 +6,7 @@ import           Test.Hspec
 result signatures
   = emptyCompletedAnalysisResult { signatures = signatures }
 
-run language content style = analyse (signaturesAnalysis (CodeSample language content) style)
+run language content style = analyse (signaturesAnalysis (CodeFragment language content) style)
 
 spec = describe "SignturesAnalyzer" $ do
   it "handles MulangStyle" $ do

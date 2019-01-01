@@ -23,7 +23,7 @@ import Language.Mulang
 import Language.Mulang.Analyzer.Analysis
 import Language.Mulang.Analyzer.DomainLanguageCompiler (emptyDomainLanguage, compileDomainLanguage)
 import Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
-import Language.Mulang.Analyzer.SampleParser (parseSample)
+import Language.Mulang.Analyzer.FragmentParser (parseFragment)
 import Language.Mulang.Analyzer.SignaturesAnalyzer  (analyseSignatures)
 import Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
 import Language.Mulang.Analyzer.TestsAnalyzer  (analyseTests)
@@ -48,19 +48,19 @@ allSmellsBut = Just . AllSmells . Just
 emptyAnalysisSpec :: AnalysisSpec
 emptyAnalysisSpec = AnalysisSpec Nothing Nothing Nothing Nothing Nothing Nothing
 
-emptyAnalysis :: Sample -> Analysis
+emptyAnalysis :: Fragment -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec
 
-domainLanguageAnalysis :: Sample -> DomainLanguage -> Analysis
+domainLanguageAnalysis :: Fragment -> DomainLanguage -> Analysis
 domainLanguageAnalysis code domainLanguage = Analysis code (emptyAnalysisSpec { domainLanguage = Just domainLanguage, smellsSet = allSmells })
 
-expectationsAnalysis :: Sample -> [Expectation] -> Analysis
+expectationsAnalysis :: Fragment -> [Expectation] -> Analysis
 expectationsAnalysis code es = Analysis code (emptyAnalysisSpec { expectations = Just es })
 
-smellsAnalysis :: Sample -> Maybe SmellsSet -> Analysis
+smellsAnalysis :: Fragment -> Maybe SmellsSet -> Analysis
 smellsAnalysis code set = Analysis code (emptyAnalysisSpec { smellsSet = set })
 
-signaturesAnalysis :: Sample -> SignatureStyle -> Analysis
+signaturesAnalysis :: Fragment -> SignatureStyle -> Analysis
 signaturesAnalysis code style = Analysis code (emptyAnalysisSpec { signatureAnalysisType = Just (StyledSignatures style) })
 
 emptyCompletedAnalysisResult :: AnalysisResult
@@ -71,7 +71,7 @@ emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing
 --
 
 analyse :: Analysis -> IO AnalysisResult
-analyse (Analysis sample spec) = analyseSample (parseSample sample)
+analyse (Analysis sample spec) = analyseSample (parseFragment sample)
   where analyseSample (Right ast)    = analyseAst ast spec
         analyseSample (Left message) = return $ AnalysisFailed message
 

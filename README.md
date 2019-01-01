@@ -538,7 +538,7 @@ Let's see some usage samples:
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeSample",
+      "tag" : "CodeFragment",
       "language" : "Haskell",
       "content" : "x = 1"
    },
@@ -574,7 +574,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeSample",
+      "tag" : "CodeFragment",
       "language" : "Haskell",
       "content" : "x = 1"
    },
@@ -610,7 +610,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeSample",
+      "tag" : "CodeFragment",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return x + y; }"
    },
@@ -638,7 +638,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeSample",
+      "tag" : "CodeFragment",
       "language" : "JavaScript",
       "content" : "function foo(x, y { return x + y; }"
    },
@@ -661,7 +661,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
-      "tag" : "MulangSample",
+      "tag" : "MulangFragment",
       "ast" : {
          "tag" : "Sequence",
          "contents" : [
@@ -707,7 +707,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeSample",
+      "tag" : "CodeFragment",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
@@ -747,7 +747,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeSample",
+      "tag" : "CodeFragment",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
@@ -784,7 +784,7 @@ by the `domainLanguage` setting, which you _can_ configure:
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeSample",
+      "tag" : "CodeFragment",
       "language" : "Prolog",
       "content" : "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer)."
    },
@@ -820,7 +820,7 @@ Also, if you want to use `HasMisspelledIdentifiers` smell, you _need_ to specify
 $ mulang  '
 {
    "sample" : {
-      "tag" : "CodeSample",
+      "tag" : "CodeFragment",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
@@ -853,7 +853,7 @@ $ mulang  '
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeSample",
+      "tag" : "CodeFragment",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
