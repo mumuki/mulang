@@ -32,8 +32,10 @@ import Language.Mulang.Interpreter.Runner (TestResult)
 type Smell = String
 type Inspection = String
 
-data Expectation
-  = Expectation { binding :: String, inspection :: Inspection } deriving (Show, Eq, Generic)
+data Expectation = Expectation {
+  binding :: String,
+  inspection :: Inspection
+} deriving (Show, Eq, Generic)
 
 --
 -- Analysis input structures
@@ -53,13 +55,12 @@ data AnalysisSpec = AnalysisSpec {
   includeIntermediateLanguage :: Maybe Bool
 } deriving (Show, Eq, Generic)
 
-data DomainLanguage
-  = DomainLanguage {
-      dictionaryFilePath :: Maybe FilePath,
-      caseStyle :: Maybe CaseStyle,
-      minimumIdentifierSize :: Maybe Int,
-      jargon :: Maybe [String]
-    }  deriving (Show, Eq, Generic)
+data DomainLanguage = DomainLanguage {
+  dictionaryFilePath :: Maybe FilePath,
+  caseStyle :: Maybe CaseStyle,
+  minimumIdentifierSize :: Maybe Int,
+  jargon :: Maybe [String]
+} deriving (Show, Eq, Generic)
 
 data CaseStyle
   = CamelCase
@@ -112,11 +113,12 @@ data Language
 --
 
 data AnalysisResult
-  = AnalysisCompleted { expectationResults :: [ExpectationResult],
-                        smells :: [Expectation],
-                        signatures :: [Code],
-                        testResults :: [TestResult],
-                        intermediateLanguage :: Maybe Expression }
+  = AnalysisCompleted {
+      expectationResults :: [ExpectationResult],
+      smells :: [Expectation],
+      signatures :: [Code],
+      testResults :: [TestResult],
+      intermediateLanguage :: Maybe Expression }
   | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
 data ExpectationResult = ExpectationResult {
