@@ -9,9 +9,7 @@ module Language.Mulang.Interpreter.Runner (
 import GHC.Generics
 
 import           Control.Monad (forM)
-import           Control.Monad.State.Class
 import           Control.Monad.State.Strict
-import           Control.Monad.Cont (callCC)
 import           Data.Maybe (fromMaybe, fromJust)
 import           Data.List (intercalate)
 
@@ -49,11 +47,8 @@ runTests' expr tests = do
   (_ref, context) <- eval defaultContext expr
   forM tests $ \(MuTest desc testExpr) -> do
     (exceptionRef, testContext) <- eval' context $ do
-      _ <- callCC $ \raiseCallback -> do
-        put (context { currentRaiseCallback = raiseCallback })
-        evalExpr testExpr
-        return nullRef
-      fromMaybe nullRef <$> gets currentException
+      (_, lastException) <- evalRaising context testExpr
+      return $ fromMaybe nullRef lastException
     let exception = dereference' (globalObjects testContext) exceptionRef
     case exception of
       MuNull -> return $ TestResult desc Success

@@ -1,18 +1,15 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Language.Mulang.Interpreter (
-  currentRaiseCallback,
   defaultContext,
+  dereference,
+  dereference',
   eval,
   eval',
-  putRef,
-  updateLocalVariables,
-  currentException,
-  nullRef,
-  dereference,
-  globalObjects,
   evalExpr,
-  dereference',
+  evalRaising,
+  nullRef,
+  ExecutionContext(..),
   Value(..)
 ) where
 
@@ -73,6 +70,15 @@ eval' ctx ref = runStateT (runContT ref return) ctx
 
 eval :: ExecutionContext -> Mu.Expression -> IO (Reference, ExecutionContext)
 eval ctx expr = eval' ctx (evalExpr expr)
+
+evalRaising :: ExecutionContext -> Mu.Expression ->  Executable (Reference, Maybe Reference)
+evalRaising context expr = do
+  resultRef <- callCC $ \raiseCallback -> do
+    put (context { currentRaiseCallback = raiseCallback })
+    evalExpr expr
+    return nullRef
+  lastException <- gets currentException
+  return (resultRef, lastException)
 
 evalExpressionsWith :: [Mu.Expression] -> ([Value] -> Executable Reference) -> Executable Reference
 evalExpressionsWith expressions f = do
@@ -228,11 +234,7 @@ evalExpr (Mu.Assignment name expr) = do
 
 evalExpr (Mu.Try expr [( Mu.VariablePattern exName, catchExpr)] finallyExpr) = do
   context <- get
-  resultRef <- callCC $ \raiseCallback -> do
-    put (context { currentRaiseCallback = raiseCallback })
-    evalExpr expr
-    return nullRef
-  lastException <- gets currentException
+  (resultRef, lastException) <- evalRaising context expr
   modify' (\c ->
               c { currentReturnCallback = currentReturnCallback context
                 , currentRaiseCallback = currentRaiseCallback context
@@ -378,4 +380,3 @@ updateRef :: Reference -> (Value -> Value) -> Executable ()
 updateRef ref f = do
   val <- dereference ref
   putRef ref (f val)
-
