@@ -1,4 +1,4 @@
-module ExplorerSpec (spec) where
+module GeneratorSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang.Generator (transitiveReferencedIdentifiers, declaredIdentifiers, referencedIdentifiers)

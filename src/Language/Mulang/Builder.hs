@@ -43,15 +43,13 @@ compact []  = None
 compact [e] = e
 compact es  = Sequence es
 
-merge :: [Expression] -> Expression
-merge = foldl plus None
-  where
-    plus e1 None                      = e1
-    plus None e2                      = e2
-    plus (Sequence s1) (Sequence s2)  = Sequence (s1 ++ s2)
-    plus (Sequence s1) e2             = Sequence (s1 ++ [e2])
-    plus e1            (Sequence s2)  = Sequence (e1 : s2)
-    plus e1            e2             = Sequence [e1, e2]
+merge :: Expression -> Expression -> Expression
+merge e1 None                      = e1
+merge None e2                      = e2
+merge (Sequence s1) (Sequence s2)  = Sequence (s1 ++ s2)
+merge (Sequence s1) e2             = Sequence (s1 ++ [e2])
+merge e1            (Sequence s2)  = Sequence (e1 : s2)
+merge e1            e2             = Sequence [e1, e2]
 
 defaultNormalizationOptions :: NormalizationOptions
 defaultNormalizationOptions = NormalizationOptions {
