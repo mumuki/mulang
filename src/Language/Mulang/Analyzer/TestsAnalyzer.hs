@@ -3,8 +3,9 @@ module Language.Mulang.Analyzer.TestsAnalyzer (
 
 import Language.Mulang
 import Language.Mulang.Analyzer.Analysis (TestAnalysisType(..))
-import Language.Mulang.Interpreter.Runner (runTests, TestResult(..))
 import Language.Mulang.Analyzer.FragmentParser (parseFragment')
+import Language.Mulang.Builder (merge)
+import Language.Mulang.Interpreter.Runner (runTests, TestResult(..))
 
 import Data.Maybe (fromMaybe)
 
@@ -13,4 +14,4 @@ analyseTests e analysis = analyseTests' e (fromMaybe NoTests analysis)
 
 analyseTests' _ NoTests    = return []
 analyseTests' e (EmbeddedTests _) = runTests e e
-analyseTests' e (ExternalTests test _ _) = runTests e (parseFragment' test)
+analyseTests' e (ExternalTests test extra _) = runTests (merge e (fromMaybe None (fmap parseFragment' extra))) (parseFragment' test)
