@@ -32,6 +32,7 @@ instance FromJSON Statement
 instance FromJSON Type
 instance FromJSON Assertion
 instance FromJSON TestAnalysisType
+instance FromJSON InterpreterOptions
 
 instance ToJSON AnalysisResult
 instance ToJSON ExpectationResult

@@ -11,6 +11,7 @@ module Language.Mulang.Analyzer.Analysis (
   Smell,
   SignatureAnalysisType(..),
   TestAnalysisType(..),
+  InterpreterOptions(..),
   SignatureStyle(..),
   Fragment(..),
   Language(..),
@@ -84,9 +85,19 @@ data Fragment
   = MulangFragment { ast :: Expression, normalizationOptions :: Maybe NormalizationOptions }
   | CodeFragment { language :: Language, content :: Code } deriving (Show, Eq, Generic)
 
+data InterpreterOptions = InterpreterOptions {
+  strictReturns :: Maybe Bool,
+  strictShortCircuit :: Maybe Bool
+} deriving (Show, Eq, Generic)
+
 data TestAnalysisType
-  = IgnoreTests
-  | RunTests { strictReturns :: Maybe Bool, strictShortCircuit :: Maybe Bool } deriving (Show, Eq, Generic)
+  = NoTests
+  | EmbeddedTests { interpreterOptions :: InterpreterOptions }
+  | ExternalTests {
+      test :: Fragment,
+      extra :: Maybe Fragment,
+      interpreterOptions :: InterpreterOptions
+    } deriving (Show, Eq, Generic)
 
 data Language
   =  Json

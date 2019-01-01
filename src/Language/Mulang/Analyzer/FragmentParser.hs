@@ -1,5 +1,6 @@
 module        Language.Mulang.Analyzer.FragmentParser (
-  parseFragment) where
+  parseFragment,
+  parseFragment') where
 
 import        Language.Mulang
 import        Language.Mulang.Parsers (EitherParser, maybeToEither)
@@ -10,6 +11,11 @@ import        Language.Mulang.Parsers.Java (parseJava)
 import        Language.Mulang.Parsers.Python (parsePython)
 import        Language.Mulang.Analyzer.Analysis (Fragment(..), Language(..))
 import        Language.Mulang.Builder (normalize, normalizeWith, NormalizationOptions)
+
+parseFragment' :: Fragment -> Expression
+parseFragment' fragment = case parseFragment fragment of
+                            (Left e) -> error e
+                            (Right v) -> v
 
 parseFragment :: Fragment -> Either String Expression
 parseFragment (CodeFragment language content) = (parserFor language) content
