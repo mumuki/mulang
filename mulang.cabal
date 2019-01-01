@@ -3,7 +3,7 @@ version:             4.3.0
 synopsis:            An intermediate language designed to perform advanced code analysis
 description:         Mulang is an intermediate language, a combinators library for static code analysis and a multilanguage comand line tool
 license:             GPL-3.0
-license-file:        LICENSE.txt
+license-file:        LICENSE
 author:              Franco Leonardo Bulgarelli
 maintainer:          franco@mumuki.org
 category:            Language
