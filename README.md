@@ -900,6 +900,44 @@ $ mulang '
 
 ```
 
+## With test running
+
+```bash
+mulang '{
+"sample" : {
+   "tag" : "CodeFragment",
+   "language" : "JavaScript",
+   "content" : "function f(x) { return x + 1 }"
+},
+"spec" : {
+   "testAnalysisType" : {
+     "tag" :  "ExternalTests",
+     "test" : {
+       "tag" : "CodeFragment",
+       "language" : "JavaScript",
+       "content" : "it(\"f increments by one\", function() { assert.equals(f(1), 2) })"
+     }
+   }
+ }
+}' | json_pp
+{
+   "testResults" : [
+      {
+         "description" : [
+            "f increments by one"
+         ],
+         "status" : {
+            "tag" : "Success"
+         }
+      }
+   ],
+   "signatures" : [],
+   "intermediateLanguage" : null,
+   "tag" : "AnalysisCompleted",
+   "smells" : [],
+   "expectationResults" : []
+}
+```
 
 # Mulang AST spec
 
