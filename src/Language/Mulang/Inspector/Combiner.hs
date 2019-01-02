@@ -5,16 +5,19 @@ module Language.Mulang.Inspector.Combiner (
   scoped,
   scopedList,
   transitive,
-  transitiveList) where
+  transitiveList,
+  Scope) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (transitiveReferencedIdentifiers, declarationsOf, declaredIdentifiers)
 import Language.Mulang.Inspector.Primitive
 
+type Scope = Inspection -> Inspection
+
 detect :: Inspection -> Expression -> [Identifier]
 detect i expression =
   filter (`inspection` expression) $ declaredIdentifiers expression
-    where inspection = scoped i
+    where inspection = scoped' i
 
 alternative :: Inspection -> Inspection -> Inspection
 alternative i1 i2 expression = i1 expression || i2 expression
@@ -22,26 +25,26 @@ alternative i1 i2 expression = i1 expression || i2 expression
 negative :: Inspection -> Inspection
 negative f = not . f
 
-scoped :: Inspection -> Identifier -> Inspection
-scoped inspection scope =  any inspection . declarationsOf scope
+scoped :: Identifier -> Scope
+scoped scope inspection =  any inspection . declarationsOf scope
 
-scopedList :: Inspection -> [Identifier] -> Inspection
-scopedList i =  foldl scoped i . reverse
+scopedList :: [Identifier] -> Scope
+scopedList scopes i =  foldl scoped' i . reverse $ scopes
 
-transitive :: Inspection -> Identifier -> Inspection
-transitive inspection identifier code = any (`scopedInspection` code) . transitiveReferencedIdentifiers identifier $ code
-  where scopedInspection = scoped inspection
+transitive :: Identifier -> Scope
+transitive identifier inspection code = any (`scopedInspection` code) . transitiveReferencedIdentifiers identifier $ code
+  where scopedInspection = scoped' inspection
 
-transitiveList :: Inspection -> [Identifier] -> Inspection
-transitiveList i identifiers = transitive (scopedList i (init identifiers)) (last identifiers)
+transitiveList :: [Identifier] -> Scope
+transitiveList identifiers i = transitive (last identifiers) (scopedList (init identifiers) i)
 
 type GeneralizedInspection = Expression -> Inspection
 
 generalize :: Inspection -> GeneralizedInspection
 generalize inspection = \_ expression -> inspection expression
 
-generalized :: (Inspection -> a -> Inspection) -> a -> GeneralizedInspection -> GeneralizedInspection
-generalized f arg inspection = \root expression -> (f (inspection root) arg) expression
+generalized :: (a -> Inspection ->  Inspection) -> a -> GeneralizedInspection -> GeneralizedInspection
+generalized f arg inspection = \root expression -> (f arg (inspection root)) expression
 
 generalizedScoped :: Identifier -> GeneralizedInspection -> GeneralizedInspection
 generalizedScoped = generalized scoped
@@ -54,3 +57,5 @@ generalizedTransitive = generalized transitive
 
 generalizedTransitiveList :: [Identifier] -> GeneralizedInspection -> GeneralizedInspection
 generalizedTransitiveList = generalized transitiveList
+
+scoped' = flip scoped

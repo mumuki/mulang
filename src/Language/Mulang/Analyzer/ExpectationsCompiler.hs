@@ -8,7 +8,6 @@ import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
 type Modifiers = (Scope, PredicateModifier)
-type Scope = (Inspection -> Inspection)
 type PredicateModifier = (IdentifierPredicate -> IdentifierPredicate)
 
 compileExpectation :: Expectation -> Inspection
@@ -28,7 +27,7 @@ compileModifiers ["Intransitive",name] = justScopeFor scopedList name
 compileModifiers [name]                = justScopeFor transitiveList name
 compileModifiers _                     = Nothing
 
-justScopeFor f name = Just (flip f names, andAlso (except (last names)))
+justScopeFor f name = Just (f names, andAlso (except (last names)))
   where names = splitOn "." name
 
 compileNegator :: [String] -> Scope

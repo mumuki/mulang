@@ -266,10 +266,10 @@ spec = do
       usesInheritance (Class "Bird" Nothing None) `shouldBe` False
 
     it "is True when present, scoped" $ do
-      (scoped usesInheritance "Bird") (Sequence [Class "Bird" (Just "Animal") None, Class "Fox" (Just "Animal") None])  `shouldBe` True
+      (scoped "Bird" usesInheritance) (Sequence [Class "Bird" (Just "Animal") None, Class "Fox" (Just "Animal") None])  `shouldBe` True
 
     it "is True when present, scoped" $ do
-      (scoped usesInheritance "Hercules") (Sequence [Class "Hercules" Nothing None, Class "Fox" (Just "Animal") None])  `shouldBe` False
+      (scoped "Hercules" usesInheritance) (Sequence [Class "Hercules" Nothing None, Class "Fox" (Just "Animal") None])  `shouldBe` False
 
   describe "usesMixins" $ do
     it "is True when include present" $ do
@@ -293,10 +293,10 @@ spec = do
       declaresMethod anyone (js "var f = {x: function(){}}")  `shouldBe` True
 
     it "is True when scoped in a class" $ do
-      scoped (declaresMethod (named "foo")) "A" (java "class A { void foo() {} }")  `shouldBe` True
+      scoped "A" (declaresMethod (named "foo")) (java "class A { void foo() {} }")  `shouldBe` True
 
     it "is False when scoped in a class and not present" $ do
-      scoped (declaresMethod (named "foo")) "A" (java "class A { void foobar() {} }") `shouldBe` False
+      scoped "A" (declaresMethod (named "foo")) (java "class A { void foobar() {} }") `shouldBe` False
 
     it "is False when not present" $ do
       declaresMethod (named "m") (js "var f = {x: function(){}}")  `shouldBe` False
@@ -305,10 +305,10 @@ spec = do
       declaresMethod (named "m") (js "var f = {x: 6}")  `shouldBe` False
 
     it "is True when object present, scoped" $ do
-      scoped (declaresMethod (named "x")) "f"  (js "var f = {x: function(){}}")  `shouldBe` True
+      scoped "f" (declaresMethod (named "x")) (js "var f = {x: function(){}}")  `shouldBe` True
 
     it "is False when object not present, scoped" $ do
-      scoped (declaresMethod (named "x")) "p"  (js "var f = {x: function(){}}")  `shouldBe` False
+      scoped "p" (declaresMethod (named "x")) (js "var f = {x: function(){}}")  `shouldBe` False
 
   describe "declaresAttribute" $ do
     it "is True when present" $ do
@@ -321,13 +321,13 @@ spec = do
       declaresAttribute (named "m") (js "var f = {x: 6}")  `shouldBe` False
 
     it "is True when attribute present, scoped" $ do
-      scoped (declaresAttribute (named "x")) "f"  (js "var f = {x: 6}")  `shouldBe` True
+      scoped "f" (declaresAttribute (named "x"))  (js "var f = {x: 6}")  `shouldBe` True
 
     it "is True when any attribute present, scoped" $ do
-      scoped (declaresAttribute anyone) "f"  (js "var f = {x: 6}")  `shouldBe` True
+      scoped "f" (declaresAttribute anyone) (js "var f = {x: 6}")  `shouldBe` True
 
     it "is False when attribute not present, scoped" $ do
-      scoped (declaresAttribute (named "x")) "g" (js "var f = {x: 6}")  `shouldBe` False
+      scoped "g" (declaresAttribute (named "x")) (js "var f = {x: 6}")  `shouldBe` False
 
   describe "uses" $ do
     it "is True on direct usage in entry point" $ do
@@ -449,7 +449,7 @@ spec = do
       uses (named "m") (hs "y = x 3") `shouldBe` False
 
     it "is False when reference is not present, scoped" $ do
-      scoped (uses (named "m")) "p" (hs "z = m 3") `shouldBe` False
+      scoped "p" (uses (named "m")) (hs "z = m 3") `shouldBe` False
 
     it "is False when required function is blank" $ do
       uses (named "" )(hs "y = m 3") `shouldBe` False
@@ -510,34 +510,34 @@ spec = do
       uses (named "m") (js "var o = {z: function(x) { m }}") `shouldBe` True
 
     it "is True on direct usage in method, scoped" $ do
-      scoped (uses (named "m")) "o" (js "var o = {z: function(x) { m }}") `shouldBe` True
+      scoped "o" (uses (named "m")) (js "var o = {z: function(x) { m }}") `shouldBe` True
 
     it "is False on missing usage in method, scoped" $ do
-      scoped (uses (named "p")) "o" (js "var o = {z: function(x) { m }}") `shouldBe` False
+      scoped "o" (uses (named "p")) (js "var o = {z: function(x) { m }}") `shouldBe` False
 
     it "is True on usage in method, scoped twice" $ do
-      scopedList (uses (named "m")) ["o", "z"] (js "var o = {z: function(x) { m }}") `shouldBe` True
+      scopedList ["o", "z"] (uses (named "m")) (js "var o = {z: function(x) { m }}") `shouldBe` True
 
     it "is False on missing usage in method, scoped twice" $ do
-      scopedList (uses (named "p")) ["o", "z"] (js "var o = {z: function(x) { m }}") `shouldBe` False
+      scopedList ["o", "z"] (uses (named "p")) (js "var o = {z: function(x) { m }}") `shouldBe` False
 
     it "is False on usage in wrong method, scoped twice" $ do
-      scopedList (uses (named "m")) ["o", "z"] (js "var o = {p: function(x) { m }}") `shouldBe` False
+      scopedList ["o", "z"] (uses (named "m")) (js "var o = {p: function(x) { m }}") `shouldBe` False
 
     it "is True through function application in function" $ do
-      transitive (uses (named "m")) "f" (js "function g() { m }; function f(x) { g() }") `shouldBe` True
+      transitive "f" (uses (named "m")) (js "function g() { m }; function f(x) { g() }") `shouldBe` True
 
     it "is True through function application in function" $ do
-      transitive (uses (named "m")) "f" (js "function g(p) { return m }; function f(x) { return g(2) }") `shouldBe` True
+      transitive "f" (uses (named "m")) (js "function g(p) { return m }; function f(x) { return g(2) }") `shouldBe` True
 
     it "is False through function application in function" $ do
-      transitive (uses (named "m")) "f" (js "function g() { m }; function f(x) { k() }") `shouldBe` False
+      transitive "f" (uses (named "m")) (js "function g() { m }; function f(x) { k() }") `shouldBe` False
 
     it "is True through message send in function" $ do
-      transitive (uses (named "m")) "f" (js "var o = {g: function(){ m }}; function f(x) { o.g() }") `shouldBe` True
+      transitive "f" (uses (named "m")) (js "var o = {g: function(){ m }}; function f(x) { o.g() }") `shouldBe` True
 
     it "is True through message send in objects" $ do
-      transitive (uses (named "m")) "p" (js "var o = {g: function(){ m }}\n\
+      transitive "p" (uses (named "m")) (js "var o = {g: function(){ m }}\n\
                                         \var p = {n: function() { o.g() }}") `shouldBe` True
 
   describe "declaresComputation" $ do
