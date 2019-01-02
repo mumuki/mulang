@@ -1,12 +1,10 @@
 module Language.Mulang.Inspector.Primitive (
-  inspect,
   containsExpression,
   containsDeclaration,
   containsBoundDeclaration,
   containsBody,
   matchesType,
   Inspection,
-  InspectionContext,
   IdentifierInspection) where
 
 import           Language.Mulang.Ast
@@ -16,7 +14,6 @@ import           Language.Mulang.Generator (expressions, boundDeclarations, equa
 import           Data.List.Extra (has)
 
 type Inspection = Expression -> Bool
-type InspectionContext = [()]
 type IdentifierInspection = IdentifierPredicate -> Inspection
 
 containsExpression :: (Expression -> Bool) -> Inspection
@@ -37,5 +34,3 @@ matchesType predicate (AsPattern _ (TypePattern n)) = predicate n
 matchesType predicate (UnionPattern patterns)       = any (matchesType predicate) patterns
 matchesType _         _                             = False
 
-inspect :: InspectionContext -> Bool
-inspect = not.null

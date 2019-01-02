@@ -40,18 +40,19 @@ library
     Language.Mulang.Signature
     Language.Mulang.DomainLanguage
     Language.Mulang.Inspector
-    Language.Mulang.Inspector.Primitive
-    Language.Mulang.Inspector.Generic
-    Language.Mulang.Inspector.Typed
-    Language.Mulang.Inspector.ObjectOriented
-    Language.Mulang.Inspector.ObjectOriented.Polymorphism
-    Language.Mulang.Inspector.Functional
-    Language.Mulang.Inspector.Logic
-    Language.Mulang.Inspector.Procedural
     Language.Mulang.Inspector.Combiner
+    Language.Mulang.Inspector.Functional
     Language.Mulang.Inspector.Generalized
+    Language.Mulang.Inspector.Generic
     Language.Mulang.Inspector.Generic.Duplication
     Language.Mulang.Inspector.Generic.Smell
+    Language.Mulang.Inspector.Logic
+    Language.Mulang.Inspector.ObjectOriented
+    Language.Mulang.Inspector.ObjectOriented.Polymorphism
+    Language.Mulang.Inspector.Primitive
+    Language.Mulang.Inspector.Procedural
+    Language.Mulang.Inspector.Query
+    Language.Mulang.Inspector.Typed
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Prolog
