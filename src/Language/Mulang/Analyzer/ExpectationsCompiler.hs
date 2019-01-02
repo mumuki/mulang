@@ -7,7 +7,7 @@ import Language.Mulang.Analyzer.Analysis (Expectation(..))
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
-type Modifiers = (Scope, PredicateModifier)
+type Modifiers = (GeneralizedScope, PredicateModifier)
 type PredicateModifier = (IdentifierPredicate -> IdentifierPredicate)
 
 compileExpectation :: Expectation -> Inspection
@@ -19,12 +19,12 @@ compileMaybe (Expectation b i) = do
   let negator = compileNegator inspectionParts
   (scope, predicateModifier) <- compileModifiers (splitOn ":" b)
   baseInspection             <- compileBaseInspection predicateModifier inspectionParts
-  return . negator . scope $ baseInspection
+  return . negator . specify . scope  $ baseInspection
 
 compileModifiers :: [String] -> Maybe Modifiers
 compileModifiers ["*"]                 = Just (id, id)
-compileModifiers ["Intransitive",name] = justScopeFor scopedList name
-compileModifiers [name]                = justScopeFor transitiveList name
+compileModifiers ["Intransitive",name] = justScopeFor generalizedScopedList name
+compileModifiers [name]                = justScopeFor generalizedTransitiveList name
 compileModifiers _                     = Nothing
 
 justScopeFor f name = Just (f names, andAlso (except (last names)))
@@ -34,7 +34,7 @@ compileNegator :: [String] -> Scope
 compileNegator ("Not":_) = negative
 compileNegator _         = id
 
-compileBaseInspection :: PredicateModifier -> [String] -> Maybe (Inspection)
+compileBaseInspection :: PredicateModifier -> [String] -> Maybe GeneralizedInspection
 compileBaseInspection p ("Not":parts)         = compileBaseInspection p parts
 compileBaseInspection p [verb]                = compileBaseInspection p [verb, "*"]
 compileBaseInspection p [verb, object]        = compileInspectionPrimitive verb (compileObject p object)
@@ -49,7 +49,7 @@ compileObject _ ('[':ns)   | last ns == ']' = anyOf . splitOn "|" . init $ ns
 compileObject _ name       = named name
 
 
-compileInspectionPrimitive :: String -> IdentifierPredicate -> Maybe Inspection
+compileInspectionPrimitive :: String -> IdentifierPredicate -> Maybe GeneralizedInspection
 compileInspectionPrimitive = f
   where
   f "Assigns"                        = binded assigns
@@ -123,6 +123,12 @@ compileInspectionPrimitive = f
   f "UsesYield"                      = simple usesYield
   f _                                = const Nothing
 
-  simple i _ = Just i
-  binded i b = Just $ i b
+  general :: GeneralizedInspection -> b -> Maybe GeneralizedInspection
+  general i _ = Just i
+
+  simple :: Inspection -> b -> Maybe GeneralizedInspection
+  simple i _ = Just (generalize i)
+
+  binded :: IdentifierInspection -> IdentifierPredicate -> Maybe GeneralizedInspection
+  binded i b = Just $ generalize (i b)
 
