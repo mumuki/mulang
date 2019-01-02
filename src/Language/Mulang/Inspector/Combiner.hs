@@ -38,24 +38,4 @@ transitive identifier inspection code = any (`scopedInspection` code) . transiti
 transitiveList :: [Identifier] -> Scope
 transitiveList identifiers i = transitive (last identifiers) (scopedList (init identifiers) i)
 
-type GeneralizedInspection = Expression -> Inspection
-
-generalize :: Inspection -> GeneralizedInspection
-generalize inspection = \_ expression -> inspection expression
-
-generalized :: Scope -> GeneralizedInspection -> GeneralizedInspection
-generalized f inspection = \root expression -> (f (inspection root)) expression
-
-generalizedScoped :: Identifier -> GeneralizedInspection -> GeneralizedInspection
-generalizedScoped scope = generalized (scoped scope)
-
-generalizedScopedList :: [Identifier] -> GeneralizedInspection -> GeneralizedInspection
-generalizedScopedList scope = generalized (scopedList scope)
-
-generalizedTransitive :: Identifier -> GeneralizedInspection -> GeneralizedInspection
-generalizedTransitive scope = generalized (transitive scope)
-
-generalizedTransitiveList :: [Identifier] -> GeneralizedInspection -> GeneralizedInspection
-generalizedTransitiveList scope = generalized (transitiveList scope)
-
 scoped' = flip scoped
