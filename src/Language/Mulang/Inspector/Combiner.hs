@@ -43,19 +43,19 @@ type GeneralizedInspection = Expression -> Inspection
 generalize :: Inspection -> GeneralizedInspection
 generalize inspection = \_ expression -> inspection expression
 
-generalized :: (a -> Inspection ->  Inspection) -> a -> GeneralizedInspection -> GeneralizedInspection
-generalized f arg inspection = \root expression -> (f arg (inspection root)) expression
+generalized :: Scope -> GeneralizedInspection -> GeneralizedInspection
+generalized f inspection = \root expression -> (f (inspection root)) expression
 
 generalizedScoped :: Identifier -> GeneralizedInspection -> GeneralizedInspection
-generalizedScoped = generalized scoped
+generalizedScoped scope = generalized (scoped scope)
 
 generalizedScopedList :: [Identifier] -> GeneralizedInspection -> GeneralizedInspection
-generalizedScopedList = generalized scopedList
+generalizedScopedList scope = generalized (scopedList scope)
 
 generalizedTransitive :: Identifier -> GeneralizedInspection -> GeneralizedInspection
-generalizedTransitive = generalized transitive
+generalizedTransitive scope = generalized (transitive scope)
 
 generalizedTransitiveList :: [Identifier] -> GeneralizedInspection -> GeneralizedInspection
-generalizedTransitiveList = generalized transitiveList
+generalizedTransitiveList scope = generalized (transitiveList scope)
 
 scoped' = flip scoped
