@@ -11,7 +11,7 @@ module Language.Mulang.Inspector.ObjectOriented.Polymorphism (
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Primitive (Inspection)
-import Language.Mulang.Inspector.Generalized (GeneralizedInspection)
+import Language.Mulang.Inspector.Generalized (GeneralizedInspection, specify)
 import Language.Mulang.Inspector.Query (Query, inspect, select, selectCount)
 import Language.Mulang.Inspector.ObjectOriented (implements, declaresMethod)
 import Language.Mulang.Inspector.Typed (usesType)
@@ -45,13 +45,19 @@ usesTemplateMethod expression = inspect $ do
   (SimpleSend Self selector _) <- expressions klass
   select (not . declaresMethod (named selector) $ klass)
 
-usesDyamicPolymorphism :: GeneralizedInspection
-usesDyamicPolymorphism root expression = inspect $ do
+usesDyamicPolymorphism :: Inspection
+usesDyamicPolymorphism = specify usesDyamicPolymorphism'
+
+usesDyamicPolymorphism' :: GeneralizedInspection
+usesDyamicPolymorphism' root expression = inspect $ do
   (SimpleSend _ selector _) <- expressions expression
   selectCount (>1) (methodDeclarationsOf selector root)
 
-usesStaticPolymorphism :: GeneralizedInspection
-usesStaticPolymorphism root expression = inspect $ do
+usesStaticPolymorphism :: Inspection
+usesStaticPolymorphism = specify usesStaticPolymorphism'
+
+usesStaticPolymorphism' :: GeneralizedInspection
+usesStaticPolymorphism' root expression = inspect $ do
   interface@(Interface interfaceId _ _) <- declarations root
   (SubroutineSignature _ _ _ _)         <- declarations interface
   select (usesType (named interfaceId) expression)

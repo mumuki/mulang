@@ -1,10 +1,12 @@
 module Language.Mulang.Inspector.Generalized (
+  specify,
   generalize,
   generalized,
   generalizedScoped,
   generalizedScopedList,
   generalizedTransitive,
   generalizedTransitiveList,
+  delegates,
   GeneralizedInspection) where
 
 import Language.Mulang.Ast
@@ -16,6 +18,9 @@ import Language.Mulang.Inspector.Query (inspect, select)
 
 type GeneralizedInspection = Expression -> Inspection
 type GeneralizedIdentifierInspection = IdentifierPredicate -> GeneralizedInspection
+
+specify :: GeneralizedInspection -> Inspection
+specify inspection = \expression -> inspection expression expression
 
 generalize :: Inspection -> GeneralizedInspection
 generalize inspection = \_ expression -> inspection expression
@@ -35,8 +40,11 @@ generalizedTransitive scope = generalized (transitive scope)
 generalizedTransitiveList :: [Identifier] -> GeneralizedInspection -> GeneralizedInspection
 generalizedTransitiveList scope = generalized (transitiveList scope)
 
-delegates :: GeneralizedIdentifierInspection
-delegates p root expression = inspect $ do
+delegates :: IdentifierPredicate -> Inspection
+delegates p = specify (delegates' p)
+
+delegates' :: IdentifierPredicate -> GeneralizedInspection
+delegates' p root expression = inspect $ do
   (Subroutine name1 _)       <- declarations root
   (Call (Reference name2) _) <- expressions expression
   select (name1 == name2)
