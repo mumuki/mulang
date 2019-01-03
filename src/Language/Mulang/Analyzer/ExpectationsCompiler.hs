@@ -133,4 +133,4 @@ compileInspectionPrimitive = f
   plain = Just . contextualizedBind . contextualize
 
   bound :: BoundInspection -> Maybe ContextualizedBoundInspection
-  bound = Just . boundContextualized
+  bound = Just . boundContextualize

@@ -3,7 +3,7 @@ module Language.Mulang.Inspector.Contextualized (
   contextualize,
   contextualized,
   contextualizedBind,
-  boundContextualized,
+  boundContextualize,
   contextualizedScoped,
   contextualizedScopedList,
   contextualizedTransitive,
@@ -22,11 +22,31 @@ type ContextualizedInspection = Expression -> Inspection
 type ContextualizedBoundInspection = IdentifierPredicate -> ContextualizedInspection
 type ContextualizedModifier = ContextualizedInspection -> ContextualizedInspection
 
-decontextualize :: ContextualizedInspection -> Inspection
-decontextualize inspection = \expression -> inspection expression expression
+--
+-- Lifts
+--
 
 contextualize :: Inspection -> ContextualizedInspection
 contextualize = const
+
+-- Generalized version of bind to accept contextualized inspections
+contextualizedBind :: ContextualizedInspection -> ContextualizedBoundInspection
+contextualizedBind = const
+
+-- Generalized version of contextualize to accept bound inspections
+boundContextualize :: BoundInspection -> ContextualizedBoundInspection
+boundContextualize i = contextualize . i
+
+--
+-- Unlift
+--
+
+decontextualize :: ContextualizedInspection -> Inspection
+decontextualize inspection = \expression -> inspection expression expression
+
+--
+-- Modifiers
+--
 
 contextualized :: Modifier -> ContextualizedModifier
 contextualized f inspection = \context -> f (inspection context)
@@ -43,10 +63,3 @@ contextualizedTransitive scope = contextualized (transitive scope)
 contextualizedTransitiveList :: [Identifier] -> ContextualizedModifier
 contextualizedTransitiveList scope = contextualized (transitiveList scope)
 
--- Generalized version of bind to accept contextualized inspections
-contextualizedBind :: ContextualizedInspection -> ContextualizedBoundInspection
-contextualizedBind = const
-
--- Generalized version of contextualize to accept bound inspections
-boundContextualized :: BoundInspection -> ContextualizedBoundInspection
-boundContextualized i = contextualize . i
