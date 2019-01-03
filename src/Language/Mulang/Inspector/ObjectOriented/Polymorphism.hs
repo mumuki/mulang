@@ -13,7 +13,7 @@ module Language.Mulang.Inspector.ObjectOriented.Polymorphism (
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Primitive (Inspection)
-import Language.Mulang.Inspector.Generalized (GeneralizedInspection, specify)
+import Language.Mulang.Inspector.Contextualized (ContextualizedInspection, decontextualize)
 import Language.Mulang.Inspector.Query (Query, inspect, select, selectCount)
 import Language.Mulang.Inspector.ObjectOriented (implements, declaresMethod)
 import Language.Mulang.Inspector.Typed (usesType)
@@ -48,22 +48,22 @@ usesTemplateMethod expression = inspect $ do
   select (not . declaresMethod (named selector) $ klass)
 
 usesDyamicPolymorphism :: Inspection
-usesDyamicPolymorphism = specify usesDyamicPolymorphism'
+usesDyamicPolymorphism = decontextualize usesDyamicPolymorphism'
 
-usesDyamicPolymorphism' :: GeneralizedInspection
-usesDyamicPolymorphism' root expression = inspect $ do
+usesDyamicPolymorphism' :: ContextualizedInspection
+usesDyamicPolymorphism' context expression = inspect $ do
   (SimpleSend _ selector _) <- expressions expression
-  selectCount (>1) (methodDeclarationsOf selector root)
+  selectCount (>1) (methodDeclarationsOf selector context)
 
 usesStaticPolymorphism :: Inspection
-usesStaticPolymorphism = specify usesStaticPolymorphism'
+usesStaticPolymorphism = decontextualize usesStaticPolymorphism'
 
-usesStaticPolymorphism' :: GeneralizedInspection
-usesStaticPolymorphism' root expression = inspect $ do
-  interface@(Interface interfaceId _ _) <- declarations root
+usesStaticPolymorphism' :: ContextualizedInspection
+usesStaticPolymorphism' context expression = inspect $ do
+  interface@(Interface interfaceId _ _) <- declarations context
   (SubroutineSignature _ _ _ _)         <- declarations interface
   select (usesType (named interfaceId) expression)
-  selectCount (>1) (implementorsOf interfaceId root)
+  selectCount (>1) (implementorsOf interfaceId context)
 
 -- private
 

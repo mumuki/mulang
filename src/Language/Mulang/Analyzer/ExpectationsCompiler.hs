@@ -7,7 +7,7 @@ import Language.Mulang.Analyzer.Analysis (Expectation(..))
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
-type Modifiers = (GeneralizedScope, PredicateModifier)
+type Modifiers = (ContextualizedScope, PredicateModifier)
 type PredicateModifier = (IdentifierPredicate -> IdentifierPredicate)
 
 compileExpectation :: Expectation -> Inspection
@@ -19,12 +19,12 @@ compileMaybe (Expectation b i) = do
   let negator = compileNegator inspectionParts
   (scope, predicateModifier) <- compileModifiers (splitOn ":" b)
   baseInspection             <- compileBaseInspection predicateModifier inspectionParts
-  return . negator . specify . scope  $ baseInspection
+  return . negator . decontextualize . scope  $ baseInspection
 
 compileModifiers :: [String] -> Maybe Modifiers
 compileModifiers ["*"]                 = Just (id, id)
-compileModifiers ["Intransitive",name] = justScopeFor generalizedScopedList name
-compileModifiers [name]                = justScopeFor generalizedTransitiveList name
+compileModifiers ["Intransitive",name] = justScopeFor contextualizedScopedList name
+compileModifiers [name]                = justScopeFor contextualizedTransitiveList name
 compileModifiers _                     = Nothing
 
 justScopeFor f name = Just (f names, andAlso (except (last names)))
@@ -34,7 +34,7 @@ compileNegator :: [String] -> Scope
 compileNegator ("Not":_) = negative
 compileNegator _         = id
 
-compileBaseInspection :: PredicateModifier -> [String] -> Maybe GeneralizedInspection
+compileBaseInspection :: PredicateModifier -> [String] -> Maybe ContextualizedInspection
 compileBaseInspection p ("Not":parts)         = compileBaseInspection p parts
 compileBaseInspection p [verb]                = compileBaseInspection p [verb, "*"]
 compileBaseInspection p [verb, object]        = fmap ($ (compileObject p object)) (compileInspectionPrimitive verb)
@@ -49,88 +49,88 @@ compileObject _ ('[':ns)   | last ns == ']' = anyOf . splitOn "|" . init $ ns
 compileObject _ name       = named name
 
 
-compileInspectionPrimitive :: String -> Maybe GeneralizedIdentifierInspection
+compileInspectionPrimitive :: String -> Maybe ContextualizedBoundInspection
 compileInspectionPrimitive = f
   where
-  f "Assigns"                        = binded assigns
-  f "Calls"                          = binded calls
-  f "Declares"                       = binded declares
-  f "DeclaresAttribute"              = binded declaresAttribute
-  f "DeclaresClass"                  = binded declaresClass
-  f "DeclaresComputation"            = binded declaresComputation
-  f "DeclaresComputationWithArity0"  = binded (declaresComputationWithArity 0)
-  f "DeclaresComputationWithArity1"  = binded (declaresComputationWithArity 1)
-  f "DeclaresComputationWithArity2"  = binded (declaresComputationWithArity 2)
-  f "DeclaresComputationWithArity3"  = binded (declaresComputationWithArity 3)
-  f "DeclaresComputationWithArity4"  = binded (declaresComputationWithArity 4)
-  f "DeclaresComputationWithArity5"  = binded (declaresComputationWithArity 5)
-  f "DeclaresEntryPoint"             = binded declaresEntryPoint
-  f "DeclaresEnumeration"            = binded declaresEnumeration
-  f "DeclaresFact"                   = binded declaresFact
-  f "DeclaresFunction"               = binded declaresFunction
-  f "DeclaresInterface"              = binded declaresInterface
-  f "DeclaresMethod"                 = binded declaresMethod
-  f "DeclaresObject"                 = binded declaresObject
-  f "DeclaresPredicate"              = binded declaresPredicate
-  f "DeclaresProcedure"              = binded declaresProcedure
-  f "DeclaresRecursively"            = binded declaresRecursively
-  f "DeclaresRule"                   = binded declaresRule
-  f "DeclaresSuperclass"             = binded declaresSuperclass
-  f "DeclaresTypeAlias"              = binded declaresTypeAlias
-  f "DeclaresTypeSignature"          = binded declaresTypeSignature
-  f "DeclaresVariable"               = binded declaresVariable
-  f "Delegates"                      = generalBinded delegates'
-  f "Implements"                     = binded implements
-  f "Includes"                       = binded includes
-  f "Inherits"                       = binded inherits
-  f "Instantiates"                   = binded instantiates
-  f "Raises"                         = binded raises
-  f "Rescues"                        = binded rescues
-  f "TypesAs"                        = binded typesAs
-  f "TypesParameterAs"               = binded typesParameterAs
-  f "TypesReturnAs"                  = binded typesReturnAs
-  f "Uses"                           = binded uses
-  f "UsesAnonymousVariable"          = simple usesAnonymousVariable
-  f "UsesComposition"                = simple usesComposition
+  f "Assigns"                        = bound assigns
+  f "Calls"                          = bound calls
+  f "Declares"                       = bound declares
+  f "DeclaresAttribute"              = bound declaresAttribute
+  f "DeclaresClass"                  = bound declaresClass
+  f "DeclaresComputation"            = bound declaresComputation
+  f "DeclaresComputationWithArity0"  = bound (declaresComputationWithArity 0)
+  f "DeclaresComputationWithArity1"  = bound (declaresComputationWithArity 1)
+  f "DeclaresComputationWithArity2"  = bound (declaresComputationWithArity 2)
+  f "DeclaresComputationWithArity3"  = bound (declaresComputationWithArity 3)
+  f "DeclaresComputationWithArity4"  = bound (declaresComputationWithArity 4)
+  f "DeclaresComputationWithArity5"  = bound (declaresComputationWithArity 5)
+  f "DeclaresEntryPoint"             = bound declaresEntryPoint
+  f "DeclaresEnumeration"            = bound declaresEnumeration
+  f "DeclaresFact"                   = bound declaresFact
+  f "DeclaresFunction"               = bound declaresFunction
+  f "DeclaresInterface"              = bound declaresInterface
+  f "DeclaresMethod"                 = bound declaresMethod
+  f "DeclaresObject"                 = bound declaresObject
+  f "DeclaresPredicate"              = bound declaresPredicate
+  f "DeclaresProcedure"              = bound declaresProcedure
+  f "DeclaresRecursively"            = bound declaresRecursively
+  f "DeclaresRule"                   = bound declaresRule
+  f "DeclaresSuperclass"             = bound declaresSuperclass
+  f "DeclaresTypeAlias"              = bound declaresTypeAlias
+  f "DeclaresTypeSignature"          = bound declaresTypeSignature
+  f "DeclaresVariable"               = bound declaresVariable
+  f "Delegates"                      = contextualizedBound delegates'
+  f "Implements"                     = bound implements
+  f "Includes"                       = bound includes
+  f "Inherits"                       = bound inherits
+  f "Instantiates"                   = bound instantiates
+  f "Raises"                         = bound raises
+  f "Rescues"                        = bound rescues
+  f "TypesAs"                        = bound typesAs
+  f "TypesParameterAs"               = bound typesParameterAs
+  f "TypesReturnAs"                  = bound typesReturnAs
+  f "Uses"                           = bound uses
+  f "UsesAnonymousVariable"          = plain usesAnonymousVariable
+  f "UsesComposition"                = plain usesComposition
   f "UsesComprehension"              = f "UsesForComprehension"
-  f "UsesConditional"                = simple usesConditional
-  f "UsesDyamicPolymorphism"         = general usesDyamicPolymorphism'
-  f "UsesDynamicMethodOverload"      = simple usesDynamicMethodOverload
-  f "UsesExceptionHandling"          = simple usesExceptionHandling
-  f "UsesExceptions"                 = simple usesExceptions
-  f "UsesFindall"                    = simple usesFindall
-  f "UsesFor"                        = simple usesFor
-  f "UsesForall"                     = simple usesForall
-  f "UsesForComprehension"           = simple usesForComprehension
-  f "UsesForeach"                    = simple usesForEach
-  f "UsesForLoop"                    = simple usesForLoop
-  f "UsesGuards"                     = simple usesGuards
-  f "UsesIf"                         = simple usesIf
-  f "UsesInheritance"                = simple usesInheritance
-  f "UsesLambda"                     = simple usesLambda
-  f "UsesLoop"                       = simple usesLoop
-  f "UsesMixins"                     = simple usesMixins
-  f "UsesNot"                        = simple usesNot
-  f "UsesObjectComposition"          = simple usesObjectComposition
-  f "UsesPatternMatching"            = simple usesPatternMatching
-  f "UsesRepeat"                     = simple usesRepeat
-  f "UsesStaticMethodOverload"       = simple usesStaticMethodOverload
-  f "UsesStaticPolymorphism"         = general usesStaticPolymorphism'
-  f "UsesSwitch"                     = simple usesSwitch
-  f "UsesTemplateMethod"             = simple usesTemplateMethod
-  f "UsesType"                       = binded usesType
-  f "UsesWhile"                      = simple usesWhile
-  f "UsesYield"                      = simple usesYield
+  f "UsesConditional"                = plain usesConditional
+  f "UsesDyamicPolymorphism"         = contextualized usesDyamicPolymorphism'
+  f "UsesDynamicMethodOverload"      = plain usesDynamicMethodOverload
+  f "UsesExceptionHandling"          = plain usesExceptionHandling
+  f "UsesExceptions"                 = plain usesExceptions
+  f "UsesFindall"                    = plain usesFindall
+  f "UsesFor"                        = plain usesFor
+  f "UsesForall"                     = plain usesForall
+  f "UsesForComprehension"           = plain usesForComprehension
+  f "UsesForeach"                    = plain usesForEach
+  f "UsesForLoop"                    = plain usesForLoop
+  f "UsesGuards"                     = plain usesGuards
+  f "UsesIf"                         = plain usesIf
+  f "UsesInheritance"                = plain usesInheritance
+  f "UsesLambda"                     = plain usesLambda
+  f "UsesLoop"                       = plain usesLoop
+  f "UsesMixins"                     = plain usesMixins
+  f "UsesNot"                        = plain usesNot
+  f "UsesObjectComposition"          = plain usesObjectComposition
+  f "UsesPatternMatching"            = plain usesPatternMatching
+  f "UsesRepeat"                     = plain usesRepeat
+  f "UsesStaticMethodOverload"       = plain usesStaticMethodOverload
+  f "UsesStaticPolymorphism"         = contextualized usesStaticPolymorphism'
+  f "UsesSwitch"                     = plain usesSwitch
+  f "UsesTemplateMethod"             = plain usesTemplateMethod
+  f "UsesType"                       = bound usesType
+  f "UsesWhile"                      = plain usesWhile
+  f "UsesYield"                      = plain usesYield
   f _                                = Nothing
 
-  general :: GeneralizedInspection -> Maybe GeneralizedIdentifierInspection
-  general = Just . generalizedBind
+  contextualized :: ContextualizedInspection -> Maybe ContextualizedBoundInspection
+  contextualized = Just . contextualizedBind
 
-  generalBinded :: GeneralizedIdentifierInspection -> Maybe GeneralizedIdentifierInspection
-  generalBinded = Just
+  contextualizedBound :: ContextualizedBoundInspection -> Maybe ContextualizedBoundInspection
+  contextualizedBound = Just
 
-  simple :: Inspection -> Maybe GeneralizedIdentifierInspection
-  simple = Just . generalizedBind . generalize
+  plain :: Inspection -> Maybe ContextualizedBoundInspection
+  plain = Just . contextualizedBind . contextualize
 
-  binded :: IdentifierInspection -> Maybe GeneralizedIdentifierInspection
-  binded = Just . boundedGeneralize
+  bound :: BoundInspection -> Maybe ContextualizedBoundInspection
+  bound = Just . boundContextualized

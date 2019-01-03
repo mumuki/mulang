@@ -19,10 +19,10 @@ detect i expression =
   filter (`inspection` expression) $ declaredIdentifiers expression
     where inspection = scoped' i
 
-alternative :: Inspection -> Inspection -> Inspection
+alternative :: Inspection -> Scope
 alternative i1 i2 expression = i1 expression || i2 expression
 
-negative :: Inspection -> Inspection
+negative :: Scope
 negative f = not . f
 
 scoped :: Identifier -> Scope
