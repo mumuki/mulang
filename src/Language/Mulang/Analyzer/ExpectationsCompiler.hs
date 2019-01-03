@@ -7,17 +7,16 @@ import Language.Mulang.Analyzer.Analysis (Expectation(..))
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
-type Modifiers = (ContextualizedScope, PredicateModifier)
-type PredicateModifier = (IdentifierPredicate -> IdentifierPredicate)
+type Modifiers = (ContextualizedModifier, PredicateModifier)
 
 compileExpectation :: Expectation -> Inspection
 compileExpectation = fromMaybe (\_ -> True) . compileMaybe
 
 compileMaybe :: Expectation -> Maybe Inspection
-compileMaybe (Expectation b i) = do
+compileMaybe (Expectation s i) = do
   let inspectionParts = splitOn ":" i
   let negator = compileNegator inspectionParts
-  (scope, predicateModifier) <- compileModifiers (splitOn ":" b)
+  (scope, predicateModifier) <- compileModifiers (splitOn ":" s)
   baseInspection             <- compileBaseInspection predicateModifier inspectionParts
   return . negator . decontextualize . scope  $ baseInspection
 
@@ -27,10 +26,11 @@ compileModifiers ["Intransitive",name] = justScopeFor contextualizedScopedList n
 compileModifiers [name]                = justScopeFor contextualizedTransitiveList name
 compileModifiers _                     = Nothing
 
+justScopeFor :: ([Identifier] -> ContextualizedModifier) -> Identifier -> Maybe Modifiers
 justScopeFor f name = Just (f names, andAlso (except (last names)))
   where names = splitOn "." name
 
-compileNegator :: [String] -> Scope
+compileNegator :: [String] -> Modifier
 compileNegator ("Not":_) = negative
 compileNegator _         = id
 

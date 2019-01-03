@@ -6,7 +6,8 @@ module Language.Mulang.Identifier (
   like,
   named,
   Identifier,
-  IdentifierPredicate) where
+  IdentifierPredicate,
+  PredicateModifier) where
 
 import  Data.List (isInfixOf)
 
@@ -14,8 +15,9 @@ import  Data.List (isInfixOf)
 -- | Mulang does not assume any special naming convention or format
 type Identifier = String
 type IdentifierPredicate = Identifier -> Bool
+type PredicateModifier = IdentifierPredicate -> IdentifierPredicate
 
-andAlso :: IdentifierPredicate -> IdentifierPredicate -> IdentifierPredicate
+andAlso :: IdentifierPredicate -> PredicateModifier
 andAlso p1 p2 identifier = p1 identifier && p2 identifier
 
 anyOf :: [Identifier] -> IdentifierPredicate

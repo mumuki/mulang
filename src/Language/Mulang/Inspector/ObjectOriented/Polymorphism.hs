@@ -14,7 +14,7 @@ import Language.Mulang.Ast
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Primitive (Inspection)
 import Language.Mulang.Inspector.Contextualized (ContextualizedInspection, decontextualize)
-import Language.Mulang.Inspector.Query (Query, inspect, select, selectCount)
+import Language.Mulang.Inspector.Query (inspect, select, selectCount)
 import Language.Mulang.Inspector.ObjectOriented (implements, declaresMethod)
 import Language.Mulang.Inspector.Typed (usesType)
 
