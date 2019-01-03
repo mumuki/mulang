@@ -37,7 +37,7 @@ compileNegator _         = id
 compileBaseInspection :: PredicateModifier -> [String] -> Maybe GeneralizedInspection
 compileBaseInspection p ("Not":parts)         = compileBaseInspection p parts
 compileBaseInspection p [verb]                = compileBaseInspection p [verb, "*"]
-compileBaseInspection p [verb, object]        = compileInspectionPrimitive verb (compileObject p object)
+compileBaseInspection p [verb, object]        = fmap ($ (compileObject p object)) (compileInspectionPrimitive verb)
 compileBaseInspection _ _                     = Nothing
 
 compileObject :: PredicateModifier -> String -> IdentifierPredicate
@@ -49,7 +49,7 @@ compileObject _ ('[':ns)   | last ns == ']' = anyOf . splitOn "|" . init $ ns
 compileObject _ name       = named name
 
 
-compileInspectionPrimitive :: String -> IdentifierPredicate -> Maybe GeneralizedInspection
+compileInspectionPrimitive :: String -> Maybe GeneralizedIdentifierInspection
 compileInspectionPrimitive = f
   where
   f "Assigns"                        = binded assigns
@@ -121,17 +121,17 @@ compileInspectionPrimitive = f
   f "UsesType"                       = binded usesType
   f "UsesWhile"                      = simple usesWhile
   f "UsesYield"                      = simple usesYield
-  f _                                = const Nothing
+  f _                                = Nothing
 
-  general :: GeneralizedInspection -> b -> Maybe GeneralizedInspection
-  general i _ = Just i
+  general :: GeneralizedInspection -> Maybe GeneralizedIdentifierInspection
+  general = Just . const
 
-  generalBinded :: GeneralizedIdentifierInspection -> IdentifierPredicate -> Maybe GeneralizedInspection
-  generalBinded i b = Just (i b)
+  generalBinded :: GeneralizedIdentifierInspection -> Maybe GeneralizedIdentifierInspection
+  generalBinded = Just
 
-  simple :: Inspection -> b -> Maybe GeneralizedInspection
-  simple i _ = Just (generalize i)
+  simple :: Inspection -> Maybe GeneralizedIdentifierInspection
+  simple = Just . const . generalize
 
-  binded :: IdentifierInspection -> IdentifierPredicate -> Maybe GeneralizedInspection
-  binded i b = Just $ generalize (i b)
+  binded :: IdentifierInspection -> Maybe GeneralizedIdentifierInspection
+  binded i = Just $ generalize . i
 
