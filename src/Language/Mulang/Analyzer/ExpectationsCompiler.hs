@@ -124,14 +124,13 @@ compileInspectionPrimitive = f
   f _                                = Nothing
 
   general :: GeneralizedInspection -> Maybe GeneralizedIdentifierInspection
-  general = Just . const
+  general = Just . generalizedBind
 
   generalBinded :: GeneralizedIdentifierInspection -> Maybe GeneralizedIdentifierInspection
   generalBinded = Just
 
   simple :: Inspection -> Maybe GeneralizedIdentifierInspection
-  simple = Just . const . generalize
+  simple = Just . generalizedBind . generalize
 
   binded :: IdentifierInspection -> Maybe GeneralizedIdentifierInspection
-  binded i = Just $ generalize . i
-
+  binded = Just . boundedGeneralize

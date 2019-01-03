@@ -2,6 +2,8 @@ module Language.Mulang.Inspector.Generalized (
   specify,
   generalize,
   generalized,
+  generalizedBind,
+  boundedGeneralize,
   generalizedScoped,
   generalizedScopedList,
   generalizedTransitive,
@@ -20,14 +22,15 @@ import Language.Mulang.Inspector.Primitive (Inspection, IdentifierInspection)
 import Language.Mulang.Inspector.Query (inspect, select)
 
 type GeneralizedInspection = Expression -> Inspection
-type GeneralizedScope = GeneralizedInspection -> GeneralizedInspection
 type GeneralizedIdentifierInspection = IdentifierPredicate -> GeneralizedInspection
+
+type GeneralizedScope = GeneralizedInspection -> GeneralizedInspection
 
 specify :: GeneralizedInspection -> Inspection
 specify inspection = \expression -> inspection expression expression
 
 generalize :: Inspection -> GeneralizedInspection
-generalize inspection = \_ expression -> inspection expression
+generalize = const
 
 generalized :: Scope -> GeneralizedScope
 generalized f inspection = \root expression -> (f (inspection root)) expression
@@ -43,6 +46,12 @@ generalizedTransitive scope = generalized (transitive scope)
 
 generalizedTransitiveList :: [Identifier] -> GeneralizedScope
 generalizedTransitiveList scope = generalized (transitiveList scope)
+
+generalizedBind :: GeneralizedInspection -> GeneralizedIdentifierInspection
+generalizedBind = const
+
+boundedGeneralize :: IdentifierInspection -> GeneralizedIdentifierInspection
+boundedGeneralize i = generalize . i
 
 delegates :: IdentifierInspection
 delegates p = specify (delegates' p)
