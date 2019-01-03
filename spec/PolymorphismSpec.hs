@@ -4,6 +4,8 @@ module PolymorphismSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang.Ast
+import           Language.Mulang.Inspector.Combiner (scoped)
+import           Language.Mulang.Inspector.Contextualized (contextualizedScoped, decontextualize)
 import           Language.Mulang.Inspector.ObjectOriented.Polymorphism
 import qualified Language.Mulang.Parsers.Java as J (java)
 
@@ -152,7 +154,54 @@ spec = do
       usesDyamicPolymorphism (java [text|
         class Sample { void aMethod() { throw new Exception(); } }|]) `shouldBe` False
 
+  describe "usesStaticPolymorphism'" $ do
+    let ast = (java [text|
+      interface Singer {
+        void sing();
+      }
+      class Bird implements Singer {
+        void sing() {}
+      }
+      class Performer implements Singer {
+        void sing() {}
+      }
+      class Human {
+        int rockAge() { return 27; }
+      }
+      class Festival {
+        Singer o;
+        void run() { o.sing(); }
+      }|])
+
+    it "is False when tested on a class that does not use it" $ do
+      decontextualize (contextualizedScoped "Human" usesStaticPolymorphism') ast `shouldBe` False
+
+    it "is True when tested on a class that uses it" $ do
+      decontextualize (contextualizedScoped "Festival" usesStaticPolymorphism') ast `shouldBe` True
+
   describe "usesStaticPolymorphism" $ do
+    it "is False when a scope is used" $ do
+      let ast = (java [text|
+        interface Singer {
+          void sing();
+        }
+        class Bird implements Singer {
+          void sing() {}
+        }
+        class Performer implements Singer {
+          void sing() {}
+        }
+        class Human {
+          int rockAge() { return 27; }
+        }
+        class Festival {
+          Singer o;
+          void run() { o.sing(); }
+        }|])
+
+      scoped "Human" usesStaticPolymorphism ast `shouldBe` False
+      scoped "Festival" usesStaticPolymorphism ast `shouldBe` False
+
     it "is True when there is an usage of an interface in an attribute implemented by two or more classes" $ do
       usesStaticPolymorphism (java [text|
             interface Singer {

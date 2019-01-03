@@ -336,8 +336,21 @@ spec = do
     it "is False if there is no usage" $ do
       uses (named "m") (EntryPoint "main" (Reference "f")) `shouldBe` False
 
+  describe "delegates'" $ do
+    it "is True when used with a scope" $ do
+      decontextualize (contextualizedScoped "main" (delegates' anyone)) (
+        Sequence [
+          EntryPoint "main" (Application (Reference "m") []),
+          SimpleProcedure "m" [] None]) `shouldBe` True
+
   describe "delegates" $ do
     context "when subroutine is declared" $ do
+      it "is False when used with a scope" $ do
+        scoped "main" (delegates anyone) (
+          Sequence [
+            EntryPoint "main" (Application (Reference "m") []),
+            SimpleProcedure "m" [] None]) `shouldBe` False
+
       it "is True on function application in entry point" $ do
         delegates (named "m") (Sequence [
                                   EntryPoint "main" (Application (Reference "m") []),

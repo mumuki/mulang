@@ -161,7 +161,7 @@ usesAnonymousVariable = containsExpression f
         isOrContainsWildcard _                                 = False
 
 delegates :: BoundInspection
-delegates p = decontextualize (delegates' p)
+delegates = decontextualize . delegates'
 
 delegates' :: ContextualizedBoundInspection
 delegates' p context expression = inspect $ do
