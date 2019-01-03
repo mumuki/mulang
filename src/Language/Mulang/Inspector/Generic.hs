@@ -55,6 +55,16 @@ calls p = containsExpression f
   where f (Call (Reference id) _ ) = p id
         f _                        = False
 
+delegates :: BoundInspection
+delegates = decontextualize . delegates'
+
+delegates' :: ContextualizedBoundInspection
+delegates' p context expression = inspect $ do
+  (Subroutine name1 _)       <- declarations context
+  (Call (Reference name2) _) <- expressions expression
+  select (name1 == name2)
+  select (p name1)
+
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
 usesIf :: Inspection
@@ -159,13 +169,3 @@ usesAnonymousVariable = containsExpression f
         isOrContainsWildcard (AsPattern _ p)                   = isOrContainsWildcard p
         isOrContainsWildcard WildcardPattern                   = True
         isOrContainsWildcard _                                 = False
-
-delegates :: BoundInspection
-delegates = decontextualize . delegates'
-
-delegates' :: ContextualizedBoundInspection
-delegates' p context expression = inspect $ do
-  (Subroutine name1 _)       <- declarations context
-  (Call (Reference name2) _) <- expressions expression
-  select (name1 == name2)
-  select (p name1)
