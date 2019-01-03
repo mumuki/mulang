@@ -2,7 +2,9 @@
 
 module Language.Mulang.Inspector.ObjectOriented.Polymorphism (
   usesDyamicPolymorphism,
+  usesDyamicPolymorphism',
   usesStaticPolymorphism,
+  usesStaticPolymorphism',
   usesTemplateMethod,
   usesObjectComposition,
   usesDynamicMethodOverload,

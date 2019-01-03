@@ -7,6 +7,7 @@ module Language.Mulang.Inspector.Generalized (
   generalizedTransitive,
   generalizedTransitiveList,
   delegates,
+  delegates',
   GeneralizedInspection,
   GeneralizedScope,
   GeneralizedIdentifierInspection) where

@@ -79,7 +79,7 @@ compileInspectionPrimitive = f
   f "DeclaresTypeAlias"              = binded declaresTypeAlias
   f "DeclaresTypeSignature"          = binded declaresTypeSignature
   f "DeclaresVariable"               = binded declaresVariable
-  f "Delegates"                      = binded delegates
+  f "Delegates"                      = generalBinded delegates'
   f "Implements"                     = binded implements
   f "Includes"                       = binded includes
   f "Inherits"                       = binded inherits
@@ -94,7 +94,7 @@ compileInspectionPrimitive = f
   f "UsesComposition"                = simple usesComposition
   f "UsesComprehension"              = f "UsesForComprehension"
   f "UsesConditional"                = simple usesConditional
-  f "UsesDyamicPolymorphism"         = simple usesDyamicPolymorphism
+  f "UsesDyamicPolymorphism"         = general usesDyamicPolymorphism'
   f "UsesDynamicMethodOverload"      = simple usesDynamicMethodOverload
   f "UsesExceptionHandling"          = simple usesExceptionHandling
   f "UsesExceptions"                 = simple usesExceptions
@@ -115,7 +115,7 @@ compileInspectionPrimitive = f
   f "UsesPatternMatching"            = simple usesPatternMatching
   f "UsesRepeat"                     = simple usesRepeat
   f "UsesStaticMethodOverload"       = simple usesStaticMethodOverload
-  f "UsesStaticPolymorphism"         = simple usesStaticPolymorphism
+  f "UsesStaticPolymorphism"         = general usesStaticPolymorphism'
   f "UsesSwitch"                     = simple usesSwitch
   f "UsesTemplateMethod"             = simple usesTemplateMethod
   f "UsesType"                       = binded usesType
@@ -125,6 +125,9 @@ compileInspectionPrimitive = f
 
   general :: GeneralizedInspection -> b -> Maybe GeneralizedInspection
   general i _ = Just i
+
+  generalBinded :: GeneralizedIdentifierInspection -> IdentifierPredicate -> Maybe GeneralizedInspection
+  generalBinded i b = Just (i b)
 
   simple :: Inspection -> b -> Maybe GeneralizedInspection
   simple i _ = Just (generalize i)
