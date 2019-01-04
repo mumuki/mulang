@@ -16,6 +16,7 @@ sed -i -r "s/version:             ${VERSION_REGEXP}/version:             ${NEW_V
 sed -i -r "s/version = \"${VERSION_REGEXP}\"/version = \"${NEW_VERSION}\"/" app/Version.hs
 sed -i -r "s/VERSION = \"${VERSION_REGEXP}/VERSION = \"${NEW_VERSION}/" gem/lib/mulang/version.rb
 sed -i -r "s/MULANG_VERSION = \"${VERSION_REGEXP}/MULANG_VERSION = \"${NEW_VERSION}/" gem/lib/mulang/version.rb
+sed -i -r "s/\"version\": \"${VERSION_REGEXP}/\"version\": \"${NEW_VERSION}/" ghcjslib/package.json
 
 echo "[Mulang] Running tests..."
 stack test
