@@ -8,10 +8,11 @@ module Language.Mulang.Inspector.Procedural (
   declaresProcedure) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Inspector.Primitive (Inspection, IdentifierInspection, containsExpression, containsBoundDeclaration)
+import Language.Mulang.Inspector.Primitive (Inspection, containsExpression)
+import Language.Mulang.Inspector.Bound (BoundInspection, containsBoundDeclaration)
 import Language.Mulang.Inspector.Generic (usesYield)
 
-declaresProcedure :: IdentifierInspection
+declaresProcedure :: BoundInspection
 declaresProcedure = containsBoundDeclaration f
   where f (Procedure _ _) = True
         f _                          = False

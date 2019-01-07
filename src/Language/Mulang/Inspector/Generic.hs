@@ -1,32 +1,34 @@
 module Language.Mulang.Inspector.Generic (
-  parses,
   assigns,
   calls,
-  delegates,
-  uses,
-  usesIf,
-  usesYield,
-  usesFor,
   declares,
-  declaresVariable,
-  declaresRecursively,
-  declaresEntryPoint,
-  declaresFunction,
   declaresComputation,
   declaresComputationWithArity,
   declaresComputationWithArity',
-  usesAnonymousVariable,
+  declaresEntryPoint,
+  declaresFunction,
+  declaresRecursively,
+  declaresVariable,
+  delegates,
+  delegates',
+  parses,
   raises,
   rescues,
+  uses,
+  usesAnonymousVariable,
+  usesExceptionHandling,
   usesExceptions,
-  usesExceptionHandling) where
+  usesFor,
+  usesIf,
+  usesYield) where
 
 import Language.Mulang.Ast
+import Language.Mulang.Generator (declaredIdentifiers, expressions, declarations, referencedIdentifiers)
 import Language.Mulang.Identifier
+import Language.Mulang.Inspector.Bound (containsBoundDeclaration, BoundInspection)
+import Language.Mulang.Inspector.Contextualized (decontextualize, ContextualizedBoundInspection)
 import Language.Mulang.Inspector.Primitive
-import Language.Mulang.Generator (declaredIdentifiers, referencedIdentifiers, declarations, expressions)
-import Control.Monad (guard)
-
+import Language.Mulang.Inspector.Query (inspect, select)
 
 import Data.Maybe (listToMaybe)
 import Data.List.Extra (has)
@@ -35,7 +37,7 @@ import Data.List.Extra (has)
 parses :: (String -> Expression) -> String -> Inspection
 parses parser code = (== (parser code))
 
-assigns :: IdentifierInspection
+assigns :: BoundInspection
 assigns predicate = containsExpression f
   where f (Assignment name _)  = predicate name
         f (Variable name _)    = predicate name
@@ -44,22 +46,24 @@ assigns predicate = containsExpression f
 
 -- | Inspection that tells whether an expression uses the the given target identifier
 -- in its definition
-uses :: IdentifierInspection
+uses :: BoundInspection
 uses p = containsExpression f
   where f = any p . referencedIdentifiers
 
-calls :: IdentifierInspection
+calls :: BoundInspection
 calls p = containsExpression f
   where f (Call (Reference id) _ ) = p id
         f _                        = False
 
--- uncontextualizable
-delegates :: IdentifierInspection
-delegates p expression = inspect $ do
-  (Subroutine name1 _)       <- declarations expression
+delegates :: BoundInspection
+delegates = decontextualize . delegates'
+
+delegates' :: ContextualizedBoundInspection
+delegates' p context expression = inspect $ do
+  (Subroutine name1 _)       <- declarations context
   (Call (Reference name2) _) <- expressions expression
-  guard (name1 == name2)
-  guard (p name1)
+  select (name1 == name2)
+  select (p name1)
 
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
@@ -80,13 +84,13 @@ usesFor = containsExpression f
 
 
 -- | Inspection that tells whether a top level declaration exists
-declares :: IdentifierInspection
+declares :: BoundInspection
 declares = containsBoundDeclaration f
   where f (TypeSignature _ _) = False
         f _                   = True
 
 -- | Inspection that tells whether an expression is direct recursive
-declaresRecursively :: IdentifierInspection
+declaresRecursively :: BoundInspection
 declaresRecursively = containsBoundDeclaration f
   where f e | (Just name) <- (nameOf e) = uses (named name) e
             | otherwise = False
@@ -95,29 +99,29 @@ declaresRecursively = containsBoundDeclaration f
         nameOf = listToMaybe . declaredIdentifiers
 
 
-declaresFunction :: IdentifierInspection
+declaresFunction :: BoundInspection
 declaresFunction = containsBoundDeclaration f
   where f (Function _ _) = True
         f _              = False
 
-declaresVariable :: IdentifierInspection
+declaresVariable :: BoundInspection
 declaresVariable = containsBoundDeclaration f
   where f (Variable _ _)  = True
         f _               = False
 
-declaresEntryPoint :: IdentifierInspection
+declaresEntryPoint :: BoundInspection
 declaresEntryPoint = containsBoundDeclaration f
   where f (EntryPoint _ _)  = True
         f _                 = False
 
 -- | Inspection that tells whether a top level computation declaration exists
-declaresComputation :: IdentifierInspection
+declaresComputation :: BoundInspection
 declaresComputation = declaresComputationWithArity' (const True)
 
-declaresComputationWithArity :: Int -> IdentifierInspection
+declaresComputationWithArity :: Int -> BoundInspection
 declaresComputationWithArity arity = declaresComputationWithArity' (== arity)
 
-declaresComputationWithArity' :: (Int -> Bool) -> IdentifierInspection
+declaresComputationWithArity' :: (Int -> Bool) -> BoundInspection
 declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
   where f (Subroutine _ es)       = any equationArityIs es
         f (Clause _ args _)       = argsHaveArity args
@@ -127,7 +131,7 @@ declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
 
         argsHaveArity = arityPredicate.length
 
-raises :: IdentifierInspection
+raises :: BoundInspection
 raises predicate = containsExpression f
   where f (Raise (New (Reference n) _)) = predicate n
         f (Raise (Reference n))         = predicate n
@@ -138,7 +142,7 @@ usesExceptions = containsExpression f
   where f (Raise _)     = True
         f _             = False
 
-rescues :: IdentifierInspection
+rescues :: BoundInspection
 rescues predicate = containsExpression f
   where f (Try _ rescues _) = any (matchesType predicate) . map fst  $ rescues
         f _                 = False

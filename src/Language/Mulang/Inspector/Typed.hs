@@ -7,35 +7,36 @@ module Language.Mulang.Inspector.Typed (
   usesType) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Inspector.Primitive (IdentifierInspection, containsDeclaration, containsBoundDeclaration)
+import Language.Mulang.Inspector.Primitive (containsDeclaration)
+import Language.Mulang.Inspector.Bound (BoundInspection, containsBoundDeclaration)
 
-declaresTypeAlias :: IdentifierInspection
+declaresTypeAlias :: BoundInspection
 declaresTypeAlias = containsBoundDeclaration f
   where f (TypeAlias _ _) = True
         f _               = False
 
-typesReturnAs :: IdentifierInspection
+typesReturnAs :: BoundInspection
 typesReturnAs predicate = containsDeclaration f
   where f (SubroutineSignature _ _ name _)  = predicate name
         f _                                 = False
 
-typesParameterAs :: IdentifierInspection
+typesParameterAs :: BoundInspection
 typesParameterAs predicate = containsDeclaration f
   where f (SubroutineSignature _ names _ _)  = any predicate names
         f _                                  = False
 
-typesAs :: IdentifierInspection
+typesAs :: BoundInspection
 typesAs predicate = containsDeclaration f
   where f (VariableSignature _ name _)   = predicate name
         f _                              = False
 
-usesType :: IdentifierInspection
+usesType :: BoundInspection
 usesType predicate = containsDeclaration f
   where f (VariableSignature _ name _)        = predicate name
         f (SubroutineSignature _ args ret _)  = any predicate (ret:args)
         f _                                   = False
 
-declaresTypeSignature :: IdentifierInspection
+declaresTypeSignature :: BoundInspection
 declaresTypeSignature = containsBoundDeclaration f
   where f (TypeSignature _ _) = True
         f _                   = False

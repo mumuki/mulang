@@ -12,16 +12,17 @@ module Language.Mulang.Inspector.Logic (
 
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
-import Language.Mulang.Inspector.Primitive (Inspection, IdentifierInspection, containsExpression, containsBoundDeclaration)
+import Language.Mulang.Inspector.Primitive (Inspection, containsExpression)
+import Language.Mulang.Inspector.Bound (BoundInspection, containsBoundDeclaration)
 import Language.Mulang.Inspector.Generic (uses)
 import Language.Mulang.Inspector.Combiner (alternative)
 
-declaresFact :: IdentifierInspection
+declaresFact :: BoundInspection
 declaresFact = containsBoundDeclaration f
   where f (Fact _ _) = True
         f _          = False
 
-declaresRule :: IdentifierInspection
+declaresRule :: BoundInspection
 declaresRule = containsBoundDeclaration f
   where f (Rule _ _ _) = True
         f _            = False
@@ -56,5 +57,5 @@ hasRedundantReduction = containsExpression f
         f (Exist "is" [(VariablePattern _), _]) = True
         f _ = False
 
-declaresPredicate :: IdentifierInspection
+declaresPredicate :: BoundInspection
 declaresPredicate pred = alternative (declaresFact pred) (declaresRule pred)
