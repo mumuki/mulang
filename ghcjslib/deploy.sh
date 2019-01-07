@@ -14,7 +14,8 @@ echo "Building mulang with GHCJS..."
 
 mkdir .deploy
 cp LICENSE ghcjslib/README.md ghcjslib/package.json .deploy/
-cp ghcjslib/build/mulang.js .deploy/index.js
+cp ghcjslib/index.js .deploy/mulang-cli.js
+cp ghcjslib/build/mulang.js .deploy/mulang.js
 
 echo "Publishing package to npm..."
 npm publish .deploy/
