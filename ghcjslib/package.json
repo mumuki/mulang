@@ -1,6 +1,6 @@
 {
   "name": "mulang",
-  "version": "1.0.0",
+  "version": "4.3.2",
   "description": "An intermediate language designed to perform advanced code analysis",
   "main": "index.js",
   "directories": {
@@ -32,5 +32,6 @@
   "devDependencies": {
     "mocha": "^5.2.0",
     "should": "^13.2.1"
-  }
+  },
+  "license": "GPL-3.0"
 }
