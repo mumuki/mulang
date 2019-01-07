@@ -2,7 +2,10 @@
   "name": "mulang",
   "version": "4.3.2",
   "description": "An intermediate language designed to perform advanced code analysis",
-  "main": "index.js",
+  "main": "mulang.js",
+  "bin": {
+    "mulang": "./index.js"
+  },
   "directories": {
     "test": "test"
   },
