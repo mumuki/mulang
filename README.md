@@ -33,6 +33,7 @@ Mulang is three different  - but thighly related - things:
     + [With Smell Analysis, by exclusion](#with-smell-analysis-by-exclusion)
     + [With expressiveness smells](#with-expressiveness-smells)
     + [With Intermediate Language Generation](#with-intermediate-language-generation)
+  * [With test running](#with-test-running)
 - [Mulang AST spec](#mulang-ast-spec)
   * [Expressions](#expressions)
     + [`Record`](#record)
@@ -220,6 +221,8 @@ Mulang is three different  - but thighly related - things:
       - [Haskell Examples](#haskell-examples-1)
       - [Java Examples](#java-examples-2)
         * [Caveats](#caveats-2)
+- [Code Execution](#code-execution)
+    + [Examples](#examples-1)
 - [Building mulang from source](#building-mulang-from-source)
   * [Setup](#setup)
   * [Installing and creating an executable](#installing-and-creating-an-executable)
@@ -229,6 +232,7 @@ Mulang is three different  - but thighly related - things:
 - [Ruby wrapper](#ruby-wrapper)
 - [JavaScript library](#javascript-library)
 - [Tagging and releasing](#tagging-and-releasing)
+- [Contributors](#contributors)
 
 <!-- tocstop -->
 
@@ -938,6 +942,7 @@ mulang '{
    "expectationResults" : []
 }
 ```
+For further detail on this spec, see [Code Execution](#code-execution)
 
 # Mulang AST spec
 
@@ -2213,25 +2218,27 @@ This feature can accessed through a `testAnalysisType` spec, such as the one sho
 
 Currently, support is given for executing the following AST elements:
 
-- [Application](#Application)
-- [Assert](#Assert)
-- [Assignment](#Assignment)
-- [ForLoop](#ForLoop)
-- [If](#If)
-- [Lambda](#Lambda)
-- [MuBool](#MuBool)
-- [MuList](#MuList)
-- [MuNil](#MuNil)
-- [MuNumber](#MuNumber)
-- [MuString](#MuString)
-- [Print](#Print)
-- [Raise](#Raise)
-- [Reference](#Reference)
-- [Return](#Return)
-- [Sequence](#Sequence)
-- [Subroutine](#Subroutine)
-- [Variable](#Variable)
-- [While](#While)
+- [Application](#application)
+- [Assert](#testgroup-test-and-assert)
+- [Assignment](#assignment)
+- [ForLoop](#forloop)
+- [If](#if)
+- [Lambda](#lambda)
+- [MuBool](#munumber-mubool-mustring-musymbol-and-muchar)
+- [MuList](#mutuple-and-mulist)
+- [MuNil](#munil)
+- [MuNumber](#munumber-mubool-mustring-musymbol-and-muchar)
+- [MuString](#munumber-mubool-mustring-musymbol-and-muchar)
+- [Print](#print)
+- [Raise](#raise)
+- [Reference](#reference)
+- [Return](#return)
+- [Sequence](#sequence)
+- [Function](#function)
+- [Procedure](#procedure)
+- [Method](#method)
+- [Variable](#variable)
+- [While](#while)
 
 ### Examples
 
