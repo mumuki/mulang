@@ -2206,6 +2206,125 @@ instead of:
 (TypeCast (Reference "something") (SimpleType "Num" ["A"]))
 ```
 
+# Code Execution
+
+As of v4.4.0, mulang provides basic support for executing its AST.
+This feature can accessed through a `testAnalysisType` spec, such as the one shown in [this section](#with-test-running).
+
+Currently, support is given for executing the following AST elements:
+
+- [Application](#Application)
+- [Assert](#Assert)
+- [Assignment](#Assignment)
+- [ForLoop](#ForLoop)
+- [If](#If)
+- [Lambda](#Lambda)
+- [MuBool](#MuBool)
+- [MuList](#MuList)
+- [MuNil](#MuNil)
+- [MuNumber](#MuNumber)
+- [MuString](#MuString)
+- [Print](#Print)
+- [Raise](#Raise)
+- [Reference](#Reference)
+- [Return](#Return)
+- [Sequence](#Sequence)
+- [Subroutine](#Subroutine)
+- [Variable](#Variable)
+- [While](#While)
+
+### Examples
+
+```bash
+mulang '{
+  "sample" : {
+    "tag" : "CodeFragment",
+    "language" : "JavaScript",
+    "content" : "
+      function f(x) {
+        return x + 1
+      }"
+  },
+  "spec" : {
+    "testAnalysisType" : {
+      "tag" :  "ExternalTests",
+      "test" : {
+        "tag" : "CodeFragment",
+        "language" : "JavaScript",
+        "content" : "
+          it(\"f increments by one\", function() { 
+            assert.equals(f(1), 2)
+          })"
+      }
+    }
+  }
+}' | json_pp
+{
+   "testResults" : [
+      {
+         "status" : {
+            "tag" : "Success"
+         },
+         "description" : [
+            "f increments by one"
+         ]
+      }
+   ],
+   "signatures" : [],
+   "smells" : [],
+   "intermediateLanguage" : null,
+   "expectationResults" : [],
+   "tag" : "AnalysisCompleted"
+}
+```
+
+Since both the code and tests are parsed to and run as an AST, the two of them needn't be in the same language:
+
+```bash
+mulang '{
+  "sample" : {
+    "tag" : "CodeFragment",
+    "language" : "Python",
+    "content" : "def f():
+        x = 0
+        while x < 10:
+          x += 1
+        return x"
+  },
+  "spec" : {
+    "testAnalysisType" : {
+      "tag" :  "ExternalTests",
+      "test" : {
+        "tag" : "CodeFragment",
+        "language" : "JavaScript",
+        "content" : "
+          it(\"f returns 10\", function() { 
+            assert.equals(f(), 10)
+          })"
+      }
+    }
+  }
+}' | json_pp
+{
+   "signatures" : [],
+   "expectationResults" : [],
+   "testResults" : [
+      {
+         "status" : {
+            "tag" : "Success"
+         },
+         "description" : [
+            "f returns 10"
+         ]
+      }
+   ],
+   "smells" : [],
+   "tag" : "AnalysisCompleted",
+   "intermediateLanguage" : null
+}
+
+```
+
 # Building mulang from source
 
 ## Setup
