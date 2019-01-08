@@ -12,14 +12,14 @@ $ node index.js '{
      "spec" : {
         "expectations" : [
            {
-              "binding" : ":Intransitive:x",
+              "binding" : "Intransitive:x",
               "inspection" : "Uses:*"
            }
         ],
         "smellsSet" : { "tag" : "NoSmells" }
      }
   }'
-{"signatures":[],"smells":[],"expectationResults":[{"expectation":{"binding":":Intransitive:x","inspection":"Uses:*"},"result":true}],"tag":"AnalysisCompleted","intermediateLanguage":null}
+{"signatures":[],"smells":[],"expectationResults":[{"expectation":{"binding":"Intransitive:x","inspection":"Uses:*"},"result":true}],"tag":"AnalysisCompleted","intermediateLanguage":null}
 ```
 
 ### As a node library
@@ -35,7 +35,7 @@ mulang.analyse({
                 "spec": {
                   "expectations": [
                     {
-                      "binding": ":Intransitive:x",
+                      "binding": "Intransitive:x",
                       "inspection": "Uses:*"
                     }
                   ],
@@ -59,7 +59,7 @@ mulang.analyse({
                 "spec": {
                   "expectations": [
                     {
-                      "binding": ":Intransitive:x",
+                      "binding": "Intransitive:x",
                       "inspection": "Uses:*"
                     }
                   ],

@@ -545,7 +545,7 @@ $ mulang '
    "spec" : {
       "expectations" : [
          {
-            "binding" : ":Intransitive:x",
+            "binding" : "Intransitive:x",
             "inspection" : "Uses:*"
          }
       ],
@@ -557,7 +557,7 @@ $ mulang '
    "expectationResults" : [
       {
          "expectation" : {
-            "binding" : ":Intransitive:x",
+            "binding" : "Intransitive:x",
             "inspection" : "Uses:*"
          },
          "result" : false
