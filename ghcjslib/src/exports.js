@@ -3,5 +3,6 @@ let ghcjsExports = {
   analyseIO: ghcjsWrapperStringAny("analyseIO"),
   analyse: function(spec) {
     return JSON.parse(this.analyseIO(JSON.stringify(spec)));
-  }
+  },
+  version: require('../package.json').version
 };

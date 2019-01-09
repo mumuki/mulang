@@ -12,10 +12,10 @@ fi
 echo "Building mulang with GHCJS..."
 ./ghcjslib/build.sh
 
-mkdir .deploy
+mkdir -p .deploy/build
 cp LICENSE ghcjslib/README.md ghcjslib/package.json .deploy/
 cp ghcjslib/index.js .deploy/mulang-cli.js
-cp ghcjslib/build/mulang.js .deploy/mulang.js
+cp ghcjslib/build/mulang.js .deploy/build/mulang.js
 
 echo "Publishing package to npm..."
-npm publish .deploy/
+#npm publish .deploy/
