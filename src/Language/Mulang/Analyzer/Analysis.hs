@@ -10,8 +10,10 @@ module Language.Mulang.Analyzer.Analysis (
   CaseStyle(..),
   Smell,
   SignatureAnalysisType(..),
+  TestAnalysisType(..),
+  InterpreterOptions(..),
   SignatureStyle(..),
-  Sample(..),
+  Fragment(..),
   Language(..),
 
   AnalysisResult(..),
@@ -21,6 +23,7 @@ import GHC.Generics
 
 import Language.Mulang.Ast
 import Language.Mulang.Builder (NormalizationOptions)
+import Language.Mulang.Interpreter.Runner (TestResult)
 
 ---
 -- Common structures
@@ -29,33 +32,35 @@ import Language.Mulang.Builder (NormalizationOptions)
 type Smell = String
 type Inspection = String
 
-data Expectation
-  = Expectation { binding :: String, inspection :: Inspection } deriving (Show, Eq, Generic)
+data Expectation = Expectation {
+  binding :: String,
+  inspection :: Inspection
+} deriving (Show, Eq, Generic)
 
 --
 -- Analysis input structures
 --
 
 data Analysis = Analysis {
-  sample :: Sample,
+  sample :: Fragment,
   spec :: AnalysisSpec
 } deriving (Show, Eq, Generic)
 
 data AnalysisSpec = AnalysisSpec {
-  expectations :: [Expectation],
-  smellsSet :: SmellsSet,
+  expectations :: Maybe [Expectation],
+  smellsSet :: Maybe SmellsSet,
   signatureAnalysisType :: Maybe SignatureAnalysisType,
+  testAnalysisType :: Maybe TestAnalysisType,
   domainLanguage :: Maybe DomainLanguage,
   includeIntermediateLanguage :: Maybe Bool
 } deriving (Show, Eq, Generic)
 
-data DomainLanguage
-  = DomainLanguage {
-      dictionaryFilePath :: Maybe FilePath,
-      caseStyle :: Maybe CaseStyle,
-      minimumIdentifierSize :: Maybe Int,
-      jargon :: Maybe [String]
-    }  deriving (Show, Eq, Generic)
+data DomainLanguage = DomainLanguage {
+  dictionaryFilePath :: Maybe FilePath,
+  caseStyle :: Maybe CaseStyle,
+  minimumIdentifierSize :: Maybe Int,
+  jargon :: Maybe [String]
+} deriving (Show, Eq, Generic)
 
 data CaseStyle
   = CamelCase
@@ -77,9 +82,23 @@ data SignatureStyle
   | HaskellStyle
   | PrologStyle deriving (Show, Eq, Generic)
 
-data Sample
+data Fragment
   = MulangSample { ast :: Expression, normalizationOptions :: Maybe NormalizationOptions }
   | CodeSample { language :: Language, content :: Code } deriving (Show, Eq, Generic)
+
+data InterpreterOptions = InterpreterOptions {
+  strictReturns :: Maybe Bool,
+  strictShortCircuit :: Maybe Bool
+} deriving (Show, Eq, Generic)
+
+data TestAnalysisType
+  = NoTests
+  | EmbeddedTests { interpreterOptions :: Maybe InterpreterOptions }
+  | ExternalTests {
+      test :: Fragment,
+      extra :: Maybe Fragment,
+      interpreterOptions :: Maybe InterpreterOptions
+    } deriving (Show, Eq, Generic)
 
 data Language
   =  Json
@@ -94,10 +113,12 @@ data Language
 --
 
 data AnalysisResult
-  = AnalysisCompleted { expectationResults :: [ExpectationResult],
-                        smells :: [Expectation],
-                        signatures :: [Code],
-                        intermediateLanguage :: Maybe Expression }
+  = AnalysisCompleted {
+      expectationResults :: [ExpectationResult],
+      smells :: [Expectation],
+      signatures :: [Code],
+      testResults :: [TestResult],
+      intermediateLanguage :: Maybe Expression }
   | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
 data ExpectationResult = ExpectationResult {

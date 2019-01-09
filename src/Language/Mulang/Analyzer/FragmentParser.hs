@@ -1,5 +1,8 @@
-module        Language.Mulang.Analyzer.SampleParser (
-  parseSample) where
+module        Language.Mulang.Analyzer.FragmentParser (
+  parseFragment,
+  parseFragment') where
+
+import        Control.Fallible (orFail)
 
 import        Language.Mulang
 import        Language.Mulang.Parsers (EitherParser, maybeToEither)
@@ -8,12 +11,15 @@ import        Language.Mulang.Parsers.JavaScript (parseJavaScript)
 import        Language.Mulang.Parsers.Prolog (parseProlog)
 import        Language.Mulang.Parsers.Java (parseJava)
 import        Language.Mulang.Parsers.Python (parsePython)
-import        Language.Mulang.Analyzer.Analysis (Sample(..), Language(..))
+import        Language.Mulang.Analyzer.Analysis (Fragment(..), Language(..))
 import        Language.Mulang.Builder (normalize, normalizeWith, NormalizationOptions)
 
-parseSample :: Sample -> Either String Expression
-parseSample (CodeSample language content) = (parserFor language) content
-parseSample (MulangSample ast options)    = Right . (normalizerFor options) $ ast
+parseFragment' :: Fragment -> Expression
+parseFragment' = orFail . parseFragment
+
+parseFragment :: Fragment -> Either String Expression
+parseFragment (CodeSample language content) = (parserFor language) content
+parseFragment (MulangSample ast options)    = Right . (normalizerFor options) $ ast
 
 parserFor :: Language -> EitherParser
 parserFor Haskell        = parseHaskell

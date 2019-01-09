@@ -4,10 +4,11 @@ import           Language.Mulang.Analyzer hiding (result, spec)
 import           Language.Mulang.Ast
 import           Test.Hspec
 
-result smellResults = AnalysisCompleted [] smellResults [] Nothing
+result smells
+  = emptyCompletedAnalysisResult { smells = smells }
 
-runExcept language content smells = analyse (smellsAnalysis (CodeSample language content) allSmells { exclude = Just smells })
-runOnly language content smells = analyse (smellsAnalysis (CodeSample language content) noSmells { include = Just smells })
+runExcept language content smells = analyse (smellsAnalysis (CodeSample language content) (allSmellsBut smells))
+runOnly language content smells = analyse (smellsAnalysis (CodeSample language content) (noSmellsBut smells))
 
 spec = describe "SmellsAnalyzer" $ do
   describe "Using domain language and nested structures" $ do

@@ -33,6 +33,7 @@ Mulang is three different  - but thighly related - things:
     + [With Smell Analysis, by exclusion](#with-smell-analysis-by-exclusion)
     + [With expressiveness smells](#with-expressiveness-smells)
     + [With Intermediate Language Generation](#with-intermediate-language-generation)
+  * [With test running](#with-test-running)
 - [Mulang AST spec](#mulang-ast-spec)
   * [Expressions](#expressions)
     + [`Record`](#record)
@@ -220,6 +221,8 @@ Mulang is three different  - but thighly related - things:
       - [Haskell Examples](#haskell-examples-1)
       - [Java Examples](#java-examples-2)
         * [Caveats](#caveats-2)
+- [Code Execution](#code-execution)
+    + [Examples](#examples-1)
 - [Building mulang from source](#building-mulang-from-source)
   * [Setup](#setup)
   * [Installing and creating an executable](#installing-and-creating-an-executable)
@@ -229,6 +232,7 @@ Mulang is three different  - but thighly related - things:
 - [Ruby wrapper](#ruby-wrapper)
 - [JavaScript library](#javascript-library)
 - [Tagging and releasing](#tagging-and-releasing)
+- [Contributors](#contributors)
 
 <!-- tocstop -->
 
@@ -548,8 +552,7 @@ $ mulang '
             "binding" : ":Intransitive:x",
             "inspection" : "Uses:*"
          }
-      ],
-      "smellsSet" : { "tag" : "NoSmells" }
+      ]
    }
 }
 ' | json_pp
@@ -580,7 +583,6 @@ $ mulang '
       "content" : "x = 1"
    },
    "spec" : {
-      "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
             "binding" : "*",
@@ -617,8 +619,6 @@ $ mulang '
       "content" : "function foo(x, y) { return x + y; }"
    },
    "spec" : {
-      "expectations" : [],
-      "smellsSet" : { "tag" : "NoSmells" },
       "signatureAnalysisType" : {
         "tag" : "StyledSignatures",
         "style" : "HaskellStyle"
@@ -647,8 +647,6 @@ $ mulang '
       "content" : "function foo(x, y { return x + y; }"
    },
    "spec" : {
-      "expectations" : [],
-      "smellsSet" : { "tag" : "NoSmells" },
       "signatureAnalysisType" : {
         "tag" : "StyledSignatures",
         "style" : "HaskellStyle"
@@ -689,14 +687,10 @@ $ mulang '
       }
    },
    "spec" : {
-      "smellsSet" : {
-        "tag" : "NoSmells"
-      },
       "signatureAnalysisType" : {
          "tag" : "StyledSignatures",
          "style" : "HaskellStyle"
-      },
-      "expectations" : []
+      }
    }
 }
 ' | json_pp
@@ -722,7 +716,6 @@ $ mulang '
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
-      "expectations" : [],
       "smellsSet" : {
         "tag" : "NoSmells",
         "include" : [
@@ -763,7 +756,6 @@ $ mulang '
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
-      "expectations" : [],
       "smellsSet" : {
         "tag" : "AllSmells",
         "exclude" : [
@@ -801,7 +793,6 @@ $ mulang '
       "content" : "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer)."
    },
    "spec" : {
-      "expectations" : [],
       "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : {
          "caseStyle" : "SnakeCase",
@@ -838,7 +829,6 @@ $ mulang  '
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
-      "expectations" : [],
       "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" }
    }
@@ -872,8 +862,6 @@ $ mulang '
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
-      "expectations" : [],
-      "smellsSet" : { "tag" : "NoSmells" },
       "includeIntermediateLanguage" : true
    }
 }
@@ -916,6 +904,45 @@ $ mulang '
 
 ```
 
+## With test running
+
+```bash
+mulang '{
+"sample" : {
+   "tag" : "CodeSample",
+   "language" : "JavaScript",
+   "content" : "function f(x) { return x + 1 }"
+},
+"spec" : {
+   "testAnalysisType" : {
+     "tag" :  "ExternalTests",
+     "test" : {
+       "tag" : "CodeSample",
+       "language" : "JavaScript",
+       "content" : "it(\"f increments by one\", function() { assert.equals(f(1), 2) })"
+     }
+   }
+ }
+}' | json_pp
+{
+   "testResults" : [
+      {
+         "description" : [
+            "f increments by one"
+         ],
+         "status" : {
+            "tag" : "Success"
+         }
+      }
+   ],
+   "signatures" : [],
+   "intermediateLanguage" : null,
+   "tag" : "AnalysisCompleted",
+   "smells" : [],
+   "expectationResults" : []
+}
+```
+For further detail on this spec, see [Code Execution](#code-execution)
 
 # Mulang AST spec
 
@@ -2182,6 +2209,127 @@ instead of:
 
 ```haskell
 (TypeCast (Reference "something") (SimpleType "Num" ["A"]))
+```
+
+# Code Execution
+
+As of v4.4.0, mulang provides basic support for executing its AST.
+This feature can accessed through a `testAnalysisType` spec, such as the one shown in [this section](#with-test-running).
+
+Currently, support is given for executing the following AST elements:
+
+- [Application](#application)
+- [Assert](#testgroup-test-and-assert)
+- [Assignment](#assignment)
+- [ForLoop](#forloop)
+- [If](#if)
+- [Lambda](#lambda)
+- [MuBool](#munumber-mubool-mustring-musymbol-and-muchar)
+- [MuList](#mutuple-and-mulist)
+- [MuNil](#munil)
+- [MuNumber](#munumber-mubool-mustring-musymbol-and-muchar)
+- [MuString](#munumber-mubool-mustring-musymbol-and-muchar)
+- [Print](#print)
+- [Raise](#raise)
+- [Reference](#reference)
+- [Return](#return)
+- [Sequence](#sequence)
+- [Function](#function)
+- [Procedure](#procedure)
+- [Method](#method)
+- [Variable](#variable)
+- [While](#while)
+
+### Examples
+
+```bash
+mulang '{
+  "sample" : {
+    "tag" : "CodeSample",
+    "language" : "JavaScript",
+    "content" : "
+      function f(x) {
+        return x + 1
+      }"
+  },
+  "spec" : {
+    "testAnalysisType" : {
+      "tag" :  "ExternalTests",
+      "test" : {
+        "tag" : "CodeSample",
+        "language" : "JavaScript",
+        "content" : "
+          it(\"f increments by one\", function() {
+            assert.equals(f(1), 2)
+          })"
+      }
+    }
+  }
+}' | json_pp
+{
+   "testResults" : [
+      {
+         "status" : {
+            "tag" : "Success"
+         },
+         "description" : [
+            "f increments by one"
+         ]
+      }
+   ],
+   "signatures" : [],
+   "smells" : [],
+   "intermediateLanguage" : null,
+   "expectationResults" : [],
+   "tag" : "AnalysisCompleted"
+}
+```
+
+Since both the code and tests are parsed to and run as an AST, the two of them needn't be in the same language:
+
+```bash
+mulang '{
+  "sample" : {
+    "tag" : "CodeSample",
+    "language" : "Python",
+    "content" : "def f():
+        x = 0
+        while x < 10:
+          x += 1
+        return x"
+  },
+  "spec" : {
+    "testAnalysisType" : {
+      "tag" :  "ExternalTests",
+      "test" : {
+        "tag" : "CodeSample",
+        "language" : "JavaScript",
+        "content" : "
+          it(\"f returns 10\", function() {
+            assert.equals(f(), 10)
+          })"
+      }
+    }
+  }
+}' | json_pp
+{
+   "signatures" : [],
+   "expectationResults" : [],
+   "testResults" : [
+      {
+         "status" : {
+            "tag" : "Success"
+         },
+         "description" : [
+            "f returns 10"
+         ]
+      }
+   ],
+   "smells" : [],
+   "tag" : "AnalysisCompleted",
+   "intermediateLanguage" : null
+}
+
 ```
 
 # Building mulang from source

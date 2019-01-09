@@ -63,16 +63,16 @@ library
     Language.Mulang.Analyzer
     Language.Mulang.Analyzer.Analysis
     Language.Mulang.Analyzer.Analysis.Json
-    Language.Mulang.Analyzer.SampleParser
+    Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.ExpectationsAnalyzer
     Language.Mulang.Analyzer.ExpectationsCompiler
+    Language.Mulang.Analyzer.FragmentParser
     Language.Mulang.Analyzer.SignaturesAnalyzer
     Language.Mulang.Analyzer.SignatureStyleCompiler
-    Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.SmellsAnalyzer
+    Language.Mulang.Analyzer.TestsAnalyzer
     Language.Mulang.Interpreter
     Language.Mulang.Interpreter.Runner
-    Language.Mulang.Interpreter.Tests
 
   build-depends:
     base                      <= 5,

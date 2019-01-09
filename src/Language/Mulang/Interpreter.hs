@@ -1,6 +1,17 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Language.Mulang.Interpreter where
+module Language.Mulang.Interpreter (
+  defaultContext,
+  dereference,
+  dereference',
+  eval,
+  eval',
+  evalExpr,
+  evalRaising,
+  nullRef,
+  ExecutionContext(..),
+  Value(..)
+) where
 
 import           Data.Map.Strict (Map)
 import           Data.Maybe (fromMaybe, fromJust)
@@ -22,7 +33,6 @@ type Callback = Reference -> Executable ()
 newtype Reference = Reference Int deriving (Show, Eq, Ord)
 
 type ObjectSpace = Map Reference Value
-type LocalVariables = Map String Reference
 
 instance Show ExecutionContext where
   show (ExecutionContext globalObjects scopes _ _ _) =
@@ -60,6 +70,15 @@ eval' ctx ref = runStateT (runContT ref return) ctx
 
 eval :: ExecutionContext -> Mu.Expression -> IO (Reference, ExecutionContext)
 eval ctx expr = eval' ctx (evalExpr expr)
+
+evalRaising :: ExecutionContext -> Mu.Expression ->  Executable (Reference, Maybe Reference)
+evalRaising context expr = do
+  resultRef <- callCC $ \raiseCallback -> do
+    put (context { currentRaiseCallback = raiseCallback })
+    evalExpr expr
+    return nullRef
+  lastException <- gets currentException
+  return (resultRef, lastException)
 
 evalExpressionsWith :: [Mu.Expression] -> ([Value] -> Executable Reference) -> Executable Reference
 evalExpressionsWith expressions f = do
@@ -215,11 +234,7 @@ evalExpr (Mu.Assignment name expr) = do
 
 evalExpr (Mu.Try expr [( Mu.VariablePattern exName, catchExpr)] finallyExpr) = do
   context <- get
-  resultRef <- callCC $ \raiseCallback -> do
-    put (context { currentRaiseCallback = raiseCallback })
-    evalExpr expr
-    return nullRef
-  lastException <- gets currentException
+  (resultRef, lastException) <- evalRaising context expr
   modify' (\c ->
               c { currentReturnCallback = currentReturnCallback context
                 , currentRaiseCallback = currentRaiseCallback context
@@ -365,4 +380,3 @@ updateRef :: Reference -> (Value -> Value) -> Executable ()
 updateRef ref f = do
   val <- dereference ref
   putRef ref (f val)
-
