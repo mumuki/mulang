@@ -26,7 +26,7 @@ Or install it yourself as:
 require 'mulang'
 
 Mulang.analyse sample: {
-                  tag: 'CodeFragment',
+                  tag: 'CodeSample',
                   language: 'JavaScript',
                   content: 'var x = 1'
                },
@@ -49,7 +49,7 @@ code.ast
 # => {"tag"=>"Variable", "contents"=>["x", {"tag"=>"MuNumber", "contents"=>1}]}
 
 code.analysis expectations: [], smellsSet: { tag: 'NoSmells' }
-# => {:sample=>{:tag=>"CodeFragment", :language=>"JavaScript", :content=>"var x = 1"}, :spec=>{:expectations=>[], :smellsSet=>{:tag=>"NoSmells"}}}
+# => {:sample=>{:tag=>"CodeSample", :language=>"JavaScript", :content=>"var x = 1"}, :spec=>{:expectations=>[], :smellsSet=>{:tag=>"NoSmells"}}}
 
 code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }
 # => {"tag"=>"AnalysisCompleted", "intermediateLanguage"=>nil, "signatures"=>[], "smells"=>[], "expectationResults"=>[]}

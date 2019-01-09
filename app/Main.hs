@@ -54,7 +54,7 @@ main = do
          #read from argument
          $ mulang '{
              "sample" : {
-                "tag" : "CodeFragment",
+                "tag" : "CodeSample",
                 "language" : "Haskell",
                 "content" : "x = 1"
              },

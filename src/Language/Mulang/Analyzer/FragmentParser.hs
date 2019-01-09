@@ -18,8 +18,8 @@ parseFragment' :: Fragment -> Expression
 parseFragment' = orFail . parseFragment
 
 parseFragment :: Fragment -> Either String Expression
-parseFragment (CodeFragment language content) = (parserFor language) content
-parseFragment (MulangFragment ast options)    = Right . (normalizerFor options) $ ast
+parseFragment (CodeSample language content) = (parserFor language) content
+parseFragment (MulangSample ast options)    = Right . (normalizerFor options) $ ast
 
 parserFor :: Language -> EitherParser
 parserFor Haskell        = parseHaskell

@@ -10,14 +10,14 @@ module Mulang::Language
 
     def ast_analysis(content)
       {
-        sample: { tag: 'CodeFragment', language: @language, content: content },
+        sample: { tag: 'CodeSample', language: @language, content: content },
         spec: { expectations: [], smellsSet: { tag: 'NoSmells' }, includeIntermediateLanguage: true }
       }
     end
 
     def sample(content)
       {
-        tag: 'CodeFragment',
+        tag: 'CodeSample',
         language: @language,
         content: content
       }
@@ -35,7 +35,7 @@ module Mulang::Language
 
     def sample(content)
       {
-        tag: 'MulangFragment',
+        tag: 'MulangSample',
         ast: ast(content)
       }
     end

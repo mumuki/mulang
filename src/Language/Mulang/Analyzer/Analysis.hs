@@ -83,8 +83,8 @@ data SignatureStyle
   | PrologStyle deriving (Show, Eq, Generic)
 
 data Fragment
-  = MulangFragment { ast :: Expression, normalizationOptions :: Maybe NormalizationOptions }
-  | CodeFragment { language :: Language, content :: Code } deriving (Show, Eq, Generic)
+  = MulangSample { ast :: Expression, normalizationOptions :: Maybe NormalizationOptions }
+  | CodeSample { language :: Language, content :: Code } deriving (Show, Eq, Generic)
 
 data InterpreterOptions = InterpreterOptions {
   strictReturns :: Maybe Bool,

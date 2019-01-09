@@ -5,7 +5,7 @@ describe("mulang", () => {
   it("can do basic analyis", () => {
     should(mulang.analyse({
       "sample": {
-        "tag": "CodeFragment",
+        "tag": "CodeSample",
         "language": "Haskell",
         "content": "x = 1"
       },
@@ -38,7 +38,7 @@ describe("mulang", () => {
   it("it can generate ast", () => {
     should(mulang.analyse({
       "sample": {
-        "tag": "CodeFragment",
+        "tag": "CodeSample",
         "language": "JavaScript",
         "content": "function foo(x, y) { return null; }"
       },

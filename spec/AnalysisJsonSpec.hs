@@ -23,12 +23,12 @@ textToLazyByteString = pack . unpack
 
 spec = describe "AnalysisJson" $ do
   it "works with Intransitive expectations" $ do
-    let analysis = Analysis (CodeFragment Haskell "x = 1")
+    let analysis = Analysis (CodeSample Haskell "x = 1")
                             (emptyAnalysisSpec { expectations = Just [Expectation "Intransitive:x" "Uses:*"] })
     let json = [text|
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "Haskell",
       "content" : "x = 1"
    },
@@ -44,12 +44,12 @@ spec = describe "AnalysisJson" $ do
     run json `shouldBe` analysis
 
   it "works with transitive expectations" $ do
-    let analysis = Analysis (CodeFragment Haskell "x = 1")
+    let analysis = Analysis (CodeSample Haskell "x = 1")
                             (emptyAnalysisSpec { expectations = Just [Expectation "x" "Declares"] })
     let json = [text|
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "Haskell",
       "content" : "x = 1"
    },
@@ -69,7 +69,7 @@ spec = describe "AnalysisJson" $ do
     let json = [text|
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return x + y; }"
    },
@@ -80,7 +80,7 @@ spec = describe "AnalysisJson" $ do
       }
    }
 } |]
-    let analysis = Analysis (CodeFragment JavaScript "function foo(x, y) { return x + y; }")
+    let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return x + y; }")
                             (emptyAnalysisSpec { signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
@@ -89,7 +89,7 @@ spec = describe "AnalysisJson" $ do
     let json = [text|
 {
    "sample" : {
-      "tag" : "MulangFragment",
+      "tag" : "MulangSample",
       "ast" : {
          "tag" : "Sequence",
          "contents" : [
@@ -117,7 +117,7 @@ spec = describe "AnalysisJson" $ do
       }
    }
 }|]
-    let analysis = Analysis (MulangFragment (Sequence [Variable "x" (MuNumber 1), Variable "y" (MuNumber 2)]) Nothing)
+    let analysis = Analysis (MulangSample (Sequence [Variable "x" (MuNumber 1), Variable "y" (MuNumber 2)]) Nothing)
                             (emptyAnalysisSpec { signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
@@ -126,7 +126,7 @@ spec = describe "AnalysisJson" $ do
     let json = [text|
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
@@ -144,7 +144,7 @@ spec = describe "AnalysisJson" $ do
       }
    }
 } |]
-    let analysis = Analysis (CodeFragment JavaScript "function foo(x, y) { return null; }")
+    let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
                             (emptyAnalysisSpec {
                               smellsSet = (noSmellsBut ["ReturnsNil", "DoesNilTest"]),
                               signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
@@ -155,7 +155,7 @@ spec = describe "AnalysisJson" $ do
     let json = [text|
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
@@ -172,7 +172,7 @@ spec = describe "AnalysisJson" $ do
       }
    }
 } |]
-    let analysis = Analysis (CodeFragment JavaScript "function foo(x, y) { return null; }")
+    let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return null; }")
                             (emptyAnalysisSpec {
                               smellsSet = allSmellsBut ["ReturnsNil"],
                               signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
@@ -183,7 +183,7 @@ spec = describe "AnalysisJson" $ do
     let json = [text|
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "Prolog",
       "content" : "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer)."
    },
@@ -196,7 +196,7 @@ spec = describe "AnalysisJson" $ do
       }
    }
 } |]
-    let analysis = Analysis (CodeFragment Prolog "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer).")
+    let analysis = Analysis (CodeSample Prolog "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer).")
                             (emptyAnalysisSpec {
                               smellsSet = allSmells,
                               domainLanguage = Just emptyDomainLanguage {
@@ -210,7 +210,7 @@ spec = describe "AnalysisJson" $ do
     let json = [text|
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function f(x, y) { return null; }"
    },
@@ -219,7 +219,7 @@ spec = describe "AnalysisJson" $ do
       "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" }
    }
 } |]
-    let analysis = Analysis (CodeFragment JavaScript "function f(x, y) { return null; }")
+    let analysis = Analysis (CodeSample JavaScript "function f(x, y) { return null; }")
                             (emptyAnalysisSpec {
                               smellsSet = allSmells,
                               domainLanguage = Just emptyDomainLanguage { dictionaryFilePath = Just "/usr/share/dict/words" } })

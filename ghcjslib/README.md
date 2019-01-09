@@ -5,7 +5,7 @@
 ```sh
 $ node index.js '{
      "sample" : {
-        "tag" : "CodeFragment",
+        "tag" : "CodeSample",
         "language" : "Haskell",
         "content" : "x = 1"
      },
@@ -28,7 +28,7 @@ $ node index.js '{
 let mulang = require('./build/mulang.js')
 mulang.analyse({
                 "sample": {
-                  "tag": "CodeFragment",
+                  "tag": "CodeSample",
                   "language": "Haskell",
                   "content": "x = 1"
                 },
@@ -52,7 +52,7 @@ mulang.analyse({
 <script>
 mulang.analyse({
                 "sample": {
-                  "tag": "CodeFragment",
+                  "tag": "CodeSample",
                   "language": "Haskell",
                   "content": "x = 1"
                 },

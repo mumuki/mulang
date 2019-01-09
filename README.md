@@ -542,7 +542,7 @@ Let's see some usage samples:
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "Haskell",
       "content" : "x = 1"
    },
@@ -578,7 +578,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "Haskell",
       "content" : "x = 1"
    },
@@ -614,7 +614,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return x + y; }"
    },
@@ -642,7 +642,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y { return x + y; }"
    },
@@ -665,7 +665,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
-      "tag" : "MulangFragment",
+      "tag" : "MulangSample",
       "ast" : {
          "tag" : "Sequence",
          "contents" : [
@@ -711,7 +711,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
@@ -751,7 +751,7 @@ $ mulang '
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
@@ -788,7 +788,7 @@ by the `domainLanguage` setting, which you _can_ configure:
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "Prolog",
       "content" : "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer)."
    },
@@ -824,7 +824,7 @@ Also, if you want to use `HasMisspelledIdentifiers` smell, you _need_ to specify
 $ mulang  '
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
@@ -857,7 +857,7 @@ $ mulang  '
 $ mulang '
 {
    "sample" : {
-      "tag" : "CodeFragment",
+      "tag" : "CodeSample",
       "language" : "JavaScript",
       "content" : "function foo(x, y) { return null; }"
    },
@@ -909,7 +909,7 @@ $ mulang '
 ```bash
 mulang '{
 "sample" : {
-   "tag" : "CodeFragment",
+   "tag" : "CodeSample",
    "language" : "JavaScript",
    "content" : "function f(x) { return x + 1 }"
 },
@@ -917,7 +917,7 @@ mulang '{
    "testAnalysisType" : {
      "tag" :  "ExternalTests",
      "test" : {
-       "tag" : "CodeFragment",
+       "tag" : "CodeSample",
        "language" : "JavaScript",
        "content" : "it(\"f increments by one\", function() { assert.equals(f(1), 2) })"
      }
@@ -2245,7 +2245,7 @@ Currently, support is given for executing the following AST elements:
 ```bash
 mulang '{
   "sample" : {
-    "tag" : "CodeFragment",
+    "tag" : "CodeSample",
     "language" : "JavaScript",
     "content" : "
       function f(x) {
@@ -2256,10 +2256,10 @@ mulang '{
     "testAnalysisType" : {
       "tag" :  "ExternalTests",
       "test" : {
-        "tag" : "CodeFragment",
+        "tag" : "CodeSample",
         "language" : "JavaScript",
         "content" : "
-          it(\"f increments by one\", function() { 
+          it(\"f increments by one\", function() {
             assert.equals(f(1), 2)
           })"
       }
@@ -2290,7 +2290,7 @@ Since both the code and tests are parsed to and run as an AST, the two of them n
 ```bash
 mulang '{
   "sample" : {
-    "tag" : "CodeFragment",
+    "tag" : "CodeSample",
     "language" : "Python",
     "content" : "def f():
         x = 0
@@ -2302,10 +2302,10 @@ mulang '{
     "testAnalysisType" : {
       "tag" :  "ExternalTests",
       "test" : {
-        "tag" : "CodeFragment",
+        "tag" : "CodeSample",
         "language" : "JavaScript",
         "content" : "
-          it(\"f returns 10\", function() { 
+          it(\"f returns 10\", function() {
             assert.equals(f(), 10)
           })"
       }

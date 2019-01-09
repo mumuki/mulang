@@ -8,7 +8,7 @@ result rs = emptyCompletedAnalysisResult { testResults = rs }
 
 run language sample test extra = analyse (testsAnalysis (fragment sample) (ExternalTests (fragment test) (fmap fragment extra) Nothing))
   where
-    fragment content = CodeFragment language content
+    fragment content = CodeSample language content
 
 spec = describe "TestsAnalyzer" $ do
   it "works with empty tests" $ do
