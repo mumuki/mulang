@@ -12,7 +12,7 @@ describe("mulang", () => {
       "spec": {
         "expectations": [
           {
-            "binding": ":Intransitive:x",
+            "binding": "Intransitive:x",
             "inspection": "Uses:*"
           }
         ],
@@ -22,7 +22,7 @@ describe("mulang", () => {
       "expectationResults": [
         {
           "expectation": {
-            "binding": ":Intransitive:x",
+            "binding": "Intransitive:x",
             "inspection": "Uses:*",
           },
           "result": true

@@ -61,7 +61,7 @@ main = do
              "spec" : {
                 "expectations" : [
                    {
-                      "binding" : ":Intransitive:x",
+                      "binding" : "Intransitive:x",
                       "inspection" : "Uses:*"
                    }
                 ],

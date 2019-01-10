@@ -3,6 +3,9 @@ set -e
 
 pushd ghcjslib
 
+echo 'Installing npm dependencies...'
+npm install
+
 echo 'Running mocha tests...'
 npm test
 
