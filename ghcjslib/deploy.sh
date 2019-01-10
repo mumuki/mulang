@@ -18,4 +18,4 @@ cp ghcjslib/index.js .deploy/mulang-cli.js
 cp ghcjslib/build/mulang.js .deploy/build/mulang.js
 
 echo "Publishing package to npm..."
-#npm publish .deploy/
+npm publish .deploy/

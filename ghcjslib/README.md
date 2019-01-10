@@ -64,3 +64,7 @@ Build and publish the package to NPM with:
 ```bash
 $ ./ghcjslib/deploy.sh
 ```
+
+## Try it out!
+
+You can find an online interactive version of mulang, along with its documentation [here](http://mumuki.github.io/mulang/)
