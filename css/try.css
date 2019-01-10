@@ -2,8 +2,7 @@ div.bs-sidebar.hidden-print.affix.well{ display: none; }
 .col-md-3{display: none;}
 .col-md-9{width: 100%}
 
-#spec {
-  font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+#jsoneditor {
   height: 600px
 }
 

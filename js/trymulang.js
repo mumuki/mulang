@@ -1,15 +1,22 @@
+let jsonEditor;
+
 document.addEventListener("DOMContentLoaded", function(event) {
   const examplesSelect = $(".examples-select");
   examplesSelect.change(function () {
     const selected = examplesSelect.val();
-    const text = examples[selected];
-    $("#spec").val(JSON.stringify(text, null, 4));
+    const exampleJSON = examples[selected];
+    jsonEditor.set(exampleJSON);
   });
+
+  const container = document.getElementById("jsoneditor");
+  const options = {
+    mode: "code"
+  };
+  jsonEditor = new JSONEditor(container, options);
 });
 
 function analyse() {
-  const data = JSON.parse($("#spec").val());
-  const result = mulang.analyse(data);
+  const result = mulang.analyse(jsonEditor.get());
   $("#result").jsonViewer(result);
 }
 
