@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="../css/highlight.min.css">
     <link href="../css/mumuki-styles.css" rel="stylesheet">
     <link href="../css/jquery.json-viewer.css" rel="stylesheet">
+    <link href="../css/docstyles.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -134,19 +135,25 @@
 </div></div>
         <div class="col-md-9" role="main">
 
-<style>
-div.bs-sidebar.hidden-print.affix.well{ display: none; }
-.col-md-3{display: none;}
-.col-md-9{width: 100%}
-#spec {
-  font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
-  height: 600px
-}
-</style>
+<p><link rel="stylesheet" href="../css/try.css">
+<script language="javascript" src="../js/trymulang.js"></script></p>
+<div class="examples-container">
+  Examples: <select class="examples-select">
+  <option selected="selected"></option>
+  <option value="intransitive">With intransitive expectations</option>
+  <option value="unscoped">With unscoped expectations</option>
+  <option value="signature">With signature analysis</option>
+  <option value="broken">With broken input</option>
+  <option value="AST">With AST as input</option>
+  <option value="smellInclusion">With Smell Analysis, by inclusion</option>
+  <option value="smellExclusion">With Smell Analysis, by exclusion</option>
+  <option value="expressiveness">With expressiveness smells</option>
+  <option value="intermediate">With Intermediate Language Generation</option>
+</select>
 
-<script language="javascript" src="../js/trymulang.js"></script>
+</div>
 
-<p><textarea id="spec" class="form-control" ></textarea>
+<p><textarea id="spec" class="form-control"></textarea>
 <button onclick="analyse()">Analyse</button>
 <pre id="result"></pre></p></div>
         
