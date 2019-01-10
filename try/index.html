@@ -138,7 +138,8 @@
 
 <p><link rel="stylesheet" href="../css/try.css">
 <script language="javascript" src="../js/trymulang.js"></script></p>
-<div class="examples-container">
+<p><button id="analyse-button" onclick="analyse()">Analyse</button></p>
+<p><span class="examples-container">
   Examples: <select class="examples-select">
   <option selected="selected"></option>
   <option value="intransitive">With intransitive expectations</option>
@@ -151,13 +152,11 @@
   <option value="expressiveness">With expressiveness smells</option>
   <option value="intermediate">With Intermediate Language Generation</option>
 </select>
-
-</div>
-
-<div id="jsoneditor"></div>
-
-<p><button onclick="analyse()">Analyse</button>
-<pre id="result"></pre></p></div>
+</span></p>
+<div id="try-container">
+  <div id="jsoneditor"></div>
+  <pre id="result"></pre>
+</div></div>
         
         
     </div>
