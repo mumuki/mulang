@@ -1,31 +1,23 @@
-## Usage
+## Installing
 
-### As a standalone program
+### As a node library
 
-```sh
-$ node index.js '{
-     "sample" : {
-        "tag" : "CodeSample",
-        "language" : "Haskell",
-        "content" : "x = 1"
-     },
-     "spec" : {
-        "expectations" : [
-           {
-              "binding" : "Intransitive:x",
-              "inspection" : "Uses:*"
-           }
-        ],
-        "smellsSet" : { "tag" : "NoSmells" }
-     }
-  }'
-{"signatures":[],"smells":[],"expectationResults":[{"expectation":{"binding":"Intransitive:x","inspection":"Uses:*"},"result":true}],"tag":"AnalysisCompleted","intermediateLanguage":null}
+```bash
+npm install mulang
 ```
+
+### As a CLI
+
+```bash
+npm install -g mulang
+```
+
+## Using
 
 ### As a node library
 
 ```javascript
-let mulang = require('./build/mulang.js')
+let mulang = require('mulang')
 mulang.analyse({
                 "sample": {
                   "tag": "CodeSample",
@@ -43,7 +35,27 @@ mulang.analyse({
                 });
 ```
 
+### As a CLI
 
+```bash
+$ mulangjs '{
+     "sample" : {
+        "tag" : "CodeSample",
+        "language" : "Haskell",
+        "content" : "x = 1"
+     },
+     "spec" : {
+        "expectations" : [
+           {
+              "binding" : "Intransitive:x",
+              "inspection" : "Uses:*"
+           }
+        ],
+        "smellsSet" : { "tag" : "NoSmells" }
+     }
+  }'
+{"signatures":[],"smells":[],"expectationResults":[{"expectation":{"binding":"Intransitive:x","inspection":"Uses:*"},"result":true}],"tag":"AnalysisCompleted","intermediateLanguage":null}
+```
 
 ### In the browser
 
@@ -66,4 +78,12 @@ mulang.analyse({
                   "smellsSet": { "tag": "NoSmells" }
                 });
 <script/>
+```
+
+## Deploying
+
+Build and publish the package to NPM with:
+
+```bash
+$ ./ghcjslib/deploy.sh
 ```
