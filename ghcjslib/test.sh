@@ -21,8 +21,8 @@ let imports = specs.map((it) => `import qualified ${it}`).join("\n");
 let descriptions = specs.map((it) => `  describe "${it}" ${it}.spec`).join("\n");
 
 console.log("Writing Spec.hs");
-fs.writeFileSync("../spec/Spec.hs",`
-module Main where
+fs.writeFileSync("../spec/Spec.hs",
+`module Main where
 
 import Test.Hspec
 ${imports}
@@ -40,7 +40,7 @@ echo 'Running hspec tests...'
 stack test
 
 echo 'Cleaning hspec tests...'
-echo spec/Spec.hs <<EOF
+cat > spec/Spec.hs <<EOF
 module Main where
 
 import Test.Hspec
