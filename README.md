@@ -544,30 +544,31 @@ $ mulang '
    "sample" : {
       "tag" : "CodeSample",
       "language" : "Haskell",
-      "content" : "x = 1"
+      "content" : "x = z + 1"
    },
    "spec" : {
       "expectations" : [
          {
             "binding" : "Intransitive:x",
-            "inspection" : "Uses:*"
+            "inspection" : "Uses:z"
          }
       ]
    }
 }
 ' | json_pp
 {
+   "tag" : "AnalysisCompleted",
    "expectationResults" : [
       {
          "expectation" : {
             "binding" : "Intransitive:x",
-            "inspection" : "Uses:*"
+            "inspection" : "Uses:z"
          },
-         "result" : false
+         "result" : true
       }
    ],
    "smells" : [],
-   "tag" : "AnalysisCompleted",
+   "intermediateLanguage" : null,
    "signatures" : []
 }
 ```

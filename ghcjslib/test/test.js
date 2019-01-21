@@ -7,13 +7,13 @@ describe("mulang", () => {
       "sample": {
         "tag": "CodeSample",
         "language": "Haskell",
-        "content": "x = 1"
+        "content": "x = z + 1"
       },
       "spec": {
         "expectations": [
           {
             "binding": "Intransitive:x",
-            "inspection": "Uses:*"
+            "inspection": "Uses:z"
           }
         ],
         "smellsSet": { "tag": "NoSmells" }
@@ -23,7 +23,7 @@ describe("mulang", () => {
         {
           "expectation": {
             "binding": "Intransitive:x",
-            "inspection": "Uses:*",
+            "inspection": "Uses:z",
           },
           "result": true
         },
@@ -31,7 +31,8 @@ describe("mulang", () => {
       "intermediateLanguage": null,
       "signatures": [],
       "smells": [],
-      "tag": "AnalysisCompleted"
+      "tag": "AnalysisCompleted",
+      "testResults": []
     });
   })
 
@@ -81,7 +82,8 @@ describe("mulang", () => {
       },
       "signatures": [],
       "smells": [],
-      "tag": "AnalysisCompleted"
+      "tag": "AnalysisCompleted",
+      "testResults": []
     });
   })
 })

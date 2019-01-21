@@ -53,6 +53,7 @@ muJSStatement (JSSwitch _ _ expression _ _ cases _ _)                       = mu
 muJSStatement (JSThrow _ expression _)                                      = Raise (muJSExpression expression)
 muJSStatement (JSTry _ block catches finally)                               = Try (muJSBlock block) (map muJSTryCatch catches) (muJSTryFinally finally)
 muJSStatement (JSVariable _ list _)                                         = muJSExpressionFromList list
+muJSStatement (JSLet _ list _)                                              = muJSExpressionFromList list
 muJSStatement (JSWhile _ _ expression _ statement)                          = While (muJSExpression expression) (muJSStatement statement)
 muJSStatement e                                                             = debug e
 
@@ -128,6 +129,7 @@ muJSExpression (JSExpressionParen _ expression _)                   = muJSExpres
 muJSExpression (JSExpressionPostfix (JSIdentifier _ name) op)       = Assignment name (muJSUnaryOp op name)
 muJSExpression (JSExpressionTernary condition _ trueVal _ falseVal) = If (muJSExpression condition) (muJSExpression trueVal) (muJSExpression falseVal)
 muJSExpression (JSFunctionExpression _ ident _ params _ body)       = muComputation ident params body
+muJSExpression (JSArrowExpression    _ params _ _ body)             = Lambda (muJSPatternList params) (muJSStatement body)
 muJSExpression (JSMemberDot receptor _ (JSIdentifier _ message))    = Send (muJSExpression receptor) (Reference message) []
 muJSExpression (JSMemberExpression id _ params _)                   = Application (muJSExpression id) (muJSExpressionList params)
 muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _)       = New (Reference name) (muJSExpressionList args)

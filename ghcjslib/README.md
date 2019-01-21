@@ -22,13 +22,13 @@ mulang.analyse({
                 "sample": {
                   "tag": "CodeSample",
                   "language": "Haskell",
-                  "content": "x = 1"
+                  "content": "x = z + 1"
                 },
                 "spec": {
                   "expectations": [
                     {
                       "binding": "Intransitive:x",
-                      "inspection": "Uses:*"
+                      "inspection": "Uses:z"
                     }
                   ],
                   "smellsSet": { "tag": "NoSmells" }
@@ -42,19 +42,33 @@ $ mulangjs '{
      "sample" : {
         "tag" : "CodeSample",
         "language" : "Haskell",
-        "content" : "x = 1"
+        "content" : "x = z + 1"
      },
      "spec" : {
         "expectations" : [
            {
               "binding" : "Intransitive:x",
-              "inspection" : "Uses:*"
+              "inspection" : "Uses:z"
            }
         ],
         "smellsSet" : { "tag" : "NoSmells" }
      }
-  }'
-{"signatures":[],"smells":[],"expectationResults":[{"expectation":{"binding":"Intransitive:x","inspection":"Uses:*"},"result":true}],"tag":"AnalysisCompleted","intermediateLanguage":null}
+  }' | json_pp
+{
+   "tag" : "AnalysisCompleted",
+   "expectationResults" : [
+      {
+         "expectation" : {
+            "binding" : "Intransitive:x",
+            "inspection" : "Uses:z"
+         },
+         "result" : true
+      }
+   ],
+   "smells" : [],
+   "intermediateLanguage" : null,
+   "signatures" : []
+}
 ```
 
 ## Deploying

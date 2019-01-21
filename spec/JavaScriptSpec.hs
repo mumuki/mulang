@@ -19,6 +19,9 @@ spec = do
     it "simple assignation" $ do
       js "var x = 1" `shouldBe` hs "x = 1"
 
+    it "simple assignation, with let" $ do
+      js "let x = 1" `shouldBe` hs "x = 1"
+
     it "simple string assignment" $ do
       js "var x = 'hello'" `shouldBe` hs "x = \"hello\""
 
@@ -36,6 +39,12 @@ spec = do
 
     it "handles lambdas likes haskell does" $ do
       js "var m = function(x) { return 1 }" `shouldBe` hs "m = \\x -> 1"
+
+    it "handles arrow functions with explicit returns" $ do
+      js "var m = (x) => { return 1 }" `shouldBe` js "var m = function(x) { return 1 }"
+
+    it "handles arrow functions" $ do -- TODO this is not entirely true
+      js "var m = (x) => { 1 }" `shouldBe` js "var m = function(x) { 1 }"
 
     it "simple function declaration" $ do
       js "function f(x) { return 1 }" `shouldBe` hs "f x = 1"
@@ -177,10 +186,10 @@ spec = do
     context "handles assertions" $ do
       it "handles truth assertions" $ do
         run "assert(true)" `shouldBe` Assert False (Truth $ MuBool True)
-      
+
       it "handles equality assertions" $ do
         run "assert.equals(123, 321)" `shouldBe` Assert False (Equality (MuNumber 123) (MuNumber 321))
-      
+
       it "handles equality assertions" $ do
         run "assert.notEquals(123, 321)" `shouldBe` Assert True (Equality (MuNumber 123) (MuNumber 321))
 
