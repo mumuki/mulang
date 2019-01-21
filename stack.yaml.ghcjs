@@ -10,9 +10,6 @@ setup-info:
         sha1: d2cfc25f9cda32a25a87d9af68891b2186ee52f9
 compiler-check: match-exact
 extra-deps:
-# Using newest aeson, with no contents in tagged
-# unions with nullary constructors
-- aeson-1.2.1.0
 - ParsecTools-0.0.2.0
 - github: erikd/language-javascript
   commit: 5257216640a1d769abd8650b7b069a2d28354ffa
