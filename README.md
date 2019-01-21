@@ -557,17 +557,18 @@ $ mulang '
 }
 ' | json_pp
 {
+   "tag" : "AnalysisCompleted",
    "expectationResults" : [
       {
          "expectation" : {
             "binding" : "Intransitive:x",
-            "inspection" : "Uses:*"
+            "inspection" : "Uses:z"
          },
-         "result" : false
+         "result" : true
       }
    ],
    "smells" : [],
-   "tag" : "AnalysisCompleted",
+   "intermediateLanguage" : null,
    "signatures" : []
 }
 ```
