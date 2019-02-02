@@ -1,6 +1,8 @@
 module Language.Mulang.Inspector.Generic (
   assigns,
+  assignsWith,
   calls,
+  callsWith,
   declares,
   declaresComputation,
   declaresComputationWithArity,
@@ -20,6 +22,9 @@ module Language.Mulang.Inspector.Generic (
   usesExceptions,
   usesFor,
   usesIf,
+  usesLiteral,
+  isLiteral,
+  areLiterals,
   usesYield) where
 
 import Language.Mulang.Ast
@@ -33,16 +38,41 @@ import Language.Mulang.Inspector.Query (inspect, select)
 import Data.Maybe (listToMaybe)
 import Data.List.Extra (has)
 
+import Text.Read (readMaybe)
+
 -- | Inspection that tells whether an expression is equal to a given piece of code after being parsed
-parses :: (String -> Expression) -> String -> Inspection
+parses :: (Code -> Expression) -> Code -> Inspection
 parses parser code = (== (parser code))
 
+type MultiInspection = [Expression] -> Bool
+
+anyExpressions :: MultiInspection
+anyExpressions = const True
+
+usesLiteral :: Code -> Inspection
+usesLiteral value = containsExpression (isLiteral value)
+
+isLiteral :: Code -> Inspection
+isLiteral value = f
+  where f MuNil              = value == "Nil"
+        f (MuNumber number)  = (readMaybe value) == Just number
+        f (MuBool bool)      = (readMaybe value) == Just bool
+        f (MuString string)  = (readMaybe value) == Just string
+        f (MuChar char)      = (readMaybe value) == Just char
+        f (MuSymbol string)  = (readMaybe value) == Just ("#" ++ string)
+
+areLiterals :: [Code] -> MultiInspection
+areLiterals codes expressions = and (zipWith isLiteral codes expressions)
+
 assigns :: BoundInspection
-assigns predicate = containsExpression f
-  where f (Assignment name _)  = predicate name
-        f (Variable name _)    = predicate name
-        f (Attribute name _)   = predicate name
-        f _                    = False
+assigns = assignsWith anyExpression
+
+assignsWith :: Inspection -> BoundInspection
+assignsWith valueMatcher predicate = containsExpression f
+  where f (Assignment name value)  = predicate name && valueMatcher value
+        f (Variable name value)    = predicate name && valueMatcher value
+        f (Attribute name value)   = predicate name && valueMatcher value
+        f _                        = False
 
 -- | Inspection that tells whether an expression uses the the given target identifier
 -- in its definition
@@ -51,9 +81,12 @@ uses p = containsExpression f
   where f = any p . referencedIdentifiers
 
 calls :: BoundInspection
-calls p = containsExpression f
-  where f (Call (Reference id) _ ) = p id
-        f _                        = False
+calls = callsWith anyExpressions
+
+callsWith :: MultiInspection -> BoundInspection
+callsWith argumentsMatcher p = containsExpression f
+  where f (Call (Reference id) arguments) = p id && argumentsMatcher arguments
+        f _                               = False
 
 delegates :: BoundInspection
 delegates = decontextualize . delegates'
