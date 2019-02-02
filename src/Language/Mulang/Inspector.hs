@@ -1,6 +1,8 @@
 module Language.Mulang.Inspector (
   Inspection,
   BoundInspection,
+  ValueMatcher (..),
+  ArgumentsMatcher (..),
   module Language.Mulang.Inspector.Combiner,
   module Language.Mulang.Inspector.Contextualized,
   module Language.Mulang.Inspector.Functional,
@@ -22,7 +24,7 @@ import Language.Mulang.Inspector.Literal
 import Language.Mulang.Inspector.Logic
 import Language.Mulang.Inspector.ObjectOriented
 import Language.Mulang.Inspector.ObjectOriented.Polymorphism
-import Language.Mulang.Inspector.Primitive (Inspection)
+import Language.Mulang.Inspector.Primitive (Inspection, ValueMatcher (..), ArgumentsMatcher (..))
 import Language.Mulang.Inspector.Procedural
 import Language.Mulang.Inspector.Query
 import Language.Mulang.Inspector.Typed

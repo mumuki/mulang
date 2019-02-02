@@ -53,9 +53,9 @@ compileInspectionPrimitive :: [String] -> Maybe ContextualizedBoundInspection
 compileInspectionPrimitive = f
   where
   f ["Assigns"]                        = bound assigns
-  f ["Assigns", value]                 = bound (assignsWith (isLiteral value))
+  f ["Assigns", value]                 = bound (assignsWith (literalMatcher value))
   f ["Calls"]                          = bound calls
-  f ("Calls":args)                     = bound (callsWith (areLiterals args))
+  f ("Calls":args)                     = bound (callsWith (literalsMatcher args))
   f ["Declares"]                       = bound declares
   f ["DeclaresAttribute"]              = bound declaresAttribute
   f ["DeclaresClass"]                  = bound declaresClass

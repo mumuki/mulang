@@ -5,38 +5,39 @@ import           Language.Mulang
 
 spec :: Spec
 spec = do
-  describe "isLiteral" $ do
+  describe "matchValue (literalMatcher" $ do
     it "works with numbers" $ do
 
-      isLiteral "4" (MuNumber 4) `shouldBe` True
-      isLiteral "4" (MuNumber 4.0) `shouldBe` True
-      isLiteral "4.5" (MuNumber 4.5) `shouldBe` True
+      matchValue (literalMatcher "4") (MuNumber 4) `shouldBe` True
+      matchValue (literalMatcher "4") (MuNumber 4.0) `shouldBe` True
+      matchValue (literalMatcher "4.5") (MuNumber 4.5) `shouldBe` True
 
-      isLiteral "4" (MuNumber 5.0) `shouldBe` False
-      isLiteral "\"4\"" (MuNumber 4.0) `shouldBe` False
-      isLiteral "foo" (MuNumber 4.0) `shouldBe` False
+      matchValue (literalMatcher "4") (MuNumber 5.0) `shouldBe` False
+      matchValue (literalMatcher "\"4\"") (MuNumber 4.0) `shouldBe` False
+      matchValue (literalMatcher "foo") (MuNumber 4.0) `shouldBe` False
 
     it "works with strings" $ do
-      isLiteral "\"4\"" (MuString "4") `shouldBe` True
-      isLiteral "\"hello\"" (MuString "hello") `shouldBe` True
+      matchValue (literalMatcher "\"4\"") (MuString "4") `shouldBe` True
+      matchValue (literalMatcher "\"hello\"") (MuString "hello") `shouldBe` True
 
     it "works with symbols" $ do
-      isLiteral "#foo" (MuSymbol "foo") `shouldBe` True
+      matchValue (literalMatcher "#foo") (MuSymbol "foo") `shouldBe` True
 
-      isLiteral "#foo" (MuString "foo") `shouldBe` False
+      matchValue (literalMatcher "#foo") (MuString "foo") `shouldBe` False
 
     it "works with chars" $ do
-      isLiteral "'4'" (MuChar '4') `shouldBe` True
-      isLiteral "'a'" (MuChar 'a') `shouldBe` True
+      matchValue (literalMatcher "'4'") (MuChar '4') `shouldBe` True
+      matchValue (literalMatcher "'a'") (MuChar 'a') `shouldBe` True
 
-      isLiteral "'abc'" (MuChar 'a') `shouldBe` False
+      matchValue (literalMatcher "'abc'") (MuChar 'a') `shouldBe` False
 
     it "works with bools" $ do
-      isLiteral "True" (MuBool True) `shouldBe` True
-      isLiteral "False" (MuBool False) `shouldBe` True
+      matchValue (literalMatcher "True") (MuBool True) `shouldBe` True
+      matchValue (literalMatcher "False") (MuBool False) `shouldBe` True
 
-      isLiteral "True" (MuSymbol "True") `shouldBe` False
+      matchValue (literalMatcher "True") (MuSymbol "True") `shouldBe` False
 
     it "works with nil" $ do
-      isLiteral "Nil" MuNil `shouldBe` True
-      isLiteral "Nil" (MuString "Nil") `shouldBe` False
+      matchValue (literalMatcher "Nil") MuNil `shouldBe` True
+      matchValue (literalMatcher "Nil") (MuString "Nil") `shouldBe` False
+
