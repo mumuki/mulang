@@ -19,7 +19,7 @@ isLiteral value = f
         f (MuBool bool)      = (readMaybe value) == Just bool
         f (MuString string)  = (readMaybe value) == Just string
         f (MuChar char)      = (readMaybe value) == Just char
-        f (MuSymbol string)  = (readMaybe value) == Just ("#" ++ string)
+        f (MuSymbol string)  = (readMaybe ("\"" ++ value ++ "\"")) == Just ("#" ++ string)
 
 areLiterals :: [Code] -> MultiInspection
 areLiterals codes expressions = and (zipWith isLiteral codes expressions)
