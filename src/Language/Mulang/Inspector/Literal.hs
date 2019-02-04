@@ -1,15 +1,10 @@
-module Language.Mulang.Inspector.Literal (
-  isLiteral,
-  usesLiteral) where
+module Language.Mulang.Inspector.Literal (isLiteral) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (expressions, declarations)
 import Language.Mulang.Inspector.Primitive (containsExpression, Inspection)
 
 import Text.Read (readMaybe)
-
-usesLiteral :: Code -> Inspection
-usesLiteral value = containsExpression (isLiteral value)
 
 isLiteral :: Code -> Inspection
 isLiteral value = f
