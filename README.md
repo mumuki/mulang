@@ -386,7 +386,7 @@ But instead of asking one by one, we could use `detect` :
 
 # Supported inspections
 
-The power of Mulang is grounded on more than 70 different kind of inspections:
+The power of Mulang is grounded on more than 90 different kind of inspections:
 
 | Inspection                        | Paradigm           | Meaning
 |-----------------------------------|--------------------|------------------------------------------------------
@@ -519,20 +519,22 @@ You can also use Mulang from the Command Line, without having to interact with H
 
 In order to pass expectations to the Command Line Tool, you must use a simple DSL that builds the inspections for you.
 
-| Kind        | DSL Sample                  | Haskell Combinators Sample
-|-------------|-----------------------------|----------------------------
-| Basic       | `* UsesIf`                  |  `usesIf`
-| Negated     | `* Not:UsesWhile`           | `(negative usesWhile)`
-| Predicated  | `* DeclaresClass:Foo`       | `(declaresClass (named "Foo"))`
-|             | `* DeclaresClass:=Foo`      | `(declaresClass (named "Foo"))`
-|             | `* DeclaresClass:~Foo`      | `(declaresClass (like "Foo"))`
-|             | `* DeclaresClass:^Foo`      | `(declaresClass (except "Foo"))`
-|             | `* DeclaresClass:[Foo\|Bar]` | `(declaresClass (anyOf ["Foo", "Bar"]))`
-|             | `* DeclaresClass:*`         | `(declaresClass anyone)`
-|             | `* DeclaresClass`           | `(declaresClass anyone)`
-| Transitive  | `foo UsesLambda`            | `(transitive usesLambda "foo")`
-| Scoped      | `Intransitive:foo UsesIf`   | `(scoped usesIf "foo")`
-| Scoped List | `foo.bar UsesIf`            | `(scopedList usesIf ["foo", "bar"])`
+| Kind              | DSL Sample                   | Haskell Combinators Sample
+|-------------------|------------------------------|----------------------------
+| Basic             | `* UsesIf`                   | `usesIf`
+| Negated           | `* Not:UsesWhile`            | `(negative usesWhile)`
+| Predicated        | `* DeclaresClass:Foo`        | `(declaresClass (named "Foo"))`
+|                   | `* DeclaresClass:=Foo`       | `(declaresClass (named "Foo"))`
+|                   | `* DeclaresClass:~Foo`       | `(declaresClass (like "Foo"))`
+|                   | `* DeclaresClass:^Foo`       | `(declaresClass (except "Foo"))`
+|                   | `* DeclaresClass:[Foo\|Bar]` | `(declaresClass (anyOf ["Foo", "Bar"]))`
+|                   | `* DeclaresClass:*`          | `(declaresClass anyone)`
+|                   | `* DeclaresClass`            | `(declaresClass anyone)`
+| Matching Literals | `* Calls:*:With:1:True`      | `(callsMatching (withEvery ["1", "True"]) anyone)`
+|                   | `* Returns:With:1`           | `(returnsMatching (with "1") anyone)`
+| Transitive        | `foo UsesLambda`             | `(transitive usesLambda "foo")`
+| Scoped            | `Intransitive:foo UsesIf`    | `(scoped usesIf "foo")`
+| Scoped List       | `foo.bar UsesIf`             | `(scopedList usesIf ["foo", "bar"])`
 
 
 ## Examples
