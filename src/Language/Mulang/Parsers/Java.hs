@@ -101,6 +101,7 @@ muStmt (Switch exp cases)              = muSwitch exp . partition isDefault $ ca
 muStmt e                               = debug e
 
 muExp (Lit lit)                         = muLit lit
+muExp (PreMinus (Lit lit))              = preMinus $ muLit lit
 muExp (MethodInv invoke)                = muMethodInvocation invoke
 muExp This                              = Self
 muExp (BinOp arg1 op arg2)              = Send (muExp arg1) (muOp op) [muExp arg2]
@@ -135,6 +136,9 @@ muLit (Double d)  = MuNumber d
 muLit (Boolean b) = MuBool   b
 muLit Null        = MuNil
 muLit e           = debug e
+
+preMinus (MuNumber n) = MuNumber (negate n)
+preMinus other        = other
 
 muOp Mult   = Reference "*"
 muOp Div    = Reference "/"

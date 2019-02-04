@@ -1,7 +1,6 @@
 module Language.Mulang.Inspector.Literal (isLiteral) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Generator (expressions, declarations)
 import Language.Mulang.Inspector.Primitive (containsExpression, Inspection)
 
 import Text.Read (readMaybe)
@@ -14,3 +13,4 @@ isLiteral value = f
         f (MuString string)  = (readMaybe value) == Just string
         f (MuChar char)      = (readMaybe value) == Just char
         f (MuSymbol string)  = (readMaybe ("\"" ++ value ++ "\"")) == Just ("#" ++ string)
+        f _                  = False

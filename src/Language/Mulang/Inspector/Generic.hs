@@ -16,6 +16,7 @@ module Language.Mulang.Inspector.Generic (
   parses,
   raises,
   rescues,
+  returnsMatching,
   uses,
   usesAnonymousVariable,
   usesExceptionHandling,
@@ -30,7 +31,7 @@ import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Bound (containsBoundDeclaration, BoundInspection)
 import Language.Mulang.Inspector.Contextualized (decontextualize, ContextualizedBoundInspection)
 import Language.Mulang.Inspector.Primitive
-import Language.Mulang.Inspector.Matcher (unmatching, thatEvery, Matcher)
+import Language.Mulang.Inspector.Matcher (unmatching, Matcher)
 import Language.Mulang.Inspector.Query (inspect, select)
 
 import Data.Maybe (listToMaybe)
@@ -89,6 +90,10 @@ usesFor = containsExpression f
   where f (For _ _) = True
         f _         = False
 
+returnsMatching :: Matcher -> Inspection
+returnsMatching matcher = containsExpression f
+  where f (Return body) = matcher [body]
+        f _             = False
 
 -- | Inspection that tells whether a top level declaration exists
 declares :: BoundInspection

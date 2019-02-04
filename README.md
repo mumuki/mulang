@@ -391,7 +391,9 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | Inspection                        | Paradigm           | Meaning
 |-----------------------------------|--------------------|------------------------------------------------------
 | `assigns`                         |  any               | the given variable or attribute assigned?
+| `assignsMatching`                 |  any               | the given variable or attribute assigned matching the given value?
 | `calls`                           |  any               | is the given method, function or procedure called?
+| `callsMatching`                   |  any               | is the given method, function or procedure called matching the given arguments?
 | `declares`                        |  any               | is the given element declared?
 | `declaresAttribute`               |  object oriented   | is a given attribute declared?
 | `declaresClass`                   |  object oriented   | is a given class declared?
@@ -442,7 +444,8 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `raises`                          |  any               | is the given _exception type_ raised?
 | `rescues`                         |  any               | is the given _exception type_ rescued?
 | `returnsNill`                     |
-| `typesAs`                         |  any             | is the given type used to type a variable?
+| `returnsMatching`                 |  any               | is a return used matching the given value?
+| `typesAs`                         |  any               | is the given type used to type a variable?
 | `typesParameterAs`                |  any               | is a parameter typed as a given type?
 | `typesReturnAs`                   |  any               | is the given type used to type a return?
 | `uses`                            |  any               | is there any reference to the given element?

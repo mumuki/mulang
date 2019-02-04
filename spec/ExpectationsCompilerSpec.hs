@@ -162,6 +162,11 @@ spec = do
     run (java "class Foo { char x = 'b'; }") "Foo" "Assigns:*:With:'b'" `shouldBe` True
     run (java "class Foo { char x = 'b'; }") "Foo" "Assigns:*:With:'c'" `shouldBe` False
 
+  it "works with Returns With" $ do
+    run (java "class Foo { int foo() { return -1; } }") "Foo" "Returns:With:-1" `shouldBe` True
+    run (java "class Foo { int foo() { return -1; } }") "Foo" "Returns:With:0" `shouldBe` False
+    run (java "class Foo { int foo() { int x = -1; } }") "Foo" "Returns:With:-1" `shouldBe` False
+
   it "works with UsesInheritance" $ do
     run (java "class Foo extends Bar {}") "Foo" "UsesInheritance" `shouldBe` True
     run (java "class Foo {}") "Foo" "UsesInheritance" `shouldBe` False

@@ -38,6 +38,7 @@ compileBaseInspection :: PredicateModifier -> [String] -> Maybe ContextualizedIn
 compileBaseInspection p ("Not":parts)                 = compileBaseInspection p parts
 compileBaseInspection p [verb]                        = compileBaseInspection p [verb, "*"]
 compileBaseInspection p [verb, object]                = compileBaseInspection p [verb, object, "With"]
+compileBaseInspection p (verb:"With":args)            = compileBaseInspection p (verb:"*":"With":args)
 compileBaseInspection p (verb:object:"With":args)     = fmap ($ (compileObject p object)) (compileInspectionPrimitive (verb:args))
 compileBaseInspection _ _                             = Nothing
 
@@ -91,6 +92,7 @@ compileInspectionPrimitive = f
   f ["TypesAs"]                        = bound typesAs
   f ["TypesParameterAs"]               = bound typesParameterAs
   f ["TypesReturnAs"]                  = bound typesReturnAs
+  f ["Returns", value]                 = plain (returnsMatching (that (isLiteral value)))
   f ["Uses"]                           = bound uses
   f ["UsesAnonymousVariable"]          = plain usesAnonymousVariable
   f ["UsesComposition"]                = plain usesComposition
