@@ -386,12 +386,14 @@ But instead of asking one by one, we could use `detect` :
 
 # Supported inspections
 
-The power of Mulang is grounded on more than 70 different kind of inspections:
+The power of Mulang is grounded on more than 90 different kind of inspections:
 
 | Inspection                        | Paradigm           | Meaning
 |-----------------------------------|--------------------|------------------------------------------------------
 | `assigns`                         |  any               | the given variable or attribute assigned?
+| `assignsMatching`                 |  any               | the given variable or attribute assigned matching the given value?
 | `calls`                           |  any               | is the given method, function or procedure called?
+| `callsMatching`                   |  any               | is the given method, function or procedure called matching the given arguments?
 | `declares`                        |  any               | is the given element declared?
 | `declaresAttribute`               |  object oriented   | is a given attribute declared?
 | `declaresClass`                   |  object oriented   | is a given class declared?
@@ -442,7 +444,8 @@ The power of Mulang is grounded on more than 70 different kind of inspections:
 | `raises`                          |  any               | is the given _exception type_ raised?
 | `rescues`                         |  any               | is the given _exception type_ rescued?
 | `returnsNill`                     |
-| `typesAs`                         |  any             | is the given type used to type a variable?
+| `returnsMatching`                 |  any               | is a return used matching the given value?
+| `typesAs`                         |  any               | is the given type used to type a variable?
 | `typesParameterAs`                |  any               | is a parameter typed as a given type?
 | `typesReturnAs`                   |  any               | is the given type used to type a return?
 | `uses`                            |  any               | is there any reference to the given element?
@@ -516,20 +519,22 @@ You can also use Mulang from the Command Line, without having to interact with H
 
 In order to pass expectations to the Command Line Tool, you must use a simple DSL that builds the inspections for you.
 
-| Kind        | DSL Sample                  | Haskell Combinators Sample
-|-------------|-----------------------------|----------------------------
-| Basic       | `* UsesIf`                  |  `usesIf`
-| Negated     | `* Not:UsesWhile`           | `(negative usesWhile)`
-| Predicated  | `* DeclaresClass:Foo`       | `(declaresClass (named "Foo"))`
-|             | `* DeclaresClass:=Foo`      | `(declaresClass (named "Foo"))`
-|             | `* DeclaresClass:~Foo`      | `(declaresClass (like "Foo"))`
-|             | `* DeclaresClass:^Foo`      | `(declaresClass (except "Foo"))`
-|             | `* DeclaresClass:[Foo\|Bar]` | `(declaresClass (anyOf ["Foo", "Bar"]))`
-|             | `* DeclaresClass:*`         | `(declaresClass anyone)`
-|             | `* DeclaresClass`           | `(declaresClass anyone)`
-| Transitive  | `foo UsesLambda`            | `(transitive usesLambda "foo")`
-| Scoped      | `Intransitive:foo UsesIf`   | `(scoped usesIf "foo")`
-| Scoped List | `foo.bar UsesIf`            | `(scopedList usesIf ["foo", "bar"])`
+| Kind              | DSL Sample                   | Haskell Combinators Sample
+|-------------------|------------------------------|----------------------------
+| Basic             | `* UsesIf`                   | `usesIf`
+| Negated           | `* Not:UsesWhile`            | `(negative usesWhile)`
+| Predicated        | `* DeclaresClass:Foo`        | `(declaresClass (named "Foo"))`
+|                   | `* DeclaresClass:=Foo`       | `(declaresClass (named "Foo"))`
+|                   | `* DeclaresClass:~Foo`       | `(declaresClass (like "Foo"))`
+|                   | `* DeclaresClass:^Foo`       | `(declaresClass (except "Foo"))`
+|                   | `* DeclaresClass:[Foo\|Bar]` | `(declaresClass (anyOf ["Foo", "Bar"]))`
+|                   | `* DeclaresClass:*`          | `(declaresClass anyone)`
+|                   | `* DeclaresClass`            | `(declaresClass anyone)`
+| Matching Literals | `* Calls:*:With:1:True`      | `(callsMatching (withEvery ["1", "True"]) anyone)`
+|                   | `* Returns:With:1`           | `(returnsMatching (with "1") anyone)`
+| Transitive        | `foo UsesLambda`             | `(transitive usesLambda "foo")`
+| Scoped            | `Intransitive:foo UsesIf`    | `(scoped usesIf "foo")`
+| Scoped List       | `foo.bar UsesIf`             | `(scopedList usesIf ["foo", "bar"])`
 
 
 ## Examples

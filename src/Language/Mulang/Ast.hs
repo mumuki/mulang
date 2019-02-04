@@ -35,6 +35,7 @@ module Language.Mulang.Ast (
     pattern SubroutineSignature,
     pattern VariableSignature,
     pattern ModuleSignature,
+    pattern Unification,
     pattern MuTrue,
     pattern MuFalse,
     pattern Subroutine,
@@ -258,6 +259,8 @@ pattern SimpleFunction name params body  = Function  name [SimpleEquation params
 pattern SimpleProcedure name params body = Procedure name [SimpleEquation params body]
 pattern SimpleMethod name params body    = Method    name [SimpleEquation params body]
 
+pattern Unification name value <- (extractUnification -> Just (name, value))
+
 pattern MuTrue  = MuBool True
 pattern MuFalse = MuBool False
 
@@ -276,6 +279,12 @@ subroutineBodyPatterns = concatMap equationPatterns
 
 equationPatterns :: Equation -> [Pattern]
 equationPatterns (Equation p _) = p
+
+extractUnification :: Expression -> Maybe (Identifier, Expression)
+extractUnification (Assignment name value)  = Just (name, value)
+extractUnification (Variable name value)    = Just (name, value)
+extractUnification (Attribute name value)   = Just (name, value)
+extractUnification _                        = Nothing
 
 extractSubroutine :: Expression -> Maybe (Identifier, SubroutineBody)
 extractSubroutine (Function name body)  = Just (name, body)

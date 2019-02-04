@@ -1,6 +1,8 @@
 module Language.Mulang.Inspector.Generic (
   assigns,
+  assignsMatching,
   calls,
+  callsMatching,
   declares,
   declaresComputation,
   declaresComputationWithArity,
@@ -14,6 +16,7 @@ module Language.Mulang.Inspector.Generic (
   parses,
   raises,
   rescues,
+  returnsMatching,
   uses,
   usesAnonymousVariable,
   usesExceptionHandling,
@@ -28,21 +31,23 @@ import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Bound (containsBoundDeclaration, BoundInspection)
 import Language.Mulang.Inspector.Contextualized (decontextualize, ContextualizedBoundInspection)
 import Language.Mulang.Inspector.Primitive
+import Language.Mulang.Inspector.Matcher (unmatching, Matcher)
 import Language.Mulang.Inspector.Query (inspect, select)
 
 import Data.Maybe (listToMaybe)
 import Data.List.Extra (has)
 
 -- | Inspection that tells whether an expression is equal to a given piece of code after being parsed
-parses :: (String -> Expression) -> String -> Inspection
+parses :: (Code -> Expression) -> Code -> Inspection
 parses parser code = (== (parser code))
 
 assigns :: BoundInspection
-assigns predicate = containsExpression f
-  where f (Assignment name _)  = predicate name
-        f (Variable name _)    = predicate name
-        f (Attribute name _)   = predicate name
-        f _                    = False
+assigns = unmatching assignsMatching
+
+assignsMatching :: Matcher -> BoundInspection
+assignsMatching matcher predicate = containsExpression f
+  where f (Unification name value) = predicate name && matcher [value]
+        f _                        = False
 
 -- | Inspection that tells whether an expression uses the the given target identifier
 -- in its definition
@@ -51,9 +56,12 @@ uses p = containsExpression f
   where f = any p . referencedIdentifiers
 
 calls :: BoundInspection
-calls p = containsExpression f
-  where f (Call (Reference id) _ ) = p id
-        f _                        = False
+calls = unmatching callsMatching
+
+callsMatching :: Matcher -> BoundInspection
+callsMatching matcher p = containsExpression f
+  where f (Call (Reference id) arguments) = p id && matcher arguments
+        f _                               = False
 
 delegates :: BoundInspection
 delegates = decontextualize . delegates'
@@ -82,6 +90,10 @@ usesFor = containsExpression f
   where f (For _ _) = True
         f _         = False
 
+returnsMatching :: Matcher -> Inspection
+returnsMatching matcher = containsExpression f
+  where f (Return body) = matcher [body]
+        f _             = False
 
 -- | Inspection that tells whether a top level declaration exists
 declares :: BoundInspection

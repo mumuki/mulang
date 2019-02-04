@@ -13,13 +13,13 @@ import           Data.List.Extra (has)
 
 type Inspection = Expression -> Bool
 
-containsExpression :: (Expression -> Bool) -> Inspection
+containsExpression :: Inspection -> Inspection
 containsExpression f = has f expressions
 
 containsBody :: (EquationBody -> Bool)-> Inspection
 containsBody f = has f equationBodies
 
-containsDeclaration :: (Expression -> Bool) -> Inspection
+containsDeclaration :: Inspection -> Inspection
 containsDeclaration f = has f declarations
 
 matchesType :: IdentifierPredicate -> Pattern -> Bool
