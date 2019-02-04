@@ -30,7 +30,7 @@ import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Bound (containsBoundDeclaration, BoundInspection)
 import Language.Mulang.Inspector.Contextualized (decontextualize, ContextualizedBoundInspection)
 import Language.Mulang.Inspector.Primitive
-import Language.Mulang.Inspector.Multi (anyExpressions, MultiInspection)
+import Language.Mulang.Inspector.Matcher (unmatching, thatEvery, Matcher)
 import Language.Mulang.Inspector.Query (inspect, select)
 
 import Data.Maybe (listToMaybe)
@@ -41,13 +41,13 @@ parses :: (Code -> Expression) -> Code -> Inspection
 parses parser code = (== (parser code))
 
 assigns :: BoundInspection
-assigns = assignsMatching anyExpression
+assigns = unmatching assignsMatching
 
-assignsMatching :: Inspection -> BoundInspection
-assignsMatching valueMatcher predicate = containsExpression f
-  where f (Assignment name value)  = predicate name && valueMatcher value
-        f (Variable name value)    = predicate name && valueMatcher value
-        f (Attribute name value)   = predicate name && valueMatcher value
+assignsMatching :: Matcher -> BoundInspection
+assignsMatching matcher predicate = containsExpression f
+  where f (Assignment name value)  = predicate name && matcher [value]
+        f (Variable name value)    = predicate name && matcher [value]
+        f (Attribute name value)   = predicate name && matcher [value]
         f _                        = False
 
 -- | Inspection that tells whether an expression uses the the given target identifier
@@ -57,11 +57,11 @@ uses p = containsExpression f
   where f = any p . referencedIdentifiers
 
 calls :: BoundInspection
-calls = callsMatching anyExpressions
+calls = unmatching callsMatching
 
-callsMatching :: MultiInspection -> BoundInspection
-callsMatching argumentsMatcher p = containsExpression f
-  where f (Call (Reference id) arguments) = p id && argumentsMatcher arguments
+callsMatching :: Matcher -> BoundInspection
+callsMatching matcher p = containsExpression f
+  where f (Call (Reference id) arguments) = p id && matcher arguments
         f _                               = False
 
 delegates :: BoundInspection
