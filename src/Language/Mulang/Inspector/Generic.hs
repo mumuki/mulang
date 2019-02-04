@@ -45,9 +45,7 @@ assigns = unmatching assignsMatching
 
 assignsMatching :: Matcher -> BoundInspection
 assignsMatching matcher predicate = containsExpression f
-  where f (Assignment name value)  = predicate name && matcher [value]
-        f (Variable name value)    = predicate name && matcher [value]
-        f (Attribute name value)   = predicate name && matcher [value]
+  where f (Unification name value) = predicate name && matcher [value]
         f _                        = False
 
 -- | Inspection that tells whether an expression uses the the given target identifier
