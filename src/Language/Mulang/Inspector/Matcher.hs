@@ -16,7 +16,7 @@ thatEvery :: [Inspection] -> Matcher
 thatEvery inspections expressions = and (zipWith ($) inspections expressions)
 
 that :: Inspection -> Matcher
-that = thatEvery . (:[])
+that inspection = inspection . head
 
 unmatching :: (Matcher -> b) -> b
 unmatching f = f (const True)
