@@ -1,19 +1,19 @@
 module Language.Mulang.Inspector.Literal (
-  literalMatcher,
-  literalsMatcher,
+  isLiteral,
+  areLiterals,
   usesLiteral) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (expressions, declarations)
-import Language.Mulang.Inspector.Primitive (containsExpression, Inspection, ValueMatcher (..), ArgumentsMatcher (..))
+import Language.Mulang.Inspector.Primitive (containsExpression, Inspection, MultiInspection)
 
 import Text.Read (readMaybe)
 
 usesLiteral :: Code -> Inspection
-usesLiteral = containsExpression . matchValue . literalMatcher
+usesLiteral value = containsExpression (isLiteral value)
 
-literalMatcher :: Code -> ValueMatcher
-literalMatcher value = ValueMatcher f
+isLiteral :: Code -> Inspection
+isLiteral value = f
   where f MuNil              = value == "Nil"
         f (MuNumber number)  = (readMaybe value) == Just number
         f (MuBool bool)      = (readMaybe value) == Just bool
@@ -21,5 +21,5 @@ literalMatcher value = ValueMatcher f
         f (MuChar char)      = (readMaybe value) == Just char
         f (MuSymbol string)  = (readMaybe ("\"" ++ value ++ "\"")) == Just ("#" ++ string)
 
-literalsMatcher :: [Code] -> ArgumentsMatcher
-literalsMatcher values = ArgumentsMatcher $ and . zipWith (matchValue . literalMatcher) values
+areLiterals :: [Code] -> MultiInspection
+areLiterals codes expressions = and (zipWith isLiteral codes expressions)

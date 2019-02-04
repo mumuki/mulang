@@ -42,11 +42,11 @@ parses parser code = (== (parser code))
 assigns :: BoundInspection
 assigns = assignsWith anyExpression
 
-assignsWith :: ValueMatcher -> BoundInspection
-assignsWith matcher predicate = containsExpression f
-  where f (Assignment name value)  = predicate name && matchValue matcher value
-        f (Variable name value)    = predicate name && matchValue matcher value
-        f (Attribute name value)   = predicate name && matchValue matcher value
+assignsWith :: Inspection -> BoundInspection
+assignsWith valueMatcher predicate = containsExpression f
+  where f (Assignment name value)  = predicate name && valueMatcher value
+        f (Variable name value)    = predicate name && valueMatcher value
+        f (Attribute name value)   = predicate name && valueMatcher value
         f _                        = False
 
 -- | Inspection that tells whether an expression uses the the given target identifier
@@ -58,9 +58,9 @@ uses p = containsExpression f
 calls :: BoundInspection
 calls = callsWith anyExpressions
 
-callsWith :: ArgumentsMatcher -> BoundInspection
-callsWith matcher p = containsExpression f
-  where f (Call (Reference id) arguments) = p id && matchArguments matcher arguments
+callsWith :: MultiInspection -> BoundInspection
+callsWith argumentsMatcher p = containsExpression f
+  where f (Call (Reference id) arguments) = p id && argumentsMatcher arguments
         f _                               = False
 
 delegates :: BoundInspection
