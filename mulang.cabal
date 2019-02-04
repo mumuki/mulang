@@ -49,6 +49,7 @@ library
     Language.Mulang.Inspector.Generic.Smell
     Language.Mulang.Inspector.Literal
     Language.Mulang.Inspector.Logic
+    Language.Mulang.Inspector.Multi
     Language.Mulang.Inspector.ObjectOriented
     Language.Mulang.Inspector.ObjectOriented.Polymorphism
     Language.Mulang.Inspector.Primitive

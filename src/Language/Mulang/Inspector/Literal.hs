@@ -5,7 +5,8 @@ module Language.Mulang.Inspector.Literal (
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (expressions, declarations)
-import Language.Mulang.Inspector.Primitive (containsExpression, Inspection, MultiInspection)
+import Language.Mulang.Inspector.Primitive (containsExpression, Inspection)
+import Language.Mulang.Inspector.Multi (allMatch, MultiInspection)
 
 import Text.Read (readMaybe)
 
@@ -22,4 +23,4 @@ isLiteral value = f
         f (MuSymbol string)  = (readMaybe ("\"" ++ value ++ "\"")) == Just ("#" ++ string)
 
 areLiterals :: [Code] -> MultiInspection
-areLiterals codes expressions = and (zipWith isLiteral codes expressions)
+areLiterals codes = allMatch (map isLiteral codes)

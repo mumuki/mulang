@@ -1,12 +1,10 @@
 module Language.Mulang.Inspector.Primitive (
   anyExpression,
-  anyExpressions,
   containsExpression,
   containsDeclaration,
   containsBody,
   matchesType,
-  Inspection,
-  MultiInspection) where
+  Inspection) where
 
 import           Language.Mulang.Ast
 import           Language.Mulang.Identifier (IdentifierPredicate)
@@ -15,13 +13,9 @@ import           Language.Mulang.Generator (expressions, equationBodies, declara
 import           Data.List.Extra (has)
 
 type Inspection = Expression -> Bool
-type MultiInspection = [Expression] -> Bool
 
 anyExpression :: Inspection
 anyExpression = const True
-
-anyExpressions :: MultiInspection
-anyExpressions = const True
 
 containsExpression :: Inspection -> Inspection
 containsExpression f = has f expressions

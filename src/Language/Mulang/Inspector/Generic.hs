@@ -30,6 +30,7 @@ import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Bound (containsBoundDeclaration, BoundInspection)
 import Language.Mulang.Inspector.Contextualized (decontextualize, ContextualizedBoundInspection)
 import Language.Mulang.Inspector.Primitive
+import Language.Mulang.Inspector.Multi (anyExpressions, MultiInspection)
 import Language.Mulang.Inspector.Query (inspect, select)
 
 import Data.Maybe (listToMaybe)
