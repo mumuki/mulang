@@ -1,8 +1,8 @@
 module Language.Mulang.Inspector.Generic (
   assigns,
-  assignsWith,
+  assignsMatching,
   calls,
-  callsWith,
+  callsMatching,
   declares,
   declaresComputation,
   declaresComputationWithArity,
@@ -41,10 +41,10 @@ parses :: (Code -> Expression) -> Code -> Inspection
 parses parser code = (== (parser code))
 
 assigns :: BoundInspection
-assigns = assignsWith anyExpression
+assigns = assignsMatching anyExpression
 
-assignsWith :: Inspection -> BoundInspection
-assignsWith valueMatcher predicate = containsExpression f
+assignsMatching :: Inspection -> BoundInspection
+assignsMatching valueMatcher predicate = containsExpression f
   where f (Assignment name value)  = predicate name && valueMatcher value
         f (Variable name value)    = predicate name && valueMatcher value
         f (Attribute name value)   = predicate name && valueMatcher value
@@ -57,10 +57,10 @@ uses p = containsExpression f
   where f = any p . referencedIdentifiers
 
 calls :: BoundInspection
-calls = callsWith anyExpressions
+calls = callsMatching anyExpressions
 
-callsWith :: MultiInspection -> BoundInspection
-callsWith argumentsMatcher p = containsExpression f
+callsMatching :: MultiInspection -> BoundInspection
+callsMatching argumentsMatcher p = containsExpression f
   where f (Call (Reference id) arguments) = p id && argumentsMatcher arguments
         f _                               = False
 

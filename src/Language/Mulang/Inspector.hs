@@ -7,6 +7,7 @@ module Language.Mulang.Inspector (
   module Language.Mulang.Inspector.Generic,
   module Language.Mulang.Inspector.Literal,
   module Language.Mulang.Inspector.Logic,
+  module Language.Mulang.Inspector.Multi,
   module Language.Mulang.Inspector.ObjectOriented,
   module Language.Mulang.Inspector.ObjectOriented.Polymorphism,
   module Language.Mulang.Inspector.Procedural,
@@ -20,6 +21,7 @@ import Language.Mulang.Inspector.Functional
 import Language.Mulang.Inspector.Generic
 import Language.Mulang.Inspector.Literal
 import Language.Mulang.Inspector.Logic
+import Language.Mulang.Inspector.Multi
 import Language.Mulang.Inspector.ObjectOriented
 import Language.Mulang.Inspector.ObjectOriented.Polymorphism
 import Language.Mulang.Inspector.Primitive (Inspection)
