@@ -13,7 +13,7 @@ compileExpectation :: Expectation -> Inspection
 compileExpectation = fromMaybe (\_ -> True) . compileMaybe
 
 compileMaybe :: Expectation -> Maybe Inspection
-compileMaybe (Expectation s i) = do
+compileMaybe (Ringed s i) = do
   let inspectionParts = splitOn ":" i
   let negator = compileNegator inspectionParts
   (scope, predicateModifier) <- compileModifiers (splitOn ":" s)

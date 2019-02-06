@@ -32,10 +32,17 @@ import Language.Mulang.Interpreter.Runner (TestResult)
 type Smell = String
 type Inspection = String
 
-data Expectation = Expectation {
-  binding :: String,
-  inspection :: Inspection
-} deriving (Show, Eq, Generic)
+data Expectation
+  = Ringed { binding :: String, inspection :: Inspection }
+  | Humanized { sentence :: String }
+  | Structured {
+      intransitive :: Maybe Bool,
+      scope :: Maybe String,
+      negated :: Maybe Bool,
+      verb :: String,
+      target :: Maybe String,
+      query :: Maybe Expectation
+    } deriving (Show, Eq, Generic)
 
 --
 -- Analysis input structures

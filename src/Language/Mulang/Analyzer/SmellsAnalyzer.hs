@@ -90,4 +90,4 @@ withLanguage :: (DomainLanguage -> Inspection) -> Detection
 withLanguage inspection language = detect (inspection language)
 
 exectationFor :: Smell -> Identifier -> Expectation
-exectationFor smell identifier = Expectation identifier smell
+exectationFor smell identifier = Ringed identifier smell

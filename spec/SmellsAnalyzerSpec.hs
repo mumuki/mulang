@@ -20,22 +20,22 @@ spec = describe "SmellsAnalyzer" $ do
           (SimpleMethod "aB" [] None),
           (SimpleMethod "fooBar" [] None)])),
         (Object "Foo" None)])) `shouldReturn` (result [
-                                                    Expectation "y" "HasTooShortIdentifiers",
-                                                    Expectation "aB" "HasTooShortIdentifiers",
-                                                    Expectation "Foo_Bar" "HasWrongCaseIdentifiers",
-                                                    Expectation "aB" "HasWrongCaseIdentifiers",
-                                                    Expectation "fooBar" "HasWrongCaseIdentifiers"])
+                                                    Ringed "y" "HasTooShortIdentifiers",
+                                                    Ringed "aB" "HasTooShortIdentifiers",
+                                                    Ringed "Foo_Bar" "HasWrongCaseIdentifiers",
+                                                    Ringed "aB" "HasWrongCaseIdentifiers",
+                                                    Ringed "fooBar" "HasWrongCaseIdentifiers"])
 
   describe "Using exclusion" $ do
     it "works with empty set" $ do
-      (runExcept Haskell "fun x = if x then True else False" []) `shouldReturn` (result [Expectation "fun" "HasRedundantIf"])
+      (runExcept Haskell "fun x = if x then True else False" []) `shouldReturn` (result [Ringed "fun" "HasRedundantIf"])
 
     describe "detect domain language violations" $ do
       it "detects identifier length violations" $ do
-        (runExcept Haskell "f x = x" []) `shouldReturn` (result [Expectation "f" "HasTooShortIdentifiers"])
+        (runExcept Haskell "f x = x" []) `shouldReturn` (result [Ringed "f" "HasTooShortIdentifiers"])
 
       it "detects case violations" $ do
-        (runExcept Haskell "fixme_now x = x" []) `shouldReturn` (result [Expectation "fixme_now" "HasWrongCaseIdentifiers"])
+        (runExcept Haskell "fixme_now x = x" []) `shouldReturn` (result [Ringed "fixme_now" "HasWrongCaseIdentifiers"])
 
     describe "works with non-empty set" $ do
       it "dont reports smell when excluded" $ do
@@ -46,7 +46,7 @@ spec = describe "SmellsAnalyzer" $ do
       it "reports smell when not excluded and present" $ do
         (runExcept JavaScript
                   "function foo() { var aVariable = 1; return aVariable }"
-                  []) `shouldReturn` (result [Expectation "foo" "HasRedundantLocalVariableReturn"])
+                  []) `shouldReturn` (result [Ringed "foo" "HasRedundantLocalVariableReturn"])
 
       it "dont reports smell when not excluded and not present" $ do
         (runExcept JavaScript
@@ -59,4 +59,4 @@ spec = describe "SmellsAnalyzer" $ do
 
   describe "Using inclusion" $ do
     it "works with empty set" $ do
-      (runExcept Python "def funcion():\n  if True:\n    pass\n  else:\n    return 1" []) `shouldReturn` (result [Expectation "funcion" "HasEmptyIfBranches"])
+      (runExcept Python "def funcion():\n  if True:\n    pass\n  else:\n    return 1" []) `shouldReturn` (result [Ringed "funcion" "HasEmptyIfBranches"])
