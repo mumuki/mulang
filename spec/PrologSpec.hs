@@ -232,3 +232,18 @@ siblings(One, Another) :-
           Exist "parent" [VariablePattern "One",VariablePattern "Parent"],
           Exist "parent" [VariablePattern "Other",VariablePattern "Parent"],
           Exist "\\=" [VariablePattern "One",VariablePattern "Parent"]]]
+
+    it "can handle single line comments" $ do
+      unpackPl [text|
+%this is a comment
+foo. %this is another comment
+      |] `shouldBe` Fact "foo" []
+
+    it "can handle multi line comments" $ do
+      unpackPl [text|
+/*
+  this is a
+  multiline comment
+*/
+foo.
+      |] `shouldBe` Fact "foo" []
