@@ -11,7 +11,8 @@ import Language.Mulang.Builder
 import Language.Mulang.Parsers
 
 import Data.Maybe (fromMaybe)
-import Data.Char (isUpper)
+import Data.Char (isUpper, isSpace)
+import Data.List (dropWhileEnd)
 
 import Control.Fallible
 
@@ -23,7 +24,26 @@ pl = orFail . parseProlog'
 parseProlog :: EitherParser
 parseProlog = orLeft . parseProlog'
 
-parseProlog' = fmap compact . parse program ""
+parseProlog' = fmap compact . parse program "" . trim . stripComments
+
+trim :: String -> String
+trim = dropWhile isSpace . dropWhileEnd isSpace
+
+stripComments :: String -> String
+stripComments ('%' : code)        = stripComments $ dropSingleLineComment code
+stripComments ('/' : '*' : code)  = stripComments $ dropMultiLineComment code
+stripComments (c : ode)           = c : stripComments ode
+stripComments ""                  = ""
+
+dropSingleLineComment :: String -> String
+dropSingleLineComment ('\n' : code) = code
+dropSingleLineComment (_ : code)    = dropSingleLineComment code
+dropSingleLineComment ""            = ""
+
+dropMultiLineComment :: String -> String
+dropMultiLineComment ('*' : '/' : code) = code
+dropMultiLineComment (_ : code)         = dropMultiLineComment code
+dropMultiLineComment ""                 = ""
 
 program :: ParsecParser [Expression]
 program = many predicate
