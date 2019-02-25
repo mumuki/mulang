@@ -43,6 +43,7 @@ dropSingleLineComment ""            = ""
 dropMultiLineComment :: String -> String
 dropMultiLineComment ('*' : '/' : code) = code
 dropMultiLineComment (_ : code)         = dropMultiLineComment code
+dropMultiLineComment ""                 = ""
 
 program :: ParsecParser [Expression]
 program = many predicate
