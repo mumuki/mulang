@@ -247,3 +247,20 @@ foo. %this is another comment
 */
 foo.
       |] `shouldBe` Fact "foo" []
+
+    it "there can be characters in the same line as multiline comment delimiter" $ do
+      unpackPl [text|
+/*something
+  this is a
+  multiline comment
+something else*/
+foo.
+      |] `shouldBe` Fact "foo" []
+
+    it "doesn't break when multiline comment isn't closed" $ do
+      unpackPl [text|
+foo.
+/*
+  this is a
+  multiline comment
+      |] `shouldBe` Fact "foo" []
