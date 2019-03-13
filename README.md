@@ -1499,10 +1499,12 @@ foo(bar).
 
 ### `Switch`
 
+> Generic switch expression, composed by the value to switch on, a list of cases and the default
+
 #### Syntax
 
 ```haskell
-(Switch Expression [(Expression, Expression)])
+(Switch Expression [(Expression, Expression)] Expression)
 ```
 
 ### `Try`
