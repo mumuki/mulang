@@ -44,9 +44,9 @@ isLongCode = containsExpression f
 compares :: (Expression -> Bool) -> Inspection
 compares f = containsExpression (any f.comparisonOperands)
 
-comparisonOperands (Call Equal    [a1, a2])   = [a1, a2]
-comparisonOperands (Call NotEqual [a1, a2])   = [a1, a2]
-comparisonOperands _                          = []
+comparisonOperands (Call (Primitive Equal)    [a1, a2])   = [a1, a2]
+comparisonOperands (Call (Primitive NotEqual) [a1, a2])   = [a1, a2]
+comparisonOperands _                                      = []
 
 returnsNil :: Inspection
 returnsNil = containsExpression f
@@ -70,7 +70,7 @@ hasRedundantGuards :: Inspection
 hasRedundantGuards = containsBody f -- TODO not true when condition is a pattern
   where f (GuardedBody [
             (_, Return x),
-            (Reference "otherwise", Return y)]) = all isBooleanLiteral [x, y]
+            (Primitive Otherwise, Return y)]) = all isBooleanLiteral [x, y]
         f _ = False
 
 
@@ -136,14 +136,14 @@ hasTooManyMethods = containsExpression f
 overridesEqualOrHashButNotBoth :: Inspection
 overridesEqualOrHashButNotBoth = containsExpression f
   where f (Sequence expressions) = (any isEqual expressions) /= (any isHash expressions)
-        f (Class _ _ (EqualMethod _)) = True
-        f (Class _ _ (HashMethod _)) = True
+        f (Class _ _ (PrimitiveMethod Equal _)) = True
+        f (Class _ _ (PrimitiveMethod Hash _)) = True
         f _ = False
 
-        isEqual (EqualMethod _) = True
+        isEqual (PrimitiveMethod Equal _) = True
         isEqual _ = False
 
-        isHash (HashMethod _) = True
+        isHash (PrimitiveMethod Hash _) = True
         isHash _ = False
 
 hasEmptyIfBranches :: Inspection
@@ -153,10 +153,10 @@ hasEmptyIfBranches = containsExpression f
 
 hasUnreachableCode :: Inspection
 hasUnreachableCode = containsExpression f
-  where f subroutine@(Subroutine _ equations) = any equationMatchesAnyValue . init $ equations 
+  where f subroutine@(Subroutine _ equations) = any equationMatchesAnyValue . init $ equations
         f _                                   = False
-        
-        equationMatchesAnyValue (Equation patterns body) = all patternMatchesAnyValue patterns && bodyMatchesAnyValue body       
+
+        equationMatchesAnyValue (Equation patterns body) = all patternMatchesAnyValue patterns && bodyMatchesAnyValue body
 
         patternMatchesAnyValue WildcardPattern     = True
         patternMatchesAnyValue (VariablePattern _) = True
@@ -166,5 +166,5 @@ hasUnreachableCode = containsExpression f
         bodyMatchesAnyValue (GuardedBody guards) = any (isTruthy . fst) guards
 
         isTruthy (MuBool True)           = True
-        isTruthy (Reference "otherwise") = True
+        isTruthy (Primitive Otherwise)   = True
         isTruthy _                       = False

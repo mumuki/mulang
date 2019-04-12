@@ -24,6 +24,7 @@ module Language.Mulang.Ast (
     Pattern(..),
     Identifier,
     SubroutineBody,
+    PrimitiveType(..),
     debug,
     debugType,
     debugPattern,
@@ -32,6 +33,7 @@ module Language.Mulang.Ast (
     pattern SimpleProcedure,
     pattern SimpleMethod,
     pattern SimpleSend,
+    pattern PrimitiveSend,
     pattern SubroutineSignature,
     pattern VariableSignature,
     pattern ModuleSignature,
@@ -104,8 +106,7 @@ data Expression
     | Procedure Identifier SubroutineBody
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
     | Method Identifier SubroutineBody
-    | EqualMethod SubroutineBody
-    | HashMethod SubroutineBody
+    | PrimitiveMethod PrimitiveType SubroutineBody
     | Variable Identifier Expression
     | Assignment Identifier Expression
     | Attribute Identifier Expression
@@ -168,8 +169,7 @@ data Expression
     -- ^ Generic sequence of statements
     | Other (Maybe Code) (Maybe Expression)
     -- ^ Unrecognized expression, with optional description and body
-    | Equal
-    | NotEqual
+    | Primitive PrimitiveType
     | Self
     | None
     -- ^ Generic value indicating an absent expression, such as when there is no finally in a try or default in a switch or js' undefined
@@ -195,6 +195,22 @@ data Expression
     -- ^ Generic test expression such as it, etc.
     | Assert Bool Assertion
     -- ^ Generic assertion expression such as assert, expect, etc. The first parameter indicates whether the assertion is negated or not
+  deriving (Eq, Show, Read, Generic, Ord)
+
+data PrimitiveType
+    = Equal
+    | NotEqual
+    | Negation
+    | And
+    | Or
+    | Hash
+    | GreatherOrEqualThan
+    | GreatherThan
+    | Otherwise
+    | LessOrEqualThan
+    | LessThan
+    | ForwardComposition
+    | BackwardComposition
   deriving (Eq, Show, Read, Generic, Ord)
 
 data Assertion
@@ -254,6 +270,7 @@ pattern ModuleSignature name cs            = TypeSignature name (ConstrainedType
 pattern SimpleEquation params body = Equation params (UnguardedBody body)
 
 pattern SimpleSend receptor selector args = Send receptor (Reference selector) args
+pattern PrimitiveSend receptor selector args = Send receptor (Primitive selector) args
 
 pattern SimpleFunction name params body  = Function  name [SimpleEquation params body]
 pattern SimpleProcedure name params body = Procedure name [SimpleEquation params body]

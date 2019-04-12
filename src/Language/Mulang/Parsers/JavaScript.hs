@@ -137,7 +137,7 @@ muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _)       = New (Refer
 muJSExpression (JSMemberSquare receptor _ index _)                  = Send (muJSExpression receptor) (Reference "[]") [muJSExpression index]
 muJSExpression (JSNewExpression _ (JSIdentifier _ name))            = New (Reference name) []
 muJSExpression (JSObjectLiteral _ propertyList _)                   = MuObject (compactMap muJSObjectProperty . muJSCommaTrailingList $ propertyList)
-muJSExpression (JSUnaryExpression (JSUnaryOpNot _) e)               = Application (Reference "!") [muJSExpression e]
+muJSExpression (JSUnaryExpression (JSUnaryOpNot _) e)               = Application (Primitive Negation) [muJSExpression e]
 muJSExpression (JSUnaryExpression op (JSIdentifier _ name))         = Assignment name (muJSUnaryOp op name)
 muJSExpression (JSVarInitExpression (JSIdentifier _ name) initial)  = Variable name (muJSVarInitializer initial)
 muJSExpression e                                                    = debug e
@@ -146,26 +146,26 @@ removeQuotes = filter (flip notElem quoteMarks)
   where quoteMarks = "\"'"
 
 muJSBinOp:: JSBinOp -> Expression
-muJSBinOp (JSBinOpAnd _)        = Reference "&&"
-muJSBinOp (JSBinOpBitAnd _)     = Reference "&"
-muJSBinOp (JSBinOpBitOr _)      = Reference "|"
+muJSBinOp (JSBinOpAnd _)        = Primitive And
+muJSBinOp (JSBinOpBitAnd _)     = Primitive And
+muJSBinOp (JSBinOpBitOr _)      = Primitive Or
 muJSBinOp (JSBinOpBitXor _)     = Reference "^"
 muJSBinOp (JSBinOpDivide _)     = Reference "/"
-muJSBinOp (JSBinOpEq _)         = Equal
-muJSBinOp (JSBinOpGe _)         = Reference ">="
-muJSBinOp (JSBinOpGt _)         = Reference ">"
+muJSBinOp (JSBinOpEq _)         = Primitive Equal
+muJSBinOp (JSBinOpGe _)         = Primitive GreatherOrEqualThan
+muJSBinOp (JSBinOpGt _)         = Primitive GreatherThan
 muJSBinOp (JSBinOpInstanceOf _) = Reference "instanceof"
-muJSBinOp (JSBinOpLe _)         = Reference "<="
+muJSBinOp (JSBinOpLe _)         = Primitive LessOrEqualThan
 muJSBinOp (JSBinOpLsh _)        = Reference "<<"
-muJSBinOp (JSBinOpLt _)         = Reference "<"
+muJSBinOp (JSBinOpLt _)         = Primitive LessThan
 muJSBinOp (JSBinOpMinus _)      = Reference "-"
 muJSBinOp (JSBinOpMod _)        = Reference "%"
-muJSBinOp (JSBinOpNeq _)        = NotEqual
-muJSBinOp (JSBinOpOr _)         = Reference "||"
+muJSBinOp (JSBinOpNeq _)        = Primitive NotEqual
+muJSBinOp (JSBinOpOr _)         = Primitive Or
 muJSBinOp (JSBinOpPlus _)       = Reference "+"
 muJSBinOp (JSBinOpRsh _)        = Reference ">>"
-muJSBinOp (JSBinOpStrictEq _)   = Equal
-muJSBinOp (JSBinOpStrictNeq _)  = NotEqual
+muJSBinOp (JSBinOpStrictEq _)   = Primitive Equal
+muJSBinOp (JSBinOpStrictNeq _)  = Primitive NotEqual
 muJSBinOp (JSBinOpTimes _)      = Reference "*"
 
 

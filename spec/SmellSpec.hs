@@ -83,13 +83,13 @@ spec = do
       hasRedundantBooleanComparison (hs "f x = True") `shouldBe` False
 
     it "is True when comparing self with a boolean, using a message" $ do
-      hasRedundantBooleanComparison (Send Self Equal [MuBool True]) `shouldBe` True
+      hasRedundantBooleanComparison (PrimitiveSend Self Equal [MuBool True]) `shouldBe` True
 
     it "is True when comparing a boolean with a reference, using a message" $ do
-      hasRedundantBooleanComparison (Send (MuBool False) NotEqual [Reference "x"]) `shouldBe` True
+      hasRedundantBooleanComparison (PrimitiveSend (MuBool False) NotEqual [Reference "x"]) `shouldBe` True
 
     it "is False when comparing references" $ do
-      hasRedundantBooleanComparison (Send (Reference "y") Equal [Reference "x"]) `shouldBe` False
+      hasRedundantBooleanComparison (PrimitiveSend (Reference "y") Equal [Reference "x"]) `shouldBe` False
 
   describe "hasRedundantLocalVariableReturn" $ do
     it "is True when local variable is not necessary" $ do
