@@ -3,8 +3,8 @@
 
 module Language.Mulang.Parsers.Java (java, parseJava) where
 
-import Language.Mulang.Ast hiding (While, Return, Equal, Lambda, Try, Switch, Assert)
-import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda, Try, Switch, Assert))
+import Language.Mulang.Ast hiding (Primitive, While, Return, Equal, Lambda, Try, Switch, Assert, PrimitiveType(..))
+import qualified Language.Mulang.Ast as M
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compact, compactMap, compactConcatMap, normalize)
 
@@ -59,8 +59,8 @@ muMemberDecl (FieldDecl _ typ varDecls)                              = concatMap
 muMemberDecl (MethodDecl _ _ typ name params _ (MethodBody Nothing)) = return $ muMethodSignature name params typ
 muMemberDecl (MethodDecl (elem Static -> True) _ Nothing (Ident "main") [_] _ body)
                                                                      = return $ EntryPoint "main" (muMethodBody body)
-muMemberDecl (MethodDecl _ _ _ (Ident "equals") params _ body)       = return $ EqualMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
-muMemberDecl (MethodDecl _ _ _ (Ident "hashCode") params _ body)     = return $ HashMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
+muMemberDecl (MethodDecl _ _ _ (Ident "equals") params _ body)       = return $ PrimitiveMethod M.Equal [SimpleEquation (map muFormalParam params) (muMethodBody body)]
+muMemberDecl (MethodDecl _ _ _ (Ident "hashCode") params _ body)     = return $ PrimitiveMethod M.Hash [SimpleEquation (map muFormalParam params) (muMethodBody body)]
 muMemberDecl (MethodDecl _ _ returnType name params _ body)          = [ muMethodSignature name params returnType,
                                                                          SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)]
 muMemberDecl e@(ConstructorDecl _ _ _ _params _ _constructorBody)    = return . debug $ e
@@ -109,7 +109,7 @@ muExp (Cond cond ifTrue ifFalse)        = If (muExp cond) (muExp ifTrue) (muExp 
 muExp (ExpName name)                    = muName name
 muExp (Assign lhs EqualA exp)           = Assignment (muLhs lhs) (muExp exp)
 muExp (InstanceCreation _ clazz args _) = New (Reference $ r clazz) (map muExp args)
-muExp (PreNot exp)                      = SimpleSend (muExp exp) "!" []
+muExp (PreNot exp)                      = PrimitiveSend (muExp exp) M.Negation []
 muExp (Lambda params exp)               = M.Lambda (muLambdaParams params) (muLambdaExp exp)
 muExp (MethodRef _ message)             = M.Lambda [VariablePattern "it"] (SimpleSend (Reference "it") (i message) [])
 muExp e                                 = debug e
@@ -145,14 +145,14 @@ muOp Div    = Reference "/"
 muOp Rem    = Reference "rem"
 muOp Add    = Reference "+"
 muOp Sub    = Reference "-"
-muOp LThan  = Reference "<"
-muOp LThanE = Reference "<="
-muOp GThan  = Reference ">"
-muOp GThanE = Reference ">="
-muOp And    = Reference "&&"
-muOp Or     = Reference "||"
-muOp Equal  = M.Equal
-muOp NotEq  = NotEqual
+muOp LThan  = M.Primitive M.LessThan
+muOp LThanE = M.Primitive M.LessOrEqualThan
+muOp GThan  = M.Primitive M.GreatherThan
+muOp GThanE = M.Primitive M.GreatherOrEqualThan
+muOp And    = M.Primitive M.And
+muOp Or     = M.Primitive M.Or
+muOp Equal  = M.Primitive M.Equal
+muOp NotEq  = M.Primitive M.NotEqual
 muOp e      = debug e
 
 muVarDecl typ (VarDecl id init) = [

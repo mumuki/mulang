@@ -12,7 +12,6 @@ import           NeatInterpolation (text)
 run :: Text -> Expression
 run = java . unpack
 
-
 spec :: Spec
 spec = do
   describe "parse" $ do
@@ -124,7 +123,7 @@ spec = do
              public boolean hello() { return !true; }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                           SubroutineSignature "hello" [] "boolean" [],
-                          (SimpleMethod "hello" [] (Return (SimpleSend MuTrue "!" [])))])
+                          (SimpleMethod "hello" [] (Return (PrimitiveSend MuTrue Negation [])))])
 
     it "parses Chars In Returns" $ do
       run [text|class Foo {
@@ -262,7 +261,7 @@ spec = do
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                            SubroutineSignature "hello" ["String"] "void" [],
                            SimpleMethod "hello" [VariablePattern "x"] (
-                             If (Send (Reference "x") Equal [MuString "foo"])
+                             If (Send (Reference "x") (Primitive Equal) [MuString "foo"])
                               None
                               None)])
 
@@ -273,7 +272,7 @@ spec = do
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             SubroutineSignature "hello" ["String"] "void" [],
                             (SimpleMethod "hello" [VariablePattern "x"] (
-                            If (Send (Reference "x") NotEqual [MuString "foo"])
+                            If (Send (Reference "x") (Primitive NotEqual) [MuString "foo"])
                               None
                               None))])
 

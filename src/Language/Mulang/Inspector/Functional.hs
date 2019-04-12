@@ -20,7 +20,8 @@ usesConditional = alternative usesIf usesGuards
 -- in its definition
 usesComposition :: Inspection
 usesComposition = containsExpression f
-  where f (Reference ".") = True
+  where f (Primitive BackwardComposition) = True
+        f (Primitive ForwardComposition)  = True
         f _ = False
 
 -- | Inspection that tells whether an expression uses pattern matching

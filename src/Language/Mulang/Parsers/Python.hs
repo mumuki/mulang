@@ -205,35 +205,35 @@ muArgument e                            = M.debug e
 --muYieldArg (YieldFrom expr _)(Expr annot) annot -- ^ Yield from a generator (Version 3 only)
 muYieldArg (YieldExpr expr) = muExpr expr
 
-muOp (Equality _)           = M.Equal
-muOp (NotEquals _)          = M.NotEqual
-muOp op                     = M.Reference $ muOpReference op
+muOp (Equality _)           = M.Primitive M.Equal
+muOp (NotEquals _)          = M.Primitive M.NotEqual
+muOp op                     = muOpReference op
 
-muOpReference (And _)                = "and"
-muOpReference (Or _)                 = "or"
-muOpReference (Not _)                = "not"
-muOpReference (Exponent _)           = "**"
-muOpReference (LessThan _)           = "<"
-muOpReference (GreaterThan _)        = ">"
-muOpReference (GreaterThanEquals _)  = ">="
-muOpReference (LessThanEquals _)     = "<="
-muOpReference (NotEqualsV2 _)        = "<>" -- Version 2 only.
-muOpReference (In _)                 = "in"
-muOpReference (Is _)                 = "is"
-muOpReference (IsNot _)              = "is not"
-muOpReference (NotIn _)              = "not in"
-muOpReference (BinaryOr _)           = "|"
-muOpReference (Xor _)                = "^"
-muOpReference (BinaryAnd _)          = "&"
-muOpReference (ShiftLeft _)          = "<<"
-muOpReference (ShiftRight _)         = ">>"
-muOpReference (Multiply _)           = "*"
-muOpReference (Plus _)               = "+"
-muOpReference (Minus _)              = "-"
-muOpReference (Divide _)             = "/"
-muOpReference (FloorDivide _)        = "//"
-muOpReference (Invert _)             = "~"
-muOpReference (Modulo _)             = "%"
+muOpReference (And _)                = M.Primitive M.And
+muOpReference (Or _)                 = M.Primitive M.Or
+muOpReference (Not _)                = M.Primitive M.Negation
+muOpReference (Exponent _)           = M.Reference "**"
+muOpReference (LessThan _)           = M.Primitive M.LessThan
+muOpReference (GreaterThan _)        = M.Primitive M.GreatherThan
+muOpReference (GreaterThanEquals _)  = M.Primitive M.GreatherOrEqualThan
+muOpReference (LessThanEquals _)     = M.Primitive M.LessOrEqualThan
+muOpReference (NotEqualsV2 _)        = M.Primitive M.NotEqual -- Version 2 only.
+muOpReference (In _)                 = M.Reference "in"
+muOpReference (Is _)                 = M.Reference "is"
+muOpReference (IsNot _)              = M.Reference "is not"
+muOpReference (NotIn _)              = M.Reference "not in"
+muOpReference (BinaryOr _)           = M.Primitive M.Or
+muOpReference (Xor _)                = M.Reference "^"
+muOpReference (BinaryAnd _)          = M.Primitive M.And
+muOpReference (ShiftLeft _)          = M.Reference "<<"
+muOpReference (ShiftRight _)         = M.Reference ">>"
+muOpReference (Multiply _)           = M.Reference "*"
+muOpReference (Plus _)               = M.Reference "+"
+muOpReference (Minus _)              = M.Reference "-"
+muOpReference (Divide _)             = M.Reference "/"
+muOpReference (FloorDivide _)        = M.Reference "//"
+muOpReference (Invert _)             = M.Reference "~"
+muOpReference (Modulo _)             = M.Reference "%"
 
 muAssignOp (PlusAssign _)       = "+"
 muAssignOp (MinusAssign _)      = "-"

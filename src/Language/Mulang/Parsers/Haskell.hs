@@ -106,9 +106,18 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muLit (HsDoublePrim  v) = MuNumber . fromRational $ v
 
     muVar :: String -> Expression
-    muVar "==" = Equal
-    muVar "/=" = NotEqual
-    muVar v = Reference v
+    muVar "=="          = Primitive Equal
+    muVar "/="          = Primitive NotEqual
+    muVar "not"         = Primitive Negation
+    muVar "&&"          = Primitive And
+    muVar "||"          = Primitive Or
+    muVar ">="          = Primitive GreatherOrEqualThan
+    muVar ">"           = Primitive GreatherThan
+    muVar "<="          = Primitive LessOrEqualThan
+    muVar "<"           = Primitive LessThan
+    muVar "otherwise"   = Primitive Otherwise
+    muVar "."           = Primitive BackwardComposition
+    muVar v             = Reference v
 
     muName :: HsName -> String
     muName (HsSymbol n) = n
