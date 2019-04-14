@@ -18,10 +18,12 @@ unextends [] = ""
 unextends parents = unwords ["extends", intercalate "," parents]
 
 unbody :: Unparser
-unbody MuNull                        = ""
-unbody (SimpleMethod name [] MuNull) = unwords ["public", "void", name, "()", "{}"]
-unbody (Sequence members)            = unlines (map unbody members)
-unbody (TypeSignature name args typ) = unwords ["public abstract", typ, name, "(", unparam args, ");"]
+unbody MuNil                                       = "null"
+unbody None                                        = ""
+unbody (SimpleMethod name [] None)                 = unwords ["public", "void", name, "()", "{}"]
+unbody (Sequence members)                          = unlines (map unbody members)
+unbody (SubroutineSignature name args typ [])      = unwords ["public abstract", typ, name, "(", unparam args, ");"]
+unbody other                                       = error . show $ other
 
 unparam :: [Identifier] -> String
 unparam = intercalate "," . zipWith buildParam [0..]
