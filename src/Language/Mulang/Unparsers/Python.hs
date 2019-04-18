@@ -14,7 +14,7 @@ unpy (MuString s)                                                  = show s
 unpy (MuList xs)                                                   = "[" ++ unpyMany xs ++ "]"
 unpy (Assignment id value)                                         = id ++ " = " ++ unpy value
 unpy (Reference id)                                                = id
-unpy (Application (Reference "not") [bool])                        = "not " ++ unpy bool
+unpy (Application (Primitive Negation) [bool])                     = "not " ++ unpy bool
 unpy (Application (Reference "+") [arg1, arg2])                    = unpy arg1 ++ " + " ++ unpy arg2
 unpy (Application (Reference "*") [arg1, arg2])                    = unpy arg1 ++ " * " ++ unpy arg2
 unpy (Application (Reference "/") [arg1, arg2])                    = unpy arg1 ++ " / " ++ unpy arg2
