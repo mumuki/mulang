@@ -19,7 +19,7 @@ spec = do
       pending
 
     it "roundTrips booleans" $ do
-      shouldRoundTrip (MuBool True)
+      shouldRoundTrip MuTrue
 
     it "roundTrips strings" $ do
       shouldRoundTrip (MuString "some string")
@@ -53,7 +53,7 @@ spec = do
       shouldRoundTrip (Sequence [MuNumber 1, MuNumber 2, MuNumber 3])
 
     it "roundTrips unary operators" $ do
-      shouldRoundTrip ((Application (Primitive Negation) [MuBool True]))
+      shouldRoundTrip ((Application (Primitive Negation) [MuTrue]))
 
     it "roundTrips classes" $ do
       shouldRoundTrip (Class "DerivedClassName" Nothing None)
@@ -62,16 +62,16 @@ spec = do
       shouldRoundTrip (Class "DerivedClassName" (Just "BaseClassName") None)
 
     it "roundTrips if, elif and else" $ do
-      shouldRoundTrip (If (MuBool True) (MuNumber 1) (If (MuBool False) (MuNumber 2) (MuNumber 3)))
+      shouldRoundTrip (If MuTrue (MuNumber 1) (If MuFalse (MuNumber 2) (MuNumber 3)))
 
     it "roundTrips functions" $ do
       shouldRoundTrip (SimpleFunction "foo" [] (Return (MuNumber 1.0)))
 
     it "roundTrips procedures" $ do
-      shouldRoundTrip (SimpleProcedure "foo" [VariablePattern "param"] (Application (Reference "print") [Reference "param"]))
+      shouldRoundTrip (SimpleProcedure "foo" [VariablePattern "param"] (Print (Reference "param")))
 
     it "roundTrips whiles" $ do
-      shouldRoundTrip (While (MuBool True) None)
+      shouldRoundTrip (While MuTrue None)
 
     it "roundTrips fors" $ do
       shouldRoundTrip (For [Generator (TuplePattern [VariablePattern "x"]) (Application (Reference "range") [MuNumber 0, MuNumber 3])] None)
@@ -100,7 +100,7 @@ spec = do
       pending
 
     it "unpies booleans" $ do
-      unpy  (MuBool True) `shouldBe` "True"
+      unpy  MuTrue `shouldBe` "True"
 
     it "unpies strings" $ do
       unpy  (MuString "some string") `shouldBe` "\"some string\""
@@ -134,7 +134,7 @@ spec = do
       unpy  (Sequence [MuNumber 1, MuNumber 2, MuNumber 3]) `shouldBe` "1.0\n2.0\n3.0"
 
     it "unpies unary operators" $ do
-      unpy  ((Application (Primitive Negation) [MuBool True])) `shouldBe` "not True"
+      unpy  ((Application (Primitive Negation) [MuTrue])) `shouldBe` "not True"
 
     it "unpies classes" $ do
       unpy  (Class "DerivedClassName" Nothing None) `shouldBe` "class DerivedClassName:\n\tpass\n"
@@ -144,16 +144,16 @@ spec = do
 
     it "unpies if, elif and else" $ do
       pending
-      -- unpy  (If (MuBool True) (MuNumber 1) (If (MuBool False) (MuNumber 2) (MuNumber 3))) `shouldBe` "if True: 1\nelif False: 2\nelse: 3"
+      -- unpy  (If MuTrue (MuNumber 1) (If MuFalse (MuNumber 2) (MuNumber 3))) `shouldBe` "if True: 1\nelif False: 2\nelse: 3"
 
     it "unpies functions" $ do
       unpy  (SimpleFunction "foo" [] (Return (MuNumber 1.0))) `shouldBe` "def foo(): return 1"
 
     it "unpies procedures" $ do
-      unpy  (SimpleProcedure "foo" [VariablePattern "param"] (Application (Reference "print") [Reference "param"])) `shouldBe` "def foo(param): print(param)"
+      unpy  (SimpleProcedure "foo" [VariablePattern "param"] (Print (Reference "param"))) `shouldBe` "def foo(param): print(param)"
 
     it "unpies whiles" $ do
-      unpy  (While (MuBool True) None) `shouldBe` "while True:\n\tpass\n"
+      unpy  (While MuTrue None) `shouldBe` "while True:\n\tpass\n"
 
     it "unpies fors" $ do
       unpy  (For [Generator (TuplePattern [VariablePattern "x"]) (Application (Reference "range") [MuNumber 0, MuNumber 3])] None) `shouldBe` "for x in range(0, 3): pass"
