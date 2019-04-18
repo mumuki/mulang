@@ -24,11 +24,14 @@ spec = do
       py "True" `shouldBe` MuBool True
 
     it "parses strings" $ do
-      py "\"some string\"" `shouldBe` MuString "\"some string\""
+      py "\"some string\"" `shouldBe` MuString "some string"
+
+    it "parses strings sequences" $ do
+      py "\"hello\" \"world\"" `shouldBe` MuString "helloworld"
 
     it "parses multi-line strings" $ do
       run [text|"""some
-      string"""|] `shouldBe` MuString "\"\"\"some\nstring\"\"\""
+      string"""|] `shouldBe` MuString "some\nstring"
 
     it "parses lists" $ do
       py "[1,2,3]" `shouldBe` MuList [MuNumber 1, MuNumber 2, MuNumber 3]
@@ -104,7 +107,7 @@ except:
       py "raise" `shouldBe` Raise None
 
     it "parses raise expressions with exception" $ do
-      py "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
+      py "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "something"])
 
     it "parses raise expressions with exception in version2 format" $ do
       py2 "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
@@ -120,7 +123,7 @@ except:
       py "lambda x: 1" `shouldBe` Lambda [VariablePattern "x"] (MuNumber 1)
 
     it "parses tuples" $ do
-      py "(1, \"something\")" `shouldBe` MuTuple [MuNumber 1, MuString "\"something\""]
+      py "(1, \"something\")" `shouldBe` MuTuple [MuNumber 1, MuString "something"]
 
     it "parses yields" $ do
       py "yield 1" `shouldBe` Yield (MuNumber 1)

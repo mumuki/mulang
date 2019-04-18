@@ -16,7 +16,7 @@ import Control.Fallible
 
 import Data.Maybe (fromMaybe)
 import Data.List (intercalate, partition)
-import Data.List.Extra (headOrElse)
+import Data.List.Extra (headOrElse, dropLast)
 import Data.Char (toLower)
 
 java :: Parser
@@ -213,7 +213,3 @@ r (ClassType [(name, _)]) = i name
 j = parser compilationUnit
 
 ns = intercalate "." . map i
-
--- list helpers
-
-dropLast n xs = take (length xs - n) xs

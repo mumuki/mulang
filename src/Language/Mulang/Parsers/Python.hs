@@ -15,7 +15,8 @@ import qualified Language.Python.Version2.Parser as Python2
 import           Language.Python.Common.Token (Token)
 import           Language.Python.Common.AST
 
-import           Data.List (intercalate, isPrefixOf)
+import           Data.List (isPrefixOf)
+import           Data.List.Extra (dropLast)
 import           Data.Maybe (fromMaybe, listToMaybe)
 
 import           Control.Fallible
@@ -176,7 +177,12 @@ muCall callType ident = callType (M.Reference $ muIdent ident)
 
 muApplication op args = M.Application (muOp op) (map muExpr args)
 
-muString = M.MuString . intercalate "\n"
+muString = M.MuString . concat . map removeQuotes
+  where removeQuotes ('"':'"':'"':rest)    = dropLast 3 rest
+        removeQuotes ('"':rest)            = dropLast 1 rest
+        removeQuotes ('\'':'\'':'\'':rest) = dropLast 3 rest
+        removeQuotes ('\'':rest)           = dropLast 1 rest
+        removeQuotes other                 = other
 
 muNumberFromInt = M.MuNumber . fromInteger
 
