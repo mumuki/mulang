@@ -1,7 +1,10 @@
+{-# LANGUAGE ViewPatterns #-}
+
 module Language.Mulang.Inspector.Generic.Smell (
   hasRedundantBooleanComparison,
   hasRedundantIf,
   hasRedundantGuards,
+  shouldUseOtherwise,
   hasRedundantLambda,
   hasRedundantParameter,
   hasRedundantLocalVariableReturn,
@@ -22,7 +25,7 @@ import Language.Mulang.Ast
 import Language.Mulang.Generator (identifierReferences)
 import Language.Mulang.Inspector.Primitive
 
--- | Inspection that tells whether an identifier has expressions like 'x == True'
+-- | Inspection that tells whether an expression has expressions like 'x == True'
 hasRedundantBooleanComparison :: Inspection
 hasRedundantBooleanComparison = compares isBooleanLiteral
 
@@ -53,7 +56,7 @@ returnsNil = containsExpression f
   where f (Return MuNil) = True
         f _              = False
 
--- | Inspection that tells whether an identifier has an if expression where both branches return
+-- | Inspection that tells whether an expression has an if expression where both branches return
 -- boolean literals
 hasRedundantIf :: Inspection
 hasRedundantIf = containsExpression f
@@ -64,7 +67,7 @@ hasRedundantIf = containsExpression f
         f (If _ x y)                                 = all isBooleanLiteral [x, y]
         f _                                          = False
 
--- | Inspection that tells whether an identifier has guards where both branches return
+-- | Inspection that tells whether an expression has guards where both branches return
 -- boolean literals
 hasRedundantGuards :: Inspection
 hasRedundantGuards = containsBody f -- TODO not true when condition is a pattern
@@ -73,15 +76,19 @@ hasRedundantGuards = containsBody f -- TODO not true when condition is a pattern
             (Primitive Otherwise, Return y)]) = all isBooleanLiteral [x, y]
         f _ = False
 
+-- | Inspection that tells whether an expression has guards with a hardcoded false instead of an otherwise
+shouldUseOtherwise :: Inspection
+shouldUseOtherwise = containsBody f
+  where f (GuardedBody (last -> (MuTrue, _))) = True
+        f _                                   = False
 
--- | Inspection that tells whether an identifier has lambda expressions like '\x -> g x'
+-- | Inspection that tells whether an expression has lambda expressions like '\x -> g x'
 hasRedundantLambda :: Inspection
 hasRedundantLambda = containsExpression f
   where f (Lambda [VariablePattern (x)] (Return (Call _ [Reference (y)]))) = x == y
         f _ = False
 
-
--- | Inspection that tells whether an identifier has parameters that
+-- | Inspection that tells whether an expression has parameters that
 -- can be avoided using point-free
 hasRedundantParameter :: Inspection
 hasRedundantParameter = containsExpression f
@@ -113,7 +120,6 @@ discardsExceptions = containsExpression f
   where f (Try _ [(_, None)] _)  = True
         f (Try _ [(_, Print _)] _) = True
         f _                        = False
-
 
 doesConsolePrint :: Inspection
 doesConsolePrint = containsExpression f

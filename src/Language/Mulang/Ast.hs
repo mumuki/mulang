@@ -136,6 +136,9 @@ data Expression
     -- ^ Logic programming universal cuantification
     | Reference Identifier
     -- ^ Generic variable
+    | Primitive PrimitiveType
+    -- ^ Reference to special, low level, universal operations like logical operaions and math, that may or may not be primitives
+    -- in the original language
     | Application Expression [Expression]
     -- ^ Generic, non-curried application of a function or procedure, composed by the applied element itself, and the application arguments
     | Send Expression Expression [Expression]
@@ -169,7 +172,6 @@ data Expression
     -- ^ Generic sequence of statements
     | Other (Maybe Code) (Maybe Expression)
     -- ^ Unrecognized expression, with optional description and body
-    | Primitive PrimitiveType
     | Self
     | None
     -- ^ Generic value indicating an absent expression, such as when there is no finally in a try or default in a switch or js' undefined

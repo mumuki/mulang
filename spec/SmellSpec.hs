@@ -191,6 +191,23 @@ spec = do
     it "is False when there is no guard" $ do
       hasRedundantGuards (hs "x = False") `shouldBe` False
 
+  describe "shouldUseOtherwise" $ do
+    it "is True when there are two guards and last one is a True" $ do
+      shouldUseOtherwise (hs "f x | c x = True\n\
+                             \    | True = False") `shouldBe` True
+
+    it "is True when there are three guards and last one is a True" $ do
+      shouldUseOtherwise (hs "f x | c x = True\n\
+                             \    | g x = False\n\
+                             \    | True = False") `shouldBe` True
+
+    it "is True when last guard is an otherwsie" $ do
+      shouldUseOtherwise (hs "f x | c x = True\n\
+                             \    | otherwise = False") `shouldBe` False
+
+    it "is False when there no guards" $ do
+      shouldUseOtherwise (hs "f x = True") `shouldBe` False
+
   describe "discardsExceptions" $ do
     it "is True when there is an empty catch" $ do
       discardsExceptions (javaStatement "try { new Bar().baz(); } catch (Exception e) { /*TODO handle exception*/ }") `shouldBe` True
