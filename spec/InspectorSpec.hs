@@ -422,6 +422,20 @@ spec = do
     it "is False when using a matcher that does not match" $ do
       (callsMatching (with . isNumber $ 1) anyone) (hs "f = g 2") `shouldBe` False
 
+  describe "usesBooleanLogic" $ do
+    it "is when it is used" $ do
+      usesBooleanLogic (hs "f x y = x || y")   `shouldBe` True
+      usesBooleanLogic (hs "f x y = x && y")   `shouldBe` True
+      usesBooleanLogic (hs "f x y = not x")    `shouldBe` True
+      usesBooleanLogic (hs "f x y = (not) x")  `shouldBe` True
+      usesBooleanLogic (hs "f x y = (&&) x y") `shouldBe` True
+
+    it "is is not used otherwise" $ do
+      usesBooleanLogic (hs "f x y = x + y") `shouldBe` False
+      usesBooleanLogic (hs "f x y = x")     `shouldBe` False
+      usesBooleanLogic (hs "f x y = and x") `shouldBe` False
+      usesBooleanLogic (hs "f x y = or x")  `shouldBe` False
+
   describe "usesExceptions" $ do
     it "is True when a raise is used, java" $ do
       usesExceptions (java "class Sample { void aMethod() { throw new RuntimeException(); } }") `shouldBe` True
