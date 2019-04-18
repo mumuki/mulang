@@ -31,6 +31,7 @@ allSmells = [
   "HasMisspelledIdentifiers",
   "HasRedundantBooleanComparison",
   "HasRedundantGuards",
+  "ShouldUseOtherwise",
   "HasRedundantIf",
   "HasRedundantLambda",
   "HasRedundantLocalVariableReturn",
@@ -61,6 +62,7 @@ detectionFor "HasMisspelledBindings"           = withLanguage hasMisspelledIdent
 detectionFor "HasMisspelledIdentifiers"        = withLanguage hasMisspelledIdentifiers
 detectionFor "HasRedundantBooleanComparison"   = simple hasRedundantBooleanComparison
 detectionFor "HasRedundantGuards"              = simple hasRedundantGuards
+detectionFor "ShouldUseOtherwise"              = simple shouldUseOtherwise
 detectionFor "HasRedundantIf"                  = simple hasRedundantIf
 detectionFor "HasRedundantLambda"              = simple hasRedundantLambda
 detectionFor "HasRedundantLocalVariableReturn" = simple hasRedundantLocalVariableReturn
