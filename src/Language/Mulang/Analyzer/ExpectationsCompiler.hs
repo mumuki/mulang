@@ -95,6 +95,7 @@ compileInspectionPrimitive = f
   f ["Returns", value]                 = plain (returnsMatching (with value))
   f ["Uses"]                           = bound uses
   f ["UsesAnonymousVariable"]          = plain usesAnonymousVariable
+  f ["UsesBooleanLogic"]               = plain usesBooleanLogic
   f ["UsesComposition"]                = plain usesComposition
   f ["UsesComprehension"]              = f ["UsesForComprehension"]
   f ["UsesConditional"]                = plain usesConditional

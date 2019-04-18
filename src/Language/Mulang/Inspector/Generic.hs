@@ -19,6 +19,7 @@ module Language.Mulang.Inspector.Generic (
   returnsMatching,
   uses,
   usesAnonymousVariable,
+  usesBooleanLogic,
   usesExceptionHandling,
   usesExceptions,
   usesFor,
@@ -142,6 +143,13 @@ declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
         equationArityIs (Equation args _) = argsHaveArity args
 
         argsHaveArity = arityPredicate.length
+
+usesBooleanLogic :: Inspection
+usesBooleanLogic = containsExpression f
+  where f (Primitive Negation) = True
+        f (Primitive And)      = True
+        f (Primitive Or)       = True
+        f _                    = False
 
 raises :: BoundInspection
 raises predicate = containsExpression f
