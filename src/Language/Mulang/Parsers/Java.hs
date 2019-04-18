@@ -3,7 +3,7 @@
 
 module Language.Mulang.Parsers.Java (java, parseJava) where
 
-import Language.Mulang.Ast hiding (Primitive, While, Return, Equal, Lambda, Try, Switch, Assert, PrimitiveType(..))
+import Language.Mulang.Ast hiding (Primitive, While, Return, Equal, Lambda, Try, Switch, Assert, PrimitiveOperator(..))
 import qualified Language.Mulang.Ast as M
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compact, compactMap, compactConcatMap, normalize)

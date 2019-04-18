@@ -33,7 +33,7 @@ instance FromJSON Type
 instance FromJSON Assertion
 instance FromJSON TestAnalysisType
 instance FromJSON InterpreterOptions
-instance FromJSON PrimitiveType
+instance FromJSON PrimitiveOperator
 
 instance ToJSON AnalysisResult
 instance ToJSON ExpectationResult
@@ -49,4 +49,4 @@ instance ToJSON Type
 instance ToJSON Assertion
 instance ToJSON TestResult
 instance ToJSON TestStatus
-instance ToJSON PrimitiveType
+instance ToJSON PrimitiveOperator

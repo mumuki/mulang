@@ -24,7 +24,7 @@ module Language.Mulang.Ast (
     Pattern(..),
     Identifier,
     SubroutineBody,
-    PrimitiveType(..),
+    PrimitiveOperator(..),
     debug,
     debugType,
     debugPattern,
@@ -106,7 +106,7 @@ data Expression
     | Procedure Identifier SubroutineBody
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
     | Method Identifier SubroutineBody
-    | PrimitiveMethod PrimitiveType SubroutineBody
+    | PrimitiveMethod PrimitiveOperator SubroutineBody
     | Variable Identifier Expression
     | Assignment Identifier Expression
     | Attribute Identifier Expression
@@ -136,7 +136,7 @@ data Expression
     -- ^ Logic programming universal cuantification
     | Reference Identifier
     -- ^ Generic variable
-    | Primitive PrimitiveType
+    | Primitive PrimitiveOperator
     -- ^ Reference to special, low level, universal operations like logical operaions and math, that may or may not be primitives
     -- in the original language
     | Application Expression [Expression]
@@ -199,20 +199,29 @@ data Expression
     -- ^ Generic assertion expression such as assert, expect, etc. The first parameter indicates whether the assertion is negated or not
   deriving (Eq, Show, Read, Generic, Ord)
 
-data PrimitiveType
+data PrimitiveOperator
     = Equal
+    -- equal operator
     | NotEqual
+    -- ^ distinct operator
     | Negation
+    -- ^ not operator
     | And
+    -- ^ and operator
     | Or
+    -- ^ or operator
     | Hash
+    -- ^ hashcode operator
     | GreatherOrEqualThan
     | GreatherThan
-    | Otherwise
     | LessOrEqualThan
     | LessThan
+    | Otherwise
+    -- ^ guard's otherwise operator
     | ForwardComposition
+    -- (f >> g)(x) = (g . f)(x) = g(f(x)) operator
     | BackwardComposition
+    -- (f << g)(x) = (f . g)(x) = f(g(x)) operator
   deriving (Eq, Show, Read, Generic, Ord)
 
 data Assertion
