@@ -5,9 +5,13 @@ module ExpectationsCorrectorSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Analyzer hiding (spec)
 import           Language.Mulang.Ast (PrimitiveOperator (..))
-import           Control.Applicative ((<|>))
 
+import           Control.Applicative ((<|>))
+import           Control.Monad ((>=>))
+
+import           Text.Read (readMaybe)
 import           Data.Tuple (swap)
+import           Data.List (stripPrefix)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 
@@ -17,6 +21,17 @@ type Token = String
 type TokensTable = Map PrimitiveOperator [Token]
 type OperatorsTable = Map Token PrimitiveOperator
 type KeywordInspectionsTable = Map Token Inspection
+
+buildUsageInspection :: PrimitiveOperator -> Inspection
+buildUsageInspection = ("Uses" ++) . show
+
+unbuildUsageInspection :: Inspection -> Maybe PrimitiveOperator
+unbuildUsageInspection = stripPrefix "Uses" >=> readMaybe
+
+unbuildDeclarationInspection :: Inspection -> Maybe PrimitiveOperator
+unbuildDeclarationInspection = stripPrefix "Declares" >=> readMaybe
+
+primitiveUsage = unbuildUsageInspection
 
 -- C-style tokens
 defaultTokensTable :: TokensTable
@@ -90,14 +105,14 @@ keywordInspectionsTable Python = Map.fromList [
   ("for", "UsesForeach")
  ]
 
-lookupOperatorInspection :: Language -> Token -> Maybe Inspection
-lookupOperatorInspection language target = fmap (("Uses" ++) . show) . (Map.lookup target) . operatorsTable $ language
+operatorInspection :: Language -> Token -> Maybe Inspection
+operatorInspection language target = fmap buildUsageInspection . (Map.lookup target) . operatorsTable $ language
 
-lookupKeywordInspection :: Language -> Token -> Maybe Inspection
-lookupKeywordInspection language target = Map.lookup target . keywordInspectionsTable $ language
+keywordInspection :: Language -> Token -> Maybe Inspection
+keywordInspection language target = Map.lookup target . keywordInspectionsTable $ language
 
 run :: Language -> Token -> Maybe Inspection
-run language  target = lookupOperatorInspection language target <|> lookupKeywordInspection language target
+run language  target = operatorInspection language target <|> keywordInspection language target
 
 spec :: Spec
 spec = do
