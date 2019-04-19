@@ -485,8 +485,11 @@ spec = do
     it "is True when required function is used as argument" $ do
       uses (named "m") (hs "y x = x m") `shouldBe` True
 
+    it "is False with primitives" $ do
+      uses (named "&&") (hs "y x = x && z") `shouldBe` False
+
     it "is True when required function is used as operator" $ do
-      uses (named "&&" )(hs "y x = x && z") `shouldBe` True
+      uses (named "<>") (hs "y x = x <> z") `shouldBe` True
 
     it "is False when required function is not used in constant" $ do
       uses (named "m") (hs "y = 3") `shouldBe` False
