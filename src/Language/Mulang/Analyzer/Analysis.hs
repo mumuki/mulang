@@ -108,7 +108,11 @@ data Language
   |  Haskell
   |  Python
   |  Python2
-  |  Python3 deriving (Show, Eq, Generic)
+  |  Python3
+  |  Ruby
+  |  Php
+  deriving (Show, Eq, Generic)
+
 
 --
 -- Analysis Output structures
