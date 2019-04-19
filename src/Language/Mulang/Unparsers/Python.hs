@@ -1,14 +1,14 @@
 {-# LANGUAGE ViewPatterns #-}
 
-module Language.Mulang.Unparsers.Python (unpy) where
+module Language.Mulang.Unparsers.Python (unparsePython) where
 import Language.Mulang.Unparsers (Unparser)
 import Language.Mulang.Ast
 import Language.Mulang.Unbuilder (tab, binary, parenthesize, number)
 
 import Data.List (intercalate)
 
-unpy :: Unparser
-unpy = unparse
+unparsePython :: Unparser
+unparsePython = unparse
 
 unparse MuNil                                                         = "None"
 unparse (Return body)                                                 = "return " ++ unparse body

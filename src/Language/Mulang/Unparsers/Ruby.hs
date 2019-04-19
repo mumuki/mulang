@@ -1,14 +1,14 @@
 {-# LANGUAGE ViewPatterns #-}
 
-module Language.Mulang.Unparsers.Ruby (unrb) where
+module Language.Mulang.Unparsers.Ruby (unparseRuby) where
 import Language.Mulang.Unparsers (Unparser)
 import Language.Mulang.Unbuilder (tab, binary, parenthesize, number)
 import Language.Mulang.Ast
 
 import Data.List (intercalate)
 
-unrb :: Unparser
-unrb = unparse
+unparseRuby :: Unparser
+unparseRuby = unparse
 
 unparse :: Unparser
 unparse MuNil                                                         = "nil"

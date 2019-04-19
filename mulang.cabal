@@ -57,6 +57,7 @@ library
     Language.Mulang.Inspector.Procedural
     Language.Mulang.Inspector.Query
     Language.Mulang.Inspector.Typed
+    Language.Mulang.Synthesizer
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Java

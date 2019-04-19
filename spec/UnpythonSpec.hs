@@ -4,9 +4,9 @@ import           Test.Hspec
 import           Language.Mulang
 
 import           Language.Mulang.Parsers.Python (py)
-import           Language.Mulang.Unparsers.Python (unpy)
+import           Language.Mulang.Unparsers.Python (unparsePython)
 
-shouldRoundTrip expression =  (py.unpy) expression `shouldBe` expression
+shouldRoundTrip expression =  (py.unparsePython) expression `shouldBe` expression
 
 spec :: Spec
 spec = do
@@ -61,95 +61,44 @@ spec = do
       itWorksWith $ muneg ((Reference "a") `muand` (Reference "b")) `muor` (Reference "c")
       itWorksWith $ (Reference "a") `muand` ((Reference "b") `muor` (Reference "c"))
 
-  describe "unpy" $ do
-    it "numbers" $ do
-      unpy  (MuNumber 1) `shouldBe` "1"
+  describe "unparsePython" $ do
+    let itWorksWith expr expectedCode = it (show expr) (unparsePython expr `shouldBe` expectedCode)
 
-    it "numbers" $ do
-      unpy  (MuNumber 1.5) `shouldBe` "1.5"
+    describe "literals" $ do
+      itWorksWith (MuNumber 1) "1"
+      itWorksWith (MuNumber 1.5) "1.5"
+      itWorksWith (MuNumber 1) "1"
+      itWorksWith MuTrue "True"
+      itWorksWith (MuString "some string") "\"some string\""
+      itWorksWith (MuList [MuNumber 1, MuNumber 2, MuNumber 3]) "[1,2,3]"
+      itWorksWith MuNil "None"
 
-    it "integers" $ do
-      unpy  (MuNumber 1) `shouldBe` "1"
+    itWorksWith (Assignment "one" (MuNumber 1)) "one = 1"
+    itWorksWith ((Reference "x")) "x"
+    itWorksWith ((Application (Reference "f") [MuNumber 2])) "f(2)"
+    itWorksWith ((Send (Reference "o") (Reference "f") [(MuNumber 2)])) "o.f(2)"
+    itWorksWith ((Assignment "x" (Application (Reference "+") [Reference "x",MuNumber 8]))) "x = (x + 8)"
+    itWorksWith ((Application (Reference "+") [Reference "x",Reference "y"])) "(x + y)"
+    itWorksWith (Sequence [MuNumber 1, MuNumber 2, MuNumber 3]) "1\n2\n3"
+    itWorksWith ((Application (Primitive Negation) [MuTrue])) "(not True)"
 
-    it "booleans" $ do
-      unpy  MuTrue `shouldBe` "True"
+    describe "clases" $ do
+      itWorksWith (Class "DerivedClassName" Nothing None) "class DerivedClassName:\n\tpass\n"
+      itWorksWith (Class "DerivedClassName" (Just "BaseClassName") None) "class DerivedClassName(BaseClassName):\n\tpass\n"
 
-    it "strings" $ do
-      unpy  (MuString "some string") `shouldBe` "\"some string\""
+    describe "defs" $ do
+      itWorksWith (SimpleFunction "foo" [] (Return (MuNumber 1))) "def foo():\n\treturn 1\n"
+      itWorksWith (SimpleProcedure "foo" [VariablePattern "param"] (Print (Reference "param"))) "def foo(param):\n\tprint(param)\n"
 
-    it "lists" $ do
-      unpy  (MuList [MuNumber 1, MuNumber 2, MuNumber 3]) `shouldBe` "[1,2,3]"
+    itWorksWith (While MuTrue None) "while True:\n\tpass\n"
+    itWorksWith (For [Generator (TuplePattern [VariablePattern "x"]) (Application (Reference "range") [MuNumber 0, MuNumber 3])] None) "for x in range(0,3): pass"
+    itWorksWith (Raise None) "raise"
+    itWorksWith (Raise (Application (Reference "Exception") [MuString "something"])) "raise Exception(\"something\")"
 
-    it "sets as lists" $ do
-      --unpy  (MuList [MuNumber 1, MuNumber 2, MuNumber 3]) `shouldBe` "{1,2,3}"
-      pending
+    describe "lambdas" $ do
+      itWorksWith (Lambda [VariablePattern "x"] (Reference "x")) "lambda x: x"
+      itWorksWith (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1)) "lambda x,y: 1"
+      itWorksWith (Lambda [] MuNil) "lambda : None"
 
-    it "assignment" $ do
-      unpy  (Assignment "one" (MuNumber 1)) `shouldBe` "one = 1"
-
-    it "references" $ do
-      unpy  ((Reference "x")) `shouldBe` "x"
-
-    it "application" $ do
-      unpy  ((Application (Reference "f") [MuNumber 2])) `shouldBe` "f(2)"
-
-    it "message sending" $ do
-      unpy  ((Send (Reference "o") (Reference "f") [(MuNumber 2)])) `shouldBe` "o.f(2)"
-
-    it "assign-operators" $ do
-      unpy  ((Assignment "x" (Application (Reference "+") [Reference "x",MuNumber 8]))) `shouldBe` "x = (x + 8)"
-
-    it "binary operators" $ do
-      unpy  ((Application (Reference "+") [Reference "x",Reference "y"])) `shouldBe` "(x + y)"
-
-    it "sequences" $ do
-      unpy  (Sequence [MuNumber 1, MuNumber 2, MuNumber 3]) `shouldBe` "1\n2\n3"
-
-    it "unary operators" $ do
-      unpy  ((Application (Primitive Negation) [MuTrue])) `shouldBe` "(not True)"
-
-    it "classes" $ do
-      unpy  (Class "DerivedClassName" Nothing None) `shouldBe` "class DerivedClassName:\n\tpass\n"
-
-    it "inheritance" $ do
-      unpy  (Class "DerivedClassName" (Just "BaseClassName") None) `shouldBe` "class DerivedClassName(BaseClassName):\n\tpass\n"
-
-    it "if, elif and else" $ do
-      pending
-      -- unpy  (If MuTrue (MuNumber 1) (If MuFalse (MuNumber 2) (MuNumber 3))) `shouldBe` "if True: 1\nelif False: 2\nelse: 3"
-
-    it "functions" $ do
-      unpy  (SimpleFunction "foo" [] (Return (MuNumber 1))) `shouldBe` "def foo():\n\treturn 1\n"
-
-    it "procedures" $ do
-      unpy  (SimpleProcedure "foo" [VariablePattern "param"] (Print (Reference "param"))) `shouldBe` "def foo(param):\n\tprint(param)\n"
-
-    it "whiles" $ do
-      unpy  (While MuTrue None) `shouldBe` "while True:\n\tpass\n"
-
-    it "fors" $ do
-      unpy  (For [Generator (TuplePattern [VariablePattern "x"]) (Application (Reference "range") [MuNumber 0, MuNumber 3])] None) `shouldBe` "for x in range(0,3): pass"
-
-    it "raise expressions" $ do
-      unpy  (Raise None) `shouldBe` "raise"
-
-    it "raise expressions with exception" $ do
-      unpy  (Raise (Application (Reference "Exception") [MuString "something"])) `shouldBe` "raise Exception(\"something\")"
-
-    it "lambdas with one arg" $ do
-      unpy  (Lambda [VariablePattern "x"] (Reference "x")) `shouldBe` "lambda x: x"
-
-    it "lambdas with two args" $ do
-      unpy  (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1)) `shouldBe` "lambda x,y: 1"
-
-    it "lambdas with zero args" $ do
-      unpy  (Lambda [] MuNil) `shouldBe` "lambda : None"
-
-    it "tuples" $ do
-      unpy  (MuTuple [MuNumber 1, MuString "something"]) `shouldBe` "(1,\"something\")"
-
-    it "yields" $ do
-      unpy  (Yield (MuNumber 1)) `shouldBe` "yield 1"
-
-    it "None" $ do
-      unpy  MuNil `shouldBe` "None"
+    itWorksWith (MuTuple [MuNumber 1, MuString "something"]) "(1,\"something\")"
+    itWorksWith (Yield (MuNumber 1)) "yield 1"

@@ -5,9 +5,9 @@ module UnjavaSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang
 import           Language.Mulang.Parsers.Java (java)
-import           Language.Mulang.Unparsers.Java (unjava)
+import           Language.Mulang.Unparsers.Java (unparseJava)
 
-shouldRoundTrip expression =  (java.unjava) expression `shouldBe` expression
+shouldRoundTrip expression =  (java.unparseJava) expression `shouldBe` expression
 
 spec :: Spec
 spec = do

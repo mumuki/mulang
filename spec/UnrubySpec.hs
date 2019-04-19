@@ -3,12 +3,12 @@ module UnrubySpec (spec) where
 import           Test.Hspec
 import           Language.Mulang
 
-import           Language.Mulang.Unparsers.Ruby (unrb)
+import           Language.Mulang.Unparsers.Ruby (unparseRuby)
 
 spec :: Spec
 spec = do
-  describe "unrb" $ do
-    let itWorksWith expr expectedCode = it (show expr) (unrb expr `shouldBe` expectedCode)
+  describe "unparseRuby" $ do
+    let itWorksWith expr expectedCode = it (show expr) (unparseRuby expr `shouldBe` expectedCode)
 
     describe "literals" $ do
       itWorksWith (MuNumber 1.5) "1.5"
@@ -17,6 +17,7 @@ spec = do
       itWorksWith MuFalse "false"
       itWorksWith (MuString "some string") "\"some string\""
       itWorksWith (MuList [MuNumber 1, MuNumber 2, MuNumber 3]) "[1,2,3]"
+      itWorksWith MuNil "nil"
 
     itWorksWith (Assignment "one" (MuNumber 1)) "one = 1"
     itWorksWith ((Reference "x")) "x"
@@ -53,7 +54,6 @@ spec = do
       itWorksWith (Lambda [] MuNil) "lambda { || nil }"
 
     itWorksWith (Yield (MuNumber 1)) "yield 1"
-    itWorksWith MuNil "nil"
 
     describe "boolean operations" $ do
       let muand x y = (Application (Primitive And) [x, y])

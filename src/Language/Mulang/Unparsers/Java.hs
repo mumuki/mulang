@@ -1,17 +1,20 @@
 {-# LANGUAGE ViewPatterns #-}
 
-module Language.Mulang.Unparsers.Java (unjava) where
+module Language.Mulang.Unparsers.Java (unparseJava) where
 import Language.Mulang.Unparsers (Unparser)
 import Language.Mulang.Ast
 
 import Data.List (intercalate)
 import Data.String (unwords)
 
-unjava :: Unparser
-unjava (Class name Nothing body)           = unwords ["public class", name, "{", unbody body, "}"]
-unjava (Class name (Just superclass) body) = unwords ["public class", name, "extends", superclass, "{", unbody body, "}"]
-unjava (Interface name extends body)       = unwords ["public interface", name, unextends extends, "{", unbody body, "}"]
-unjava _                                   = ""
+unparseJava :: Unparser
+unparseJava = unparse
+
+unparse :: Unparser
+unparse (Class name Nothing body)           = unwords ["public class", name, "{", unbody body, "}"]
+unparse (Class name (Just superclass) body) = unwords ["public class", name, "extends", superclass, "{", unbody body, "}"]
+unparse (Interface name extends body)       = unwords ["public interface", name, unextends extends, "{", unbody body, "}"]
+unparse _                                   = ""
 
 unextends :: [Identifier] -> String
 unextends [] = ""
