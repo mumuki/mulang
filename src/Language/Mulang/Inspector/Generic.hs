@@ -18,6 +18,7 @@ module Language.Mulang.Inspector.Generic (
   rescues,
   returnsMatching,
   uses,
+  usesPrimitive,
   usesAnonymousVariable,
   usesBooleanLogic,
   usesExceptionHandling,
@@ -55,6 +56,11 @@ assignsMatching matcher predicate = containsExpression f
 uses :: BoundInspection
 uses p = containsExpression f
   where f = any p . referencedIdentifiers
+
+usesPrimitive :: PrimitiveOperator -> Inspection
+usesPrimitive operator = containsExpression f
+  where f (Primitive o) = operator == o
+        f _             = False
 
 calls :: BoundInspection
 calls = unmatching callsMatching
