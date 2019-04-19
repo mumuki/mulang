@@ -3,7 +3,7 @@
 module Language.Mulang.Unparsers.Python (unpy) where
 import Language.Mulang.Unparsers (Unparser)
 import Language.Mulang.Ast
-import Language.Mulang.Unbuilder (tab, binary, parenthesize)
+import Language.Mulang.Unbuilder (tab, binary, parenthesize, number)
 
 import Data.List (intercalate)
 
@@ -13,7 +13,7 @@ unpy = unparse
 unparse MuNil                                                         = "None"
 unparse (Return body)                                                 = "return " ++ unparse body
 unparse (Print exp)                                                   = "print(" ++ unparse exp ++ ")"
-unparse (MuNumber n)                                                  = show n
+unparse (MuNumber n)                                                  = number n
 unparse (MuBool b)                                                    = show b
 unparse (MuString s)                                                  = show s
 unparse (MuList xs)                                                   = "[" ++ unparseMany xs ++ "]"

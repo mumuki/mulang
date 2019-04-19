@@ -2,7 +2,7 @@
 
 module Language.Mulang.Unparsers.Ruby (unrb) where
 import Language.Mulang.Unparsers (Unparser)
-import Language.Mulang.Unbuilder (tab, binary, parenthesize)
+import Language.Mulang.Unbuilder (tab, binary, parenthesize, number)
 import Language.Mulang.Ast
 
 import Data.List (intercalate)
@@ -14,7 +14,7 @@ unparse :: Unparser
 unparse MuNil                                                         = "nil"
 unparse (Print exp)                                                   = "puts(" ++ unparse exp ++ ")"
 unparse (Return exp)                                                  = "return " ++ unparse exp
-unparse (MuNumber n)                                                  = show n
+unparse (MuNumber n)                                                  = number n
 unparse MuTrue                                                        = "true"
 unparse MuFalse                                                       = "false"
 unparse (MuString s)                                                  = show s
