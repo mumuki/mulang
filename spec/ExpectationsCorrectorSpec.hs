@@ -8,13 +8,17 @@ import           Language.Mulang.Analyzer hiding (spec)
 import           Language.Mulang.Ast (PrimitiveOperator (..))
 
 import Data.Tuple (swap)
-
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
 type Target = String
 type Inspection = String
 type Token = String
 
-tokensTable :: Language -> [(PrimitiveOperator, [Token])]
-tokensTable Haskell = [
+type TokensTable = Map PrimitiveOperator [Token]
+type OperatorsTable = Map Token PrimitiveOperator
+
+tokensTable :: Language -> TokensTable
+tokensTable Haskell = Map.fromList [
     (Equal, ["=="]),
     (NotEqual, ["/="]),
     (Negation, ["not"]),
@@ -29,7 +33,7 @@ tokensTable Haskell = [
     (ForwardComposition, []),
     (BackwardComposition, ["."])
   ]
-tokensTable Java = [
+tokensTable Java = Map.fromList [
     (Equal, ["=="]),
     (NotEqual, ["!="]),
     (Negation, ["!"]),
@@ -44,7 +48,7 @@ tokensTable Java = [
     (ForwardComposition, []),
     (BackwardComposition, [])
   ]
-tokensTable Ruby = [
+tokensTable Ruby = Map.fromList [
     (Equal, ["=="]),
     (NotEqual, ["!="]),
     (Negation, ["!"]),
@@ -59,7 +63,7 @@ tokensTable Ruby = [
     (ForwardComposition, [">>"]),
     (BackwardComposition, ["<<"])
   ]
-tokensTable Python = [
+tokensTable Python = Map.fromList [
     (Equal, ["=="]),
     (NotEqual, ["!=", "<>"]),
     (Negation, ["not"]),
@@ -75,8 +79,8 @@ tokensTable Python = [
     (BackwardComposition, ["<<"])
   ]
 
-operatorsTable :: Language -> [(Token, PrimitiveOperator)]
-operatorsTable =  concatMap (fill . swap) . tokensTable
+operatorsTable :: Language -> OperatorsTable
+operatorsTable =  Map.fromList . concatMap (fill . swap) . Map.toList . tokensTable
 
 fill (xs, t) = map (,t) xs
 
@@ -91,7 +95,7 @@ run Python  "def"       = Just "DeclaresComputation"
 run Ruby    "class"     = Just "DeclaresClass"
 run Ruby    "include"   = Just  "Includes"
 run Ruby    "def"       = Just "DeclaresComputation"
-run language  target    = fmap (("Uses" ++) . show) . lookup target . operatorsTable $ language
+run language  target    = fmap (("Uses" ++) . show) . (Map.lookup target) . operatorsTable $ language
 
 spec :: Spec
 spec = do
