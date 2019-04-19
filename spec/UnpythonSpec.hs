@@ -11,89 +11,56 @@ shouldRoundTrip expression =  (py.unpy) expression `shouldBe` expression
 spec :: Spec
 spec = do
   describe "roundTrip" $ do
-    it "numbers" $ do
-      shouldRoundTrip (MuNumber 1.0)
+    let itWorksWith expr = it (show expr) $ do shouldRoundTrip expr
+    let itDoesntWorkYetWith expr = it (show expr) pending
 
-    it "integers" $ do
-      --shouldRoundTrip (MuNumber 1)
-      pending
+    describe "literals" $ do
+      itWorksWith $ (MuNumber 1.0)
+      itDoesntWorkYetWith $ (MuNumber 1)
+      itWorksWith $ MuTrue
+      itWorksWith $ (MuString "some string")
+      itWorksWith $ (MuList [MuNumber 1.0, MuNumber 2.0, MuNumber 3.0])
+      itDoesntWorkYetWith $ (MuList [MuNumber 1, MuNumber 2, MuNumber 3])
 
-    it "booleans" $ do
-      shouldRoundTrip MuTrue
+    itWorksWith $ (Assignment "one" (MuNumber 1.0))
+    itWorksWith $ ((Reference "x"))
+    itWorksWith $ ((Application (Reference "f") [MuNumber 2.0]))
+    itWorksWith $ ((Send (Reference "o") (Reference "f") [(MuNumber 2)]))
+    itWorksWith $ ((Assignment "x" (Application (Reference "+") [Reference "x",MuNumber 8.0])))
+    itWorksWith $ ((Application (Reference "+") [Reference "x",Reference "y"]))
+    itWorksWith $ (Sequence [MuNumber 1, MuNumber 2, MuNumber 3])
+    itWorksWith $ ((Application (Primitive Negation) [MuTrue]))
 
-    it "strings" $ do
-      shouldRoundTrip (MuString "some string")
+    describe "classes" $ do
+      itWorksWith $ (Class "DerivedClassName" Nothing None)
+      itWorksWith $ (Class "DerivedClassName" (Just "BaseClassName") None)
 
-    it "lists" $ do
-      shouldRoundTrip (MuList [MuNumber 1.0, MuNumber 2.0, MuNumber 3.0])
+    itWorksWith $ (If MuTrue (MuNumber 1) (If MuFalse (MuNumber 2) (MuNumber 3)))
+    itWorksWith $ (SimpleFunction "foo" [] (Return (MuNumber 1.0)))
+    itWorksWith $ (SimpleProcedure "foo" [VariablePattern "param"] (Print (Reference "param")))
+    itWorksWith $ (While MuTrue None)
+    itWorksWith $ (For [Generator (TuplePattern [VariablePattern "x"]) (Application (Reference "range") [MuNumber 0, MuNumber 3])] None)
+    itWorksWith $ (Raise None)
+    itWorksWith $ (Raise (Application (Reference "Exception") [MuString "something"]))
 
-    it "sets as lists" $ do
-      --shouldRoundTrip (MuList [MuNumber 1, MuNumber 2, MuNumber 3])
-      pending
+    describe "lambdas" $ do
+      itWorksWith $ (Lambda [VariablePattern "x"] (MuNumber 1))
+      itWorksWith $ (Lambda [] (Reference "foo"))
 
-    it "assignment" $ do
-      shouldRoundTrip (Assignment "one" (MuNumber 1.0))
+    itWorksWith $ (MuTuple [MuNumber 1, MuString "something"])
+    itWorksWith $ (Yield (MuNumber 1.0))
 
-    it "references" $ do
-      shouldRoundTrip ((Reference "x"))
+    describe "boolean operations" $ do
+      let muand x y = (Application (Primitive And) [x, y])
+      let muor  x y = (Application (Primitive Or) [x, y])
+      let muneg x = (Application (Primitive Negation) [x])
 
-    it "application" $ do
-      shouldRoundTrip ((Application (Reference "f") [MuNumber 2.0]))
-
-    it "message sending" $ do
-      shouldRoundTrip ((Send (Reference "o") (Reference "f") [(MuNumber 2)]))
-
-    it "assign-operators" $ do
-      shouldRoundTrip ((Assignment "x" (Application (Reference "+") [Reference "x",MuNumber 8.0])))
-
-    it "binary operators" $ do
-      shouldRoundTrip ((Application (Reference "+") [Reference "x",Reference "y"]))
-
-    it "sequences" $ do
-      shouldRoundTrip (Sequence [MuNumber 1, MuNumber 2, MuNumber 3])
-
-    it "unary operators" $ do
-      shouldRoundTrip ((Application (Primitive Negation) [MuTrue]))
-
-    it "classes" $ do
-      shouldRoundTrip (Class "DerivedClassName" Nothing None)
-
-    it "inheritance" $ do
-      shouldRoundTrip (Class "DerivedClassName" (Just "BaseClassName") None)
-
-    it "if, elif and else" $ do
-      shouldRoundTrip (If MuTrue (MuNumber 1) (If MuFalse (MuNumber 2) (MuNumber 3)))
-
-    it "functions" $ do
-      shouldRoundTrip (SimpleFunction "foo" [] (Return (MuNumber 1.0)))
-
-    it "procedures" $ do
-      shouldRoundTrip (SimpleProcedure "foo" [VariablePattern "param"] (Print (Reference "param")))
-
-    it "whiles" $ do
-      shouldRoundTrip (While MuTrue None)
-
-    it "fors" $ do
-      shouldRoundTrip (For [Generator (TuplePattern [VariablePattern "x"]) (Application (Reference "range") [MuNumber 0, MuNumber 3])] None)
-
-    it "raise expressions" $ do
-      shouldRoundTrip (Raise None)
-
-    it "raise expressions with exception" $ do
-      shouldRoundTrip (Raise (Application (Reference "Exception") [MuString "something"]))
-
-    it "lambdas with one argument" $ do
-      shouldRoundTrip (Lambda [VariablePattern "x"] (MuNumber 1))
-
-    it "lambdas with zero arguments" $ do
-      shouldRoundTrip (Lambda [] (Reference "foo"))
-
-    it "tuples" $ do
-      shouldRoundTrip (MuTuple [MuNumber 1, MuString "something"])
-
-    it "yields" $ do
-      shouldRoundTrip (Yield (MuNumber 1.0))
-
+      itWorksWith $ (Reference "a") `muand` (Reference "b")
+      itWorksWith $ (Reference "a") `muor` (Reference "b")
+      itWorksWith $ (muneg (Reference "a")) `muor` (Reference "b")
+      itWorksWith $ muneg ((Reference "a") `muor` (Reference "b"))
+      itWorksWith $ muneg ((Reference "a") `muand` (Reference "b")) `muor` (Reference "c")
+      itWorksWith $ (Reference "a") `muand` ((Reference "b") `muor` (Reference "c"))
 
   describe "unpy" $ do
     it "numbers" $ do
