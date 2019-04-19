@@ -25,7 +25,7 @@ spec = do
     itWorksWith ((Send (Reference "o") (Reference "f") [(MuNumber 2)])) "o.f(2)"
     itWorksWith ((Assignment "x" (Application (Reference "+") [Reference "x",MuNumber 8]))) "x = (x + 8)"
     itWorksWith ((Application (Reference "+") [Reference "x",Reference "y"])) "(x + y)"
-    itWorksWith (Sequence [MuNumber 1, MuNumber 2, MuNumber 3]) "1\n2\n3"
+    itWorksWith (Sequence [MuNumber 1, MuNumber 2, MuNumber 3]) "1\n2\n3\n"
     itWorksWith ((Application (Primitive Negation) [MuTrue])) "(!true)"
 
     describe "classes" $ do

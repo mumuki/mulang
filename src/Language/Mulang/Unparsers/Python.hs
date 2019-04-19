@@ -1,9 +1,11 @@
 {-# LANGUAGE ViewPatterns #-}
 
 module Language.Mulang.Unparsers.Python (unparsePython) where
+
+import Language.Mulang.Operators.Python (pythonTokensTable)
 import Language.Mulang.Unparsers (Unparser)
 import Language.Mulang.Ast
-import Language.Mulang.Unbuilder (tab, binary, parenthesize, number)
+import Language.Mulang.Unbuilder (tab, binary, parenthesize, number, binaryOperator)
 
 import Data.List (intercalate)
 
@@ -19,15 +21,14 @@ unparse (MuString s)                                                  = show s
 unparse (MuList xs)                                                   = "[" ++ unparseMany xs ++ "]"
 unparse (Assignment id value)                                         = id ++ " = " ++ unparse value
 unparse (Reference id)                                                = id
+unparse (Call (Primitive Negation) [arg1])                            = parenthesize $ "not " ++ unparse arg1
 unparse (Call (Reference "+") [arg1, arg2])                           = binary "+" (unparse arg1) (unparse arg2)
 unparse (Call (Reference "*") [arg1, arg2])                           = binary "*" (unparse arg1) (unparse arg2)
 unparse (Call (Reference "/") [arg1, arg2])                           = binary "/" (unparse arg1) (unparse arg2)
 unparse (Call (Reference "-") [arg1, arg2])                           = binary "-" (unparse arg1) (unparse arg2)
-unparse (Call (Primitive And) [arg1, arg2])                           = binary "and" (unparse arg1) (unparse arg2)
-unparse (Call (Primitive Or) [arg1, arg2])                            = binary "or" (unparse arg1) (unparse arg2)
-unparse (Call (Primitive Negation) [arg1])                            = parenthesize $ "not " ++ unparse arg1
+unparse (Call (Primitive op) [arg1, arg2])                            = binaryOperator op (unparse arg1) (unparse arg2)  pythonTokensTable
 unparse (Application (Reference id) args)                             = id ++ "(" ++ unparseMany args ++ ")"
-unparse (Sequence xs)                                                 = intercalate "\n" . map unparse $ xs
+unparse (Sequence xs)                                                 = unlines . map unparse $ xs
 unparse (While cond body)                                             = "while "++ unparse cond ++ ":\n" ++ (tab . unparse) body
 unparse  (For [Generator (TuplePattern [VariablePattern "x"]) generator] None) = "for x in "++ unparse generator ++": pass"
 unparse (Raise None)                                                   = "raise"

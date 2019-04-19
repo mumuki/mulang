@@ -1,8 +1,10 @@
 {-# LANGUAGE ViewPatterns #-}
 
 module Language.Mulang.Unparsers.Ruby (unparseRuby) where
+
+import Language.Mulang.Operators.Ruby (rubyTokensTable)
 import Language.Mulang.Unparsers (Unparser)
-import Language.Mulang.Unbuilder (tab, binary, parenthesize, number)
+import Language.Mulang.Unbuilder (tab, binary, parenthesize, number, binaryOperator)
 import Language.Mulang.Ast
 
 import Data.List (intercalate)
@@ -21,15 +23,14 @@ unparse (MuString s)                                                  = show s
 unparse (MuList xs)                                                   = "[" ++ unparseMany xs ++ "]"
 unparse (Assignment id value)                                         = id ++ " = " ++ unparse value
 unparse (Reference id)                                                = id
+unparse (Call (Primitive Negation) [arg1])                            = parenthesize $ "!" ++ unparse arg1
 unparse (Call (Reference "+") [arg1, arg2])                           = binary "+" (unparse arg1) (unparse arg2)
 unparse (Call (Reference "*") [arg1, arg2])                           = binary "*" (unparse arg1) (unparse arg2)
 unparse (Call (Reference "/") [arg1, arg2])                           = binary "/" (unparse arg1) (unparse arg2)
 unparse (Call (Reference "-") [arg1, arg2])                           = binary "-" (unparse arg1) (unparse arg2)
-unparse (Call (Primitive And) [arg1, arg2])                           = binary "&&" (unparse arg1) (unparse arg2)
-unparse (Call (Primitive Or) [arg1, arg2])                            = binary "||" (unparse arg1) (unparse arg2)
-unparse (Call (Primitive Negation) [arg1])                            = parenthesize $ "!" ++ unparse arg1
+unparse (Call (Primitive op) [arg1, arg2])                            = binaryOperator op (unparse arg1) (unparse arg2)  rubyTokensTable
 unparse (Application (Reference id) args)                             = id ++ "(" ++ unparseMany args ++ ")"
-unparse (Sequence xs)                                                 = intercalate "\n" . map unparse $ xs
+unparse (Sequence xs)                                                 = unlines . map unparse $ xs
 unparse (While cond body)                                             = "while "++ unparse cond ++ "\n" ++ (tab . unparse) body ++ "end\n"
 unparse (Raise None)                                                  = "raise"
 unparse (Raise arg)                                                   = "raise " ++ unparse arg
