@@ -169,13 +169,15 @@ muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "print"
 muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "printf"]) (expr:_)) = Print (muExp expr)
 
 muMethodInvocation (MethodCall (Name [message]) args)           = muNormalizeReference $ SimpleSend Self (i message) (map muExp args)
-muMethodInvocation (MethodCall (Name receptorAndMessage) args)  =  SimpleSend (Reference  (ns . init $ receptorAndMessage)) (i . last $ receptorAndMessage) (map muExp args)
-muMethodInvocation (PrimaryMethodCall receptor _ selector args) =  SimpleSend (muExp receptor) (i selector) (map muExp args)
+muMethodInvocation (MethodCall (Name receptorAndMessage) args)  = muNormalizeReference $ SimpleSend (Reference  (ns . init $ receptorAndMessage)) (i . last $ receptorAndMessage) (map muExp args)
+muMethodInvocation (PrimaryMethodCall receptor _ selector args) = muNormalizeReference $ SimpleSend (muExp receptor) (i selector) (map muExp args)
 muMethodInvocation e = debug e
 
 muNormalizeReference (SimpleSend Self "assertTrue" [expression])         = M.Assert False $ Truth expression
 muNormalizeReference (SimpleSend Self "assertFalse" [expression])        = M.Assert True $ Truth expression
 muNormalizeReference (SimpleSend Self "assertEquals" [expected, actual]) = M.Assert False $ Equality expected actual
+muNormalizeReference (SimpleSend one  "equals" [other])                  = M.PrimitiveSend one M.Equal [other]
+muNormalizeReference (SimpleSend one  "hashCode" [other])                = M.PrimitiveSend one M.Hash [other]
 muNormalizeReference e = e
 
 muRefType (ClassRefType clazz) = r clazz
