@@ -170,6 +170,7 @@ muCallType (Dot _ (Ident "assertEqual" _) _) [a, b] = M.Assert False $ M.Equalit
 muCallType (Dot _ (Ident "assertTrue" _) _)  [a]    = M.Assert False $ M.Truth a
 muCallType (Dot _ (Ident "assertFalse" _) _) [a]    = M.Assert True $ M.Truth a
 muCallType (Dot receiver ident _)            x      = muCall (M.Send $ muExpr receiver) ident x
+muCallType (Var (Ident "print" _) _)         [x]    = M.Print x -- FIXME python print can have multiple arguments
 muCallType (Var ident _)                     x      = muCall M.Application ident x
 
 muCall callType ident = callType (M.Reference $ muIdent ident)
