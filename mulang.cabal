@@ -58,10 +58,15 @@ library
     Language.Mulang.Inspector.Typed
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
-    Language.Mulang.Parsers.Prolog
     Language.Mulang.Parsers.Java
     Language.Mulang.Parsers.JavaScript
+    Language.Mulang.Parsers.Prolog
     Language.Mulang.Parsers.Python
+    Language.Mulang.Operators
+    Language.Mulang.Operators.Haskell
+    Language.Mulang.Operators.Java
+    Language.Mulang.Operators.Python
+    Language.Mulang.Operators.Ruby
     Language.Mulang.Analyzer
     Language.Mulang.Analyzer.Analysis
     Language.Mulang.Analyzer.Analysis.Json
