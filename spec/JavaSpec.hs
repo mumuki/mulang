@@ -70,7 +70,7 @@ spec = do
             class Foo {
                public <A> A hello(A a) {}
             }|] `shouldBe` Class "Foo" Nothing (Sequence [
-                              SubroutineSignature "hello" ["A"] "A" [],
+                              SubroutineSignature "hello" ["A"] "A" ["A"],
                               (SimpleMethod "hello" [VariablePattern "a"] None)])
 
     it "parses Methods with type arguments and type constraints" $ do
@@ -78,7 +78,7 @@ spec = do
             class Foo {
                public <A extends Serializable> A hello(A a) {}
             }|] `shouldBe` Class "Foo" Nothing (Sequence [
-                              SubroutineSignature "hello" ["A"] "A" [],
+                              SubroutineSignature "hello" ["A"] "A" ["A"],
                               (SimpleMethod "hello" [VariablePattern "a"] None)])
 
     it "parses Empty Returns" $ do
