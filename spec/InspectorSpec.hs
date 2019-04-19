@@ -589,6 +589,32 @@ spec = do
       transitive "p" (uses (named "m")) (js "var o = {g: function(){ m }}\n\
                                         \var p = {n: function() { o.g() }}") `shouldBe` True
 
+  describe "usesPrimitive, hs" $ do
+    it "is True when required primitive is used on application" $ do
+      usesPrimitive And (hs "y x = x && z") `shouldBe` True
+      usesPrimitive BackwardComposition (hs "y x = x . z") `shouldBe` True
+      usesPrimitive Negation (hs "y x = not z") `shouldBe` True
+
+    it "is True when required primitive is used as argument" $ do
+      usesPrimitive And (hs "y x = f (&&) y z") `shouldBe` True
+
+    it "is False when primitive is just apparently used" $ do
+      usesPrimitive And (hs "y x = and x") `shouldBe` False
+
+    it "is False when primitive is not used" $ do
+      usesPrimitive Negation (hs "y x = m x") `shouldBe` False
+
+  describe "usesPrimitive, js" $ do
+    it "is True when required primitive is used on application" $ do
+      usesPrimitive And (js "x && z") `shouldBe` True
+      usesPrimitive Negation (js "function () { return !z }") `shouldBe` True
+
+    it "is False when primitive is just apparently used" $ do
+      usesPrimitive Or (js "or(x)") `shouldBe` False
+
+    it "is False when primitive is not used" $ do
+      usesPrimitive ForwardComposition (js "f(g(x))") `shouldBe` False
+
   describe "declaresComputation" $ do
     describe "with constants" $ do
       it "is False when exists" $ do
