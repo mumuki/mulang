@@ -1,21 +1,22 @@
 {-# LANGUAGE TupleSections #-}
 
-
 module ExpectationsCorrectorSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang.Analyzer hiding (spec)
 import           Language.Mulang.Ast (PrimitiveOperator (..))
+import           Control.Applicative ((<|>))
 
-import Data.Tuple (swap)
-import Data.Map.Strict (Map)
+import           Data.Tuple (swap)
+import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-type Target = String
+
 type Inspection = String
 type Token = String
 
 type TokensTable = Map PrimitiveOperator [Token]
 type OperatorsTable = Map Token PrimitiveOperator
+type KeywordInspectionsTable = Map Token Inspection
 
 -- C-style tokens
 defaultTokensTable :: TokensTable
@@ -61,25 +62,49 @@ tokensTable Python = buildTokensTable [
 
 operatorsTable :: Language -> OperatorsTable
 operatorsTable =  Map.fromList . concatMap (fill . swap) . Map.toList . tokensTable
+  where
+    fill (xs, t) = map (,t) xs
 
-fill (xs, t) = map (,t) xs
+keywordInspectionsTable :: Language -> KeywordInspectionsTable
+keywordInspectionsTable Haskell = Map.fromList [
+  ("type", "DeclaresTypeAlias"),
+  ("if", "UsesIf")
+ ]
+keywordInspectionsTable Java = Map.fromList [
+  ("if", "UsesIf"),
+  ("class", "DeclaresClass"),
+  ("interface", "DeclaresInterface"),
+  ("for", "UsesForLoop")
+ ]
+keywordInspectionsTable Ruby = Map.fromList [
+  ("if", "UsesIf"),
+  ("class", "DeclaresClass"),
+  ("def", "DeclaresComputation"),
+  ("for", "UsesForeach"),
+  ("include",  "Includes")
+ ]
+keywordInspectionsTable Python = Map.fromList [
+  ("if", "UsesIf"),
+  ("class", "DeclaresClass"),
+  ("def", "DeclaresComputation"),
+  ("for", "UsesForeach")
+ ]
 
-run :: Language -> Target -> Maybe Inspection
+lookupOperatorInspection :: Language -> Token -> Maybe Inspection
+lookupOperatorInspection language target = fmap (("Uses" ++) . show) . (Map.lookup target) . operatorsTable $ language
 
-run Haskell "type"      = Just "DeclaresTypeAlias"
-run Java    "if"        = Just "UsesIf"
-run Java    "class"     = Just "DeclaresClass"
-run Java    "interface" = Just "DeclaresInterface"
-run Java    "for"       = Just "UsesForLoop"
-run Python  "def"       = Just "DeclaresComputation"
-run Ruby    "class"     = Just "DeclaresClass"
-run Ruby    "include"   = Just  "Includes"
-run Ruby    "def"       = Just "DeclaresComputation"
-run language  target    = fmap (("Uses" ++) . show) . (Map.lookup target) . operatorsTable $ language
+lookupKeywordInspection :: Language -> Token -> Maybe Inspection
+lookupKeywordInspection language target = Map.lookup target . keywordInspectionsTable $ language
+
+run :: Language -> Token -> Maybe Inspection
+run language  target = lookupOperatorInspection language target <|> lookupKeywordInspection language target
 
 spec :: Spec
 spec = do
   describe "correct primitive usages" $ do
+    it "corrects haskell and" $ do
+      run Haskell "otherwise"  `shouldBe` (Just "UsesOtherwise")
+
     it "corrects haskell and" $ do
       run Haskell "and" `shouldBe` Nothing
       run Haskell "&&"  `shouldBe` (Just "UsesAnd")
