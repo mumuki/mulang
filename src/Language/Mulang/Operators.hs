@@ -21,17 +21,18 @@ type OperatorsTable = Map Token PrimitiveOperator
 
 -- C-style tokens
 defaultTokensTable :: TokensTable
-defaultTokensTable = Map.fromList [
-  (Equal, ["=="]),
-  (NotEqual, ["!="]),
-  (Negation, ["!"]),
-  (And, ["&&"]),
-  (Or, ["||"]),
-  (GreatherOrEqualThan, [">="]),
-  (GreatherThan, [">"]),
-  (LessOrEqualThan, ["<="]),
-  (LessThan, ["<"])
- ]
+defaultTokensTable =
+  Map.fromList [
+    (Equal, ["=="]),
+    (NotEqual, ["!="]),
+    (Negation, ["!"]),
+    (And, ["&&"]),
+    (Or, ["||"]),
+    (GreatherOrEqualThan, [">="]),
+    (GreatherThan, [">"]),
+    (LessOrEqualThan, ["<="]),
+    (LessThan, ["<"])
+  ]
 
 buildTokensTable :: [(PrimitiveOperator, [Token])] -> TokensTable
 buildTokensTable = flip Map.union defaultTokensTable  . Map.fromList

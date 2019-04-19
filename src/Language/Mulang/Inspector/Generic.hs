@@ -18,13 +18,14 @@ module Language.Mulang.Inspector.Generic (
   rescues,
   returnsMatching,
   uses,
-  usesPrimitive,
   usesAnonymousVariable,
   usesBooleanLogic,
   usesExceptionHandling,
   usesExceptions,
   usesFor,
   usesIf,
+  usesPrimitive,
+  usesPrint,
   usesYield) where
 
 import Language.Mulang.Ast
@@ -90,6 +91,11 @@ usesIf = containsExpression f
 usesYield :: Inspection
 usesYield = containsExpression f
   where f (Yield _) = True
+        f _         = False
+
+usesPrint :: Inspection
+usesPrint = containsExpression f
+  where f (Print _) = True
         f _         = False
 
 usesFor :: Inspection

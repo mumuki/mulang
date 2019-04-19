@@ -1,7 +1,10 @@
+{-# LANGUAGE ViewPatterns #-}
+
 module Language.Mulang.Analyzer.ExpectationsCompiler(
   compileExpectation) where
 
 import Language.Mulang
+import Language.Mulang.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
 import Language.Mulang.Analyzer.Analysis (Expectation(..))
 
 import Data.Maybe (fromMaybe)
@@ -89,10 +92,10 @@ compileInspectionPrimitive = f
   f ["Instantiates"]                   = bound instantiates
   f ["Raises"]                         = bound raises
   f ["Rescues"]                        = bound rescues
+  f ["Returns", value]                 = plain (returnsMatching (with value))
   f ["TypesAs"]                        = bound typesAs
   f ["TypesParameterAs"]               = bound typesParameterAs
   f ["TypesReturnAs"]                  = bound typesReturnAs
-  f ["Returns", value]                 = plain (returnsMatching (with value))
   f ["Uses"]                           = bound uses
   f ["UsesAnonymousVariable"]          = plain usesAnonymousVariable
   f ["UsesBooleanLogic"]               = plain usesBooleanLogic
@@ -118,6 +121,7 @@ compileInspectionPrimitive = f
   f ["UsesNot"]                        = plain usesNot
   f ["UsesObjectComposition"]          = plain usesObjectComposition
   f ["UsesPatternMatching"]            = plain usesPatternMatching
+  f ["UsesPrint"]                      = plain usesPrint
   f ["UsesRepeat"]                     = plain usesRepeat
   f ["UsesStaticMethodOverload"]       = plain usesStaticMethodOverload
   f ["UsesStaticPolymorphism"]         = contextualized usesStaticPolymorphism'
@@ -126,7 +130,13 @@ compileInspectionPrimitive = f
   f ["UsesType"]                       = bound usesType
   f ["UsesWhile"]                      = plain usesWhile
   f ["UsesYield"]                      = plain usesYield
-  f _                                = Nothing
+  f [primitiveUsage -> Just p]         = plain (usesPrimitive p)
+  f [primitiveDeclaration -> Just p]   = plain (declaresPrimitive p)
+  f _                                  = Nothing
+
+  primitiveUsage = decodeUsageInspection
+  primitiveDeclaration = decodeDeclarationInspection
+
 
   contextualized :: ContextualizedInspection -> Maybe ContextualizedBoundInspection
   contextualized = Just . contextualizedBind

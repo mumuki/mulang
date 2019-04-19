@@ -132,6 +132,15 @@ spec = do
                           SubroutineSignature "hello" [] "char" [],
                           (SimpleMethod "hello" [] (Return (MuChar 'f')))])
 
+    it "parses equals methods invocations" $ do
+      run [text|public class Foo {
+            public static void main() {
+              System.out.println((5).equals(6));
+            }
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          SubroutineSignature "main" [] "void" [],
+                          (SimpleMethod "main" [] (Print (PrimitiveSend (MuNumber 5) Equal [MuNumber 6])))])
+
     it "parses Parameters" $ do
       run "public class Foo extends Bar { int succ(int y) {} }" `shouldBe` Class "Foo" (Just "Bar") (Sequence [
                                                                               SubroutineSignature "succ" ["int"] "int" [],
