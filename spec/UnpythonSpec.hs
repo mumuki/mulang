@@ -11,7 +11,7 @@ shouldRoundTrip expression =  (py.unpy) expression `shouldBe` expression
 spec :: Spec
 spec = do
   describe "roundTrip" $ do
-    let itWorksWith expr = it (show expr) $ do shouldRoundTrip expr
+    let itWorksWith expr = it (show expr) (shouldRoundTrip expr)
     let itDoesntWorkYetWith expr = it (show expr) pending
 
     describe "literals" $ do
@@ -96,16 +96,16 @@ spec = do
       unpy  ((Send (Reference "o") (Reference "f") [(MuNumber 2)])) `shouldBe` "o.f(2.0)"
 
     it "assign-operators" $ do
-      unpy  ((Assignment "x" (Application (Reference "+") [Reference "x",MuNumber 8.0]))) `shouldBe` "x = x + 8.0"
+      unpy  ((Assignment "x" (Application (Reference "+") [Reference "x",MuNumber 8.0]))) `shouldBe` "x = (x + 8.0)"
 
     it "binary operators" $ do
-      unpy  ((Application (Reference "+") [Reference "x",Reference "y"])) `shouldBe` "x + y"
+      unpy  ((Application (Reference "+") [Reference "x",Reference "y"])) `shouldBe` "(x + y)"
 
     it "sequences" $ do
       unpy  (Sequence [MuNumber 1, MuNumber 2, MuNumber 3]) `shouldBe` "1.0\n2.0\n3.0"
 
     it "unary operators" $ do
-      unpy  ((Application (Primitive Negation) [MuTrue])) `shouldBe` "not True"
+      unpy  ((Application (Primitive Negation) [MuTrue])) `shouldBe` "(not True)"
 
     it "classes" $ do
       unpy  (Class "DerivedClassName" Nothing None) `shouldBe` "class DerivedClassName:\n\tpass\n"

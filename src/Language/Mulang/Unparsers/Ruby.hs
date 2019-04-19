@@ -2,6 +2,7 @@
 
 module Language.Mulang.Unparsers.Ruby (unrb) where
 import Language.Mulang.Unparsers (Unparser)
+import Language.Mulang.Unbuilder (tab, binary, parenthesize)
 import Language.Mulang.Ast
 
 import Data.List (intercalate)
@@ -20,11 +21,13 @@ unparse (MuString s)                                                  = show s
 unparse (MuList xs)                                                   = "[" ++ unparseMany xs ++ "]"
 unparse (Assignment id value)                                         = id ++ " = " ++ unparse value
 unparse (Reference id)                                                = id
-unparse (Application (Primitive Negation) [bool])                     = "!" ++ unparse bool
-unparse (Application (Reference "+") [arg1, arg2])                    = unparse arg1 ++ " + " ++ unparse arg2
-unparse (Application (Reference "*") [arg1, arg2])                    = unparse arg1 ++ " * " ++ unparse arg2
-unparse (Application (Reference "/") [arg1, arg2])                    = unparse arg1 ++ " / " ++ unparse arg2
-unparse (Application (Reference "-") [arg1, arg2])                    = unparse arg1 ++ " - " ++ unparse arg2
+unparse (Call (Reference "+") [arg1, arg2])                           = binary "+" (unparse arg1) (unparse arg2)
+unparse (Call (Reference "*") [arg1, arg2])                           = binary "*" (unparse arg1) (unparse arg2)
+unparse (Call (Reference "/") [arg1, arg2])                           = binary "/" (unparse arg1) (unparse arg2)
+unparse (Call (Reference "-") [arg1, arg2])                           = binary "-" (unparse arg1) (unparse arg2)
+unparse (Call (Primitive And) [arg1, arg2])                           = binary "&&" (unparse arg1) (unparse arg2)
+unparse (Call (Primitive Or) [arg1, arg2])                            = binary "||" (unparse arg1) (unparse arg2)
+unparse (Call (Primitive Negation) [arg1])                            = parenthesize $ "!" ++ unparse arg1
 unparse (Application (Reference id) args)                             = id ++ "(" ++ unparseMany args ++ ")"
 unparse (Sequence xs)                                                 = intercalate "\n" . map unparse $ xs
 unparse (While cond body)                                             = "while "++ unparse cond ++ "\n" ++ (tab . unparse) body ++ "end\n"
@@ -51,9 +54,6 @@ unparseParams = intercalate "," . map unparseParam
 unparseParam :: Pattern -> String
 unparseParam (VariablePattern id) = id
 unparseParam other = error . show $ other
-
-tab :: String -> String
-tab = unlines . map ("\t"++) . lines
 
 unparseMany :: [Expression] -> String
 unparseMany = intercalate "," . map unparse

@@ -8,91 +8,61 @@ import           Language.Mulang.Unparsers.Ruby (unrb)
 spec :: Spec
 spec = do
   describe "unrb" $ do
-    it "numbers" $ do
-      unrb  (MuNumber 1.0) `shouldBe` "1.0"
+    let itWorksWith expr expectedCode = it (show expr) (unrb expr `shouldBe` expectedCode)
 
-    it "integers" $ do
-      --unrb  (MuNumber 1) `shouldBe` "1"
-      pending
+    describe "literals" $ do
+      itWorksWith (MuNumber 1.0) "1.0"
+      itWorksWith (MuNumber 1) "1"
+      itWorksWith MuTrue "true"
+      itWorksWith MuFalse "false"
+      itWorksWith (MuString "some string") "\"some string\""
+      itWorksWith (MuList [MuNumber 1.0, MuNumber 2.0, MuNumber 3.0]) "[1.0,2.0,3.0]"
 
-    it "booleans" $ do
-      unrb  MuTrue `shouldBe` "true"
-      unrb  MuFalse `shouldBe` "false"
+    itWorksWith (Assignment "one" (MuNumber 1.0)) "one = 1.0"
+    itWorksWith ((Reference "x")) "x"
+    itWorksWith ((Application (Reference "f") [MuNumber 2.0])) "f(2.0)"
+    itWorksWith ((Send (Reference "o") (Reference "f") [(MuNumber 2)])) "o.f(2.0)"
+    itWorksWith ((Assignment "x" (Application (Reference "+") [Reference "x",MuNumber 8.0]))) "x = (x + 8.0)"
+    itWorksWith ((Application (Reference "+") [Reference "x",Reference "y"])) "(x + y)"
+    itWorksWith (Sequence [MuNumber 1, MuNumber 2, MuNumber 3]) "1.0\n2.0\n3.0"
+    itWorksWith ((Application (Primitive Negation) [MuTrue])) "(!true)"
 
-    it "strings" $ do
-      unrb  (MuString "some string") `shouldBe` "\"some string\""
+    describe "classes" $ do
+      itWorksWith (Class "DerivedClassName" Nothing None) "class DerivedClassName\nend\n"
+      itWorksWith (Class "DerivedClassName" (Just "BaseClassName") None) "class DerivedClassName < BaseClassName\nend\n"
 
-    it "lists" $ do
-      unrb  (MuList [MuNumber 1.0, MuNumber 2.0, MuNumber 3.0]) `shouldBe` "[1.0,2.0,3.0]"
+    itWorksWith (If MuTrue (MuNumber 1.0) (MuNumber 3.0)) "if true\n\t1.0\nelse\n\t3.0\nend\n"
 
-    it "assignment" $ do
-      unrb  (Assignment "one" (MuNumber 1.0)) `shouldBe` "one = 1.0"
+    describe "functions and procedures" $ do
+      itWorksWith (SimpleFunction "foo" [] (Return (MuNumber 1.0))) "def foo()\n\treturn 1.0\nend\n"
+      itWorksWith (SimpleFunction "foo" [VariablePattern "x"] (Return (Reference "x"))) "def foo(x)\n\treturn x\nend\n"
+      itWorksWith (SimpleProcedure "foo" [] (Print (Reference "param"))) "def foo()\n\tputs(param)\nend\n"
+      itWorksWith (SimpleProcedure "foo" [VariablePattern "param"] (Print (Reference "param"))) "def foo(param)\n\tputs(param)\nend\n"
 
-    it "references" $ do
-      unrb  ((Reference "x")) `shouldBe` "x"
+    describe "while" $ do
+      itWorksWith (While MuTrue None) "while true\nend\n"
+      itWorksWith (While MuTrue (Print (MuString "hi"))) "while true\n\tputs(\"hi\")\nend\n"
 
-    it "application" $ do
-      unrb  ((Application (Reference "f") [MuNumber 2.0])) `shouldBe` "f(2.0)"
+    describe "raise" $ do
+      itWorksWith (Raise None) "raise"
+      itWorksWith (Raise (MuString "something")) "raise \"something\""
 
-    it "message sending" $ do
-      unrb  ((Send (Reference "o") (Reference "f") [(MuNumber 2)])) `shouldBe` "o.f(2.0)"
+    describe "lambda" $ do
+      itWorksWith (Lambda [VariablePattern "x"] (Reference "x")) "lambda { |x| x }"
+      itWorksWith (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1)) "lambda { |x,y| 1.0 }"
+      itWorksWith (Lambda [] MuNil) "lambda { || nil }"
 
-    it "assign-operators" $ do
-      unrb  ((Assignment "x" (Application (Reference "+") [Reference "x",MuNumber 8.0]))) `shouldBe` "x = x + 8.0"
+    itWorksWith (Yield (MuNumber 1.0)) "yield 1.0"
+    itWorksWith MuNil "nil"
 
-    it "binary operators" $ do
-      unrb  ((Application (Reference "+") [Reference "x",Reference "y"])) `shouldBe` "x + y"
+    describe "boolean operations" $ do
+      let muand x y = (Application (Primitive And) [x, y])
+      let muor  x y = (Application (Primitive Or) [x, y])
+      let muneg x = (Application (Primitive Negation) [x])
 
-    it "sequences" $ do
-      unrb  (Sequence [MuNumber 1, MuNumber 2, MuNumber 3]) `shouldBe` "1.0\n2.0\n3.0"
-
-    it "unary operators" $ do
-      unrb  ((Application (Primitive Negation) [MuTrue])) `shouldBe` "!true"
-
-    it "classes" $ do
-      unrb  (Class "DerivedClassName" Nothing None) `shouldBe` "class DerivedClassName\nend\n"
-
-    it "inheritance" $ do
-      unrb  (Class "DerivedClassName" (Just "BaseClassName") None) `shouldBe` "class DerivedClassName < BaseClassName\nend\n"
-
-    it "if, elif and else" $ do
-      unrb  (If MuTrue (MuNumber 1.0) (MuNumber 3.0)) `shouldBe` "if true\n\t1.0\nelse\n\t3.0\nend\n"
-
-    it "functions" $ do
-      unrb  (SimpleFunction "foo" [] (Return (MuNumber 1.0))) `shouldBe` "def foo()\n\treturn 1.0\nend\n"
-
-    it "functions with args" $ do
-      unrb  (SimpleFunction "foo" [VariablePattern "x"] (Return (Reference "x"))) `shouldBe` "def foo(x)\n\treturn x\nend\n"
-
-    it "procedures" $ do
-      unrb  (SimpleProcedure "foo" [] (Print (Reference "param"))) `shouldBe` "def foo()\n\tputs(param)\nend\n"
-
-    it "procedures with arguments" $ do
-      unrb  (SimpleProcedure "foo" [VariablePattern "param"] (Print (Reference "param"))) `shouldBe` "def foo(param)\n\tputs(param)\nend\n"
-
-    it "whiles" $ do
-      unrb  (While MuTrue None) `shouldBe` "while true\nend\n"
-
-    it "whiles with body" $ do
-      unrb  (While MuTrue (Print (MuString "hi"))) `shouldBe` "while true\n\tputs(\"hi\")\nend\n"
-
-    it "raise expressions" $ do
-      unrb  (Raise None) `shouldBe` "raise"
-
-    it "raise expressions with exception" $ do
-      unrb  (Raise (MuString "something")) `shouldBe` "raise \"something\""
-
-    it "lambdas with one arg" $ do
-      unrb (Lambda [VariablePattern "x"] (Reference "x")) `shouldBe` "lambda { |x| x }"
-
-    it "lambdas with two args" $ do
-      unrb (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1)) `shouldBe` "lambda { |x,y| 1.0 }"
-
-    it "lambdas with zero args" $ do
-      unrb (Lambda [] MuNil) `shouldBe` "lambda { || nil }"
-
-    it "yields" $ do
-      unrb  (Yield (MuNumber 1.0)) `shouldBe` "yield 1.0"
-
-    it "nil" $ do
-      unrb  MuNil `shouldBe` "nil"
+      itWorksWith ((Reference "a") `muand` (Reference "b")) "(a && b)"
+      itWorksWith ((Reference "a") `muor` (Reference "b")) "(a || b)"
+      itWorksWith ((muneg (Reference "a")) `muor` (Reference "b")) "((!a) || b)"
+      itWorksWith (muneg ((Reference "a") `muor` (Reference "b"))) "(!(a || b))"
+      itWorksWith (muneg ((Reference "a") `muand` (Reference "b")) `muor` (Reference "c")) "((!(a && b)) || c)"
+      itWorksWith ((Reference "a") `muand` ((Reference "b") `muor` (Reference "c"))) "(a && (b || c))"
