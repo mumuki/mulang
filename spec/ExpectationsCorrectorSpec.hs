@@ -17,66 +17,46 @@ type Token = String
 type TokensTable = Map PrimitiveOperator [Token]
 type OperatorsTable = Map Token PrimitiveOperator
 
+-- C-style tokens
+defaultTokensTable :: TokensTable
+defaultTokensTable = Map.fromList [
+  (Equal, ["=="]),
+  (NotEqual, ["!="]),
+  (Negation, ["!"]),
+  (And, ["&&"]),
+  (Or, ["||"]),
+  (GreatherOrEqualThan, [">="]),
+  (GreatherThan, [">"]),
+  (LessOrEqualThan, ["<="]),
+  (LessThan, ["<"])
+ ]
+
+buildTokensTable :: [(PrimitiveOperator, [Token])] -> TokensTable
+buildTokensTable = flip Map.union defaultTokensTable  . Map.fromList
+
 tokensTable :: Language -> TokensTable
-tokensTable Haskell = Map.fromList [
-    (Equal, ["=="]),
+tokensTable Haskell = buildTokensTable [
     (NotEqual, ["/="]),
     (Negation, ["not"]),
-    (And, ["&&"]),
-    (Or, ["||"]),
-    (Hash, []),
-    (GreatherOrEqualThan, [">="]),
-    (GreatherThan, [">"]),
-    (LessOrEqualThan, ["<="]),
-    (LessThan, ["<"]),
     (Otherwise, ["otherwise"]),
-    (ForwardComposition, []),
     (BackwardComposition, ["."])
   ]
-tokensTable Java = Map.fromList [
-    (Equal, ["=="]),
-    (NotEqual, ["!="]),
-    (Negation, ["!"]),
-    (And, ["&&"]),
-    (Or, ["||"]),
-    (Hash, ["hashCode"]),
-    (GreatherOrEqualThan, [">="]),
-    (GreatherThan, [">"]),
-    (LessOrEqualThan, ["<="]),
-    (LessThan, ["<"]),
-    (Otherwise, []),
-    (ForwardComposition, []),
-    (BackwardComposition, [])
+tokensTable Java = buildTokensTable [
+    (Hash, ["hashCode"])
   ]
-tokensTable Ruby = Map.fromList [
-    (Equal, ["=="]),
-    (NotEqual, ["!="]),
-    (Negation, ["!"]),
+tokensTable Ruby = buildTokensTable [
     (And, ["&&", "and"]),
     (Or, ["||", "or"]),
     (Hash, ["hash"]),
-    (GreatherOrEqualThan, [">="]),
-    (GreatherThan, [">"]),
-    (LessOrEqualThan, ["<="]),
-    (LessThan, ["<"]),
-    (Otherwise, []),
     (ForwardComposition, [">>"]),
     (BackwardComposition, ["<<"])
   ]
-tokensTable Python = Map.fromList [
-    (Equal, ["=="]),
+tokensTable Python = buildTokensTable [
     (NotEqual, ["!=", "<>"]),
     (Negation, ["not"]),
     (And, ["and"]),
     (Or, ["or"]),
-    (Hash, ["hash"]),
-    (GreatherOrEqualThan, [">="]),
-    (GreatherThan, [">"]),
-    (LessOrEqualThan, ["<="]),
-    (LessThan, ["<"]),
-    (Otherwise, []),
-    (ForwardComposition, [">>"]),
-    (BackwardComposition, ["<<"])
+    (Hash, ["hash"])
   ]
 
 operatorsTable :: Language -> OperatorsTable
