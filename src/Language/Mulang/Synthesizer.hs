@@ -13,7 +13,7 @@ import           Language.Mulang.Operators.Haskell (haskellTokensTable)
 import           Language.Mulang.Operators.Ruby (rubyTokensTable)
 import           Language.Mulang.Operators.Java (javaTokensTable)
 import           Language.Mulang.Operators.Python (pythonTokensTable)
-import           Language.Mulang.Ast (PrimitiveOperator (..))
+import           Language.Mulang.Ast (Operator (..))
 
 import           Control.Applicative ((<|>))
 import           Control.Monad ((>=>))
@@ -27,14 +27,14 @@ type Inspection = String
 type KeywordInspectionsTable = Map Token Inspection
 
 -- converts an operator into an inspection
-encodeUsageInspection :: PrimitiveOperator -> Inspection
+encodeUsageInspection :: Operator -> Inspection
 encodeUsageInspection = ("Uses" ++) . show
 
 -- extract an operator from an inspection
-decodeUsageInspection :: Inspection -> Maybe PrimitiveOperator
+decodeUsageInspection :: Inspection -> Maybe Operator
 decodeUsageInspection = stripPrefix "Uses" >=> readMaybe
 
-decodeDeclarationInspection :: Inspection -> Maybe PrimitiveOperator
+decodeDeclarationInspection :: Inspection -> Maybe Operator
 decodeDeclarationInspection = stripPrefix "Declares" >=> readMaybe
 
 tokensTable :: Language -> TokensTable

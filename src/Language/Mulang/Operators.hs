@@ -7,7 +7,7 @@ module Language.Mulang.Operators (
   TokensTable,
   OperatorsTable) where
 
-import           Language.Mulang.Ast (PrimitiveOperator (..))
+import           Language.Mulang.Ast (Operator (..))
 
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
@@ -16,8 +16,8 @@ import           Data.Tuple (swap)
 
 type Token = String
 
-type TokensTable = Map PrimitiveOperator [Token]
-type OperatorsTable = Map Token PrimitiveOperator
+type TokensTable = Map Operator [Token]
+type OperatorsTable = Map Token Operator
 
 -- C-style tokens
 defaultTokensTable :: TokensTable
@@ -34,7 +34,7 @@ defaultTokensTable =
     (LessThan, ["<"])
   ]
 
-buildTokensTable :: [(PrimitiveOperator, [Token])] -> TokensTable
+buildTokensTable :: [(Operator, [Token])] -> TokensTable
 buildTokensTable = flip Map.union defaultTokensTable  . Map.fromList
 
 buildOperatorsTable :: TokensTable -> OperatorsTable

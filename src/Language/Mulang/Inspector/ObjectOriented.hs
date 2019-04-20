@@ -79,7 +79,7 @@ declaresMethod =  containsBoundDeclaration f
         f _            = False
 
 -- primitive can only be declared as methods
-declaresPrimitive :: PrimitiveOperator -> Inspection
+declaresPrimitive :: Operator -> Inspection
 declaresPrimitive operator = containsExpression f
   where f (PrimitiveMethod o _) = operator == o
         f _                     = False
