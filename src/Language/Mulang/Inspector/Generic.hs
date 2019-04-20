@@ -58,7 +58,7 @@ uses :: BoundInspection
 uses p = containsExpression f
   where f = any p . referencedIdentifiers
 
-usesPrimitive :: PrimitiveOperator -> Inspection
+usesPrimitive :: Operator -> Inspection
 usesPrimitive operator = containsExpression f
   where f (Primitive o) = operator == o
         f _             = False

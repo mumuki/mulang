@@ -21,7 +21,7 @@ module Language.Mulang.Analyzer (
   module Language.Mulang.Analyzer.Analysis) where
 
 import Language.Mulang
-import Language.Mulang.Analyzer.Analysis
+import Language.Mulang.Analyzer.Analysis hiding (Inspection)
 import Language.Mulang.Analyzer.DomainLanguageCompiler (emptyDomainLanguage, compileDomainLanguage)
 import Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
 import Language.Mulang.Analyzer.FragmentParser (parseFragment)
@@ -47,7 +47,7 @@ allSmellsBut :: [Smell] -> Maybe SmellsSet
 allSmellsBut = Just . AllSmells . Just
 
 emptyAnalysisSpec :: AnalysisSpec
-emptyAnalysisSpec = AnalysisSpec Nothing Nothing Nothing Nothing Nothing Nothing
+emptyAnalysisSpec = AnalysisSpec Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 emptyAnalysis :: Fragment -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec
@@ -75,16 +75,16 @@ emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing
 --
 
 analyse :: Analysis -> IO AnalysisResult
-analyse (Analysis sample spec) = analyseSample (parseFragment sample)
-  where analyseSample (Right ast)    = analyseAst ast spec
+analyse analysis@(Analysis sample spec) = analyseSample . parseFragment $ sample
+  where analyseSample (Right ast)    = analyseAst (inferredLanguage analysis) ast spec
         analyseSample (Left message) = return $ AnalysisFailed message
 
-analyseAst :: Expression -> AnalysisSpec -> IO AnalysisResult
-analyseAst ast spec = do
-  language <- compileDomainLanguage (domainLanguage spec)
+analyseAst :: Maybe Language -> Expression -> AnalysisSpec -> IO AnalysisResult
+analyseAst lang ast spec = do
+  domaingLang <- compileDomainLanguage (domainLanguage spec)
   testResults <- analyseTests ast (testAnalysisType spec)
-  return $ AnalysisCompleted (analyseExpectations ast (expectations spec))
-                             (analyseSmells ast language (smellsSet spec))
+  return $ AnalysisCompleted (analyseExpectations lang ast (expectations spec))
+                             (analyseSmells ast domaingLang (smellsSet spec))
                              (analyseSignatures ast (signatureAnalysisType spec))
                              testResults
                              (analyzeIntermediateLanguage ast spec)

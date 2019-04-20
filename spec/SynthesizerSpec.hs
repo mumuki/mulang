@@ -1,10 +1,10 @@
 module SynthesizerSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Synthesizer
+import           Language.Mulang.Analyzer.Synthesizer
 import           Language.Mulang.Analyzer hiding (spec)
 
-run = synthesizeInspection
+run = synthesizeUsageInspection
 
 spec :: Spec
 spec = do

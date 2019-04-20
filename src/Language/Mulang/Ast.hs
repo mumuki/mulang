@@ -24,7 +24,7 @@ module Language.Mulang.Ast (
     Pattern(..),
     Identifier,
     SubroutineBody,
-    PrimitiveOperator(..),
+    Operator(..),
     debug,
     debugType,
     debugPattern,
@@ -106,7 +106,7 @@ data Expression
     | Procedure Identifier SubroutineBody
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
     | Method Identifier SubroutineBody
-    | PrimitiveMethod PrimitiveOperator SubroutineBody
+    | PrimitiveMethod Operator SubroutineBody
     | Variable Identifier Expression
     | Assignment Identifier Expression
     | Attribute Identifier Expression
@@ -136,7 +136,7 @@ data Expression
     -- ^ Logic programming universal cuantification
     | Reference Identifier
     -- ^ Generic variable
-    | Primitive PrimitiveOperator
+    | Primitive Operator
     -- ^ Reference to special, low level, universal operations like logical operaions and math, that may or may not be primitives
     -- in the original language
     | Application Expression [Expression]
@@ -199,7 +199,7 @@ data Expression
     -- ^ Generic assertion expression such as assert, expect, etc. The first parameter indicates whether the assertion is negated or not
   deriving (Eq, Show, Read, Generic, Ord)
 
-data PrimitiveOperator
+data Operator
     = Equal
     -- equal operator
     | NotEqual
