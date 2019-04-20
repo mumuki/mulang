@@ -9,6 +9,7 @@ module Language.Mulang.Analyzer.Analysis (
   DomainLanguage(..),
   CaseStyle(..),
   Smell,
+  Inspection,
   SignatureAnalysisType(..),
   TestAnalysisType(..),
   InterpreterOptions(..),

@@ -4,7 +4,7 @@ module Language.Mulang.Analyzer.SmellsAnalyzer (
 import Language.Mulang
 import Language.Mulang.Inspector.Generic.Smell
 import Language.Mulang.DomainLanguage
-import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage)
+import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage, Inspection)
 import Data.List ((\\))
 import Data.Maybe (fromMaybe)
 

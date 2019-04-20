@@ -21,7 +21,7 @@ module Language.Mulang.Analyzer (
   module Language.Mulang.Analyzer.Analysis) where
 
 import Language.Mulang
-import Language.Mulang.Analyzer.Analysis
+import Language.Mulang.Analyzer.Analysis hiding (Inspection)
 import Language.Mulang.Analyzer.DomainLanguageCompiler (emptyDomainLanguage, compileDomainLanguage)
 import Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
 import Language.Mulang.Analyzer.FragmentParser (parseFragment)

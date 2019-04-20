@@ -1,13 +1,14 @@
 -- Module por synthesizing inspections
 -- from tokens, keywords and operators
-module Language.Mulang.Synthesizer (
+module Language.Mulang.Analyzer.Synthesizer (
   synthesizeInspection,
   encodeUsageInspection,
   decodeUsageInspection,
   decodeDeclarationInspection
 ) where
 
-import           Language.Mulang.Analyzer.Analysis (Language(..))
+import           Language.Mulang.Analyzer.Analysis (Language(..), Inspection)
+
 import           Language.Mulang.Operators
 import           Language.Mulang.Operators.Haskell (haskellTokensTable)
 import           Language.Mulang.Operators.Ruby (rubyTokensTable)
@@ -23,7 +24,6 @@ import           Data.List (stripPrefix)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 
-type Inspection = String
 type KeywordInspectionsTable = Map Token Inspection
 
 -- converts an operator into an inspection

@@ -4,8 +4,8 @@ module Language.Mulang.Analyzer.ExpectationsCompiler(
   compileExpectation) where
 
 import Language.Mulang
-import Language.Mulang.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
 import Language.Mulang.Analyzer.Analysis (Expectation(..))
+import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
 
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
