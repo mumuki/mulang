@@ -9,7 +9,7 @@ module Language.Mulang.Analyzer.Synthesizer (
 
 import           Language.Mulang.Analyzer.Analysis (Language(..), Inspection)
 
-import           Language.Mulang.Operators
+import           Language.Mulang.Operators (parseOperator, Token, TokensTable)
 import           Language.Mulang.Operators.Haskell (haskellTokensTable)
 import           Language.Mulang.Operators.Ruby (rubyTokensTable)
 import           Language.Mulang.Operators.Java (javaTokensTable)
@@ -72,7 +72,7 @@ synthesizeInspection :: Language -> Token -> Maybe Inspection
 synthesizeInspection language  target = operatorInspection <|> keywordInspection
   where
     operatorInspection :: Maybe Inspection
-    operatorInspection = fmap encodeUsageInspection . (Map.lookup target) . buildOperatorsTable . tokensTable $ language
+    operatorInspection = fmap encodeUsageInspection . parseOperator target . tokensTable $ language
 
     keywordInspection :: Maybe Inspection
     keywordInspection = Map.lookup target . keywordInspectionsTable $ language

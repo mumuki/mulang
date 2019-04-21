@@ -3,6 +3,8 @@
 module Language.Mulang.Operators (
   buildTokensTable,
   buildOperatorsTable,
+  parseOperator,
+  unparseOperator,
   Token,
   TokensTable,
   OperatorsTable) where
@@ -41,6 +43,12 @@ buildOperatorsTable :: TokensTable -> OperatorsTable
 buildOperatorsTable =  Map.fromList . concatMap (fill . swap) . Map.toList
   where
     fill (xs, t) = map (,t) xs
+
+unparseOperator :: Operator -> TokensTable -> Maybe Token
+unparseOperator target = fmap head . (Map.lookup target)
+
+parseOperator :: Token -> TokensTable -> Maybe Operator
+parseOperator target =  (Map.lookup target) . buildOperatorsTable
 
 
 
