@@ -2381,7 +2381,7 @@ stack ghci
 
 # Ruby wrapper
 
-This module can also be deployed a ruby gem. `mulang` works with Ruby 2.3.1
+This module can also be deployed a ruby gem. `mulang` works with Ruby 2.3+
 
 ## Building
 
