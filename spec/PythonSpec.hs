@@ -8,6 +8,7 @@ import           Language.Mulang.Parsers.Python
 
 import           Data.Text (Text, unpack)
 import           NeatInterpolation (text)
+import           Control.Exception (evaluate)
 
 run :: Text -> Expression
 run = py . unpack
@@ -104,6 +105,16 @@ except:
 
     it "parses raise expressions with exception" $ do
       py "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
+
+    it "parses raise expressions with exception in version2 format" $ do
+      py2 "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
+      py2 "raise Exception, 'something'" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
+      py2 "raise Exception" `shouldBe` Raise (Reference "Exception")
+
+    it "parses raise expressions with exception in version3 format" $ do
+      py3 "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
+      evaluate (py3 "raise Exception, 'something'") `shouldThrow` anyErrorCall
+      py3 "raise Exception" `shouldBe` Raise (Reference "Exception")
 
     it "parses lambdas" $ do
       py "lambda x: 1" `shouldBe` Lambda [VariablePattern "x"] (MuNumber 1)
