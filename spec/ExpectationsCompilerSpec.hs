@@ -9,7 +9,8 @@ import           Language.Mulang.Parsers.Java
 
 spec :: Spec
 spec = do
-  let run code scope inspection = compileExpectation (Expectation scope inspection) code
+  let runWithLanguage language code scope inspection = compileExpectation language (Expectation scope inspection) code
+  let run = runWithLanguage Nothing
 
   it "works with DeclaresEntryPoint" $ do
     run (hs "f x = 2") "*" "DeclaresEntryPoint" `shouldBe` False
@@ -255,3 +256,10 @@ spec = do
   it "works with primitive operators declarations in java" $ do
     run (java "public class Foo { public boolean equals(Object other) { return false; } }") "*" "DeclaresEqual" `shouldBe` True
     run (java "public class Foo { public boolean equals(Object other) { return false; } }") "*" "DeclaresHash" `shouldBe` False
+
+  it "works without expectation synthesis" $ do
+    runWithLanguage Nothing (hs "type X = Int") "*" "Uses:type" `shouldBe` False
+
+  it "works with expectation synthesis" $ do
+    runWithLanguage (Just Haskell) (hs "type X = Int") "*" "Declares:type" `shouldBe` True
+    runWithLanguage (Just Haskell) (hs "type X = Int") "*" "Uses:type" `shouldBe` True

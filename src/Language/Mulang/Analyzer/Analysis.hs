@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Language.Mulang.Analyzer.Analysis (
+  inferredLanguage,
   Expectation(..),
 
   Analysis(..),
@@ -53,7 +54,8 @@ data AnalysisSpec = AnalysisSpec {
   signatureAnalysisType :: Maybe SignatureAnalysisType,
   testAnalysisType :: Maybe TestAnalysisType,
   domainLanguage :: Maybe DomainLanguage,
-  includeIntermediateLanguage :: Maybe Bool
+  includeIntermediateLanguage :: Maybe Bool,
+  originalLanguage :: Maybe Language
 } deriving (Show, Eq, Generic)
 
 data DomainLanguage = DomainLanguage {
@@ -114,7 +116,6 @@ data Language
   |  Php
   deriving (Show, Eq, Generic)
 
-
 --
 -- Analysis Output structures
 --
@@ -133,4 +134,12 @@ data ExpectationResult = ExpectationResult {
   result :: Bool
 } deriving (Show, Eq, Generic)
 
+---
+--- Accessors
+---
+
+inferredLanguage :: Analysis -> Maybe Language
+inferredLanguage (Analysis _ AnalysisSpec { originalLanguage = Just language  }) = Just language
+inferredLanguage (Analysis (CodeSample language  _) _ )                          = Just language
+inferredLanguage _                                                               = Nothing
 

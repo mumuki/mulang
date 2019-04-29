@@ -4,23 +4,23 @@ module Language.Mulang.Analyzer.ExpectationsCompiler(
   compileExpectation) where
 
 import Language.Mulang
-import Language.Mulang.Analyzer.Analysis (Expectation(..))
-import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
+import Language.Mulang.Analyzer.Analysis (Expectation(..), Language)
+import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection, synthesizeUsageInspection, synthesizeDeclarationInspection)
 
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
 type Modifiers = (ContextualizedModifier, PredicateModifier)
 
-compileExpectation :: Expectation -> Inspection
-compileExpectation = fromMaybe (\_ -> True) . compileMaybe
+compileExpectation :: Maybe Language -> Expectation -> Inspection
+compileExpectation language = fromMaybe (\_ -> True) . compileMaybe language
 
-compileMaybe :: Expectation -> Maybe Inspection
-compileMaybe (Expectation s i) = do
+compileMaybe :: Maybe Language -> Expectation -> Maybe Inspection
+compileMaybe language (Expectation s i) = do
   let inspectionParts = splitOn ":" i
   let negator = compileNegator inspectionParts
   (scope, predicateModifier) <- compileModifiers (splitOn ":" s)
-  baseInspection             <- compileBaseInspection predicateModifier inspectionParts
+  baseInspection             <- compileLanguageInspection language predicateModifier inspectionParts
   return . negator . decontextualize . scope  $ baseInspection
 
 compileModifiers :: [String] -> Maybe Modifiers
@@ -37,13 +37,19 @@ compileNegator :: [String] -> Modifier
 compileNegator ("Not":_) = negative
 compileNegator _         = id
 
+compileLanguageInspection :: Maybe Language -> PredicateModifier -> [String] -> Maybe ContextualizedInspection
+compileLanguageInspection l p ("Not":parts)               = compileLanguageInspection l p parts
+compileLanguageInspection (Just l) p ["Uses", target]     | Just verb <- synthesizeUsageInspection l target       = compileBaseInspection p [verb]
+compileLanguageInspection (Just l) p ["Declares", target] | Just verb <- synthesizeDeclarationInspection l target = compileBaseInspection p [verb]
+compileLanguageInspection _ p parts                       = compileBaseInspection p parts
+
 compileBaseInspection :: PredicateModifier -> [String] -> Maybe ContextualizedInspection
-compileBaseInspection p ("Not":parts)                 = compileBaseInspection p parts
 compileBaseInspection p [verb]                        = compileBaseInspection p [verb, "*"]
 compileBaseInspection p [verb, object]                = compileBaseInspection p [verb, object, "With"]
 compileBaseInspection p (verb:"With":args)            = compileBaseInspection p (verb:"*":"With":args)
 compileBaseInspection p (verb:object:"With":args)     = fmap ($ (compileObject p object)) (compileInspectionPrimitive (verb:args))
 compileBaseInspection _ _                             = Nothing
+
 
 compileObject :: PredicateModifier -> String -> IdentifierPredicate
 compileObject p "*"        = p $ anyone
