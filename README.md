@@ -491,7 +491,7 @@ Mulang is an universal tool which can work with many different programming langu
   * Haskell
   * Java
   * JavaScript (ES5)
-  * Python
+  * Python (2 and 3)
   * Prolog
 
 In addition, through external tools, it offers support for the following languages:

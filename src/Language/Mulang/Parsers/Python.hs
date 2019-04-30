@@ -1,34 +1,48 @@
-module Language.Mulang.Parsers.Python (py, parsePython) where
+module Language.Mulang.Parsers.Python (
+  py,
+  py2,
+  py3,
+  parsePython,
+  parsePython2,
+  parsePython3) where
 
 import qualified Language.Mulang.Ast as M
-import Language.Mulang.Builder
-import Language.Mulang.Parsers
+import           Language.Mulang.Builder
+import           Language.Mulang.Parsers
 
-import Language.Python.Version3.Parser (parseModule)
-import Language.Python.Common.Token (Token)
-import Language.Python.Common.AST
+import qualified Language.Python.Version3.Parser as Python3
+import qualified Language.Python.Version2.Parser as Python2
+import           Language.Python.Common.Token (Token)
+import           Language.Python.Common.AST
 
-import Data.List (intercalate, isPrefixOf)
-import Data.Maybe (fromMaybe, listToMaybe)
+import           Data.List (intercalate, isPrefixOf)
+import           Data.Maybe (fromMaybe, listToMaybe)
 
-import Control.Fallible
+import           Control.Fallible
 
-py:: Parser
-py = orFail . parsePython'
 
-parsePython:: EitherParser
-parsePython = orLeft . parsePython'
+py, py2, py3 :: Parser
+py = py3
+py2 = parsePythonOrFail Python2.parseModule
+py3 = parsePythonOrFail Python3.parseModule
 
-parsePython' = fmap (normalize . muPyAST) . (`parseModule` "")
+parsePython, parsePython2, parsePython3 :: EitherParser
+parsePython = parsePython3
+parsePython2 = parsePythonOrLeft Python2.parseModule
+parsePython3 = parsePythonOrLeft Python3.parseModule
 
-muPyAST:: (ModuleSpan, [Token]) -> M.Expression
+parsePythonOrFail p = orFail . parsePython' p
+parsePythonOrLeft p = orLeft . parsePython' p
+parsePython' parseModule = fmap (normalize . muPyAST) . (`parseModule` "")
+
+muPyAST :: (ModuleSpan, [Token]) -> M.Expression
 muPyAST (modul, _) = muModule modul
 
-muModule:: ModuleSpan -> M.Expression
+muModule :: ModuleSpan -> M.Expression
 muModule (Module statements) = compactMap muStatement statements
 
 
-muStatement:: StatementSpan -> M.Expression
+muStatement :: StatementSpan -> M.Expression
 muStatement (While cond body _ _)             = M.While (muExpr cond) (muSuite body)
 muStatement (For targets generator body _ _)  = M.For [M.Generator (M.TuplePattern (map (M.VariablePattern . muVariable) targets)) (muExpr generator)] (muSuite body)
 muStatement (Fun name args _ body _)          = muComputation (muIdent name) (map muParameter args) (muSuite body)
@@ -99,17 +113,17 @@ containsReturn (M.Return _)    = True
 containsReturn (M.Sequence xs) = any containsReturn xs
 containsReturn _               = False
 
-muParameter:: ParameterSpan -> M.Pattern
+muParameter :: ParameterSpan -> M.Pattern
 muParameter (Param name _ _ _) = M.VariablePattern (muIdent name)
 
-muIdent:: IdentSpan -> String
+muIdent :: IdentSpan -> String
 muIdent (Ident id _) = id
 
-muSuite:: SuiteSpan -> M.Expression
+muSuite :: SuiteSpan -> M.Expression
 muSuite = compactMap muStatement
 
 
-muExpr:: ExprSpan -> M.Expression
+muExpr :: ExprSpan -> M.Expression
 muExpr (Var ident _)              = M.Reference (muIdent ident)
 muExpr (Int value _ _)            = muNumberFromInt value
 muExpr (LongInt value _ _)        = muNumberFromInt value
@@ -151,8 +165,8 @@ muExpr e                          = M.debug e
 
 muList = M.MuList . map muExpr
 
-muCallType (Dot _ (Ident "assertEqual" _) _) [a, b] = M.Assert False $ M.Equality a b 
-muCallType (Dot _ (Ident "assertTrue" _) _)  [a]    = M.Assert False $ M.Truth a 
+muCallType (Dot _ (Ident "assertEqual" _) _) [a, b] = M.Assert False $ M.Equality a b
+muCallType (Dot _ (Ident "assertTrue" _) _)  [a]    = M.Assert False $ M.Truth a
 muCallType (Dot _ (Ident "assertFalse" _) _) [a]    = M.Assert True $ M.Truth a
 muCallType (Dot receiver ident _)            x      = muCall (M.Send $ muExpr receiver) ident x
 muCallType (Var ident _)                     x      = muCall M.Application ident x
@@ -166,7 +180,7 @@ muString = M.MuString . intercalate "\n"
 
 muNumberFromInt = M.MuNumber . fromInteger
 
-muVariable:: ExprSpan -> M.Identifier
+muVariable :: ExprSpan -> M.Identifier
 muVariable (Var ident _) = muIdent ident
 
 muArgument (ArgExpr expr _)             = muExpr expr
@@ -233,9 +247,10 @@ muExceptClause (Just (except, maybeVar))  = muPattern maybeVar (M.TypePattern $ 
 muPattern Nothing = id
 muPattern (Just var) = M.AsPattern (muVarToId var)
 
-muRaiseExpr (RaiseV3 Nothing)           = M.None
-muRaiseExpr (RaiseV3 (Just (expr, _)))  = muExpr expr
---muRaiseExpr RaiseV2 (Maybe (Expr annot, (Maybe (Expr annot, Maybe (Expr annot))))) -- ^ /Version 2 only/.
+muRaiseExpr (RaiseV3 Nothing)                    = M.None
+muRaiseExpr (RaiseV3 (Just (expr, _)))           = muExpr expr
+muRaiseExpr (RaiseV2 (Just (ex, Nothing)))       = muExpr ex
+muRaiseExpr (RaiseV2 (Just (ex, Just (arg, _)))) = (M.Application (muExpr ex) [muExpr arg])
 
 -- Helpers
 

@@ -106,7 +106,9 @@ data Language
   |  JavaScript
   |  Prolog
   |  Haskell
-  |  Python deriving (Show, Eq, Generic)
+  |  Python
+  |  Python2
+  |  Python3 deriving (Show, Eq, Generic)
 
 --
 -- Analysis Output structures
