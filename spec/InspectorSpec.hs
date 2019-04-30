@@ -7,6 +7,7 @@ import           Language.Mulang
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Java (java)
+import           Language.Mulang.Parsers.Python (py2, py3)
 import           Language.Mulang.Inspector.Generic.Smell
 
 spec :: Spec
@@ -438,11 +439,17 @@ spec = do
       usesExceptions (hs "f = 4") `shouldBe` False
 
   describe "raises" $ do
-    it "is True when raises an expected exception" $ do
+    it "is True when raises an expected instance exception" $ do
       raises (named "RuntimeException") (java "class Sample { void aMethod() { throw new RuntimeException(); } }") `shouldBe` True
 
-    it "is False when raises an unexpected exception" $ do
-      raises (named "RuntimeException") (java "class Sample { void aMethod() { throw new Exception(); } }") `shouldBe` False
+    it "is True when raises an expected exception class" $ do
+      raises (named "Exception") (py2 "raise Exception") `shouldBe` True
+
+    it "is True when raises an expected exception application, python" $ do
+      raises (named "Exception") (py3 "raise Exception('ups')") `shouldBe` True
+
+    it "is True when raises an expected exception application, js" $ do
+      raises (named "Error") (js "throw Error('ups')") `shouldBe` True
 
   describe "rescues" $ do
     it "is True when rescues an expected exception" $ do
