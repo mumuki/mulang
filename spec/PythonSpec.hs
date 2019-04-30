@@ -22,6 +22,11 @@ spec = do
 
     it "parses booleans" $ do
       py "True" `shouldBe` MuBool True
+      py "False" `shouldBe` MuBool False
+
+    it "parses booleans in version2" $ do
+      py2 "True" `shouldBe` MuBool True
+      py2 "False" `shouldBe` MuBool False
 
     it "parses strings" $ do
       py "\"some string\"" `shouldBe` MuString "some string"

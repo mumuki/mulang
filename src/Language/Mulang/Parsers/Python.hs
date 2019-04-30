@@ -125,6 +125,8 @@ muSuite = compactMap muStatement
 
 
 muExpr :: ExprSpan -> M.Expression
+muExpr (Var (Ident "True" _) _)   = M.MuTrue
+muExpr (Var (Ident "False" _) _)  = M.MuFalse
 muExpr (Var ident _)              = M.Reference (muIdent ident)
 muExpr (Int value _ _)            = muNumberFromInt value
 muExpr (LongInt value _ _)        = muNumberFromInt value
