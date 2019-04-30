@@ -2,16 +2,34 @@ module CombinerSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang
+import           Language.Mulang.Inspector.Generic.Smell
 import           Language.Mulang.Parsers.Haskell
+import           Language.Mulang.Parsers.JavaScript
 
 spec :: Spec
 spec = do
   describe "detect" $ do
     it "can detect inspections" $ do
       let code = hs "x = if True then True else False\n\
-                 \y = 2\n\
-                 \z = if True then True else False"
+                    \y = 2\n\
+                    \z = if True then True else False"
       detect usesIf code `shouldBe` ["x", "z"]
+
+    it "can detect inspections at top level" $ do
+      detect doesConsolePrint (js "console.log(hello)") `shouldBe` []
+
+  describe "locate" $ do
+    it "can locate nested inspections" $ do
+      let code = hs "x = if True then True else False\n\
+                    \y = 2\n\
+                    \z = if True then True else False"
+      locate usesIf code `shouldBe` Nested ["x", "z"]
+
+    it "can locate inspections at top level" $ do
+      locate doesConsolePrint (js "console.log(hello)") `shouldBe` TopLevel
+
+    it "fails when inspection is not present" $ do
+      locate usesWhile (js "hello") `shouldBe` Nowhere
 
   describe "negate" $ do
     it "is False when inspection is true" $ do

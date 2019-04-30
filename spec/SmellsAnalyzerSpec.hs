@@ -27,7 +27,10 @@ spec = describe "SmellsAnalyzer" $ do
                                                     Expectation "fooBar" "HasWrongCaseIdentifiers"])
 
   describe "Using exclusion" $ do
-    it "works with empty set" $ do
+    it "works with empty set, in java" $ do
+      (runExcept Java "class Foo { static { System.out.println(\"foo\"); } }" []) `shouldReturn` (result [Expectation "Foo" "DoesConsolePrint"])
+
+    it "works with empty set, in haskell" $ do
       (runExcept Haskell "fun x = if x then True else False" []) `shouldReturn` (result [Expectation "fun" "HasRedundantIf"])
 
     describe "detect domain language violations" $ do
@@ -53,10 +56,17 @@ spec = describe "SmellsAnalyzer" $ do
                   "function foo() { return 1; }"
                   ["HasRedundantLocalVariableReturn"]) `shouldReturn` (result [])
 
-  describe "Using inclusion" $ do
-    it "works with empty set" $ do
-      (runOnly Haskell "f x = if x then True else False" []) `shouldReturn` (result [])
+    describe "works with top level detections" $ do
+      it "works with empty set, in Python" $ do
+        (runExcept Python "print(4)" []) `shouldReturn` (result [Expectation "*" "DoesConsolePrint"])
+
+      it "works with empty set, in JavaScript" $ do
+        (runExcept JavaScript "console.log(4)" []) `shouldReturn` (result [Expectation "*" "DoesConsolePrint"])
+
 
   describe "Using inclusion" $ do
-    it "works with empty set" $ do
+    it "works with empty set, in haskell" $ do
+      (runOnly Haskell "f x = if x then True else False" []) `shouldReturn` (result [])
+
+    it "works with empty set, in python" $ do
       (runExcept Python "def funcion():\n  if True:\n    pass\n  else:\n    return 1" []) `shouldReturn` (result [Expectation "funcion" "HasEmptyIfBranches"])

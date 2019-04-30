@@ -5,7 +5,7 @@ import Language.Mulang
 import Language.Mulang.Inspector.Generic.Smell
 import Language.Mulang.DomainLanguage
 import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage)
-import Data.List
+import Data.List ((\\))
 import Data.Maybe (fromMaybe)
 
 analyseSmells :: Expression -> DomainLanguage -> Maybe SmellsSet -> [Expectation]
@@ -86,10 +86,15 @@ unsupported :: Detection
 unsupported _ _ = []
 
 simple :: Inspection -> Detection
-simple inspection _ = detect inspection
+simple inspection _ = locate' inspection
 
 withLanguage :: (DomainLanguage -> Inspection) -> Detection
-withLanguage inspection language = detect (inspection language)
+withLanguage inspection language = locate' (inspection language)
 
 exectationFor :: Smell -> Identifier -> Expectation
 exectationFor smell identifier = Expectation identifier smell
+
+locate' inspection = identifiers . locate inspection
+  where identifiers Nowhere      = []
+        identifiers TopLevel     = ["*"]
+        identifiers (Nested ids) = ids
