@@ -451,9 +451,6 @@ spec = do
     it "is True when raises an expected exception application, js" $ do
       raises (named "Error") (js "throw Error('ups')") `shouldBe` True
 
-    it "is True when raises an expected exception" $ do
-      raises (named "RuntimeException") (java "class Sample { void aMethod() { throw new RuntimeException(); } }") `shouldBe` True
-
   describe "rescues" $ do
     it "is True when rescues an expected exception" $ do
       rescues (named "RuntimeException") (java "class Sample { void aMethod() { try { foo(); } catch (RuntimeException e) { } } }") `shouldBe` True
