@@ -81,7 +81,7 @@ spec = do
       py "def foo(): return 1" `shouldBe` SimpleFunction "foo" [] (Return (MuNumber 1.0))
 
     it "parses procedures" $ do
-      py "def foo(param): print(param)" `shouldBe` SimpleProcedure "foo" [VariablePattern "param"] (Application (Reference "print") [Reference "param"])
+      py "def foo(param): print(param)" `shouldBe` SimpleProcedure "foo" [VariablePattern "param"] (Print (Reference "param"))
 
     it "parses whiles" $ do
       py "while True: pass" `shouldBe` While (MuBool True) None
@@ -110,12 +110,12 @@ except:
       py "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "something"])
 
     it "parses raise expressions with exception in version2 format" $ do
-      py2 "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
-      py2 "raise Exception, 'something'" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
+      py2 "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "something"])
+      py2 "raise Exception, 'something'" `shouldBe` Raise (Application (Reference "Exception") [MuString "something"])
       py2 "raise Exception" `shouldBe` Raise (Reference "Exception")
 
     it "parses raise expressions with exception in version3 format" $ do
-      py3 "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
+      py3 "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "something"])
       evaluate (py3 "raise Exception, 'something'") `shouldThrow` anyErrorCall
       py3 "raise Exception" `shouldBe` Raise (Reference "Exception")
 
