@@ -52,7 +52,7 @@ muDeclaration name args decl = Sequence [ModuleSignature (i name) (map prettyPri
 
 muDecl :: Decl -> [Expression]
 muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
-muDecl e                       = return . debug $ e
+muDecl (InitDecl _ block)      = [muBlock block]
 
 muMemberDecl :: MemberDecl -> [Expression]
 muMemberDecl (FieldDecl _ typ varDecls)                              = concatMap (variableToAttribute.muVarDecl typ) varDecls

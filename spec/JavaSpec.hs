@@ -52,6 +52,12 @@ spec = do
     it "parses Interface with superinterfaces" $ do
       run "public interface Foo extends Bar, Baz {}" `shouldBe` Interface "Foo" ["Bar", "Baz"] None
 
+    it "parses Class With initializers" $ do
+      run [text|
+            class Foo {
+               static { System.out.println("hello"); }
+            }|] `shouldBe` Class "Foo" Nothing (Print (MuString "hello"))
+
     it "parses Class With Methods" $ do
       run [text|
             class Foo {
