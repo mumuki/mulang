@@ -1,11 +1,13 @@
 module Language.Mulang.Inspector.Combiner (
   detect,
+  locate,
   negative,
   alternative,
   scoped,
   scopedList,
   transitive,
   transitiveList,
+  Location (..),
   Modifier) where
 
 import Language.Mulang.Ast
@@ -14,10 +16,24 @@ import Language.Mulang.Inspector.Primitive
 
 type Modifier = Inspection -> Inspection
 
+data Location
+  = Nowhere                   -- ^ No subexpression match, nor the whole expression
+  | TopLevel                  -- ^ No subexpression match, but the whole expression
+  | Nested [Identifier]       -- ^ One ore more subexpressions match
+  deriving (Show, Eq)
+
+-- | Answers those identifiers that are bound to expressions that match the given inspection
 detect :: Inspection -> Expression -> [Identifier]
 detect i expression =
   filter (`inspection` expression) $ declaredIdentifiers expression
     where inspection = scoped' i
+
+-- | Answers the Locations of those expressions that match the given inspection
+locate :: Inspection -> Expression -> Location
+locate inspection expression
+  | identifiers@(_:_) <- detect inspection expression = Nested identifiers
+  | inspection expression = TopLevel
+  | otherwise = Nowhere
 
 alternative :: Inspection -> Modifier
 alternative i1 i2 expression = i1 expression || i2 expression
