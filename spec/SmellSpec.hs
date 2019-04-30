@@ -7,6 +7,7 @@ import           Language.Mulang.Ast
 import           Language.Mulang.Inspector.Generic.Smell
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)
+import           Language.Mulang.Parsers.Python (py)
 import           Language.Mulang.Parsers.Java (java)
 import           Language.Mulang.Parsers.Prolog (pl)
 
@@ -200,12 +201,27 @@ spec = do
     it "is False when there is no catch" $ do
       discardsExceptions (javaStatement "new Bar().baz();")  `shouldBe` False
 
-  describe "doesConsolePrint" $ do
-    it "is True java's system.out is used" $ do
+  describe "doesConsolePrint, in java" $ do
+    it "is True when java's system.out is used" $ do
       doesConsolePrint (javaStatement "int i = 4; System.out.println(4);") `shouldBe` True
 
     it "is False when no print is used" $ do
       doesConsolePrint (javaStatement "int i = 4; System.err.println(4);") `shouldBe` False
+
+  describe "doesConsolePrint, in javascript" $ do
+    it "is True when console.log is used" $ do
+      doesConsolePrint (js "console.log(4);") `shouldBe` True
+
+    it "is False when no print is used" $ do
+      doesConsolePrint (js "mylog.log(4);") `shouldBe` False
+
+  describe "doesConsolePrint, in python" $ do
+    it "is True when print is used" $ do
+      doesConsolePrint (py "print(4);") `shouldBe` True
+
+    it "is False when no print is used" $ do
+      doesConsolePrint (py "prune(4);") `shouldBe` False
+
 
   describe "hasLongParameterList" $ do
     it "is True when a function has over 4 parameters" $ do
@@ -263,7 +279,7 @@ spec = do
     it "is False when no equation follows " $ do
       hasUnreachableCode (runHaskell [text|
         foo _ = 1
-        |]) `shouldBe` False      
+        |]) `shouldBe` False
 
     it "is False when not all patterns match any value" $ do
       hasUnreachableCode (runHaskell [text|

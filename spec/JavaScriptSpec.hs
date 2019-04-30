@@ -54,7 +54,7 @@ spec = do
                 SimpleProcedure
                     "f"
                     [VariablePattern "x"]
-                    (Send (Reference "console") (Reference "log") [MuString "fruit"]))
+                    (Print (MuString "fruit")))
 
     it "multiple params function declaration" $ do
       js "function f(x, y) { return 1 }" `shouldBe` hs "f x y = 1"
