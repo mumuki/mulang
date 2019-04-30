@@ -145,9 +145,10 @@ declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
 
 raises :: BoundInspection
 raises predicate = containsExpression f
-  where f (Raise (New (Reference n) _)) = predicate n
-        f (Raise (Reference n))         = predicate n
-        f _                             = False
+  where f (Raise (New (Reference n) _))         = predicate n
+        f (Raise (Application (Reference n) _)) = predicate n
+        f (Raise (Reference n))                 = predicate n
+        f _                                     = False
 
 usesExceptions :: Inspection
 usesExceptions = containsExpression f
