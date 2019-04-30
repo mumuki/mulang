@@ -57,6 +57,7 @@ muJSStatement (JSLet _ list _)                                              = mu
 muJSStatement (JSWhile _ _ expression _ statement)                          = While (muJSExpression expression) (muJSStatement statement)
 muJSStatement e                                                             = debug e
 
+normalizeReference (SimpleSend  (Reference "console") "log"      [value])                    = Print value
 normalizeReference (SimpleSend  (Reference "assert") "equals"    [expected, actual])         = Assert False $ Equality expected actual
 normalizeReference (SimpleSend  (Reference "assert") "notEquals" [expected, actual])         = Assert True $ Equality expected actual
 normalizeReference (SimpleSend  (Reference "assert") "throws"    [block, error])             = Assert False $ Failure block error

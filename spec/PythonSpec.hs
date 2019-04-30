@@ -22,13 +22,21 @@ spec = do
 
     it "parses booleans" $ do
       py "True" `shouldBe` MuBool True
+      py "False" `shouldBe` MuBool False
+
+    it "parses booleans in version2" $ do
+      py2 "True" `shouldBe` MuBool True
+      py2 "False" `shouldBe` MuBool False
 
     it "parses strings" $ do
-      py "\"some string\"" `shouldBe` MuString "\"some string\""
+      py "\"some string\"" `shouldBe` MuString "some string"
+
+    it "parses strings sequences" $ do
+      py "\"hello\" \"world\"" `shouldBe` MuString "helloworld"
 
     it "parses multi-line strings" $ do
       run [text|"""some
-      string"""|] `shouldBe` MuString "\"\"\"some\nstring\"\"\""
+      string"""|] `shouldBe` MuString "some\nstring"
 
     it "parses lists" $ do
       py "[1,2,3]" `shouldBe` MuList [MuNumber 1, MuNumber 2, MuNumber 3]
@@ -78,7 +86,7 @@ spec = do
       py "def foo(): return 1" `shouldBe` SimpleFunction "foo" [] (Return (MuNumber 1.0))
 
     it "parses procedures" $ do
-      py "def foo(param): print(param)" `shouldBe` SimpleProcedure "foo" [VariablePattern "param"] (Application (Reference "print") [Reference "param"])
+      py "def foo(param): print(param)" `shouldBe` SimpleProcedure "foo" [VariablePattern "param"] (Print (Reference "param"))
 
     it "parses whiles" $ do
       py "while True: pass" `shouldBe` While (MuBool True) None
@@ -104,15 +112,15 @@ except:
       py "raise" `shouldBe` Raise None
 
     it "parses raise expressions with exception" $ do
-      py "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
+      py "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "something"])
 
     it "parses raise expressions with exception in version2 format" $ do
-      py2 "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
-      py2 "raise Exception, 'something'" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
+      py2 "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "something"])
+      py2 "raise Exception, 'something'" `shouldBe` Raise (Application (Reference "Exception") [MuString "something"])
       py2 "raise Exception" `shouldBe` Raise (Reference "Exception")
 
     it "parses raise expressions with exception in version3 format" $ do
-      py3 "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "'something'"])
+      py3 "raise Exception('something')" `shouldBe` Raise (Application (Reference "Exception") [MuString "something"])
       evaluate (py3 "raise Exception, 'something'") `shouldThrow` anyErrorCall
       py3 "raise Exception" `shouldBe` Raise (Reference "Exception")
 
@@ -120,7 +128,7 @@ except:
       py "lambda x: 1" `shouldBe` Lambda [VariablePattern "x"] (MuNumber 1)
 
     it "parses tuples" $ do
-      py "(1, \"something\")" `shouldBe` MuTuple [MuNumber 1, MuString "\"something\""]
+      py "(1, \"something\")" `shouldBe` MuTuple [MuNumber 1, MuString "something"]
 
     it "parses yields" $ do
       py "yield 1" `shouldBe` Yield (MuNumber 1)

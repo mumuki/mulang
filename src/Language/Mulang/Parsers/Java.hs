@@ -16,7 +16,7 @@ import Control.Fallible
 
 import Data.Maybe (fromMaybe)
 import Data.List (intercalate, partition)
-import Data.List.Extra (headOrElse)
+import Data.List.Extra (headOrElse, dropLast)
 import Data.Char (toLower)
 
 java :: Parser
@@ -52,7 +52,7 @@ muDeclaration name args decl = Sequence [ModuleSignature (i name) (map prettyPri
 
 muDecl :: Decl -> [Expression]
 muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
-muDecl e                       = return . debug $ e
+muDecl (InitDecl _ block)      = [muBlock block]
 
 muMemberDecl :: MemberDecl -> [Expression]
 muMemberDecl (FieldDecl _ typ varDecls)                              = concatMap (variableToAttribute.muVarDecl typ) varDecls
@@ -213,7 +213,3 @@ r (ClassType [(name, _)]) = i name
 j = parser compilationUnit
 
 ns = intercalate "." . map i
-
--- list helpers
-
-dropLast n xs = take (length xs - n) xs
