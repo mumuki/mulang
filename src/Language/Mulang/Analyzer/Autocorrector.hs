@@ -1,8 +1,10 @@
 module Language.Mulang.Analyzer.Autocorrector (autocorrect) where
 
 import           Language.Mulang.Analyzer.Analysis
+import           Language.Mulang.Analyzer.Synthesizer (encodeUsageInspection, encodeDeclarationInspection)
 
-import           Language.Mulang.Operators (Token, TokensTable)
+import           Language.Mulang.Ast (Operator)
+import           Language.Mulang.Operators (Token, OperatorsTable, buildOperatorsTable)
 import           Language.Mulang.Operators.Haskell (haskellTokensTable)
 import           Language.Mulang.Operators.Ruby (rubyTokensTable)
 import           Language.Mulang.Operators.Java (javaTokensTable)
@@ -27,7 +29,7 @@ autocorrect (Analysis f@(CodeSample { language = l } ) s)               = autoco
 autocorrect a                                                           = a
 
 autocorrectSpec :: AnalysisSpec -> AnalysisSpec
-autocorrectSpec s = runFixes [rulesFix, expectationsFix, emptyDomainLanguageFix, domainLanguageCaseStyleFix]
+autocorrectSpec s = runFixes [rulesFix, rulesAgumentationFix, expectationsFix, emptyDomainLanguageFix, domainLanguageCaseStyleFix]
   where
     runFixes = foldl combine s . map ($ (justOriginalLanguage s))
     combine s f | Just s' <- f s = s'
@@ -41,6 +43,17 @@ rulesFix :: Fix  -- (2)
 rulesFix l s = do
   AnalysisSpec { autocorrectionRules = Nothing } <- Just s
   return s { autocorrectionRules = Just (inferAutocorrectionRules l) }
+
+rulesAgumentationFix :: Fix
+rulesAgumentationFix l s = do
+  AnalysisSpec { autocorrectionRules = Just rules } <- Just s
+  return s { autocorrectionRules = Just (augment rules (inferOperatorsTable l)) }
+  where
+    augment :: AutocorrectionRules -> OperatorsTable -> AutocorrectionRules
+    augment rules tokens = Map.fromList (Map.toList rules ++ (concatMap encode . Map.toList) tokens)
+
+    encode :: (Token, Operator) -> [(Inspection, Inspection)]
+    encode (token, operator) = [("Uses:" ++ token, encodeUsageInspection operator), ("Declares" ++ token, encodeDeclarationInspection operator)]
 
 expectationsFix :: Fix -- (3)
 expectationsFix _ s = do
@@ -65,12 +78,12 @@ domainLanguageCaseStyleFix l s = do
 
 type Inference a = Language -> a
 
-inferTokensTable :: Inference TokensTable
-inferTokensTable Haskell = haskellTokensTable
-inferTokensTable Java    = javaTokensTable
-inferTokensTable Ruby    = rubyTokensTable
-inferTokensTable Python  = pythonTokensTable
-inferTokensTable _       = Map.empty
+inferOperatorsTable :: Inference OperatorsTable
+inferOperatorsTable Haskell = buildOperatorsTable haskellTokensTable
+inferOperatorsTable Java    = buildOperatorsTable javaTokensTable
+inferOperatorsTable Ruby    = buildOperatorsTable rubyTokensTable
+inferOperatorsTable Python  = buildOperatorsTable pythonTokensTable
+inferOperatorsTable _       = buildOperatorsTable Map.empty
 
 inferCaseStyle :: Inference CaseStyle
 inferCaseStyle Python  = RubyCase
