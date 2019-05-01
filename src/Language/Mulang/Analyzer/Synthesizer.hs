@@ -4,6 +4,7 @@ module Language.Mulang.Analyzer.Synthesizer (
   synthesizeUsageInspection,
   synthesizeDeclarationInspection,
   encodeUsageInspection,
+  encodeDeclarationInspection,
   decodeUsageInspection,
   decodeUsageInspection,
   decodeDeclarationInspection,
@@ -31,7 +32,6 @@ type Encoder = Operator -> Inspection
 type Decoder = Inspection -> Maybe Operator
 
 -- converts an operator into an inspection
-
 encodeUsageInspection :: Encoder
 encodeUsageInspection = encodeInspection "Uses"
 

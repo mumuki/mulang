@@ -70,6 +70,7 @@ library
     Language.Mulang.Analyzer
     Language.Mulang.Analyzer.Analysis
     Language.Mulang.Analyzer.Analysis.Json
+    Language.Mulang.Analyzer.Autocorrector
     Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.ExpectationsAnalyzer
     Language.Mulang.Analyzer.ExpectationsCompiler
