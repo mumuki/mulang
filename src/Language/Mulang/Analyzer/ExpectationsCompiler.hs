@@ -6,21 +6,22 @@ module Language.Mulang.Analyzer.ExpectationsCompiler(
 import Language.Mulang
 import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol)
 import Language.Mulang.Analyzer.Analysis (Expectation(..))
+import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
 
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
 type Modifiers = (ContextualizedModifier, PredicateModifier)
 
-compileExpectation :: Maybe Language -> Expectation -> Inspection
-compileExpectation language = fromMaybe (\_ -> True) . compileMaybe language
+compileExpectation :: Expectation -> Inspection
+compileExpectation = fromMaybe (\_ -> True) . compileMaybe
 
-compileMaybe :: Maybe Language -> Expectation -> Maybe Inspection
-compileMaybe language (Expectation s i) = do
+compileMaybe :: Expectation -> Maybe Inspection
+compileMaybe (Expectation s i) = do
   let inspectionParts = splitOn ":" i
   let negator = compileNegator inspectionParts
   (scope, predicateModifier) <- compileModifiers (splitOn ":" s)
-  baseInspection             <- compileLanguageInspection language predicateModifier inspectionParts
+  baseInspection             <- compileBaseInspection predicateModifier inspectionParts
   return . negator . decontextualize . scope  $ baseInspection
 
 compileModifiers :: [String] -> Maybe Modifiers
@@ -36,12 +37,6 @@ justScopeFor f name = Just (f names, andAlso (except (last names)))
 compileNegator :: [String] -> Modifier
 compileNegator ("Not":_) = negative
 compileNegator _         = id
-
-compileLanguageInspection :: Maybe Language -> PredicateModifier -> [String] -> Maybe ContextualizedInspection
-compileLanguageInspection l p ("Not":parts)               = compileLanguageInspection l p parts
-compileLanguageInspection (Just l) p ["Uses", target]     | Just verb <- synthesizeUsageInspection l target       = compileBaseInspection p [verb]
-compileLanguageInspection (Just l) p ["Declares", target] | Just verb <- synthesizeDeclarationInspection l target = compileBaseInspection p [verb]
-compileLanguageInspection _ p parts                       = compileBaseInspection p parts
 
 compileBaseInspection :: PredicateModifier -> [String] -> Maybe ContextualizedInspection
 compileBaseInspection p ("Not":parts)               = compileBaseInspection p parts

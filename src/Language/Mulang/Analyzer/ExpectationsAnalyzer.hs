@@ -7,10 +7,10 @@ import Language.Mulang
 import Language.Mulang.Analyzer.Analysis (Language, Expectation, ExpectationResult(..))
 import Language.Mulang.Analyzer.ExpectationsCompiler (compileExpectation)
 
-analyseExpectations :: Maybe Language -> Expression -> Maybe [Expectation] -> [ExpectationResult]
-analyseExpectations language content = map (analyseExpectation language content) . (fromMaybe [])
+analyseExpectations :: Expression -> Maybe [Expectation] -> [ExpectationResult]
+analyseExpectations content = map (analyseExpectation content) . (fromMaybe [])
 
-analyseExpectation :: Maybe Language -> Expression -> Expectation -> ExpectationResult
-analyseExpectation language ast e = ExpectationResult e (compileAndEval e)
-  where compileAndEval e = (compileExpectation language e) ast
+analyseExpectation :: Expression -> Expectation -> ExpectationResult
+analyseExpectation ast e = ExpectationResult e (compileAndEval e)
+  where compileAndEval e = (compileExpectation e) ast
 

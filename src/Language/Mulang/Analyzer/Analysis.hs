@@ -1,22 +1,39 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Language.Mulang.Analyzer.Analysis (
-  inferredLanguage,
+  noSmells,
+  allSmells,
+  noSmellsBut,
+  allSmellsBut,
+
+  emptyDomainLanguage,
+  emptyAnalysisSpec,
+
+  emptyAnalysis,
+  domainLanguageAnalysis,
+  expectationsAnalysis,
+  smellsAnalysis,
+  signaturesAnalysis,
+  testsAnalysis,
+
+  emptyCompletedAnalysisResult,
+
   Expectation(..),
 
   Analysis(..),
   AnalysisSpec(..),
-  SmellsSet(..),
-  DomainLanguage(..),
+  AutocorrectionRules,
   CaseStyle(..),
-  Smell,
-  Inspection,
-  SignatureAnalysisType(..),
-  TestAnalysisType(..),
-  InterpreterOptions(..),
-  SignatureStyle(..),
+  DomainLanguage(..),
   Fragment(..),
+  Inspection,
+  InterpreterOptions(..),
   Language(..),
+  SignatureAnalysisType(..),
+  SignatureStyle(..),
+  Smell,
+  SmellsSet(..),
+  TestAnalysisType(..),
 
   AnalysisResult(..),
   ExpectationResult(..)) where
@@ -26,6 +43,7 @@ import GHC.Generics
 import Language.Mulang.Ast
 import Language.Mulang.Builder (NormalizationOptions)
 import Language.Mulang.Interpreter.Runner (TestResult)
+import Data.Map.Strict (Map)
 
 ---
 -- Common structures
@@ -33,6 +51,7 @@ import Language.Mulang.Interpreter.Runner (TestResult)
 
 type Smell = String
 type Inspection = String
+type AutocorrectionRules = Map Inspection Inspection
 
 data Expectation = Expectation {
   binding :: String,
@@ -55,7 +74,8 @@ data AnalysisSpec = AnalysisSpec {
   testAnalysisType :: Maybe TestAnalysisType,
   domainLanguage :: Maybe DomainLanguage,
   includeIntermediateLanguage :: Maybe Bool,
-  originalLanguage :: Maybe Language
+  originalLanguage :: Maybe Language,
+  autocorrectionRules :: Maybe AutocorrectionRules
 } deriving (Show, Eq, Generic)
 
 data DomainLanguage = DomainLanguage {
@@ -134,12 +154,45 @@ data ExpectationResult = ExpectationResult {
   result :: Bool
 } deriving (Show, Eq, Generic)
 
----
---- Accessors
----
+--
+-- Builder functions
+--
 
-inferredLanguage :: Analysis -> Maybe Language
-inferredLanguage (Analysis _ AnalysisSpec { originalLanguage = Just language  }) = Just language
-inferredLanguage (Analysis (CodeSample language  _) _ )                          = Just language
-inferredLanguage _                                                               = Nothing
+noSmells :: Maybe SmellsSet
+noSmells = Just $ NoSmells Nothing
 
+noSmellsBut :: [Smell] -> Maybe SmellsSet
+noSmellsBut = Just . NoSmells . Just
+
+allSmells :: Maybe SmellsSet
+allSmells = Just $ AllSmells Nothing
+
+allSmellsBut :: [Smell] -> Maybe SmellsSet
+allSmellsBut = Just . AllSmells . Just
+
+emptyAnalysisSpec :: AnalysisSpec
+emptyAnalysisSpec = AnalysisSpec Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+emptyAnalysis :: Fragment -> Analysis
+emptyAnalysis code = Analysis code emptyAnalysisSpec
+
+domainLanguageAnalysis :: Fragment -> DomainLanguage -> Analysis
+domainLanguageAnalysis code domainLanguage = Analysis code (emptyAnalysisSpec { domainLanguage = Just domainLanguage, smellsSet = allSmells })
+
+expectationsAnalysis :: Fragment -> [Expectation] -> Analysis
+expectationsAnalysis code es = Analysis code (emptyAnalysisSpec { expectations = Just es })
+
+smellsAnalysis :: Fragment -> Maybe SmellsSet -> Analysis
+smellsAnalysis code set = Analysis code (emptyAnalysisSpec { smellsSet = set })
+
+signaturesAnalysis :: Fragment -> SignatureStyle -> Analysis
+signaturesAnalysis code style = Analysis code (emptyAnalysisSpec { signatureAnalysisType = Just (StyledSignatures style) })
+
+testsAnalysis :: Fragment -> TestAnalysisType -> Analysis
+testsAnalysis code testAnalysisType = Analysis code (emptyAnalysisSpec { testAnalysisType = Just testAnalysisType })
+
+emptyCompletedAnalysisResult :: AnalysisResult
+emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing
+
+emptyDomainLanguage :: DomainLanguage
+emptyDomainLanguage = DomainLanguage Nothing Nothing Nothing Nothing

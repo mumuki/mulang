@@ -1,101 +1,60 @@
 -- Module por synthesizing inspections
 -- from tokens, keywords and operators
 module Language.Mulang.Analyzer.Synthesizer (
-  synthesizeUsageInspection,
-  synthesizeDeclarationInspection,
   encodeUsageInspection,
-  decodeUsageInspection,
+  encodeDeclarationInspection,
   decodeUsageInspection,
   decodeDeclarationInspection,
+  generateInspectionEncodingRules,
+  generateOperatorEncodingRules
 ) where
 
-import           Language.Mulang.Analyzer.Analysis (Language(..), Inspection)
+import           Language.Mulang.Analyzer.Analysis (Inspection)
 
-import           Language.Mulang.Operators (parseOperator, Token, TokensTable)
-import           Language.Mulang.Operators.Haskell (haskellTokensTable)
-import           Language.Mulang.Operators.Ruby (rubyTokensTable)
-import           Language.Mulang.Operators.Java (javaTokensTable)
-import           Language.Mulang.Operators.Python (pythonTokensTable)
-import           Language.Mulang.Ast (Operator (..))
+import           Language.Mulang.Operators (Token)
+import           Language.Mulang.Ast (Operator)
 
-import           Control.Applicative ((<|>))
 import           Control.Monad ((>=>))
 
 import           Text.Read (readMaybe)
 import           Data.List (stripPrefix)
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
 
-type KeywordInspectionsTable = Map Token Inspection
-type Encoder = Operator -> Inspection
-type Decoder = Inspection -> Maybe Operator
+type Encoder a = a -> Inspection
+type Decoder a = Inspection -> Maybe a
+
+type EncodingRuleGenerator a b = (a, b) -> [(Inspection, Inspection)]
 
 -- converts an operator into an inspection
-
-encodeUsageInspection :: Encoder
+encodeUsageInspection :: Encoder Operator
 encodeUsageInspection = encodeInspection "Uses"
 
-encodeDeclarationInspection :: Encoder
+encodeDeclarationInspection :: Encoder Operator
 encodeDeclarationInspection = encodeInspection "Declares"
 
-encodeInspection :: String -> Encoder
+encodeInspection :: String -> Encoder Operator
 encodeInspection prefix = (prefix ++) . show
 
 -- extract an operator from an inspection
 
-decodeUsageInspection :: Decoder
+decodeUsageInspection :: Decoder Operator
 decodeUsageInspection = decodeInspection "Uses"
 
-decodeDeclarationInspection :: Decoder
+decodeDeclarationInspection :: Decoder Operator
 decodeDeclarationInspection = decodeInspection "Declares"
 
-decodeInspection :: String -> Decoder
+decodeInspection :: String -> Decoder Operator
 decodeInspection prefix = stripPrefix prefix >=> readMaybe
 
-tokensTable :: Language -> TokensTable
-tokensTable Haskell = haskellTokensTable
-tokensTable Java = javaTokensTable
-tokensTable Ruby = rubyTokensTable
-tokensTable Python = pythonTokensTable
+generateInspectionEncodingRules :: EncodingRuleGenerator Token Inspection
+generateInspectionEncodingRules = generateEncodingRules id id
 
-keywordInspectionsTable :: Language -> KeywordInspectionsTable
-keywordInspectionsTable Haskell =
-  Map.fromList [
-    ("type", "DeclaresTypeAlias"),
-    ("if", "UsesIf")
-  ]
-keywordInspectionsTable Java =
-  Map.fromList [
-    ("if", "UsesIf"),
-    ("class", "DeclaresClass"),
-    ("interface", "DeclaresInterface"),
-    ("for", "UsesForLoop")
-  ]
-keywordInspectionsTable Ruby =
-  Map.fromList [
-    ("if", "UsesIf"),
-    ("class", "DeclaresClass"),
-    ("def", "DeclaresComputation"),
-    ("for", "UsesForeach"),
-    ("include",  "Includes")
-  ]
-keywordInspectionsTable Python =
-  Map.fromList [
-    ("if", "UsesIf"),
-    ("class", "DeclaresClass"),
-    ("def", "DeclaresComputation"),
-    ("for", "UsesForeach")
-  ]
+generateOperatorEncodingRules :: EncodingRuleGenerator Token Operator
+generateOperatorEncodingRules = generateEncodingRules encodeUsageInspection encodeDeclarationInspection
 
-synthesizeDeclarationInspection, synthesizeUsageInspection :: Language -> Token -> Maybe Inspection
-synthesizeDeclarationInspection = synthesizeInspection encodeDeclarationInspection
-synthesizeUsageInspection = synthesizeInspection encodeUsageInspection
-
-synthesizeInspection :: Encoder -> Language -> Token -> Maybe Inspection
-synthesizeInspection encoder language  target = operatorInspection <|> keywordInspection
+generateEncodingRules :: Encoder a -> Encoder a -> EncodingRuleGenerator Token a
+generateEncodingRules usageEncoder declarationEncoder (k, v) = concatMap generateEncodingNegationRules baseEncodings
   where
-    operatorInspection :: Maybe Inspection
-    operatorInspection = fmap encoder . parseOperator target . tokensTable $ language
+    baseEncodings = [("Uses:" ++ k, usageEncoder v), ("Declares:" ++ k, declarationEncoder v)]
 
-    keywordInspection :: Maybe Inspection
-    keywordInspection = Map.lookup target . keywordInspectionsTable $ language
+    generateEncodingNegationRules :: EncodingRuleGenerator Inspection Inspection
+    generateEncodingNegationRules (k, v) = [(k, v), ("Not:" ++ k, "Not:" ++ v)]
