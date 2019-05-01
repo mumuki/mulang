@@ -23,14 +23,39 @@ autocorrect (Analysis f@(CodeSample { language = l } ) s)               = autoco
 autocorrect a                                                           = a
 
 autocorrectSpec :: Language -> AnalysisSpec -> AnalysisSpec
-autocorrectSpec l s@(AnalysisSpec { autocorrectionRules = Nothing }) = autocorrectSpec l s { autocorrectionRules = Just (inferAutocorrectionRules l) } -- (2)
--- autocorrectSpec l s@(AnalysisSpec { expectations = Just es })        = autocorrectSpec l s { expectations = Just (autocorrectExpectations l es) }
-autocorrectSpec l s@(AnalysisSpec { domainLanguage = Nothing })      = autocorrectSpec l s { domainLanguage = Just emptyDomainLanguage } -- (4)
-autocorrectSpec l s@(AnalysisSpec { domainLanguage = Just dl })      = s { domainLanguage = Just (autocorrectDomainLanguage l dl) }
+autocorrectSpec l s = runFixes [rulesFix, expectationsFix, emptyDomainLanguageFix, domainLanguageCaseStyleFix]
+  where
+    runFixes = foldl combine s . map ($l)
+    combine s f | Just s' <- f s = s'
+                | otherwise = s
 
-autocorrectDomainLanguage :: Language -> DomainLanguage -> DomainLanguage
-autocorrectDomainLanguage l dl@(DomainLanguage { caseStyle = Nothing }) = dl { caseStyle = Just (inferCaseStyle l) } -- (5)
-autocorrectDomainLanguage _ dl                                          = dl
+-- Fixes
+
+type Fix = Language -> AnalysisSpec -> Maybe AnalysisSpec
+
+rulesFix :: Fix  -- (2)
+rulesFix l s = do
+  AnalysisSpec { autocorrectionRules = Nothing } <- Just s
+  return s { autocorrectionRules = Just (inferAutocorrectionRules l) }
+
+expectationsFix :: Fix -- (3)
+expectationsFix l s = do
+  AnalysisSpec { expectations = Just es } <- Just s
+  return s { expectations = Just (autocorrectExpectations l es) }
+
+emptyDomainLanguageFix :: Fix  -- (4)
+emptyDomainLanguageFix l s = do
+  AnalysisSpec { domainLanguage = Nothing } <- Just s
+  return s { domainLanguage = Just emptyDomainLanguage }
+
+domainLanguageCaseStyleFix :: Fix -- (5)
+domainLanguageCaseStyleFix l s = do
+  AnalysisSpec { domainLanguage = Just dl } <- Just s
+  DomainLanguage { caseStyle = Nothing } <- Just dl
+  return s { domainLanguage = Just (dl { caseStyle = Just (inferCaseStyle l) }) }
+
+
+-- Misc
 
 autocorrectExpectations :: Language -> [Expectation] -> [Expectation]
 autocorrectExpectations l = map (autocorrectExpectation l)

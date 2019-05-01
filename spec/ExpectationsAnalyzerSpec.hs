@@ -136,10 +136,26 @@ spec = describe "ExpectationsAnalyzer" $ do
     let hasNot = Expectation "foo" "UsesNot"
     (run Haskell " foo " [hasNot]) `shouldReturn` (AnalysisFailed "Parse error")
 
-  it "works with expectation synthesis of declares" $ do
-    let declaresType = Expectation "*" "Declares:type"
-    run Haskell "type X = Int" [declaresType] `shouldReturn` (result [passed declaresType] [])
-
-  it "works with expectation synthesis of uses" $ do
+  it "works with keyword-based expectation synthesis of declares" $ do
     let usesType = Expectation "*" "Uses:type"
-    run Haskell "type X = Int" [usesType] `shouldReturn` (result [passed usesType] [])
+    let declaresTypeAlias = Expectation "*" "DeclaresTypeAlias"
+    run Haskell "type X = Int" [usesType] `shouldReturn` (result [passed declaresTypeAlias] [])
+
+  it "works with keyword-based expectation synthesis of uses" $ do
+    let usesType = Expectation "*" "Uses:type"
+    let declaresTypeAlias = Expectation "*" "DeclaresTypeAlias"
+    run Haskell "type X = Int" [usesType] `shouldReturn` (result [passed declaresTypeAlias] [])
+
+  it "works with operator-based expectation synthesis of declares" $ do
+    let declaresNot = Expectation "*" "Declares:not"
+    let usesNegation = Expectation "*" "UsesNegation"
+    run Haskell "x = not True" [declaresNot] `shouldReturn` (result [passed usesNegation] [])
+
+  it "works with operator-based expectation synthesis of uses" $ do
+    let usesNot = Expectation "*" "Uses:not"
+    let usesNegation = Expectation "*" "UsesNegation"
+    run Haskell "x = not True" [usesNot] `shouldReturn` (result [passed usesNegation] [])
+
+  it "works with operators" $ do
+    let usesNegation = Expectation "*" "UsesNegation"
+    run Haskell "x = not True" [usesNegation] `shouldReturn` (result [passed usesNegation] [])
