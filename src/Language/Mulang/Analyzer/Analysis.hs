@@ -18,7 +18,6 @@ module Language.Mulang.Analyzer.Analysis (
 
   emptyCompletedAnalysisResult,
 
-  inferredLanguage,
   Expectation(..),
 
   Analysis(..),
@@ -154,15 +153,6 @@ data ExpectationResult = ExpectationResult {
   expectation :: Expectation,
   result :: Bool
 } deriving (Show, Eq, Generic)
-
----
---- Accessors
----
-
-inferredLanguage :: Analysis -> Maybe Language
-inferredLanguage (Analysis _ AnalysisSpec { originalLanguage = Just language  }) = Just language
-inferredLanguage (Analysis (CodeSample language  _) _ )                          = Just language
-inferredLanguage _                                                               = Nothing
 
 --
 -- Builder functions

@@ -10,6 +10,7 @@ import Language.Mulang.Analyzer.FragmentParser (parseFragment)
 import Language.Mulang.Analyzer.SignaturesAnalyzer  (analyseSignatures)
 import Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
 import Language.Mulang.Analyzer.TestsAnalyzer  (analyseTests)
+import Language.Mulang.Analyzer.Autocorrector  (autocorrect)
 import Data.Maybe (fromMaybe)
 
 
@@ -19,11 +20,12 @@ import Data.Maybe (fromMaybe)
 
 analyse :: Analysis -> IO AnalysisResult
 analyse analysis@(Analysis sample spec) = analyseSample . parseFragment $ sample
-  where analyseSample (Right ast)    = analyseAst (inferredLanguage analysis) ast spec
+  where analyseSample (Right ast)    = analyseAst ast spec
         analyseSample (Left message) = return $ AnalysisFailed message
 
-analyseAst :: Maybe Language -> Expression -> AnalysisSpec -> IO AnalysisResult
-analyseAst lang ast spec = do
+analyseAst :: Expression -> AnalysisSpec -> IO AnalysisResult
+analyseAst ast spec = do
+  let lang = originalLanguage spec
   domaingLang <- compileDomainLanguage (domainLanguage spec)
   testResults <- analyseTests ast (testAnalysisType spec)
   return $ AnalysisCompleted (analyseExpectations lang ast (expectations spec))
