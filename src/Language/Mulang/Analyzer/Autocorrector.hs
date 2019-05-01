@@ -24,7 +24,7 @@ autocorrect a                                                           = a
 
 autocorrectSpec :: Language -> AnalysisSpec -> AnalysisSpec
 autocorrectSpec l s@(AnalysisSpec { autocorrectionRules = Nothing }) = autocorrectSpec l s { autocorrectionRules = Just (inferAutocorrectionRules l) } -- (2)
-autocorrectSpec l s@(AnalysisSpec { expectations = Just es })        = autocorrectSpec l s { expectations = Just (autocorrectExpectations l es) }
+-- autocorrectSpec l s@(AnalysisSpec { expectations = Just es })        = autocorrectSpec l s { expectations = Just (autocorrectExpectations l es) }
 autocorrectSpec l s@(AnalysisSpec { domainLanguage = Nothing })      = autocorrectSpec l s { domainLanguage = Just emptyDomainLanguage } -- (4)
 autocorrectSpec l s@(AnalysisSpec { domainLanguage = Just dl })      = s { domainLanguage = Just (autocorrectDomainLanguage l dl) }
 

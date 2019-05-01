@@ -18,8 +18,10 @@ import Data.Maybe (fromMaybe)
 -- Analysis running
 --
 
-analyse :: Analysis -> IO AnalysisResult
-analyse analysis@(Analysis sample spec) = analyseSample . parseFragment $ sample
+analyse, analyse' :: Analysis -> IO AnalysisResult
+analyse = analyse' . autocorrect
+
+analyse' (Analysis sample spec) = analyseSample . parseFragment $ sample
   where analyseSample (Right ast)    = analyseAst ast spec
         analyseSample (Left message) = return $ AnalysisFailed message
 
