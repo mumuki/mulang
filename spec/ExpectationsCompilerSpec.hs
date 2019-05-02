@@ -227,6 +227,10 @@ spec = do
     run (java "class Foo implements Bar {}") "Foo" "Implements:Bar" `shouldBe` True
     run (java "class Foo implements Bar {}") "Foo" "Implements:Baz" `shouldBe` False
 
+  it "works with Print" $ do
+    run (java "public class Foo { public static void main() { } }") "*" "UsesPrint" `shouldBe` False
+    run (java "public class Foo { public static void main() { System.out.println((5).equals(6)); } }") "*" "UsesPrint" `shouldBe` True
+
   it "works with Inherits" $ do
     run (java "class Foo extends Bar {}") "Foo" "Inherits:Bar" `shouldBe` True
     run (java "class Foo extends Bar {}") "Foo" "Inherits:Baz" `shouldBe` False
@@ -235,3 +239,22 @@ spec = do
     run (java "class Foo implements Bar {}") "Foo" "Implements:[Bar|Baz|Foobar]" `shouldBe` True
     run (java "class Foo implements Baz {}") "Foo" "Implements:[Bar|Baz|Foobar]" `shouldBe` True
     run (java "class Foo implements Foobaz {}") "Foo" "Implements:[Bar|Baz|Foobar]" `shouldBe` False
+
+  it "works with primitive operators in js" $ do
+    run (js "x == 4") "*" "UsesEqual" `shouldBe` True
+    run (js "x != 4") "*" "UsesEqual" `shouldBe` False
+
+  it "works with primitive operators in hs" $ do
+    run (hs "x = x . y") "*" "UsesForwardComposition" `shouldBe` False
+    run (hs "x = x . y") "*" "UsesBackwardComposition" `shouldBe` True
+
+  it "works with primitive operators usages in java" $ do
+    run (java "public class Foo { public static void main() { System.out.println((5).equals(6)); } }") "*" "UsesHash" `shouldBe` False
+    run (java "public class Foo { public static void main() { System.out.println((5).equals(6)); } }") "*" "UsesEqual" `shouldBe` True
+
+  it "works with primitive operators declarations in java" $ do
+    run (java "public class Foo { public boolean equals(Object other) { return false; } }") "*" "DeclaresEqual" `shouldBe` True
+    run (java "public class Foo { public boolean equals(Object other) { return false; } }") "*" "DeclaresHash" `shouldBe` False
+
+  it "does not mix keywords with inspections" $ do
+    run (hs "type X = Int") "*" "Uses:type" `shouldBe` False

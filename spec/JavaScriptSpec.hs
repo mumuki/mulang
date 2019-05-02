@@ -93,10 +93,10 @@ spec = do
       js "true" `shouldBe` MuTrue
 
     it "handles negation" $ do
-      js "!true" `shouldBe` (Application (Reference "!") [MuTrue])
+      js "!true" `shouldBe` (Application (Primitive Negation) [MuTrue])
 
     it "handles boolean binary operations" $ do
-      js "true || false " `shouldBe` (Application (Reference "||") [MuTrue, MuFalse])
+      js "true || false " `shouldBe` (Application (Primitive Or) [MuTrue, MuFalse])
 
     it "handles lambdas" $ do
       js "(function(x, y) { 1 })" `shouldBe` (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1))

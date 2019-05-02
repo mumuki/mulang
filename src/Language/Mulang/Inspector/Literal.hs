@@ -1,7 +1,7 @@
 module Language.Mulang.Inspector.Literal (isLiteral) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Inspector.Primitive (containsExpression, Inspection)
+import Language.Mulang.Inspector.Primitive (Inspection)
 
 import Text.Read (readMaybe)
 

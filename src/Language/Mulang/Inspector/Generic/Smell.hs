@@ -1,7 +1,10 @@
+{-# LANGUAGE ViewPatterns #-}
+
 module Language.Mulang.Inspector.Generic.Smell (
   hasRedundantBooleanComparison,
   hasRedundantIf,
   hasRedundantGuards,
+  shouldUseOtherwise,
   hasRedundantLambda,
   hasRedundantParameter,
   hasRedundantLocalVariableReturn,
@@ -22,7 +25,7 @@ import Language.Mulang.Ast
 import Language.Mulang.Generator (identifierReferences)
 import Language.Mulang.Inspector.Primitive
 
--- | Inspection that tells whether an identifier has expressions like 'x == True'
+-- | Inspection that tells whether an expression has expressions like 'x == True'
 hasRedundantBooleanComparison :: Inspection
 hasRedundantBooleanComparison = compares isBooleanLiteral
 
@@ -44,16 +47,16 @@ isLongCode = containsExpression f
 compares :: (Expression -> Bool) -> Inspection
 compares f = containsExpression (any f.comparisonOperands)
 
-comparisonOperands (Call Equal    [a1, a2])   = [a1, a2]
-comparisonOperands (Call NotEqual [a1, a2])   = [a1, a2]
-comparisonOperands _                          = []
+comparisonOperands (Call (Primitive Equal)    [a1, a2])   = [a1, a2]
+comparisonOperands (Call (Primitive NotEqual) [a1, a2])   = [a1, a2]
+comparisonOperands _                                      = []
 
 returnsNil :: Inspection
 returnsNil = containsExpression f
   where f (Return MuNil) = True
         f _              = False
 
--- | Inspection that tells whether an identifier has an if expression where both branches return
+-- | Inspection that tells whether an expression has an if expression where both branches return
 -- boolean literals
 hasRedundantIf :: Inspection
 hasRedundantIf = containsExpression f
@@ -64,24 +67,28 @@ hasRedundantIf = containsExpression f
         f (If _ x y)                                 = all isBooleanLiteral [x, y]
         f _                                          = False
 
--- | Inspection that tells whether an identifier has guards where both branches return
+-- | Inspection that tells whether an expression has guards where both branches return
 -- boolean literals
 hasRedundantGuards :: Inspection
 hasRedundantGuards = containsBody f -- TODO not true when condition is a pattern
   where f (GuardedBody [
             (_, Return x),
-            (Reference "otherwise", Return y)]) = all isBooleanLiteral [x, y]
+            (Primitive Otherwise, Return y)]) = all isBooleanLiteral [x, y]
         f _ = False
 
+-- | Inspection that tells whether an expression has guards with a hardcoded false instead of an otherwise
+shouldUseOtherwise :: Inspection
+shouldUseOtherwise = containsBody f
+  where f (GuardedBody (last -> (MuTrue, _))) = True
+        f _                                   = False
 
--- | Inspection that tells whether an identifier has lambda expressions like '\x -> g x'
+-- | Inspection that tells whether an expression has lambda expressions like '\x -> g x'
 hasRedundantLambda :: Inspection
 hasRedundantLambda = containsExpression f
   where f (Lambda [VariablePattern (x)] (Return (Call _ [Reference (y)]))) = x == y
         f _ = False
 
-
--- | Inspection that tells whether an identifier has parameters that
+-- | Inspection that tells whether an expression has parameters that
 -- can be avoided using point-free
 hasRedundantParameter :: Inspection
 hasRedundantParameter = containsExpression f
@@ -114,7 +121,6 @@ discardsExceptions = containsExpression f
         f (Try _ [(_, Print _)] _) = True
         f _                        = False
 
-
 doesConsolePrint :: Inspection
 doesConsolePrint = containsExpression f
   where f (Print _) = True
@@ -136,14 +142,14 @@ hasTooManyMethods = containsExpression f
 overridesEqualOrHashButNotBoth :: Inspection
 overridesEqualOrHashButNotBoth = containsExpression f
   where f (Sequence expressions) = (any isEqual expressions) /= (any isHash expressions)
-        f (Class _ _ (EqualMethod _)) = True
-        f (Class _ _ (HashMethod _)) = True
+        f (Class _ _ (PrimitiveMethod Equal _)) = True
+        f (Class _ _ (PrimitiveMethod Hash _)) = True
         f _ = False
 
-        isEqual (EqualMethod _) = True
+        isEqual (PrimitiveMethod Equal _) = True
         isEqual _ = False
 
-        isHash (HashMethod _) = True
+        isHash (PrimitiveMethod Hash _) = True
         isHash _ = False
 
 hasEmptyIfBranches :: Inspection
@@ -153,10 +159,10 @@ hasEmptyIfBranches = containsExpression f
 
 hasUnreachableCode :: Inspection
 hasUnreachableCode = containsExpression f
-  where f subroutine@(Subroutine _ equations) = any equationMatchesAnyValue . init $ equations 
-        f _                                   = False
-        
-        equationMatchesAnyValue (Equation patterns body) = all patternMatchesAnyValue patterns && bodyMatchesAnyValue body       
+  where f (Subroutine _ equations) = any equationMatchesAnyValue . init $ equations
+        f _                        = False
+
+        equationMatchesAnyValue (Equation patterns body) = all patternMatchesAnyValue patterns && bodyMatchesAnyValue body
 
         patternMatchesAnyValue WildcardPattern     = True
         patternMatchesAnyValue (VariablePattern _) = True
@@ -166,5 +172,5 @@ hasUnreachableCode = containsExpression f
         bodyMatchesAnyValue (GuardedBody guards) = any (isTruthy . fst) guards
 
         isTruthy (MuBool True)           = True
-        isTruthy (Reference "otherwise") = True
+        isTruthy (Primitive Otherwise)   = True
         isTruthy _                       = False

@@ -416,6 +416,20 @@ spec = do
     it "is False when using a matcher that does not match" $ do
       (callsMatching (with "1") anyone) (hs "f = g 2") `shouldBe` False
 
+  describe "usesBooleanLogic" $ do
+    it "is when it is used" $ do
+      usesBooleanLogic (hs "f x y = x || y")   `shouldBe` True
+      usesBooleanLogic (hs "f x y = x && y")   `shouldBe` True
+      usesBooleanLogic (hs "f x y = not x")    `shouldBe` True
+      usesBooleanLogic (hs "f x y = (not) x")  `shouldBe` True
+      usesBooleanLogic (hs "f x y = (&&) x y") `shouldBe` True
+
+    it "is is not used otherwise" $ do
+      usesBooleanLogic (hs "f x y = x + y") `shouldBe` False
+      usesBooleanLogic (hs "f x y = x")     `shouldBe` False
+      usesBooleanLogic (hs "f x y = and x") `shouldBe` False
+      usesBooleanLogic (hs "f x y = or x")  `shouldBe` False
+
   describe "usesExceptions" $ do
     it "is True when a raise is used, java" $ do
       usesExceptions (java "class Sample { void aMethod() { throw new RuntimeException(); } }") `shouldBe` True
@@ -465,8 +479,11 @@ spec = do
     it "is True when required function is used as argument" $ do
       uses (named "m") (hs "y x = x m") `shouldBe` True
 
+    it "is False with primitives" $ do
+      uses (named "&&") (hs "y x = x && z") `shouldBe` False
+
     it "is True when required function is used as operator" $ do
-      uses (named "&&" )(hs "y x = x && z") `shouldBe` True
+      uses (named "<>") (hs "y x = x <> z") `shouldBe` True
 
     it "is False when required function is not used in constant" $ do
       uses (named "m") (hs "y = 3") `shouldBe` False
@@ -565,6 +582,32 @@ spec = do
     it "is True through message send in objects" $ do
       transitive "p" (uses (named "m")) (js "var o = {g: function(){ m }}\n\
                                         \var p = {n: function() { o.g() }}") `shouldBe` True
+
+  describe "usesPrimitive, hs" $ do
+    it "is True when required primitive is used on application" $ do
+      usesPrimitive And (hs "y x = x && z") `shouldBe` True
+      usesPrimitive BackwardComposition (hs "y x = x . z") `shouldBe` True
+      usesPrimitive Negation (hs "y x = not z") `shouldBe` True
+
+    it "is True when required primitive is used as argument" $ do
+      usesPrimitive And (hs "y x = f (&&) y z") `shouldBe` True
+
+    it "is False when primitive is just apparently used" $ do
+      usesPrimitive And (hs "y x = and x") `shouldBe` False
+
+    it "is False when primitive is not used" $ do
+      usesPrimitive Negation (hs "y x = m x") `shouldBe` False
+
+  describe "usesPrimitive, js" $ do
+    it "is True when required primitive is used on application" $ do
+      usesPrimitive And (js "x && z") `shouldBe` True
+      usesPrimitive Negation (js "function () { return !z }") `shouldBe` True
+
+    it "is False when primitive is just apparently used" $ do
+      usesPrimitive Or (js "or(x)") `shouldBe` False
+
+    it "is False when primitive is not used" $ do
+      usesPrimitive ForwardComposition (js "f(g(x))") `shouldBe` False
 
   describe "declaresComputation" $ do
     describe "with constants" $ do

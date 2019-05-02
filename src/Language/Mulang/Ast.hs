@@ -24,6 +24,7 @@ module Language.Mulang.Ast (
     Pattern(..),
     Identifier,
     SubroutineBody,
+    Operator(..),
     debug,
     debugType,
     debugPattern,
@@ -32,6 +33,7 @@ module Language.Mulang.Ast (
     pattern SimpleProcedure,
     pattern SimpleMethod,
     pattern SimpleSend,
+    pattern PrimitiveSend,
     pattern SubroutineSignature,
     pattern VariableSignature,
     pattern ModuleSignature,
@@ -104,8 +106,7 @@ data Expression
     | Procedure Identifier SubroutineBody
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
     | Method Identifier SubroutineBody
-    | EqualMethod SubroutineBody
-    | HashMethod SubroutineBody
+    | PrimitiveMethod Operator SubroutineBody
     | Variable Identifier Expression
     | Assignment Identifier Expression
     | Attribute Identifier Expression
@@ -135,6 +136,9 @@ data Expression
     -- ^ Logic programming universal cuantification
     | Reference Identifier
     -- ^ Generic variable
+    | Primitive Operator
+    -- ^ Reference to special, low level, universal operations like logical operaions and math, that may or may not be primitives
+    -- in the original language
     | Application Expression [Expression]
     -- ^ Generic, non-curried application of a function or procedure, composed by the applied element itself, and the application arguments
     | Send Expression Expression [Expression]
@@ -168,8 +172,6 @@ data Expression
     -- ^ Generic sequence of statements
     | Other (Maybe Code) (Maybe Expression)
     -- ^ Unrecognized expression, with optional description and body
-    | Equal
-    | NotEqual
     | Self
     | None
     -- ^ Generic value indicating an absent expression, such as when there is no finally in a try or default in a switch or js' undefined
@@ -195,6 +197,31 @@ data Expression
     -- ^ Generic test expression such as it, etc.
     | Assert Bool Assertion
     -- ^ Generic assertion expression such as assert, expect, etc. The first parameter indicates whether the assertion is negated or not
+  deriving (Eq, Show, Read, Generic, Ord)
+
+data Operator
+    = Equal
+    -- equal operator
+    | NotEqual
+    -- ^ distinct operator
+    | Negation
+    -- ^ not operator
+    | And
+    -- ^ and operator
+    | Or
+    -- ^ or operator
+    | Hash
+    -- ^ hashcode operator
+    | GreatherOrEqualThan
+    | GreatherThan
+    | LessOrEqualThan
+    | LessThan
+    | Otherwise
+    -- ^ guard's otherwise operator
+    | ForwardComposition
+    -- (f >> g)(x) = (g . f)(x) = g(f(x)) operator
+    | BackwardComposition
+    -- (f << g)(x) = (f . g)(x) = f(g(x)) operator
   deriving (Eq, Show, Read, Generic, Ord)
 
 data Assertion
@@ -254,6 +281,7 @@ pattern ModuleSignature name cs            = TypeSignature name (ConstrainedType
 pattern SimpleEquation params body = Equation params (UnguardedBody body)
 
 pattern SimpleSend receptor selector args = Send receptor (Reference selector) args
+pattern PrimitiveSend receptor selector args = Send receptor (Primitive selector) args
 
 pattern SimpleFunction name params body  = Function  name [SimpleEquation params body]
 pattern SimpleProcedure name params body = Procedure name [SimpleEquation params body]

@@ -1,8 +1,11 @@
+{-# LANGUAGE ViewPatterns #-}
+
 module Language.Mulang.Analyzer.ExpectationsCompiler(
   compileExpectation) where
 
 import Language.Mulang
 import Language.Mulang.Analyzer.Analysis (Expectation(..))
+import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
 
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
@@ -35,12 +38,16 @@ compileNegator ("Not":_) = negative
 compileNegator _         = id
 
 compileBaseInspection :: PredicateModifier -> [String] -> Maybe ContextualizedInspection
-compileBaseInspection p ("Not":parts)                 = compileBaseInspection p parts
-compileBaseInspection p [verb]                        = compileBaseInspection p [verb, "*"]
-compileBaseInspection p [verb, object]                = compileBaseInspection p [verb, object, "With"]
-compileBaseInspection p (verb:"With":args)            = compileBaseInspection p (verb:"*":"With":args)
-compileBaseInspection p (verb:object:"With":args)     = fmap ($ (compileObject p object)) (compileInspectionPrimitive (verb:args))
-compileBaseInspection _ _                             = Nothing
+compileBaseInspection p ("Not":parts)               = compileBaseInspection p parts
+compileBaseInspection p parts                       = compileAffirmativeInspection p parts
+
+compileAffirmativeInspection :: PredicateModifier -> [String] -> Maybe ContextualizedInspection
+compileAffirmativeInspection p [verb]                        = compileAffirmativeInspection p [verb, "*"]
+compileAffirmativeInspection p [verb, object]                = compileAffirmativeInspection p [verb, object, "With"]
+compileAffirmativeInspection p (verb:"With":args)            = compileAffirmativeInspection p (verb:"*":"With":args)
+compileAffirmativeInspection p (verb:object:"With":args)     = fmap ($ (compileObject p object)) (compileInspectionPrimitive (verb:args))
+compileAffirmativeInspection _ _                             = Nothing
+
 
 compileObject :: PredicateModifier -> String -> IdentifierPredicate
 compileObject p "*"        = p $ anyone
@@ -89,12 +96,13 @@ compileInspectionPrimitive = f
   f ["Instantiates"]                   = bound instantiates
   f ["Raises"]                         = bound raises
   f ["Rescues"]                        = bound rescues
+  f ["Returns", value]                 = plain (returnsMatching (with value))
   f ["TypesAs"]                        = bound typesAs
   f ["TypesParameterAs"]               = bound typesParameterAs
   f ["TypesReturnAs"]                  = bound typesReturnAs
-  f ["Returns", value]                 = plain (returnsMatching (with value))
   f ["Uses"]                           = bound uses
   f ["UsesAnonymousVariable"]          = plain usesAnonymousVariable
+  f ["UsesBooleanLogic"]               = plain usesBooleanLogic
   f ["UsesComposition"]                = plain usesComposition
   f ["UsesComprehension"]              = f ["UsesForComprehension"]
   f ["UsesConditional"]                = plain usesConditional
@@ -117,6 +125,7 @@ compileInspectionPrimitive = f
   f ["UsesNot"]                        = plain usesNot
   f ["UsesObjectComposition"]          = plain usesObjectComposition
   f ["UsesPatternMatching"]            = plain usesPatternMatching
+  f ["UsesPrint"]                      = plain usesPrint
   f ["UsesRepeat"]                     = plain usesRepeat
   f ["UsesStaticMethodOverload"]       = plain usesStaticMethodOverload
   f ["UsesStaticPolymorphism"]         = contextualized usesStaticPolymorphism'
@@ -125,7 +134,13 @@ compileInspectionPrimitive = f
   f ["UsesType"]                       = bound usesType
   f ["UsesWhile"]                      = plain usesWhile
   f ["UsesYield"]                      = plain usesYield
-  f _                                = Nothing
+  f [primitiveUsage -> Just p]         = plain (usesPrimitive p)
+  f [primitiveDeclaration -> Just p]   = plain (declaresPrimitive p)
+  f _                                  = Nothing
+
+  primitiveUsage = decodeUsageInspection
+  primitiveDeclaration = decodeDeclarationInspection
+
 
   contextualized :: ContextualizedInspection -> Maybe ContextualizedBoundInspection
   contextualized = Just . contextualizedBind

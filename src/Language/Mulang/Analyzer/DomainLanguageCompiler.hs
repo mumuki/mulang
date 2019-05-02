@@ -1,5 +1,4 @@
 module Language.Mulang.Analyzer.DomainLanguageCompiler (
-  emptyDomainLanguage,
   compileDomainLanguage) where
 
 import           Data.Maybe (fromMaybe)
@@ -8,9 +7,6 @@ import qualified Language.Mulang.DomainLanguage as DL
 import           Text.Inflections.Tokenizer (camelCase, rubyCase, snakeCase)
 import           Text.Dictionary (fromFile, toDictionary)
 
-
-emptyDomainLanguage :: DomainLanguage
-emptyDomainLanguage = DomainLanguage Nothing Nothing Nothing Nothing
 
 compileDomainLanguage :: Maybe DomainLanguage -> IO DL.DomainLanguage
 compileDomainLanguage Nothing                                 = compileDomainLanguage (Just emptyDomainLanguage)

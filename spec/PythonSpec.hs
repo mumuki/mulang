@@ -69,7 +69,7 @@ spec = do
       py "1;2;3" `shouldBe` Sequence [MuNumber 1, MuNumber 2, MuNumber 3]
 
     it "parses unary operators" $ do
-      py "not True" `shouldBe` (Application (Reference "not") [MuBool True])
+      py "not True" `shouldBe` (Application (Primitive Negation) [MuBool True])
 
     it "parses classes" $ do
       py "class DerivedClassName: pass" `shouldBe` Class "DerivedClassName" Nothing None

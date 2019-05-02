@@ -36,6 +36,7 @@ library
     Language.Mulang.Ast
     Language.Mulang.Identifier
     Language.Mulang.Builder
+    Language.Mulang.Unbuilder
     Language.Mulang.Generator
     Language.Mulang.Signature
     Language.Mulang.DomainLanguage
@@ -58,13 +59,23 @@ library
     Language.Mulang.Inspector.Typed
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
-    Language.Mulang.Parsers.Prolog
     Language.Mulang.Parsers.Java
     Language.Mulang.Parsers.JavaScript
+    Language.Mulang.Parsers.Prolog
     Language.Mulang.Parsers.Python
+    Language.Mulang.Operators
+    Language.Mulang.Operators.Haskell
+    Language.Mulang.Operators.Java
+    Language.Mulang.Operators.Python
+    Language.Mulang.Operators.Ruby
+    Language.Mulang.Unparsers
+    Language.Mulang.Unparsers.Java
+    Language.Mulang.Unparsers.Python
+    Language.Mulang.Unparsers.Ruby
     Language.Mulang.Analyzer
     Language.Mulang.Analyzer.Analysis
     Language.Mulang.Analyzer.Analysis.Json
+    Language.Mulang.Analyzer.Autocorrector
     Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.ExpectationsAnalyzer
     Language.Mulang.Analyzer.ExpectationsCompiler
@@ -73,6 +84,7 @@ library
     Language.Mulang.Analyzer.SignatureStyleCompiler
     Language.Mulang.Analyzer.SmellsAnalyzer
     Language.Mulang.Analyzer.TestsAnalyzer
+    Language.Mulang.Analyzer.Synthesizer
     Language.Mulang.Interpreter
     Language.Mulang.Interpreter.Runner
 

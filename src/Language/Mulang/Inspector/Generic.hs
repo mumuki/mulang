@@ -19,10 +19,13 @@ module Language.Mulang.Inspector.Generic (
   returnsMatching,
   uses,
   usesAnonymousVariable,
+  usesBooleanLogic,
   usesExceptionHandling,
   usesExceptions,
   usesFor,
   usesIf,
+  usesPrimitive,
+  usesPrint,
   usesYield) where
 
 import Language.Mulang.Ast
@@ -55,6 +58,11 @@ uses :: BoundInspection
 uses p = containsExpression f
   where f = any p . referencedIdentifiers
 
+usesPrimitive :: Operator -> Inspection
+usesPrimitive operator = containsExpression f
+  where f (Primitive o) = operator == o
+        f _             = False
+
 calls :: BoundInspection
 calls = unmatching callsMatching
 
@@ -83,6 +91,11 @@ usesIf = containsExpression f
 usesYield :: Inspection
 usesYield = containsExpression f
   where f (Yield _) = True
+        f _         = False
+
+usesPrint :: Inspection
+usesPrint = containsExpression f
+  where f (Print _) = True
         f _         = False
 
 usesFor :: Inspection
@@ -142,6 +155,13 @@ declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
         equationArityIs (Equation args _) = argsHaveArity args
 
         argsHaveArity = arityPredicate.length
+
+usesBooleanLogic :: Inspection
+usesBooleanLogic = containsExpression f
+  where f (Primitive Negation) = True
+        f (Primitive And)      = True
+        f (Primitive Or)       = True
+        f _                    = False
 
 raises :: BoundInspection
 raises predicate = containsExpression f

@@ -4,7 +4,7 @@ module Language.Mulang.Analyzer.SmellsAnalyzer (
 import Language.Mulang
 import Language.Mulang.Inspector.Generic.Smell
 import Language.Mulang.DomainLanguage
-import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage)
+import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage, Inspection, allSmells)
 import Data.List ((\\))
 import Data.Maybe (fromMaybe)
 
@@ -31,6 +31,7 @@ allSmells = [
   "HasMisspelledIdentifiers",
   "HasRedundantBooleanComparison",
   "HasRedundantGuards",
+  "ShouldUseOtherwise",
   "HasRedundantIf",
   "HasRedundantLambda",
   "HasRedundantLocalVariableReturn",
@@ -61,6 +62,7 @@ detectionFor "HasMisspelledBindings"           = withLanguage hasMisspelledIdent
 detectionFor "HasMisspelledIdentifiers"        = withLanguage hasMisspelledIdentifiers
 detectionFor "HasRedundantBooleanComparison"   = simple hasRedundantBooleanComparison
 detectionFor "HasRedundantGuards"              = simple hasRedundantGuards
+detectionFor "ShouldUseOtherwise"              = simple shouldUseOtherwise
 detectionFor "HasRedundantIf"                  = simple hasRedundantIf
 detectionFor "HasRedundantLambda"              = simple hasRedundantLambda
 detectionFor "HasRedundantLocalVariableReturn" = simple hasRedundantLocalVariableReturn

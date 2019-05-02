@@ -83,13 +83,13 @@ spec = do
       hasRedundantBooleanComparison (hs "f x = True") `shouldBe` False
 
     it "is True when comparing self with a boolean, using a message" $ do
-      hasRedundantBooleanComparison (Send Self Equal [MuBool True]) `shouldBe` True
+      hasRedundantBooleanComparison (PrimitiveSend Self Equal [MuBool True]) `shouldBe` True
 
     it "is True when comparing a boolean with a reference, using a message" $ do
-      hasRedundantBooleanComparison (Send (MuBool False) NotEqual [Reference "x"]) `shouldBe` True
+      hasRedundantBooleanComparison (PrimitiveSend (MuBool False) NotEqual [Reference "x"]) `shouldBe` True
 
     it "is False when comparing references" $ do
-      hasRedundantBooleanComparison (Send (Reference "y") Equal [Reference "x"]) `shouldBe` False
+      hasRedundantBooleanComparison (PrimitiveSend (Reference "y") Equal [Reference "x"]) `shouldBe` False
 
   describe "hasRedundantLocalVariableReturn" $ do
     it "is True when local variable is not necessary" $ do
@@ -190,6 +190,23 @@ spec = do
 
     it "is False when there is no guard" $ do
       hasRedundantGuards (hs "x = False") `shouldBe` False
+
+  describe "shouldUseOtherwise" $ do
+    it "is True when there are two guards and last one is a True" $ do
+      shouldUseOtherwise (hs "f x | c x = True\n\
+                             \    | True = False") `shouldBe` True
+
+    it "is True when there are three guards and last one is a True" $ do
+      shouldUseOtherwise (hs "f x | c x = True\n\
+                             \    | g x = False\n\
+                             \    | True = False") `shouldBe` True
+
+    it "is True when last guard is an otherwsie" $ do
+      shouldUseOtherwise (hs "f x | c x = True\n\
+                             \    | otherwise = False") `shouldBe` False
+
+    it "is False when there no guards" $ do
+      shouldUseOtherwise (hs "f x = True") `shouldBe` False
 
   describe "discardsExceptions" $ do
     it "is True when there is an empty catch" $ do

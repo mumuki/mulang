@@ -1,6 +1,8 @@
 module Language.Mulang.Parsers.Haskell (hs, parseHaskell) where
 
 import Language.Mulang.Ast
+import Language.Mulang.Operators.Haskell (haskellTokensTable)
+import Language.Mulang.Operators (parseOperator)
 import Language.Mulang.Builder (compact, normalizeWith, defaultNormalizationOptions, NormalizationOptions(..), SequenceSortMode(..))
 import Language.Mulang.Parsers
 
@@ -106,8 +108,7 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muLit (HsDoublePrim  v) = MuNumber . fromRational $ v
 
     muVar :: String -> Expression
-    muVar "==" = Equal
-    muVar "/=" = NotEqual
+    muVar v | (Just op) <- parseOperator v haskellTokensTable = Primitive op
     muVar v = Reference v
 
     muName :: HsName -> String
