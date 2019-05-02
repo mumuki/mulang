@@ -148,8 +148,8 @@ spec = describe "ExpectationsAnalyzer" $ do
 
   it "works with operator-based expectation synthesis of declares" $ do
     let declaresNot = Expectation "*" "Declares:not"
-    let usesNegation = Expectation "*" "UsesNegation"
-    run Haskell "x = not True" [declaresNot] `shouldReturn` (result [passed usesNegation] [])
+    let usesNegation = Expectation "*" "DeclaresNegation"
+    run Haskell "x = not True" [declaresNot] `shouldReturn` (result [failed usesNegation] [])
 
   it "works with operator-based expectation synthesis of uses" $ do
     let usesNot = Expectation "*" "Uses:not"

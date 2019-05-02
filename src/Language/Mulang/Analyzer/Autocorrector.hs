@@ -50,10 +50,10 @@ rulesAgumentationFix l s = do
   return s { autocorrectionRules = Just (augment rules (inferOperatorsTable l)) }
   where
     augment :: AutocorrectionRules -> OperatorsTable -> AutocorrectionRules
-    augment rules tokens = Map.fromList (Map.toList rules ++ (concatMap encode . Map.toList) tokens)
+    augment rules tokens = Map.fromList (Map.toList rules ++ (concatMap encodeEntry . Map.toList) tokens)
 
-    encode :: (Token, Operator) -> [(Inspection, Inspection)]
-    encode (token, operator) = [("Uses:" ++ token, encodeUsageInspection operator), ("Declares" ++ token, encodeDeclarationInspection operator)]
+    encodeEntry :: (Token, Operator) -> [(Inspection, Inspection)]
+    encodeEntry (token, operator) = concatMap (\(k, v) -> [(k, v), ("Not:" ++ k, "Not:" ++ v)]) [("Uses:" ++ token, encodeUsageInspection operator), ("Declares:" ++ token, encodeDeclarationInspection operator)]
 
 expectationsFix :: Fix -- (3)
 expectationsFix _ s = do
@@ -79,11 +79,13 @@ domainLanguageCaseStyleFix l s = do
 type Inference a = Language -> a
 
 inferOperatorsTable :: Inference OperatorsTable
-inferOperatorsTable Haskell = buildOperatorsTable haskellTokensTable
-inferOperatorsTable Java    = buildOperatorsTable javaTokensTable
-inferOperatorsTable Ruby    = buildOperatorsTable rubyTokensTable
-inferOperatorsTable Python  = buildOperatorsTable pythonTokensTable
-inferOperatorsTable _       = buildOperatorsTable Map.empty
+inferOperatorsTable = buildOperatorsTable . inferOperatorsTable'
+  where
+    inferOperatorsTable' Haskell = haskellTokensTable
+    inferOperatorsTable' Java    = javaTokensTable
+    inferOperatorsTable' Ruby    = rubyTokensTable
+    inferOperatorsTable' Python  = pythonTokensTable
+    inferOperatorsTable' _       = Map.empty
 
 inferCaseStyle :: Inference CaseStyle
 inferCaseStyle Python  = RubyCase
@@ -99,32 +101,32 @@ inferAutocorrectionRules = buildAutocorrectorRules . inferAutocorrectionRules'
     buildAutocorrectorRules = Map.fromList . concatMap encodeEntry
 
     encodeEntry :: (Token, Inspection) -> [(Inspection, Inspection)]
-    encodeEntry (token, inspection) = map (\e -> (e token, inspection)) [("Uses:" ++), ("Declares:"++)]
+    encodeEntry (token, inspection) = concatMap (\(k, v) -> [(k, v), ("Not:" ++ k, "Not:" ++ v)]) . map (\e -> (e token, inspection)) $ [("Uses:" ++), ("Declares:"++)]
 
-inferAutocorrectionRules' Haskell = [
-    ("type", "DeclaresTypeAlias"),
-    ("if", "UsesIf")
-  ]
-inferAutocorrectionRules' Java = [
-    ("if", "UsesIf"),
-    ("class", "DeclaresClass"),
-    ("interface", "DeclaresInterface"),
-    ("for", "UsesForLoop")
-  ]
-inferAutocorrectionRules' Ruby = [
-    ("if", "UsesIf"),
-    ("class", "DeclaresClass"),
-    ("def", "DeclaresComputation"),
-    ("for", "UsesForeach"),
-    ("include",  "Includes")
-  ]
-inferAutocorrectionRules' Python = [
-    ("if", "UsesIf"),
-    ("class", "DeclaresClass"),
-    ("def", "DeclaresComputation"),
-    ("for", "UsesForeach")
-  ]
-inferAutocorrectionRules' _ = []
+    inferAutocorrectionRules' Haskell = [
+        ("type", "DeclaresTypeAlias"),
+        ("if", "UsesIf")
+      ]
+    inferAutocorrectionRules' Java = [
+        ("if", "UsesIf"),
+        ("class", "DeclaresClass"),
+        ("interface", "DeclaresInterface"),
+        ("for", "UsesForLoop")
+      ]
+    inferAutocorrectionRules' Ruby = [
+        ("if", "UsesIf"),
+        ("class", "DeclaresClass"),
+        ("def", "DeclaresComputation"),
+        ("for", "UsesForeach"),
+        ("include",  "Includes")
+      ]
+    inferAutocorrectionRules' Python = [
+        ("if", "UsesIf"),
+        ("class", "DeclaresClass"),
+        ("def", "DeclaresComputation"),
+        ("for", "UsesForeach")
+      ]
+    inferAutocorrectionRules' _ = []
 
 -- Misc
 

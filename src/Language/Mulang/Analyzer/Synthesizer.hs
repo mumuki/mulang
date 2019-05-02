@@ -1,11 +1,8 @@
 -- Module por synthesizing inspections
 -- from tokens, keywords and operators
 module Language.Mulang.Analyzer.Synthesizer (
-  synthesizeUsageInspection,
-  synthesizeDeclarationInspection,
   encodeUsageInspection,
   encodeDeclarationInspection,
-  decodeUsageInspection,
   decodeUsageInspection,
   decodeDeclarationInspection,
 ) where
@@ -51,51 +48,3 @@ decodeDeclarationInspection = decodeInspection "Declares"
 
 decodeInspection :: String -> Decoder
 decodeInspection prefix = stripPrefix prefix >=> readMaybe
-
-tokensTable :: Language -> TokensTable
-tokensTable Haskell = haskellTokensTable
-tokensTable Java = javaTokensTable
-tokensTable Ruby = rubyTokensTable
-tokensTable Python = pythonTokensTable
-
-keywordInspectionsTable :: Language -> KeywordInspectionsTable
-keywordInspectionsTable Haskell =
-  Map.fromList [
-    ("type", "DeclaresTypeAlias"),
-    ("if", "UsesIf")
-  ]
-keywordInspectionsTable Java =
-  Map.fromList [
-    ("if", "UsesIf"),
-    ("class", "DeclaresClass"),
-    ("interface", "DeclaresInterface"),
-    ("for", "UsesForLoop")
-  ]
-keywordInspectionsTable Ruby =
-  Map.fromList [
-    ("if", "UsesIf"),
-    ("class", "DeclaresClass"),
-    ("def", "DeclaresComputation"),
-    ("for", "UsesForeach"),
-    ("include",  "Includes")
-  ]
-keywordInspectionsTable Python =
-  Map.fromList [
-    ("if", "UsesIf"),
-    ("class", "DeclaresClass"),
-    ("def", "DeclaresComputation"),
-    ("for", "UsesForeach")
-  ]
-
-synthesizeDeclarationInspection, synthesizeUsageInspection :: Language -> Token -> Maybe Inspection
-synthesizeDeclarationInspection = synthesizeInspection encodeDeclarationInspection
-synthesizeUsageInspection = synthesizeInspection encodeUsageInspection
-
-synthesizeInspection :: Encoder -> Language -> Token -> Maybe Inspection
-synthesizeInspection encoder language  target = operatorInspection <|> keywordInspection
-  where
-    operatorInspection :: Maybe Inspection
-    operatorInspection = fmap encoder . parseOperator target . tokensTable $ language
-
-    keywordInspection :: Maybe Inspection
-    keywordInspection = Map.lookup target . keywordInspectionsTable $ language
