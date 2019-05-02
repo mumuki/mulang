@@ -350,9 +350,6 @@ dereference ref = do
 updateGlobalObjects f context =
   context { globalObjects = f $ globalObjects context }
 
-updateLocalVariables f context =
-  context { scopes = f $ scopes context }
-
 incrementRef (Reference n) = Reference $ n + 1
 
 createReference :: Value -> Executable Reference
