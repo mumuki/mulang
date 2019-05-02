@@ -1,9 +1,8 @@
 module Language.Mulang.Analyzer.Autocorrector (autocorrect) where
 
 import           Language.Mulang.Analyzer.Analysis
-import           Language.Mulang.Analyzer.Synthesizer (encodeUsageInspection, encodeDeclarationInspection)
+import           Language.Mulang.Analyzer.Synthesizer (generateOperatorEncodingRules, generateInspectionEncodingRules)
 
-import           Language.Mulang.Ast (Operator)
 import           Language.Mulang.Operators (Token, OperatorsTable, buildOperatorsTable)
 import           Language.Mulang.Operators.Haskell (haskellTokensTable)
 import           Language.Mulang.Operators.Ruby (rubyTokensTable)
@@ -20,9 +19,10 @@ import qualified Data.Map.Strict as Map
 --
 --  1. fills originalLanguage when it is not present but can be inferred from the code sample
 --  2. fills the autocorrectionRules when they are not present but can be inferred from the originalLanguage
---  3. corrects the expectations' inspections using the autocorrectionRules
---  4. fills the domainLanguage rules when it is not present but can be inferred from the originalLanguage
---  5. fills the domainLanguage's caseStyle when it is not present but can be inferred from the originalLanguage
+--  3. aguments the autocorrectionRules with operators-based rules when they can be inferred from the originalLanguage
+--  4. corrects the expectations' inspections using the autocorrectionRules
+--  5. fills the domainLanguage rules when it is not present but can be inferred from the originalLanguage
+--  6. fills the domainLanguage's caseStyle when it is not present but can be inferred from the originalLanguage
 autocorrect :: Analysis -> Analysis
 autocorrect (Analysis f s@(AnalysisSpec { originalLanguage = Just _ })) = Analysis f (autocorrectSpec s)
 autocorrect (Analysis f@(CodeSample { language = l } ) s)               = autocorrect (Analysis f s { originalLanguage = Just l }) -- (1)
@@ -44,18 +44,15 @@ rulesFix l s = do
   AnalysisSpec { autocorrectionRules = Nothing } <- Just s
   return s { autocorrectionRules = Just (inferAutocorrectionRules l) }
 
-rulesAgumentationFix :: Fix
+rulesAgumentationFix :: Fix -- (3)
 rulesAgumentationFix l s = do
   AnalysisSpec { autocorrectionRules = Just rules } <- Just s
-  return s { autocorrectionRules = Just (augment rules (inferOperatorsTable l)) }
+  return s { autocorrectionRules = Just (augmentRules rules (inferOperatorsTable l)) }
   where
-    augment :: AutocorrectionRules -> OperatorsTable -> AutocorrectionRules
-    augment rules tokens = Map.fromList (Map.toList rules ++ (concatMap encodeEntry . Map.toList) tokens)
+    augmentRules :: AutocorrectionRules -> OperatorsTable -> AutocorrectionRules
+    augmentRules rules tokens = Map.fromList (Map.toList rules ++ (concatMap generateOperatorEncodingRules . Map.toList) tokens)
 
-    encodeEntry :: (Token, Operator) -> [(Inspection, Inspection)]
-    encodeEntry (token, operator) = concatMap (\(k, v) -> [(k, v), ("Not:" ++ k, "Not:" ++ v)]) [("Uses:" ++ token, encodeUsageInspection operator), ("Declares:" ++ token, encodeDeclarationInspection operator)]
-
-expectationsFix :: Fix -- (3)
+expectationsFix :: Fix -- (4)
 expectationsFix _ s = do
   AnalysisSpec { expectations = Just es } <- Just s
   return s { expectations = Just (map autocorrectExpectation es) }
@@ -63,12 +60,12 @@ expectationsFix _ s = do
     autocorrectExpectation :: Expectation -> Expectation
     autocorrectExpectation (Expectation b i) = Expectation b . fromMaybe i . Map.lookup i . justAutocorrectionRules $ s
 
-emptyDomainLanguageFix :: Fix  -- (4)
+emptyDomainLanguageFix :: Fix  -- (5)
 emptyDomainLanguageFix _ s = do
   AnalysisSpec { domainLanguage = Nothing } <- Just s
   return s { domainLanguage = Just emptyDomainLanguage }
 
-domainLanguageCaseStyleFix :: Fix -- (5)
+domainLanguageCaseStyleFix :: Fix -- (6)
 domainLanguageCaseStyleFix l s = do
   AnalysisSpec { domainLanguage = Just dl } <- Just s
   DomainLanguage { caseStyle = Nothing } <- Just dl
@@ -79,13 +76,15 @@ domainLanguageCaseStyleFix l s = do
 type Inference a = Language -> a
 
 inferOperatorsTable :: Inference OperatorsTable
-inferOperatorsTable = buildOperatorsTable . inferOperatorsTable'
+inferOperatorsTable = buildOperatorsTable . table
   where
-    inferOperatorsTable' Haskell = haskellTokensTable
-    inferOperatorsTable' Java    = javaTokensTable
-    inferOperatorsTable' Ruby    = rubyTokensTable
-    inferOperatorsTable' Python  = pythonTokensTable
-    inferOperatorsTable' _       = Map.empty
+    table Haskell = haskellTokensTable
+    table Java    = javaTokensTable
+    table Ruby    = rubyTokensTable
+    table Python  = pythonTokensTable
+    table Python2 = pythonTokensTable
+    table Python3 = pythonTokensTable
+    table _       = Map.empty
 
 inferCaseStyle :: Inference CaseStyle
 inferCaseStyle Python  = RubyCase
@@ -95,38 +94,37 @@ inferCaseStyle Ruby    = RubyCase
 inferCaseStyle _       = CamelCase
 
 inferAutocorrectionRules :: Inference AutocorrectionRules
-inferAutocorrectionRules = buildAutocorrectorRules . inferAutocorrectionRules'
+inferAutocorrectionRules = buildRules . rules
   where
-    buildAutocorrectorRules :: [(Token, Inspection)] -> AutocorrectionRules
-    buildAutocorrectorRules = Map.fromList . concatMap encodeEntry
+    buildRules :: [(Token, Inspection)] -> AutocorrectionRules
+    buildRules = Map.fromList . concatMap generateInspectionEncodingRules
 
-    encodeEntry :: (Token, Inspection) -> [(Inspection, Inspection)]
-    encodeEntry (token, inspection) = concatMap (\(k, v) -> [(k, v), ("Not:" ++ k, "Not:" ++ v)]) . map (\e -> (e token, inspection)) $ [("Uses:" ++), ("Declares:"++)]
-
-    inferAutocorrectionRules' Haskell = [
+    rules Haskell = [
         ("type", "DeclaresTypeAlias"),
         ("if", "UsesIf")
       ]
-    inferAutocorrectionRules' Java = [
+    rules Java = [
         ("if", "UsesIf"),
         ("class", "DeclaresClass"),
         ("interface", "DeclaresInterface"),
         ("for", "UsesForLoop")
       ]
-    inferAutocorrectionRules' Ruby = [
+    rules Ruby = [
         ("if", "UsesIf"),
         ("class", "DeclaresClass"),
         ("def", "DeclaresComputation"),
         ("for", "UsesForeach"),
         ("include",  "Includes")
       ]
-    inferAutocorrectionRules' Python = [
+    rules Python = [
         ("if", "UsesIf"),
         ("class", "DeclaresClass"),
         ("def", "DeclaresComputation"),
         ("for", "UsesForeach")
       ]
-    inferAutocorrectionRules' _ = []
+    rules Python2 = rules Python
+    rules Python3 = rules Python
+    rules _ = []
 
 -- Misc
 
