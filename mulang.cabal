@@ -1,5 +1,5 @@
 name:                mulang
-version:             4.5.0
+version:             4.5.1
 synopsis:            An intermediate language designed to perform advanced code analysis
 description:         Mulang is an intermediate language, a combinators library for static code analysis and a multilanguage comand line tool
 license:             GPL-3.0
