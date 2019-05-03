@@ -95,6 +95,12 @@ spec = do
 
       usesLoop code `shouldBe` True
 
+    it "is True when a for-of is present" $ do
+      let code = js "function printAll(list) { for (let e of list) { console.log(e) } }"
+
+      usesForEach code `shouldBe` True
+      usesLoop code `shouldBe` True
+
     it "is False when none of the aforementioned are present" $ do
       let code = js "function f(x){return 1;}"
 

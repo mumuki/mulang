@@ -177,11 +177,23 @@ spec = do
     it "handles c-style for with var" $ do
       run "for(var i = 0; i < 3; i++) i;" `shouldBe` ForLoop (Variable "i" (MuNumber 0)) (js "i < 3") (js "i++") (Reference "i")
 
-    it "handles for in" $ do
-      run "for(i in [1,2]) i;" `shouldBe` For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
+    describe "for generator" $ do
+      let generatorAst = For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
 
-    it "handles for var in" $ do
-      run "for(var i in [1,2]) i;" `shouldBe` For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
+      it "handles for in" $ do
+        run "for(i in [1,2]) i;" `shouldBe` generatorAst
+
+      it "handles for var in" $ do
+        run "for(var i in [1,2]) i;" `shouldBe` generatorAst
+
+      it "handles for let of" $ do
+        run "for(let i of [1,2]) i;" `shouldBe` generatorAst
+
+      it "handles for var of" $ do
+        run "for(var i of [1,2]) i;" `shouldBe` generatorAst
+
+      it "handles for let in" $ do
+        run "for(let i in [1,2]) i;" `shouldBe` generatorAst
 
     context "handles assertions" $ do
       it "handles truth assertions" $ do
