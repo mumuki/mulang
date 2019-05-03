@@ -1,30 +1,23 @@
 module Language.Mulang.Inspector.Matcher (
   unmatching,
-  thatEvery,
-  that,
-  with,
   withEvery,
+  with,
   Matcher) where
 
 import           Language.Mulang.Ast
 import           Language.Mulang.Inspector.Primitive (Inspection)
-import           Language.Mulang.Inspector.Literal (isLiteral)
 
 type Matcher = [Expression] -> Bool
 
-thatEvery :: [Inspection] -> Matcher
-thatEvery inspections expressions = and (zipWith ($) inspections expressions)
+-- | Creates a simple matcher that evaluates the given inspection only againts the first of its arguments
+with :: Inspection -> Matcher
+with inspection = inspection . head
 
-that :: Inspection -> Matcher
-that inspection = inspection . head
+-- | Creates a matcher using a list of inspections
+-- The resultant matcher evaluates each inspection against each of its arguments
+withEvery :: [Inspection] -> Matcher
+withEvery inspections expressions = and (zipWith ($) inspections expressions)
 
 unmatching :: (Matcher -> b) -> b
 unmatching f = f (const True)
 
--- Special, simplified matchers
-
-with :: Code -> Matcher
-with = that . isLiteral
-
-withEvery :: [Code] -> Matcher
-withEvery = thatEvery . map isLiteral
