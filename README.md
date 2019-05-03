@@ -519,22 +519,25 @@ You can also use Mulang from the Command Line, without having to interact with H
 
 In order to pass expectations to the Command Line Tool, you must use a simple DSL that builds the inspections for you.
 
-| Kind              | DSL Sample                   | Haskell Combinators Sample
-|-------------------|------------------------------|----------------------------
-| Basic             | `* UsesIf`                   | `usesIf`
-| Negated           | `* Not:UsesWhile`            | `(negative usesWhile)`
-| Predicated        | `* DeclaresClass:Foo`        | `(declaresClass (named "Foo"))`
-|                   | `* DeclaresClass:=Foo`       | `(declaresClass (named "Foo"))`
-|                   | `* DeclaresClass:~Foo`       | `(declaresClass (like "Foo"))`
-|                   | `* DeclaresClass:^Foo`       | `(declaresClass (except "Foo"))`
-|                   | `* DeclaresClass:[Foo\|Bar]` | `(declaresClass (anyOf ["Foo", "Bar"]))`
-|                   | `* DeclaresClass:*`          | `(declaresClass anyone)`
-|                   | `* DeclaresClass`            | `(declaresClass anyone)`
-| Matching Literals | `* Calls:*:With:1:True`      | `(callsMatching (withEvery ["1", "True"]) anyone)`
-|                   | `* Returns:With:1`           | `(returnsMatching (with "1") anyone)`
-| Transitive        | `foo UsesLambda`             | `(transitive usesLambda "foo")`
-| Scoped            | `Intransitive:foo UsesIf`    | `(scoped usesIf "foo")`
-| Scoped List       | `foo.bar UsesIf`             | `(scopedList usesIf ["foo", "bar"])`
+| Kind              | DSL Sample                         | Haskell Combinators Sample
+|-------------------|------------------------------------|----------------------------
+| Basic             | `* UsesIf`                         | `usesIf`
+| Negated           | `* Not:UsesWhile`                  | `(negative usesWhile)`
+| Predicated        | `* DeclaresClass:Foo`              | `(declaresClass (named "Foo"))`
+|                   | `* DeclaresClass:=Foo`             | `(declaresClass (named "Foo"))`
+|                   | `* DeclaresClass:~Foo`             | `(declaresClass (like "Foo"))`
+|                   | `* DeclaresClass:^Foo`             | `(declaresClass (except "Foo"))`
+|                   | `* DeclaresClass:[Foo\|Bar]`       | `(declaresClass (anyOf ["Foo", "Bar"]))`
+|                   | `* DeclaresClass:*`                | `(declaresClass anyone)`
+|                   | `* DeclaresClass`                  | `(declaresClass anyone)`
+| Matching Literals | `* Calls:*:WithChar:'a':WithTrue`  | `(callsMatching (withEvery [isChar 'a', isBool True]) anyone)`
+|                   | `* Calls:*:WithNil`                | `(callsMatching (withEvery [isNil]) anyone)`
+|                   | `* Returns:WithNumber:1`           | `(returnsMatching (withEvery [isNumber 1]) anyone)`
+|                   | `* Returns:WithString:"foo"`       | `(returnsMatching (withEvery [isString "foo"]) anyone)`
+|                   | `* Returns:WithSymbol:"foo"`       | `(returnsMatching (withEvery [isSymbol "foo"]) anyone)`
+| Transitive        | `foo UsesLambda`                   | `(transitive usesLambda "foo")`
+| Scoped            | `Intransitive:foo UsesIf`          | `(scoped usesIf "foo")`
+| Scoped List       | `foo.bar UsesIf`                   | `(scopedList usesIf ["foo", "bar"])`
 
 
 ## Examples
