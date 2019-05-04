@@ -159,5 +159,5 @@ compileMatcher = withEvery . f
     f ("WithChar":value:args)   =  isChar (read value) : (f args)
     f ("WithNumber":value:args) =  isNumber (read value) : (f args)
     f ("WithString":value:args) =  isString (read value) : (f args)
-    f ("WithSymbol":value:args) =  isSymbol (read value) : (f args)
+    f ("WithSymbol":value:args) =  isSymbol (read ("\""++value++"\"")) : (f args)
     f []                        = []

@@ -161,8 +161,8 @@ spec = do
     run (java "class Foo { int x = 4; }") "Foo" "Assigns:x:WithNumber:5" `shouldBe` False
 
   it "works with Assigns WithSymbol" $ do
-    run (Assignment "x" (MuSymbol "foo")) "*" "Assigns:x:WithSymbol:\"foo\"" `shouldBe` True
-    run (Assignment "x" (MuSymbol "foo")) "*" "Assigns:x:WithSymbol:\"bar\"" `shouldBe` False
+    run (Assignment "x" (MuSymbol "foo")) "*" "Assigns:x:WithSymbol:foo" `shouldBe` True
+    run (Assignment "x" (MuSymbol "foo")) "*" "Assigns:x:WithSymbol:bar" `shouldBe` False
 
   it "works with Assigns WithChar" $ do
     run (java "class Foo { char x = 'a'; }") "Foo" "Assigns:x:WithChar:'a'" `shouldBe` True
