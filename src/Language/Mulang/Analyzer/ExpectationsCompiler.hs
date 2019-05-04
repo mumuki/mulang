@@ -153,7 +153,7 @@ compileMatcher :: [String] -> Matcher
 compileMatcher = withEvery . f
   where
     f :: [String] -> [Inspection]
-    f ("WithFalse":args)        =  isBool True : (f args)
+    f ("WithFalse":args)        =  isBool False : (f args)
     f ("WithNil":args)          =  isNil : (f args)
     f ("WithTrue":args)         =  isBool True : (f args)
     f ("WithChar":value:args)   =  isChar (read value) : (f args)

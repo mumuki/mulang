@@ -154,7 +154,9 @@ spec = do
 
   it "works with Calls WithNumber and WithTrue" $ do
     run (hs "f a b = g 1 True") "f" "Calls:g:WithNumber:1:WithTrue" `shouldBe` True
+    run (hs "f a b = g 1 False") "f" "Calls:g:WithNumber:1:WithFalse" `shouldBe` True
     run (hs "f a b = g 2") "f" "Calls:g:WithNumber:1:WithTrue" `shouldBe` False
+    run (hs "f a b = g True") "f" "Calls:g:WithNumber:1:WithFalse" `shouldBe` False
 
   it "works with Assigns WithNumber" $ do
     run (java "class Foo { int x = 4; }") "Foo" "Assigns:x:WithNumber:4" `shouldBe` True
