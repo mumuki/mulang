@@ -3,6 +3,7 @@ module ExpectationsCompilerSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Analyzer hiding (spec)
 import           Language.Mulang.Analyzer.ExpectationsCompiler (compileExpectation)
+import           Language.Mulang.Ast
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Java
@@ -147,25 +148,42 @@ spec = do
     run (hs "f a b = g") "f" "Calls:g" `shouldBe` False
     run (hs "f a b = g b") "f" "Calls:g" `shouldBe` True
 
-  it "works with Calls With" $ do
-    run (hs "f a b = g 1") "f" "Calls:g:With:1" `shouldBe` True
-    run (hs "f a b = g 2") "f" "Calls:g:With:1" `shouldBe` False
+  it "works with Calls WithNumber" $ do
+    run (hs "f a b = g 1") "f" "Calls:g:WithNumber:1" `shouldBe` True
+    run (hs "f a b = g 2") "f" "Calls:g:WithNumber:1" `shouldBe` False
 
-    run (hs "f a b = g 1 True") "f" "Calls:g:With:1:True" `shouldBe` True
-    run (hs "f a b = g 2") "f" "Calls:g:With:1:True" `shouldBe` False
+  it "works with Calls WithNumber and WithTrue" $ do
+    run (hs "f a b = g 1 True") "f" "Calls:g:WithNumber:1:WithTrue" `shouldBe` True
+    run (hs "f a b = g 1 False") "f" "Calls:g:WithNumber:1:WithFalse" `shouldBe` True
+    run (hs "f a b = g 2") "f" "Calls:g:WithNumber:1:WithTrue" `shouldBe` False
+    run (hs "f a b = g True") "f" "Calls:g:WithNumber:1:WithFalse" `shouldBe` False
 
-  it "works with Assigns With" $ do
-    run (java "class Foo { int x = 4; }") "Foo" "Assigns:x:With:4" `shouldBe` True
-    run (java "class Foo { char x = 'a'; }") "Foo" "Assigns:x:With:'a'" `shouldBe` True
-    run (java "class Foo { char x = 'b'; }") "Foo" "Assigns:x:With:'a'" `shouldBe` False
+  it "works with Assigns WithNumber" $ do
+    run (java "class Foo { int x = 4; }") "Foo" "Assigns:x:WithNumber:4" `shouldBe` True
+    run (java "class Foo { int x = 4; }") "Foo" "Assigns:x:WithNumber:5" `shouldBe` False
 
-    run (java "class Foo { char x = 'b'; }") "Foo" "Assigns:*:With:'b'" `shouldBe` True
-    run (java "class Foo { char x = 'b'; }") "Foo" "Assigns:*:With:'c'" `shouldBe` False
+  it "works with Assigns WithSymbol" $ do
+    run (Assignment "x" (MuSymbol "foo")) "*" "Assigns:x:WithSymbol:foo" `shouldBe` True
+    run (Assignment "x" (MuSymbol "foo")) "*" "Assigns:x:WithSymbol:bar" `shouldBe` False
 
-  it "works with Returns With" $ do
-    run (java "class Foo { int foo() { return -1; } }") "Foo" "Returns:With:-1" `shouldBe` True
-    run (java "class Foo { int foo() { return -1; } }") "Foo" "Returns:With:0" `shouldBe` False
-    run (java "class Foo { int foo() { int x = -1; } }") "Foo" "Returns:With:-1" `shouldBe` False
+  it "works with Assigns WithChar" $ do
+    run (java "class Foo { char x = 'a'; }") "Foo" "Assigns:x:WithChar:'a'" `shouldBe` True
+    run (java "class Foo { char x = 'b'; }") "Foo" "Assigns:x:WithChar:'a'" `shouldBe` False
+
+    run (java "class Foo { char x = 'b'; }") "Foo" "Assigns:*:WithChar:'b'" `shouldBe` True
+    run (java "class Foo { char x = 'b'; }") "Foo" "Assigns:*:WithChar:'c'" `shouldBe` False
+
+  it "works with Assigns WithString" $ do
+    run (java "class Foo { char x = \"hello\"; }") "Foo" "Assigns:x:WithString:\"hello\"" `shouldBe` True
+    run (java "class Foo { char x = \"world\"; }") "Foo" "Assigns:x:WithString:\"hello\"" `shouldBe` False
+
+    run (java "class Foo { char x = \"world\"; }") "Foo" "Assigns:*:WithString:\"world\"" `shouldBe` True
+    run (java "class Foo { char x = \"world\"; }") "Foo" "Assigns:*:WithString:\"hello\"" `shouldBe` False
+
+  it "works with Returns WithNumber" $ do
+    run (java "class Foo { int foo() { return 9; } }") "Foo" "Returns:WithNumber:9" `shouldBe` True
+    run (java "class Foo { int foo() { int x = 4; } }") "Foo" "Returns:WithNumber:4" `shouldBe` False
+    run (java "class Foo { int foo() { return 3; } }") "Foo" "Returns:WithNumber:0" `shouldBe` False
 
   it "works with UsesInheritance" $ do
     run (java "class Foo extends Bar {}") "Foo" "UsesInheritance" `shouldBe` True

@@ -1,16 +1,31 @@
-module Language.Mulang.Inspector.Literal (isLiteral) where
+module Language.Mulang.Inspector.Literal (
+  isNil,
+  isNumber,
+  isBool,
+  isChar,
+  isString,
+  isSymbol) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Inspector.Primitive (containsExpression, Inspection)
 
-import Text.Read (readMaybe)
+isNil :: Inspection
+isNil = isLiteral MuNil
 
-isLiteral :: Code -> Inspection
-isLiteral value = f
-  where f MuNil              = value == "Nil"
-        f (MuNumber number)  = (readMaybe value) == Just number
-        f (MuBool bool)      = (readMaybe value) == Just bool
-        f (MuString string)  = (readMaybe value) == Just string
-        f (MuChar char)      = (readMaybe value) == Just char
-        f (MuSymbol string)  = (readMaybe ("\"" ++ value ++ "\"")) == Just ("#" ++ string)
-        f _                  = False
+isNumber :: Double -> Inspection
+isNumber = isLiteral . MuNumber
+
+isBool :: Bool -> Inspection
+isBool = isLiteral . MuBool
+
+isString :: String -> Inspection
+isString = isLiteral . MuString
+
+isChar :: Char -> Inspection
+isChar = isLiteral . MuChar
+
+isSymbol :: String -> Inspection
+isSymbol = isLiteral . MuSymbol
+
+isLiteral :: Expression -> Inspection
+isLiteral = (==)

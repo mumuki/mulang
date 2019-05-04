@@ -5,38 +5,32 @@ import           Language.Mulang
 
 spec :: Spec
 spec = do
-  describe "isLiteral" $ do
+  describe "literal inspections" $ do
     it "works with numbers" $ do
 
-      isLiteral "4" (MuNumber 4) `shouldBe` True
-      isLiteral "4" (MuNumber 4.0) `shouldBe` True
-      isLiteral "4.5" (MuNumber 4.5) `shouldBe` True
-
-      isLiteral "4" (MuNumber 5.0) `shouldBe` False
-      isLiteral "\"4\"" (MuNumber 4.0) `shouldBe` False
-      isLiteral "foo" (MuNumber 4.0) `shouldBe` False
+      isNumber 4 (MuNumber 4) `shouldBe` True
+      isNumber 4 (MuNumber 4.0) `shouldBe` True
+      isNumber 4.5 (MuNumber 4.5) `shouldBe` True
+      isNumber 4 (MuNumber 5.0) `shouldBe` False
 
     it "works with strings" $ do
-      isLiteral "\"4\"" (MuString "4") `shouldBe` True
-      isLiteral "\"hello\"" (MuString "hello") `shouldBe` True
+      isString "4" (MuString "4") `shouldBe` True
+      isString "hello" (MuString "hello") `shouldBe` True
 
     it "works with symbols" $ do
-      isLiteral "#foo" (MuSymbol "foo") `shouldBe` True
-
-      isLiteral "#foo" (MuString "foo") `shouldBe` False
+      isSymbol "foo" (MuSymbol "foo") `shouldBe` True
+      isSymbol "foo" (MuString "bar") `shouldBe` False
 
     it "works with chars" $ do
-      isLiteral "'4'" (MuChar '4') `shouldBe` True
-      isLiteral "'a'" (MuChar 'a') `shouldBe` True
-
-      isLiteral "'abc'" (MuChar 'a') `shouldBe` False
+      isChar '4' (MuChar '4') `shouldBe` True
+      isChar 'a' (MuChar 'a') `shouldBe` True
+      isChar 'a' (MuChar 'b') `shouldBe` False
 
     it "works with bools" $ do
-      isLiteral "True" (MuBool True) `shouldBe` True
-      isLiteral "False" (MuBool False) `shouldBe` True
-
-      isLiteral "True" (MuSymbol "True") `shouldBe` False
+      isBool True (MuBool True) `shouldBe` True
+      isBool False (MuBool False) `shouldBe` True
+      isBool True (MuSymbol "True") `shouldBe` False
 
     it "works with nil" $ do
-      isLiteral "Nil" MuNil `shouldBe` True
-      isLiteral "Nil" (MuString "Nil") `shouldBe` False
+      isNil MuNil `shouldBe` True
+      isNil (MuString "Nil") `shouldBe` False

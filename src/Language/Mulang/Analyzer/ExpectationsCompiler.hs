@@ -2,6 +2,7 @@ module Language.Mulang.Analyzer.ExpectationsCompiler(
   compileExpectation) where
 
 import Language.Mulang
+import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol)
 import Language.Mulang.Analyzer.Analysis (Expectation(..))
 
 import Data.Maybe (fromMaybe)
@@ -35,12 +36,21 @@ compileNegator ("Not":_) = negative
 compileNegator _         = id
 
 compileBaseInspection :: PredicateModifier -> [String] -> Maybe ContextualizedInspection
-compileBaseInspection p ("Not":parts)                 = compileBaseInspection p parts
-compileBaseInspection p [verb]                        = compileBaseInspection p [verb, "*"]
-compileBaseInspection p [verb, object]                = compileBaseInspection p [verb, object, "With"]
-compileBaseInspection p (verb:"With":args)            = compileBaseInspection p (verb:"*":"With":args)
-compileBaseInspection p (verb:object:"With":args)     = fmap ($ (compileObject p object)) (compileInspectionPrimitive (verb:args))
-compileBaseInspection _ _                             = Nothing
+compileBaseInspection p ("Not":parts)               = compileBaseInspection p parts
+compileBaseInspection p parts                       = compileAffirmativeInspection p parts
+
+compileAffirmativeInspection :: PredicateModifier -> [String] -> Maybe ContextualizedInspection
+compileAffirmativeInspection p [verb]                        = compileAffirmativeInspection p [verb,"*"]
+compileAffirmativeInspection p [verb,"WithFalse"]            = compileAffirmativeInspection p [verb,"*","WithFalse"]
+compileAffirmativeInspection p [verb,"WithNil"]              = compileAffirmativeInspection p [verb,"*","WithNil"]
+compileAffirmativeInspection p [verb,"WithTrue"]             = compileAffirmativeInspection p [verb,"*","WithTrue"]
+compileAffirmativeInspection p (verb:"WithChar":args)        = compileAffirmativeInspection p (verb:"*":"WithChar":args)
+compileAffirmativeInspection p (verb:"WithNumber":args)      = compileAffirmativeInspection p (verb:"*":"WithNumber":args)
+compileAffirmativeInspection p (verb:"WithString":args)      = compileAffirmativeInspection p (verb:"*":"WithString":args)
+compileAffirmativeInspection p (verb:"WithSymbol":args)      = compileAffirmativeInspection p (verb:"*":"WithSymbol":args)
+compileAffirmativeInspection p (verb:object:args)            = fmap ($ (compileObject p object)) (compileInspectionPrimitive (verb:args))
+compileAffirmativeInspection _ _                             = Nothing
+
 
 compileObject :: PredicateModifier -> String -> IdentifierPredicate
 compileObject p "*"        = p $ anyone
@@ -54,9 +64,9 @@ compileInspectionPrimitive :: [String] -> Maybe ContextualizedBoundInspection
 compileInspectionPrimitive = f
   where
   f ["Assigns"]                        = bound assigns
-  f ["Assigns", value]                 = bound (assignsMatching (with value))
+  f ("Assigns":args)                   = bound (assignsMatching (compileMatcher args))
   f ["Calls"]                          = bound calls
-  f ("Calls":args)                     = bound (callsMatching (withEvery args))
+  f ("Calls":args)                     = bound (callsMatching (compileMatcher args))
   f ["Declares"]                       = bound declares
   f ["DeclaresAttribute"]              = bound declaresAttribute
   f ["DeclaresClass"]                  = bound declaresClass
@@ -92,7 +102,7 @@ compileInspectionPrimitive = f
   f ["TypesAs"]                        = bound typesAs
   f ["TypesParameterAs"]               = bound typesParameterAs
   f ["TypesReturnAs"]                  = bound typesReturnAs
-  f ["Returns", value]                 = plain (returnsMatching (with value))
+  f ("Returns":args)                   = plain (returnsMatching (compileMatcher args))
   f ["Uses"]                           = bound uses
   f ["UsesAnonymousVariable"]          = plain usesAnonymousVariable
   f ["UsesComposition"]                = plain usesComposition
@@ -125,7 +135,7 @@ compileInspectionPrimitive = f
   f ["UsesType"]                       = bound usesType
   f ["UsesWhile"]                      = plain usesWhile
   f ["UsesYield"]                      = plain usesYield
-  f _                                = Nothing
+  f _                                  = Nothing
 
   contextualized :: ContextualizedInspection -> Maybe ContextualizedBoundInspection
   contextualized = Just . contextualizedBind
@@ -138,3 +148,16 @@ compileInspectionPrimitive = f
 
   bound :: BoundInspection -> Maybe ContextualizedBoundInspection
   bound = Just . boundContextualize
+
+compileMatcher :: [String] -> Matcher
+compileMatcher = withEvery . f
+  where
+    f :: [String] -> [Inspection]
+    f ("WithFalse":args)        =  isBool False : (f args)
+    f ("WithNil":args)          =  isNil : (f args)
+    f ("WithTrue":args)         =  isBool True : (f args)
+    f ("WithChar":value:args)   =  isChar (read value) : (f args)
+    f ("WithNumber":value:args) =  isNumber (read value) : (f args)
+    f ("WithString":value:args) =  isString (read value) : (f args)
+    f ("WithSymbol":value:args) =  isSymbol (read ("\""++value++"\"")) : (f args)
+    f []                        = []

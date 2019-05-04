@@ -417,10 +417,10 @@ spec = do
       calls (named "m") (EntryPoint "main" (Reference "f")) `shouldBe` False
 
     it "is True when using a matcher that matches" $ do
-      (callsMatching (with "1") anyone) (hs "f = g 1") `shouldBe` True
+      (callsMatching (with . isNumber $ 1) anyone) (hs "f = g 1") `shouldBe` True
 
     it "is False when using a matcher that does not match" $ do
-      (callsMatching (with "1") anyone) (hs "f = g 2") `shouldBe` False
+      (callsMatching (with . isNumber $ 1) anyone) (hs "f = g 2") `shouldBe` False
 
   describe "usesExceptions" $ do
     it "is True when a raise is used, java" $ do
