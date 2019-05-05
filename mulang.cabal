@@ -86,6 +86,7 @@ library
 
   build-depends:
     base                      <= 5,
+    explang                   ,
     bytestring                ,
     text                      ,
     unordered-containers      ,

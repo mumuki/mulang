@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Language.Explang.Expectation (
   Expectation (..),
   Scope (..),
@@ -9,6 +11,8 @@ module Language.Explang.Expectation (
   noFlags,
   intransitiveFlag) where
 
+import GHC.Generics
+
 data Expectation =
   Expectation {
     flags :: Flags,
@@ -18,14 +22,14 @@ data Expectation =
     binding :: Binding,
     matcher :: Matcher,
     count :: Count
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Generic)
 
 data Scope
   = Unscoped
   | Scoped { context :: String }
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
 
-data Flags = Flags { intransitive :: Bool } deriving (Eq, Show)
+data Flags = Flags { intransitive :: Bool } deriving (Eq, Show, Generic)
 
 data Binding
   = Any
@@ -33,19 +37,19 @@ data Binding
   | Like { identifier :: String }
   | Except { identifier :: String }
   | AnyOf { identifiers :: [String] }
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
 
 data Matcher
   = Unmatching
   | Matching { expectations :: [Predicate] }
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
 
 data Count
   = AnyCount
   | AtLeast { times :: Int }
   | AtMost { times :: Int }
   | Exactly { times :: Int }
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
 
 
 data Predicate
@@ -60,7 +64,7 @@ data Predicate
   | IsSelf
   | IsMath
   | IsLogic
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
 
 noFlags :: Flags
 noFlags = Flags False

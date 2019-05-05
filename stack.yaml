@@ -1,6 +1,7 @@
 resolver: lts-7.24
 packages:
 - '.'
+- './explang'
 extra-deps:
 # Using newest aeson, with no contents in tagged
 # unions with nullary constructors

@@ -25,6 +25,7 @@ module Language.Mulang.Analyzer.Analysis (
   AutocorrectionRules,
   CaseStyle(..),
   DomainLanguage(..),
+  ExpectationsAnalysisType (..),
   Fragment(..),
   Inspection,
   InterpreterOptions(..),
@@ -32,13 +33,17 @@ module Language.Mulang.Analyzer.Analysis (
   SignatureAnalysisType(..),
   SignatureStyle(..),
   Smell,
+  Smell,
   SmellsSet(..),
+  TestAnalysisType(..),
   TestAnalysisType(..),
 
   AnalysisResult(..),
   ExpectationResult(..)) where
 
 import GHC.Generics
+
+import qualified Language.Explang.Expectation as Explang
 
 import Language.Mulang.Ast
 import Language.Mulang.Builder (NormalizationOptions)
@@ -68,7 +73,8 @@ data Analysis = Analysis {
 } deriving (Show, Eq, Generic)
 
 data AnalysisSpec = AnalysisSpec {
-  expectations :: Maybe [Expectation],
+  expectations :: Maybe [Expectation], -- ^ depracated: use expectationsAnalysisType
+  expectationsAnalysisType :: Maybe ExpectationsAnalysisType,
   smellsSet :: Maybe SmellsSet,
   signatureAnalysisType :: Maybe SignatureAnalysisType,
   testAnalysisType :: Maybe TestAnalysisType,
@@ -77,6 +83,13 @@ data AnalysisSpec = AnalysisSpec {
   originalLanguage :: Maybe Language,
   autocorrectionRules :: Maybe AutocorrectionRules
 } deriving (Show, Eq, Generic)
+
+data ExpectationsAnalysisType
+  = NoExpectations
+  | Piped [Expectation]
+  | Explang String
+  | Raw Explang.Expectation
+  deriving (Show, Eq, Generic)
 
 data DomainLanguage = DomainLanguage {
   dictionaryFilePath :: Maybe FilePath,
@@ -171,7 +184,7 @@ allSmellsBut :: [Smell] -> Maybe SmellsSet
 allSmellsBut = Just . AllSmells . Just
 
 emptyAnalysisSpec :: AnalysisSpec
-emptyAnalysisSpec = AnalysisSpec Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+emptyAnalysisSpec = AnalysisSpec Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 emptyAnalysis :: Fragment -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec
