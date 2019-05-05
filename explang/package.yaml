@@ -1,0 +1,48 @@
+name:                explang
+version:             0.1.0.0
+github:              "mumuki/mulang"
+license:             GPL-3.0
+author:              "Franco Leonardo Bulgarelli"
+maintainer:          "franco@mumuki.org"
+copyright:           "2019 Franco Leonardo Bulgarelli"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+description: Expectations language parser
+dependencies:
+- base >= 4.7 && < 5
+- array
+- utf8-string
+- containers
+
+library:
+  source-dirs: src
+  dependencies:
+    - mtl
+  build-tools:
+    - happy
+    - alex
+
+tests:
+  explang-test:
+    main:                Spec.hs
+    source-dirs:         spec
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    - -fno-warn-missing-signatures
+    - -fno-warn-unused-do-bind
+    - -fno-warn-orphans
+    - -fno-warn-name-shadowing
+    - -fno-warn-incomplete-patterns
+    - -fno-warn-missing-pattern-synonym-signatures
+    - -fwarn-tabs
+    - -funbox-strict-fields
+    dependencies:
+    - hspec
+    - explang
+
