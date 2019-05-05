@@ -33,7 +33,11 @@ defaultTokensTable =
     (GreatherOrEqualThan, [">="]),
     (GreatherThan, [">"]),
     (LessOrEqualThan, ["<="]),
-    (LessThan, ["<"])
+    (LessThan, ["<"]),
+    (Plus, ["+"]),
+    (Minus, ["-"]),
+    (Multiply, ["*"]),
+    (Divide, ["/"])
   ]
 
 buildTokensTable :: [(Operator, [Token])] -> TokensTable

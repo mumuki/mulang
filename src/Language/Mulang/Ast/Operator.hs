@@ -22,11 +22,15 @@ data Operator
     | LessOrEqualThan
     | LessThan
     | Otherwise
+    | Plus
+    | Minus
+    | Multiply
+    | Divide
     -- ^ guard's otherwise operator
     | ForwardComposition
     -- (f >> g)(x) = (g . f)(x) = g(f(x)) operator
     | BackwardComposition
     -- (f << g)(x) = (f . g)(x) = f(g(x)) operator
-  deriving (Eq, Show, Read, Generic, Ord)
+  deriving (Eq, Show, Read, Generic, Ord, Enum)
 
 

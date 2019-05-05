@@ -108,6 +108,7 @@ compileInspectionPrimitive = f
   f ["Uses"]                           = bound uses
   f ["UsesAnonymousVariable"]          = plain usesAnonymousVariable
   f ["UsesBooleanLogic"]               = plain usesBooleanLogic
+  f ["UsesArithmetic"]                 = plain usesArithmetic
   f ["UsesComposition"]                = plain usesComposition
   f ["UsesComprehension"]              = f ["UsesForComprehension"]
   f ["UsesConditional"]                = plain usesConditional

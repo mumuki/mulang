@@ -70,16 +70,16 @@ spec = do
       js "x = 8" `shouldBe` (Assignment "x" (MuNumber 8))
 
     it "update should be Assignment" $ do
-      js "x += 8" `shouldBe` (Assignment "x" (Application (Reference "+") [Reference "x",MuNumber 8.0]))
+      js "x += 8" `shouldBe` (Assignment "x" (Application (Primitive Plus) [Reference "x",MuNumber 8.0]))
 
     it "increment should be Assignment" $ do
-      js "x++" `shouldBe` (Assignment "x" (Application (Reference "+") [Reference "x", MuNumber 1]))
+      js "x++" `shouldBe` (Assignment "x" (Application (Primitive Plus) [Reference "x", MuNumber 1]))
 
     it "decrement should be Assignment" $ do
-      js "x--" `shouldBe` (Assignment "x" (Application (Reference "-") [Reference "x", MuNumber 1]))
+      js "x--" `shouldBe` (Assignment "x" (Application (Primitive Minus) [Reference "x", MuNumber 1]))
 
     it "sum should be parseable" $ do
-      js "x + y" `shouldBe` (Application (Reference "+") [Reference "x",Reference "y"])
+      js "x + y" `shouldBe` (Application (Primitive Plus) [Reference "x",Reference "y"])
 
     it "list literal top level expression" $ do
       js "[8, 7]" `shouldBe` MuList [MuNumber 8, MuNumber 7]

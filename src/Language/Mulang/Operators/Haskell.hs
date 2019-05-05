@@ -10,5 +10,6 @@ haskellTokensTable =
     (NotEqual, ["/="]),
     (Negation, ["not"]),
     (Otherwise, ["otherwise"]),
-    (BackwardComposition, ["."])
+    (BackwardComposition, ["."]),
+    (Divide, ["/", "div"])
   ]

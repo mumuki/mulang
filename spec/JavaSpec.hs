@@ -303,7 +303,7 @@ spec = do
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             SubroutineSignature "hello" [] "Object" [],
                             (SimpleMethod "hello" [] (
-                            Return (Lambda [VariablePattern "x"] (SimpleSend (Reference "x") "+" [MuNumber 1]))))])
+                            Return (Lambda [VariablePattern "x"] (PrimitiveSend (Reference "x") Plus [MuNumber 1]))))])
 
     it "parses News" $ do
       run [text|class Foo {

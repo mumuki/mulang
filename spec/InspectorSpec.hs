@@ -437,6 +437,20 @@ spec = do
       usesBooleanLogic (hs "f x y = and x") `shouldBe` False
       usesBooleanLogic (hs "f x y = or x")  `shouldBe` False
 
+  describe "usesArithmetic" $ do
+    it "is when it is used" $ do
+      usesArithmetic (hs "f x y = x + y")    `shouldBe` True
+      usesArithmetic (hs "f x y = x * y")    `shouldBe` True
+      usesArithmetic (hs "f x y = x / x")    `shouldBe` True
+      usesArithmetic (hs "f x y = div x z")  `shouldBe` True
+      usesArithmetic (hs "f x y = x - y")    `shouldBe` True
+
+    it "is is not used otherwise" $ do
+      usesArithmetic (hs "f x y = x")       `shouldBe` False
+      usesArithmetic (hs "f x y = plus x")  `shouldBe` False
+      usesArithmetic (hs "f x y = minus x") `shouldBe` False
+      usesArithmetic (hs "f x y = x || y")  `shouldBe` False
+
   describe "usesExceptions" $ do
     it "is True when a raise is used, java" $ do
       usesExceptions (java "class Sample { void aMethod() { throw new RuntimeException(); } }") `shouldBe` True

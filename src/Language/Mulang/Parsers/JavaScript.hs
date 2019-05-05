@@ -156,7 +156,7 @@ muJSBinOp (JSBinOpAnd _)        = Primitive And
 muJSBinOp (JSBinOpBitAnd _)     = Primitive And
 muJSBinOp (JSBinOpBitOr _)      = Primitive Or
 muJSBinOp (JSBinOpBitXor _)     = Reference "^"
-muJSBinOp (JSBinOpDivide _)     = Reference "/"
+muJSBinOp (JSBinOpDivide _)     = Primitive Divide
 muJSBinOp (JSBinOpEq _)         = Primitive Equal
 muJSBinOp (JSBinOpGe _)         = Primitive GreatherOrEqualThan
 muJSBinOp (JSBinOpGt _)         = Primitive GreatherThan
@@ -164,21 +164,21 @@ muJSBinOp (JSBinOpInstanceOf _) = Reference "instanceof"
 muJSBinOp (JSBinOpLe _)         = Primitive LessOrEqualThan
 muJSBinOp (JSBinOpLsh _)        = Reference "<<"
 muJSBinOp (JSBinOpLt _)         = Primitive LessThan
-muJSBinOp (JSBinOpMinus _)      = Reference "-"
+muJSBinOp (JSBinOpMinus _)      = Primitive Minus
 muJSBinOp (JSBinOpMod _)        = Reference "%"
 muJSBinOp (JSBinOpNeq _)        = Primitive NotEqual
 muJSBinOp (JSBinOpOr _)         = Primitive Or
-muJSBinOp (JSBinOpPlus _)       = Reference "+"
+muJSBinOp (JSBinOpPlus _)       = Primitive Plus
 muJSBinOp (JSBinOpRsh _)        = Reference ">>"
 muJSBinOp (JSBinOpStrictEq _)   = Primitive Equal
 muJSBinOp (JSBinOpStrictNeq _)  = Primitive NotEqual
-muJSBinOp (JSBinOpTimes _)      = Reference "*"
+muJSBinOp (JSBinOpTimes _)      = Primitive Multiply
 
 
 muJSUnaryOp:: JSUnaryOp -> Identifier -> Expression
-muJSUnaryOp (JSUnaryOpDecr _) r = (Application (Reference "-") [Reference r, MuNumber 1])
+muJSUnaryOp (JSUnaryOpDecr _) r = (Application (Primitive Minus) [Reference r, MuNumber 1])
 --muJSUnaryOp (JSUnaryOpDelete _)
-muJSUnaryOp (JSUnaryOpIncr _) r = (Application (Reference "+") [Reference r, MuNumber 1])
+muJSUnaryOp (JSUnaryOpIncr _) r = (Application (Primitive Plus) [Reference r, MuNumber 1])
 --muJSUnaryOp (JSUnaryOpMinus _)
 --muJSUnaryOp (JSUnaryOpPlus _)
 --muJSUnaryOp (JSUnaryOpTilde _)
@@ -191,11 +191,11 @@ muJSAssignOp (JSAssign _) _ v = v
 muJSAssignOp op r v           = (Application (muJSAssignOp' op) [Reference r, v])
 
 muJSAssignOp':: JSAssignOp -> Expression
-muJSAssignOp' (JSTimesAssign _)   = Reference "*"
-muJSAssignOp' (JSDivideAssign _)  = Reference "/"
+muJSAssignOp' (JSTimesAssign _)   = Primitive Multiply
+muJSAssignOp' (JSDivideAssign _)  = Primitive Divide
 --muJSAssignOp' (JSModAssign _)
-muJSAssignOp' (JSPlusAssign _)    = Reference "+"
-muJSAssignOp' (JSMinusAssign _)   = Reference "-"
+muJSAssignOp' (JSPlusAssign _)    = Primitive Plus
+muJSAssignOp' (JSMinusAssign _)   = Primitive Minus
 --muJSAssignOp' (JSLshAssign _)
 --muJSAssignOp' (JSRshAssign _)
 --muJSAssignOp' (JSUrshAssign _)

@@ -143,11 +143,11 @@ muLit e           = debug e
 preMinus (MuNumber n) = MuNumber (negate n)
 preMinus other        = other
 
-muOp Mult   = Reference "*"
-muOp Div    = Reference "/"
+muOp Mult   = M.Primitive O.Multiply
+muOp Div    = M.Primitive O.Divide
 muOp Rem    = Reference "rem"
-muOp Add    = Reference "+"
-muOp Sub    = Reference "-"
+muOp Add    = M.Primitive O.Plus
+muOp Sub    = M.Primitive O.Minus
 muOp LThan  = M.Primitive O.LessThan
 muOp LThanE = M.Primitive O.LessOrEqualThan
 muOp GThan  = M.Primitive O.GreatherThan

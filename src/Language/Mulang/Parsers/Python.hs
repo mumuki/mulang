@@ -51,7 +51,7 @@ muStatement (Fun name args _ body _)          = muComputation (muIdent name) (ma
 muStatement (Class name parents body _)       = muClass (listToMaybe . map muParent $ parents) (muIdent name) (muSuite body)
 muStatement (Conditional guards els _ )       = foldr muIf (muSuite els) guards
 muStatement (Assign [to] from _)              = M.Assignment (muVariable to) (muExpr from)
-muStatement (AugmentedAssign to op from _)    = M.Assignment (muVariable to) (M.Application (M.Reference . muAssignOp $ op) [M.Reference . muVariable $ to, muExpr from])
+muStatement (AugmentedAssign to op from _)    = M.Assignment (muVariable to) (M.Application (muAssignOp $ op) [M.Reference . muVariable $ to, muExpr from])
 --muStatement (Decorated
 --     { decorated_decorators :: [Decorator annot] -- ^ Decorators.
 --     , decorated_def :: Statement annot -- ^ Function or class definition to be decorated.
@@ -228,26 +228,26 @@ muOpReference (Xor _)                = M.Reference "^"
 muOpReference (BinaryAnd _)          = M.Primitive O.And
 muOpReference (ShiftLeft _)          = M.Reference "<<"
 muOpReference (ShiftRight _)         = M.Reference ">>"
-muOpReference (Multiply _)           = M.Reference "*"
-muOpReference (Plus _)               = M.Reference "+"
-muOpReference (Minus _)              = M.Reference "-"
-muOpReference (Divide _)             = M.Reference "/"
+muOpReference (Multiply _)           = M.Primitive O.Multiply
+muOpReference (Plus _)               = M.Primitive O.Plus
+muOpReference (Minus _)              = M.Primitive O.Minus
+muOpReference (Divide _)             = M.Primitive O.Divide
 muOpReference (FloorDivide _)        = M.Reference "//"
 muOpReference (Invert _)             = M.Reference "~"
 muOpReference (Modulo _)             = M.Reference "%"
 
-muAssignOp (PlusAssign _)       = "+"
-muAssignOp (MinusAssign _)      = "-"
-muAssignOp (MultAssign _)       = "*"
-muAssignOp (DivAssign _)        = "/"
-muAssignOp (ModAssign _)        = "%"
-muAssignOp (PowAssign _)        = "**"
-muAssignOp (BinAndAssign _)     = "&"
-muAssignOp (BinOrAssign _)      = "|"
-muAssignOp (BinXorAssign _)     = "^"
-muAssignOp (LeftShiftAssign _)  = "<"
-muAssignOp (RightShiftAssign _) = ">"
-muAssignOp (FloorDivAssign _)   = "/"
+muAssignOp (PlusAssign _)       = M.Primitive O.Plus
+muAssignOp (MinusAssign _)      = M.Primitive O.Minus
+muAssignOp (MultAssign _)       = M.Primitive O.Multiply
+muAssignOp (DivAssign _)        = M.Primitive O.Divide
+muAssignOp (ModAssign _)        = M.Reference "%"
+muAssignOp (PowAssign _)        = M.Reference "**"
+muAssignOp (BinAndAssign _)     = M.Reference "&"
+muAssignOp (BinOrAssign _)      = M.Reference "|"
+muAssignOp (BinXorAssign _)     = M.Reference "^"
+muAssignOp (LeftShiftAssign _)  = M.Reference "<"
+muAssignOp (RightShiftAssign _) = M.Reference ">"
+muAssignOp (FloorDivAssign _)   = M.Reference "/"
 
 muHandler (Handler (ExceptClause clause _) suite _) = (muExceptClause clause, muSuite suite)
 

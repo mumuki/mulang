@@ -20,6 +20,7 @@ module Language.Mulang.Inspector.Generic (
   uses,
   usesAnonymousVariable,
   usesBooleanLogic,
+  usesArithmetic,
   usesExceptionHandling,
   usesExceptions,
   usesFor,
@@ -162,6 +163,14 @@ usesBooleanLogic = containsExpression f
   where f (Primitive Negation) = True
         f (Primitive And)      = True
         f (Primitive Or)       = True
+        f _                    = False
+
+usesArithmetic :: Inspection
+usesArithmetic = containsExpression f
+  where f (Primitive Plus)     = True
+        f (Primitive Minus)    = True
+        f (Primitive Multiply) = True
+        f (Primitive Divide)   = True
         f _                    = False
 
 raises :: BoundInspection

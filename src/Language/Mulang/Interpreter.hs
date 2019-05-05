@@ -148,7 +148,7 @@ evalExpr (M.Application (M.Primitive O.Negation) expressions) =
   where f [MuBool b] = createReference $ MuBool $ not b
         f params     = error $ "Bad parameters, expected one bool but got " ++ show params
 
-evalExpr (M.Application (M.Reference "*") expressions) =
+evalExpr (M.Application (M.Primitive O.Multiply) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 * n2
 
@@ -170,11 +170,11 @@ evalExpr (M.Application (M.Primitive O.LessThan) expressions) =
   where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 < n2
         f params                     = raiseString $ "Bad parameters, expected two numbers but got " ++ show params
 
-evalExpr (M.Application (M.Reference "+") expressions) =
+evalExpr (M.Application (M.Primitive O.Plus) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 + n2
 
-evalExpr (M.Application (M.Reference "-") expressions) =
+evalExpr (M.Application (M.Primitive O.Minus) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 - n2
 

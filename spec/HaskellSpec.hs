@@ -1,7 +1,8 @@
 module HaskellSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Ast
+import           Language.Mulang.Ast hiding (Equal, NotEqual)
+import           Language.Mulang.Ast.Operator
 import           Language.Mulang.Parsers.Haskell
 
 spec :: Spec
@@ -17,10 +18,10 @@ spec = do
       hs "f 1 = 1" `shouldBe` (Function "f" [Equation [LiteralPattern "1"] (UnguardedBody (Return (MuNumber 1.0)))])
 
     it "parses left infix partial application" $ do
-      hs "f = (1+)" `shouldBe` Variable "f" (Application (Reference "+") [MuNumber 1.0])
+      hs "f = (1+)" `shouldBe` Variable "f" (Application (Primitive Plus) [MuNumber 1.0])
 
     it "parses right infix partial application" $ do
-      hs "f = (+1)" `shouldBe` Variable "f" (Application (Reference "flip") [Reference "+", MuNumber 1.0])
+      hs "f = (+1)" `shouldBe` Variable "f" (Application (Reference "flip") [Primitive Plus, MuNumber 1.0])
 
     it "parses type restrictions" $ do
       hs "f :: Num a => [a] -> [a]" `shouldBe` SubroutineSignature "f" ["[a]"] "[a]" ["Num a"]
