@@ -6,7 +6,7 @@ prettyVersion :: String
 prettyVersion = "Mulang Release " ++ version ++ ", compiled on " ++ compilationTimestamp
 
 version :: String
-version = "4.5.1"
+version = "4.5.2"
 
 compilationTimestamp :: String
 compilationTimestamp = __DATE__ ++ " " ++ __TIME__
