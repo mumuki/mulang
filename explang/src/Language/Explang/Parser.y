@@ -25,7 +25,7 @@ import           Control.Monad.Error
   distinct { TDistinct {} }
   exactly { TExactly {} }
   false { TFalse {} }
-  inspection { TInspection {} }
+  identifier { TIdentifier {} }
   intransitively { TIntransitively {} }
   least { TLeast {} }
   like { TLike {} }
@@ -66,7 +66,8 @@ Negation : { False }
  | not { True }
 
 Inspection :: { String }
-Inspection : inspection { let (TInspection i) = $1 in i }
+Inspection : identifier { identifierValue $1 }
+  | identifier Inspection { (identifierValue $1) ++ " " ++ $2 }
 
 Binding :: { Binding }
 Binding : { Any }

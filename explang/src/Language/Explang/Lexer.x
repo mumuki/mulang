@@ -1,7 +1,7 @@
 {
 module Language.Explang.Lexer (Token(..),P,evalP,lexer, tokens) where
 import Control.Monad.State
-import Control.Monad.Error
+import Control.Monad.Except
 import Data.Word
 import Codec.Binary.UTF8.String as UTF8 (encode, decode)
 
@@ -48,8 +48,11 @@ $not_double_quote = [. \n] # \"
 -- char
 @char = $str_char|@backslash_pair|\"
 
--- identifier
+-- symbol
 @symbol = ($symbol_char|@backslash_pair)+
+
+-- identifier
+@identifier = $ident_letter+
 
 tokens :-
 
@@ -64,13 +67,6 @@ tokens :-
   "("   { symbolToken TOpenParen }
   ")"   { symbolToken TCloseParen }
   ","   { symbolToken TComma }
-
- -- $lower_letter($ident_letter|$digit)*("?"|"!"|"=")?  { keywordOrIdent }
-
-
-  "calls" { mkInspection }
-  "returns" { mkInspection }
-
 
   "and" { symbolToken TAnd }
   "any" { symbolToken TAny }
@@ -95,6 +91,7 @@ tokens :-
   "with" { symbolToken TWith }
   "within" { symbolToken TWithin }
 
+  @identifier { mkIdentifier }
 
 {
 data Token
@@ -109,7 +106,6 @@ data Token
   | TEOF
   | TExactly
   | TFalse
-  | TInspection String
   | TIntransitively
   | TLeast
   | TLike
@@ -124,6 +120,7 @@ data Token
   | TSomething
   | TString { stringValue :: String }
   | TSymbol { symbolValue :: String }
+  | TIdentifier { identifierValue :: String }
   | TThat
   | TTimes
   | TTrue
@@ -198,6 +195,6 @@ mkChar = token TChar (head.tail)
 mkString :: (String -> Token) -> Action
 mkString kind = token kind (\str -> drop 1 . take (length str - 1) $ str)
 
-mkInspection :: Action
-mkInspection = token TInspection id
+mkIdentifier :: Action
+mkIdentifier = token TIdentifier id
 }
