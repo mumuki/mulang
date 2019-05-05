@@ -21,9 +21,10 @@ module Language.Mulang.Inspector.Generic.Smell (
   overridesEqualOrHashButNotBoth,
   hasUnreachableCode) where
 
-import Language.Mulang.Ast
-import Language.Mulang.Generator (identifierReferences)
-import Language.Mulang.Inspector.Primitive
+import           Language.Mulang.Ast
+import qualified Language.Mulang.Ast.Operator as O
+import           Language.Mulang.Generator (identifierReferences)
+import           Language.Mulang.Inspector.Primitive
 
 -- | Inspection that tells whether an expression has expressions like 'x == True'
 hasRedundantBooleanComparison :: Inspection
@@ -47,8 +48,10 @@ isLongCode = containsExpression f
 compares :: (Expression -> Bool) -> Inspection
 compares f = containsExpression (any f.comparisonOperands)
 
-comparisonOperands (Call (Primitive Equal)    [a1, a2])   = [a1, a2]
-comparisonOperands (Call (Primitive NotEqual) [a1, a2])   = [a1, a2]
+comparisonOperands (Call Equal                [a1, a2])   = [a1, a2] -- deprecated
+comparisonOperands (Call NotEqual             [a1, a2])   = [a1, a2] -- deprecated
+comparisonOperands (Call (Primitive O.Equal)    [a1, a2])   = [a1, a2]
+comparisonOperands (Call (Primitive O.NotEqual) [a1, a2])   = [a1, a2]
 comparisonOperands _                                      = []
 
 returnsNil :: Inspection
@@ -73,7 +76,7 @@ hasRedundantGuards :: Inspection
 hasRedundantGuards = containsBody f -- TODO not true when condition is a pattern
   where f (GuardedBody [
             (_, Return x),
-            (Primitive Otherwise, Return y)]) = all isBooleanLiteral [x, y]
+            (Primitive O.Otherwise, Return y)]) = all isBooleanLiteral [x, y]
         f _ = False
 
 -- | Inspection that tells whether an expression has guards with a hardcoded false instead of an otherwise
@@ -142,14 +145,18 @@ hasTooManyMethods = containsExpression f
 overridesEqualOrHashButNotBoth :: Inspection
 overridesEqualOrHashButNotBoth = containsExpression f
   where f (Sequence expressions) = (any isEqual expressions) /= (any isHash expressions)
-        f (Class _ _ (PrimitiveMethod Equal _)) = True
-        f (Class _ _ (PrimitiveMethod Hash _)) = True
+        f (Class _ _ (PrimitiveMethod O.Equal _)) = True
+        f (Class _ _ (EqualMethod _))             = True
+        f (Class _ _ (PrimitiveMethod O.Hash _))  = True
+        f (Class _ _ (HashMethod _))              = True
         f _ = False
 
-        isEqual (PrimitiveMethod Equal _) = True
+        isEqual (PrimitiveMethod O.Equal _) = True
+        isEqual (EqualMethod _)             = True -- deprecated
         isEqual _ = False
 
-        isHash (PrimitiveMethod Hash _) = True
+        isHash (PrimitiveMethod O.Hash _) = True
+        isHash (HashMethod _)             = True -- deprecated
         isHash _ = False
 
 hasEmptyIfBranches :: Inspection
@@ -172,5 +179,5 @@ hasUnreachableCode = containsExpression f
         bodyMatchesAnyValue (GuardedBody guards) = any (isTruthy . fst) guards
 
         isTruthy (MuBool True)           = True
-        isTruthy (Primitive Otherwise)   = True
+        isTruthy (Primitive O.Otherwise) = True
         isTruthy _                       = False

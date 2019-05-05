@@ -2,7 +2,7 @@
 
 module Language.Mulang.Operators.Ruby (rubyTokensTable) where
 import Language.Mulang.Operators (TokensTable, buildTokensTable)
-import Language.Mulang.Ast (Operator (..))
+import Language.Mulang.Ast.Operator (Operator (..))
 
 rubyTokensTable :: TokensTable
 rubyTokensTable =

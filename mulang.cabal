@@ -34,6 +34,7 @@ library
     Text.Inflections.Tokenizer
     Language.Mulang
     Language.Mulang.Ast
+    Language.Mulang.Ast.Operator
     Language.Mulang.Identifier
     Language.Mulang.Builder
     Language.Mulang.Generator

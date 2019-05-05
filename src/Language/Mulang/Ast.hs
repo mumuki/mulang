@@ -24,7 +24,6 @@ module Language.Mulang.Ast (
     Pattern(..),
     Identifier,
     SubroutineBody,
-    Operator(..),
     debug,
     debugType,
     debugPattern,
@@ -48,6 +47,7 @@ module Language.Mulang.Ast (
 
 import           GHC.Generics
 import           Language.Mulang.Identifier (Identifier)
+import           Language.Mulang.Ast.Operator (Operator)
 
 type Code = String
 
@@ -106,6 +106,8 @@ data Expression
     | Procedure Identifier SubroutineBody
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
     | Method Identifier SubroutineBody
+    | EqualMethod SubroutineBody -- deprecated
+    | HashMethod SubroutineBody -- deprecated
     | PrimitiveMethod Operator SubroutineBody
     | Variable Identifier Expression
     | Assignment Identifier Expression
@@ -172,6 +174,8 @@ data Expression
     -- ^ Generic sequence of statements
     | Other (Maybe Code) (Maybe Expression)
     -- ^ Unrecognized expression, with optional description and body
+    | Equal -- ^ deprecated
+    | NotEqual -- ^ deprecated
     | Self
     | None
     -- ^ Generic value indicating an absent expression, such as when there is no finally in a try or default in a switch or js' undefined
@@ -197,31 +201,6 @@ data Expression
     -- ^ Generic test expression such as it, etc.
     | Assert Bool Assertion
     -- ^ Generic assertion expression such as assert, expect, etc. The first parameter indicates whether the assertion is negated or not
-  deriving (Eq, Show, Read, Generic, Ord)
-
-data Operator
-    = Equal
-    -- equal operator
-    | NotEqual
-    -- ^ distinct operator
-    | Negation
-    -- ^ not operator
-    | And
-    -- ^ and operator
-    | Or
-    -- ^ or operator
-    | Hash
-    -- ^ hashcode operator
-    | GreatherOrEqualThan
-    | GreatherThan
-    | LessOrEqualThan
-    | LessThan
-    | Otherwise
-    -- ^ guard's otherwise operator
-    | ForwardComposition
-    -- (f >> g)(x) = (g . f)(x) = g(f(x)) operator
-    | BackwardComposition
-    -- (f << g)(x) = (f . g)(x) = f(g(x)) operator
   deriving (Eq, Show, Read, Generic, Ord)
 
 data Assertion
@@ -315,10 +294,11 @@ extractUnification (Attribute name value)   = Just (name, value)
 extractUnification _                        = Nothing
 
 extractSubroutine :: Expression -> Maybe (Identifier, SubroutineBody)
-extractSubroutine (Function name body)  = Just (name, body)
-extractSubroutine (Procedure name body) = Just (name, body)
-extractSubroutine (Method name body)    = Just (name, body)
-extractSubroutine _                     = Nothing
+extractSubroutine (Function name body)        = Just (name, body)
+extractSubroutine (Procedure name body)       = Just (name, body)
+extractSubroutine (Method name body)          = Just (name, body)
+extractSubroutine (PrimitiveMethod op body)   = Just (show op, body)
+extractSubroutine _                           = Nothing
 
 extractParams :: Expression -> Maybe ([Pattern])
 extractParams (Subroutine _ equations) = Just (equationParams.head $ equations)

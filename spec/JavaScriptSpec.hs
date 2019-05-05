@@ -3,7 +3,8 @@
 module JavaScriptSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang
+import           Language.Mulang.Ast hiding (Equal, NotEqual)
+import           Language.Mulang.Ast.Operator
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 

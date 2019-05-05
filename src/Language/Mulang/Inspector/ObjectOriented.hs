@@ -15,6 +15,7 @@ module Language.Mulang.Inspector.ObjectOriented (
   declaresPrimitive)  where
 
 import Language.Mulang.Ast
+import Language.Mulang.Ast.Operator (Operator)
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Bound (BoundInspection, containsBoundDeclaration)
 import Language.Mulang.Inspector.Primitive (Inspection, containsExpression, containsDeclaration)

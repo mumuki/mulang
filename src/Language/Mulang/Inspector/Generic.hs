@@ -28,7 +28,8 @@ module Language.Mulang.Inspector.Generic (
   usesPrint,
   usesYield) where
 
-import Language.Mulang.Ast
+import Language.Mulang.Ast hiding (Equal, NotEqual)
+import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Generator (declaredIdentifiers, expressions, declarations, referencedIdentifiers)
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Bound (containsBoundDeclaration, BoundInspection)

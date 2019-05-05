@@ -1,7 +1,7 @@
 module HaskellSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang
+import           Language.Mulang.Ast
 import           Language.Mulang.Parsers.Haskell
 
 spec :: Spec

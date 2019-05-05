@@ -3,7 +3,8 @@
 module JavaSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang
+import           Language.Mulang.Ast hiding (Equal, NotEqual)
+import           Language.Mulang.Ast.Operator
 import           Language.Mulang.Parsers.Java
 
 import           Data.Text (Text, unpack)

@@ -9,7 +9,7 @@ module Language.Mulang.Operators (
   TokensTable,
   OperatorsTable) where
 
-import           Language.Mulang.Ast (Operator (..))
+import           Language.Mulang.Ast.Operator (Operator (..))
 
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
