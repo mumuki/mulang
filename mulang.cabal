@@ -74,6 +74,8 @@ library
     Language.Mulang.Analyzer.Autocorrector
     Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.ExpectationsAnalyzer
+    Language.Mulang.Analyzer.ExplangAnalyzer
+    Language.Mulang.Analyzer.ExplangExpectationsCompiler
     Language.Mulang.Analyzer.ExpectationsCompiler
     Language.Mulang.Analyzer.FragmentParser
     Language.Mulang.Analyzer.SignaturesAnalyzer

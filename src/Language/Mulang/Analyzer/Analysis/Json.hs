@@ -36,15 +36,6 @@ instance FromJSON Assertion
 instance FromJSON TestAnalysisType
 instance FromJSON InterpreterOptions
 instance FromJSON Operator
-instance FromJSON ExpectationsAnalysisType
-
-instance FromJSON Explang.Expectation
-instance FromJSON Explang.Scope
-instance FromJSON Explang.Flags
-instance FromJSON Explang.Count
-instance FromJSON Explang.Matcher
-instance FromJSON Explang.Binding
-instance FromJSON Explang.Predicate
 
 instance ToJSON AnalysisResult
 instance ToJSON ExpectationResult
@@ -60,4 +51,5 @@ instance ToJSON Type
 instance ToJSON Assertion
 instance ToJSON TestResult
 instance ToJSON TestStatus
+instance ToJSON ExplangTestResult
 instance ToJSON Operator

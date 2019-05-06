@@ -25,7 +25,6 @@ module Language.Mulang.Analyzer.Analysis (
   AutocorrectionRules,
   CaseStyle(..),
   DomainLanguage(..),
-  ExpectationsAnalysisType (..),
   Fragment(..),
   Inspection,
   InterpreterOptions(..),
@@ -33,17 +32,14 @@ module Language.Mulang.Analyzer.Analysis (
   SignatureAnalysisType(..),
   SignatureStyle(..),
   Smell,
-  Smell,
   SmellsSet(..),
-  TestAnalysisType(..),
   TestAnalysisType(..),
 
   AnalysisResult(..),
-  ExpectationResult(..)) where
+  ExpectationResult(..),
+  ExplangTestResult(..)) where
 
 import GHC.Generics
-
-import qualified Language.Explang.Expectation as Explang
 
 import Language.Mulang.Ast
 import Language.Mulang.Builder (NormalizationOptions)
@@ -73,8 +69,8 @@ data Analysis = Analysis {
 } deriving (Show, Eq, Generic)
 
 data AnalysisSpec = AnalysisSpec {
-  expectations :: Maybe [Expectation], -- ^ depracated: use expectationsAnalysisType
-  expectationsAnalysisType :: Maybe ExpectationsAnalysisType,
+  expectations :: Maybe [Expectation],
+  explangTest :: Maybe String,
   smellsSet :: Maybe SmellsSet,
   signatureAnalysisType :: Maybe SignatureAnalysisType,
   testAnalysisType :: Maybe TestAnalysisType,
@@ -83,13 +79,6 @@ data AnalysisSpec = AnalysisSpec {
   originalLanguage :: Maybe Language,
   autocorrectionRules :: Maybe AutocorrectionRules
 } deriving (Show, Eq, Generic)
-
-data ExpectationsAnalysisType
-  = NoExpectations
-  | Piped [Expectation]
-  | Explang String
-  | Raw Explang.Expectation
-  deriving (Show, Eq, Generic)
 
 data DomainLanguage = DomainLanguage {
   dictionaryFilePath :: Maybe FilePath,
@@ -156,6 +145,7 @@ data Language
 data AnalysisResult
   = AnalysisCompleted {
       expectationResults :: [ExpectationResult],
+      explangTestResults :: [ExplangTestResult],
       smells :: [Expectation],
       signatures :: [Code],
       testResults :: [TestResult],
@@ -165,6 +155,12 @@ data AnalysisResult
 data ExpectationResult = ExpectationResult {
   expectation :: Expectation,
   result :: Bool
+} deriving (Show, Eq, Generic)
+
+
+data ExplangTestResult = ExplangTestResult {
+  name :: String,
+  status :: Bool
 } deriving (Show, Eq, Generic)
 
 --
@@ -205,7 +201,7 @@ testsAnalysis :: Fragment -> TestAnalysisType -> Analysis
 testsAnalysis code testAnalysisType = Analysis code (emptyAnalysisSpec { testAnalysisType = Just testAnalysisType })
 
 emptyCompletedAnalysisResult :: AnalysisResult
-emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing
+emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] [] Nothing
 
 emptyDomainLanguage :: DomainLanguage
 emptyDomainLanguage = DomainLanguage Nothing Nothing Nothing Nothing

@@ -30,6 +30,7 @@ analyseAst ast spec = do
   domaingLang <- compileDomainLanguage (domainLanguage spec)
   testResults <- analyseTests ast (testAnalysisType spec)
   return $ AnalysisCompleted (analyseExpectations ast (expectations spec))
+                             []
                              (analyseSmells ast domaingLang (smellsSet spec))
                              (analyseSignatures ast (signatureAnalysisType spec))
                              testResults
