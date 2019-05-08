@@ -14,20 +14,19 @@ import Data.List.Split (splitOn)
 compileExpectation :: A.Expectation -> Inspection
 compileExpectation (A.Expectation s i) = EC.compileExpectation . negator . scope $ Expectation noFlags Unscoped baseQuery AnyCount -- TODO move to explang
   where
-    inspectionParts = splitOn ":" i
-    negator = compileNegator inspectionParts
-    scope = compileScope (splitOn ":" s)
+    (inspectionParts, negator) = compileInspectionPartsAndNegator (splitOn ":" i)
+    scope = compileScopeAndFlags (splitOn ":" s)
     baseQuery = compileBaseQuery inspectionParts
 
-compileScope :: [String] -> Expectation -> Expectation
-compileScope ["*"]                 e = e { scope = Unscoped }
-compileScope ["Intransitive",name] e = e { flags = intransitiveFlag, scope = Scoped name }
-compileScope [name]                e = e { scope = Scoped name}
-compileScope _                     e = e
+compileInspectionPartsAndNegator :: [String] -> ([String], Expectation -> Expectation)
+compileInspectionPartsAndNegator ("Not":ps) = (ps, \e -> e { query = Not (query e) })
+compileInspectionPartsAndNegator ps         = (ps, id)
 
-compileNegator :: [String] -> Expectation -> Expectation
-compileNegator ("Not":_) e = e { query = Not (query e) }
-compileNegator _         e = e
+compileScopeAndFlags :: [String] -> Expectation -> Expectation
+compileScopeAndFlags ["*"]                 e = e { scope = Unscoped }
+compileScopeAndFlags ["Intransitive",name] e = e { flags = intransitiveFlag, scope = Scoped name }
+compileScopeAndFlags [name]                e = e { scope = Scoped name}
+compileScopeAndFlags _                     e = e
 
 compileBaseQuery :: [String] -> Query
 compileBaseQuery []                            = compileBaseQuery ["Parses","*"]

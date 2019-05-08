@@ -35,12 +35,9 @@ justScopeFor :: ([Identifier] -> ContextualizedModifier) -> Identifier -> Maybe 
 justScopeFor f name = Just (f names, andAlso (except (last names)))
   where names = splitOn "." name
 
-compileNegator :: [String] -> Modifier
-compileNegator ("Not":_) = negative
-compileNegator _         = id
-
 compileBaseInspection :: PredicateModifier -> Query -> Maybe ContextualizedInspection
 compileBaseInspection p (E.Inspection i b m) = fmap ($ (compileObject p b)) (compileInspectionPrimitive i m)
+compileBaseInspection p (E.Not q)            = fmap contextualizedNegative (compileBaseInspection p q)
 compileBaseInspection _ _                    = Nothing
 
 compileObject :: PredicateModifier -> Binding -> IdentifierPredicate

@@ -4,6 +4,7 @@ module Language.Mulang.Inspector.Contextualized (
   contextualized,
   contextualizedBind,
   boundContextualize,
+  contextualizedNegative,
   contextualizedScoped,
   contextualizedScopedList,
   contextualizedTransitive,
@@ -15,7 +16,7 @@ module Language.Mulang.Inspector.Contextualized (
 import Language.Mulang.Ast
 import Language.Mulang.Identifier (IdentifierPredicate)
 import Language.Mulang.Inspector.Bound (BoundInspection)
-import Language.Mulang.Inspector.Combiner (scoped, scopedList, transitive, transitiveList, Modifier)
+import Language.Mulang.Inspector.Combiner (scoped, scopedList, transitive, transitiveList, negative, Modifier)
 import Language.Mulang.Inspector.Primitive (Inspection)
 
 type ContextualizedInspection = Expression -> Inspection
@@ -50,6 +51,9 @@ decontextualize inspection = \expression -> inspection expression expression
 
 contextualized :: Modifier -> ContextualizedModifier
 contextualized f inspection = \context -> f (inspection context)
+
+contextualizedNegative :: ContextualizedModifier
+contextualizedNegative = contextualized negative
 
 contextualizedScoped :: Identifier -> ContextualizedModifier
 contextualizedScoped scope = contextualized (scoped scope)
