@@ -6,8 +6,6 @@ import           Language.Mulang.Analyzer.Analysis
 import           Language.Mulang.Builder (NormalizationOptions, SequenceSortMode)
 import           Language.Mulang.Interpreter.Runner (TestResult, TestStatus)
 
-import qualified Language.Explang.Expectation as Explang
-
 instance FromJSON Analysis
 instance FromJSON AnalysisSpec
 

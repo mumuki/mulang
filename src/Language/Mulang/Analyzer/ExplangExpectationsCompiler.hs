@@ -20,7 +20,7 @@ compileExpectation :: Expectation -> Inspection
 compileExpectation = fromMaybe (\_ -> True) . compileMaybe
 
 compileMaybe :: Expectation -> Maybe Inspection
-compileMaybe (Expectation flags scope query count) = do
+compileMaybe (Expectation flags scope query _) = do
   (scope, predicateModifier) <- compileModifiers flags scope
   baseInspection <- compileBaseInspection predicateModifier query
   return . decontextualize . scope  $ baseInspection
