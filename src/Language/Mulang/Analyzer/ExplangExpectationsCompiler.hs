@@ -130,7 +130,7 @@ compileInspectionPrimitive = f
   f "UsesYield"                        Unmatching   = plain usesYield
   f (primitiveUsage -> Just p)         Unmatching   = plain (usesPrimitive p)
   f (primitiveDeclaration -> Just p)   Unmatching   = plain (declaresPrimitive p)
-  f _                                  Unmatching   = Nothing
+  f _                                  _            = Nothing
 
   primitiveUsage = decodeUsageInspection
   primitiveDeclaration = decodeDeclarationInspection
