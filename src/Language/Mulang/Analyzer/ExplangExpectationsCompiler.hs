@@ -20,16 +20,16 @@ compileExpectation :: Expectation -> Inspection
 compileExpectation = fromMaybe (\_ -> True) . compileMaybe
 
 compileMaybe :: Expectation -> Maybe Inspection
-compileMaybe (Expectation flags scope query _) = do
-  (scope, predicateModifier) <- compileModifiers flags scope
+compileMaybe (Expectation scope query _) = do
+  (scope, predicateModifier) <- compileScope scope
   baseInspection <- compileBaseInspection predicateModifier query
   return . decontextualize . scope  $ baseInspection
 
-compileModifiers :: Flags -> Scope -> Maybe Modifiers
-compileModifiers (Flags False) Unscoped      = Just (id, id)
-compileModifiers (Flags True)  (Scoped name) = justScopeFor contextualizedScopedList name
-compileModifiers (Flags False) (Scoped name) = justScopeFor contextualizedTransitiveList name
-compileModifiers _             _             = Nothing
+compileScope :: Scope -> Maybe Modifiers
+compileScope Anywhere       = Just (id, id)
+compileScope (Within name)  = justScopeFor contextualizedScopedList name
+compileScope (Through name) = justScopeFor contextualizedTransitiveList name
+compileScope _              = Nothing
 
 justScopeFor :: ([Identifier] -> ContextualizedModifier) -> Identifier -> Maybe Modifiers
 justScopeFor f name = Just (f names, andAlso (except (last names)))

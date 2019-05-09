@@ -12,21 +12,21 @@ import qualified Language.Mulang.Analyzer.Analysis as A
 import Data.List.Split (splitOn)
 
 compileExpectation :: A.Expectation -> Inspection
-compileExpectation (A.Expectation s i) = EC.compileExpectation . negator . scope $ Expectation noFlags Unscoped baseQuery AnyCount -- TODO move to explang
+compileExpectation (A.Expectation s i) = EC.compileExpectation . negator . scope $ Expectation Anywhere baseQuery AnyCount -- TODO move to explang
   where
     (inspectionParts, negator) = compileInspectionPartsAndNegator (splitOn ":" i)
-    scope = compileScopeAndFlags (splitOn ":" s)
+    scope = compileScope (splitOn ":" s)
     baseQuery = compileBaseQuery inspectionParts
 
 compileInspectionPartsAndNegator :: [String] -> ([String], Expectation -> Expectation)
 compileInspectionPartsAndNegator ("Not":ps) = (ps, \e -> e { query = Not (query e) })
 compileInspectionPartsAndNegator ps         = (ps, id)
 
-compileScopeAndFlags :: [String] -> Expectation -> Expectation
-compileScopeAndFlags ["*"]                 e = e { scope = Unscoped }
-compileScopeAndFlags ["Intransitive",name] e = e { flags = intransitiveFlag, scope = Scoped name }
-compileScopeAndFlags [name]                e = e { scope = Scoped name}
-compileScopeAndFlags _                     e = e
+compileScope :: [String] -> Expectation -> Expectation
+compileScope ["*"]                 e = e { scope = Anywhere }
+compileScope ["Intransitive",name] e = e { scope = Within name }
+compileScope [name]                e = e { scope = Through name}
+compileScope _                     e = e
 
 compileBaseQuery :: [String] -> Query
 compileBaseQuery []                            = compileBaseQuery ["Parses","*"]
