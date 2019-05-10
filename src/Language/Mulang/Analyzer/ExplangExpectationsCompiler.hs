@@ -17,30 +17,32 @@ import Data.List.Split (splitOn)
 type Modifiers = (ContextualizedModifier, PredicateModifier)
 
 compileExpectation :: Expectation -> Inspection
-compileExpectation = fromMaybe (\_ -> True) . compileMaybe
+compileExpectation = fromMaybe (\_ -> True) . compileQuery
 
-compileMaybe :: Expectation -> Maybe Inspection
-compileMaybe (Expectation scope query _) = do
-  (scope, predicateModifier) <- compileScope scope
-  baseInspection <- compileBaseInspection predicateModifier query
-  return . decontextualize . scope  $ baseInspection
+compileQuery :: Expectation -> Maybe Inspection
+compileQuery (E.Decontextualize query) = compileCQuery id query >>= (return . decontextualize)
+compileQuery (E.Within name query)     | (scope, p) <- compileWithin name  = fmap (decontextualize.scope) (compileCQuery p query)
+compileQuery (E.Through name query)    | (scope, p) <- compileThrough name = fmap (decontextualize.scope) (compileCQuery p query)
+compileQuery (E.Not query)             = fmap negative (compileQuery query)
+compileQuery (E.And query1 query2)     = combined <$> (compileQuery query1) <*> (compileQuery query2)
+compileQuery (E.Or query1 query2)      = alternative <$> (compileQuery query1) <*> (compileQuery query2)
 
-compileScope :: Scope -> Maybe Modifiers
-compileScope Anywhere       = Just (id, id)
-compileScope (Within name)  = justScopeFor contextualizedScopedList name
-compileScope (Through name) = justScopeFor contextualizedTransitiveList name
-compileScope _              = Nothing
 
-justScopeFor :: ([Identifier] -> ContextualizedModifier) -> Identifier -> Maybe Modifiers
-justScopeFor f name = Just (f names, andAlso (except (last names)))
+compileWithin, compileThrough :: String -> Modifiers
+compileWithin name  = scopeFor contextualizedScopedList name
+compileThrough name = scopeFor contextualizedTransitiveList name
+
+scopeFor :: ([Identifier] -> ContextualizedModifier) -> Identifier -> Modifiers
+scopeFor f name = (f names, andAlso (except (last names)))
   where names = splitOn "." name
 
-compileBaseInspection :: PredicateModifier -> Query -> Maybe ContextualizedInspection
-compileBaseInspection p (E.Inspection i b m) = fmap ($ (compileObject p b)) (compileInspectionPrimitive i m)
-compileBaseInspection p (E.Not q)            = fmap contextualizedNegative (compileBaseInspection p q)
-compileBaseInspection _ _                    = Nothing
+compileCQuery :: PredicateModifier -> E.CQuery -> Maybe ContextualizedInspection
+compileCQuery p (E.Inspection i b m) = fmap ($ (compileObject p b)) (compileInspectionPrimitive i m)
+compileCQuery p (E.CNot q)           = fmap contextualizedNegative (compileCQuery p q) -- we should merge predicates here
+compileCQuery _ _                    = Nothing
 
-compileObject :: PredicateModifier -> Binding -> IdentifierPredicate
+
+compileObject :: PredicateModifier -> E.Predicate -> IdentifierPredicate
 compileObject p Any           = p $ anyone
 compileObject p (Like name)   = p $ like name
 compileObject _ (Named name)  = named name
@@ -144,10 +146,10 @@ compileInspectionPrimitive = f
   bound :: BoundInspection -> Maybe ContextualizedBoundInspection
   bound = Just . boundContextualize
 
-compileMatcher :: [Predicate] -> Matcher
+compileMatcher :: [E.Clause] -> Matcher
 compileMatcher = withEvery . f
   where
-    f :: [Predicate] -> [Inspection]
+    f :: [E.Clause] -> [Inspection]
     f (IsFalse:args)         = isBool False : (f args)
     f (IsNil:args)           = isNil : (f args)
     f (IsTrue:args)          = isBool True : (f args)

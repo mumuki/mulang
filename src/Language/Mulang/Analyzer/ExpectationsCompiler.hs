@@ -12,35 +12,35 @@ import qualified Language.Mulang.Analyzer.Analysis as A
 import Data.List.Split (splitOn)
 
 compileExpectation :: A.Expectation -> Inspection
-compileExpectation (A.Expectation s i) = EC.compileExpectation . negator . scope $ Expectation Anywhere baseQuery AnyCount -- TODO move to explang
+compileExpectation (A.Expectation s i) = EC.compileExpectation . negator . scope $ baseQuery -- TODO move to explang
   where
     (inspectionParts, negator) = compileInspectionPartsAndNegator (splitOn ":" i)
     scope = compileScope (splitOn ":" s)
-    baseQuery = compileBaseQuery inspectionParts
+    baseQuery = compileCQuery inspectionParts
 
-compileInspectionPartsAndNegator :: [String] -> ([String], Expectation -> Expectation)
-compileInspectionPartsAndNegator ("Not":ps) = (ps, \e -> e { query = Not (query e) })
+compileInspectionPartsAndNegator :: [String] -> ([String], Query -> Query)
+compileInspectionPartsAndNegator ("Not":ps) = (ps, Not)
 compileInspectionPartsAndNegator ps         = (ps, id)
 
-compileScope :: [String] -> Expectation -> Expectation
-compileScope ["*"]                 e = e { scope = Anywhere }
-compileScope ["Intransitive",name] e = e { scope = Within name }
-compileScope [name]                e = e { scope = Through name}
-compileScope _                     e = e
+compileScope :: [String] -> CQuery -> Query
+compileScope ["*"]                 q = Decontextualize q
+compileScope ["Intransitive",name] q = Within name q
+compileScope [name]                q = Through name q
+compileScope _                     q = Decontextualize q
 
-compileBaseQuery :: [String] -> Query
-compileBaseQuery []                            = compileBaseQuery ["Parses","*"]
-compileBaseQuery [verb]                        = compileBaseQuery [verb,"*"]
-compileBaseQuery [verb,"WithFalse"]            = compileBaseQuery [verb,"*","WithFalse"]
-compileBaseQuery [verb,"WithNil"]              = compileBaseQuery [verb,"*","WithNil"]
-compileBaseQuery [verb,"WithTrue"]             = compileBaseQuery [verb,"*","WithTrue"]
-compileBaseQuery (verb:"WithChar":args)        = compileBaseQuery (verb:"*":"WithChar":args)
-compileBaseQuery (verb:"WithNumber":args)      = compileBaseQuery (verb:"*":"WithNumber":args)
-compileBaseQuery (verb:"WithString":args)      = compileBaseQuery (verb:"*":"WithString":args)
-compileBaseQuery (verb:"WithSymbol":args)      = compileBaseQuery (verb:"*":"WithSymbol":args)
-compileBaseQuery (verb:object:args)            = Inspection verb (compileBinding object) (compileMatcher args)
+compileCQuery :: [String] -> CQuery
+compileCQuery []                            = compileCQuery ["Parses","*"]
+compileCQuery [verb]                        = compileCQuery [verb,"*"]
+compileCQuery [verb,"WithFalse"]            = compileCQuery [verb,"*","WithFalse"]
+compileCQuery [verb,"WithNil"]              = compileCQuery [verb,"*","WithNil"]
+compileCQuery [verb,"WithTrue"]             = compileCQuery [verb,"*","WithTrue"]
+compileCQuery (verb:"WithChar":args)        = compileCQuery (verb:"*":"WithChar":args)
+compileCQuery (verb:"WithNumber":args)      = compileCQuery (verb:"*":"WithNumber":args)
+compileCQuery (verb:"WithString":args)      = compileCQuery (verb:"*":"WithString":args)
+compileCQuery (verb:"WithSymbol":args)      = compileCQuery (verb:"*":"WithSymbol":args)
+compileCQuery (verb:object:args)            = Inspection verb (compileBinding object) (compileMatcher args)
 
-compileBinding :: String -> Binding
+compileBinding :: String -> Predicate
 compileBinding "*"        = Any
 compileBinding ('~':name) = Like name
 compileBinding ('=':name) = Named name
@@ -54,7 +54,7 @@ compileMatcher = matching . f
     matching [] = Unmatching -- TODO move to explang
     matching xs = Matching xs
 
-    f :: [String] -> [Predicate]
+    f :: [String] -> [Clause]
     f ("WithFalse":args)        =  IsFalse : f args
     f ("WithNil":args)          =  IsNil : f args
     f ("WithTrue":args)         =  IsTrue : f args

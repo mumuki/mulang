@@ -11,6 +11,7 @@ import           Language.Mulang.Generator (expressions, equationBodies, declara
 
 import           Data.List.Extra (has)
 
+type Counter = Expression -> Bool
 type Inspection = Expression -> Bool
 
 containsExpression :: Inspection -> Inspection

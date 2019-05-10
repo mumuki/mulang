@@ -3,6 +3,7 @@ module Language.Mulang.Inspector.Combiner (
   locate,
   negative,
   alternative,
+  combined,
   scoped,
   scopedList,
   transitive,
@@ -37,6 +38,9 @@ locate inspection expression
 
 alternative :: Inspection -> Modifier
 alternative i1 i2 expression = i1 expression || i2 expression
+
+combined :: Inspection -> Modifier
+combined i1 i2 expression = i1 expression && i2 expression
 
 negative :: Modifier
 negative f = not . f
