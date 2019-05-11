@@ -13,6 +13,7 @@ import Language.Mulang.Inspector.Primitive (atLeast, atMost, exactly)
 import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol)
 import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
 
+import qualified Data.Text as Text
 import qualified Language.Explang.Expectation as E
 
 import Data.Maybe (fromMaybe)
@@ -40,7 +41,7 @@ scopeFor f name = (contextualized (f names), andAlso (except (last names)))
   where names = splitOn "." name
 
 compileCQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.CQuery -> Maybe ContextualizedInspection
-compileCQuery pm (E.Inspection i p m) = ($ (compilePredicate pm p))         <$> compileInspection i m
+compileCQuery pm (E.Inspection i p m) = ($ (compilePredicate pm p))         <$> compileInspection (compileVerb i) m
 compileCQuery pm (E.AtLeast n q)      = contextualized (atLeast (encode n)) <$> compileTQuery pm q
 compileCQuery pm (E.AtMost n q)       = contextualized (atMost (encode n))  <$> compileTQuery pm q
 compileCQuery pm (E.Exactly n q)      = contextualized (exactly (encode n)) <$> compileTQuery pm q
@@ -49,7 +50,7 @@ compileCQuery pm (E.CAnd q1 q2)       = contextualized2 andAlso             <$> 
 compileCQuery pm (E.COr q1 q2)        = contextualized2 orElse              <$> compileCQuery pm q1 <*> compileCQuery pm q2
 
 compileTQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.TQuery -> Maybe ContextualizedCounter
-compileTQuery pm (E.Counter i p m) = ($ (compilePredicate pm p)) <$> compileCounter i m
+compileTQuery pm (E.Counter i p m) = ($ (compilePredicate pm p)) <$> compileCounter (compileVerb i) m
 compileTQuery pm (E.Plus q1 q2)    = contextualized2 plus        <$> (compileTQuery pm q1) <*> (compileTQuery pm q2)
 
 compilePredicate :: (IdentifierPredicate -> IdentifierPredicate) -> E.Predicate -> IdentifierPredicate
@@ -59,6 +60,10 @@ compilePredicate _ (E.Named name)  = named name
 compilePredicate _ (E.Except name) = except name
 compilePredicate _ (E.AnyOf ns)    = anyOf ns
 
+
+compileVerb s | (_:_:_) <- words = Text.unpack . Text.concat . map Text.toTitle $ words
+              | otherwise = s
+  where words = Text.words . Text.pack $  s
 
 compileCounter :: String -> E.Matcher -> Maybe (ContextualizedBoundCounter)
 compileCounter = f
