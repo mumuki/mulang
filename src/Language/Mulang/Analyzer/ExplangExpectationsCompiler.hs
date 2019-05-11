@@ -3,6 +3,7 @@
 module Language.Mulang.Analyzer.ExplangExpectationsCompiler(
   compileExpectation) where
 
+import Data.Count (encode)
 import Data.Function.Extra (orElse, andAlso, never)
 
 import Language.Mulang
@@ -41,9 +42,9 @@ compileCQuery pm (E.Inspection i p m) = ($ (compilePredicate pm p)) <$> compileI
 compileCQuery pm (E.CNot q)           = contextualized never        <$> compileCQuery pm q
 compileCQuery pm (E.CAnd q1 q2)       = contextualized2 andAlso     <$> compileCQuery pm q1 <*> compileCQuery pm q2
 compileCQuery pm (E.COr q1 q2)        = contextualized2 orElse      <$> compileCQuery pm q1 <*> compileCQuery pm q2
-compileCQuery pm (E.AtLeast n q)      = atLeast n                   <$> compileTQuery pm q
-compileCQuery pm (E.AtMost n q)       = atMost n                    <$> compileTQuery pm q
-compileCQuery pm (E.Exactly n q)      = exactly n                   <$> compileTQuery pm q
+compileCQuery pm (E.AtLeast n q)      = atLeast (encode n)          <$> compileTQuery pm q
+compileCQuery pm (E.AtMost n q)       = atMost (encode n)           <$> compileTQuery pm q
+compileCQuery pm (E.Exactly n q)      = exactly (encode n)          <$> compileTQuery pm q
 
 compileTQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.TQuery -> Maybe Counter
 compileTQuery pm (E.Counter i p m) = ($ (compilePredicate pm p)) <$> compileCounter i m

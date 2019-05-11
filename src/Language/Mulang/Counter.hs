@@ -3,15 +3,16 @@ module Language.Mulang.Counter (
   atLeast,
   atMost,
   exactly,
+  Count (..),
   Counter) where
 
+import Data.Count (Count (..))
 import Data.Function.Extra (compose2)
 
 import Language.Mulang.Ast (Expression)
 import Language.Mulang.Identifier (IdentifierPredicate)
 import Language.Mulang.Inspector.Contextualized (ContextualizedInspection)
 
-type Count = Int
 type Counter = Expression -> Expression -> Count
 type BoundCounter = IdentifierPredicate -> Counter
 

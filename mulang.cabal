@@ -28,8 +28,9 @@ library
 
   exposed-modules:
     Control.Fallible
-    Data.List.Extra
+    Data.Count
     Data.Function.Extra
+    Data.List.Extra
     Text.Dictionary
     Text.SimpleParser
     Text.Inflections.Tokenizer
