@@ -1,5 +1,5 @@
 module Language.Mulang.Inspector.Generic (
-  countIf,
+  countIfs,
   assigns,
   assignsMatching,
   calls,
@@ -87,11 +87,10 @@ delegates' p context expression = inspect $ do
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
 usesIf :: Inspection
-usesIf = containsExpression f
-  where f (If _ _ _) = True
-        f _          = False
+usesIf = positive countIfs
 
-countIf = countExpression f
+countIfs :: Counter
+countIfs = countExpressions f
   where f (If _ _ _) = True
         f _          = False
 

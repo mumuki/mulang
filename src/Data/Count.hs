@@ -4,6 +4,7 @@ module Data.Count (
   cast,
   decode,
   count,
+  counts,
   Count (..)) where
 
 data Count
@@ -34,6 +35,9 @@ count :: [a] -> Count
 count []     = Zero
 count [x]    = One
 count xs     = MoreThanOne (length xs)
+
+counts :: (a -> Bool) -> (b -> [a]) -> b -> Count
+counts f g = count . filter f . g
 
 instance  Num Count  where
   negate _ = Zero

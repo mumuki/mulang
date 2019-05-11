@@ -6,21 +6,21 @@ import           Language.Mulang.Parsers.JavaScript (js)
 
 spec :: Spec
 spec = do
-  describe "countIf" $ do
+  describe "countIfs" $ do
     it "counts 0" $ do
-      countIf (js "") `shouldBe` 0
+      countIfs (js "") `shouldBe` 0
 
     it "counts 1" $ do
-      countIf (js "if (true) {}") `shouldBe` 1
-      countIf (js "if (true) {} else {}" ) `shouldBe` 1
+      countIfs (js "if (true) {}") `shouldBe` 1
+      countIfs (js "if (true) {} else {}" ) `shouldBe` 1
 
     it "counts 2 or more" $ do
-      countIf (js "if (true) {} else {}\n\
+      countIfs (js "if (true) {} else {}\n\
                   \if (true) {} else {}" ) `shouldBe` 2
-      countIf (js "if (true) {} else {}\n\
+      countIfs (js "if (true) {} else {}\n\
                   \if (true) {} else {}\n\
                   \if (true) {}\n" ) `shouldBe` 3
 
     it "counts across procedures" $ do
-      countIf (js "function f1() {if (true) {} else {}}\n\
+      countIfs (js "function f1() {if (true) {} else {}}\n\
                   \function f2() {if (true) {} else {}}\n" ) `shouldBe` 2

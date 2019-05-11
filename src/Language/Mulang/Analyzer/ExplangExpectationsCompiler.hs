@@ -7,7 +7,8 @@ import Data.Count (encode)
 import Data.Function.Extra (orElse, andAlso, never)
 
 import Language.Mulang
-import Language.Mulang.Counter (Counter, plus, atLeast, atMost, exactly)
+import Language.Mulang.Counter (plus)
+import Language.Mulang.Inspector.Primitive (atLeast, atMost, exactly)
 import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol)
 import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
 
@@ -38,17 +39,17 @@ scopeFor f name = (contextualized (f names), andAlso (except (last names)))
   where names = splitOn "." name
 
 compileCQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.CQuery -> Maybe ContextualizedInspection
-compileCQuery pm (E.Inspection i p m) = ($ (compilePredicate pm p)) <$> compileInspection i m
-compileCQuery pm (E.CNot q)           = contextualized never        <$> compileCQuery pm q
-compileCQuery pm (E.CAnd q1 q2)       = contextualized2 andAlso     <$> compileCQuery pm q1 <*> compileCQuery pm q2
-compileCQuery pm (E.COr q1 q2)        = contextualized2 orElse      <$> compileCQuery pm q1 <*> compileCQuery pm q2
-compileCQuery pm (E.AtLeast n q)      = atLeast (encode n)          <$> compileTQuery pm q
-compileCQuery pm (E.AtMost n q)       = atMost (encode n)           <$> compileTQuery pm q
-compileCQuery pm (E.Exactly n q)      = exactly (encode n)          <$> compileTQuery pm q
+compileCQuery pm (E.Inspection i p m) = ($ (compilePredicate pm p))         <$> compileInspection i m
+compileCQuery pm (E.AtLeast n q)      = contextualized (atLeast (encode n)) <$> compileTQuery pm q
+compileCQuery pm (E.AtMost n q)       = contextualized (atMost (encode n))  <$> compileTQuery pm q
+compileCQuery pm (E.Exactly n q)      = contextualized (exactly (encode n)) <$> compileTQuery pm q
+compileCQuery pm (E.CNot q)           = contextualized never                <$> compileCQuery pm q
+compileCQuery pm (E.CAnd q1 q2)       = contextualized2 andAlso             <$> compileCQuery pm q1 <*> compileCQuery pm q2
+compileCQuery pm (E.COr q1 q2)        = contextualized2 orElse              <$> compileCQuery pm q1 <*> compileCQuery pm q2
 
-compileTQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.TQuery -> Maybe Counter
+compileTQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.TQuery -> Maybe ContextualizedCounter
 compileTQuery pm (E.Counter i p m) = ($ (compilePredicate pm p)) <$> compileCounter i m
-compileTQuery pm (E.Plus q1 q2)    = plus                        <$> (compileTQuery pm q1) <*> (compileTQuery pm q2)
+compileTQuery pm (E.Plus q1 q2)    = contextualized2 plus        <$> (compileTQuery pm q1) <*> (compileTQuery pm q2)
 
 compilePredicate :: (IdentifierPredicate -> IdentifierPredicate) -> E.Predicate -> IdentifierPredicate
 compilePredicate p E.Any           = p $ anyone
@@ -58,10 +59,10 @@ compilePredicate _ (E.Except name) = except name
 compilePredicate _ (E.AnyOf ns)    = anyOf ns
 
 
-compileCounter :: String -> E.Matcher -> Maybe (IdentifierPredicate -> Counter)
+compileCounter :: String -> E.Matcher -> Maybe (ContextualizedBoundCounter)
 compileCounter = f
   where
-  f "UsesIf" = undefined
+  f "UsesIf" _ = undefined
 
 compileInspection :: String -> E.Matcher -> Maybe ContextualizedBoundInspection
 compileInspection = f
