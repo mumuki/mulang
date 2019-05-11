@@ -3,6 +3,8 @@
 module Language.Mulang.Analyzer.ExplangExpectationsCompiler(
   compileExpectation) where
 
+import Data.Condition (orElse, andAlso, never)
+
 import Language.Mulang hiding (Query)
 import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol)
 import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
@@ -10,11 +12,10 @@ import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclar
 import Language.Explang.Expectation hiding (Matcher)
 import qualified Language.Explang.Expectation as E
 
-
 import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
-type Modifiers = (ContextualizedModifier, PredicateModifier)
+type Scope = (ContextualizedInspection -> ContextualizedInspection, IdentifierPredicate -> IdentifierPredicate)
 
 compileExpectation :: Expectation -> Inspection
 compileExpectation = fromMaybe (\_ -> True) . compileQuery
@@ -23,30 +24,29 @@ compileQuery :: Expectation -> Maybe Inspection
 compileQuery (E.Decontextualize query) = compileCQuery id query >>= (return . decontextualize)
 compileQuery (E.Within name query)     | (scope, p) <- compileWithin name  = fmap (decontextualize.scope) (compileCQuery p query)
 compileQuery (E.Through name query)    | (scope, p) <- compileThrough name = fmap (decontextualize.scope) (compileCQuery p query)
-compileQuery (E.Not query)             = fmap negative (compileQuery query)
-compileQuery (E.And query1 query2)     = combined <$> (compileQuery query1) <*> (compileQuery query2)
-compileQuery (E.Or query1 query2)      = alternative <$> (compileQuery query1) <*> (compileQuery query2)
+compileQuery (E.Not query)             = fmap never (compileQuery query)
+compileQuery (E.And query1 query2)     = andAlso <$> (compileQuery query1) <*> (compileQuery query2)
+compileQuery (E.Or query1 query2)      = orElse <$> (compileQuery query1) <*> (compileQuery query2)
 
-
-compileWithin, compileThrough :: String -> Modifiers
+compileWithin, compileThrough :: String -> Scope
 compileWithin name  = scopeFor scopedList name
 compileThrough name = scopeFor transitiveList name
 
-scopeFor :: ([Identifier] -> Modifier) -> Identifier -> Modifiers
+scopeFor :: ([Identifier] -> Inspection -> Inspection) -> Identifier -> Scope
 scopeFor f name = (contextualized (f names), andAlso (except (last names)))
   where names = splitOn "." name
 
-compileCQuery :: PredicateModifier -> E.CQuery -> Maybe ContextualizedInspection
+compileCQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.CQuery -> Maybe ContextualizedInspection
 compileCQuery pm (E.Inspection i p m) = fmap ($ (compilePredicate pm p)) (compileInspection i m)
-compileCQuery pm (E.CNot q)           = fmap (contextualized negative) (compileCQuery pm q) -- we should merge predicates here
-compileCQuery pm (E.CAnd q1 q2)       = contextualized2 combined <$> (compileCQuery pm q1) <*> (compileCQuery pm q2)
-compileCQuery pm (E.COr q1 q2)        = contextualized2 alternative <$> (compileCQuery pm q1) <*> (compileCQuery pm q2)
+compileCQuery pm (E.CNot q)           = fmap (contextualized never) (compileCQuery pm q) -- we should merge predicates here
+compileCQuery pm (E.CAnd q1 q2)       = contextualized2 andAlso <$> (compileCQuery pm q1) <*> (compileCQuery pm q2)
+compileCQuery pm (E.COr q1 q2)        = contextualized2 orElse <$> (compileCQuery pm q1) <*> (compileCQuery pm q2)
 compileCQuery pm (E.AtLeast _ q)      = Nothing
 compileCQuery pm (E.AtMost _ q)       = Nothing
 compileCQuery pm (E.Exactly _ q)      = Nothing
 compileCQuery _ _                     = Nothing
 
-compilePredicate :: PredicateModifier -> E.Predicate -> IdentifierPredicate
+compilePredicate :: (IdentifierPredicate -> IdentifierPredicate) -> E.Predicate -> IdentifierPredicate
 compilePredicate p Any           = p $ anyone
 compilePredicate p (Like name)   = p $ like name
 compilePredicate _ (Named name)  = named name

@@ -10,12 +10,13 @@ module Language.Mulang.Inspector.Logic (
   declaresRule,
   declaresPredicate) where
 
+import Data.Condition (orElse)
+
 import Language.Mulang.Ast
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Primitive (Inspection, containsExpression)
 import Language.Mulang.Inspector.Bound (BoundInspection, containsBoundDeclaration)
 import Language.Mulang.Inspector.Generic (uses)
-import Language.Mulang.Inspector.Combiner (alternative)
 
 declaresFact :: BoundInspection
 declaresFact = containsBoundDeclaration f
@@ -58,4 +59,4 @@ hasRedundantReduction = containsExpression f
         f _ = False
 
 declaresPredicate :: BoundInspection
-declaresPredicate pred = alternative (declaresFact pred) (declaresRule pred)
+declaresPredicate pred = orElse (declaresFact pred) (declaresRule pred)

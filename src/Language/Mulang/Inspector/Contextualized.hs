@@ -6,19 +6,15 @@ module Language.Mulang.Inspector.Contextualized (
   contextualizedBind,
   boundContextualize,
   ContextualizedInspection,
-  ContextualizedModifier,
   ContextualizedBoundInspection) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Identifier (IdentifierPredicate)
 import Language.Mulang.Inspector.Bound (BoundInspection)
-import Language.Mulang.Inspector.Combiner (Modifier, Modifier2)
 import Language.Mulang.Inspector.Primitive (Inspection)
 
 type ContextualizedInspection = Expression -> Inspection
 type ContextualizedBoundInspection = IdentifierPredicate -> ContextualizedInspection
-type ContextualizedModifier = ContextualizedInspection -> ContextualizedInspection
-type ContextualizedModifier2 = ContextualizedInspection -> ContextualizedModifier
 
 --
 -- Lifts
@@ -46,8 +42,8 @@ decontextualize inspection = \expression -> inspection expression expression
 -- Modifiers
 --
 
-contextualized :: Modifier -> ContextualizedModifier
+contextualized :: (Inspection -> Inspection) -> ContextualizedInspection -> ContextualizedInspection
 contextualized f inspection = \context -> f (inspection context)
 
-contextualized2 :: Modifier2 -> ContextualizedModifier2
+contextualized2 :: (Inspection -> Inspection -> Inspection) -> ContextualizedInspection -> ContextualizedInspection -> ContextualizedInspection
 contextualized2 f i1 i2 = \context -> f (i1 context) (i2 context)
