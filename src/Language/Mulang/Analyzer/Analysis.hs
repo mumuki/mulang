@@ -12,8 +12,9 @@ module Language.Mulang.Analyzer.Analysis (
   emptyAnalysis,
   domainLanguageAnalysis,
   expectationsAnalysis,
-  smellsAnalysis,
+  explangTestAnalysis,
   signaturesAnalysis,
+  smellsAnalysis,
   testsAnalysis,
 
   emptyCompletedAnalysisResult,
@@ -187,6 +188,9 @@ emptyAnalysis code = Analysis code emptyAnalysisSpec
 
 domainLanguageAnalysis :: Fragment -> DomainLanguage -> Analysis
 domainLanguageAnalysis code domainLanguage = Analysis code (emptyAnalysisSpec { domainLanguage = Just domainLanguage, smellsSet = allSmells })
+
+explangTestAnalysis :: Fragment -> String -> Analysis
+explangTestAnalysis code es = Analysis code (emptyAnalysisSpec { explangTest = Just es })
 
 expectationsAnalysis :: Fragment -> [Expectation] -> Analysis
 expectationsAnalysis code es = Analysis code (emptyAnalysisSpec { expectations = Just es })

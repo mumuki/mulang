@@ -7,6 +7,7 @@ import Data.Count (encode)
 import Data.Function.Extra (orElse, andAlso, never)
 
 import Language.Mulang
+import Language.Mulang.Consult (Consult)
 import Language.Mulang.Counter (plus)
 import Language.Mulang.Inspector.Primitive (atLeast, atMost, exactly)
 import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol)
@@ -62,7 +63,7 @@ compilePredicate _ (E.AnyOf ns)    = anyOf ns
 compileCounter :: String -> E.Matcher -> Maybe (ContextualizedBoundCounter)
 compileCounter = f
   where
-  f "UsesIf" _ = undefined
+  f "UsesIf" _ = plain countIfs
 
 compileInspection :: String -> E.Matcher -> Maybe ContextualizedBoundInspection
 compileInspection = f
@@ -114,7 +115,7 @@ compileInspection = f
   f "UsesComposition"                  E.Unmatching   = plain usesComposition
   f "UsesComprehension"                E.Unmatching   = f "UsesForComprehension" E.Unmatching
   f "UsesConditional"                  E.Unmatching   = plain usesConditional
-  f "UsesDyamicPolymorphism"           E.Unmatching   = contextualized usesDyamicPolymorphism'
+  f "UsesDyamicPolymorphism"           E.Unmatching   = contextual usesDyamicPolymorphism'
   f "UsesDynamicMethodOverload"        E.Unmatching   = plain usesDynamicMethodOverload
   f "UsesExceptionHandling"            E.Unmatching   = plain usesExceptionHandling
   f "UsesExceptions"                   E.Unmatching   = plain usesExceptions
@@ -136,7 +137,7 @@ compileInspection = f
   f "UsesPrint"                        E.Unmatching   = plain usesPrint
   f "UsesRepeat"                       E.Unmatching   = plain usesRepeat
   f "UsesStaticMethodOverload"         E.Unmatching   = plain usesStaticMethodOverload
-  f "UsesStaticPolymorphism"           E.Unmatching   = contextualized usesStaticPolymorphism'
+  f "UsesStaticPolymorphism"           E.Unmatching   = contextual usesStaticPolymorphism'
   f "UsesSwitch"                       E.Unmatching   = plain usesSwitch
   f "UsesTemplateMethod"               E.Unmatching   = plain usesTemplateMethod
   f "UsesType"                         E.Unmatching   = bound usesType
@@ -149,17 +150,17 @@ compileInspection = f
   primitiveUsage = decodeUsageInspection
   primitiveDeclaration = decodeDeclarationInspection
 
-  contextualized :: ContextualizedInspection -> Maybe ContextualizedBoundInspection
-  contextualized = Just . contextualizedBind
+contextual :: ContextualizedConsult a -> Maybe (ContextualizedBoundConsult a)
+contextual = Just . contextualizedBind
 
-  contextualizedBound :: ContextualizedBoundInspection -> Maybe ContextualizedBoundInspection
-  contextualizedBound = Just
+contextualizedBound :: ContextualizedBoundConsult a -> Maybe (ContextualizedBoundConsult a)
+contextualizedBound = Just
 
-  plain :: Inspection -> Maybe ContextualizedBoundInspection
-  plain = Just . contextualizedBind . contextualize
+plain :: Consult a -> Maybe (ContextualizedBoundConsult a)
+plain = Just . contextualizedBind . contextualize
 
-  bound :: BoundInspection -> Maybe ContextualizedBoundInspection
-  bound = Just . boundContextualize
+bound :: BoundConsult a -> Maybe (ContextualizedBoundConsult a)
+bound = Just . boundContextualize
 
 compileMatcher :: [E.Clause] -> Matcher
 compileMatcher = withEvery . f
