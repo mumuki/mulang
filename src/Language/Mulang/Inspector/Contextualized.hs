@@ -2,15 +2,9 @@ module Language.Mulang.Inspector.Contextualized (
   decontextualize,
   contextualize,
   contextualized,
+  contextualized2,
   contextualizedBind,
   boundContextualize,
-  contextualizedNegative,
-  contextualizedScoped,
-  contextualizedScopedList,
-  contextualizedTransitive,
-  contextualizedTransitiveList,
-  contextualizedCombined,
-  contextualizedAlternative,
   ContextualizedInspection,
   ContextualizedModifier,
   ContextualizedBoundInspection) where
@@ -18,7 +12,7 @@ module Language.Mulang.Inspector.Contextualized (
 import Language.Mulang.Ast
 import Language.Mulang.Identifier (IdentifierPredicate)
 import Language.Mulang.Inspector.Bound (BoundInspection)
-import Language.Mulang.Inspector.Combiner (scoped, scopedList, transitive, transitiveList, negative, alternative, combined, Modifier, Modifier2)
+import Language.Mulang.Inspector.Combiner (Modifier, Modifier2)
 import Language.Mulang.Inspector.Primitive (Inspection)
 
 type ContextualizedInspection = Expression -> Inspection
@@ -57,24 +51,3 @@ contextualized f inspection = \context -> f (inspection context)
 
 contextualized2 :: Modifier2 -> ContextualizedModifier2
 contextualized2 f i1 i2 = \context -> f (i1 context) (i2 context)
-
-contextualizedNegative :: ContextualizedModifier
-contextualizedNegative = contextualized negative
-
-contextualizedScoped :: Identifier -> ContextualizedModifier
-contextualizedScoped scope = contextualized (scoped scope)
-
-contextualizedScopedList :: [Identifier] -> ContextualizedModifier
-contextualizedScopedList scope = contextualized (scopedList scope)
-
-contextualizedTransitive :: Identifier -> ContextualizedModifier
-contextualizedTransitive scope = contextualized (transitive scope)
-
-contextualizedTransitiveList :: [Identifier] -> ContextualizedModifier
-contextualizedTransitiveList scope = contextualized (transitiveList scope)
-
-contextualizedAlternative :: ContextualizedModifier2
-contextualizedAlternative = contextualized2 alternative
-
-contextualizedCombined :: ContextualizedModifier2
-contextualizedCombined = contextualized2 combined

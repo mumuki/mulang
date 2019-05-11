@@ -29,18 +29,18 @@ compileQuery (E.Or query1 query2)      = alternative <$> (compileQuery query1) <
 
 
 compileWithin, compileThrough :: String -> Modifiers
-compileWithin name  = scopeFor contextualizedScopedList name
-compileThrough name = scopeFor contextualizedTransitiveList name
+compileWithin name  = scopeFor scopedList name
+compileThrough name = scopeFor transitiveList name
 
-scopeFor :: ([Identifier] -> ContextualizedModifier) -> Identifier -> Modifiers
-scopeFor f name = (f names, andAlso (except (last names)))
+scopeFor :: ([Identifier] -> Modifier) -> Identifier -> Modifiers
+scopeFor f name = (contextualized (f names), andAlso (except (last names)))
   where names = splitOn "." name
 
 compileCQuery :: PredicateModifier -> E.CQuery -> Maybe ContextualizedInspection
 compileCQuery pm (E.Inspection i p m) = fmap ($ (compilePredicate pm p)) (compileInspection i m)
-compileCQuery pm (E.CNot q)           = fmap contextualizedNegative (compileCQuery pm q) -- we should merge predicates here
-compileCQuery pm (E.CAnd q1 q2)       = contextualizedCombined <$> (compileCQuery q1) <*> (compileCQuery q2)
-compileCQuery pm (E.COr q1 q2)        = contextualizedAlternative <$> (compileCQuery q1) <*> (compileCQuery q2)
+compileCQuery pm (E.CNot q)           = fmap (contextualized negative) (compileCQuery pm q) -- we should merge predicates here
+compileCQuery pm (E.CAnd q1 q2)       = contextualized2 combined <$> (compileCQuery pm q1) <*> (compileCQuery pm q2)
+compileCQuery pm (E.COr q1 q2)        = contextualized2 alternative <$> (compileCQuery pm q1) <*> (compileCQuery pm q2)
 compileCQuery pm (E.AtLeast _ q)      = Nothing
 compileCQuery pm (E.AtMost _ q)       = Nothing
 compileCQuery pm (E.Exactly _ q)      = Nothing

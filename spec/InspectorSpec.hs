@@ -346,7 +346,7 @@ spec = do
 
   describe "delegates'" $ do
     it "is True when used with a scope" $ do
-      decontextualize (contextualizedScoped "main" (delegates' anyone)) (
+      decontextualize (contextualized (scoped "main") (delegates' anyone)) (
         Sequence [
           EntryPoint "main" (Application (Reference "m") []),
           SimpleProcedure "m" [] None]) `shouldBe` True
