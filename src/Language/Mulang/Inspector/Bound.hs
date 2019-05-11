@@ -1,5 +1,6 @@
 module Language.Mulang.Inspector.Bound (
   bind,
+  bound,
   containsBoundDeclaration,
   countBoundDeclarations,
   BoundConsult,
@@ -20,6 +21,9 @@ type BoundInspection = BoundConsult Bool
 
 bind :: Consult a -> BoundConsult a
 bind = const
+
+bound :: (Consult a -> Consult b) -> BoundConsult a -> BoundConsult b
+bound = (.)
 
 containsBoundDeclaration :: Inspection -> BoundInspection
 containsBoundDeclaration f b  = has f (boundDeclarations b)

@@ -63,7 +63,14 @@ compilePredicate _ (E.AnyOf ns)    = anyOf ns
 compileCounter :: String -> E.Matcher -> Maybe (ContextualizedBoundCounter)
 compileCounter = f
   where
-  f "UsesIf" _ = plain countIfs
+  f "UsesIf"              _ = plain countIfs
+  f "UsesFor"             _ = plain countFors
+  f "DeclaresFunction"    _ = bound countFunctions
+  f "DeclaresVariable"    _ = bound countVariables
+  f "DeclaresMethod"      _ = bound countMethods
+  f "DeclaresClass"       _ = bound countClasses
+  f "DeclaresAttribute"   _ = bound countAttributes
+  f "DeclaresInterface"   _ = bound countInterfaces
 
 compileInspection :: String -> E.Matcher -> Maybe ContextualizedBoundInspection
 compileInspection = f

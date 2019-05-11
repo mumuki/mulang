@@ -1,5 +1,8 @@
 module Language.Mulang.Inspector.Generic (
   countIfs,
+  countFors,
+  countFunctions,
+  countVariables,
   assigns,
   assignsMatching,
   calls,
@@ -34,7 +37,7 @@ import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Generator (declaredIdentifiers, expressions, declarations, referencedIdentifiers)
 import Language.Mulang.Identifier
-import Language.Mulang.Inspector.Bound (containsBoundDeclaration, BoundInspection)
+import Language.Mulang.Inspector.Bound (bound, containsBoundDeclaration, countBoundDeclarations, BoundInspection, BoundCounter)
 import Language.Mulang.Inspector.Contextualized (decontextualize, ContextualizedBoundInspection)
 import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Inspector.Matcher (unmatching, Matcher)
@@ -105,9 +108,13 @@ usesPrint = containsExpression f
         f _         = False
 
 usesFor :: Inspection
-usesFor = containsExpression f
+usesFor = positive countFors
+
+countFors :: Counter
+countFors = countExpressions f
   where f (For _ _) = True
         f _         = False
+
 
 returnsMatching :: Matcher -> Inspection
 returnsMatching matcher = containsExpression f
@@ -129,14 +136,19 @@ declaresRecursively = containsBoundDeclaration f
         nameOf :: Expression -> Maybe Identifier
         nameOf = listToMaybe . declaredIdentifiers
 
-
 declaresFunction :: BoundInspection
-declaresFunction = containsBoundDeclaration f
+declaresFunction = bound positive countFunctions
+
+countFunctions :: BoundCounter
+countFunctions = countBoundDeclarations f
   where f (Function _ _) = True
         f _              = False
 
 declaresVariable :: BoundInspection
-declaresVariable = containsBoundDeclaration f
+declaresVariable = bound positive countVariables
+
+countVariables :: BoundCounter
+countVariables = countBoundDeclarations f
   where f (Variable _ _)  = True
         f _               = False
 
