@@ -12,7 +12,7 @@ import qualified Language.Mulang.Analyzer.Analysis as A
 import Data.List.Split (splitOn)
 
 compileExpectation :: A.Expectation -> Inspection
-compileExpectation (A.Expectation s i) = EC.compileExpectation . negator . scope $ baseQuery -- TODO move to explang
+compileExpectation (A.Expectation s i) = EC.compileExpectation . negator . scope $ baseQuery
   where
     (inspectionParts, negator) = compileInspectionPartsAndNegator (splitOn ":" i)
     scope = compileScope (splitOn ":" s)

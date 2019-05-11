@@ -9,6 +9,8 @@ module Language.Mulang.Inspector.Contextualized (
   contextualizedScopedList,
   contextualizedTransitive,
   contextualizedTransitiveList,
+  contextualizedCombined,
+  contextualizedAlternative,
   ContextualizedInspection,
   ContextualizedModifier,
   ContextualizedBoundInspection) where
@@ -16,12 +18,13 @@ module Language.Mulang.Inspector.Contextualized (
 import Language.Mulang.Ast
 import Language.Mulang.Identifier (IdentifierPredicate)
 import Language.Mulang.Inspector.Bound (BoundInspection)
-import Language.Mulang.Inspector.Combiner (scoped, scopedList, transitive, transitiveList, negative, Modifier)
+import Language.Mulang.Inspector.Combiner (scoped, scopedList, transitive, transitiveList, negative, alternative, combined, Modifier, Modifier2)
 import Language.Mulang.Inspector.Primitive (Inspection)
 
 type ContextualizedInspection = Expression -> Inspection
 type ContextualizedBoundInspection = IdentifierPredicate -> ContextualizedInspection
 type ContextualizedModifier = ContextualizedInspection -> ContextualizedInspection
+type ContextualizedModifier2 = ContextualizedInspection -> ContextualizedModifier
 
 --
 -- Lifts
@@ -52,6 +55,9 @@ decontextualize inspection = \expression -> inspection expression expression
 contextualized :: Modifier -> ContextualizedModifier
 contextualized f inspection = \context -> f (inspection context)
 
+contextualized2 :: Modifier2 -> ContextualizedModifier2
+contextualized2 f i1 i2 = \context -> f (i1 context) (i2 context)
+
 contextualizedNegative :: ContextualizedModifier
 contextualizedNegative = contextualized negative
 
@@ -67,3 +73,8 @@ contextualizedTransitive scope = contextualized (transitive scope)
 contextualizedTransitiveList :: [Identifier] -> ContextualizedModifier
 contextualizedTransitiveList scope = contextualized (transitiveList scope)
 
+contextualizedAlternative :: ContextualizedModifier2
+contextualizedAlternative = contextualized2 alternative
+
+contextualizedCombined :: ContextualizedModifier2
+contextualizedCombined = contextualized2 combined

@@ -9,13 +9,15 @@ module Language.Mulang.Inspector.Combiner (
   transitive,
   transitiveList,
   Location (..),
-  Modifier) where
+  Modifier,
+  Modifier2) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (transitiveReferencedIdentifiers, declarationsOf, declaredIdentifiers)
 import Language.Mulang.Inspector.Primitive
 
 type Modifier = Inspection -> Inspection
+type Modifier2 = Inspection -> Modifier
 
 data Location
   = Nowhere                   -- ^ No subexpression match, nor the whole expression
@@ -36,10 +38,10 @@ locate inspection expression
   | inspection expression = TopLevel
   | otherwise = Nowhere
 
-alternative :: Inspection -> Modifier
+alternative :: Modifier2
 alternative i1 i2 expression = i1 expression || i2 expression
 
-combined :: Inspection -> Modifier
+combined :: Modifier2
 combined i1 i2 expression = i1 expression && i2 expression
 
 negative :: Modifier

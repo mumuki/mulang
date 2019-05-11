@@ -37,20 +37,24 @@ scopeFor f name = (f names, andAlso (except (last names)))
   where names = splitOn "." name
 
 compileCQuery :: PredicateModifier -> E.CQuery -> Maybe ContextualizedInspection
-compileCQuery p (E.Inspection i b m) = fmap ($ (compileObject p b)) (compileInspectionPrimitive i m)
-compileCQuery p (E.CNot q)           = fmap contextualizedNegative (compileCQuery p q) -- we should merge predicates here
-compileCQuery _ _                    = Nothing
+compileCQuery pm (E.Inspection i p m) = fmap ($ (compilePredicate pm p)) (compileInspection i m)
+compileCQuery pm (E.CNot q)           = fmap contextualizedNegative (compileCQuery pm q) -- we should merge predicates here
+compileCQuery pm (E.CAnd q1 q2)       = contextualizedCombined <$> (compileCQuery q1) <*> (compileCQuery q2)
+compileCQuery pm (E.COr q1 q2)        = contextualizedAlternative <$> (compileCQuery q1) <*> (compileCQuery q2)
+compileCQuery pm (E.AtLeast _ q)      = Nothing
+compileCQuery pm (E.AtMost _ q)       = Nothing
+compileCQuery pm (E.Exactly _ q)      = Nothing
+compileCQuery _ _                     = Nothing
 
+compilePredicate :: PredicateModifier -> E.Predicate -> IdentifierPredicate
+compilePredicate p Any           = p $ anyone
+compilePredicate p (Like name)   = p $ like name
+compilePredicate _ (Named name)  = named name
+compilePredicate _ (Except name) = except name
+compilePredicate _ (AnyOf ns)    = anyOf ns
 
-compileObject :: PredicateModifier -> E.Predicate -> IdentifierPredicate
-compileObject p Any           = p $ anyone
-compileObject p (Like name)   = p $ like name
-compileObject _ (Named name)  = named name
-compileObject _ (Except name) = except name
-compileObject _ (AnyOf ns)    = anyOf ns
-
-compileInspectionPrimitive :: String -> E.Matcher -> Maybe ContextualizedBoundInspection
-compileInspectionPrimitive = f
+compileInspection :: String -> E.Matcher -> Maybe ContextualizedBoundInspection
+compileInspection = f
   where
   f "Assigns"                          Unmatching   = bound assigns
   f "Assigns"                          (Matching p) = bound (assignsMatching (compileMatcher p))
