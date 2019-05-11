@@ -3,7 +3,7 @@
 module Language.Mulang.Analyzer.ExplangExpectationsCompiler(
   compileExpectation) where
 
-import Data.Condition (orElse, andAlso, never)
+import Data.Function.Extra (orElse, andAlso, never, compose2)
 
 import Language.Mulang hiding (Query)
 import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol)
@@ -37,14 +37,18 @@ scopeFor f name = (contextualized (f names), andAlso (except (last names)))
   where names = splitOn "." name
 
 compileCQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.CQuery -> Maybe ContextualizedInspection
-compileCQuery pm (E.Inspection i p m) = fmap ($ (compilePredicate pm p)) (compileInspection i m)
-compileCQuery pm (E.CNot q)           = fmap (contextualized never) (compileCQuery pm q) -- we should merge predicates here
-compileCQuery pm (E.CAnd q1 q2)       = contextualized2 andAlso <$> (compileCQuery pm q1) <*> (compileCQuery pm q2)
-compileCQuery pm (E.COr q1 q2)        = contextualized2 orElse <$> (compileCQuery pm q1) <*> (compileCQuery pm q2)
-compileCQuery pm (E.AtLeast _ q)      = Nothing
-compileCQuery pm (E.AtMost _ q)       = Nothing
-compileCQuery pm (E.Exactly _ q)      = Nothing
+compileCQuery pm (E.Inspection i p m) = ($ (compilePredicate pm p)) <$> compileInspection i m
+compileCQuery pm (E.CNot q)           = contextualized never        <$> compileCQuery pm q
+compileCQuery pm (E.CAnd q1 q2)       = contextualized2 andAlso     <$> compileCQuery pm q1 <*> compileCQuery pm q2
+compileCQuery pm (E.COr q1 q2)        = contextualized2 orElse      <$> compileCQuery pm q1 <*> compileCQuery pm q2
+compileCQuery pm (E.AtLeast n q)      = (\f c -> (>= n) . f c)      <$> compileTQuery pm q
+compileCQuery pm (E.AtMost n q)       = (\f c -> (<= n) . f c)      <$> compileTQuery pm q
+compileCQuery pm (E.Exactly n q)      = (\f c -> (== n) . f c)       <$> compileTQuery pm q
 compileCQuery _ _                     = Nothing
+
+compileTQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.TQuery -> Maybe (Expression -> Expression -> Int)
+compileTQuery pm (E.Plus q1 q2)    = compose2 (compose2 (+)) <$> (compileTQuery pm q1) <*> (compileTQuery pm q2)
+compileTQuery pm (E.Counter i p m) = ($ (compilePredicate pm p)) <$> compileCounter i m
 
 compilePredicate :: (IdentifierPredicate -> IdentifierPredicate) -> E.Predicate -> IdentifierPredicate
 compilePredicate p Any           = p $ anyone
@@ -52,6 +56,12 @@ compilePredicate p (Like name)   = p $ like name
 compilePredicate _ (Named name)  = named name
 compilePredicate _ (Except name) = except name
 compilePredicate _ (AnyOf ns)    = anyOf ns
+
+
+compileCounter :: String -> E.Matcher -> Maybe (IdentifierPredicate -> Expression -> Expression -> Int)
+compileCounter = f
+  where
+  f "UsesIf" = undefined
 
 compileInspection :: String -> E.Matcher -> Maybe ContextualizedBoundInspection
 compileInspection = f

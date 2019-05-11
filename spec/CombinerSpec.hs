@@ -1,6 +1,6 @@
 module CombinerSpec (spec) where
 
-import           Data.Condition (never)
+import           Data.Function.Extra (never)
 
 import           Test.Hspec
 import           Language.Mulang

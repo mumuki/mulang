@@ -10,7 +10,7 @@ module Language.Mulang.Inspector.Logic (
   declaresRule,
   declaresPredicate) where
 
-import Data.Condition (orElse)
+import Data.Function.Extra (orElse)
 
 import Language.Mulang.Ast
 import Language.Mulang.Identifier

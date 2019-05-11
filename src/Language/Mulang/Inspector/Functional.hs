@@ -7,7 +7,7 @@ module Language.Mulang.Inspector.Functional (
   usesComprehension,
   usesConditional) where
 
-import Data.Condition (orElse)
+import Data.Function.Extra (orElse)
 
 import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))

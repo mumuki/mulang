@@ -8,6 +8,7 @@ module Language.Mulang.Inspector.Contextualized (
   ContextualizedInspection,
   ContextualizedBoundInspection) where
 
+import Data.Function.Extra (compose2)
 import Language.Mulang.Ast
 import Language.Mulang.Identifier (IdentifierPredicate)
 import Language.Mulang.Inspector.Bound (BoundInspection)
@@ -43,7 +44,7 @@ decontextualize inspection = \expression -> inspection expression expression
 --
 
 contextualized :: (Inspection -> Inspection) -> ContextualizedInspection -> ContextualizedInspection
-contextualized f inspection = \context -> f (inspection context)
+contextualized = (.)
 
 contextualized2 :: (Inspection -> Inspection -> Inspection) -> ContextualizedInspection -> ContextualizedInspection -> ContextualizedInspection
-contextualized2 f i1 i2 = \context -> f (i1 context) (i2 context)
+contextualized2 = compose2
