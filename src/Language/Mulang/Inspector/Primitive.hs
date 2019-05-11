@@ -3,8 +3,10 @@ module Language.Mulang.Inspector.Primitive (
   containsDeclaration,
   containsBody,
   matchesType,
+  countExpression,
   Inspection) where
 
+import Data.Count (Count, count)
 import           Language.Mulang.Ast
 import           Language.Mulang.Identifier (IdentifierPredicate)
 import           Language.Mulang.Generator (expressions, equationBodies, declarations)
@@ -15,6 +17,9 @@ type Inspection = Expression -> Bool
 
 containsExpression :: Inspection -> Inspection
 containsExpression f = has f expressions
+
+countExpression :: Inspection -> Expression -> Count
+countExpression f = count . filter f . expressions
 
 containsBody :: (EquationBody -> Bool)-> Inspection
 containsBody f = has f equationBodies
