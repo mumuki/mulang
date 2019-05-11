@@ -3,13 +3,13 @@
 module Language.Mulang.Analyzer.ExplangExpectationsCompiler(
   compileExpectation) where
 
-import Data.Function.Extra (orElse, andAlso, never, compose2)
+import Data.Function.Extra (orElse, andAlso, never)
 
-import Language.Mulang hiding (Query)
+import Language.Mulang
+import Language.Mulang.Counter (Counter, plus, atLeast, atMost, exactly)
 import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol)
 import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
 
-import Language.Explang.Expectation hiding (Matcher)
 import qualified Language.Explang.Expectation as E
 
 import Data.Maybe (fromMaybe)
@@ -17,10 +17,10 @@ import Data.List.Split (splitOn)
 
 type Scope = (ContextualizedInspection -> ContextualizedInspection, IdentifierPredicate -> IdentifierPredicate)
 
-compileExpectation :: Expectation -> Inspection
+compileExpectation :: E.Expectation -> Inspection
 compileExpectation = fromMaybe (\_ -> True) . compileQuery
 
-compileQuery :: Expectation -> Maybe Inspection
+compileQuery :: E.Query -> Maybe Inspection
 compileQuery (E.Decontextualize query) = compileCQuery id query >>= (return . decontextualize)
 compileQuery (E.Within name query)     | (scope, p) <- compileWithin name  = fmap (decontextualize.scope) (compileCQuery p query)
 compileQuery (E.Through name query)    | (scope, p) <- compileThrough name = fmap (decontextualize.scope) (compileCQuery p query)
@@ -41,24 +41,23 @@ compileCQuery pm (E.Inspection i p m) = ($ (compilePredicate pm p)) <$> compileI
 compileCQuery pm (E.CNot q)           = contextualized never        <$> compileCQuery pm q
 compileCQuery pm (E.CAnd q1 q2)       = contextualized2 andAlso     <$> compileCQuery pm q1 <*> compileCQuery pm q2
 compileCQuery pm (E.COr q1 q2)        = contextualized2 orElse      <$> compileCQuery pm q1 <*> compileCQuery pm q2
-compileCQuery pm (E.AtLeast n q)      = (\f c -> (>= n) . f c)      <$> compileTQuery pm q
-compileCQuery pm (E.AtMost n q)       = (\f c -> (<= n) . f c)      <$> compileTQuery pm q
-compileCQuery pm (E.Exactly n q)      = (\f c -> (== n) . f c)       <$> compileTQuery pm q
-compileCQuery _ _                     = Nothing
+compileCQuery pm (E.AtLeast n q)      = atLeast n                   <$> compileTQuery pm q
+compileCQuery pm (E.AtMost n q)       = atMost n                    <$> compileTQuery pm q
+compileCQuery pm (E.Exactly n q)      = exactly n                   <$> compileTQuery pm q
 
-compileTQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.TQuery -> Maybe (Expression -> Expression -> Int)
-compileTQuery pm (E.Plus q1 q2)    = compose2 (compose2 (+)) <$> (compileTQuery pm q1) <*> (compileTQuery pm q2)
+compileTQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.TQuery -> Maybe Counter
 compileTQuery pm (E.Counter i p m) = ($ (compilePredicate pm p)) <$> compileCounter i m
+compileTQuery pm (E.Plus q1 q2)    = plus                        <$> (compileTQuery pm q1) <*> (compileTQuery pm q2)
 
 compilePredicate :: (IdentifierPredicate -> IdentifierPredicate) -> E.Predicate -> IdentifierPredicate
-compilePredicate p Any           = p $ anyone
-compilePredicate p (Like name)   = p $ like name
-compilePredicate _ (Named name)  = named name
-compilePredicate _ (Except name) = except name
-compilePredicate _ (AnyOf ns)    = anyOf ns
+compilePredicate p E.Any           = p $ anyone
+compilePredicate p (E.Like name)   = p $ like name
+compilePredicate _ (E.Named name)  = named name
+compilePredicate _ (E.Except name) = except name
+compilePredicate _ (E.AnyOf ns)    = anyOf ns
 
 
-compileCounter :: String -> E.Matcher -> Maybe (IdentifierPredicate -> Expression -> Expression -> Int)
+compileCounter :: String -> E.Matcher -> Maybe (IdentifierPredicate -> Counter)
 compileCounter = f
   where
   f "UsesIf" = undefined
@@ -66,84 +65,84 @@ compileCounter = f
 compileInspection :: String -> E.Matcher -> Maybe ContextualizedBoundInspection
 compileInspection = f
   where
-  f "Assigns"                          Unmatching   = bound assigns
-  f "Assigns"                          (Matching p) = bound (assignsMatching (compileMatcher p))
-  f "Calls"                            Unmatching   = bound calls
-  f "Calls"                            (Matching p) = bound (callsMatching (compileMatcher p))
-  f "Declares"                         Unmatching   = bound declares
-  f "DeclaresAttribute"                Unmatching   = bound declaresAttribute
-  f "DeclaresClass"                    Unmatching   = bound declaresClass
-  f "DeclaresComputation"              Unmatching   = bound declaresComputation
-  f "DeclaresComputationWithArity0"    Unmatching   = bound (declaresComputationWithArity 0)
-  f "DeclaresComputationWithArity1"    Unmatching   = bound (declaresComputationWithArity 1)
-  f "DeclaresComputationWithArity2"    Unmatching   = bound (declaresComputationWithArity 2)
-  f "DeclaresComputationWithArity3"    Unmatching   = bound (declaresComputationWithArity 3)
-  f "DeclaresComputationWithArity4"    Unmatching   = bound (declaresComputationWithArity 4)
-  f "DeclaresComputationWithArity5"    Unmatching   = bound (declaresComputationWithArity 5)
-  f "DeclaresEntryPoint"               Unmatching   = bound declaresEntryPoint
-  f "DeclaresEnumeration"              Unmatching   = bound declaresEnumeration
-  f "DeclaresFact"                     Unmatching   = bound declaresFact
-  f "DeclaresFunction"                 Unmatching   = bound declaresFunction
-  f "DeclaresInterface"                Unmatching   = bound declaresInterface
-  f "DeclaresMethod"                   Unmatching   = bound declaresMethod
-  f "DeclaresObject"                   Unmatching   = bound declaresObject
-  f "DeclaresPredicate"                Unmatching   = bound declaresPredicate
-  f "DeclaresProcedure"                Unmatching   = bound declaresProcedure
-  f "DeclaresRecursively"              Unmatching   = bound declaresRecursively
-  f "DeclaresRule"                     Unmatching   = bound declaresRule
-  f "DeclaresSuperclass"               Unmatching   = bound declaresSuperclass
-  f "DeclaresTypeAlias"                Unmatching   = bound declaresTypeAlias
-  f "DeclaresTypeSignature"            Unmatching   = bound declaresTypeSignature
-  f "DeclaresVariable"                 Unmatching   = bound declaresVariable
-  f "Delegates"                        Unmatching   = contextualizedBound delegates'
-  f "Implements"                       Unmatching   = bound implements
-  f "Includes"                         Unmatching   = bound includes
-  f "Inherits"                         Unmatching   = bound inherits
-  f "Instantiates"                     Unmatching   = bound instantiates
-  f "Raises"                           Unmatching   = bound raises
-  f "Rescues"                          Unmatching   = bound rescues
-  f "Returns"                          (Matching p) = plain (returnsMatching (compileMatcher p))
-  f "TypesAs"                          Unmatching   = bound typesAs
-  f "TypesParameterAs"                 Unmatching   = bound typesParameterAs
-  f "TypesReturnAs"                    Unmatching   = bound typesReturnAs
-  f "Uses"                             Unmatching   = bound uses
-  f "UsesAnonymousVariable"            Unmatching   = plain usesAnonymousVariable
-  f "UsesBooleanLogic"                 Unmatching   = plain usesBooleanLogic
-  f "UsesArithmetic"                   Unmatching   = plain usesArithmetic
-  f "UsesComposition"                  Unmatching   = plain usesComposition
-  f "UsesComprehension"                Unmatching   = f "UsesForComprehension" Unmatching
-  f "UsesConditional"                  Unmatching   = plain usesConditional
-  f "UsesDyamicPolymorphism"           Unmatching   = contextualized usesDyamicPolymorphism'
-  f "UsesDynamicMethodOverload"        Unmatching   = plain usesDynamicMethodOverload
-  f "UsesExceptionHandling"            Unmatching   = plain usesExceptionHandling
-  f "UsesExceptions"                   Unmatching   = plain usesExceptions
-  f "UsesFindall"                      Unmatching   = plain usesFindall
-  f "UsesFor"                          Unmatching   = plain usesFor
-  f "UsesForall"                       Unmatching   = plain usesForall
-  f "UsesForComprehension"             Unmatching   = plain usesForComprehension
-  f "UsesForeach"                      Unmatching   = plain usesForEach
-  f "UsesForLoop"                      Unmatching   = plain usesForLoop
-  f "UsesGuards"                       Unmatching   = plain usesGuards
-  f "UsesIf"                           Unmatching   = plain usesIf
-  f "UsesInheritance"                  Unmatching   = plain usesInheritance
-  f "UsesLambda"                       Unmatching   = plain usesLambda
-  f "UsesLoop"                         Unmatching   = plain usesLoop
-  f "UsesMixins"                       Unmatching   = plain usesMixins
-  f "UsesNot"                          Unmatching   = plain usesNot
-  f "UsesObjectComposition"            Unmatching   = plain usesObjectComposition
-  f "UsesPatternMatching"              Unmatching   = plain usesPatternMatching
-  f "UsesPrint"                        Unmatching   = plain usesPrint
-  f "UsesRepeat"                       Unmatching   = plain usesRepeat
-  f "UsesStaticMethodOverload"         Unmatching   = plain usesStaticMethodOverload
-  f "UsesStaticPolymorphism"           Unmatching   = contextualized usesStaticPolymorphism'
-  f "UsesSwitch"                       Unmatching   = plain usesSwitch
-  f "UsesTemplateMethod"               Unmatching   = plain usesTemplateMethod
-  f "UsesType"                         Unmatching   = bound usesType
-  f "UsesWhile"                        Unmatching   = plain usesWhile
-  f "UsesYield"                        Unmatching   = plain usesYield
-  f (primitiveUsage -> Just p)         Unmatching   = plain (usesPrimitive p)
-  f (primitiveDeclaration -> Just p)   Unmatching   = plain (declaresPrimitive p)
-  f _                                  _            = Nothing
+  f "Assigns"                          E.Unmatching   = bound assigns
+  f "Assigns"                          (E.Matching p) = bound (assignsMatching (compileMatcher p))
+  f "Calls"                            E.Unmatching   = bound calls
+  f "Calls"                            (E.Matching p) = bound (callsMatching (compileMatcher p))
+  f "Declares"                         E.Unmatching   = bound declares
+  f "DeclaresAttribute"                E.Unmatching   = bound declaresAttribute
+  f "DeclaresClass"                    E.Unmatching   = bound declaresClass
+  f "DeclaresComputation"              E.Unmatching   = bound declaresComputation
+  f "DeclaresComputationWithArity0"    E.Unmatching   = bound (declaresComputationWithArity 0)
+  f "DeclaresComputationWithArity1"    E.Unmatching   = bound (declaresComputationWithArity 1)
+  f "DeclaresComputationWithArity2"    E.Unmatching   = bound (declaresComputationWithArity 2)
+  f "DeclaresComputationWithArity3"    E.Unmatching   = bound (declaresComputationWithArity 3)
+  f "DeclaresComputationWithArity4"    E.Unmatching   = bound (declaresComputationWithArity 4)
+  f "DeclaresComputationWithArity5"    E.Unmatching   = bound (declaresComputationWithArity 5)
+  f "DeclaresEntryPoint"               E.Unmatching   = bound declaresEntryPoint
+  f "DeclaresEnumeration"              E.Unmatching   = bound declaresEnumeration
+  f "DeclaresFact"                     E.Unmatching   = bound declaresFact
+  f "DeclaresFunction"                 E.Unmatching   = bound declaresFunction
+  f "DeclaresInterface"                E.Unmatching   = bound declaresInterface
+  f "DeclaresMethod"                   E.Unmatching   = bound declaresMethod
+  f "DeclaresObject"                   E.Unmatching   = bound declaresObject
+  f "DeclaresPredicate"                E.Unmatching   = bound declaresPredicate
+  f "DeclaresProcedure"                E.Unmatching   = bound declaresProcedure
+  f "DeclaresRecursively"              E.Unmatching   = bound declaresRecursively
+  f "DeclaresRule"                     E.Unmatching   = bound declaresRule
+  f "DeclaresSuperclass"               E.Unmatching   = bound declaresSuperclass
+  f "DeclaresTypeAlias"                E.Unmatching   = bound declaresTypeAlias
+  f "DeclaresTypeSignature"            E.Unmatching   = bound declaresTypeSignature
+  f "DeclaresVariable"                 E.Unmatching   = bound declaresVariable
+  f "Delegates"                        E.Unmatching   = contextualizedBound delegates'
+  f "Implements"                       E.Unmatching   = bound implements
+  f "Includes"                         E.Unmatching   = bound includes
+  f "Inherits"                         E.Unmatching   = bound inherits
+  f "Instantiates"                     E.Unmatching   = bound instantiates
+  f "Raises"                           E.Unmatching   = bound raises
+  f "Rescues"                          E.Unmatching   = bound rescues
+  f "Returns"                          (E.Matching p) = plain (returnsMatching (compileMatcher p))
+  f "TypesAs"                          E.Unmatching   = bound typesAs
+  f "TypesParameterAs"                 E.Unmatching   = bound typesParameterAs
+  f "TypesReturnAs"                    E.Unmatching   = bound typesReturnAs
+  f "Uses"                             E.Unmatching   = bound uses
+  f "UsesAnonymousVariable"            E.Unmatching   = plain usesAnonymousVariable
+  f "UsesBooleanLogic"                 E.Unmatching   = plain usesBooleanLogic
+  f "UsesArithmetic"                   E.Unmatching   = plain usesArithmetic
+  f "UsesComposition"                  E.Unmatching   = plain usesComposition
+  f "UsesComprehension"                E.Unmatching   = f "UsesForComprehension" E.Unmatching
+  f "UsesConditional"                  E.Unmatching   = plain usesConditional
+  f "UsesDyamicPolymorphism"           E.Unmatching   = contextualized usesDyamicPolymorphism'
+  f "UsesDynamicMethodOverload"        E.Unmatching   = plain usesDynamicMethodOverload
+  f "UsesExceptionHandling"            E.Unmatching   = plain usesExceptionHandling
+  f "UsesExceptions"                   E.Unmatching   = plain usesExceptions
+  f "UsesFindall"                      E.Unmatching   = plain usesFindall
+  f "UsesFor"                          E.Unmatching   = plain usesFor
+  f "UsesForall"                       E.Unmatching   = plain usesForall
+  f "UsesForComprehension"             E.Unmatching   = plain usesForComprehension
+  f "UsesForeach"                      E.Unmatching   = plain usesForEach
+  f "UsesForLoop"                      E.Unmatching   = plain usesForLoop
+  f "UsesGuards"                       E.Unmatching   = plain usesGuards
+  f "UsesIf"                           E.Unmatching   = plain usesIf
+  f "UsesInheritance"                  E.Unmatching   = plain usesInheritance
+  f "UsesLambda"                       E.Unmatching   = plain usesLambda
+  f "UsesLoop"                         E.Unmatching   = plain usesLoop
+  f "UsesMixins"                       E.Unmatching   = plain usesMixins
+  f "UsesNot"                          E.Unmatching   = plain usesNot
+  f "UsesObjectComposition"            E.Unmatching   = plain usesObjectComposition
+  f "UsesPatternMatching"              E.Unmatching   = plain usesPatternMatching
+  f "UsesPrint"                        E.Unmatching   = plain usesPrint
+  f "UsesRepeat"                       E.Unmatching   = plain usesRepeat
+  f "UsesStaticMethodOverload"         E.Unmatching   = plain usesStaticMethodOverload
+  f "UsesStaticPolymorphism"           E.Unmatching   = contextualized usesStaticPolymorphism'
+  f "UsesSwitch"                       E.Unmatching   = plain usesSwitch
+  f "UsesTemplateMethod"               E.Unmatching   = plain usesTemplateMethod
+  f "UsesType"                         E.Unmatching   = bound usesType
+  f "UsesWhile"                        E.Unmatching   = plain usesWhile
+  f "UsesYield"                        E.Unmatching   = plain usesYield
+  f (primitiveUsage -> Just p)         E.Unmatching   = plain (usesPrimitive p)
+  f (primitiveDeclaration -> Just p)   E.Unmatching   = plain (declaresPrimitive p)
+  f _                                  _              = Nothing
 
   primitiveUsage = decodeUsageInspection
   primitiveDeclaration = decodeDeclarationInspection
@@ -164,11 +163,11 @@ compileMatcher :: [E.Clause] -> Matcher
 compileMatcher = withEvery . f
   where
     f :: [E.Clause] -> [Inspection]
-    f (IsFalse:args)         = isBool False : (f args)
-    f (IsNil:args)           = isNil : (f args)
-    f (IsTrue:args)          = isBool True : (f args)
-    f (IsChar value:args)    = isChar value : (f args)
-    f (IsNumber value:args)  = isNumber value : (f args)
-    f (IsString value:args)  = isString value : (f args)
-    f (IsSymbol value:args)  = isSymbol value : (f args)
+    f (E.IsFalse:args)         = isBool False : (f args)
+    f (E.IsNil:args)           = isNil : (f args)
+    f (E.IsTrue:args)          = isBool True : (f args)
+    f (E.IsChar value:args)    = isChar value : (f args)
+    f (E.IsNumber value:args)  = isNumber value : (f args)
+    f (E.IsString value:args)  = isString value : (f args)
+    f (E.IsSymbol value:args)  = isSymbol value : (f args)
     f []                     = []

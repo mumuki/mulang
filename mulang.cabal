@@ -36,11 +36,12 @@ library
     Language.Mulang
     Language.Mulang.Ast
     Language.Mulang.Ast.Operator
-    Language.Mulang.Identifier
     Language.Mulang.Builder
-    Language.Mulang.Generator
-    Language.Mulang.Signature
+    Language.Mulang.Counter
     Language.Mulang.DomainLanguage
+    Language.Mulang.Generator
+    Language.Mulang.Identifier
+    Language.Mulang.Signature
     Language.Mulang.Inspector
     Language.Mulang.Inspector.Bound
     Language.Mulang.Inspector.Combiner
@@ -75,15 +76,15 @@ library
     Language.Mulang.Analyzer.Autocorrector
     Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.ExpectationsAnalyzer
+    Language.Mulang.Analyzer.ExpectationsCompiler
     Language.Mulang.Analyzer.ExplangAnalyzer
     Language.Mulang.Analyzer.ExplangExpectationsCompiler
-    Language.Mulang.Analyzer.ExpectationsCompiler
     Language.Mulang.Analyzer.FragmentParser
     Language.Mulang.Analyzer.SignaturesAnalyzer
     Language.Mulang.Analyzer.SignatureStyleCompiler
     Language.Mulang.Analyzer.SmellsAnalyzer
-    Language.Mulang.Analyzer.TestsAnalyzer
     Language.Mulang.Analyzer.Synthesizer
+    Language.Mulang.Analyzer.TestsAnalyzer
     Language.Mulang.Interpreter
     Language.Mulang.Interpreter.Runner
 
