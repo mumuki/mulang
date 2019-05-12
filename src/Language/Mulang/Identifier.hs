@@ -7,7 +7,9 @@ module Language.Mulang.Identifier (
   Identifier,
   IdentifierPredicate) where
 
-import  Data.List (isInfixOf)
+import Data.Char (toLower)
+import Data.List (isInfixOf)
+import Data.Function (on)
 
 -- | An identifier
 -- | Mulang does not assume any special naming convention or format
@@ -24,7 +26,7 @@ except :: String -> IdentifierPredicate
 except = (/=)
 
 like :: String -> IdentifierPredicate
-like = isInfixOf
+like = on isInfixOf (map toLower)
 
 named :: String -> IdentifierPredicate
 named = (==)
