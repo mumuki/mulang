@@ -1,28 +1,36 @@
 module Language.Mulang.Inspector.ObjectOriented (
-  countMethods,
-  countClasses,
   countAttributes,
+  countClasses,
   countInterfaces,
+  countMethods,
+  countObjects,
   implements,
   includes,
   inherits,
   instantiates,
   usesInheritance,
   usesMixins,
-  declaresObject,
-  declaresSuperclass,
-  declaresClass,
-  declaresInterface,
-  declaresEnumeration,
   declaresAttribute,
+  declaresAttributeMatching,
+  declaresClass,
+  declaresClassMatching,
+  declaresEnumeration,
+  declaresInterface,
+  declaresInterfaceMatching,
   declaresMethod,
+  declaresMethodMatching,
+  declaresObject,
+  declaresObjectMatching,
+  declaresSuperclass,
   declaresPrimitive)  where
 
 import Language.Mulang.Ast
 import Language.Mulang.Ast.Operator (Operator)
+import Language.Mulang.Generator (equationsExpressions)
 import Language.Mulang.Identifier
-import Language.Mulang.Inspector.Bound (BoundInspection, BoundCounter, bound, containsBoundDeclaration, countBoundDeclarations)
-import Language.Mulang.Inspector.Primitive (Inspection, positive, containsExpression, containsDeclaration)
+import Language.Mulang.Inspector.Matcher (Matcher, matches, unmatching)
+import Language.Mulang.Inspector.Bound (BoundInspection, BoundCounter, containsBoundDeclaration, countBoundDeclarations, uncounting)
+import Language.Mulang.Inspector.Primitive (Inspection, containsExpression, containsDeclaration)
 
 implements :: BoundInspection
 implements predicate = containsExpression f
@@ -51,20 +59,29 @@ usesMixins :: Inspection
 usesMixins = includes anyone
 
 declaresObject :: BoundInspection
-declaresObject =  containsBoundDeclaration f
-  where f (Object _ _) = True
-        f _            = False
+declaresObject = unmatching declaresObjectMatching
+
+declaresObjectMatching :: Matcher -> BoundInspection
+declaresObjectMatching = uncounting countObjects
+
+countObjects :: Matcher -> BoundCounter
+countObjects matcher = countBoundDeclarations f
+  where f (Object _ body) = matches matcher id [body]
+        f _               = False
 
 declaresSuperclass :: BoundInspection
 declaresSuperclass = inherits
 
 declaresClass :: BoundInspection
-declaresClass =  bound positive countClasses
+declaresClass = unmatching declaresClassMatching
 
-countClasses :: BoundCounter
-countClasses =  countBoundDeclarations f
-  where f (Class _ _ _) = True
-        f _             = False
+declaresClassMatching :: Matcher -> BoundInspection
+declaresClassMatching = uncounting countClasses
+
+countClasses :: Matcher -> BoundCounter
+countClasses matcher = countBoundDeclarations f
+  where f (Class _ _ body) = matches matcher id [body]
+        f _                = False
 
 declaresEnumeration :: BoundInspection
 declaresEnumeration =  containsBoundDeclaration f
@@ -72,29 +89,38 @@ declaresEnumeration =  containsBoundDeclaration f
         f _                 = False
 
 declaresInterface :: BoundInspection
-declaresInterface = bound positive countInterfaces
+declaresInterface = unmatching declaresInterfaceMatching
 
-countInterfaces :: BoundCounter
-countInterfaces =  countBoundDeclarations f
-  where f (Interface _ _ _) = True
-        f _                 = False
+declaresInterfaceMatching :: Matcher -> BoundInspection
+declaresInterfaceMatching = uncounting countInterfaces
+
+countInterfaces :: Matcher -> BoundCounter
+countInterfaces matcher = countBoundDeclarations f
+  where f (Interface _ _ body) = matches matcher id [body]
+        f _                    = False
 
 declaresAttribute :: BoundInspection
-declaresAttribute =  bound positive countAttributes
+declaresAttribute = unmatching declaresAttributeMatching
 
-countAttributes :: BoundCounter
-countAttributes =  countBoundDeclarations f
-  where f (Attribute _ _) = True
-        f _               = False
+declaresAttributeMatching :: Matcher -> BoundInspection
+declaresAttributeMatching = uncounting countAttributes
+
+countAttributes :: Matcher -> BoundCounter
+countAttributes matcher = countBoundDeclarations f
+  where f (Attribute _ body) = matches matcher id [body]
+        f _                  = False
 
 
 declaresMethod :: BoundInspection
-declaresMethod =  bound positive countMethods
+declaresMethod = unmatching declaresMethodMatching
 
-countMethods :: BoundCounter
-countMethods =  countBoundDeclarations f
-  where f (Method _ _) = True
-        f _            = False
+declaresMethodMatching :: Matcher -> BoundInspection
+declaresMethodMatching = uncounting countMethods
+
+countMethods :: Matcher -> BoundCounter
+countMethods matcher = countBoundDeclarations f
+  where f (Method _ equations) = matches matcher equationsExpressions $ equations
+        f _                    = False
 
 -- primitive can only be declared as methods
 declaresPrimitive :: Operator -> Inspection

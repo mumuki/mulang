@@ -13,8 +13,10 @@ module Language.Mulang.Inspector.Generic (
   declaresComputationWithArity',
   declaresEntryPoint,
   declaresFunction,
+  declaresFunctionMatching,
   declaresRecursively,
   declaresVariable,
+  declaresVariableMatching,
   delegates,
   delegates',
   parses,
@@ -35,12 +37,12 @@ module Language.Mulang.Inspector.Generic (
 
 import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
-import Language.Mulang.Generator (declaredIdentifiers, expressions, declarations, referencedIdentifiers)
+import Language.Mulang.Generator (declaredIdentifiers, expressions, declarations, referencedIdentifiers, equationsExpressions)
 import Language.Mulang.Identifier
-import Language.Mulang.Inspector.Bound (bound, containsBoundDeclaration, countBoundDeclarations, BoundInspection, BoundCounter)
+import Language.Mulang.Inspector.Bound (bound, uncounting, containsBoundDeclaration, countBoundDeclarations, BoundInspection, BoundCounter)
 import Language.Mulang.Inspector.Contextualized (decontextualize, ContextualizedBoundInspection)
 import Language.Mulang.Inspector.Primitive
-import Language.Mulang.Inspector.Matcher (unmatching, Matcher)
+import Language.Mulang.Inspector.Matcher (unmatching, matches, Matcher)
 import Language.Mulang.Inspector.Query (inspect, select)
 
 import Data.Maybe (listToMaybe)
@@ -137,20 +139,26 @@ declaresRecursively = containsBoundDeclaration f
         nameOf = listToMaybe . declaredIdentifiers
 
 declaresFunction :: BoundInspection
-declaresFunction = bound positive countFunctions
+declaresFunction = unmatching declaresFunctionMatching
 
-countFunctions :: BoundCounter
-countFunctions = countBoundDeclarations f
-  where f (Function _ _) = True
-        f _              = False
+declaresFunctionMatching :: Matcher -> BoundInspection
+declaresFunctionMatching = uncounting countFunctions
+
+countFunctions :: Matcher -> BoundCounter
+countFunctions matcher = countBoundDeclarations f
+  where f (Function _ equations) = matches matcher equationsExpressions $ equations
+        f _                      = False
 
 declaresVariable :: BoundInspection
-declaresVariable = bound positive countVariables
+declaresVariable = unmatching declaresVariableMatching
 
-countVariables :: BoundCounter
-countVariables = countBoundDeclarations f
-  where f (Variable _ _)  = True
-        f _               = False
+declaresVariableMatching :: Matcher -> BoundInspection
+declaresVariableMatching = uncounting countVariables
+
+countVariables :: Matcher -> BoundCounter
+countVariables matcher = countBoundDeclarations f
+  where f (Variable _ body) = matches matcher id [body]
+        f _                 = False
 
 declaresEntryPoint :: BoundInspection
 declaresEntryPoint = containsBoundDeclaration f

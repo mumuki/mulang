@@ -1,22 +1,31 @@
 module Language.Mulang.Inspector.Procedural (
+  countProcedures,
   usesRepeat,
   usesWhile,
   usesSwitch,
   usesForEach,
   usesForLoop,
   usesLoop,
-  declaresProcedure) where
+  declaresProcedure,
+  declaresProcedureMatching) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Inspector.Primitive (Inspection, containsExpression)
-import Language.Mulang.Inspector.Bound (BoundInspection, containsBoundDeclaration)
+import Language.Mulang.Generator (equationsExpressions)
+import Language.Mulang.Inspector.Matcher (Matcher, unmatching, matches)
+import Language.Mulang.Inspector.Primitive (Inspection, positive, containsExpression)
+import Language.Mulang.Inspector.Bound (BoundCounter, BoundInspection, bound, containsBoundDeclaration, countBoundDeclarations, uncounting)
 import Language.Mulang.Inspector.Generic (usesYield)
 
 declaresProcedure :: BoundInspection
-declaresProcedure = containsBoundDeclaration f
-  where f (Procedure _ _) = True
-        f _                          = False
+declaresProcedure = unmatching declaresProcedureMatching
 
+declaresProcedureMatching :: Matcher -> BoundInspection
+declaresProcedureMatching = uncounting countProcedures
+
+countProcedures :: Matcher -> BoundCounter
+countProcedures matcher = countBoundDeclarations f
+  where f (Procedure _ equations) = matches matcher equationsExpressions $ equations
+        f _                       = False
 
 -- | Inspection that tells whether an expression uses while
 -- in its definition

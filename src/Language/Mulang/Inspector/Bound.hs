@@ -1,6 +1,7 @@
 module Language.Mulang.Inspector.Bound (
   bind,
   bound,
+  uncounting,
   containsBoundDeclaration,
   countBoundDeclarations,
   BoundConsult,
@@ -11,7 +12,8 @@ import  Data.List.Extra (has)
 import  Data.Count (Count, counts)
 
 import  Language.Mulang.Consult (Consult)
-import  Language.Mulang.Inspector.Primitive (Inspection)
+import  Language.Mulang.Inspector.Matcher (Matcher)
+import  Language.Mulang.Inspector.Primitive (Inspection, positive)
 import  Language.Mulang.Identifier (IdentifierPredicate)
 import  Language.Mulang.Generator (boundDeclarations)
 
@@ -30,3 +32,6 @@ containsBoundDeclaration f b  = has f (boundDeclarations b)
 
 countBoundDeclarations :: Inspection -> BoundCounter
 countBoundDeclarations f b  = counts f (boundDeclarations b)
+
+uncounting :: (Matcher -> BoundCounter) -> Matcher -> BoundInspection
+uncounting counter matcher = bound positive (counter matcher)

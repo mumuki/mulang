@@ -68,25 +68,25 @@ compileVerb s | (_:_:_) <- words = Text.unpack . Text.concat . map Text.toTitle 
 compileCounter :: String -> E.Matcher -> Maybe (ContextualizedBoundCounter)
 compileCounter = f
   where
-  f "UsesIf"              _ = plain countIfs
-  f "UsesFor"             _ = plain countFors
-  f "DeclaresFunction"    _ = bound countFunctions
-  f "DeclaresVariable"    _ = bound countVariables
-  f "DeclaresMethod"      _ = bound countMethods
-  f "DeclaresClass"       _ = bound countClasses
-  f "DeclaresAttribute"   _ = bound countAttributes
-  f "DeclaresInterface"   _ = bound countInterfaces
+  f "UsesIf"              E.Unmatching = plain countIfs
+  f "UsesFor"             E.Unmatching = plain countFors
+  f "DeclaresAttribute"   m            = boundMatching countAttributes m
+  f "DeclaresClass"       m            = boundMatching countClasses m
+  f "DeclaresFunction"    m            = boundMatching countFunctions m
+  f "DeclaresInterface"   m            = boundMatching countInterfaces m
+  f "DeclaresMethod"      m            = boundMatching countMethods m
+  f "DeclaresObject"      m            = boundMatching countObjects m
+  f "DeclaresProcedure"   m            = boundMatching countProcedures m
+  f "DeclaresVariable"    m            = boundMatching countVariables m
 
 compileInspection :: String -> E.Matcher -> Maybe ContextualizedBoundInspection
 compileInspection = f
   where
-  f "Assigns"                          E.Unmatching   = bound assigns
-  f "Assigns"                          (E.Matching p) = bound (assignsMatching (compileMatcher p))
-  f "Calls"                            E.Unmatching   = bound calls
-  f "Calls"                            (E.Matching p) = bound (callsMatching (compileMatcher p))
+  f "Assigns"                          m              = boundMatching assignsMatching m
+  f "Calls"                            m              = boundMatching callsMatching m
   f "Declares"                         E.Unmatching   = bound declares
   f "DeclaresAttribute"                E.Unmatching   = bound declaresAttribute
-  f "DeclaresClass"                    E.Unmatching   = bound declaresClass
+  f "DeclaresClass"                    m              = boundMatching declaresClassMatching m
   f "DeclaresComputation"              E.Unmatching   = bound declaresComputation
   f "DeclaresComputationWithArity0"    E.Unmatching   = bound (declaresComputationWithArity 0)
   f "DeclaresComputationWithArity1"    E.Unmatching   = bound (declaresComputationWithArity 1)
@@ -97,18 +97,18 @@ compileInspection = f
   f "DeclaresEntryPoint"               E.Unmatching   = bound declaresEntryPoint
   f "DeclaresEnumeration"              E.Unmatching   = bound declaresEnumeration
   f "DeclaresFact"                     E.Unmatching   = bound declaresFact
-  f "DeclaresFunction"                 E.Unmatching   = bound declaresFunction
-  f "DeclaresInterface"                E.Unmatching   = bound declaresInterface
-  f "DeclaresMethod"                   E.Unmatching   = bound declaresMethod
-  f "DeclaresObject"                   E.Unmatching   = bound declaresObject
+  f "DeclaresFunction"                 m              = boundMatching declaresFunctionMatching m
+  f "DeclaresInterface"                m              = boundMatching declaresInterfaceMatching m
+  f "DeclaresMethod"                   m              = boundMatching declaresMethodMatching m
+  f "DeclaresObject"                   m              = boundMatching declaresObjectMatching m
   f "DeclaresPredicate"                E.Unmatching   = bound declaresPredicate
-  f "DeclaresProcedure"                E.Unmatching   = bound declaresProcedure
+  f "DeclaresProcedure"                m              = boundMatching declaresProcedureMatching m
   f "DeclaresRecursively"              E.Unmatching   = bound declaresRecursively
   f "DeclaresRule"                     E.Unmatching   = bound declaresRule
   f "DeclaresSuperclass"               E.Unmatching   = bound declaresSuperclass
   f "DeclaresTypeAlias"                E.Unmatching   = bound declaresTypeAlias
   f "DeclaresTypeSignature"            E.Unmatching   = bound declaresTypeSignature
-  f "DeclaresVariable"                 E.Unmatching   = bound declaresVariable
+  f "DeclaresVariable"                 m              = boundMatching declaresVariableMatching m
   f "Delegates"                        E.Unmatching   = contextualizedBound delegates'
   f "Implements"                       E.Unmatching   = bound implements
   f "Includes"                         E.Unmatching   = bound includes
@@ -116,7 +116,7 @@ compileInspection = f
   f "Instantiates"                     E.Unmatching   = bound instantiates
   f "Raises"                           E.Unmatching   = bound raises
   f "Rescues"                          E.Unmatching   = bound rescues
-  f "Returns"                          (E.Matching p) = plain (returnsMatching (compileMatcher p))
+  f "Returns"                          m@(E.Matching _) = plain (returnsMatching (compileMatcher m))
   f "TypesAs"                          E.Unmatching   = bound typesAs
   f "TypesParameterAs"                 E.Unmatching   = bound typesParameterAs
   f "TypesReturnAs"                    E.Unmatching   = bound typesReturnAs
@@ -174,8 +174,15 @@ plain = Just . contextualizedBind . contextualize
 bound :: BoundConsult a -> Maybe (ContextualizedBoundConsult a)
 bound = Just . boundContextualize
 
-compileMatcher :: [E.Clause] -> Matcher
-compileMatcher = withEvery . f
+boundMatching :: (Matcher -> BoundConsult a) -> E.Matcher -> Maybe (ContextualizedBoundConsult a)
+boundMatching f m = bound (f (compileMatcher m))
+
+compileMatcher :: E.Matcher -> Matcher
+compileMatcher (E.Matching clauses) = compileClauses clauses
+compileMatcher _                    = const True
+
+compileClauses :: [E.Clause] -> Matcher
+compileClauses = withEvery . f
   where
     f :: [E.Clause] -> [Inspection]
     f (E.IsFalse:args)         = isBool False : (f args)
