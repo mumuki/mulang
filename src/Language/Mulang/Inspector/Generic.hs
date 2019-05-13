@@ -25,8 +25,8 @@ module Language.Mulang.Inspector.Generic (
   returnsMatching,
   uses,
   usesAnonymousVariable,
-  usesBooleanLogic,
-  usesArithmetic,
+  usesLogic,
+  usesMath,
   usesExceptionHandling,
   usesExceptions,
   usesFor,
@@ -44,6 +44,7 @@ import Language.Mulang.Inspector.Contextualized (decontextualize, Contextualized
 import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Inspector.Matcher (unmatching, matches, Matcher)
 import Language.Mulang.Inspector.Query (inspect, select)
+import Language.Mulang.Inspector.Literal (isMath, isLogic)
 
 import Data.Maybe (listToMaybe)
 import Data.List.Extra (has)
@@ -182,20 +183,11 @@ declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
 
         argsHaveArity = arityPredicate.length
 
-usesBooleanLogic :: Inspection
-usesBooleanLogic = containsExpression f
-  where f (Primitive Negation) = True
-        f (Primitive And)      = True
-        f (Primitive Or)       = True
-        f _                    = False
+usesLogic :: Inspection
+usesLogic = containsExpression isLogic
 
-usesArithmetic :: Inspection
-usesArithmetic = containsExpression f
-  where f (Primitive Plus)     = True
-        f (Primitive Minus)    = True
-        f (Primitive Multiply) = True
-        f (Primitive Divide)   = True
-        f _                    = False
+usesMath :: Inspection
+usesMath = containsExpression isMath
 
 raises :: BoundInspection
 raises predicate = containsExpression f

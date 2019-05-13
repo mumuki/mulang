@@ -423,33 +423,33 @@ spec = do
     it "is False when using a matcher that does not match" $ do
       (callsMatching (with . isNumber $ 1) anyone) (hs "f = g 2") `shouldBe` False
 
-  describe "usesBooleanLogic" $ do
+  describe "usesLogic" $ do
     it "is when it is used" $ do
-      usesBooleanLogic (hs "f x y = x || y")   `shouldBe` True
-      usesBooleanLogic (hs "f x y = x && y")   `shouldBe` True
-      usesBooleanLogic (hs "f x y = not x")    `shouldBe` True
-      usesBooleanLogic (hs "f x y = (not) x")  `shouldBe` True
-      usesBooleanLogic (hs "f x y = (&&) x y") `shouldBe` True
+      usesLogic (hs "f x y = x || y")   `shouldBe` True
+      usesLogic (hs "f x y = x && y")   `shouldBe` True
+      usesLogic (hs "f x y = not x")    `shouldBe` True
+      usesLogic (hs "f x y = (not) x")  `shouldBe` True
+      usesLogic (hs "f x y = (&&) x y") `shouldBe` True
 
     it "is is not used otherwise" $ do
-      usesBooleanLogic (hs "f x y = x + y") `shouldBe` False
-      usesBooleanLogic (hs "f x y = x")     `shouldBe` False
-      usesBooleanLogic (hs "f x y = and x") `shouldBe` False
-      usesBooleanLogic (hs "f x y = or x")  `shouldBe` False
+      usesLogic (hs "f x y = x + y") `shouldBe` False
+      usesLogic (hs "f x y = x")     `shouldBe` False
+      usesLogic (hs "f x y = and x") `shouldBe` False
+      usesLogic (hs "f x y = or x")  `shouldBe` False
 
-  describe "usesArithmetic" $ do
+  describe "usesMath" $ do
     it "is when it is used" $ do
-      usesArithmetic (hs "f x y = x + y")    `shouldBe` True
-      usesArithmetic (hs "f x y = x * y")    `shouldBe` True
-      usesArithmetic (hs "f x y = x / x")    `shouldBe` True
-      usesArithmetic (hs "f x y = div x z")  `shouldBe` False -- TODO support mod/div operators in the future
-      usesArithmetic (hs "f x y = x - y")    `shouldBe` True
+      usesMath (hs "f x y = x + y")    `shouldBe` True
+      usesMath (hs "f x y = x * y")    `shouldBe` True
+      usesMath (hs "f x y = x / x")    `shouldBe` True
+      usesMath (hs "f x y = div x z")  `shouldBe` False -- TODO support mod/div operators in the future
+      usesMath (hs "f x y = x - y")    `shouldBe` True
 
     it "is is not used otherwise" $ do
-      usesArithmetic (hs "f x y = x")       `shouldBe` False
-      usesArithmetic (hs "f x y = plus x")  `shouldBe` False
-      usesArithmetic (hs "f x y = minus x") `shouldBe` False
-      usesArithmetic (hs "f x y = x || y")  `shouldBe` False
+      usesMath (hs "f x y = x")       `shouldBe` False
+      usesMath (hs "f x y = plus x")  `shouldBe` False
+      usesMath (hs "f x y = minus x") `shouldBe` False
+      usesMath (hs "f x y = x || y")  `shouldBe` False
 
   describe "usesExceptions" $ do
     it "is True when a raise is used, java" $ do

@@ -10,7 +10,7 @@ import Language.Mulang
 import Language.Mulang.Consult (Consult)
 import Language.Mulang.Counter (plus)
 import Language.Mulang.Inspector.Primitive (atLeast, atMost, exactly)
-import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol)
+import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol, isSelf)
 import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
 
 import qualified Data.Text as Text
@@ -122,8 +122,8 @@ compileInspection = f
   f "TypesReturnAs"                    E.Unmatching   = bound typesReturnAs
   f "Uses"                             E.Unmatching   = bound uses
   f "UsesAnonymousVariable"            E.Unmatching   = plain usesAnonymousVariable
-  f "UsesBooleanLogic"                 E.Unmatching   = plain usesBooleanLogic
-  f "UsesArithmetic"                   E.Unmatching   = plain usesArithmetic
+  f "UsesBooleanLogic"                 E.Unmatching   = plain usesLogic
+  f "UsesArithmetic"                   E.Unmatching   = plain usesMath
   f "UsesComposition"                  E.Unmatching   = plain usesComposition
   f "UsesComprehension"                E.Unmatching   = f "UsesForComprehension" E.Unmatching
   f "UsesConditional"                  E.Unmatching   = plain usesConditional
@@ -187,6 +187,9 @@ compileClauses = withEvery . f
     f :: [E.Clause] -> [Inspection]
     f (E.IsFalse:args)         = isBool False : (f args)
     f (E.IsNil:args)           = isNil : (f args)
+    f (E.IsSelf:args)          = isSelf : (f args)
+    f (E.IsLogic:args)         = isLogic : (f args)
+    f (E.IsMath:args)          = isMath : (f args)
     f (E.IsTrue:args)          = isBool True : (f args)
     f (E.IsChar value:args)    = isChar value : (f args)
     f (E.IsNumber value:args)  = isNumber value : (f args)
