@@ -37,6 +37,9 @@ spec = do
 
         declaresProcedure (named "g") code `shouldBe` False
 
+      it "is False when using a matcher and procedure does not have a body" $ do
+        (declaresProcedureMatching (with . isNumber $ 2) anyone) (js "function f() {}") `shouldBe` False
+
   describe "usesWhile" $ do
     it "is True when present in function" $ do
       usesWhile (js "function f() { while(true) { console.log('foo') }  }")  `shouldBe` True
@@ -182,6 +185,22 @@ spec = do
 
       it "is False when is a method" $ do
         declaresFunction (named "f") (js "var o = {f: function(){}}") `shouldBe` False
+
+    describe "with matcher" $ do
+      it "is True when using a matcher that matches" $ do
+        (declaresFunctionMatching (with isSelf) anyone) (js "function f(x) { this; return 0; }") `shouldBe` True
+
+      it "is False when using a matcher that does not match" $ do
+        (declaresFunctionMatching (with isSelf) anyone) (js "function f(x) { this; return 0; }") `shouldBe` False
+
+      it "is True when using a non literal matcher that matches" $ do
+        (declaresFunctionMatching (with (returnsMatching (with (isNumber 2)))) anyone) (js "function f() { return 2; }") `shouldBe` True
+
+      it "is False when using a non literal matcher that doesn't match" $ do
+        (declaresFunctionMatching (with (returnsMatching (with (isNumber 2)))) anyone) (js "function f() { return 3; }") `shouldBe` False
+
+      it "is False when using a literal matcher and it does not match literally" $ do
+        (declaresFunctionMatching (with . isNumber $ 2) anyone) (js "function f() { return 2; }") `shouldBe` False
 
   describe "declaresComputationWithArity" $ do
     describe "with function declarations, hs" $ do

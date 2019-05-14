@@ -31,11 +31,21 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "var x = 1;\n\
                     \let y = 2" "test: count (declares variable) = 2") `shouldReturn` ok
 
+  it "evaluates declares procedure that (assigns)" $ do
+    let test = "test: declares procedure that (assigns)"
+
+    (run JavaScript "" test) `shouldReturn` nok
+    (run JavaScript "function finish(){}" test) `shouldReturn` nok
+    (run JavaScript "function finish() { pending = false }" test) `shouldReturn` ok
+    (run JavaScript "function finish() { finished = false }" test) `shouldReturn` nok
+    (run JavaScript "function finish() { finished = true }" test) `shouldReturn` ok
+
   it "evaluates declares procedure that (assigns `finished` with true)" $ do
     let test = "test: declares procedure that (assigns `finished` with true)"
 
     (run JavaScript "" test) `shouldReturn` nok
     (run JavaScript "function finish(){}" test) `shouldReturn` nok
+    (run JavaScript "function finish() { pending = false }" test) `shouldReturn` nok
     (run JavaScript "function finish() { finished = false }" test) `shouldReturn` nok
     (run JavaScript "function finish() { finished = true }" test) `shouldReturn` ok
 
@@ -49,7 +59,7 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function totalAmount() { var z = x + y; return z }" test) `shouldReturn` nok
 
   it "evaluates declares function like `total` with math" $ do
-    let test = "declares function like `total` with math"
+    let test = "test: declares function like `total` with math"
 
     (run JavaScript "" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() {}" test) `shouldReturn` nok
@@ -58,7 +68,7 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function totalAmount() { var z = x + y; return z }" test) `shouldReturn` nok
 
   it "evaluates declares function like `total` that (uses math)" $ do
-    let test = "declares function like `total` that (uses math)"
+    let test = "test: declares function like `total` that (uses math)"
 
     (run JavaScript "" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() {}" test) `shouldReturn` nok
@@ -69,7 +79,7 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "var magicNumber = 10 + 1; function totalAmount() { var z = magicNumber; return 0 }" test) `shouldReturn` ok
 
   it "evaluates declares function like `total` that (returns something that (uses math))" $ do
-    let test = "declares function like `total` that (returns something that (uses math))"
+    let test = "test: declares function like `total` that (returns something that (uses math))"
 
     (run JavaScript "" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() {}" test) `shouldReturn` nok

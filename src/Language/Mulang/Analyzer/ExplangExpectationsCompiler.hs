@@ -22,7 +22,7 @@ import Data.List.Split (splitOn)
 type Scope = (ContextualizedInspection -> ContextualizedInspection, IdentifierPredicate -> IdentifierPredicate)
 
 compileExpectation :: E.Expectation -> Inspection
-compileExpectation = fromMaybe (\_ -> True) . compileQuery
+compileExpectation = fromMaybe (const True) . compileQuery
 
 compileQuery :: E.Query -> Maybe Inspection
 compileQuery (E.Decontextualize query) = compileCQuery id query >>= (return . decontextualize)
@@ -185,14 +185,15 @@ compileClauses :: [E.Clause] -> Matcher
 compileClauses = withEvery . f
   where
     f :: [E.Clause] -> [Inspection]
-    f (E.IsFalse:args)         = isBool False : (f args)
-    f (E.IsNil:args)           = isNil : (f args)
-    f (E.IsSelf:args)          = isSelf : (f args)
-    f (E.IsLogic:args)         = isLogic : (f args)
-    f (E.IsMath:args)          = isMath : (f args)
-    f (E.IsTrue:args)          = isBool True : (f args)
-    f (E.IsChar value:args)    = isChar value : (f args)
-    f (E.IsNumber value:args)  = isNumber value : (f args)
-    f (E.IsString value:args)  = isString value : (f args)
-    f (E.IsSymbol value:args)  = isSymbol value : (f args)
-    f []                     = []
+    f (E.IsFalse:args)          = isBool False : (f args)
+    f (E.IsNil:args)            = isNil : (f args)
+    f (E.IsSelf:args)           = isSelf : (f args)
+    f (E.IsLogic:args)          = isLogic : (f args)
+    f (E.IsMath:args)           = isMath : (f args)
+    f (E.IsTrue:args)           = isBool True : (f args)
+    f (E.IsChar value:args)     = isChar value : (f args)
+    f (E.IsNumber value:args)   = isNumber value : (f args)
+    f (E.IsString value:args)   = isString value : (f args)
+    f (E.IsSymbol value:args)   = isSymbol value : (f args)
+    f (E.That expectation:args) = compileExpectation expectation : (f args)
+    f []                        = []
