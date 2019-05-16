@@ -126,7 +126,14 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "if (true) {}; if(true) {}; if (false) {}" "test: count (UsesIf) >= 3") `shouldReturn` ok
 
   it "is case sensitive in standard syntax" $ do
+    (run JavaScript "" "test: UsesIf") `shouldReturn` nok
     (run JavaScript "" "test: usesif") `shouldReturn` ok
+
+  it "accepts titlecase in standard syntax" $ do
+    (run JavaScript "" "test: UsesIf") `shouldReturn` nok
+
+  it "accepts camelcase in standard syntax" $ do
+    (run JavaScript "" "test: usesIf") `shouldReturn` nok
 
   it "is white-space insensitive in extended syntax" $ do
     (run JavaScript "" "test: Uses If") `shouldReturn` nok

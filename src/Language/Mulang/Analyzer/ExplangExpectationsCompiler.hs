@@ -3,6 +3,7 @@
 module Language.Mulang.Analyzer.ExplangExpectationsCompiler(
   compileExpectation) where
 
+import Data.Char (toUpper)
 import Data.Count (encode)
 import Data.Function.Extra (orElse, andAlso, never)
 
@@ -13,10 +14,9 @@ import Language.Mulang.Inspector.Primitive (atLeast, atMost, exactly)
 import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol, isSelf)
 import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
 
-import qualified Data.Text as Text
 import qualified Language.Explang.Expectation as E
 
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, fromJust)
 import Data.List.Split (splitOn)
 
 type Scope = (ContextualizedInspection -> ContextualizedInspection, IdentifierPredicate -> IdentifierPredicate)
@@ -61,9 +61,9 @@ compilePredicate _ (E.Except name) = except name
 compilePredicate _ (E.AnyOf ns)    = anyOf ns
 
 
-compileVerb s | (_:_:_) <- words = Text.unpack . Text.concat . map Text.toTitle $ words
-              | otherwise = s
-  where words = Text.words . Text.pack $  s
+compileVerb :: String -> String
+compileVerb = concat . map headToUpper . words
+  where headToUpper (x:xs) = toUpper x : xs
 
 compileCounter :: String -> E.Matcher -> Maybe (ContextualizedBoundCounter)
 compileCounter = f
