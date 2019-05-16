@@ -38,11 +38,11 @@ library
     Language.Mulang.Ast
     Language.Mulang.Ast.Operator
     Language.Mulang.Builder
+    Language.Mulang.Consult
     Language.Mulang.Counter
     Language.Mulang.DomainLanguage
     Language.Mulang.Generator
     Language.Mulang.Identifier
-    Language.Mulang.Signature
     Language.Mulang.Inspector
     Language.Mulang.Inspector.Bound
     Language.Mulang.Inspector.Combiner
@@ -60,17 +60,18 @@ library
     Language.Mulang.Inspector.Procedural
     Language.Mulang.Inspector.Query
     Language.Mulang.Inspector.Typed
+    Language.Mulang.Operators
+    Language.Mulang.Operators.Haskell
+    Language.Mulang.Operators.Java
+    Language.Mulang.Operators.Python
+    Language.Mulang.Operators.Ruby
     Language.Mulang.Parsers
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Java
     Language.Mulang.Parsers.JavaScript
     Language.Mulang.Parsers.Prolog
     Language.Mulang.Parsers.Python
-    Language.Mulang.Operators
-    Language.Mulang.Operators.Haskell
-    Language.Mulang.Operators.Java
-    Language.Mulang.Operators.Python
-    Language.Mulang.Operators.Ruby
+    Language.Mulang.Signature
     Language.Mulang.Analyzer
     Language.Mulang.Analyzer.Analysis
     Language.Mulang.Analyzer.Analysis.Json
