@@ -33,7 +33,7 @@ decode (MoreThanOne n) = fromIntegral n
 
 count :: [a] -> Count
 count []     = Zero
-count [x]    = One
+count [_]    = One
 count xs     = MoreThanOne (length xs)
 
 counts :: (a -> Bool) -> (b -> [a]) -> b -> Count

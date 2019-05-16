@@ -7,7 +7,6 @@ module Language.Mulang.Counter (
 import Data.Count (Count (..), counts)
 import Data.Function.Extra (compose2)
 
-import Language.Mulang.Ast (Expression)
 import Language.Mulang.Consult (Consult)
 
 type Counter = Consult Count
