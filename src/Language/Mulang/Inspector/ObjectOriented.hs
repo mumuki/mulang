@@ -26,7 +26,7 @@ module Language.Mulang.Inspector.ObjectOriented (
 
 import Language.Mulang.Ast
 import Language.Mulang.Ast.Operator (Operator)
-import Language.Mulang.Generator (equationsExpressions)
+import Language.Mulang.Generator (equationsExpandedExpressions)
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Matcher (Matcher, matches, unmatching)
 import Language.Mulang.Inspector.Bound (BoundInspection, BoundCounter, containsBoundDeclaration, countBoundDeclarations, uncounting)
@@ -119,7 +119,7 @@ declaresMethodMatching = uncounting countMethods
 
 countMethods :: Matcher -> BoundCounter
 countMethods matcher = countBoundDeclarations f
-  where f (Method _ equations) = matches matcher equationsExpressions $ equations
+  where f (Method _ equations) = matches matcher equationsExpandedExpressions $ equations
         f _                    = False
 
 -- primitive can only be declared as methods

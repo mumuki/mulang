@@ -12,6 +12,7 @@ module Language.Mulang.Generator (
   transitiveReferencedIdentifiers,
   equationsExpressions,
   statementsExpressions,
+  equationsExpandedExpressions,
   Generator,
   Declarator,
   Expression(..)) where
@@ -136,6 +137,12 @@ equationBodies = concatMap bodiesOf . declarations
     bodiesOf _ = []
 
     equationBodies = map (\(Equation _ body) -> body)
+
+equationsExpandedExpressions :: [Equation] -> [Expression]
+equationsExpandedExpressions = concatMap expand . equationsExpressions
+  where
+    expand (Sequence xs) = xs
+    expand other         = [other]
 
 declarationsOf :: Identifier -> Generator Expression
 declarationsOf b = boundDeclarations (named b)

@@ -37,9 +37,9 @@ module Language.Mulang.Inspector.Generic (
 
 import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
-import Language.Mulang.Generator (declaredIdentifiers, expressions, declarations, referencedIdentifiers, equationsExpressions)
+import Language.Mulang.Generator (declaredIdentifiers, expressions, declarations, referencedIdentifiers, equationsExpandedExpressions)
 import Language.Mulang.Identifier
-import Language.Mulang.Inspector.Bound (bound, uncounting, containsBoundDeclaration, countBoundDeclarations, BoundInspection, BoundCounter)
+import Language.Mulang.Inspector.Bound (uncounting, containsBoundDeclaration, countBoundDeclarations, BoundInspection, BoundCounter)
 import Language.Mulang.Inspector.Contextualized (decontextualize, ContextualizedBoundInspection)
 import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Inspector.Matcher (unmatching, matches, Matcher)
@@ -147,7 +147,7 @@ declaresFunctionMatching = uncounting countFunctions
 
 countFunctions :: Matcher -> BoundCounter
 countFunctions matcher = countBoundDeclarations f
-  where f (Function _ equations) = matches matcher equationsExpressions $ equations
+  where f (Function _ equations) = matches matcher equationsExpandedExpressions $ equations
         f _                      = False
 
 declaresVariable :: BoundInspection

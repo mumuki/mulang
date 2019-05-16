@@ -191,7 +191,7 @@ spec = do
         (declaresFunctionMatching (with isSelf) anyone) (js "function f(x) { this; return 0; }") `shouldBe` True
 
       it "is False when using a matcher that does not match" $ do
-        (declaresFunctionMatching (with isSelf) anyone) (js "function f(x) { this; return 0; }") `shouldBe` False
+        (declaresFunctionMatching (with isSelf) anyone) (js "function f(x) { return 0; }") `shouldBe` False
 
       it "is True when using a non literal matcher that matches" $ do
         (declaresFunctionMatching (with (returnsMatching (with (isNumber 2)))) anyone) (js "function f() { return 2; }") `shouldBe` True
