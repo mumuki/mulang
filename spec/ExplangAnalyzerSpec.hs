@@ -37,7 +37,7 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "" test) `shouldReturn` nok
     (run JavaScript "function finish(){}" test) `shouldReturn` nok
     (run JavaScript "function finish() { pending = false }" test) `shouldReturn` ok
-    (run JavaScript "function finish() { finished = false }" test) `shouldReturn` nok
+    (run JavaScript "function finish() { finished = false }" test) `shouldReturn` ok
     (run JavaScript "function finish() { finished = true }" test) `shouldReturn` ok
 
   it "evaluates declares procedure that (assigns `finished` with true)" $ do
