@@ -79,38 +79,43 @@ library
     Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.ExpectationsAnalyzer
     Language.Mulang.Analyzer.ExpectationsCompiler
-    Language.Mulang.Analyzer.ExplangAnalyzer
-    Language.Mulang.Analyzer.ExplangExpectationsCompiler
+    Language.Mulang.Analyzer.CustomExpectationsAnalyzer
+    Language.Mulang.Analyzer.EdlQueryCompiler
     Language.Mulang.Analyzer.FragmentParser
     Language.Mulang.Analyzer.SignaturesAnalyzer
     Language.Mulang.Analyzer.SignatureStyleCompiler
     Language.Mulang.Analyzer.SmellsAnalyzer
     Language.Mulang.Analyzer.Synthesizer
     Language.Mulang.Analyzer.TestsAnalyzer
+    Language.Mulang.Edl
+    Language.Mulang.Edl.Expectation
+    Language.Mulang.Edl.Lexer
+    Language.Mulang.Edl.Parser
     Language.Mulang.Interpreter
     Language.Mulang.Interpreter.Runner
 
   build-depends:
     base                      <= 5,
-    explang                   ,
     bytestring                ,
-    text                      ,
-    unordered-containers      ,
+    aeson                     ,
+    array                     ,
     containers                ,
-    scientific                ,
-    vector                    ,
+    hashable                  ,
     haskell-src               ,
+    inflections               <= 0.2.0.1,
     language-java             ,
     language-javascript       ,
     language-python           ,
-    aeson                     ,
-    inflections               <= 0.2.0.1,
+    monad-loops               ,
+    mtl                       ,
     parsec                    ,
     ParsecTools               ,
+    scientific                ,
     split                     ,
-    hashable                  ,
-    mtl                       ,
-    monad-loops               ,
+    text                      ,
+    unordered-containers      ,
+    utf8-string               ,
+    vector                    ,
     process
   build-tools:
     happy,

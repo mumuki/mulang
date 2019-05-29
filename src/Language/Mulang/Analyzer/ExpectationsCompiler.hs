@@ -3,16 +3,16 @@
 module Language.Mulang.Analyzer.ExpectationsCompiler(
   compileExpectation) where
 
-import           Language.Explang.Expectation
+import           Language.Mulang.Edl.Expectation
 
 import           Language.Mulang (Inspection)
-import qualified Language.Mulang.Analyzer.ExplangExpectationsCompiler as EC
+import           Language.Mulang.Analyzer.EdlQueryCompiler (compileTopQuery)
 import qualified Language.Mulang.Analyzer.Analysis as A
 
 import Data.List.Split (splitOn)
 
 compileExpectation :: A.Expectation -> Inspection
-compileExpectation (A.Expectation s i) = EC.compileExpectation . negator . scope $ baseQuery
+compileExpectation (A.Expectation s i) = compileTopQuery . negator . scope $ baseQuery
   where
     (inspectionParts, negator) = compileInspectionPartsAndNegator (splitOn ":" i)
     scope = compileScope (splitOn ":" s)

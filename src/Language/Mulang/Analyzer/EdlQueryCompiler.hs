@@ -1,7 +1,7 @@
 {-# LANGUAGE ViewPatterns #-}
 
-module Language.Mulang.Analyzer.ExplangExpectationsCompiler(
-  compileExpectation) where
+module Language.Mulang.Analyzer.EdlQueryCompiler(
+  compileTopQuery) where
 
 import Data.Char (toUpper)
 import Data.Count (encode)
@@ -14,15 +14,15 @@ import Language.Mulang.Inspector.Primitive (atLeast, atMost, exactly)
 import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol, isSelf)
 import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
 
-import qualified Language.Explang.Expectation as E
+import qualified Language.Mulang.Edl.Expectation as E
 
 import Data.Maybe (fromMaybe, fromJust)
 import Data.List.Split (splitOn)
 
 type Scope = (ContextualizedInspection -> ContextualizedInspection, IdentifierPredicate -> IdentifierPredicate)
 
-compileExpectation :: E.Expectation -> Inspection
-compileExpectation = fromMaybe (const True) . compileQuery
+compileTopQuery :: E.Query -> Inspection
+compileTopQuery = fromMaybe (const True) . compileQuery
 
 compileQuery :: E.Query -> Maybe Inspection
 compileQuery (E.Decontextualize query) = compileCQuery id query >>= (return . decontextualize)
@@ -188,12 +188,12 @@ compileClauses = withEvery . f
     f (E.IsFalse:args)          = isBool False : (f args)
     f (E.IsNil:args)            = isNil : (f args)
     f (E.IsSelf:args)           = isSelf : (f args)
-    f (E.IsLogic:args)          = isLogic : (f args)
-    f (E.IsMath:args)           = isMath : (f args)
+    f (E.IsLogic:args)          = usesLogic : (f args)
+    f (E.IsMath:args)           = usesMath : (f args)
     f (E.IsTrue:args)           = isBool True : (f args)
     f (E.IsChar value:args)     = isChar value : (f args)
     f (E.IsNumber value:args)   = isNumber value : (f args)
     f (E.IsString value:args)   = isString value : (f args)
     f (E.IsSymbol value:args)   = isSymbol value : (f args)
-    f (E.That expectation:args) = compileExpectation expectation : (f args)
+    f (E.That expectation:args) = compileTopQuery expectation : (f args)
     f []                        = []

@@ -71,7 +71,7 @@ data Analysis = Analysis {
 
 data AnalysisSpec = AnalysisSpec {
   expectations :: Maybe [Expectation],
-  explangTest :: Maybe String,
+  customExpectations :: Maybe String,
   smellsSet :: Maybe SmellsSet,
   signatureAnalysisType :: Maybe SignatureAnalysisType,
   testAnalysisType :: Maybe TestAnalysisType,
@@ -190,7 +190,7 @@ domainLanguageAnalysis :: Fragment -> DomainLanguage -> Analysis
 domainLanguageAnalysis code domainLanguage = Analysis code (emptyAnalysisSpec { domainLanguage = Just domainLanguage, smellsSet = allSmells })
 
 explangTestAnalysis :: Fragment -> String -> Analysis
-explangTestAnalysis code es = Analysis code (emptyAnalysisSpec { explangTest = Just es })
+explangTestAnalysis code es = Analysis code (emptyAnalysisSpec { customExpectations = Just es })
 
 expectationsAnalysis :: Fragment -> [Expectation] -> Analysis
 expectationsAnalysis code es = Analysis code (emptyAnalysisSpec { expectations = Just es })
