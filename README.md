@@ -969,7 +969,15 @@ For further detail on this spec, see [Code Execution](#code-execution)
 
 ### Basic usage
 
+
 ```
+expectation "must call something":
+  calls;
+
+expectation "must call something":
+  %% exactly the same as previous example
+  calls something;
+
 expectation "assignment operator must be used":
   assigns;
 
@@ -984,6 +992,7 @@ expectation "`System` must be used":
 
 expectation "`exit` must be called":
   calls `exit`;
+
 ```
 
 ### Using advanced predicates
@@ -1008,8 +1017,91 @@ expectation "must call `feed` or `bark`":
   calls something in (`feed`, `bark`);
 ```
 
-### Using nested predicates
+### Using scopes
 
+```
+expectation "`HouseBuilder` must raise something":
+  %% this will work if within the lexical scope of
+  %% HouseBuilder a raise statement is used
+  within `HouseBuilder` raises something"
+
+expectation "`HouseBuilder` must raise something":
+  %% this will work if within the lexical scope of
+  %% HouseBuilder a raise statement is used, or if any code outside
+  %% the lexical scope of HouseBuilder raises an excepcion
+  through `HouseBuilder` raises something"
+
+expectation "`HouseBuilder.builder` must create a new `House`":
+  within `HouseBuilder.builder` instantiates `House`"
+```
+
+### Negating and composing queries
+
+```
+expectation "must not call anything":
+  ! calls;
+
+expectation "must not call anything":
+  %% exactly the same as previous example
+  ! calls something;
+
+expectation "must declare a class, enum or interface named `Pet`":
+  declares enumeration `Pet` || declares class `Pet` || declares interface `Pet`;
+
+expectation "must declare `Owner` and `Pet`":
+  %% however in most cases, it is better to declare two different, separate
+  %% expectations
+  declares `Owner` && declares `Pet`;
+```
+
+### Using literal matchers
+
+```
+expectation "`exit` must be called with value 0":
+  calls `exit` with 0;
+
+expectation "`tell` must be called with value 10 and true":
+  calls `tell` with (10, true);
+
+expectation "`play` must be called with this":
+  calls `play` with self;
+```
+
+### Using arithmethic and boolean logic matchers
+
+```
+expectation "the method `getTotalAmount` must return an arithmetic expresion":
+  within `getTotalAmmount` returns with math;
+
+expectation "a method that performs boolean operations must be declared":
+  declares method with logic;
+```
+
+### Using nested matchers
+
+```
+expectation "must declare a procedure that uses ifs":
+  declares procedure that (uses if)
+
+expectation "must declare a procedure that uses ifs but not while":
+  declares procedure that (uses if && ! uses while)
+```
+
+## Using counters
+
+```
+expectation "must perform at least three calls":
+  count(calls) >= 3;
+
+expectation "must declare three instances of `Tax`":
+  count(inherits `Tax`) = 3;
+
+expectation "must declare three subclases of `Tax` and two subclases of `Product`":
+  count(inherits `Tax`) = 3 && count(inherits `Product`) = 2;
+
+expectation "must declare no more than 4 methods in class `Queue`":
+  within `Queue` count(declares method) <= 4;
+```
 
 
 # Mulang AST spec
