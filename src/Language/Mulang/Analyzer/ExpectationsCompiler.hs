@@ -51,11 +51,13 @@ compileBinding name       = Named name
 compileMatcher :: [String] -> Matcher
 compileMatcher = matching . f
   where
-    matching [] = Unmatching -- TODO move to explang
+    matching [] = Unmatching
     matching xs = Matching xs
 
     f :: [String] -> [Clause]
     f ("WithFalse":args)        =  IsFalse : f args
+    f ("WithLogic":args)        =  IsLogic   : f args
+    f ("WithMath":args)         =  IsMath : f args
     f ("WithNil":args)          =  IsNil : f args
     f ("WithTrue":args)         =  IsTrue : f args
     f ("WithChar":value:args)   =  IsChar (read value) : f args
