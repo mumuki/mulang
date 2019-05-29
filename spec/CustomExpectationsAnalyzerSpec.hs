@@ -31,6 +31,13 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "var x = 1;\n\
                     \let y = 2" "expectation: count (declares variable) = 2") `shouldReturn` ok
 
+  it "evaluates count (declares procedure)" $ do
+    (run JavaScript "" "expectation: count (declares procedure) = 0") `shouldReturn` ok
+    (run JavaScript "function f(){}" "expectation: count (declares procedure) = 0") `shouldReturn` nok
+    (run JavaScript "function f(){}" "expectation: count (declares procedure) = 1") `shouldReturn` ok
+    (run JavaScript "function f1(){} function f2(){}" "expectation: count (declares procedure) = 1") `shouldReturn` nok
+    (run JavaScript "function f1(){} function f2(){}" "expectation: count (declares procedure) = 2") `shouldReturn` ok
+
   it "evaluates declares procedure that (assigns)" $ do
     let test = "expectation: declares procedure that (assigns)"
 
@@ -163,11 +170,3 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "" "expectation: uses if") `shouldReturn` nok
     (run JavaScript "if (true) {}" "expectation: uses if") `shouldReturn` ok
 
-
-      -- f "DeclaresAttribute"   m            = boundMatching countAttributes m
-      -- f "DeclaresClass"       m            = boundMatching countClasses m
-      -- f "DeclaresFunction"    m            = boundMatching countFunctions m
-      -- f "DeclaresInterface"   m            = boundMatching countInterfaces m
-      -- f "DeclaresMethod"      m            = boundMatching countMethods m
-      -- f "DeclaresObject"      m            = boundMatching countObjects m
-      -- f "DeclaresProcedure"   m            = boundMatching countProcedures m
