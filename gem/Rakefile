@@ -3,7 +3,7 @@ require "rspec/core/rake_task"
 
 RSpec::Core::RakeTask.new(:spec)
 
-task :default => :spec
+task :default => :all
 
 namespace :wrapper do
   desc 'Wrap mulang into this gem'
@@ -14,4 +14,7 @@ namespace :wrapper do
   task :clean do
     rm_rf 'bin/mulang'
   end
+
 end
+
+task :all => ['wrapper:wrap', :spec]
