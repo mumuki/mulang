@@ -12,7 +12,7 @@ module Language.Mulang.Analyzer.Analysis (
   emptyAnalysis,
   domainLanguageAnalysis,
   expectationsAnalysis,
-  explangTestAnalysis,
+  customExpectationsAnalysis,
   signaturesAnalysis,
   smellsAnalysis,
   testsAnalysis,
@@ -38,7 +38,7 @@ module Language.Mulang.Analyzer.Analysis (
 
   AnalysisResult(..),
   ExpectationResult(..),
-  ExplangTestResult(..)) where
+  CustomExpectationResult(..)) where
 
 import GHC.Generics
 
@@ -146,7 +146,7 @@ data Language
 data AnalysisResult
   = AnalysisCompleted {
       expectationResults :: [ExpectationResult],
-      explangTestResults :: [ExplangTestResult],
+      customExpectationResults :: [CustomExpectationResult],
       smells :: [Expectation],
       signatures :: [Code],
       testResults :: [TestResult],
@@ -159,7 +159,7 @@ data ExpectationResult = ExpectationResult {
 } deriving (Show, Eq, Generic)
 
 
-data ExplangTestResult = ExplangTestResult {
+data CustomExpectationResult = CustomExpectationResult {
   name :: String,
   status :: Bool
 } deriving (Show, Eq, Generic)
@@ -189,8 +189,8 @@ emptyAnalysis code = Analysis code emptyAnalysisSpec
 domainLanguageAnalysis :: Fragment -> DomainLanguage -> Analysis
 domainLanguageAnalysis code domainLanguage = Analysis code (emptyAnalysisSpec { domainLanguage = Just domainLanguage, smellsSet = allSmells })
 
-explangTestAnalysis :: Fragment -> String -> Analysis
-explangTestAnalysis code es = Analysis code (emptyAnalysisSpec { customExpectations = Just es })
+customExpectationsAnalysis :: Fragment -> String -> Analysis
+customExpectationsAnalysis code es = Analysis code (emptyAnalysisSpec { customExpectations = Just es })
 
 expectationsAnalysis :: Fragment -> [Expectation] -> Analysis
 expectationsAnalysis code es = Analysis code (emptyAnalysisSpec { expectations = Just es })

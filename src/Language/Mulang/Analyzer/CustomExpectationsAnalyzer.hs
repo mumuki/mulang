@@ -1,17 +1,17 @@
 module Language.Mulang.Analyzer.CustomExpectationsAnalyzer (
-  analyseExplang) where
+  analyseCustomExpectations) where
 
 import Data.Maybe (fromMaybe)
 
 import Language.Mulang hiding (Expectation)
-import Language.Mulang.Analyzer.Analysis (ExplangTestResult(..))
+import Language.Mulang.Analyzer.Analysis (CustomExpectationResult(..))
 import Language.Mulang.Analyzer.EdlQueryCompiler (compileTopQuery)
 
 import Language.Mulang.Edl (parseExpectations, Expectation (..))
 
-analyseExplang :: Expression -> Maybe String -> [ExplangTestResult]
-analyseExplang ast  = fromMaybe [] . fmap (map (runExpectation ast) . parseExpectations)
+analyseCustomExpectations :: Expression -> Maybe String -> [CustomExpectationResult]
+analyseCustomExpectations ast  = fromMaybe [] . fmap (map (runExpectation ast) . parseExpectations)
 
-runExpectation :: Expression -> Expectation -> ExplangTestResult
-runExpectation ast (Expectation name q) = ExplangTestResult name (compileTopQuery q ast)
+runExpectation :: Expression -> Expectation -> CustomExpectationResult
+runExpectation ast (Expectation name q) = CustomExpectationResult name (compileTopQuery q ast)
 

@@ -3,13 +3,13 @@ module CustomExpectationsAnalyzerSpec(spec) where
 import           Language.Mulang.Analyzer hiding (result, spec)
 import           Test.Hspec
 
-result explangTestResults smells
-  = emptyCompletedAnalysisResult { explangTestResults = explangTestResults, smells = smells }
+result customExpectationResults smells
+  = emptyCompletedAnalysisResult { customExpectationResults = customExpectationResults, smells = smells }
 
-run language content test = analyse (explangTestAnalysis (CodeSample language content) test)
+run language content test = analyse (customExpectationsAnalysis (CodeSample language content) test)
 
-passed message = ExplangTestResult message True
-failed message = ExplangTestResult message False
+passed message = CustomExpectationResult message True
+failed message = CustomExpectationResult message False
 
 nok = result [failed "E0"] []
 ok = result [passed "E0"] []

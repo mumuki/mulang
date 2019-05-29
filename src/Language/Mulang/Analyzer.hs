@@ -6,7 +6,7 @@ import Language.Mulang
 import Language.Mulang.Analyzer.Analysis hiding (Inspection)
 import Language.Mulang.Analyzer.DomainLanguageCompiler (compileDomainLanguage)
 import Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
-import Language.Mulang.Analyzer.CustomExpectationsAnalyzer (analyseExplang)
+import Language.Mulang.Analyzer.CustomExpectationsAnalyzer (analyseCustomExpectations)
 import Language.Mulang.Analyzer.FragmentParser (parseFragment)
 import Language.Mulang.Analyzer.SignaturesAnalyzer  (analyseSignatures)
 import Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
@@ -31,7 +31,7 @@ analyseAst ast spec = do
   domaingLang <- compileDomainLanguage (domainLanguage spec)
   testResults <- analyseTests ast (testAnalysisType spec)
   return $ AnalysisCompleted (analyseExpectations ast (expectations spec))
-                             (analyseExplang ast (customExpectations spec))
+                             (analyseCustomExpectations ast (customExpectations spec))
                              (analyseSmells ast domaingLang (smellsSet spec))
                              (analyseSignatures ast (signatureAnalysisType spec))
                              testResults

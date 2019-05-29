@@ -49,5 +49,5 @@ instance ToJSON Type
 instance ToJSON Assertion
 instance ToJSON TestResult
 instance ToJSON TestStatus
-instance ToJSON ExplangTestResult
+instance ToJSON CustomExpectationResult
 instance ToJSON Operator
