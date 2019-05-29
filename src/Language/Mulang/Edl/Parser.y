@@ -19,6 +19,7 @@ import           Control.Monad.Error
 %token
 
   and { TAnd {} }
+  anything { TAnything {} }
   atLeast { TAtLeast {} }
   atMost { TAtMost {} }
   cand { TCAnd {} }
@@ -110,6 +111,7 @@ Inspection : identifier { identifierValue $1 }
 
 Keyword :: { String }
 Keyword : and { "and" }
+  | anything { "anything" }
   | count { "count" }
   | false { "false" }
   | logic { "logic" }
@@ -151,12 +153,13 @@ Clause : number { IsNumber . numberValue $ $1 }
   | string { IsString . stringValue $ $1 }
   | char { IsChar . charValue $ $1 }
   | symbol { IsSymbol . symbolValue $ $1 }
-  | true { IsTrue }
+  | anything { IsAnything }
   | false { IsFalse }
-  | self { IsSelf }
-  | math { IsMath }
   | logic { IsLogic }
+  | math { IsMath }
   | nil { IsNil }
+  | self { IsSelf }
+  | true { IsTrue }
   | something that openParen TopQuery closeParen { That $4 }
   | that openParen TopQuery closeParen { That $3 } -- relaxed syntax
 
@@ -185,6 +188,7 @@ m TIn = "in is not expected here"
 m TLike = "like is not expected here"
 m TLogic = "logic is not expected here"
 m TMath = "math is not expected here"
+m TAnything = "anything is not expected here"
 m TNil = "nil is not expected here"
 m TNot = "not is not expected here"
 m TOf = "of is not expected here"

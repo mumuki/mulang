@@ -130,6 +130,7 @@ spec = do
     test "within `bar` calls `foo` with (self, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsSelf, IsSelf]))
     test "within `bar` calls `foo` with (math, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsMath, IsSelf]))
     test "within `bar` calls `foo` with (logic, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsLogic, IsSelf]))
+    test "within `bar` calls `foo` with (anything, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsAnything, IsSelf]))
 
     test "declares function like `total` that (uses not)" (simpleMatching "declares function" (Like "total") (Matching [That (simple "uses not" Any)]))
     test "declares function like `total` that (uses logic)" (simpleMatching "declares function" (Like "total") (Matching [That (simple "uses logic" Any)]))

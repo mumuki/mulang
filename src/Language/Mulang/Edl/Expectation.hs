@@ -56,15 +56,16 @@ data Matcher
 
 data Clause
   = That Query
+  | IsAnything
+  | IsChar Char
+  | IsFalse
+  | IsLogic
+  | IsMath
+  | IsNil
   | IsNumber Double
+  | IsSelf
   | IsString String
   | IsSymbol String
-  | IsChar Char
   | IsTrue
-  | IsFalse
-  | IsNil
-  | IsSelf
-  | IsMath
-  | IsLogic
   deriving (Eq, Show, Generic)
 

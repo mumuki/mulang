@@ -78,8 +78,10 @@ tokens :-
   "="   { symbolToken TExactly }
 
   "and" { symbolToken TAnd }
+  "anything" { symbolToken TAnything }
   "count" { symbolToken TCount }
   "distinct" { symbolToken TDistinct }
+  "expectation" { symbolToken TExpectation }
   "false" { symbolToken TFalse }
   "in" { symbolToken TIn }
   "like" { symbolToken TLike }
@@ -91,7 +93,6 @@ tokens :-
   "or" { symbolToken TOr }
   "self" { symbolToken TSelf }
   "something" { symbolToken TSomething }
-  "expectation" { symbolToken TExpectation }
   "that" { symbolToken TThat }
   "through" { symbolToken TThrough }
   "true" { symbolToken TTrue }
@@ -103,6 +104,7 @@ tokens :-
 {
 data Token
   = TAnd
+  | TAnything
   | TAtLeast
   | TAtMost
   | TCAnd
