@@ -145,79 +145,148 @@ Such operations don't have an eqivalence on the standard expectations, and are u
 
 ## Scopes
 
-Also, custom expectations mmy be scoped using the `within` and `through` operators,
-which allow to inspect only a given portion of the code,
+Also, custom expectations mmy be scoped using `within` and `through`,
+which allow to inspect only a given portion of the code: `within` performs intransitive cuts while
+`through` performs transitive cuts.
 
 ```
 expectation "`HouseBuilder` must raise something":
   %% this will work if within the lexical scope of
   %% HouseBuilder a raise statement is used
-  within `HouseBuilder` raises something"
+  %% equivalent to Intransitive:HouseBuilder Raises
+  within `HouseBuilder` raises something";
 
 expectation "`HouseBuilder` must raise something":
   %% this will work if within the lexical scope of
   %% HouseBuilder a raise statement is used, or if any code outside
   %% the lexical scope of HouseBuilder raises an excepcion
-  through `HouseBuilder` raises something"
+  %% equivalent to HouseBuilder Raises
+  through `HouseBuilder` raises something";
 
 expectation "`HouseBuilder.builder` must create a new `House`":
-  within `HouseBuilder.builder` instantiates `House`"
+  %% equivalent to Instransitive:HouseBuilder.builder Instantiates:House
+  within `HouseBuilder.builder` instantiates `House`";
 
-expectation "In the contexto of :
+expectation "In the context of `Tree`, something other than `foo` is called":
+  %% equivalent to Tree Calls:^foo
   through `Tree` calls something distinct of `foo`;
-
 ```
 
+## Matchers
 
-
-
-
-
-
-## Operators Reference
-
-* `not`, `and`, `or`: they answer a scoped inspections that operates scoped inspections logically
-* `count`: it answers a counter that counts a given inspection
-* `+`: it answers a counter that sums two different counter
-* `=`, `>=`, `<=`: it answers an unscoped inspection that compares a counter
-* `within`, `through`: it scopes an unscoped inspection
-
-
-
-### Using literal matchers
+Some inspections support an optional matcher argument, that allow you to provide
+additional conditions using the `with` keyword:
 
 ```
 expectation "`exit` must be called with value 0":
+  %% equivalent to * Calls:exit:WithNumber:0
   calls `exit` with 0;
 
 expectation "`tell` must be called with value 10 and true":
+  %% equivalent to * Calls:tell:WithNumber:10:WithTrue
   calls `tell` with (10, true);
 
 expectation "`play` must be called with this":
+  %% equivalent to * Calls:play:WithSelf
   calls `play` with self;
 ```
 
-### Using arithmethic and boolean logic matchers
+Most of the matchers are designed to perform literal queries, but some of them allow more complex matching:
 
 ```
 expectation "the method `getTotalAmount` must return an arithmetic expresion":
+  %% equivalent to Intransitive:getTotalAmmount Returns:WithMath
   within `getTotalAmmount` returns with math;
 
 expectation "a method that performs boolean operations must be declared":
+  %% equivalent to * DeclaresMethod:WithLogic
   declares method with logic;
+
+expectation "`getAge` must not return a hardcoded value:
+  %% equivalent to Intransitive:getAge Returns:WithNonliteral
+  within `getAge` returns with nonliteral;
 ```
 
-### Using nested matchers
+As you can see in previous exampls, many of the simplest matchers can also be used in the standard expectation syntax. However, EDL also supports the `that` matcher,
+that allows you to build complex, nested queries:
+
+```
+expectation "must declare a class that uses an if":
+  declares class with something that (uses if);
+
+expectation "must declare a class that uses an if":
+  %% shorter, equivalent version of previous example
+  declares class that (uses if);
+
+expectation "`VirtualPet.HappyState` must declare a getter that returns a literal value":
+  within `VirtualPet.HappyState`
+  declares method like `get`
+  that (returns with literal);
+```
+
+`that`-queries can be nested, thus allowing you to write quite abstract expectations:
+
+```
+expectation "package `tamagochi` must declare a class with a method that returns an arithmethic expression":
+
+  within `tamagochi`
+  declares class
+  that (
+    declares method
+    that (
+      returns with math));
+```
+
+Previous logical operators may be also be used with the `that`-queries:
+
 
 ```
 expectation "must declare a procedure that uses ifs":
-  declares procedure that (uses if)
+  declares procedure
+  that (uses if);
 
 expectation "must declare a procedure that uses ifs but not while":
-  declares procedure that (uses if && ! uses while)
+  declares procedure
+  that (uses if && ! uses while);
 ```
 
-## Using counters
+
+### Supported inspections
+
+This is the complete list of inspections that support matchers:
+
+* `assigns`: accepts a matcher that matches the assigned value
+* `calls`: accepts a matcher that matches the passed arguments
+* `declares class`: accepts a matcher that matches any the body expressions
+* `declares function`: accepts a matcher that matches any the body expressions
+* `declares interface`: accepts a matcher that matches any the body expressions
+* `declares method`: accepts a matcher that matches any the body expressions
+* `declares object`: accepts a matcher that matches any the body expressions
+* `declares procedure`: accepts a matcher that matches any the body expressions
+* `declares variable`: accepts a matcher that matches the initial value
+* `returns`: accepts a matcher that matches the returned value
+
+### Supported matchers
+
+* `(<matcher1>, <matcher2>.., <matcherN>)`: matches a tuple of arguments
+* `<character>`: matches a single character
+* `<number>`: matches a number literal
+* `<string>`: matches a single string
+* `<symbol>`: matches a symbol literal
+* `anything`: matches anything
+* `false` and `true`: matches the `true` and `false` literals
+* `literal`: matches any literal
+* `logic`: matches a boolean expression
+* `math`: matches an arithmetic expresion
+* `nil`: matches the nil/null literal
+* `nonliteral`: matches a non-literal expression
+* `self`: matches the self/this literal
+* `that (<other query>)`: matches an expression that make the given query true
+
+
+## Counters
+
+EDL allows you to define expectations by counting and comparing matches of another inspection, by using the `count`, `=`, `>=` and `<=` operators:
 
 ```
 expectation "must perform at least three calls":
@@ -232,3 +301,26 @@ expectation "must declare three subclases of `Tax` and two subclases of `Product
 expectation "must declare no more than 4 methods in class `Queue`":
   within `Queue` count(declares method) <= 4;
 ```
+
+Finally, counters may be added, using the `+` opertor:
+
+```
+expectation "The `Bar` must declare 4 or more methods related to beer or whisky":
+  within `Bar`
+  count (declares method like `whisky`) + count (declares method like `beer`) >= 4;
+```
+
+## Supported counters
+
+Not all inspections can be counted. Currently, only the following are supported:
+
+* `uses if`
+* `uses for`
+* `declares attribute`
+* `declares class`
+* `declares function`
+* `declares interface`
+* `declares method`
+* `declares object`
+* `declares procedure`
+* `declares variable`
