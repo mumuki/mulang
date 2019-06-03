@@ -3,7 +3,7 @@ module Language.Mulang.Analyzer.CustomExpectationsAnalyzer (
 
 import Data.Maybe (fromMaybe)
 
-import Language.Mulang hiding (Expectation)
+import Language.Mulang
 import Language.Mulang.Analyzer.Analysis (CustomExpectationResult(..))
 import Language.Mulang.Analyzer.EdlQueryCompiler (compileTopQuery)
 

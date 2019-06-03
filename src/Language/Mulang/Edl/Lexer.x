@@ -5,10 +5,7 @@ import Control.Monad.Except
 import Data.Word
 import Codec.Binary.UTF8.String as UTF8 (encode, decode)
 
-import qualified Data.Map as Map
 import Control.Monad (liftM)
-import Data.List (foldl')
-
 }
 
 

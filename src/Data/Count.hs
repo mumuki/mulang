@@ -52,7 +52,7 @@ instance  Num Count  where
   (MoreThanOne n) + One  = MoreThanOne (n+1)
   (MoreThanOne n) + (MoreThanOne m) = MoreThanOne (n+m)
 
-  fromInteger = cast . fromIntegral
+  fromInteger = cast
 
   n - Zero                      = n
   One - _                       = Zero
