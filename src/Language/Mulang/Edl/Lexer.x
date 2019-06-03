@@ -8,7 +8,6 @@ import Codec.Binary.UTF8.String as UTF8 (encode, decode)
 import qualified Data.Map as Map
 import Control.Monad (liftM)
 import Data.List (foldl')
-import Numeric (readHex, readOct)
 
 }
 
@@ -85,9 +84,11 @@ tokens :-
   "false" { symbolToken TFalse }
   "in" { symbolToken TIn }
   "like" { symbolToken TLike }
+  "literal" { symbolToken TLiteral }
   "logic" { symbolToken TLogic }
   "math" { symbolToken TMath }
   "nil" { symbolToken TNil }
+  "nonliteral" { symbolToken TNonliteral }
   "not" { symbolToken TNot }
   "of" { symbolToken TOf }
   "or" { symbolToken TOr }
@@ -123,9 +124,11 @@ data Token
   | TIn
   | TLeast
   | TLike
+  | TLiteral
   | TLogic
   | TMath
   | TNil
+  | TNonliteral
   | TNot
   | TNumber { numberValue :: Double }
   | TOf

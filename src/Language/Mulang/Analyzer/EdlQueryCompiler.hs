@@ -16,7 +16,7 @@ import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclar
 
 import qualified Language.Mulang.Edl.Expectation as E
 
-import Data.Maybe (fromMaybe, fromJust)
+import Data.Maybe (fromMaybe)
 import Data.List.Split (splitOn)
 
 type Scope = (ContextualizedInspection -> ContextualizedInspection, IdentifierPredicate -> IdentifierPredicate)
@@ -185,13 +185,15 @@ compileClauses :: [E.Clause] -> Matcher
 compileClauses = withEvery . f
   where
     f :: [E.Clause] -> [Inspection]
+    f (E.IsChar value:args)     = isChar value : (f args)
     f (E.IsFalse:args)          = isBool False : (f args)
-    f (E.IsNil:args)            = isNil : (f args)
-    f (E.IsSelf:args)           = isSelf : (f args)
+    f (E.IsLiteral:args)        = isLiteral : (f args)
     f (E.IsLogic:args)          = usesLogic : (f args)
     f (E.IsMath:args)           = usesMath : (f args)
+    f (E.IsNil:args)            = isNil : (f args)
+    f (E.IsNonliteral:args)     = isNonliteral : (f args)
+    f (E.IsSelf:args)           = isSelf : (f args)
     f (E.IsTrue:args)           = isBool True : (f args)
-    f (E.IsChar value:args)     = isChar value : (f args)
     f (E.IsNumber value:args)   = isNumber value : (f args)
     f (E.IsString value:args)   = isString value : (f args)
     f (E.IsSymbol value:args)   = isSymbol value : (f args)

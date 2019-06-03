@@ -119,6 +119,8 @@ spec = do
     test "within `bar` returns with self" (simpleMatchingWithin "bar" "returns" Any (Matching [IsSelf]))
     test "within `bar` returns with math" (simpleMatchingWithin "bar" "returns" Any (Matching [IsMath]))
     test "within `bar` returns with logic" (simpleMatchingWithin "bar" "returns" Any (Matching [IsLogic]))
+    test "within `bar` returns with literal" (simpleMatchingWithin "bar" "returns" Any (Matching [IsLiteral]))
+    test "within `bar` returns with nonliteral" (simpleMatchingWithin "bar" "returns" Any (Matching [IsNonliteral]))
 
     test "within `bar` calls `foo` with (0, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsNumber 0, IsSelf]))
     test "within `bar` calls `foo` with (\"hello\", self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsString "hello", IsSelf]))

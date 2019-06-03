@@ -7,32 +7,34 @@ module Language.Mulang.Inspector.Literal (
   isString,
   isSymbol,
   isLogic,
-  isMath) where
+  isMath,
+  isLiteral,
+  isNonliteral) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Inspector.Primitive (Inspection)
 
 isNil :: Inspection
-isNil = isLiteral MuNil
+isNil = (==) MuNil
 
 isNumber :: Double -> Inspection
-isNumber = isLiteral . MuNumber
+isNumber = (==) . MuNumber
 
 isBool :: Bool -> Inspection
-isBool = isLiteral . MuBool
+isBool = (==) . MuBool
 
 isString :: String -> Inspection
-isString = isLiteral . MuString
+isString = (==) . MuString
 
 isChar :: Char -> Inspection
-isChar = isLiteral . MuChar
+isChar = (==) . MuChar
 
 isSymbol :: String -> Inspection
-isSymbol = isLiteral . MuSymbol
+isSymbol = (==) . MuSymbol
 
 isSelf :: Inspection
-isSelf = isLiteral Self
+isSelf = (==) Self
 
 isMath :: Inspection
 isMath (Primitive Plus)     = True
@@ -47,5 +49,15 @@ isLogic (Primitive And)      = True
 isLogic (Primitive Or)       = True
 isLogic _                    = False
 
-isLiteral :: Expression -> Inspection
-isLiteral = (==)
+isLiteral :: Inspection
+isLiteral (MuBool _)   = True
+isLiteral (MuChar _)   = True
+isLiteral (MuNumber _) = True
+isLiteral (MuString _) = True
+isLiteral (MuSymbol _) = True
+isLiteral MuNil        = True
+isLiteral Self         = True
+isLiteral _            = False
+
+isNonliteral :: Inspection
+isNonliteral = not . isLiteral

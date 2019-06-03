@@ -59,9 +59,11 @@ data Clause
   | IsAnything
   | IsChar Char
   | IsFalse
+  | IsLiteral
   | IsLogic
   | IsMath
   | IsNil
+  | IsNonliteral
   | IsNumber Double
   | IsSelf
   | IsString String

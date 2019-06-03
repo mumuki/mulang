@@ -32,13 +32,16 @@ import           Control.Monad.Error
   count { TCount {} }
   distinct { TDistinct {} }
   exactly { TExactly {} }
+  expectation { TExpectation {} }
   false { TFalse {} }
   identifier { TIdentifier {} }
   in { TIn {} }
   like { TLike {} }
+  literal { TLiteral {} }
   logic { TLogic {} }
   math { TMath {} }
   nil { TNil {} }
+  nonliteral { TNonliteral {} }
   not { TNot {} }
   number { TNumber {} }
   of { TOf {} }
@@ -50,7 +53,6 @@ import           Control.Monad.Error
   something { TSomething {} }
   string { TString {} }
   symbol { TSymbol {} }
-  expectation { TExpectation {} }
   that { TThat {} }
   through { TThrough {} }
   true { TTrue {} }
@@ -113,14 +115,16 @@ Keyword :: { String }
 Keyword : and { "and" }
   | anything { "anything" }
   | count { "count" }
+  | expectation { "expectation" }
   | false { "false" }
+  | literal { "literal" }
   | logic { "logic" }
   | math { "math" }
   | nil { "nil" }
+  | nonliteral { "nonliteral" }
   | not { "not" }
   | or { "or" }
   | self { "self" }
-  | expectation { "expectation" }
   | true { "true" }
 
 Consult :: { (String, Predicate, Matcher) }
@@ -155,9 +159,11 @@ Clause : number { IsNumber . numberValue $ $1 }
   | symbol { IsSymbol . symbolValue $ $1 }
   | anything { IsAnything }
   | false { IsFalse }
+  | literal { IsLiteral }
   | logic { IsLogic }
   | math { IsMath }
   | nil { IsNil }
+  | nonliteral { IsNonliteral }
   | self { IsSelf }
   | true { IsTrue }
   | something that openParen TopQuery closeParen { That $4 }
@@ -172,6 +178,7 @@ m (TNumber v) = "number " ++ show v ++ " is not expected here"
 m (TString v) = "string " ++ show v ++ " is not expected here"
 m (TSymbol v) = "symbol " ++ v ++ " is not expected here"
 m TAnd = "and is not expected here"
+m TAnything = "anything is not expected here"
 m TAtLeast = "least is not expected here"
 m TAtMost = "most is not expected here"
 m TCAnd = "&& is not expected here"
@@ -186,10 +193,11 @@ m TExactly = "exactly is not expected here"
 m TFalse = "false is not expected here"
 m TIn = "in is not expected here"
 m TLike = "like is not expected here"
+m TLiteral = "literal is not expected here"
 m TLogic = "logic is not expected here"
 m TMath = "math is not expected here"
-m TAnything = "anything is not expected here"
 m TNil = "nil is not expected here"
+m TNonliteral = "nonliteral is not expected here"
 m TNot = "not is not expected here"
 m TOf = "of is not expected here"
 m TOpenParen = "Unexpected )"

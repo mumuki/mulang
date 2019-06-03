@@ -56,9 +56,11 @@ compileMatcher = matching . f
 
     f :: [String] -> [Clause]
     f ("WithFalse":args)        =  IsFalse : f args
+    f ("WithLiteral":args)      =  IsLiteral : f args
     f ("WithLogic":args)        =  IsLogic   : f args
     f ("WithMath":args)         =  IsMath : f args
     f ("WithNil":args)          =  IsNil : f args
+    f ("WithNonliteral":args)   =  IsNonliteral : f args
     f ("WithTrue":args)         =  IsTrue : f args
     f ("WithChar":value:args)   =  IsChar (read value) : f args
     f ("WithNumber":value:args) =  IsNumber (read value) : f args
