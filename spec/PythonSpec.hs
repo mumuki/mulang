@@ -3,7 +3,8 @@
 module PythonSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang
+import           Language.Mulang.Ast hiding (Equal, NotEqual)
+import           Language.Mulang.Ast.Operator
 import           Language.Mulang.Parsers.Python
 
 import           Data.Text (Text, unpack)
@@ -60,16 +61,16 @@ spec = do
       py "o.f(2)" `shouldBe` (Send (Reference "o") (Reference "f") [(MuNumber 2)])
 
     it "parses assign-operators" $ do
-      py "x += 8" `shouldBe` (Assignment "x" (Application (Reference "+") [Reference "x",MuNumber 8.0]))
+      py "x += 8" `shouldBe` (Assignment "x" (Application (Primitive Plus) [Reference "x",MuNumber 8.0]))
 
     it "parses binary operators" $ do
-      py "x + y" `shouldBe` (Application (Reference "+") [Reference "x",Reference "y"])
+      py "x + y" `shouldBe` (Application (Primitive Plus) [Reference "x",Reference "y"])
 
     it "parses sequences" $ do
       py "1;2;3" `shouldBe` Sequence [MuNumber 1, MuNumber 2, MuNumber 3]
 
     it "parses unary operators" $ do
-      py "not True" `shouldBe` (Application (Reference "not") [MuBool True])
+      py "not True" `shouldBe` (Application (Primitive Negation) [MuBool True])
 
     it "parses classes" $ do
       py "class DerivedClassName: pass" `shouldBe` Class "DerivedClassName" Nothing None

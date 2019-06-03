@@ -1,6 +1,7 @@
 module Language.Mulang.Parsers.JavaScript (js, parseJavaScript) where
 
-import Language.Mulang.Ast
+import Language.Mulang.Ast hiding (Equal, NotEqual)
+import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Builder (compact, compactMap, normalizeWith, defaultNormalizationOptions, NormalizationOptions(..), SequenceSortMode(..))
 import Language.Mulang.Parsers
 
@@ -142,7 +143,7 @@ muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _)       = New (Refer
 muJSExpression (JSMemberSquare receptor _ index _)                  = Send (muJSExpression receptor) (Reference "[]") [muJSExpression index]
 muJSExpression (JSNewExpression _ (JSIdentifier _ name))            = New (Reference name) []
 muJSExpression (JSObjectLiteral _ propertyList _)                   = MuObject (compactMap muJSObjectProperty . muJSCommaTrailingList $ propertyList)
-muJSExpression (JSUnaryExpression (JSUnaryOpNot _) e)               = Application (Reference "!") [muJSExpression e]
+muJSExpression (JSUnaryExpression (JSUnaryOpNot _) e)               = Application (Primitive Negation) [muJSExpression e]
 muJSExpression (JSUnaryExpression op (JSIdentifier _ name))         = Assignment name (muJSUnaryOp op name)
 muJSExpression (JSVarInitExpression (JSIdentifier _ name) initial)  = Variable name (muJSVarInitializer initial)
 muJSExpression e                                                    = debug e
@@ -151,33 +152,33 @@ removeQuotes = filter (flip notElem quoteMarks)
   where quoteMarks = "\"'"
 
 muJSBinOp:: JSBinOp -> Expression
-muJSBinOp (JSBinOpAnd _)        = Reference "&&"
-muJSBinOp (JSBinOpBitAnd _)     = Reference "&"
-muJSBinOp (JSBinOpBitOr _)      = Reference "|"
+muJSBinOp (JSBinOpAnd _)        = Primitive And
+muJSBinOp (JSBinOpBitAnd _)     = Primitive And
+muJSBinOp (JSBinOpBitOr _)      = Primitive Or
 muJSBinOp (JSBinOpBitXor _)     = Reference "^"
-muJSBinOp (JSBinOpDivide _)     = Reference "/"
-muJSBinOp (JSBinOpEq _)         = Equal
-muJSBinOp (JSBinOpGe _)         = Reference ">="
-muJSBinOp (JSBinOpGt _)         = Reference ">"
+muJSBinOp (JSBinOpDivide _)     = Primitive Divide
+muJSBinOp (JSBinOpEq _)         = Primitive Equal
+muJSBinOp (JSBinOpGe _)         = Primitive GreatherOrEqualThan
+muJSBinOp (JSBinOpGt _)         = Primitive GreatherThan
 muJSBinOp (JSBinOpInstanceOf _) = Reference "instanceof"
-muJSBinOp (JSBinOpLe _)         = Reference "<="
+muJSBinOp (JSBinOpLe _)         = Primitive LessOrEqualThan
 muJSBinOp (JSBinOpLsh _)        = Reference "<<"
-muJSBinOp (JSBinOpLt _)         = Reference "<"
-muJSBinOp (JSBinOpMinus _)      = Reference "-"
+muJSBinOp (JSBinOpLt _)         = Primitive LessThan
+muJSBinOp (JSBinOpMinus _)      = Primitive Minus
 muJSBinOp (JSBinOpMod _)        = Reference "%"
-muJSBinOp (JSBinOpNeq _)        = NotEqual
-muJSBinOp (JSBinOpOr _)         = Reference "||"
-muJSBinOp (JSBinOpPlus _)       = Reference "+"
+muJSBinOp (JSBinOpNeq _)        = Primitive NotEqual
+muJSBinOp (JSBinOpOr _)         = Primitive Or
+muJSBinOp (JSBinOpPlus _)       = Primitive Plus
 muJSBinOp (JSBinOpRsh _)        = Reference ">>"
-muJSBinOp (JSBinOpStrictEq _)   = Equal
-muJSBinOp (JSBinOpStrictNeq _)  = NotEqual
-muJSBinOp (JSBinOpTimes _)      = Reference "*"
+muJSBinOp (JSBinOpStrictEq _)   = Primitive Equal
+muJSBinOp (JSBinOpStrictNeq _)  = Primitive NotEqual
+muJSBinOp (JSBinOpTimes _)      = Primitive Multiply
 
 
 muJSUnaryOp:: JSUnaryOp -> Identifier -> Expression
-muJSUnaryOp (JSUnaryOpDecr _) r = (Application (Reference "-") [Reference r, MuNumber 1])
+muJSUnaryOp (JSUnaryOpDecr _) r = (Application (Primitive Minus) [Reference r, MuNumber 1])
 --muJSUnaryOp (JSUnaryOpDelete _)
-muJSUnaryOp (JSUnaryOpIncr _) r = (Application (Reference "+") [Reference r, MuNumber 1])
+muJSUnaryOp (JSUnaryOpIncr _) r = (Application (Primitive Plus) [Reference r, MuNumber 1])
 --muJSUnaryOp (JSUnaryOpMinus _)
 --muJSUnaryOp (JSUnaryOpPlus _)
 --muJSUnaryOp (JSUnaryOpTilde _)
@@ -190,11 +191,11 @@ muJSAssignOp (JSAssign _) _ v = v
 muJSAssignOp op r v           = (Application (muJSAssignOp' op) [Reference r, v])
 
 muJSAssignOp':: JSAssignOp -> Expression
-muJSAssignOp' (JSTimesAssign _)   = Reference "*"
-muJSAssignOp' (JSDivideAssign _)  = Reference "/"
+muJSAssignOp' (JSTimesAssign _)   = Primitive Multiply
+muJSAssignOp' (JSDivideAssign _)  = Primitive Divide
 --muJSAssignOp' (JSModAssign _)
-muJSAssignOp' (JSPlusAssign _)    = Reference "+"
-muJSAssignOp' (JSMinusAssign _)   = Reference "-"
+muJSAssignOp' (JSPlusAssign _)    = Primitive Plus
+muJSAssignOp' (JSMinusAssign _)   = Primitive Minus
 --muJSAssignOp' (JSLshAssign _)
 --muJSAssignOp' (JSRshAssign _)
 --muJSAssignOp' (JSUrshAssign _)

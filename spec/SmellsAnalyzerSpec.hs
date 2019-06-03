@@ -11,20 +11,27 @@ runExcept language content smells = analyse (smellsAnalysis (CodeSample language
 runOnly language content smells = analyse (smellsAnalysis (CodeSample language content) (noSmellsBut smells))
 
 spec = describe "SmellsAnalyzer" $ do
-  describe "Using domain language and nested structures" $ do
+  it "Using domain language and nested structures" $ do
     let runRuby sample = analyse (domainLanguageAnalysis (MulangSample sample Nothing) (DomainLanguage Nothing (Just RubyCase) (Just 3) Nothing))
-    it "works with empty set" $ do
-      (runRuby (Sequence [
-        (Object "Foo_Bar" (Sequence [
-          (SimpleMethod "y" [] None),
-          (SimpleMethod "aB" [] None),
-          (SimpleMethod "fooBar" [] None)])),
-        (Object "Foo" None)])) `shouldReturn` (result [
-                                                    Expectation "y" "HasTooShortIdentifiers",
-                                                    Expectation "aB" "HasTooShortIdentifiers",
-                                                    Expectation "Foo_Bar" "HasWrongCaseIdentifiers",
-                                                    Expectation "aB" "HasWrongCaseIdentifiers",
-                                                    Expectation "fooBar" "HasWrongCaseIdentifiers"])
+    (runRuby (Sequence [
+      (Object "Foo_Bar" (Sequence [
+        (SimpleMethod "y" [] None),
+        (SimpleMethod "aB" [] None),
+        (SimpleMethod "fooBar" [] None)])),
+      (Object "Foo" None)])) `shouldReturn` (result [
+                                                  Expectation "y" "HasTooShortIdentifiers",
+                                                  Expectation "aB" "HasTooShortIdentifiers",
+                                                  Expectation "Foo_Bar" "HasWrongCaseIdentifiers",
+                                                  Expectation "aB" "HasWrongCaseIdentifiers",
+                                                  Expectation "fooBar" "HasWrongCaseIdentifiers"])
+
+  it "works inferring domain language" $ do
+    let runPython sample = runExcept Python3 sample []
+    runPython "def fooBar():\n\tpass\n\ndef foo_baz():\n\tpass\n\n" `shouldReturn` (result [Expectation "fooBar" "HasWrongCaseIdentifiers"])
+
+  it "works inferring caseStyl" $ do
+    let runPython sample = analyse (domainLanguageAnalysis (CodeSample Python3 sample) (DomainLanguage Nothing Nothing (Just 3) Nothing))
+    runPython "def fooBar():\n\tpass\n\ndef foo_baz():\n\tpass\n\n" `shouldReturn` (result [Expectation "fooBar" "HasWrongCaseIdentifiers"])
 
   describe "Using exclusion" $ do
     it "works with empty set, in java" $ do

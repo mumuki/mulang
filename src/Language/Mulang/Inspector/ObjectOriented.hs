@@ -11,9 +11,11 @@ module Language.Mulang.Inspector.ObjectOriented (
   declaresInterface,
   declaresEnumeration,
   declaresAttribute,
-  declaresMethod)  where
+  declaresMethod,
+  declaresPrimitive)  where
 
 import Language.Mulang.Ast
+import Language.Mulang.Ast.Operator (Operator)
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Bound (BoundInspection, containsBoundDeclaration)
 import Language.Mulang.Inspector.Primitive (Inspection, containsExpression, containsDeclaration)
@@ -77,3 +79,8 @@ declaresMethod =  containsBoundDeclaration f
   where f (Method _ _) = True
         f _            = False
 
+-- primitive can only be declared as methods
+declaresPrimitive :: Operator -> Inspection
+declaresPrimitive operator = containsExpression f
+  where f (PrimitiveMethod o _) = operator == o
+        f _                     = False

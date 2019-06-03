@@ -18,7 +18,7 @@ isLightweight (Reference _)             = True
 isLightweight Self                      = True
 isLightweight None                      = True
 isLightweight MuNil                     = True
-isLightweight Equal                     = True
+isLightweight (Primitive _)             = True
 isLightweight (Application _ es)        = not $ any isApplication es
 isLightweight (Return e)                = isLightweight e
 isLightweight (Assignment _ e)  = isLightweight e
@@ -45,6 +45,7 @@ hash Self                          = 15
 hash (SimpleProcedure _ _ body)    = 17 * (37 + hash body)
 hash (Sequence es)                 = 19 * (37 + positionalHash es)
 hash (MuChar e)                    = 23 * H.hash e
+hash (Primitive p)                 = 29 * H.hash (fromEnum p)
 hash _                             = 1
 
 positionalHash :: [Expression] -> Int

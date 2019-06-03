@@ -7,7 +7,7 @@ module Language.Mulang.Inspector.Literal (
   isSymbol) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Inspector.Primitive (containsExpression, Inspection)
+import Language.Mulang.Inspector.Primitive (Inspection)
 
 isNil :: Inspection
 isNil = isLiteral MuNil

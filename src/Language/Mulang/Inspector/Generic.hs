@@ -19,13 +19,18 @@ module Language.Mulang.Inspector.Generic (
   returnsMatching,
   uses,
   usesAnonymousVariable,
+  usesBooleanLogic,
+  usesArithmetic,
   usesExceptionHandling,
   usesExceptions,
   usesFor,
   usesIf,
+  usesPrimitive,
+  usesPrint,
   usesYield) where
 
-import Language.Mulang.Ast
+import Language.Mulang.Ast hiding (Equal, NotEqual)
+import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Generator (declaredIdentifiers, expressions, declarations, referencedIdentifiers)
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Bound (containsBoundDeclaration, BoundInspection)
@@ -55,6 +60,11 @@ uses :: BoundInspection
 uses p = containsExpression f
   where f = any p . referencedIdentifiers
 
+usesPrimitive :: Operator -> Inspection
+usesPrimitive operator = containsExpression f
+  where f (Primitive o) = operator == o
+        f _             = False
+
 calls :: BoundInspection
 calls = unmatching callsMatching
 
@@ -83,6 +93,11 @@ usesIf = containsExpression f
 usesYield :: Inspection
 usesYield = containsExpression f
   where f (Yield _) = True
+        f _         = False
+
+usesPrint :: Inspection
+usesPrint = containsExpression f
+  where f (Print _) = True
         f _         = False
 
 usesFor :: Inspection
@@ -142,6 +157,21 @@ declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
         equationArityIs (Equation args _) = argsHaveArity args
 
         argsHaveArity = arityPredicate.length
+
+usesBooleanLogic :: Inspection
+usesBooleanLogic = containsExpression f
+  where f (Primitive Negation) = True
+        f (Primitive And)      = True
+        f (Primitive Or)       = True
+        f _                    = False
+
+usesArithmetic :: Inspection
+usesArithmetic = containsExpression f
+  where f (Primitive Plus)     = True
+        f (Primitive Minus)    = True
+        f (Primitive Multiply) = True
+        f (Primitive Divide)   = True
+        f _                    = False
 
 raises :: BoundInspection
 raises predicate = containsExpression f

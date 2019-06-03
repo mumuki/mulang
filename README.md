@@ -443,13 +443,15 @@ The power of Mulang is grounded on more than 90 different kind of inspections:
 | `overridesEqualsOrHashButNotBoth` |  object oriented   | does a given class override equals but not hash? or hash but not equals?
 | `raises`                          |  any               | is the given _exception type_ raised?
 | `rescues`                         |  any               | is the given _exception type_ rescued?
-| `returnsNill`                     |
 | `returnsMatching`                 |  any               | is a return used matching the given value?
+| `returnsNil`                      |
 | `typesAs`                         |  any               | is the given type used to type a variable?
 | `typesParameterAs`                |  any               | is a parameter typed as a given type?
 | `typesReturnAs`                   |  any               | is the given type used to type a return?
 | `uses`                            |  any               | is there any reference to the given element?
 | `usesAnonymousVariable`           |
+| `usesArithmetic`                  |  any               | are arithmetic operators used?
+| `usesBooleanLogic`                |  any               | are logical operators used?
 | `usesComposition`                 |
 | `usesConditional`                 |
 | `usesCut`                         |  logic             | is the logic `!` consult used?

@@ -3,8 +3,9 @@
 
 module Language.Mulang.Parsers.Java (java, parseJava) where
 
-import Language.Mulang.Ast hiding (While, Return, Equal, Lambda, Try, Switch, Assert)
-import qualified Language.Mulang.Ast as M (Expression(While, Return, Equal, Lambda, Try, Switch, Assert))
+import Language.Mulang.Ast hiding (Primitive, While, Return, Equal, Lambda, Try, Switch, Assert)
+import qualified Language.Mulang.Ast as M
+import qualified Language.Mulang.Ast.Operator as O
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compact, compactMap, compactConcatMap, normalize)
 
@@ -55,19 +56,21 @@ muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
 muDecl (InitDecl _ block)      = [muBlock block]
 
 muMemberDecl :: MemberDecl -> [Expression]
-muMemberDecl (FieldDecl _ typ varDecls)                              = concatMap (variableToAttribute.muVarDecl typ) varDecls
-muMemberDecl (MethodDecl _ _ typ name params _ (MethodBody Nothing)) = return $ muMethodSignature name params typ
+muMemberDecl (FieldDecl _ typ varDecls)                                       = concatMap (variableToAttribute.muVarDecl typ) varDecls
+muMemberDecl (MethodDecl _ typeParams typ name params _ (MethodBody Nothing)) = return $ muMethodSignature name params typ typeParams
 muMemberDecl (MethodDecl (elem Static -> True) _ Nothing (Ident "main") [_] _ body)
-                                                                     = return $ EntryPoint "main" (muMethodBody body)
-muMemberDecl (MethodDecl _ _ _ (Ident "equals") params _ body)       = return $ EqualMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
-muMemberDecl (MethodDecl _ _ _ (Ident "hashCode") params _ body)     = return $ HashMethod [SimpleEquation (map muFormalParam params) (muMethodBody body)]
-muMemberDecl (MethodDecl _ _ returnType name params _ body)          = [ muMethodSignature name params returnType,
-                                                                         SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)]
-muMemberDecl e@(ConstructorDecl _ _ _ _params _ _constructorBody)    = return . debug $ e
-muMemberDecl (MemberClassDecl decl)                                  = return $ muClassTypeDecl decl
-muMemberDecl (MemberInterfaceDecl decl)                              = return $ muInterfaceTypeDecl decl
+                                                                              = return $ EntryPoint "main" (muMethodBody body)
+muMemberDecl (MethodDecl _ _ _ (Ident "equals") params _ body)                = return $ PrimitiveMethod O.Equal [SimpleEquation (map muFormalParam params) (muMethodBody body)]
+muMemberDecl (MethodDecl _ _ _ (Ident "hashCode") params _ body)              = return $ PrimitiveMethod O.Hash [SimpleEquation (map muFormalParam params) (muMethodBody body)]
+muMemberDecl (MethodDecl _ typeParams returnType name params _ body)          = [ muMethodSignature name params returnType typeParams,
+                                                                                  SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)]
+muMemberDecl e@(ConstructorDecl _ _ _ _params _ _constructorBody)             = return . debug $ e
+muMemberDecl (MemberClassDecl decl)                                           = return $ muClassTypeDecl decl
+muMemberDecl (MemberInterfaceDecl decl)                                       = return $ muInterfaceTypeDecl decl
 
-muMethodSignature name params returnType = SubroutineSignature (i name) (map muFormalParamType params) (muReturnType returnType) []
+muMethodSignature name params returnType typeParams = SubroutineSignature (i name) (map muFormalParamType params) (muReturnType returnType) (map muTypeParam typeParams)
+muTypeParam (TypeParam (Ident i) _) = i
+
 muEnumConstant (EnumConstant name _ _) = i name
 
 muFormalParam (FormalParam _ _ _ id)      = VariablePattern (v id)
@@ -109,7 +112,7 @@ muExp (Cond cond ifTrue ifFalse)        = If (muExp cond) (muExp ifTrue) (muExp 
 muExp (ExpName name)                    = muName name
 muExp (Assign lhs EqualA exp)           = Assignment (muLhs lhs) (muExp exp)
 muExp (InstanceCreation _ clazz args _) = New (Reference $ r clazz) (map muExp args)
-muExp (PreNot exp)                      = SimpleSend (muExp exp) "!" []
+muExp (PreNot exp)                      = PrimitiveSend (muExp exp) O.Negation []
 muExp (Lambda params exp)               = M.Lambda (muLambdaParams params) (muLambdaExp exp)
 muExp (MethodRef _ message)             = M.Lambda [VariablePattern "it"] (SimpleSend (Reference "it") (i message) [])
 muExp e                                 = debug e
@@ -140,19 +143,21 @@ muLit e           = debug e
 preMinus (MuNumber n) = MuNumber (negate n)
 preMinus other        = other
 
-muOp Mult   = Reference "*"
-muOp Div    = Reference "/"
+muOp Mult   = M.Primitive O.Multiply
+muOp Div    = M.Primitive O.Divide
 muOp Rem    = Reference "rem"
-muOp Add    = Reference "+"
-muOp Sub    = Reference "-"
-muOp LThan  = Reference "<"
-muOp LThanE = Reference "<="
-muOp GThan  = Reference ">"
-muOp GThanE = Reference ">="
-muOp And    = Reference "&&"
-muOp Or     = Reference "||"
-muOp Equal  = M.Equal
-muOp NotEq  = NotEqual
+muOp Add    = M.Primitive O.Plus
+muOp Sub    = M.Primitive O.Minus
+muOp LThan  = M.Primitive O.LessThan
+muOp LThanE = M.Primitive O.LessOrEqualThan
+muOp GThan  = M.Primitive O.GreatherThan
+muOp GThanE = M.Primitive O.GreatherOrEqualThan
+muOp And    = M.Primitive O.And
+muOp Or     = M.Primitive O.Or
+muOp CAnd   = M.Primitive O.And
+muOp COr    = M.Primitive O.Or
+muOp Equal  = M.Primitive O.Equal
+muOp NotEq  = M.Primitive O.NotEqual
 muOp e      = debug e
 
 muVarDecl typ (VarDecl id init) = [
@@ -169,13 +174,15 @@ muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "print"
 muMethodInvocation (MethodCall (Name [Ident "System", Ident "out", Ident "printf"]) (expr:_)) = Print (muExp expr)
 
 muMethodInvocation (MethodCall (Name [message]) args)           = muNormalizeReference $ SimpleSend Self (i message) (map muExp args)
-muMethodInvocation (MethodCall (Name receptorAndMessage) args)  =  SimpleSend (Reference  (ns . init $ receptorAndMessage)) (i . last $ receptorAndMessage) (map muExp args)
-muMethodInvocation (PrimaryMethodCall receptor _ selector args) =  SimpleSend (muExp receptor) (i selector) (map muExp args)
+muMethodInvocation (MethodCall (Name receptorAndMessage) args)  = muNormalizeReference $ SimpleSend (Reference  (ns . init $ receptorAndMessage)) (i . last $ receptorAndMessage) (map muExp args)
+muMethodInvocation (PrimaryMethodCall receptor _ selector args) = muNormalizeReference $ SimpleSend (muExp receptor) (i selector) (map muExp args)
 muMethodInvocation e = debug e
 
 muNormalizeReference (SimpleSend Self "assertTrue" [expression])         = M.Assert False $ Truth expression
 muNormalizeReference (SimpleSend Self "assertFalse" [expression])        = M.Assert True $ Truth expression
 muNormalizeReference (SimpleSend Self "assertEquals" [expected, actual]) = M.Assert False $ Equality expected actual
+muNormalizeReference (SimpleSend one  "equals" [other])                  = M.PrimitiveSend one O.Equal [other]
+muNormalizeReference (SimpleSend one  "hashCode" [other])                = M.PrimitiveSend one O.Hash [other]
 muNormalizeReference e = e
 
 muRefType (ClassRefType clazz) = r clazz

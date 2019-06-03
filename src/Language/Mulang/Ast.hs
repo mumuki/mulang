@@ -32,6 +32,7 @@ module Language.Mulang.Ast (
     pattern SimpleProcedure,
     pattern SimpleMethod,
     pattern SimpleSend,
+    pattern PrimitiveSend,
     pattern SubroutineSignature,
     pattern VariableSignature,
     pattern ModuleSignature,
@@ -46,6 +47,7 @@ module Language.Mulang.Ast (
 
 import           GHC.Generics
 import           Language.Mulang.Identifier (Identifier)
+import           Language.Mulang.Ast.Operator (Operator)
 
 type Code = String
 
@@ -104,8 +106,9 @@ data Expression
     | Procedure Identifier SubroutineBody
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
     | Method Identifier SubroutineBody
-    | EqualMethod SubroutineBody
-    | HashMethod SubroutineBody
+    | EqualMethod SubroutineBody -- deprecated
+    | HashMethod SubroutineBody -- deprecated
+    | PrimitiveMethod Operator SubroutineBody
     | Variable Identifier Expression
     | Assignment Identifier Expression
     | Attribute Identifier Expression
@@ -135,6 +138,9 @@ data Expression
     -- ^ Logic programming universal cuantification
     | Reference Identifier
     -- ^ Generic variable
+    | Primitive Operator
+    -- ^ Reference to special, low level, universal operations like logical operaions and math, that may or may not be primitives
+    -- in the original language
     | Application Expression [Expression]
     -- ^ Generic, non-curried application of a function or procedure, composed by the applied element itself, and the application arguments
     | Send Expression Expression [Expression]
@@ -168,8 +174,8 @@ data Expression
     -- ^ Generic sequence of statements
     | Other (Maybe Code) (Maybe Expression)
     -- ^ Unrecognized expression, with optional description and body
-    | Equal
-    | NotEqual
+    | Equal -- ^ deprecated
+    | NotEqual -- ^ deprecated
     | Self
     | None
     -- ^ Generic value indicating an absent expression, such as when there is no finally in a try or default in a switch or js' undefined
@@ -254,6 +260,7 @@ pattern ModuleSignature name cs            = TypeSignature name (ConstrainedType
 pattern SimpleEquation params body = Equation params (UnguardedBody body)
 
 pattern SimpleSend receptor selector args = Send receptor (Reference selector) args
+pattern PrimitiveSend receptor selector args = Send receptor (Primitive selector) args
 
 pattern SimpleFunction name params body  = Function  name [SimpleEquation params body]
 pattern SimpleProcedure name params body = Procedure name [SimpleEquation params body]
@@ -287,10 +294,11 @@ extractUnification (Attribute name value)   = Just (name, value)
 extractUnification _                        = Nothing
 
 extractSubroutine :: Expression -> Maybe (Identifier, SubroutineBody)
-extractSubroutine (Function name body)  = Just (name, body)
-extractSubroutine (Procedure name body) = Just (name, body)
-extractSubroutine (Method name body)    = Just (name, body)
-extractSubroutine _                     = Nothing
+extractSubroutine (Function name body)        = Just (name, body)
+extractSubroutine (Procedure name body)       = Just (name, body)
+extractSubroutine (Method name body)          = Just (name, body)
+extractSubroutine (PrimitiveMethod op body)   = Just (show op, body)
+extractSubroutine _                           = Nothing
 
 extractParams :: Expression -> Maybe ([Pattern])
 extractParams (Subroutine _ equations) = Just (equationParams.head $ equations)
