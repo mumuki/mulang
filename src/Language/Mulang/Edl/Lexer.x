@@ -4,8 +4,6 @@ import Control.Monad.State
 import Control.Monad.Except
 import Data.Word
 import Codec.Binary.UTF8.String as UTF8 (encode, decode)
-
-import Control.Monad (liftM)
 }
 
 
@@ -13,6 +11,7 @@ import Control.Monad (liftM)
 $lf = \n  -- line feed
 $cr = \r  -- carriage return
 $eol_char = [$lf $cr] -- any end of line character
+$not_eol_char = ~$eol_char -- anything but an end of line character
 $white_char   = [\ \n\r\f\v\t]
 $white_no_nl = $white_char # $eol_char
 $ident_letter = [a-zA-Z_]
@@ -53,6 +52,8 @@ $not_double_quote = [. \n] # \"
 tokens :-
 
   $white+  ;  -- skip whitespace
+
+  "%%" ($not_eol_char)* ;  -- skip comments
 
   ' @char '    { mkChar }
   \" @string \"     { mkString TString }

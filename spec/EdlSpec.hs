@@ -163,6 +163,10 @@ spec = do
     let run = parseExpectations
     let test code expectation = it ("test " ++ code ++ " shouldBe " ++ show expectation) (run code `shouldBe` expectation)
 
+    test "%% this is a comment\nexpectation: calls;" (run "expectation: calls;")
+    test "expectation: %% this is a comment\ncalls;" (run "expectation: calls;")
+    test "expectation: %% this is a comment\n%% this is another comment\ncalls;" (run "expectation: calls;")
+
     test "expectation: declares class `Baz`" [Expectation "E0" (Decontextualize (Inspection "declares class" (Named "Baz") Unmatching))]
     test "expectation: declares class `Baz`;" [Expectation "E0" (Decontextualize (Inspection "declares class" (Named "Baz") Unmatching))]
     test "expectation: declares class `Baz`;\n" [Expectation "E0" (Decontextualize (Inspection "declares class" (Named "Baz") Unmatching))]
