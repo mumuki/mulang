@@ -16,7 +16,7 @@
   ];
 
   const atoms = [
-    "anything", "false",  "logic",   "math",  "nil",  "self",  "true"
+    "anything", "false",  "logic",   "math",  "nil",  "self",  "true", "literal", "nonliteral"
   ];
 
   const operators = [
