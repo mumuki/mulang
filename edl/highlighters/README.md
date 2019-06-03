@@ -8,4 +8,4 @@ It contains a simple mode defined using the [Simple Mode Addon](https://codemirr
 
 ## CodeMirror Grammar
 
-It contains an nearly-equivalent mode, but defined with [Grammar Addon](https://github.com/foo123/codemirror-grammar). This mode provides auto-complete, but not smart indentation.
+It contains a nearly-equivalent mode, but defined with [Grammar Addon](https://github.com/foo123/codemirror-grammar). This mode provides auto-complete, but not smart indentation.

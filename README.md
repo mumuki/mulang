@@ -420,8 +420,8 @@ The power of Mulang is grounded on more than 90 different kind of inspections:
 | `declaresSuperclass`              |  object oriented   | is a given class declared as superclass?
 | `declaresTypeAlias`               |  any               | is a given type synonym declared?
 | `declaresTypeSignature`           |  any               | is a given computation type signature declared?
-| `declaresVariable`                |  any               | is a given local o global variable declared?
-| `declaresVariableMatching`        |  any               | is a given local o global variable declared matching the given expression?
+| `declaresVariable`                |  any               | is a given local or global variable declared?
+| `declaresVariableMatching`        |  any               | is a given local or global variable declared matching the given expression?
 | `delegates`                       |  delegates         | is a method, function or procedure declared AND called?
 | `discardsExceptions`              |  any               | are exceptions discarded within an empty catch block?
 | `doesConsolePrint`                |  any               | is there any console-print-statement like `System.out.println`, `puts` or `console.log`?
@@ -478,9 +478,9 @@ The power of Mulang is grounded on more than 90 different kind of inspections:
 | `usesIf`                          |  any               | is an `if` control structure used?
 | `usesInheritance`                 |  object oriented   | is any superclass explicitly declared?
 | `usesLambda`                      |
-| `usesLogic`                       |  any               | are boolean opeartors used?
+| `usesLogic`                       |  any               | are boolean operators used?
 | `usesLoop`                        |  procedural        | are any of: repeat / for loop / foreach / while used?
-| `usesMath`                        |  any               | are artithmetic operatos used?
+| `usesMath`                        |  any               | are artithmetic operators used?
 | `usesMixins`                      |  object oriented   | is any mixins explicitly included?
 | `usesNot`                         |
 | `usesObjectComposition`           |  object oriented   | is there a class that declares an attributes and sends a message to it?
@@ -970,7 +970,7 @@ For further detail on this spec, see [Code Execution](#code-execution)
 # Customs Expectations and the Expectations Definition Language
 
 Mulang accepts custom-made expectations expressed in an Expectations Definition Language - EDL - which allows to build complex
-expecation by combining existing inspections.
+expectations by combining existing inspections.
 
 
 # Mulang AST spec
@@ -2034,7 +2034,7 @@ function foo(x, y) { }
 
 ## Primitive Operators
 
-Primitive operatos represent low-level language operations that are well known and common to most languages, usually in the fashion of operators.
+Primitive operators represent low-level language operations that are well known and common to most languages, usually in the fashion of operators.
 
 * `Equal`: equal operator
 * `NotEqual`: distinct operator
@@ -2046,11 +2046,11 @@ Primitive operatos represent low-level language operations that are well known a
 * `GreatherThan`
 * `LessOrEqualThan`
 * `LessThan`
-* `Otherwise`
+* `Otherwise`: guard's otherwise operator
 * `Plus`
 * `Minus`
 * `Multiply`
-* `Divide`: guard's otherwise operator
+* `Divide`
 * `ForwardComposition`: `(f >> g)(x) = (g . f)(x) = g(f(x))` operator
 * `BackwardComposition`: `(g << f)(x) = (g . f)(x) = g(f(x))` operator
 

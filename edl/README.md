@@ -26,16 +26,16 @@ expectation:
   calls something;
 ```
 
-...which is just syntactic sugger - the `something` keyword is just a dummy token you can add to make the expectation syntax more human-readable.
+...which is just syntactic sugar - the `something` keyword is just a dummy token you can add to make the expectation syntax more human-readable.
 
-Although you can declared unnamed expectations, it is usually more conventient to add an intention-revealing name:
+Although you can declare unnamed expectations, it is usually more convenient to add an intention-revealing name:
 
 ```
 expectation "you should call something":
   calls something;
 ```
 
-The inspection names match exactly with th standard expectation format, but it is more releax, you can it write it in three diferent formats:
+The inspection names match exactly with the standard expectation format, but it is more relaxed, you can it write it in three diferent formats:
 
  * `UpperCamelCase`, which is the standard syntax, e.g. `UsesIf`
  * `lowerCamelCase`, e.g. `usesIf`
@@ -81,7 +81,7 @@ expectation "a function must be declared":
 
 ## Predicates
 
-Like with standard expectations, you can use predicates with the inspections. The simplest of them is the _named_ predicate, that matches a name exactly againts the given identifier:
+Like with standard expectations, you can use predicates with the inspections. The simplest of them is the _named_ predicate, that matches a name exactly against the given identifier:
 
 ```
 expectation "`System` must be used":
@@ -141,12 +141,12 @@ expectation "must declare `Owner` and `Pet`":
   declares `Owner` && declares `Pet`;
 ```
 
-Such operations don't have an eqivalence on the standard expectations, and are unique to EDL.
+Such operations don't have an equivalence on the standard expectations, and are unique to EDL.
 
 ## Scopes
 
 Also, custom expectations mmy be scoped using `within` and `through`,
-which allow to inspect only a given portion of the code: `within` performs intransitive cuts while
+which allow inspecting only a given portion of the code: `within` performs intransitive cuts while
 `through` performs transitive cuts.
 
 ```
@@ -159,7 +159,7 @@ expectation "`HouseBuilder` must raise something":
 expectation "`HouseBuilder` must raise something":
   %% this will work if within the lexical scope of
   %% HouseBuilder a raise statement is used, or if any code outside
-  %% the lexical scope of HouseBuilder raises an excepcion
+  %% the lexical scope of HouseBuilder raises an exception
   %% equivalent to HouseBuilder Raises
   through `HouseBuilder` raises something";
 
@@ -207,7 +207,7 @@ expectation "`getAge` must not return a hardcoded value:
   within `getAge` returns with nonliteral;
 ```
 
-As you can see in previous exampls, many of the simplest matchers can also be used in the standard expectation syntax. However, EDL also supports the `that` matcher,
+As you can see in previous examples, many of the simplest matchers can also be used in the standard expectation syntax. However, EDL also supports the `that` matcher,
 that allows you to build complex, nested queries:
 
 ```
@@ -237,7 +237,7 @@ expectation "package `tamagochi` must declare a class with a method that returns
       returns with math));
 ```
 
-Previous logical operators may be also be used with the `that`-queries:
+Previous logical operators may also be used with `that`-queries:
 
 
 ```
@@ -257,12 +257,12 @@ This is the complete list of inspections that support matchers:
 
 * `assigns`: accepts a matcher that matches the assigned value
 * `calls`: accepts a matcher that matches the passed arguments
-* `declares class`: accepts a matcher that matches any the body expressions
-* `declares function`: accepts a matcher that matches any the body expressions
-* `declares interface`: accepts a matcher that matches any the body expressions
-* `declares method`: accepts a matcher that matches any the body expressions
-* `declares object`: accepts a matcher that matches any the body expressions
-* `declares procedure`: accepts a matcher that matches any the body expressions
+* `declares class`: accepts a matcher that matches any of the body expressions
+* `declares function`: accepts a matcher that matches any of the body expressions
+* `declares interface`: accepts a matcher that matches any of the body expressions
+* `declares method`: accepts a matcher that matches any of the body expressions
+* `declares object`: accepts a matcher that matches any of the body expressions
+* `declares procedure`: accepts a matcher that matches any of the body expressions
 * `declares variable`: accepts a matcher that matches the initial value
 * `returns`: accepts a matcher that matches the returned value
 
@@ -281,7 +281,7 @@ This is the complete list of inspections that support matchers:
 * `nil`: matches the nil/null literal
 * `nonliteral`: matches a non-literal expression
 * `self`: matches the self/this literal
-* `that (<other query>)`: matches an expression that make the given query true
+* `that (<other query>)`: matches an expression that makes the given query true
 
 
 ## Counters
@@ -295,7 +295,7 @@ expectation "must perform at least three calls":
 expectation "must declare three instances of `Tax`":
   count(inherits `Tax`) = 3;
 
-expectation "must declare three subclases of `Tax` and two subclases of `Product`":
+expectation "must declare three subclasses of `Tax` and two subclasses of `Product`":
   count(inherits `Tax`) = 3 && count(inherits `Product`) = 2;
 
 expectation "must declare no more than 4 methods in class `Queue`":
