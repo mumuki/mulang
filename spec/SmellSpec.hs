@@ -202,7 +202,7 @@ spec = do
                              \    | g x = False\n\
                              \    | True = False") `shouldBe` True
 
-    it "is True when last guard is an otherwsie" $ do
+    it "is False when last guard is an otherwsie" $ do
       shouldUseOtherwise (hs "f x | c x = True\n\
                              \    | otherwise = False") `shouldBe` False
 
