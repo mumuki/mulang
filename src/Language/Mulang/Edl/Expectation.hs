@@ -47,6 +47,7 @@ data Predicate
   | Like String
   | Except String
   | AnyOf [String]
+  | NoneOf [String]
   deriving (Eq, Show, Generic)
 
 data Matcher

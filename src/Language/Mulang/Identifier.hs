@@ -1,5 +1,6 @@
 module Language.Mulang.Identifier (
   anyOf,
+  noneOf,
   anyone,
   except,
   like,
@@ -18,6 +19,9 @@ type IdentifierPredicate = Identifier -> Bool
 
 anyOf :: [Identifier] -> IdentifierPredicate
 anyOf options identifier = any (== identifier) options
+
+noneOf :: [Identifier] -> IdentifierPredicate
+noneOf options = not . anyOf options
 
 anyone :: IdentifierPredicate
 anyone = const True

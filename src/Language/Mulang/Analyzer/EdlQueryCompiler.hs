@@ -59,6 +59,7 @@ compilePredicate p (E.Like name)   = p $ like name
 compilePredicate _ (E.Named name)  = named name
 compilePredicate _ (E.Except name) = except name
 compilePredicate _ (E.AnyOf ns)    = anyOf ns
+compilePredicate _ (E.NoneOf ns)   = noneOf ns
 
 
 compileVerb :: String -> String
