@@ -74,21 +74,25 @@ tokens :-
   "<="  { symbolToken TAtMost }
   "="   { symbolToken TExactly }
 
+  "^"   { symbolToken POExcept }
+  "~"   { symbolToken POLike }
+  "^~"  { symbolToken PONotLike }
+  "@"   { symbolToken POAnyOf }
+  "^@"  { symbolToken PONoneOf }
+  "~@"  { symbolToken POLikeAnyOf }
+  "^~@" { symbolToken POLikeNoneOf }
+
   "and" { symbolToken TAnd }
   "anything" { symbolToken TAnything }
   "count" { symbolToken TCount }
-  "distinct" { symbolToken TDistinct }
   "expectation" { symbolToken TExpectation }
   "false" { symbolToken TFalse }
-  "in" { symbolToken TIn }
-  "like" { symbolToken TLike }
   "literal" { symbolToken TLiteral }
   "logic" { symbolToken TLogic }
   "math" { symbolToken TMath }
   "nil" { symbolToken TNil }
   "nonliteral" { symbolToken TNonliteral }
   "not" { symbolToken TNot }
-  "of" { symbolToken TOf }
   "or" { symbolToken TOr }
   "self" { symbolToken TSelf }
   "something" { symbolToken TSomething }
@@ -102,7 +106,14 @@ tokens :-
 
 {
 data Token
-  = TAnd
+  = POAnyOf
+  | POExcept
+  | POLike
+  | POLikeAnyOf
+  | POLikeNoneOf
+  | PONoneOf
+  | PONotLike
+  | TAnd
   | TAnything
   | TAtLeast
   | TAtMost
@@ -114,14 +125,12 @@ data Token
   | TComma
   | TCOr
   | TCount
-  | TDistinct
   | TEOF
   | TExactly
+  | TExpectation
   | TFalse
   | TIdentifier { identifierValue :: String }
-  | TIn
   | TLeast
-  | TLike
   | TLiteral
   | TLogic
   | TMath
@@ -129,7 +138,6 @@ data Token
   | TNonliteral
   | TNot
   | TNumber { numberValue :: Double }
-  | TOf
   | TOpenParen
   | TOr
   | TPlus
@@ -138,7 +146,6 @@ data Token
   | TSomething
   | TString { stringValue :: String }
   | TSymbol { symbolValue :: String }
-  | TExpectation
   | TThat
   | TThrough
   | TTrue

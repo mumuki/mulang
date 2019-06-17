@@ -19,6 +19,7 @@ import           Control.Monad.Error
 %token
 
   and { TAnd {} }
+  anyOf { POAnyOf {} }
   anything { TAnything {} }
   atLeast { TAtLeast {} }
   atMost { TAtMost {} }
@@ -30,21 +31,23 @@ import           Control.Monad.Error
   comma { TComma {} }
   cor { TCOr {} }
   count { TCount {} }
-  distinct { TDistinct {} }
   exactly { TExactly {} }
+  except { POExcept {} }
   expectation { TExpectation {} }
   false { TFalse {} }
   identifier { TIdentifier {} }
-  in { TIn {} }
-  like { TLike {} }
+  like { POLike {} }
+  likeAnyOf { POLikeAnyOf {} }
+  likeNoneOf { POLikeNoneOf {} }
   literal { TLiteral {} }
   logic { TLogic {} }
   math { TMath {} }
   nil { TNil {} }
+  noneOf { PONoneOf {} }
   nonliteral { TNonliteral {} }
   not { TNot {} }
+  notLike { PONotLike {} }
   number { TNumber {} }
-  of { TOf {} }
   openParen  { TOpenParen {} }
   or { TOr {} }
   plus { TPlus {} }
@@ -134,10 +137,13 @@ Consult : Inspection something Predicate Matcher { ($1, $3, $4) }
 Predicate :: { Predicate }
 Predicate : { Any }
  | symbol { (Named . symbolValue) $1 }
+ | except symbol { (Except . symbolValue) $2 }
  | like symbol { (Like . symbolValue) $2 }
- | distinct of symbol { (Except . symbolValue) $3 }
- | in openParen Symbols closeParen  { (AnyOf . map symbolValue) $3 }
- | not in openParen Symbols closeParen  { (NoneOf . map symbolValue) $4 }
+ | notLike symbol { (NotLike . symbolValue) $2 }
+ | anyOf openParen Symbols closeParen  { (AnyOf . map symbolValue) $3 }
+ | noneOf openParen Symbols closeParen  { (NoneOf . map symbolValue) $3 }
+ | likeAnyOf openParen Symbols closeParen  { (LikeAnyOf . map symbolValue) $3 }
+ | likeNoneOf openParen Symbols closeParen  { (LikeNoneOf . map symbolValue) $3 }
 
 Symbols :: { [Token] }
 Symbols : symbol { [$1] }
@@ -178,6 +184,13 @@ m (TIdentifier id) = "Unexpected keyword " ++ id
 m (TNumber v) = "number " ++ show v ++ " is not expected here"
 m (TString v) = "string " ++ show v ++ " is not expected here"
 m (TSymbol v) = "symbol " ++ v ++ " is not expected here"
+m POAnyOf = "predicate operator `any of` (`@`) is not expected here"
+m POExcept = "predicate operator `except` (`^`) is not expected here"
+m POLike = "predicate operator `like` (`~`) is not expected here"
+m POLikeAnyOf = "predicate operator `like any of` (`~@`) is not expected here"
+m POLikeNoneOf = "predicate operator `like none of` (`^~@`) is not expected here"
+m PONoneOf = "predicate operator `none of` (`^@`) is not expected here"
+m PONotLike = "predicate operator `not like` (`^~`) is not expected here"
 m TAnd = "and is not expected here"
 m TAnything = "anything is not expected here"
 m TAtLeast = "least is not expected here"
@@ -188,19 +201,15 @@ m TCNot = "! is not expected here"
 m TComma = "Unexpected ,"
 m TCOr = "|| is not expected here"
 m TCount = "count is not expected here"
-m TDistinct = "distinct is not expected here"
 m TEOF = "Unexpected end of file"
 m TExactly = "exactly is not expected here"
 m TFalse = "false is not expected here"
-m TIn = "in is not expected here"
-m TLike = "like is not expected here"
 m TLiteral = "literal is not expected here"
 m TLogic = "logic is not expected here"
 m TMath = "math is not expected here"
 m TNil = "nil is not expected here"
 m TNonliteral = "nonliteral is not expected here"
 m TNot = "not is not expected here"
-m TOf = "of is not expected here"
 m TOpenParen = "Unexpected )"
 m TOr = "or is not expected here"
 m TSelf = "self is not expected here"
@@ -212,5 +221,6 @@ m TTrue = "true is not expected here"
 m TWith = "with is not expected here"
 m TWithin = "within is not expected here"
 m x =  "Unexpected " ++ show x
+
 
 }

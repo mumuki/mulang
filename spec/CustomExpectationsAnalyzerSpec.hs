@@ -56,8 +56,8 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function finish() { finished = false }" test) `shouldReturn` nok
     (run JavaScript "function finish() { finished = true }" test) `shouldReturn` ok
 
-  it "evaluates declares function like `total` that (returns with nil)" $ do
-    let test = "expectation: declares function like `total` that (returns with nil)"
+  it "evaluates declares function ~ `total` that (returns with nil)" $ do
+    let test = "expectation: declares function ~ `total` that (returns with nil)"
 
     (run JavaScript "function totalAmount() { return 2 }" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() { return null }" test) `shouldReturn` ok
@@ -76,8 +76,8 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function totalAmount() { return 4 + 4 }" test) `shouldReturn` ok
 
 
-  it "evaluates declares function like `total` that (returns with math)" $ do
-    let test = "expectation: declares function like `total` that (returns with math)"
+  it "evaluates declares function ~ `total` that (returns with math)" $ do
+    let test = "expectation: declares function ~ `total` that (returns with math)"
 
     (run JavaScript "" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() {}" test) `shouldReturn` nok
@@ -85,8 +85,8 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function totalAmount() { return x + y }" test) `shouldReturn` ok
     (run JavaScript "function totalAmount() { var z = x + y; return z }" test) `shouldReturn` nok
 
-  it "evaluates declares function like `total` with math" $ do
-    let test = "expectation: declares function like `total` with math"
+  it "evaluates declares function ~ `total` with math" $ do
+    let test = "expectation: declares function ~ `total` with math"
 
     (run JavaScript "" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() {}" test) `shouldReturn` nok
@@ -94,8 +94,8 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function totalAmount() { return x + y }" test) `shouldReturn` ok
     (run JavaScript "function totalAmount() { var z = x + y; return z }" test) `shouldReturn` ok
 
-  it "evaluates declares function like `total` that (uses math)" $ do
-    let test = "expectation: declares function like `total` that (uses math)"
+  it "evaluates declares function ~ `total` that (uses math)" $ do
+    let test = "expectation: declares function ~ `total` that (uses math)"
 
     (run JavaScript "" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() {}" test) `shouldReturn` nok
@@ -105,8 +105,8 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "var magicNumber = 10 + 1; function totalAmount() { return magicNumber }" test) `shouldReturn` nok
     (run JavaScript "var magicNumber = 10 + 1; function totalAmount() { var z = magicNumber; return 0 }" test) `shouldReturn` nok
 
-  it "evaluates declares function like `total` that (returns something that (uses math))" $ do
-    let test = "expectation: declares function like `total` that (returns something that (uses math))"
+  it "evaluates declares function ~ `total` that (returns something that (uses math))" $ do
+    let test = "expectation: declares function ~ `total` that (returns something that (uses math))"
 
     (run JavaScript "" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() {}" test) `shouldReturn` nok
@@ -116,15 +116,15 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "var magicNumber = 10 + 1; function totalAmount() { return magicNumber }" test) `shouldReturn` nok
     (run JavaScript "var magicNumber = 10 + 1; function totalAmount() { var z = magicNumber; return 0 }" test) `shouldReturn` nok
 
-  it "evaluates count (declares variable like `client`)" $ do
-    (run JavaScript "var clientName = 'jon'" "expectation: count (declares variable like `client`) = 0") `shouldReturn` nok
-    (run JavaScript "var clientName = 'jon'" "expectation: count (declares variable like `client`) = 1") `shouldReturn` ok
-    (run JavaScript "var clientName = 'jon'" "expectation: count (declares variable like `client`) = 2") `shouldReturn` nok
+  it "evaluates count (declares variable ~ `client`)" $ do
+    (run JavaScript "var clientName = 'jon'" "expectation: count (declares variable ~ `client`) = 0") `shouldReturn` nok
+    (run JavaScript "var clientName = 'jon'" "expectation: count (declares variable ~ `client`) = 1") `shouldReturn` ok
+    (run JavaScript "var clientName = 'jon'" "expectation: count (declares variable ~ `client`) = 2") `shouldReturn` nok
     (run JavaScript "var clientName = 'jon';\n\
-                    \let clientSurname = 'doe'" "expectation: count (declares variable like `client`) = 2") `shouldReturn` ok
+                    \let clientSurname = 'doe'" "expectation: count (declares variable ~ `client`) = 2") `shouldReturn` ok
     (run JavaScript "var clientName = 'jon';\n\
                     \let clientSurname = 'doe';\n\
-                    \let username = 'jondoe4'" "expectation: count (declares variable like `client`) = 3") `shouldReturn` nok
+                    \let username = 'jondoe4'" "expectation: count (declares variable ~ `client`) = 3") `shouldReturn` nok
 
   it "evaluates count (declares variable with \"jon\")" $ do
       (run JavaScript "var clientName = 'jon'" "expectation: count (declares variable with \"jon\") = 0") `shouldReturn` nok

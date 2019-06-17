@@ -23,3 +23,61 @@ spec = do
       like "amount" "totalamount" `shouldBe` True
       like "amount" "total_amount" `shouldBe` True
       like "amount" "totalAmount" `shouldBe` True
+
+  describe "notLike" $ do
+    it "matches exactly" $ do
+      notLike "amount" "amount" `shouldBe` False
+      notLike "amount" "count" `shouldBe` True
+
+    it "matches ignoring case" $ do
+      notLike "amount" "Amount" `shouldBe` False
+      notLike "amount" "AMOUNT" `shouldBe` False
+      notLike "Amount" "AMOUNT" `shouldBe` False
+
+    it "matches prefix" $ do
+      notLike "amount" "amountOfHouses" `shouldBe` False
+
+    it "matches suffix" $ do
+      notLike "amount" "totalamount" `shouldBe` False
+      notLike "amount" "total_amount" `shouldBe` False
+      notLike "amount" "totalAmount" `shouldBe` False
+
+  describe "likeAnyOf" $ do
+    it "matches exactly" $ do
+      likeAnyOf ["amount", "count"] "amount" `shouldBe` True
+      likeAnyOf ["amount", "count"] "count" `shouldBe` True
+      likeAnyOf ["amount", "count"] "transaction" `shouldBe` False
+
+    it "matches ignoring case" $ do
+      likeAnyOf ["amount", "count"] "Amount" `shouldBe` True
+      likeAnyOf ["amount", "count"] "AMOUNT" `shouldBe` True
+      likeAnyOf ["Amount", "Count"] "COUNT" `shouldBe` True
+
+    it "matches prefix" $ do
+      likeAnyOf ["amount", "count"] "amountOfHouses" `shouldBe` True
+
+    it "matches suffix" $ do
+      likeAnyOf ["amount", "count"] "totalamount" `shouldBe` True
+      likeAnyOf ["amount", "count"] "total_amount" `shouldBe` True
+      likeAnyOf ["amount", "count"] "totalAmount" `shouldBe` True
+      likeAnyOf ["amount", "count"] "account" `shouldBe` True
+
+  describe "likeNoneOf" $ do
+    it "matches exactly" $ do
+      likeNoneOf ["amount", "count"] "amount" `shouldBe` False
+      likeNoneOf ["amount", "count"] "count" `shouldBe` False
+      likeNoneOf ["amount", "count"] "transaction" `shouldBe` True
+
+    it "matches ignoring case" $ do
+      likeNoneOf ["amount", "count"] "Amount" `shouldBe` False
+      likeNoneOf ["amount", "count"] "AMOUNT" `shouldBe` False
+      likeNoneOf ["Amount", "Count"] "COUNT" `shouldBe` False
+
+    it "matches prefix" $ do
+      likeNoneOf ["amount", "count"] "amountOfHouses" `shouldBe` False
+
+    it "matches suffix" $ do
+      likeNoneOf ["amount", "count"] "totalamount" `shouldBe` False
+      likeNoneOf ["amount", "count"] "total_amount" `shouldBe` False
+      likeNoneOf ["amount", "count"] "totalAmount" `shouldBe` False
+      likeNoneOf ["amount", "count"] "account" `shouldBe` False
