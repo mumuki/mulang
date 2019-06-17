@@ -47,25 +47,25 @@ spec = do
     run (js "var pepita = {volar:function(){}}") "Intransitive:pepita.volar" "DeclaresMethod:^volar" `shouldBe` False
     run (js "var pepita = {volar:function(){}}") "pepita.cantar" "DeclaresMethod" `shouldBe` False
 
-  it "works with DeclaresFunction in any scope and empty target" $ do
+  it "works with DeclaresFunction in any scope and empty predicate" $ do
     run (hs "f x = 2") "*" "DeclaresFunction" `shouldBe` True
 
-  it "works with DeclaresFunction in any scope and explicitly anyone target" $ do
+  it "works with DeclaresFunction in any scope and explicitly anyone predicate" $ do
     run (hs "f x = 2") "*" "DeclaresFunction:*" `shouldBe` True
 
-  it "works with DeclaresFunction with non-empty scope and empty target" $ do
+  it "works with DeclaresFunction with non-empty scope and except predicate" $ do
     run (hs "f x = 2") "f" "DeclaresFunction:^f" `shouldBe` False
     run (hs "f x = 2") "g" "DeclaresFunction:^f" `shouldBe` False
 
-  it "works with DeclaresFunction in any scope and non-empty target" $ do
+  it "works with DeclaresFunction in any scope and non-empty predicate" $ do
     run (hs "f x = 2") "*" "DeclaresFunction:f" `shouldBe` True
     run (hs "f x = 2") "*" "DeclaresFunction:g" `shouldBe` False
 
-  it "works with DeclaresFunction in any scope and explicitly equal target" $ do
+  it "works with DeclaresFunction in any scope and explicitly equal predicate" $ do
     run (hs "f x = 2") "*" "DeclaresFunction:=f" `shouldBe` True
     run (hs "f x = 2") "*" "DeclaresFunction:=g" `shouldBe` False
 
-  it "works with DeclaresFunction in any scope and explicitly like target" $ do
+  it "works with DeclaresFunction in any scope and explicitly like predicate" $ do
     run (hs "foo x = 2") "*" "DeclaresFunction:~fo" `shouldBe` True
     run (hs "foo x = 2") "*" "DeclaresFunction:~go" `shouldBe` False
 
