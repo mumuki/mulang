@@ -101,13 +101,17 @@ expectation "assignment a variable similar to `amount`":
   %% equivalent to * Assigns:~amount
   assigns something like `amount`;
 
+expectation "declares methods apart from getters":
+  %% equivalent to * DeclaresMethod:^~get
+  declares method except like `get`;
+
 expectation "must declare something aside of `Pet`":
   %% equivalent to * Declares:^Pet
-  declares something distinct of `Pet`;
+  declares something except `Pet`;
 
 expectation "must declare a class aside of `Dog`":
   %% equivalent to * DeclaresClass:^Dog
-  declares class distinct of `Dog`;
+  declares class except `Dog`;
 
 expectation "must declare `feed` or `bark`":
   %% equivalent to * DeclaresMethod:[feed|bark]
@@ -116,6 +120,18 @@ expectation "must declare `feed` or `bark`":
 expectation "must call `feed` or `bark`":
   %% equivalent to * Calls:[feed|bark]
   calls something in (`feed`, `bark`);
+
+expectation "must call something similar to `feed` or `bark`":
+  %% equivalent to * Calls:~[feed|bark]
+  calls something like in (`feed`, `bark`);
+
+expectation "must call something apart from `feed` or `bark`":
+  %% equivalent to * Calls:^[feed|bark]
+  calls something except in (`feed`, `bark`);
+
+expectation "must declare something apart from classes like `Base` or `Abstract`":
+  %% equivalent to * DeclaresClass:^~[feed|bark]
+  declares class except like in (`Base`, `Abstract`);
 ```
 
 ## Boolean operators on unscoped inspections
@@ -169,7 +185,7 @@ expectation "`HouseBuilder.builder` must create a new `House`":
 
 expectation "In the context of `Tree`, something other than `foo` is called":
   %% equivalent to Tree Calls:^foo
-  through `Tree` calls something distinct of `foo`;
+  through `Tree` calls something except `foo`;
 ```
 
 ## Matchers

@@ -82,10 +82,9 @@
             "autocomplete": true,
             "tokens": [
                 "count",
-                "distinct",
+                "except",
                 "in",
                 "like",
-                "of",
                 "something",
                 "expectation",
                 "that",

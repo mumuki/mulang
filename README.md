@@ -541,7 +541,11 @@ In order to pass expectations to the Command Line Tool, you must use a simple DS
 |                   | `* DeclaresClass:=Foo`             | `(declaresClass (named "Foo"))`
 |                   | `* DeclaresClass:~Foo`             | `(declaresClass (like "Foo"))`
 |                   | `* DeclaresClass:^Foo`             | `(declaresClass (except "Foo"))`
+|                   | `* DeclaresClass:^~Foo`            | `(declaresClass (notLike "Foo"))`
 |                   | `* DeclaresClass:[Foo\|Bar]`       | `(declaresClass (anyOf ["Foo", "Bar"]))`
+|                   | `* DeclaresClass:^[Foo\|Bar]`      | `(declaresClass (noneOf ["Foo", "Bar"]))`
+|                   | `* DeclaresClass:~[Foo\|Bar]`      | `(declaresClass (likeAnyOf ["Foo", "Bar"]))`
+|                   | `* DeclaresClass:^~[Foo\|Bar]`     | `(declaresClass (likeNoneOf ["Foo", "Bar"]))`
 |                   | `* DeclaresClass:*`                | `(declaresClass anyone)`
 |                   | `* DeclaresClass`                  | `(declaresClass anyone)`
 | Matching Literals | `* Calls:*:WithChar:'a':WithTrue`  | `(callsMatching (withEvery [isChar 'a', isBool True]) anyone)`
