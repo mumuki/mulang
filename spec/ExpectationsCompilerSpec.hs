@@ -285,6 +285,24 @@ spec = do
     run (java "class Foo implements Baz {}") "Foo" "Implements:^[Bar|Baz|Foobar]" `shouldBe` False
     run (java "class Foo implements Foobaz {}") "Foo" "Implements:^[Bar|Baz|Foobar]" `shouldBe` True
 
+  it "works with like-any-of predicate" $ do
+    run (java "class Foo implements Bar {}") "Foo" "Implements:~[Bar|Baz|Foobar]" `shouldBe` True
+    run (java "class Foo implements Baz {}") "Foo" "Implements:~[Bar|Baz|Foobar]" `shouldBe` True
+    run (java "class Foo implements Foobaz {}") "Foo" "Implements:~[Bar|Baz|Foobar]" `shouldBe` True
+    run (java "class Foo implements Goo {}") "Foo" "Implements:~[Bar|Baz|Foobar]" `shouldBe` False
+
+  it "works with like-none-of predicate" $ do
+    run (java "class Foo implements Bar {}") "Foo" "Implements:^~[Bar|Baz|Foobar]" `shouldBe` False
+    run (java "class Foo implements Baz {}") "Foo" "Implements:^~[Bar|Baz|Foobar]" `shouldBe` False
+    run (java "class Foo implements Foobaz {}") "Foo" "Implements:^~[Bar|Baz|Foobar]" `shouldBe` False
+    run (java "class Foo implements Goo {}") "Foo" "Implements:^~[Bar|Baz|Foobar]" `shouldBe` True
+
+  it "works with not-like predicate" $ do
+    run (java "class Foo implements Bar {}") "Foo" "Implements:^~Bar" `shouldBe` False
+    run (java "class Foo implements Baz {}") "Foo" "Implements:^~Bar" `shouldBe` True
+    run (java "class Foo implements Foobaz {}") "Foo" "Implements:^~Baz" `shouldBe` False
+    run (java "class Foo implements Goo {}") "Foo" "Implements:^~Bar" `shouldBe` True
+
   it "works with primitive operators in js" $ do
     run (js "x == 4") "*" "UsesEqual" `shouldBe` True
     run (js "x != 4") "*" "UsesEqual" `shouldBe` False

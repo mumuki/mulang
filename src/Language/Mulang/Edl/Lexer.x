@@ -74,19 +74,14 @@ tokens :-
   "<="  { symbolToken TAtMost }
   "="   { symbolToken TExactly }
 
-  "^"   { symbolToken POExcept }
-  "~"   { symbolToken POLike }
-  "^~"  { symbolToken PONotLike }
-  "@"   { symbolToken POAnyOf }
-  "^@"  { symbolToken PONoneOf }
-  "~@"  { symbolToken POLikeAnyOf }
-  "^~@" { symbolToken POLikeNoneOf }
-
   "and" { symbolToken TAnd }
   "anything" { symbolToken TAnything }
   "count" { symbolToken TCount }
+  "except"   { symbolToken TExcept }
   "expectation" { symbolToken TExpectation }
   "false" { symbolToken TFalse }
+  "in"   { symbolToken TIn }
+  "like"   { symbolToken TLike }
   "literal" { symbolToken TLiteral }
   "logic" { symbolToken TLogic }
   "math" { symbolToken TMath }
@@ -106,14 +101,7 @@ tokens :-
 
 {
 data Token
-  = POAnyOf
-  | POExcept
-  | POLike
-  | POLikeAnyOf
-  | POLikeNoneOf
-  | PONoneOf
-  | PONotLike
-  | TAnd
+  = TAnd
   | TAnything
   | TAtLeast
   | TAtMost
@@ -127,10 +115,13 @@ data Token
   | TCount
   | TEOF
   | TExactly
+  | TExcept
   | TExpectation
   | TFalse
   | TIdentifier { identifierValue :: String }
+  | TIn
   | TLeast
+  | TLike
   | TLiteral
   | TLogic
   | TMath

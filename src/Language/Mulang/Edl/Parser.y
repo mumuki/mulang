@@ -19,7 +19,7 @@ import           Control.Monad.Error
 %token
 
   and { TAnd {} }
-  anyOf { POAnyOf {} }
+  in { TIn {} }
   anything { TAnything {} }
   atLeast { TAtLeast {} }
   atMost { TAtMost {} }
@@ -32,21 +32,17 @@ import           Control.Monad.Error
   cor { TCOr {} }
   count { TCount {} }
   exactly { TExactly {} }
-  except { POExcept {} }
+  except { TExcept {} }
   expectation { TExpectation {} }
   false { TFalse {} }
   identifier { TIdentifier {} }
-  like { POLike {} }
-  likeAnyOf { POLikeAnyOf {} }
-  likeNoneOf { POLikeNoneOf {} }
+  like { TLike {} }
   literal { TLiteral {} }
   logic { TLogic {} }
   math { TMath {} }
   nil { TNil {} }
-  noneOf { PONoneOf {} }
   nonliteral { TNonliteral {} }
   not { TNot {} }
-  notLike { PONotLike {} }
   number { TNumber {} }
   openParen  { TOpenParen {} }
   or { TOr {} }
@@ -139,11 +135,11 @@ Predicate : { Any }
  | symbol { (Named . symbolValue) $1 }
  | except symbol { (Except . symbolValue) $2 }
  | like symbol { (Like . symbolValue) $2 }
- | notLike symbol { (NotLike . symbolValue) $2 }
- | anyOf openParen Symbols closeParen  { (AnyOf . map symbolValue) $3 }
- | noneOf openParen Symbols closeParen  { (NoneOf . map symbolValue) $3 }
- | likeAnyOf openParen Symbols closeParen  { (LikeAnyOf . map symbolValue) $3 }
- | likeNoneOf openParen Symbols closeParen  { (LikeNoneOf . map symbolValue) $3 }
+ | except like symbol { (NotLike . symbolValue) $3 }
+ | in openParen Symbols closeParen  { (AnyOf . map symbolValue) $3 }
+ | except in openParen Symbols closeParen  { (NoneOf . map symbolValue) $4 }
+ | like in openParen Symbols closeParen  { (LikeAnyOf . map symbolValue) $4 }
+ | except like in  openParen Symbols closeParen  { (LikeNoneOf . map symbolValue) $5 }
 
 Symbols :: { [Token] }
 Symbols : symbol { [$1] }
@@ -179,18 +175,17 @@ Clause : number { IsNumber . numberValue $ $1 }
 {
 parseError token = throwError ("Parse Error: " ++ m token)
 
+predicateOperatorError operator = unlines [
+    "Predicate operator " ++ operator ++ " is not expected here.",
+    "Remember it must be used after the inspection.",
+    "Valid forms are `except`, `like`, `except like`, `in`, `except in`, `like in`, `except like in`"
+  ]
+
 m (TChar v) = "char " ++ show v ++ " is not expected here"
 m (TIdentifier id) = "Unexpected keyword " ++ id
 m (TNumber v) = "number " ++ show v ++ " is not expected here"
 m (TString v) = "string " ++ show v ++ " is not expected here"
 m (TSymbol v) = "symbol " ++ v ++ " is not expected here"
-m POAnyOf = "predicate operator `any of` (`@`) is not expected here"
-m POExcept = "predicate operator `except` (`^`) is not expected here"
-m POLike = "predicate operator `like` (`~`) is not expected here"
-m POLikeAnyOf = "predicate operator `like any of` (`~@`) is not expected here"
-m POLikeNoneOf = "predicate operator `like none of` (`^~@`) is not expected here"
-m PONoneOf = "predicate operator `none of` (`^@`) is not expected here"
-m PONotLike = "predicate operator `not like` (`^~`) is not expected here"
 m TAnd = "and is not expected here"
 m TAnything = "anything is not expected here"
 m TAtLeast = "least is not expected here"
@@ -203,7 +198,10 @@ m TCOr = "|| is not expected here"
 m TCount = "count is not expected here"
 m TEOF = "Unexpected end of file"
 m TExactly = "exactly is not expected here"
+m TExcept = predicateOperatorError "except"
 m TFalse = "false is not expected here"
+m TIn = predicateOperatorError "in"
+m TLike = predicateOperatorError "like"
 m TLiteral = "literal is not expected here"
 m TLogic = "logic is not expected here"
 m TMath = "math is not expected here"

@@ -42,12 +42,15 @@ compileCQuery (verb:object:args)            = Inspection verb (compileBinding ob
 
 compileBinding :: String -> Predicate
 compileBinding "*"          = Any
-compileBinding ('~':name)   = Like name
-compileBinding ('=':name)   = Named name
-compileBinding ('^':'[':ns) | last ns == ']' = compileBindings NoneOf ns
-compileBinding ('^':name)   = Except name
-compileBinding ('[':ns)     | last ns == ']' = compileBindings AnyOf ns
-compileBinding name         = Named name
+compileBinding ('^':'~':'[':ns) | last ns == ']' = compileBindings LikeNoneOf ns
+compileBinding ('~':'[':ns) | last ns == ']'     = compileBindings LikeAnyOf ns
+compileBinding ('^':'[':ns) | last ns == ']'     = compileBindings NoneOf ns
+compileBinding ('[':ns)     | last ns == ']'     = compileBindings AnyOf ns
+compileBinding ('^':'~':name)                    = NotLike name
+compileBinding ('^':name)                        = Except name
+compileBinding ('~':name)                        = Like name
+compileBinding ('=':name)                        = Named name
+compileBinding name                              = Named name
 
 compileBindings f = f . splitOn "|" . init
 
