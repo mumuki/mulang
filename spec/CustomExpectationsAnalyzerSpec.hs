@@ -170,3 +170,49 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "" "expectation: uses if") `shouldReturn` nok
     (run JavaScript "if (true) {}" "expectation: uses if") `shouldReturn` ok
 
+  it "evaluates usesNot" $ do
+    let test = "expectation: usesNot"
+
+    (run Prolog "" test) `shouldReturn` nok
+    (run Prolog "foo(X):-bar(X)." test) `shouldReturn` nok
+    (run Prolog "foo(X):-not(bar(X))." test) `shouldReturn` ok
+
+  it "evaluates uses not" $ do
+    let test = "expectation: uses not"
+
+    (run Prolog "" test) `shouldReturn` nok
+    (run Prolog "foo(X):-bar(X)." test) `shouldReturn` nok
+    (run Prolog "foo(X):-not(bar(X))." test) `shouldReturn` ok
+
+  it "evaluates uses `not`" $ do
+    -- (run Haskell "x = not y" "expectation: uses `not`") `shouldReturn` nok
+    pendingWith "autocorrector does not work with EDL"
+
+  it "evaluates uses `!`" $ do
+    -- (run JavaScript "var x = ! y" "expectation: uses `!`") `shouldReturn` nok
+    pendingWith "autocorrector does not work with EDL"
+
+  it "evaluates uses negation" $ do
+    let test = "expectation: uses negation"
+
+    (run Haskell "" test) `shouldReturn` nok
+    (run Haskell "x = not y" test) `shouldReturn` ok
+    (run Haskell "x = y" test) `shouldReturn` nok
+
+  it "evaluates UsesNegation" $ do
+    let test = "expectation: UsesNegation"
+
+    (run Haskell "" test) `shouldReturn` nok
+    (run Haskell "x = not y" test) `shouldReturn` ok
+    (run Haskell "x = y" test) `shouldReturn` nok
+
+  it "evaluates uses and" $ do
+    let test = "expectation: uses and"
+
+    (run Haskell "" test) `shouldReturn` nok
+    (run Haskell "x = y && z" test) `shouldReturn` ok
+    (run Haskell "x = y" test) `shouldReturn` nok
+
+  it "evaluates uses `&&`" $ do
+    -- (run Haskell "x = y && x" "expectation: uses `&&`") `shouldReturn` ok
+    pendingWith "autocorrector does not work with EDL"
