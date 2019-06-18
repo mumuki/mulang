@@ -101,36 +101,30 @@ expectation "assignment a variable similar to `amount`":
   %% equivalent to * Assigns:~amount
   assigns something like `amount`;
 
-expectation "declares methods apart from getters":
-  %% equivalent to * DeclaresMethod:^~get
-  declares method except like `get`;
-
-expectation "must declare something aside of `Pet`":
-  %% equivalent to * Declares:^Pet
-  declares something except `Pet`;
-
 expectation "must declare a class aside of `Dog`":
   %% equivalent to * DeclaresClass:^Dog
   declares class except `Dog`;
+```
+
+Also, there EDL exposes more predicates:
+
+```
+expectation "declares methods apart from getters":
+  declares method except like `get`;
 
 expectation "must declare `feed` or `bark`":
-  %% equivalent to * DeclaresMethod:[feed|bark]
   declares method in (`feed`, `bark`);
 
 expectation "must call `feed` or `bark`":
-  %% equivalent to * Calls:[feed|bark]
   calls something in (`feed`, `bark`);
 
 expectation "must call something similar to `feed` or `bark`":
-  %% equivalent to * Calls:~[feed|bark]
   calls something like in (`feed`, `bark`);
 
 expectation "must call something apart from `feed` or `bark`":
-  %% equivalent to * Calls:^[feed|bark]
   calls something except in (`feed`, `bark`);
 
 expectation "must declare something apart from classes like `Base` or `Abstract`":
-  %% equivalent to * DeclaresClass:^~[feed|bark]
   declares class except like in (`Base`, `Abstract`);
 ```
 

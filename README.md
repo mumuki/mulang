@@ -330,10 +330,14 @@ Many inspections support an _identifier predicate_, that is, a matcher for ident
 
 * `anyone`: true for all identifiers
 * `except`: true for any identifier different to the given one
-* `like`: true for any identifier that contains the given one
+* `like`: true for any identifier that contains the given one, ignoring case
+* `notLike`: false for any identifier that contains the given one, ignoring case
 * `named`: true for only the given identifier
+* `anyOf`: true for any identifier that is equal to any of the given ones
+* `noneOf`: true for any identifier that is different to all of the given ones
+* `likeAnyOf`: true for any identifier that is like to any of the given ones
+* `likeNoneOf`: true for any identifier that is not like to all of the given ones
 * `andAlso`: identifier predicates combiner. True when both predicates are True
-* `anyOf`: identifier predicates combiner. True when any of the predicates are True
 
 For example, does the former piece of code declare any attribute?
 
@@ -541,11 +545,6 @@ In order to pass expectations to the Command Line Tool, you must use a simple DS
 |                   | `* DeclaresClass:=Foo`             | `(declaresClass (named "Foo"))`
 |                   | `* DeclaresClass:~Foo`             | `(declaresClass (like "Foo"))`
 |                   | `* DeclaresClass:^Foo`             | `(declaresClass (except "Foo"))`
-|                   | `* DeclaresClass:^~Foo`            | `(declaresClass (notLike "Foo"))`
-|                   | `* DeclaresClass:[Foo\|Bar]`       | `(declaresClass (anyOf ["Foo", "Bar"]))`
-|                   | `* DeclaresClass:^[Foo\|Bar]`      | `(declaresClass (noneOf ["Foo", "Bar"]))`
-|                   | `* DeclaresClass:~[Foo\|Bar]`      | `(declaresClass (likeAnyOf ["Foo", "Bar"]))`
-|                   | `* DeclaresClass:^~[Foo\|Bar]`     | `(declaresClass (likeNoneOf ["Foo", "Bar"]))`
 |                   | `* DeclaresClass:*`                | `(declaresClass anyone)`
 |                   | `* DeclaresClass`                  | `(declaresClass anyone)`
 | Matching Literals | `* Calls:*:WithChar:'a':WithTrue`  | `(callsMatching (withEvery [isChar 'a', isBool True]) anyone)`
