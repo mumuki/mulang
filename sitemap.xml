@@ -2,27 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
      <loc>https://mumuki.io/</loc>
-     <lastmod>2019-01-10</lastmod>
+     <lastmod>2019-06-23</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://mumuki.io/try/</loc>
-     <lastmod>2019-01-10</lastmod>
+     <lastmod>2019-06-23</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://mumuki.io/userguide/</loc>
-     <lastmod>2019-01-10</lastmod>
+     <lastmod>2019-06-23</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://mumuki.io/astspec/</loc>
-     <lastmod>2019-01-10</lastmod>
+     <lastmod>2019-06-23</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://mumuki.io/build/</loc>
-     <lastmod>2019-01-10</lastmod>
+     <lastmod>2019-06-23</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>

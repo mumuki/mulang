@@ -9325,6 +9325,82 @@ pre code {
     .new-message-modal .mu-message-textarea:focus {
       outline: -webkit-focus-ring-color none 0; }
 
+.mu-multiple-scenarios {
+  display: flex;
+  flex-direction: column; }
+  .mu-multiple-scenarios .mu-scenarios {
+    position: relative;
+    flex-grow: 9;
+    min-height: 90%;
+    height: 100%;
+    overflow: hidden; }
+    .mu-multiple-scenarios .mu-scenarios a.mu-scenario-control {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+      justify-content: center;
+      width: 15%;
+      text-align: center;
+      opacity: 0.8;
+      color: #0B465D;
+      text-decoration: none; }
+      .mu-multiple-scenarios .mu-scenarios a.mu-scenario-control i {
+        cursor: pointer;
+        padding: 15px; }
+      .mu-multiple-scenarios .mu-scenarios a.mu-scenario-control.previous {
+        left: 0; }
+      .mu-multiple-scenarios .mu-scenarios a.mu-scenario-control.next {
+        right: 0; }
+  .mu-multiple-scenarios .indicators {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    padding-left: 0;
+    margin-right: 15%;
+    margin-left: 15%;
+    list-style: none;
+    margin-bottom: 0; }
+    .mu-multiple-scenarios .indicators li {
+      position: relative;
+      -webkit-box-flex: 0;
+      -ms-flex: 0 1 auto;
+      flex: 0 1 auto;
+      margin: 10px 5px;
+      opacity: 0.5;
+      color: #0B465D;
+      cursor: pointer; }
+      .mu-multiple-scenarios .indicators li.jump {
+        -webkit-animation: jump 1s ease-in-out infinite alternate;
+        -moz-animation: jump 1s ease-in-out infinite alternate;
+        animation: jump 1s ease-in-out infinite alternate; }
+    .mu-multiple-scenarios .indicators > li:only-child {
+      display: none; }
+    .mu-multiple-scenarios .indicators li.active {
+      opacity: 1; }
+
+@keyframes jump {
+  0% {
+    transform: none; }
+  50% {
+    transform: translateY(-0.5em); } }
+    .mu-multiple-scenarios .indicators .failed {
+      color: #d9534f; }
+    .mu-multiple-scenarios .indicators .passed {
+      color: #5cb85c; }
+  .mu-multiple-scenarios .mu-scenario:not(.active) {
+    display: none !important; }
+
 .mu-navbar {
   display: flex;
   flex-flow: row;
@@ -9397,6 +9473,9 @@ pre code {
       border-radius: 50%;
       object-fit: cover;
       cursor: pointer; }
+
+.da-mumuki {
+  text-decoration: none; }
 
 .pointer {
   cursor: pointer; }

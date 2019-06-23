@@ -19,19 +19,30 @@ command -v unzip >/dev/null 2>&1 || {
 DOCSDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 echo "[Mulang::Docs] Cleaning up resources..."
-rm -f ${DOCSDIR}/js/mulang.js
-rm -f ${DOCSDIR}/js/mumuk-styles.js
-rm -f ${DOCSDIR}/css/mumuki-styles.js
+rm -f  ${DOCSDIR}/js/mulang.js
+rm -f  ${DOCSDIR}/js/mumuk-styles.js
+rm -f  ${DOCSDIR}/css/mumuki-styles.js
+rm -rf ${DOCSDIR}/themes/cinder/
 
 echo "[Mulang::Docs] Installing mulang.js..."
-TMPFILE=mulang.js.zip
-wget https://github.com/mumuki/mulang/releases/download/v4.2.0/mulang.js.zip -O ${TMPFILE}
-unzip -d ${DOCSDIR}/js ${TMPFILE}
-rm ${TMPFILE}
+MULANG_TMPFILE=mulang.js.zip
+MULANG_VERSION=4.5.3
+wget https://github.com/mumuki/mulang/releases/download/v${MULANG_VERSION}/mulang.js.zip -O ${MULANG_TMPFILE}
+unzip -d ${DOCSDIR}/js ${MULANG_TMPFILE}
+rm ${MULANG_TMPFILE}
 
 echo "[Mulang::Docs] Installing mumuki-styles..."
 wget https://raw.githubusercontent.com/mumuki/mumuki-styles/master/dist/css/mumuki-styles.css -O ${DOCSDIR}/css/mumuki-styles.css
 wget https://raw.githubusercontent.com/mumuki/mumuki-styles/master/dist/javascripts/mumuki-styles.js -O ${DOCSDIR}/js/mumuki-styles.js
+
+echo "[Mulang::Docs] Installing cinder theme..."
+CINDER_TMPFILE=cinder.zip
+CINDER_VERSION=0.17.0
+wget https://github.com/chrissimpkins/cinder/archive/v${CINDER_VERSION}.zip -O ${CINDER_TMPFILE}
+unzip ${CINDER_TMPFILE} "cinder-${CINDER_VERSION}/cinder/*" -d ${DOCSDIR}/themes/
+mv ${DOCSDIR}/themes/cinder-${CINDER_VERSION}/cinder/ ${DOCSDIR}/themes/
+rmdir ${DOCSDIR}/themes/cinder-${CINDER_VERSION}/
+rm ${CINDER_TMPFILE}
 
 echo "[Mulang::Docs] Building the docs for first time..."
 mkdocs build
