@@ -1,0 +1,28 @@
+div.bs-sidebar.hidden-print.affix.well{ display: none; }
+.col-md-3{display: none;}
+.col-md-9{width: 100%}
+
+#try-container{
+  display: flex;
+  flex-direction: row;
+  height: 600px;
+}
+
+#jsoneditor {
+  display: flex;
+  flex: 1;
+}
+
+#result {
+  display: flex;
+  flex: 1;
+  margin-left: 16px;
+}
+
+.examples-container {
+}
+
+#analyse-button {
+  float: right;
+  font-size: 16pt;
+}

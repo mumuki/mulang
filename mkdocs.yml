@@ -1,0 +1,23 @@
+site_name: Mulang
+site_url: https://mumuki.io
+nav:
+  - Home: index.md
+  - Try it!: try.md
+  - User Guide: userguide.md
+  - AST Spec: astspec.md
+  - Build: build.md
+extra_css:
+  - "css/mumuki-styles.css"
+  - "css/jquery.json-viewer.css"
+  - "css/jsoneditor.min.css"
+  - "css/docstyles.css"
+extra_javascript:
+  - "js/mumuki-styles.js"
+  - "js/mulang.js"
+  - "js/jquery.json-viewer.js"
+  - "js/jsoneditor.min.js"
+repo_url: "https://github.com/mumuki/mulang"
+copyright: '© Copyright 2015-2018 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a>'
+theme:
+  name: null
+  custom_dir: 'docs/themes/cinder'
