@@ -50,6 +50,7 @@ import           Control.Monad.Error
   self { TSelf {} }
   semi { TSemi {} }
   something { TSomething {} }
+  somewhere { TSomewhere {} }
   string { TString {} }
   symbol { TSymbol {} }
   that { TThat {} }
@@ -82,7 +83,8 @@ TopQuery : Query { $1 }
   | CQuery { Decontextualize $1 }
 
 Query :: { Query }
-Query : within symbol CQuery { Within (symbolValue $2) $3 }
+Query : somewhere CQuery { Decontextualize $2 }
+  | within symbol CQuery { Within (symbolValue $2) $3 }
   | through symbol CQuery { Through (symbolValue $2) $3 }
   | not openParen Query closeParen { Not $3 }
   | openParen Query closeParen or openParen Query closeParen { Or $2 $6 }
@@ -221,6 +223,7 @@ m TOr = "or is not expected here"
 m TSelf = "self is not expected here"
 m TSemi = "Unexpected ;"
 m TSomething = "something is not expected here"
+m TSomewhere = "somewhere is not expected here"
 m TThat = "that is not expected here"
 m TThrough = scopeOperatorError "through"
 m TTrue = "true is not expected here"

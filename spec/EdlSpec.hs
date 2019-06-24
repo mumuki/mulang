@@ -82,6 +82,8 @@ spec = do
     test "(within `f` calls) and (within `g` returns)" (And (Within "f" (Inspection "calls" Any Unmatching)) (Within "g" (Inspection "returns" Any Unmatching)))
     test "calls && returns" (Decontextualize (CAnd (Inspection "calls" Any Unmatching) (Inspection "returns" Any Unmatching)))
     test "(calls) && (returns)" (run "calls && returns")
+    test "(somewhere calls) and (somewhere returns)" (And (Decontextualize (Inspection "calls" Any Unmatching)) (Decontextualize (Inspection "returns" Any Unmatching)))
+    test "(somewhere calls) or (somewhere returns)" (Or (Decontextualize (Inspection "calls" Any Unmatching)) (Decontextualize (Inspection "returns" Any Unmatching)))
 
     test "within `vet` declares enumeration `Pet` || declares class `Pet` || declares interface `Pet`" (run "within `vet` (declares enumeration `Pet`) || (declares class `Pet`) || (declares interface `Pet`)")
 

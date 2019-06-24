@@ -91,6 +91,7 @@ tokens :-
   "or" { symbolToken TOr }
   "self" { symbolToken TSelf }
   "something" { symbolToken TSomething }
+  "somewhere" { symbolToken TSomewhere }
   "that" { symbolToken TThat }
   "through" { symbolToken TThrough }
   "true" { symbolToken TTrue }
@@ -136,6 +137,7 @@ data Token
   | TSelf
   | TSemi
   | TSomething
+  | TSomewhere
   | TString { stringValue :: String }
   | TSymbol { symbolValue :: String }
   | TThat

@@ -8,6 +8,7 @@
     "like",
     "unlike",
     "something",
+    "somewhere",
     "expectation",
     "that",
     "through",
