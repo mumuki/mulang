@@ -182,6 +182,13 @@ predicateOperatorError operator = unlines [
     "Valid forms are `except`, `like`, `unlike`, `in`, `except in`, `like in`, `unlike in`"
   ]
 
+
+scopeOperatorError operator = unlines [
+    "Scope operator " ++ operator ++ " is not expected here.",
+    "Remember it must be the first part of an scoped query.",
+    "For example "++ operator ++" `foo` assigns `bar`"
+  ]
+
 m (TChar v) = "char " ++ show v ++ " is not expected here"
 m (TIdentifier id) = "Unexpected keyword " ++ id
 m (TNumber v) = "number " ++ show v ++ " is not expected here"
@@ -215,11 +222,11 @@ m TSelf = "self is not expected here"
 m TSemi = "Unexpected ;"
 m TSomething = "something is not expected here"
 m TThat = "that is not expected here"
-m TThrough = "through is not expected here"
+m TThrough = scopeOperatorError "through"
 m TTrue = "true is not expected here"
 m TUnlike = predicateOperatorError "unlike"
 m TWith = "with is not expected here"
-m TWithin = "within is not expected here"
+m TWithin = scopeOperatorError "within"
 m x =  "Unexpected " ++ show x
 
 
