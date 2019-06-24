@@ -41,12 +41,11 @@ compileCQuery (verb:"WithSymbol":args)      = compileCQuery (verb:"*":"WithSymbo
 compileCQuery (verb:object:args)            = Inspection verb (compileBinding object) (compileMatcher args)
 
 compileBinding :: String -> Predicate
-compileBinding "*"        = Any
-compileBinding ('~':name) = Like name
-compileBinding ('=':name) = Named name
-compileBinding ('^':name) = Except name
-compileBinding ('[':ns)   | last ns == ']' = AnyOf . splitOn "|" . init $ ns
-compileBinding name       = Named name
+compileBinding "*"          = Any
+compileBinding ('^':name)   = Except name
+compileBinding ('~':name)   = Like name
+compileBinding ('=':name)   = Named name
+compileBinding name         = Named name
 
 compileMatcher :: [String] -> Matcher
 compileMatcher = matching . f

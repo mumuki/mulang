@@ -3,11 +3,12 @@
 
   var keywords = [
     "count",
-    "distinct",
+    "except",
     "in",
     "like",
-    "of",
+    "unlike",
     "something",
+    "somewhere",
     "expectation",
     "that",
     "through",

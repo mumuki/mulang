@@ -77,24 +77,25 @@ tokens :-
   "and" { symbolToken TAnd }
   "anything" { symbolToken TAnything }
   "count" { symbolToken TCount }
-  "distinct" { symbolToken TDistinct }
+  "except"   { symbolToken TExcept }
   "expectation" { symbolToken TExpectation }
   "false" { symbolToken TFalse }
-  "in" { symbolToken TIn }
-  "like" { symbolToken TLike }
+  "in"   { symbolToken TIn }
+  "like"   { symbolToken TLike }
   "literal" { symbolToken TLiteral }
   "logic" { symbolToken TLogic }
   "math" { symbolToken TMath }
   "nil" { symbolToken TNil }
   "nonliteral" { symbolToken TNonliteral }
   "not" { symbolToken TNot }
-  "of" { symbolToken TOf }
   "or" { symbolToken TOr }
   "self" { symbolToken TSelf }
   "something" { symbolToken TSomething }
+  "somewhere" { symbolToken TSomewhere }
   "that" { symbolToken TThat }
   "through" { symbolToken TThrough }
   "true" { symbolToken TTrue }
+  "unlike"   { symbolToken TUnlike }
   "with" { symbolToken TWith }
   "within" { symbolToken TWithin }
 
@@ -114,9 +115,10 @@ data Token
   | TComma
   | TCOr
   | TCount
-  | TDistinct
   | TEOF
   | TExactly
+  | TExcept
+  | TExpectation
   | TFalse
   | TIdentifier { identifierValue :: String }
   | TIn
@@ -129,19 +131,19 @@ data Token
   | TNonliteral
   | TNot
   | TNumber { numberValue :: Double }
-  | TOf
   | TOpenParen
   | TOr
   | TPlus
   | TSelf
   | TSemi
   | TSomething
+  | TSomewhere
   | TString { stringValue :: String }
   | TSymbol { symbolValue :: String }
-  | TExpectation
   | TThat
   | TThrough
   | TTrue
+  | TUnlike
   | TWith
   | TWithin
   deriving (Eq,Show)
@@ -190,7 +192,7 @@ tokens = loop . encode
 type Action = String -> P Token
 
 readFloat :: String -> Double
-readFloat str@('.':cs) = read ('0':readFloatRest str)
+readFloat str@('.':_) = read ('0':readFloatRest str)
 readFloat str = read (readFloatRest str)
 readFloatRest :: String -> String
 readFloatRest [] = []

@@ -45,8 +45,12 @@ data Predicate
   = Any
   | Named String
   | Like String
+  | Unlike String
   | Except String
   | AnyOf [String]
+  | NoneOf [String]
+  | LikeAnyOf [String]
+  | LikeNoneOf [String]
   deriving (Eq, Show, Generic)
 
 data Matcher

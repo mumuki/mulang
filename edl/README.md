@@ -17,7 +17,7 @@ expectation:
   calls;
 ```
 
-This expectation simple checks that something is called - like a function, a procedure - and it behaves exactly as the `* Calls:*` expectation.
+This expectation performs a simple _query_ that checks that something is called - like a function, a procedure - and it behaves exactly as the `* Calls:*` expectation.
 
 If you want to make it more explicit that you are expecting to call _something_, you can also write it this way...
 
@@ -101,26 +101,36 @@ expectation "assignment a variable similar to `amount`":
   %% equivalent to * Assigns:~amount
   assigns something like `amount`;
 
-expectation "must declare something aside of `Pet`":
-  %% equivalent to * Declares:^Pet
-  declares something distinct of `Pet`;
-
 expectation "must declare a class aside of `Dog`":
   %% equivalent to * DeclaresClass:^Dog
-  declares class distinct of `Dog`;
+  declares class except `Dog`;
+```
+
+Also, there EDL exposes more predicates:
+
+```
+expectation "declares methods apart from getters":
+  declares method unlike `get`;
 
 expectation "must declare `feed` or `bark`":
-  %% equivalent to * DeclaresMethod:[feed|bark]
   declares method in (`feed`, `bark`);
 
 expectation "must call `feed` or `bark`":
-  %% equivalent to * Calls:[feed|bark]
   calls something in (`feed`, `bark`);
+
+expectation "must call something similar to `feed` or `bark`":
+  calls something like in (`feed`, `bark`);
+
+expectation "must call something apart from `feed` or `bark`":
+  calls something except in (`feed`, `bark`);
+
+expectation "must declare something apart from classes like `Base` or `Abstract`":
+  declares class unlike in (`Base`, `Abstract`);
 ```
 
-## Boolean operators on unscoped inspections
+## Boolean operators on unscoped queries
 
-EDL allows to use logical operations with - _unscoped_, more on that later - inspections:
+EDL allows to use logical operations with - _unscoped_, more on that later - queries:
 
 ```
 %% negation
@@ -169,8 +179,10 @@ expectation "`HouseBuilder.builder` must create a new `House`":
 
 expectation "In the context of `Tree`, something other than `foo` is called":
   %% equivalent to Tree Calls:^foo
-  through `Tree` calls something distinct of `foo`;
+  through `Tree` calls something except `foo`;
 ```
+
+Queries that use a scope operator are called _scoped queries_. Conversely _unscoped queries_ are those that don't use one.
 
 ## Matchers
 
@@ -286,7 +298,7 @@ This is the complete list of inspections that support matchers:
 
 ## Counters
 
-EDL allows you to define expectations by counting and comparing matches of another inspection, by using the `count`, `=`, `>=` and `<=` operators:
+EDL allows you to define expectations by counting and comparing matches of another query, by using the `count`, `=`, `>=` and `<=` operators:
 
 ```
 expectation "must perform at least three calls":
@@ -310,7 +322,7 @@ expectation "The `Bar` must declare 4 or more methods related to beer or whisky"
   count (declares method like `whisky`) + count (declares method like `beer`) >= 4;
 ```
 
-## Supported counters
+### Supported counters
 
 Not all inspections can be counted. Currently, only the following are supported:
 
@@ -324,3 +336,32 @@ Not all inspections can be counted. Currently, only the following are supported:
 * `declares object`
 * `declares procedure`
 * `declares variable`
+
+## Boolean operators on scoped queries
+
+Finally, EDL allows to use logical operations with scoped queries:
+
+```
+%% negation
+
+expectation "must not assign anything in `main`":
+  not (within 'main' assigns);
+
+%% logical-or
+
+expectation "pacakge `vet` must declare a class, enum or interface named `Pet`":
+  (within `vet` declares enumeration `Pet`)
+  or (within `vet` declares class `Pet`)
+  or (within `vet` declares interface `Pet`);
+
+%% alternate definition, which is equivalent provided package `vet` exists
+expectation "pacakge `vet` must declare a class, enum or interface named `Pet`":
+  within `vet` declares enumeration `Pet` || declares class `Pet` || declares interface `Pet`;
+
+%% logical-and
+
+expectation "`Pet` must declare `eat` and `Owner` must send it":
+  %% however in most cases, it is better to declare two different, separate
+  %% expectations
+  (within `Pet` declares `eat`) and (within `Owner` sends `eat`);
+```

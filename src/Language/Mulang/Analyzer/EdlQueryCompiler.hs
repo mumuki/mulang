@@ -54,11 +54,15 @@ compileTQuery pm (E.Counter i p m) = ($ (compilePredicate pm p)) <$> compileCoun
 compileTQuery pm (E.Plus q1 q2)    = contextualized2 plus        <$> (compileTQuery pm q1) <*> (compileTQuery pm q2)
 
 compilePredicate :: (IdentifierPredicate -> IdentifierPredicate) -> E.Predicate -> IdentifierPredicate
-compilePredicate p E.Any           = p $ anyone
-compilePredicate p (E.Like name)   = p $ like name
-compilePredicate _ (E.Named name)  = named name
-compilePredicate _ (E.Except name) = except name
-compilePredicate _ (E.AnyOf ns)    = anyOf ns
+compilePredicate p E.Any             = p $ anyone
+compilePredicate _ (E.Named name)    = named name
+compilePredicate p (E.Except name)   = p $ except name
+compilePredicate p (E.Like name)     = p $ like name
+compilePredicate p (E.Unlike name)   = p $ unlike name
+compilePredicate _ (E.AnyOf ns)      = anyOf ns
+compilePredicate p (E.NoneOf ns)     = p $ noneOf ns
+compilePredicate p (E.LikeAnyOf ns)  = p $ likeAnyOf ns
+compilePredicate p (E.LikeNoneOf ns) = p $ likeNoneOf ns
 
 
 compileVerb :: String -> String

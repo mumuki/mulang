@@ -309,12 +309,23 @@ spec = do
     it "is True when present" $ do
       declaresMethod (named "x") (js "var f = {x: function(){}}")  `shouldBe` True
 
-    it "is True when present anyOf Identifiers" $ do
-      declaresMethod (anyOf ["x", "y"]) (js "var f = {x: function(){}}")  `shouldBe` True
-      declaresMethod (anyOf ["x", "y"]) (js "var f = {y: function(){}}")  `shouldBe` True
+    it "is works with except" $ do
+      declaresMethod (except "x") (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (except "a") (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (except "y") (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (except "b") (js "var obj = {b: function(){}}")  `shouldBe` False
 
-    it "is True when not present anyOf Identifiers" $ do
-      declaresMethod (anyOf ["x", "y"]) (js "var f = {z: function(){}}")  `shouldBe` False
+    it "is works with anyOf" $ do
+      declaresMethod (anyOf ["x", "y"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` False
+      declaresMethod (anyOf ["a", "y"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (anyOf ["x", "b"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (anyOf ["a", "b"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+
+    it "is works with noneOf" $ do
+      declaresMethod (noneOf ["x", "y"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (noneOf ["x", "b"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (noneOf ["a", "y"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (noneOf ["a", "b"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` False
 
     it "is True when any present" $ do
       declaresMethod anyone (js "var f = {x: function(){}}")  `shouldBe` True

@@ -1,9 +1,13 @@
 module Language.Mulang.Identifier (
-  anyOf,
   anyone,
+  named,
   except,
   like,
-  named,
+  unlike,
+  anyOf,
+  noneOf,
+  likeAnyOf,
+  likeNoneOf,
   Identifier,
   IdentifierPredicate) where
 
@@ -16,11 +20,11 @@ import Data.Function (on)
 type Identifier = String
 type IdentifierPredicate = Identifier -> Bool
 
-anyOf :: [Identifier] -> IdentifierPredicate
-anyOf options identifier = any (== identifier) options
-
 anyone :: IdentifierPredicate
 anyone = const True
+
+named :: String -> IdentifierPredicate
+named = (==)
 
 except :: String -> IdentifierPredicate
 except = (/=)
@@ -28,5 +32,17 @@ except = (/=)
 like :: String -> IdentifierPredicate
 like = on isInfixOf (map toLower)
 
-named :: String -> IdentifierPredicate
-named = (==)
+unlike :: String -> IdentifierPredicate
+unlike identifier = not . like identifier
+
+anyOf :: [Identifier] -> IdentifierPredicate
+anyOf options identifier = any (== identifier) options
+
+noneOf :: [Identifier] -> IdentifierPredicate
+noneOf options = not . anyOf options
+
+likeAnyOf :: [Identifier] -> IdentifierPredicate
+likeAnyOf options identifier = any (`like` identifier) options
+
+likeNoneOf :: [Identifier] -> IdentifierPredicate
+likeNoneOf options = not . likeAnyOf options
