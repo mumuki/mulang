@@ -94,6 +94,7 @@ tokens :-
   "that" { symbolToken TThat }
   "through" { symbolToken TThrough }
   "true" { symbolToken TTrue }
+  "unlike"   { symbolToken TUnlike }
   "with" { symbolToken TWith }
   "within" { symbolToken TWithin }
 
@@ -140,6 +141,7 @@ data Token
   | TThat
   | TThrough
   | TTrue
+  | TUnlike
   | TWith
   | TWithin
   deriving (Eq,Show)

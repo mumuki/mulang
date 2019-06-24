@@ -30,7 +30,7 @@ spec = do
     test "calls something in (`foo`, `bar`, `baz`)" (simple "calls" (AnyOf ["foo", "bar", "baz"]))
     test "calls something like in (`foo`, `bar`, `baz`)" (simple "calls" (LikeAnyOf ["foo", "bar", "baz"]))
     test "calls something except in (`foo`, `bar`, `baz`)" (simple "calls" (NoneOf ["foo", "bar", "baz"]))
-    test "calls something except like in (`foo`, `bar`, `baz`)" (simple "calls" (LikeNoneOf ["foo", "bar", "baz"]))
+    test "calls something unlike in (`foo`, `bar`, `baz`)" (simple "calls" (LikeNoneOf ["foo", "bar", "baz"]))
 
     test "calls something" (run "calls")
 
@@ -231,7 +231,7 @@ spec = do
     test "expectation: declares function like `total` that (uses within)" "Parse Error: within is not expected here"
     test "expectation: declares class `Baz` exoctly 3 times" "Parse Error: Unexpected keyword exoctly"
     test "expectation: declares class `Baz`\n within `Baz` sends `foo`" "Parse Error: within is not expected here"
-    test "expectation: declares class `Baz` except like\n" "Parse Error: Predicate operator except is not expected here.\nRemember it must be used after the inspection.\nValid forms are `except`, `like`, `except like`, `in`, `except in`, `like in`, `except like in`\n"
+    test "expectation: declares class `Baz` except\n" "Parse Error: Predicate operator except is not expected here.\nRemember it must be used after the inspection.\nValid forms are `except`, `like`, `unlike`, `in`, `except in`, `like in`, `unlike in`\n"
     test "expectation: declares class `Baz` 3 times" "Parse Error: number 3.0 is not expected here"
     test "expectation: declares class `Baz` ! = 3 times" "Parse Error: ! is not expected here"
     test "expectation: declares class `Baz`;\n\

@@ -19,7 +19,6 @@ import           Control.Monad.Error
 %token
 
   and { TAnd {} }
-  in { TIn {} }
   anything { TAnything {} }
   atLeast { TAtLeast {} }
   atMost { TAtMost {} }
@@ -36,6 +35,7 @@ import           Control.Monad.Error
   expectation { TExpectation {} }
   false { TFalse {} }
   identifier { TIdentifier {} }
+  in { TIn {} }
   like { TLike {} }
   literal { TLiteral {} }
   logic { TLogic {} }
@@ -55,6 +55,7 @@ import           Control.Monad.Error
   that { TThat {} }
   through { TThrough {} }
   true { TTrue {} }
+  unlike { TUnlike {} }
   with { TWith {} }
   within { TWithin {} }
 
@@ -135,11 +136,11 @@ Predicate : { Any }
  | symbol { (Named . symbolValue) $1 }
  | except symbol { (Except . symbolValue) $2 }
  | like symbol { (Like . symbolValue) $2 }
- | except like symbol { (NotLike . symbolValue) $3 }
+ | unlike symbol { (NotLike . symbolValue) $2 }
  | in openParen Symbols closeParen  { (AnyOf . map symbolValue) $3 }
  | except in openParen Symbols closeParen  { (NoneOf . map symbolValue) $4 }
  | like in openParen Symbols closeParen  { (LikeAnyOf . map symbolValue) $4 }
- | except like in  openParen Symbols closeParen  { (LikeNoneOf . map symbolValue) $5 }
+ | unlike in openParen Symbols closeParen  { (LikeNoneOf . map symbolValue) $4 }
 
 Symbols :: { [Token] }
 Symbols : symbol { [$1] }
@@ -178,7 +179,7 @@ parseError token = throwError ("Parse Error: " ++ m token)
 predicateOperatorError operator = unlines [
     "Predicate operator " ++ operator ++ " is not expected here.",
     "Remember it must be used after the inspection.",
-    "Valid forms are `except`, `like`, `except like`, `in`, `except in`, `like in`, `except like in`"
+    "Valid forms are `except`, `like`, `unlike`, `in`, `except in`, `like in`, `unlike in`"
   ]
 
 m (TChar v) = "char " ++ show v ++ " is not expected here"
@@ -216,6 +217,7 @@ m TSomething = "something is not expected here"
 m TThat = "that is not expected here"
 m TThrough = "through is not expected here"
 m TTrue = "true is not expected here"
+m TUnlike = predicateOperatorError "unlike"
 m TWith = "with is not expected here"
 m TWithin = "within is not expected here"
 m x =  "Unexpected " ++ show x
