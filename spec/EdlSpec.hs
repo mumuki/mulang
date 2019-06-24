@@ -83,6 +83,7 @@ spec = do
     test "calls && returns" (Decontextualize (CAnd (Inspection "calls" Any Unmatching) (Inspection "returns" Any Unmatching)))
     test "(calls) && (returns)" (run "calls && returns")
 
+    test "within `vet` declares enumeration `Pet` || declares class `Pet` || declares interface `Pet`" (run "within `vet` (declares enumeration `Pet`) || (declares class `Pet`) || (declares interface `Pet`)")
 
     test "count(calls) >= 3 && count(returns) >= 4" (Decontextualize (CAnd (AtLeast 3 (Counter "calls" Any Unmatching)) (AtLeast 4 (Counter "returns" Any Unmatching))))
     test "(count(calls) >= 3) && (count(returns) >= 4)" (run "count(calls) >= 3 && count(returns) >= 4")
