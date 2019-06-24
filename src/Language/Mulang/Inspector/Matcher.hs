@@ -2,6 +2,7 @@ module Language.Mulang.Inspector.Matcher (
   unmatching,
   withEvery,
   with,
+  matches,
   Matcher) where
 
 import           Language.Mulang.Ast
@@ -21,3 +22,5 @@ withEvery inspections expressions = and (zipWith ($) inspections expressions)
 unmatching :: (Matcher -> b) -> b
 unmatching f = f (const True)
 
+matches :: Matcher -> (a -> [Expression]) -> a -> Bool
+matches matcher f = any (matcher.(:[])) . f

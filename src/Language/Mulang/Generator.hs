@@ -10,6 +10,9 @@ module Language.Mulang.Generator (
   referencedIdentifiers,
   identifierReferences,
   transitiveReferencedIdentifiers,
+  equationsExpressions,
+  statementsExpressions,
+  equationsExpandedExpressions,
   Generator,
   Declarator,
   Expression(..)) where
@@ -35,7 +38,7 @@ declarators e@(Clause n _ es)      = (n, e) : concatMap declarators es
 declarators e@(Enumeration n _)    = [(n, e)]
 declarators e@(Interface n _ b)    = (n, e) : declarators b
 declarators e@(EntryPoint n b)     = (n, e) : declarators b
-declarators e@(Subroutine n b)     = (n, e) : concatMap declarators (equationExpressions b)
+declarators e@(Subroutine n b)     = (n, e) : concatMap declarators (equationsExpressions b)
 declarators e@(Object n b)         = (n, e) : declarators b
 declarators e@(Clause n _ _)       = [(n, e)]
 declarators e@(Record n)           = [(n, e)]
@@ -64,7 +67,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Class _ _ v)           = [v]
     subExpressions (Clause _ _ es)         = es
     subExpressions (EntryPoint _ e)        = [e]
-    subExpressions (For stmts a)           = statementExpressions stmts ++ [a]
+    subExpressions (For stmts a)           = statementsExpressions stmts ++ [a]
     subExpressions (Forall e1 e2)          = [e1, e2]
     subExpressions (ForLoop i c p s)       = [i, c, p, s]
     subExpressions (If a b c)              = [a, b, c]
@@ -72,7 +75,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Include e)             = [e]
     subExpressions (Interface _ _ v)       = [v]
     subExpressions (Lambda _ a)            = [a]
-    subExpressions (Match e1 equations)    = e1:equationExpressions equations
+    subExpressions (Match e1 equations)    = e1:equationsExpressions equations
     subExpressions (MuList as)             = as
     subExpressions (MuObject es)           = [es]
     subExpressions (MuTuple as)            = as
@@ -84,7 +87,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Repeat e1 e2)          = [e1, e2]
     subExpressions (Return v)              = [v]
     subExpressions (Sequence es)           = es
-    subExpressions (Subroutine _ es)       = equationExpressions es
+    subExpressions (Subroutine _ es)       = equationsExpressions es
     subExpressions (Switch e1 list _)      = e1 : concatMap (\(x,y) -> [x,y]) list
     subExpressions (Try t cs f)            = t : map snd cs ++ [f]
     subExpressions (TypeCast e _)          = [e]
@@ -135,6 +138,12 @@ equationBodies = concatMap bodiesOf . declarations
 
     equationBodies = map (\(Equation _ body) -> body)
 
+equationsExpandedExpressions :: [Equation] -> [Expression]
+equationsExpandedExpressions = concatMap expand . equationsExpressions
+  where
+    expand (Sequence xs) = xs
+    expand other         = [other]
+
 declarationsOf :: Identifier -> Generator Expression
 declarationsOf b = boundDeclarations (named b)
 
@@ -143,12 +152,14 @@ extractReference (Reference n)        = Just n
 extractReference (Exist n _)          = Just n
 extractReference _                    = Nothing
 
-equationExpressions = concatMap (\(Equation _ body) -> bodyExpressions body)
+equationsExpressions :: [Equation] -> [Expression]
+equationsExpressions = concatMap (\(Equation _ body) -> bodyExpressions body)
   where
     bodyExpressions (UnguardedBody e)      = [e]
     bodyExpressions (GuardedBody b)        = b >>= \(es1, es2) -> [es1, es2]
 
-statementExpressions = map expression
+statementsExpressions :: [Statement] -> [Expression]
+statementsExpressions = map expression
   where
     expression (Generator _ e) = e
     expression (Guard e)       = e

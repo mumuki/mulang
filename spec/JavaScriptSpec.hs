@@ -90,6 +90,9 @@ spec = do
     it "handles blocks as sequences" $ do
       js "8; 9" `shouldBe` js "{8; 9}"
 
+    it "handles this" $ do
+      js "this" `shouldBe` Self
+
     it "handles booleans" $ do
       js "true" `shouldBe` MuTrue
 

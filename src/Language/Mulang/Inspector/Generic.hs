@@ -1,4 +1,8 @@
 module Language.Mulang.Inspector.Generic (
+  countIfs,
+  countFors,
+  countFunctions,
+  countVariables,
   assigns,
   assignsMatching,
   calls,
@@ -9,8 +13,10 @@ module Language.Mulang.Inspector.Generic (
   declaresComputationWithArity',
   declaresEntryPoint,
   declaresFunction,
+  declaresFunctionMatching,
   declaresRecursively,
   declaresVariable,
+  declaresVariableMatching,
   delegates,
   delegates',
   parses,
@@ -19,8 +25,8 @@ module Language.Mulang.Inspector.Generic (
   returnsMatching,
   uses,
   usesAnonymousVariable,
-  usesBooleanLogic,
-  usesArithmetic,
+  usesLogic,
+  usesMath,
   usesExceptionHandling,
   usesExceptions,
   usesFor,
@@ -31,13 +37,14 @@ module Language.Mulang.Inspector.Generic (
 
 import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
-import Language.Mulang.Generator (declaredIdentifiers, expressions, declarations, referencedIdentifiers)
+import Language.Mulang.Generator (declaredIdentifiers, expressions, declarations, referencedIdentifiers, equationsExpandedExpressions)
 import Language.Mulang.Identifier
-import Language.Mulang.Inspector.Bound (containsBoundDeclaration, BoundInspection)
+import Language.Mulang.Inspector.Bound (uncounting, containsBoundDeclaration, countBoundDeclarations, BoundInspection, BoundCounter)
 import Language.Mulang.Inspector.Contextualized (decontextualize, ContextualizedBoundInspection)
 import Language.Mulang.Inspector.Primitive
-import Language.Mulang.Inspector.Matcher (unmatching, Matcher)
+import Language.Mulang.Inspector.Matcher (unmatching, matches, Matcher)
 import Language.Mulang.Inspector.Query (inspect, select)
+import Language.Mulang.Inspector.Literal (isMath, isLogic)
 
 import Data.Maybe (listToMaybe)
 import Data.List.Extra (has)
@@ -86,7 +93,10 @@ delegates' p context expression = inspect $ do
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
 usesIf :: Inspection
-usesIf = containsExpression f
+usesIf = positive countIfs
+
+countIfs :: Counter
+countIfs = countExpressions f
   where f (If _ _ _) = True
         f _          = False
 
@@ -101,9 +111,13 @@ usesPrint = containsExpression f
         f _         = False
 
 usesFor :: Inspection
-usesFor = containsExpression f
+usesFor = positive countFors
+
+countFors :: Counter
+countFors = countExpressions f
   where f (For _ _) = True
         f _         = False
+
 
 returnsMatching :: Matcher -> Inspection
 returnsMatching matcher = containsExpression f
@@ -125,16 +139,27 @@ declaresRecursively = containsBoundDeclaration f
         nameOf :: Expression -> Maybe Identifier
         nameOf = listToMaybe . declaredIdentifiers
 
-
 declaresFunction :: BoundInspection
-declaresFunction = containsBoundDeclaration f
-  where f (Function _ _) = True
-        f _              = False
+declaresFunction = unmatching declaresFunctionMatching
+
+declaresFunctionMatching :: Matcher -> BoundInspection
+declaresFunctionMatching = uncounting countFunctions
+
+countFunctions :: Matcher -> BoundCounter
+countFunctions matcher = countBoundDeclarations f
+  where f (Function _ equations) = matches matcher equationsExpandedExpressions $ equations
+        f _                      = False
 
 declaresVariable :: BoundInspection
-declaresVariable = containsBoundDeclaration f
-  where f (Variable _ _)  = True
-        f _               = False
+declaresVariable = unmatching declaresVariableMatching
+
+declaresVariableMatching :: Matcher -> BoundInspection
+declaresVariableMatching = uncounting countVariables
+
+countVariables :: Matcher -> BoundCounter
+countVariables matcher = countBoundDeclarations f
+  where f (Variable _ body) = matches matcher id [body]
+        f _                 = False
 
 declaresEntryPoint :: BoundInspection
 declaresEntryPoint = containsBoundDeclaration f
@@ -158,20 +183,11 @@ declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
 
         argsHaveArity = arityPredicate.length
 
-usesBooleanLogic :: Inspection
-usesBooleanLogic = containsExpression f
-  where f (Primitive Negation) = True
-        f (Primitive And)      = True
-        f (Primitive Or)       = True
-        f _                    = False
+usesLogic :: Inspection
+usesLogic = containsExpression isLogic
 
-usesArithmetic :: Inspection
-usesArithmetic = containsExpression f
-  where f (Primitive Plus)     = True
-        f (Primitive Minus)    = True
-        f (Primitive Multiply) = True
-        f (Primitive Divide)   = True
-        f _                    = False
+usesMath :: Inspection
+usesMath = containsExpression isMath
 
 raises :: BoundInspection
 raises predicate = containsExpression f

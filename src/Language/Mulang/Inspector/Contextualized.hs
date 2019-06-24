@@ -2,64 +2,60 @@ module Language.Mulang.Inspector.Contextualized (
   decontextualize,
   contextualize,
   contextualized,
+  contextualized2,
   contextualizedBind,
   boundContextualize,
-  contextualizedScoped,
-  contextualizedScopedList,
-  contextualizedTransitive,
-  contextualizedTransitiveList,
+  ContextualizedConsult,
+  ContextualizedCounter,
   ContextualizedInspection,
-  ContextualizedModifier,
+  ContextualizedBoundConsult,
+  ContextualizedBoundCounter,
   ContextualizedBoundInspection) where
 
-import Language.Mulang.Ast
-import Language.Mulang.Identifier (IdentifierPredicate)
-import Language.Mulang.Inspector.Bound (BoundInspection)
-import Language.Mulang.Inspector.Combiner (scoped, scopedList, transitive, transitiveList, Modifier)
-import Language.Mulang.Inspector.Primitive (Inspection)
+import Data.Count (Count)
+import Data.Function.Extra (compose2)
 
-type ContextualizedInspection = Expression -> Inspection
-type ContextualizedBoundInspection = IdentifierPredicate -> ContextualizedInspection
-type ContextualizedModifier = ContextualizedInspection -> ContextualizedInspection
+import Language.Mulang.Ast
+import Language.Mulang.Consult (Consult)
+import Language.Mulang.Identifier (IdentifierPredicate)
+import Language.Mulang.Inspector.Bound (BoundConsult)
+
+type ContextualizedConsult a = Expression -> Consult a
+type ContextualizedCounter = ContextualizedConsult Count
+type ContextualizedInspection = ContextualizedConsult Bool
+
+type ContextualizedBoundConsult a = IdentifierPredicate -> ContextualizedConsult a
+type ContextualizedBoundCounter = ContextualizedBoundConsult Count
+type ContextualizedBoundInspection = ContextualizedBoundConsult Bool
 
 --
 -- Lifts
 --
 
-contextualize :: Inspection -> ContextualizedInspection
+contextualize :: Consult a -> ContextualizedConsult a
 contextualize = const
 
 -- Generalized version of bind to accept contextualized inspections
-contextualizedBind :: ContextualizedInspection -> ContextualizedBoundInspection
+contextualizedBind :: ContextualizedConsult a -> ContextualizedBoundConsult a
 contextualizedBind = const
 
 -- Generalized version of contextualize to accept bound inspections
-boundContextualize :: BoundInspection -> ContextualizedBoundInspection
+boundContextualize :: BoundConsult a -> ContextualizedBoundConsult a
 boundContextualize i = contextualize . i
 
 --
 -- Unlift
 --
 
-decontextualize :: ContextualizedInspection -> Inspection
+decontextualize :: ContextualizedConsult a -> Consult a
 decontextualize inspection = \expression -> inspection expression expression
 
 --
 -- Modifiers
 --
 
-contextualized :: Modifier -> ContextualizedModifier
-contextualized f inspection = \context -> f (inspection context)
+contextualized :: (Consult a -> Consult b) -> ContextualizedConsult a -> ContextualizedConsult b
+contextualized = (.)
 
-contextualizedScoped :: Identifier -> ContextualizedModifier
-contextualizedScoped scope = contextualized (scoped scope)
-
-contextualizedScopedList :: [Identifier] -> ContextualizedModifier
-contextualizedScopedList scope = contextualized (scopedList scope)
-
-contextualizedTransitive :: Identifier -> ContextualizedModifier
-contextualizedTransitive scope = contextualized (transitive scope)
-
-contextualizedTransitiveList :: [Identifier] -> ContextualizedModifier
-contextualizedTransitiveList scope = contextualized (transitiveList scope)
-
+contextualized2 :: (Consult a -> Consult a -> Consult b) -> ContextualizedConsult a -> ContextualizedConsult a -> ContextualizedConsult b
+contextualized2 = compose2

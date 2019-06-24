@@ -5,7 +5,7 @@ module PolymorphismSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Ast
 import           Language.Mulang.Inspector.Combiner (scoped)
-import           Language.Mulang.Inspector.Contextualized (contextualizedScoped, decontextualize)
+import           Language.Mulang.Inspector.Contextualized (contextualized, decontextualize)
 import           Language.Mulang.Inspector.ObjectOriented.Polymorphism
 import qualified Language.Mulang.Parsers.Java as J (java)
 
@@ -174,10 +174,10 @@ spec = do
       }|])
 
     it "is False when tested on a class that does not use it" $ do
-      decontextualize (contextualizedScoped "Human" usesStaticPolymorphism') ast `shouldBe` False
+      decontextualize (contextualized (scoped "Human") usesStaticPolymorphism') ast `shouldBe` False
 
     it "is True when tested on a class that uses it" $ do
-      decontextualize (contextualizedScoped "Festival" usesStaticPolymorphism') ast `shouldBe` True
+      decontextualize (contextualized (scoped "Festival") usesStaticPolymorphism') ast `shouldBe` True
 
   describe "usesStaticPolymorphism" $ do
     it "is False when a scope is used" $ do

@@ -107,8 +107,8 @@ spec = describe "ExpectationsAnalyzer" $ do
     let hasWhile = Expectation "f" "UsesWhile"
     (run JavaScript "function f() { var x = 5; while (x < 10) { x++ } }" [hasWhile]) `shouldReturn` (result [passed hasWhile] [])
 
-  it "works with HasForall" $ do
-    let hasForall = Expectation "f" "HasForall"
+  it "works with UsesForall" $ do
+    let hasForall = Expectation "f" "UsesForall"
     (run Prolog "f(X) :- isElement(Usuario), forall(isRelated(X, Y), complies(Y))." [hasForall]) `shouldReturn` (result [
                                                                                                           passed hasForall] [])
 

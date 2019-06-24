@@ -1,0 +1,106 @@
+{
+    "RegExpID": "RE::",
+    "Style": {
+        "comment": "comment",
+        "atom": "atom",
+        "keyword": "keyword",
+        "operator": "operator",
+        "identifier": "variable",
+        "number": "number",
+        "string": "string",
+        "symbol": "string-2"
+    },
+    "Lex": {
+        "comment": {
+            "type": "comment",
+            "tokens": [
+                [
+                    "%%",
+                    null
+                ]
+            ]
+        },
+        "identifier": "RE::/[_A-Za-z$][_A-Za-z0-9$]*/",
+        "number": [
+            "RE::/[1-9]\\d*(e[\\+\\-]?\\d+)?L?/",
+            "RE::/\\.\\d+/",
+            "RE::/0(?![\\dx])/"
+        ],
+        "string": {
+            "type": "escaped-block",
+            "escape": "\\",
+            "tokens": [
+                "RE::/([\"])/",
+                1
+            ]
+        },
+        "symbol": {
+            "type": "escaped-block",
+            "escape": "\\",
+            "tokens": [
+                "RE::/([`])/",
+                1
+            ]
+        },
+        "operator": {
+            "tokens": [
+                "&&",
+                "and",
+                "||",
+                "or",
+                "!",
+                "not",
+                "=",
+                ">=",
+                "<="
+            ]
+        },
+        "delimiter": {
+            "tokens": [
+                "(",
+                ")",
+                ":",
+                ";",
+                ","
+            ]
+        },
+        "atom": {
+            "autocomplete": true,
+            "tokens": [
+                "anything",
+                "false",
+                "logic",
+                "math",
+                "nil",
+                "self",
+                "true",
+                "literal",
+                "nonliteral"
+            ]
+        },
+        "keyword": {
+            "autocomplete": true,
+            "tokens": [
+                "count",
+                "distinct",
+                "in",
+                "like",
+                "of",
+                "something",
+                "expectation",
+                "that",
+                "through",
+                "with",
+                "within"
+            ]
+        }
+    },
+    "Syntax": {
+        "edl": "comment | number | string | symbol | keyword | operator | atom | identifier"
+    },
+    "Parser": [
+        [
+            "edl"
+        ]
+    ]
+}

@@ -37,6 +37,9 @@ spec = do
 
         declaresProcedure (named "g") code `shouldBe` False
 
+      it "is False when using a matcher and procedure does not have a body" $ do
+        (declaresProcedureMatching (with . isNumber $ 2) anyone) (js "function f() {}") `shouldBe` False
+
   describe "usesWhile" $ do
     it "is True when present in function" $ do
       usesWhile (js "function f() { while(true) { console.log('foo') }  }")  `shouldBe` True
@@ -182,6 +185,22 @@ spec = do
 
       it "is False when is a method" $ do
         declaresFunction (named "f") (js "var o = {f: function(){}}") `shouldBe` False
+
+    describe "with matcher" $ do
+      it "is True when using a matcher that matches" $ do
+        (declaresFunctionMatching (with isSelf) anyone) (js "function f(x) { this; return 0; }") `shouldBe` True
+
+      it "is False when using a matcher that does not match" $ do
+        (declaresFunctionMatching (with isSelf) anyone) (js "function f(x) { return 0; }") `shouldBe` False
+
+      it "is True when using a non literal matcher that matches" $ do
+        (declaresFunctionMatching (with (returnsMatching (with (isNumber 2)))) anyone) (js "function f() { return 2; }") `shouldBe` True
+
+      it "is False when using a non literal matcher that doesn't match" $ do
+        (declaresFunctionMatching (with (returnsMatching (with (isNumber 2)))) anyone) (js "function f() { return 3; }") `shouldBe` False
+
+      it "is False when using a literal matcher and it does not match literally" $ do
+        (declaresFunctionMatching (with . isNumber $ 2) anyone) (js "function f() { return 2; }") `shouldBe` False
 
   describe "declaresComputationWithArity" $ do
     describe "with function declarations, hs" $ do
@@ -346,7 +365,7 @@ spec = do
 
   describe "delegates'" $ do
     it "is True when used with a scope" $ do
-      decontextualize (contextualizedScoped "main" (delegates' anyone)) (
+      decontextualize (contextualized (scoped "main") (delegates' anyone)) (
         Sequence [
           EntryPoint "main" (Application (Reference "m") []),
           SimpleProcedure "m" [] None]) `shouldBe` True
@@ -423,33 +442,33 @@ spec = do
     it "is False when using a matcher that does not match" $ do
       (callsMatching (with . isNumber $ 1) anyone) (hs "f = g 2") `shouldBe` False
 
-  describe "usesBooleanLogic" $ do
+  describe "usesLogic" $ do
     it "is when it is used" $ do
-      usesBooleanLogic (hs "f x y = x || y")   `shouldBe` True
-      usesBooleanLogic (hs "f x y = x && y")   `shouldBe` True
-      usesBooleanLogic (hs "f x y = not x")    `shouldBe` True
-      usesBooleanLogic (hs "f x y = (not) x")  `shouldBe` True
-      usesBooleanLogic (hs "f x y = (&&) x y") `shouldBe` True
+      usesLogic (hs "f x y = x || y")   `shouldBe` True
+      usesLogic (hs "f x y = x && y")   `shouldBe` True
+      usesLogic (hs "f x y = not x")    `shouldBe` True
+      usesLogic (hs "f x y = (not) x")  `shouldBe` True
+      usesLogic (hs "f x y = (&&) x y") `shouldBe` True
 
     it "is is not used otherwise" $ do
-      usesBooleanLogic (hs "f x y = x + y") `shouldBe` False
-      usesBooleanLogic (hs "f x y = x")     `shouldBe` False
-      usesBooleanLogic (hs "f x y = and x") `shouldBe` False
-      usesBooleanLogic (hs "f x y = or x")  `shouldBe` False
+      usesLogic (hs "f x y = x + y") `shouldBe` False
+      usesLogic (hs "f x y = x")     `shouldBe` False
+      usesLogic (hs "f x y = and x") `shouldBe` False
+      usesLogic (hs "f x y = or x")  `shouldBe` False
 
-  describe "usesArithmetic" $ do
+  describe "usesMath" $ do
     it "is when it is used" $ do
-      usesArithmetic (hs "f x y = x + y")    `shouldBe` True
-      usesArithmetic (hs "f x y = x * y")    `shouldBe` True
-      usesArithmetic (hs "f x y = x / x")    `shouldBe` True
-      usesArithmetic (hs "f x y = div x z")  `shouldBe` False -- TODO support mod/div operators in the future
-      usesArithmetic (hs "f x y = x - y")    `shouldBe` True
+      usesMath (hs "f x y = x + y")    `shouldBe` True
+      usesMath (hs "f x y = x * y")    `shouldBe` True
+      usesMath (hs "f x y = x / x")    `shouldBe` True
+      usesMath (hs "f x y = div x z")  `shouldBe` False -- TODO support mod/div operators in the future
+      usesMath (hs "f x y = x - y")    `shouldBe` True
 
     it "is is not used otherwise" $ do
-      usesArithmetic (hs "f x y = x")       `shouldBe` False
-      usesArithmetic (hs "f x y = plus x")  `shouldBe` False
-      usesArithmetic (hs "f x y = minus x") `shouldBe` False
-      usesArithmetic (hs "f x y = x || y")  `shouldBe` False
+      usesMath (hs "f x y = x")       `shouldBe` False
+      usesMath (hs "f x y = plus x")  `shouldBe` False
+      usesMath (hs "f x y = minus x") `shouldBe` False
+      usesMath (hs "f x y = x || y")  `shouldBe` False
 
   describe "usesExceptions" $ do
     it "is True when a raise is used, java" $ do

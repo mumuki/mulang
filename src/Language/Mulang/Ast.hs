@@ -168,6 +168,7 @@ data Expression
     | Print Expression
     -- ^ Generic print expression
     | For [Statement] Expression
+    -- ^ For-comprehension / For-each statement
     | ForLoop Expression Expression Expression Expression
     -- ^ Imperative / OOP programming c-style for loop
     | Sequence [Expression]

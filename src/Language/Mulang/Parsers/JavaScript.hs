@@ -120,6 +120,7 @@ muJSExpression (JSDecimal _ val)                                    = MuNumber (
 muJSExpression (JSLiteral _ "null")                                 = MuNil
 muJSExpression (JSLiteral _ "true")                                 = MuTrue
 muJSExpression (JSLiteral _ "false")                                = MuFalse
+muJSExpression (JSLiteral _ "this")                                 = Self
 --muJSExpression (JSHexInteger _ String)
 --muJSExpression (JSOctal _ String)
 muJSExpression (JSStringLiteral _ val)                              = MuString (removeQuotes val)

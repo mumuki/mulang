@@ -1,10 +1,10 @@
 module Language.Mulang.Analyzer.Analysis.Json () where
 
-import Data.Aeson
-import Language.Mulang
-import Language.Mulang.Analyzer.Analysis
-import Language.Mulang.Builder (NormalizationOptions, SequenceSortMode)
-import Language.Mulang.Interpreter.Runner (TestResult, TestStatus)
+import           Data.Aeson
+import           Language.Mulang
+import           Language.Mulang.Analyzer.Analysis
+import           Language.Mulang.Builder (NormalizationOptions, SequenceSortMode)
+import           Language.Mulang.Interpreter.Runner (TestResult, TestStatus)
 
 instance FromJSON Analysis
 instance FromJSON AnalysisSpec
@@ -49,4 +49,5 @@ instance ToJSON Type
 instance ToJSON Assertion
 instance ToJSON TestResult
 instance ToJSON TestStatus
+instance ToJSON CustomExpectationResult
 instance ToJSON Operator

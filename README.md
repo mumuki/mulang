@@ -397,23 +397,31 @@ The power of Mulang is grounded on more than 90 different kind of inspections:
 | `declares`                        |  any               | is the given element declared?
 | `declaresAttribute`               |  object oriented   | is a given attribute declared?
 | `declaresClass`                   |  object oriented   | is a given class declared?
+| `declaresClassMatching`           |  object oriented   | is a given class declared matching the given body expressions?
 | `declaresComputation`             |  any               | that is, does the given computation  - method, predicate, function, etc - exist?
 | `declaresComputationWithArity`    |  any               |  that is, does the given computation have the exact given arity?
 | `declaresEntryPoint`              |  any               | is there a program entry point, like a `main` procedure?
 | `declaresEnumeration`             |  imperative        | is a given enumeration declared?
 | `declaresFact`                    |  logic             | is a given logic fact declared?
 | `declaresFunction`                |  functional/imperative | is a given function declared?
+| `declaresFunctionMatching`        |  functional/imperative | is a given function declared matching the given body expressions?
 | `declaresInterface`               |  object oriented   | is a given interface declared?
+| `declaresInterfaceMatching`       |  object oriented   | is a given interface declared matching the given body expressions?
 | `declaresMethod`                  |  object oriented   | is a given method declared?
+| `declaresMethodMatching`          |  object oriented   | is a given method declared matching the given body expressions?
 | `declaresObject`                  |  object oriented   | is a given named object declared?
+| `declaresObjectMatching`          |  object oriented   | is a given named object declared matching the given body expressions?
 | `declaresPredicate`               |  logic             | is a given rule o fact declared?
+| `declaresPrimitive`               |  object oriented   | Is the given primitive operator overriden?
 | `declaresProcedure`               |  imperative        | is a given procedure declared?
+| `declaresProcedureMatching`       |  imperative        | is a given procedure declared matching the given body expressions?
 | `declaresRecursively`             |  any               | is a given computation declared using recusion?
 | `declaresRule`                    |  logic             | is a given logic rule declared?
 | `declaresSuperclass`              |  object oriented   | is a given class declared as superclass?
 | `declaresTypeAlias`               |  any               | is a given type synonym declared?
 | `declaresTypeSignature`           |  any               | is a given computation type signature declared?
-| `declaresVariable`                |  any               | is a given local o global variable declared?
+| `declaresVariable`                |  any               | is a given local or global variable declared?
+| `declaresVariableMatching`        |  any               | is a given local or global variable declared matching the given expression?
 | `delegates`                       |  delegates         | is a method, function or procedure declared AND called?
 | `discardsExceptions`              |  any               | are exceptions discarded within an empty catch block?
 | `doesConsolePrint`                |  any               | is there any console-print-statement like `System.out.println`, `puts` or `console.log`?
@@ -455,8 +463,8 @@ The power of Mulang is grounded on more than 90 different kind of inspections:
 | `usesComposition`                 |
 | `usesConditional`                 |
 | `usesCut`                         |  logic             | is the logic `!` consult used?
-| `usesDyamicPolymorphism`          |  object oriented | are there two or more methods definitions for some sent selector?
-| `usesDynamicMethodOverload`       |  object oriented | is there a class that defined two methods with different arity but with the same name?
+| `usesDyamicPolymorphism`          |  object oriented   | are there two or more methods definitions for some sent selector?
+| `usesDynamicMethodOverload`       |  object oriented   | is there a class that defined two methods with different arity but with the same name?
 | `usesExceptionHandling`           |  any               | is any _exception_ handlded?
 | `usesExceptions`                  |  any               | is any _exception_ raised?
 | `usesFail`                        |  logic             | is the logic `fail` consult used?
@@ -470,17 +478,21 @@ The power of Mulang is grounded on more than 90 different kind of inspections:
 | `usesIf`                          |  any               | is an `if` control structure used?
 | `usesInheritance`                 |  object oriented   | is any superclass explicitly declared?
 | `usesLambda`                      |
+| `usesLogic`                       |  any               | are boolean operators used?
 | `usesLoop`                        |  procedural        | are any of: repeat / for loop / foreach / while used?
+| `usesMath`                        |  any               | are artithmetic operators used?
 | `usesMixins`                      |  object oriented   | is any mixins explicitly included?
 | `usesNot`                         |
-| `usesObjectComposition`           |  object oriented | is there a class that declares an attributes and sends a message to it?
+| `usesObjectComposition`           |  object oriented   | is there a class that declares an attributes and sends a message to it?
 | `usesPatternMatching`             |
+| `usesPrimitive`                   |                    | is the given primitive operator used?
+| `usesPrint`                       |  any               | is a print statement used?
 | `usesRepeat`                      |
-| `usesStaticMethodOverload`        |  object oriented | is there a class that defined two method signatures but with the same name?
-| `usesStaticPolymorphism`          |  object oriented | is there an interface with at least a method signature that is implemented by two or more classes and used in the code?
+| `usesStaticMethodOverload`        |  object oriented   | is there a class that defined two method signatures but with the same name?
+| `usesStaticPolymorphism`          |  object oriented   | is there an interface with at least a method signature that is implemented by two or more classes and used in the code?
 | `usesSwitch`                      |
-| `usesTemplateMethod`              |  object oriented | is there a class that sends a message whose corresonding method is not declared?
-| `usesType`                        |  any             | is the given typed used in a signature?
+| `usesTemplateMethod`              |  object oriented   | is there a class that sends a message whose corresonding method is not declared?
+| `usesType`                        |  any               | is the given typed used in a signature?
 | `usesUnificationOperator`         |  logic             | is the logic unification operator `=` used?
 | `usesWhile`                       |  imperative        | is a `while` control structure used?
 | `usesYield`                       |  functional        | is an expression yielded within a comprehension?
@@ -955,6 +967,12 @@ mulang '{
 ```
 For further detail on this spec, see [Code Execution](#code-execution)
 
+# Customs Expectations and the Expectations Definition Language
+
+Mulang accepts custom-made expectations expressed in an Expectations Definition Language - EDL - which allows to build complex
+expectations by combining existing inspections.
+
+
 # Mulang AST spec
 
 In this section, we will get into the technical details of the Mulang AST. It is built around 5 core elements:
@@ -1105,19 +1123,14 @@ public class Bird {
 ```
 
 
-### `EqualMethod` and `HashMethod`
+### `PrimitiveMethod`
 
-> Declaration of custom equivalance and _hash code_ operations. `EqualMethod` typically corresponds to `equals` or `==` method declarations, while `HashMethod`, typically corresponds
-to `hash` or `hashCode`- like methods.
+> Declaration of custom primitive operators - also known as operator overriding. See [primitive operators](#primitive-operators)
 
 #### Syntax
 
 ```haskell
-(EqualMethod [Equation])
-```
-
-```haskell
-(HashMethod [Equation])
+(PrimitiveMethod Operator [Equation])
 ```
 
 #### Ruby Example
@@ -1132,12 +1145,12 @@ end
 
 ```haskell
 (Sequence [
-  (EqualMethod (Equation
-                [VariablePatten "other"]
-                (UnguardedBody MuNil))),
-  (HashMethod (Equation
-              []
-              (UnguardedBody MuNil)))]
+  (PrimitiveMethod Equal (Equation
+                         [VariablePatten "other"]
+                         (UnguardedBody MuNil))),
+  (PrimitiveMethod Hash (Equation
+                        []
+                        (UnguardedBody MuNil)))]
 
 ```
 
@@ -1648,15 +1661,6 @@ for (var i = 0; i < 10; i++) {
 (Other)
 ```
 
-### `Equal` and `NotEqual`
-
-#### Syntax
-
-```haskell
-(Equal)
-(NotEqual)
-```
-
 ### `Self`
 
 > Object oriented self-reference, like  C-like `this` and Smalltalk-derived `self`
@@ -2027,6 +2031,28 @@ function foo(x, y) { }
 ```haskell
 (OtherPattern)
 ```
+
+## Primitive Operators
+
+Primitive operators represent low-level language operations that are well known and common to most languages, usually in the fashion of operators.
+
+* `Equal`: equal operator
+* `NotEqual`: distinct operator
+* `Negation`: not operator
+* `And`: and operator
+* `Or`: or operator
+* `Hash`: hashcode operator
+* `GreatherOrEqualThan`
+* `GreatherThan`
+* `LessOrEqualThan`
+* `LessThan`
+* `Otherwise`: guard's otherwise operator
+* `Plus`
+* `Minus`
+* `Multiply`
+* `Divide`
+* `ForwardComposition`: `(f >> g)(x) = (g . f)(x) = g(f(x))` operator
+* `BackwardComposition`: `(g << f)(x) = (g . f)(x) = g(f(x))` operator
 
 ## Types
 

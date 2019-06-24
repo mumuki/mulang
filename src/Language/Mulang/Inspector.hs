@@ -1,6 +1,7 @@
 module Language.Mulang.Inspector (
   Inspection,
   BoundInspection,
+  BoundConsult,
   module Language.Mulang.Inspector.Combiner,
   module Language.Mulang.Inspector.Contextualized,
   module Language.Mulang.Inspector.Functional,
@@ -14,7 +15,7 @@ module Language.Mulang.Inspector (
   module Language.Mulang.Inspector.Query,
   module Language.Mulang.Inspector.Typed) where
 
-import Language.Mulang.Inspector.Bound (BoundInspection)
+import Language.Mulang.Inspector.Bound (BoundInspection, BoundConsult)
 import Language.Mulang.Inspector.Combiner
 import Language.Mulang.Inspector.Contextualized
 import Language.Mulang.Inspector.Functional

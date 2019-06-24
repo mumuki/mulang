@@ -34,3 +34,14 @@ spec = do
     it "works with nil" $ do
       isNil MuNil `shouldBe` True
       isNil (MuString "Nil") `shouldBe` False
+
+    it "works with literal and nonliteral" $ do
+      isLiteral MuNil `shouldBe` True
+      isLiteral (MuString "Nil") `shouldBe` True
+      isLiteral MuTrue `shouldBe` True
+      isLiteral (MuNumber 4) `shouldBe` True
+
+      isNonliteral MuNil `shouldBe` False
+      isNonliteral (MuString "Nil") `shouldBe` False
+      isNonliteral MuTrue `shouldBe` False
+      isNonliteral (MuNumber 4) `shouldBe` False

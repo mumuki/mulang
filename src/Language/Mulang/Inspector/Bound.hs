@@ -1,18 +1,37 @@
 module Language.Mulang.Inspector.Bound (
   bind,
+  bound,
+  uncounting,
   containsBoundDeclaration,
+  countBoundDeclarations,
+  BoundConsult,
+  BoundCounter,
   BoundInspection) where
 
-import  Language.Mulang.Inspector.Primitive (Inspection)
+import  Data.List.Extra (has)
+import  Data.Count (Count, counts)
+
+import  Language.Mulang.Consult (Consult)
+import  Language.Mulang.Inspector.Matcher (Matcher)
+import  Language.Mulang.Inspector.Primitive (Inspection, positive)
 import  Language.Mulang.Identifier (IdentifierPredicate)
-import  Language.Mulang.Ast (Expression)
 import  Language.Mulang.Generator (boundDeclarations)
-import  Data.List.Extra(has)
 
-type BoundInspection = IdentifierPredicate -> Inspection
+type BoundConsult a = IdentifierPredicate -> Consult a
+type BoundCounter = BoundConsult Count
+type BoundInspection = BoundConsult Bool
 
-bind :: Inspection -> BoundInspection
+bind :: Consult a -> BoundConsult a
 bind = const
 
-containsBoundDeclaration :: (Expression -> Bool) -> BoundInspection
+bound :: (Consult a -> Consult b) -> BoundConsult a -> BoundConsult b
+bound = (.)
+
+containsBoundDeclaration :: Inspection -> BoundInspection
 containsBoundDeclaration f b  = has f (boundDeclarations b)
+
+countBoundDeclarations :: Inspection -> BoundCounter
+countBoundDeclarations f b  = counts f (boundDeclarations b)
+
+uncounting :: (Matcher -> BoundCounter) -> Matcher -> BoundInspection
+uncounting counter matcher = bound positive (counter matcher)

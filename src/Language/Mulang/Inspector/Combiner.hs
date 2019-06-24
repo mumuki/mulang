@@ -1,20 +1,15 @@
 module Language.Mulang.Inspector.Combiner (
   detect,
   locate,
-  negative,
-  alternative,
   scoped,
   scopedList,
   transitive,
   transitiveList,
-  Location (..),
-  Modifier) where
+  Location (..)) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (transitiveReferencedIdentifiers, declarationsOf, declaredIdentifiers)
 import Language.Mulang.Inspector.Primitive
-
-type Modifier = Inspection -> Inspection
 
 data Location
   = Nowhere                   -- ^ No subexpression match, nor the whole expression
@@ -35,23 +30,17 @@ locate inspection expression
   | inspection expression = TopLevel
   | otherwise = Nowhere
 
-alternative :: Inspection -> Modifier
-alternative i1 i2 expression = i1 expression || i2 expression
-
-negative :: Modifier
-negative f = not . f
-
-scoped :: Identifier -> Modifier
+scoped :: Identifier -> Inspection -> Inspection
 scoped scope inspection =  any inspection . declarationsOf scope
 
-scopedList :: [Identifier] -> Modifier
+scopedList :: [Identifier] -> Inspection -> Inspection
 scopedList scopes i =  foldl scoped' i . reverse $ scopes
 
-transitive :: Identifier -> Modifier
+transitive :: Identifier -> Inspection -> Inspection
 transitive identifier inspection code = any (`scopedInspection` code) . transitiveReferencedIdentifiers identifier $ code
   where scopedInspection = scoped' inspection
 
-transitiveList :: [Identifier] -> Modifier
+transitiveList :: [Identifier] -> Inspection -> Inspection
 transitiveList identifiers i = transitive (last identifiers) (scopedList (init identifiers) i)
 
 scoped' = flip scoped

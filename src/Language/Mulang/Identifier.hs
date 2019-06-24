@@ -1,24 +1,20 @@
 module Language.Mulang.Identifier (
-  andAlso,
   anyOf,
   anyone,
   except,
   like,
   named,
   Identifier,
-  IdentifierPredicate,
-  PredicateModifier) where
+  IdentifierPredicate) where
 
-import  Data.List (isInfixOf)
+import Data.Char (toLower)
+import Data.List (isInfixOf)
+import Data.Function (on)
 
 -- | An identifier
 -- | Mulang does not assume any special naming convention or format
 type Identifier = String
 type IdentifierPredicate = Identifier -> Bool
-type PredicateModifier = IdentifierPredicate -> IdentifierPredicate
-
-andAlso :: IdentifierPredicate -> PredicateModifier
-andAlso p1 p2 identifier = p1 identifier && p2 identifier
 
 anyOf :: [Identifier] -> IdentifierPredicate
 anyOf options identifier = any (== identifier) options
@@ -30,7 +26,7 @@ except :: String -> IdentifierPredicate
 except = (/=)
 
 like :: String -> IdentifierPredicate
-like = isInfixOf
+like = on isInfixOf (map toLower)
 
 named :: String -> IdentifierPredicate
 named = (==)

@@ -12,8 +12,9 @@ module Language.Mulang.Analyzer.Analysis (
   emptyAnalysis,
   domainLanguageAnalysis,
   expectationsAnalysis,
-  smellsAnalysis,
+  customExpectationsAnalysis,
   signaturesAnalysis,
+  smellsAnalysis,
   testsAnalysis,
 
   emptyCompletedAnalysisResult,
@@ -36,7 +37,8 @@ module Language.Mulang.Analyzer.Analysis (
   TestAnalysisType(..),
 
   AnalysisResult(..),
-  ExpectationResult(..)) where
+  ExpectationResult(..),
+  CustomExpectationResult(..)) where
 
 import GHC.Generics
 
@@ -69,6 +71,7 @@ data Analysis = Analysis {
 
 data AnalysisSpec = AnalysisSpec {
   expectations :: Maybe [Expectation],
+  customExpectations :: Maybe String,
   smellsSet :: Maybe SmellsSet,
   signatureAnalysisType :: Maybe SignatureAnalysisType,
   testAnalysisType :: Maybe TestAnalysisType,
@@ -143,6 +146,7 @@ data Language
 data AnalysisResult
   = AnalysisCompleted {
       expectationResults :: [ExpectationResult],
+      customExpectationResults :: [CustomExpectationResult],
       smells :: [Expectation],
       signatures :: [Code],
       testResults :: [TestResult],
@@ -152,6 +156,12 @@ data AnalysisResult
 data ExpectationResult = ExpectationResult {
   expectation :: Expectation,
   result :: Bool
+} deriving (Show, Eq, Generic)
+
+
+data CustomExpectationResult = CustomExpectationResult {
+  name :: String,
+  status :: Bool
 } deriving (Show, Eq, Generic)
 
 --
@@ -171,13 +181,16 @@ allSmellsBut :: [Smell] -> Maybe SmellsSet
 allSmellsBut = Just . AllSmells . Just
 
 emptyAnalysisSpec :: AnalysisSpec
-emptyAnalysisSpec = AnalysisSpec Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+emptyAnalysisSpec = AnalysisSpec Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 emptyAnalysis :: Fragment -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec
 
 domainLanguageAnalysis :: Fragment -> DomainLanguage -> Analysis
 domainLanguageAnalysis code domainLanguage = Analysis code (emptyAnalysisSpec { domainLanguage = Just domainLanguage, smellsSet = allSmells })
+
+customExpectationsAnalysis :: Fragment -> String -> Analysis
+customExpectationsAnalysis code es = Analysis code (emptyAnalysisSpec { customExpectations = Just es })
 
 expectationsAnalysis :: Fragment -> [Expectation] -> Analysis
 expectationsAnalysis code es = Analysis code (emptyAnalysisSpec { expectations = Just es })
@@ -192,7 +205,7 @@ testsAnalysis :: Fragment -> TestAnalysisType -> Analysis
 testsAnalysis code testAnalysisType = Analysis code (emptyAnalysisSpec { testAnalysisType = Just testAnalysisType })
 
 emptyCompletedAnalysisResult :: AnalysisResult
-emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing
+emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] [] Nothing
 
 emptyDomainLanguage :: DomainLanguage
 emptyDomainLanguage = DomainLanguage Nothing Nothing Nothing Nothing

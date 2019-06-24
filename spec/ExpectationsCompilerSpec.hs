@@ -158,6 +158,28 @@ spec = do
     run (hs "f a b = g 2") "f" "Calls:g:WithNumber:1:WithTrue" `shouldBe` False
     run (hs "f a b = g True") "f" "Calls:g:WithNumber:1:WithFalse" `shouldBe` False
 
+  it "works with Calls WithMath" $ do
+    run (hs "f a = g (a + 2)") "f" "Calls:g:WithMath" `shouldBe` True
+    run (hs "f a = g a") "f" "Calls:g:WithMath" `shouldBe` False
+    run (hs "f a = g 2") "f" "Calls:g:WithMath" `shouldBe` False
+
+  it "works with Calls WithLiteral" $ do
+    run (hs "f a = g (a + 2)") "f" "Calls:g:WithLiteral" `shouldBe` False
+    run (hs "f a = g a") "f" "Calls:g:WithLiteral" `shouldBe` False
+    run (hs "f a = g 2") "f" "Calls:g:WithLiteral" `shouldBe` True
+    run (hs "f a = g 'a'") "f" "Calls:g:WithLiteral" `shouldBe` True
+
+  it "works with Calls WithNonliteral" $ do
+    run (hs "f a = g (a + 2)") "f" "Calls:g:WithNonliteral" `shouldBe` True
+    run (hs "f a = g a") "f" "Calls:g:WithNonliteral" `shouldBe` True
+    run (hs "f a = g 2") "f" "Calls:g:WithNonliteral" `shouldBe` False
+    run (hs "f a = g 'a'") "f" "Calls:g:WithNonliteral" `shouldBe` False
+
+  it "works with Calls WithNumber and WithLogic" $ do
+    run (hs "f a = g (a || b)") "f" "Calls:g:WithLogic" `shouldBe` True
+    run (hs "f a = g a") "f" "Calls:g:WithLogic" `shouldBe` False
+    run (hs "f a = g True") "f" "Calls:g:WithLogic" `shouldBe` False
+
   it "works with Assigns WithNumber" $ do
     run (java "class Foo { int x = 4; }") "Foo" "Assigns:x:WithNumber:4" `shouldBe` True
     run (java "class Foo { int x = 4; }") "Foo" "Assigns:x:WithNumber:5" `shouldBe` False
