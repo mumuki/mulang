@@ -188,7 +188,7 @@ tokens = loop . encode
 type Action = String -> P Token
 
 readFloat :: String -> Double
-readFloat str@('.':cs) = read ('0':readFloatRest str)
+readFloat str@('.':_) = read ('0':readFloatRest str)
 readFloat str = read (readFloatRest str)
 readFloatRest :: String -> String
 readFloatRest [] = []
