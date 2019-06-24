@@ -138,7 +138,7 @@ Predicate : { Any }
  | symbol { (Named . symbolValue) $1 }
  | except symbol { (Except . symbolValue) $2 }
  | like symbol { (Like . symbolValue) $2 }
- | unlike symbol { (NotLike . symbolValue) $2 }
+ | unlike symbol { (Unlike . symbolValue) $2 }
  | in openParen Symbols closeParen  { (AnyOf . map symbolValue) $3 }
  | except in openParen Symbols closeParen  { (NoneOf . map symbolValue) $4 }
  | like in openParen Symbols closeParen  { (LikeAnyOf . map symbolValue) $4 }

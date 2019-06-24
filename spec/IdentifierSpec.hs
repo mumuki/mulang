@@ -24,23 +24,23 @@ spec = do
       like "amount" "total_amount" `shouldBe` True
       like "amount" "totalAmount" `shouldBe` True
 
-  describe "notLike" $ do
+  describe "unlike" $ do
     it "matches exactly" $ do
-      notLike "amount" "amount" `shouldBe` False
-      notLike "amount" "count" `shouldBe` True
+      unlike "amount" "amount" `shouldBe` False
+      unlike "amount" "count" `shouldBe` True
 
     it "matches ignoring case" $ do
-      notLike "amount" "Amount" `shouldBe` False
-      notLike "amount" "AMOUNT" `shouldBe` False
-      notLike "Amount" "AMOUNT" `shouldBe` False
+      unlike "amount" "Amount" `shouldBe` False
+      unlike "amount" "AMOUNT" `shouldBe` False
+      unlike "Amount" "AMOUNT" `shouldBe` False
 
     it "matches prefix" $ do
-      notLike "amount" "amountOfHouses" `shouldBe` False
+      unlike "amount" "amountOfHouses" `shouldBe` False
 
     it "matches suffix" $ do
-      notLike "amount" "totalamount" `shouldBe` False
-      notLike "amount" "total_amount" `shouldBe` False
-      notLike "amount" "totalAmount" `shouldBe` False
+      unlike "amount" "totalamount" `shouldBe` False
+      unlike "amount" "total_amount" `shouldBe` False
+      unlike "amount" "totalAmount" `shouldBe` False
 
   describe "likeAnyOf" $ do
     it "matches exactly" $ do

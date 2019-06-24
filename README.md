@@ -331,7 +331,7 @@ Many inspections support an _identifier predicate_, that is, a matcher for ident
 * `anyone`: true for all identifiers
 * `except`: true for any identifier different to the given one
 * `like`: true for any identifier that contains the given one, ignoring case
-* `notLike`: false for any identifier that contains the given one, ignoring case
+* `unlike`: false for any identifier that contains the given one, ignoring case
 * `named`: true for only the given identifier
 * `anyOf`: true for any identifier that is equal to any of the given ones
 * `noneOf`: true for any identifier that is different to all of the given ones

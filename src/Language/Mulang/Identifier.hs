@@ -3,7 +3,7 @@ module Language.Mulang.Identifier (
   named,
   except,
   like,
-  notLike,
+  unlike,
   anyOf,
   noneOf,
   likeAnyOf,
@@ -32,8 +32,8 @@ except = (/=)
 like :: String -> IdentifierPredicate
 like = on isInfixOf (map toLower)
 
-notLike :: String -> IdentifierPredicate
-notLike identifier = not . like identifier
+unlike :: String -> IdentifierPredicate
+unlike identifier = not . like identifier
 
 anyOf :: [Identifier] -> IdentifierPredicate
 anyOf options identifier = any (== identifier) options

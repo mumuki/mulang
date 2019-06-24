@@ -45,7 +45,7 @@ data Predicate
   = Any
   | Named String
   | Like String
-  | NotLike String
+  | Unlike String
   | Except String
   | AnyOf [String]
   | NoneOf [String]
