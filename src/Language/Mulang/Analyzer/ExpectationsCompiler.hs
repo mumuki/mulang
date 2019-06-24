@@ -42,10 +42,10 @@ compileCQuery (verb:object:args)            = Inspection verb (compileBinding ob
 
 compileBinding :: String -> Predicate
 compileBinding "*"          = Any
-compileBinding ('^':name)                        = Except name
-compileBinding ('~':name)                        = Like name
-compileBinding ('=':name)                        = Named name
-compileBinding name                              = Named name
+compileBinding ('^':name)   = Except name
+compileBinding ('~':name)   = Like name
+compileBinding ('=':name)   = Named name
+compileBinding name         = Named name
 
 compileMatcher :: [String] -> Matcher
 compileMatcher = matching . f

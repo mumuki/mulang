@@ -335,8 +335,8 @@ Many inspections support an _identifier predicate_, that is, a matcher for ident
 * `named`: true for only the given identifier
 * `anyOf`: true for any identifier that is equal to any of the given ones
 * `noneOf`: true for any identifier that is different to all of the given ones
-* `likeAnyOf`: true for any identifier that is like to any of the given ones
-* `likeNoneOf`: true for any identifier that is not like to all of the given ones
+* `likeAnyOf`: true for any identifier that is like any of the given ones
+* `likeNoneOf`: true for any identifier that is not like any of the given ones
 * `andAlso`: identifier predicates combiner. True when both predicates are True
 
 For example, does the former piece of code declare any attribute?
