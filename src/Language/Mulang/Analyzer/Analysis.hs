@@ -17,6 +17,7 @@ module Language.Mulang.Analyzer.Analysis (
   smellsAnalysis,
   testsAnalysis,
 
+  customExpectationResult,
   emptyCompletedAnalysisResult,
 
   Expectation(..),
@@ -37,8 +38,7 @@ module Language.Mulang.Analyzer.Analysis (
   TestAnalysisType(..),
 
   AnalysisResult(..),
-  ExpectationResult(..),
-  CustomExpectationResult(..)) where
+  ExpectationResult(..)) where
 
 import GHC.Generics
 
@@ -146,7 +146,6 @@ data Language
 data AnalysisResult
   = AnalysisCompleted {
       expectationResults :: [ExpectationResult],
-      customExpectationResults :: [CustomExpectationResult],
       smells :: [Expectation],
       signatures :: [Code],
       testResults :: [TestResult],
@@ -158,11 +157,6 @@ data ExpectationResult = ExpectationResult {
   result :: Bool
 } deriving (Show, Eq, Generic)
 
-
-data CustomExpectationResult = CustomExpectationResult {
-  name :: String,
-  status :: Bool
-} deriving (Show, Eq, Generic)
 
 --
 -- Builder functions
@@ -205,7 +199,10 @@ testsAnalysis :: Fragment -> TestAnalysisType -> Analysis
 testsAnalysis code testAnalysisType = Analysis code (emptyAnalysisSpec { testAnalysisType = Just testAnalysisType })
 
 emptyCompletedAnalysisResult :: AnalysisResult
-emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] [] Nothing
+emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing
 
 emptyDomainLanguage :: DomainLanguage
 emptyDomainLanguage = DomainLanguage Nothing Nothing Nothing Nothing
+
+customExpectationResult :: String -> Bool -> ExpectationResult
+customExpectationResult title result = ExpectationResult (Expectation "<<custom>>" title) result
