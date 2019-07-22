@@ -4,12 +4,12 @@ import           Language.Mulang.Analyzer hiding (result, spec)
 import           Test.Hspec
 
 result customExpectationResults smells
-  = emptyCompletedAnalysisResult { customExpectationResults = customExpectationResults, smells = smells }
+  = emptyCompletedAnalysisResult { expectationResults = customExpectationResults, smells = smells }
 
 run language content test = analyse (customExpectationsAnalysis (CodeSample language content) test)
 
-passed message = CustomExpectationResult message True
-failed message = CustomExpectationResult message False
+passed message = customExpectationResult message True
+failed message = customExpectationResult message False
 
 nok = result [failed "E0"] []
 ok = result [passed "E0"] []
