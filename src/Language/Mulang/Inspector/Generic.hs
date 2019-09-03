@@ -33,8 +33,6 @@ module Language.Mulang.Inspector.Generic (
   usesFor,
   usesIf,
   usesIfMatching,
-  usesThenMatching,
-  usesElseMatching,
   usesPrimitive,
   usesPrint,
   usesPrintMatching,
@@ -106,17 +104,7 @@ usesIfMatching matcher = positive (countIfs matcher)
 
 countIfs :: Matcher -> Counter
 countIfs matcher = countExpressions f
-  where f (If c _ _) = matcher [c]
-        f _          = False
-
-usesThenMatching :: Matcher -> Inspection
-usesThenMatching matcher = containsExpression f
-  where f (If _ t _) = matcher [t]
-        f _          = False
-
-usesElseMatching :: Matcher -> Inspection
-usesElseMatching matcher = containsExpression f
-  where f (If _ _ e) = matcher [e]
+  where f (If c t e) = matcher [c, t, e]
         f _          = False
 
 usesYield :: Inspection

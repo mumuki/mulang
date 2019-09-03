@@ -14,8 +14,7 @@ module Language.Mulang.Inspector.Procedural (
   usesForLoopMatching,
   usesLoop,
   declaresProcedure,
-  declaresProcedureMatching,
-  usesIterationMatching) where
+  declaresProcedureMatching) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (equationsExpandedExpressions, statementsExpressions)
@@ -47,7 +46,7 @@ usesWhileMatching matcher = positive (countWhiles matcher)
 
 countWhiles :: Matcher -> Counter
 countWhiles matcher = countExpressions f
-  where f (While e _) = matcher [e]
+  where f (While c a) = matcher [c, a]
         f _ = False
 
 -- | Inspection that tells whether an expression uses Switch
@@ -67,7 +66,7 @@ usesRepeatMatching matcher = positive (countRepeats matcher)
 
 countRepeats :: Matcher -> Counter
 countRepeats matcher = countExpressions f
-  where f (Repeat e _) = matcher [e]
+  where f (Repeat c a) = matcher [c, a]
         f _ = False
 
 usesForEach :: Inspection
@@ -75,7 +74,7 @@ usesForEach = unmatching usesForEachMatching
 
 usesForEachMatching :: Matcher -> Inspection
 usesForEachMatching matcher = containsExpression f
-  where f (For ss e) = not (usesYield e) && any (matcher.(:[])) (statementsExpressions ss)
+  where f (For ss e) = not (usesYield e) && matcher [Sequence (statementsExpressions ss), e]
         f _          = False
 
 usesForLoop :: Inspection
@@ -86,16 +85,8 @@ usesForLoopMatching matcher = positive (countForLoops matcher)
 
 countForLoops :: Matcher -> Counter
 countForLoops matcher = countExpressions f
-  where f (ForLoop i c incr _) = matcher [i, c, incr]
+  where f (ForLoop i c incr e) = matcher [i, c, incr, e]
         f _                    = False
-
-usesIterationMatching :: Matcher -> Inspection
-usesIterationMatching matcher = containsExpression f
-  where f (Repeat _ e)      = matcher [e]
-        f (While _ e)       = matcher [e]
-        f (For _ e)         = not (usesYield e) && matcher [e]
-        f (ForLoop _ _ _ e) = matcher [e]
-        f _                 = False
 
 usesLoop :: Inspection
 usesLoop e = usesRepeat e || usesWhile e || usesForLoop e || usesForEach e
