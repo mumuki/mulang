@@ -85,7 +85,10 @@ spec = do
       usesLoop code `shouldBe` True
 
     it "is True when foreach is present" $ do
-      let code = SimpleFunction "f" [] (Sequence [For [] None, Return (MuNumber 2)])
+      let code = SimpleFunction "f" [] (Sequence [
+                                          For [Generator (VariablePattern "x") (MuList [MuNumber 2])] None,
+                                          Return (MuNumber 2)
+                                        ])
 
       usesLoop code `shouldBe` True
 

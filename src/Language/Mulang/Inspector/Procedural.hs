@@ -1,16 +1,21 @@
 module Language.Mulang.Inspector.Procedural (
   countProcedures,
   usesRepeat,
+  usesRepeatMatching,
   usesWhile,
+  usesWhileMatching,
   usesSwitch,
   usesForEach,
+  usesForEachMatching,
   usesForLoop,
+  usesForLoopMatching,
   usesLoop,
   declaresProcedure,
-  declaresProcedureMatching) where
+  declaresProcedureMatching,
+  usesIterationMatching) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Generator (equationsExpandedExpressions)
+import Language.Mulang.Generator (equationsExpandedExpressions, statementsExpressions)
 import Language.Mulang.Inspector.Matcher (Matcher, unmatching, matches)
 import Language.Mulang.Inspector.Primitive (Inspection, containsExpression)
 import Language.Mulang.Inspector.Bound (BoundCounter, BoundInspection, countBoundDeclarations, uncounting)
@@ -30,9 +35,15 @@ countProcedures matcher = countBoundDeclarations f
 -- | Inspection that tells whether an expression uses while
 -- in its definition
 usesWhile :: Inspection
-usesWhile = containsExpression f
-  where f (While _ _) = True
+usesWhile = unmatching usesWhileMatching
+
+-- | Inspection that tells whether an expression uses while
+-- in its definition
+usesWhileMatching :: Matcher -> Inspection
+usesWhileMatching matcher = containsExpression f
+  where f (While e _) = matcher [e]
         f _ = False
+
 -- | Inspection that tells whether an expression uses Switch
 -- in its definition
 usesSwitch :: Inspection
@@ -43,18 +54,35 @@ usesSwitch = containsExpression f
 -- | Inspection that tells whether an expression uses reoeat
 -- in its definition
 usesRepeat :: Inspection
-usesRepeat = containsExpression f
-  where f (Repeat _ _) = True
+usesRepeat = unmatching usesRepeatMatching
+
+usesRepeatMatching :: Matcher -> Inspection
+usesRepeatMatching matcher = containsExpression f
+  where f (Repeat e _) = matcher [e]
         f _ = False
 
 usesForEach :: Inspection
-usesForEach = containsExpression f
-  where f (For _ e) = not $ usesYield e
-        f _         = False
+usesForEach = unmatching usesForEachMatching
+
+usesForEachMatching :: Matcher -> Inspection
+usesForEachMatching matcher = containsExpression f
+  where f (For ss e) = not (usesYield e) && any (matcher.(:[])) (statementsExpressions ss)
+        f _          = False
 
 usesForLoop :: Inspection
-usesForLoop = containsExpression f
-  where f (ForLoop _ _ _ _) = True
+usesForLoop = unmatching usesForLoopMatching
+
+usesForLoopMatching :: Matcher -> Inspection
+usesForLoopMatching matcher = containsExpression f
+  where f (ForLoop i c incr _) = matcher [i, c, incr]
+        f _                    = False
+
+usesIterationMatching :: Matcher -> Inspection
+usesIterationMatching matcher = containsExpression f
+  where f (Repeat _ e)      = matcher [e]
+        f (While _ e)       = matcher [e]
+        f (For _ e)         = not (usesYield e) && matcher [e]
+        f (ForLoop _ _ _ e) = matcher [e]
         f _                 = False
 
 usesLoop :: Inspection
