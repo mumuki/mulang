@@ -89,7 +89,7 @@ compileInspection = f
   f "Assigns"                          m              = boundMatching assignsMatching m
   f "Calls"                            m              = boundMatching callsMatching m
   f "Declares"                         E.Unmatching   = bound declares
-  f "DeclaresAttribute"                E.Unmatching   = bound declaresAttribute
+  f "DeclaresAttribute"                m              = boundMatching declaresAttributeMatching m
   f "DeclaresClass"                    m              = boundMatching declaresClassMatching m
   f "DeclaresComputation"              E.Unmatching   = bound declaresComputation
   f "DeclaresComputationWithArity0"    E.Unmatching   = bound (declaresComputationWithArity 0)
@@ -98,7 +98,7 @@ compileInspection = f
   f "DeclaresComputationWithArity3"    E.Unmatching   = bound (declaresComputationWithArity 3)
   f "DeclaresComputationWithArity4"    E.Unmatching   = bound (declaresComputationWithArity 4)
   f "DeclaresComputationWithArity5"    E.Unmatching   = bound (declaresComputationWithArity 5)
-  f "DeclaresEntryPoint"               E.Unmatching   = bound declaresEntryPoint
+  f "DeclaresEntryPoint"               m              = boundMatching declaresEntryPointMatching m
   f "DeclaresEnumeration"              E.Unmatching   = bound declaresEnumeration
   f "DeclaresFact"                     E.Unmatching   = bound declaresFact
   f "DeclaresFunction"                 m              = boundMatching declaresFunctionMatching m
@@ -120,7 +120,7 @@ compileInspection = f
   f "Instantiates"                     E.Unmatching   = bound instantiates
   f "Raises"                           E.Unmatching   = bound raises
   f "Rescues"                          E.Unmatching   = bound rescues
-  f "Returns"                          m@(E.Matching _) = plain (returnsMatching (compileMatcher m))
+  f "Returns"                          m@(E.Matching _) = plainMatching returnsMatching m
   f "TypesAs"                          E.Unmatching   = bound typesAs
   f "TypesParameterAs"                 E.Unmatching   = bound typesParameterAs
   f "TypesReturnAs"                    E.Unmatching   = bound typesReturnAs
@@ -142,7 +142,7 @@ compileInspection = f
   f "UsesGuards"                       E.Unmatching   = plain usesGuards
   f "UsesIf"                           E.Unmatching   = plain usesIf
   f "UsesInheritance"                  E.Unmatching   = plain usesInheritance
-  f "UsesLambda"                       E.Unmatching   = plain usesLambda
+  f "UsesLambda"                       m              = plainMatching usesLambdaMatching m
   f "UsesLogic"                        E.Unmatching   = plain usesLogic
   f "UsesLoop"                         E.Unmatching   = plain usesLoop
   f "UsesMath"                         E.Unmatching   = plain usesMath
@@ -150,7 +150,7 @@ compileInspection = f
   f "UsesNot"                          E.Unmatching   = plain usesNot
   f "UsesObjectComposition"            E.Unmatching   = plain usesObjectComposition
   f "UsesPatternMatching"              E.Unmatching   = plain usesPatternMatching
-  f "UsesPrint"                        E.Unmatching   = plain usesPrint
+  f "UsesPrint"                        m              = plainMatching usesPrintMatching m
   f "UsesRepeat"                       E.Unmatching   = plain usesRepeat
   f "UsesStaticMethodOverload"         E.Unmatching   = plain usesStaticMethodOverload
   f "UsesStaticPolymorphism"           E.Unmatching   = contextual usesStaticPolymorphism'
@@ -158,7 +158,7 @@ compileInspection = f
   f "UsesTemplateMethod"               E.Unmatching   = plain usesTemplateMethod
   f "UsesType"                         E.Unmatching   = bound usesType
   f "UsesWhile"                        E.Unmatching   = plain usesWhile
-  f "UsesYield"                        E.Unmatching   = plain usesYield
+  f "UsesYield"                        m              = plainMatching usesYieldMatching m
   f (primitiveDeclaration -> Just p)   E.Unmatching   = plain (declaresPrimitive p)
   f (primitiveUsage -> Just p)         E.Unmatching   = plain (usesPrimitive p)
   f _                                  _              = Nothing
@@ -180,6 +180,9 @@ bound = Just . boundContextualize
 
 boundMatching :: (Matcher -> BoundConsult a) -> E.Matcher -> Maybe (ContextualizedBoundConsult a)
 boundMatching f m = bound (f (compileMatcher m))
+
+plainMatching :: (Matcher -> Consult a) -> E.Matcher -> Maybe (ContextualizedBoundConsult a)
+plainMatching f m = plain (f (compileMatcher m))
 
 compileMatcher :: E.Matcher -> Matcher
 compileMatcher (E.Matching clauses) = compileClauses clauses
