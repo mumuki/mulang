@@ -195,6 +195,7 @@ compileClauses :: [E.Clause] -> Matcher
 compileClauses = withEvery . f
   where
     f :: [E.Clause] -> [Inspection]
+    f (E.IsAnything:args)       = isAnything : (f args)
     f (E.IsChar value:args)     = isChar value : (f args)
     f (E.IsFalse:args)          = isBool False : (f args)
     f (E.IsLiteral:args)        = isLiteral : (f args)
