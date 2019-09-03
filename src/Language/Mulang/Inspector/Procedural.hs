@@ -1,6 +1,9 @@
 module Language.Mulang.Inspector.Procedural (
   countProcedures,
+  countWhiles,
+  countForLoops,
   usesRepeat,
+  countRepeats,
   usesRepeatMatching,
   usesWhile,
   usesWhileMatching,
@@ -17,7 +20,7 @@ module Language.Mulang.Inspector.Procedural (
 import Language.Mulang.Ast
 import Language.Mulang.Generator (equationsExpandedExpressions, statementsExpressions)
 import Language.Mulang.Inspector.Matcher (Matcher, unmatching, matches)
-import Language.Mulang.Inspector.Primitive (Inspection, containsExpression)
+import Language.Mulang.Inspector.Primitive (Inspection, Counter, containsExpression, positive, countExpressions)
 import Language.Mulang.Inspector.Bound (BoundCounter, BoundInspection, countBoundDeclarations, uncounting)
 import Language.Mulang.Inspector.Generic (usesYield)
 
@@ -40,7 +43,10 @@ usesWhile = unmatching usesWhileMatching
 -- | Inspection that tells whether an expression uses while
 -- in its definition
 usesWhileMatching :: Matcher -> Inspection
-usesWhileMatching matcher = containsExpression f
+usesWhileMatching matcher = positive (countWhiles matcher)
+
+countWhiles :: Matcher -> Counter
+countWhiles matcher = countExpressions f
   where f (While e _) = matcher [e]
         f _ = False
 
@@ -57,7 +63,10 @@ usesRepeat :: Inspection
 usesRepeat = unmatching usesRepeatMatching
 
 usesRepeatMatching :: Matcher -> Inspection
-usesRepeatMatching matcher = containsExpression f
+usesRepeatMatching matcher = positive (countRepeats matcher)
+
+countRepeats :: Matcher -> Counter
+countRepeats matcher = countExpressions f
   where f (Repeat e _) = matcher [e]
         f _ = False
 
@@ -73,7 +82,10 @@ usesForLoop :: Inspection
 usesForLoop = unmatching usesForLoopMatching
 
 usesForLoopMatching :: Matcher -> Inspection
-usesForLoopMatching matcher = containsExpression f
+usesForLoopMatching matcher = positive (countForLoops matcher)
+
+countForLoops :: Matcher -> Counter
+countForLoops matcher = countExpressions f
   where f (ForLoop i c incr _) = matcher [i, c, incr]
         f _                    = False
 
