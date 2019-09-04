@@ -199,7 +199,9 @@ data Expression
     | MuSymbol String
     -- ^ Generic symbol/atom literal
     | MuTuple [Expression]
+    -- ^ Generic tuple value literal
     | MuList [Expression]
+    -- ^ Generic list or stream value literal
     | TestGroup Expression Expression
     -- ^ Generic test grouping expression such as describe, context, etc.
     | Test Expression Expression
