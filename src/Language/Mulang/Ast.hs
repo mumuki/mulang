@@ -177,6 +177,9 @@ data Expression
     -- ^ Unrecognized expression, with optional description and body
     | Equal -- ^ deprecated
     | NotEqual -- ^ deprecated
+    | Arrow Expression Expression
+    -- ^ Generic arrow - AKA pair or entry - that is typically used to build dictionaries.
+    -- It corresponds to ruby's, perl's and php's `=>` operator, or ruby's and javascript's `:` operator
     | Self
     -- ^ Object oriented self-refence literal - AKA this or me
     | None
@@ -185,7 +188,8 @@ data Expression
     | MuNil
     -- ^ Generic nothing value literal - AKA nil, null or unit
     | MuDict Expression
-    -- ^ Generic dictionary - AKA hash, table or map - value literal. Its expressions are normally a sequence of Arrows
+    -- ^ Generic dictionary - AKA hash, table or map - value literal.
+    -- Its expressions are normally a sequence of Arrows
     | MuObject Expression
     -- ^ Object oriented unnamed object literal
     | MuNumber Double
