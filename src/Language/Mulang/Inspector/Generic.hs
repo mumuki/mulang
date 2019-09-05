@@ -12,6 +12,7 @@ module Language.Mulang.Inspector.Generic (
   declaresComputationWithArity,
   declaresComputationWithArity',
   declaresEntryPoint,
+  declaresEntryPointMatching,
   declaresFunction,
   declaresFunctionMatching,
   declaresRecursively,
@@ -31,9 +32,12 @@ module Language.Mulang.Inspector.Generic (
   usesExceptions,
   usesFor,
   usesIf,
+  usesIfMatching,
   usesPrimitive,
   usesPrint,
-  usesYield) where
+  usesPrintMatching,
+  usesYield,
+  usesYieldMatching) where
 
 import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
@@ -93,21 +97,30 @@ delegates' p context expression = inspect $ do
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
 usesIf :: Inspection
-usesIf = positive countIfs
+usesIf = unmatching usesIfMatching
 
-countIfs :: Counter
-countIfs = countExpressions f
-  where f (If _ _ _) = True
+usesIfMatching :: Matcher -> Inspection
+usesIfMatching matcher = positive (countIfs matcher)
+
+countIfs :: Matcher -> Counter
+countIfs matcher = countExpressions f
+  where f (If c t e) = matcher [c, t, e]
         f _          = False
 
 usesYield :: Inspection
-usesYield = containsExpression f
-  where f (Yield _) = True
+usesYield = unmatching usesYieldMatching
+
+usesYieldMatching ::  Matcher -> Inspection
+usesYieldMatching matcher = containsExpression f
+  where f (Yield e) = matcher [e]
         f _         = False
 
 usesPrint :: Inspection
-usesPrint = containsExpression f
-  where f (Print _) = True
+usesPrint = unmatching usesPrintMatching
+
+usesPrintMatching :: Matcher -> Inspection
+usesPrintMatching matcher = containsExpression f
+  where f (Print e) = matcher [e]
         f _         = False
 
 usesFor :: Inspection
@@ -162,8 +175,11 @@ countVariables matcher = countBoundDeclarations f
         f _                 = False
 
 declaresEntryPoint :: BoundInspection
-declaresEntryPoint = containsBoundDeclaration f
-  where f (EntryPoint _ _)  = True
+declaresEntryPoint = unmatching declaresEntryPointMatching
+
+declaresEntryPointMatching :: Matcher -> BoundInspection
+declaresEntryPointMatching matcher = containsBoundDeclaration f
+  where f (EntryPoint _ e)  = matcher [e]
         f _                 = False
 
 -- | Inspection that tells whether a top level computation declaration exists

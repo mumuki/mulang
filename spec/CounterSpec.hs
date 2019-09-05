@@ -8,19 +8,19 @@ spec :: Spec
 spec = do
   describe "countIfs" $ do
     it "counts 0" $ do
-      countIfs (js "") `shouldBe` 0
+      (unmatching countIfs) (js "") `shouldBe` 0
 
     it "counts 1" $ do
-      countIfs (js "if (true) {}") `shouldBe` 1
-      countIfs (js "if (true) {} else {}" ) `shouldBe` 1
+      (unmatching countIfs) (js "if (true) {}") `shouldBe` 1
+      (unmatching countIfs) (js "if (true) {} else {}" ) `shouldBe` 1
 
     it "counts 2 or more" $ do
-      countIfs (js "if (true) {} else {}\n\
-                  \if (true) {} else {}" ) `shouldBe` 2
-      countIfs (js "if (true) {} else {}\n\
-                  \if (true) {} else {}\n\
-                  \if (true) {}\n" ) `shouldBe` 3
+      (unmatching countIfs) (js "if (true) {} else {}\n\
+                                \if (true) {} else {}" ) `shouldBe` 2
+      (unmatching countIfs) (js "if (true) {} else {}\n\
+                                \if (true) {} else {}\n\
+                                \if (true) {}\n" ) `shouldBe` 3
 
     it "counts across procedures" $ do
-      countIfs (js "function f1() {if (true) {} else {}}\n\
-                  \function f2() {if (true) {} else {}}\n" ) `shouldBe` 2
+      (unmatching countIfs) (js "function f1() {if (true) {} else {}}\n\
+                                \function f2() {if (true) {} else {}}\n" ) `shouldBe` 2

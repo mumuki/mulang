@@ -1,4 +1,5 @@
 module Language.Mulang.Inspector.Literal (
+  isAnything,
   isBool,
   isChar,
   isNil,
@@ -14,6 +15,9 @@ module Language.Mulang.Inspector.Literal (
 import Language.Mulang.Ast
 import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Inspector.Primitive (Inspection)
+
+isAnything :: Inspection
+isAnything = const True
 
 isNil :: Inspection
 isNil = (==) MuNil

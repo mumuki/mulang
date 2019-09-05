@@ -148,9 +148,9 @@ data Expression
     | New Expression [Expression]
     -- ^ Object oriented instantiation, composed by the class reference and instantiation arguments
     | Implement Expression
-    -- ^ Object oriented instantiation, interface implementation
+    -- ^ Object oriented interface implementation
     | Include Expression
-    -- ^ Object oriented instantiation, mixin inclusion
+    -- ^ Object oriented mixin inclusion
     | Lambda [Pattern] Expression
     | If Expression Expression Expression
     | Return Expression
