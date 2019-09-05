@@ -42,6 +42,11 @@ spec = do
     it "parses lists" $ do
       py "[1,2,3]" `shouldBe` MuList [MuNumber 1, MuNumber 2, MuNumber 3]
 
+    it "parses dictionaries" $ do
+      py "{}" `shouldBe` MuDict None
+      py "{'foo': 1}" `shouldBe` MuDict (Arrow (MuString "foo") (MuNumber 1))
+      py "{'foo': 1, 'bar': 2}" `shouldBe` MuDict (Sequence [Arrow (MuString "foo") (MuNumber 1), Arrow (MuString "bar") (MuNumber 2)])
+
     it "parses sets as lists" $ do
       py "{1,2,3}" `shouldBe` MuList [MuNumber 1, MuNumber 2, MuNumber 3]
 

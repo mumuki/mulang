@@ -157,7 +157,7 @@ muExpr (Yield arg _)              = M.Yield $ fmapOrNull muYieldArg arg
 --muExpr (Generator { gen_comprehension :: Comprehension annot, expr_annot :: annot }
 --muExpr (ListComp { list_comprehension :: Comprehension annot, expr_annot :: annot }
 muExpr (List exprs _)             = muList exprs
---muExpr (Dictionary { dict_mappings :: [DictMappingPair annot], expr_annot :: annot }
+muExpr (Dictionary mappings _)    = muDict mappings
 --muExpr (DictComp { dict_comprehension :: Comprehension annot, expr_annot :: annot }
 muExpr (Set exprs _)              = muList exprs
 --muExpr (SetComp { set_comprehension :: Comprehension annot, expr_annot :: annot }
@@ -168,6 +168,9 @@ muExpr e                          = M.debug e
 
 
 muList = M.MuList . map muExpr
+
+muDict = M.MuDict . compactMap muArrow
+muArrow (DictMappingPair k v) = M.Arrow (muExpr k) (muExpr v)
 
 muCallType (Dot _ (Ident "assertEqual" _) _) [a, b] = M.Assert False $ M.Equality a b
 muCallType (Dot _ (Ident "assertTrue" _) _)  [a]    = M.Assert False $ M.Truth a
