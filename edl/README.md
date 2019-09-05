@@ -201,6 +201,12 @@ expectation "`tell` must be called with value 10 and true":
 expectation "`play` must be called with this":
   %% equivalent to * Calls:play:WithSelf
   calls `play` with self;
+
+expectation "uses a repeat with a non-literal amount of iterations":
+  uses repeat with (nonliteral, anything);
+
+expectation "repeats `next()` 3 times":
+  uses repeat with (3, something that (calls `next`));
 ```
 
 Most of the matchers are designed to perform literal queries, but some of them allow more complex matching:
@@ -260,6 +266,13 @@ expectation "must declare a procedure that uses ifs":
 expectation "must declare a procedure that uses ifs but not while":
   declares procedure
   that (uses if && ! uses while);
+
+expectation "does not nest a while within an if":
+  ! uses if with (anything, something that uses while, anything)
+    && ! uses if with (anything, anything, something that (uses while));
+
+expectation "uses an if that does not nest a while inside it":
+  uses if with (anything, something that (!uses while), something that (!uses while));
 ```
 
 
@@ -269,7 +282,9 @@ This is the complete list of inspections that support matchers:
 
 * `assigns`: accepts a matcher that matches the assigned value
 * `calls`: accepts a matcher that matches the passed arguments
+* `declares attribute`: accepts a matcher that matches the initial value
 * `declares class`: accepts a matcher that matches any of the body expressions
+* `declares entry point`: accepts a matchers that matches the entry point body
 * `declares function`: accepts a matcher that matches any of the body expressions
 * `declares interface`: accepts a matcher that matches any of the body expressions
 * `declares method`: accepts a matcher that matches any of the body expressions
@@ -277,6 +292,14 @@ This is the complete list of inspections that support matchers:
 * `declares procedure`: accepts a matcher that matches any of the body expressions
 * `declares variable`: accepts a matcher that matches the initial value
 * `returns`: accepts a matcher that matches the returned value
+* `uses for each`: accepts a matcher that matches the generator, and the loop body
+* `uses for loop`: accepts a matcher that matches the initializer expression, the condition expression, the increment expression and the loop body
+* `uses if`: accepts a matcher that matches the condition, the `then` expression and the `else` expression
+* `uses lambda`: accepts a matcher that matches the lambda body
+* `uses print`: accepts a matcher that matchers the printed value
+* `uses repeat`: accepts a matcher that matches the repeat expression and the loop body
+* `uses while`: accepts a matcher that matches the condition expression and the loop body
+* `uses yield`: accepts a matcher that matches the yielded value
 
 ### Supported matchers
 
@@ -326,8 +349,6 @@ expectation "The `Bar` must declare 4 or more methods related to beer or whisky"
 
 Not all inspections can be counted. Currently, only the following are supported:
 
-* `uses if`
-* `uses for`
 * `declares attribute`
 * `declares class`
 * `declares function`
@@ -336,6 +357,11 @@ Not all inspections can be counted. Currently, only the following are supported:
 * `declares object`
 * `declares procedure`
 * `declares variable`
+* `uses for loop`
+* `uses for`
+* `uses if`
+* `uses repeat`
+* `uses while`
 
 ## Boolean operators on scoped queries
 

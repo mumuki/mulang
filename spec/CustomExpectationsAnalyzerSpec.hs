@@ -213,13 +213,23 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run Haskell "x = y && z" test) `shouldReturn` ok
     (run Haskell "x = y" test) `shouldReturn` nok
 
-  it "evaluates matchers with anything" $ do
+  it "evaluates if with anything" $ do
     let test = "expectation: uses if with (anything, literal, nonliteral)"
 
     (run Haskell "" test) `shouldReturn` nok
     (run Haskell "x y = if y then True else y" test) `shouldReturn` ok
     (run Haskell "x y = if y then True else False" test) `shouldReturn` nok
     (run Haskell "x y = if y then y else y" test) `shouldReturn` nok
+
+  it "evaluates if with nested matchers" $ do
+    let test = "expectation: uses if with (anything, something that (!uses while), something that (!uses while));"
+
+    (run JavaScript "" test) `shouldReturn` nok
+    (run JavaScript "if (window) { console.log('ok') }" test) `shouldReturn` ok
+    (run JavaScript "if (window) { console.log('ok') } else { console.log('nok') }" test) `shouldReturn` ok
+    (run JavaScript "if (window) { while(true) { } } else { console.log('nok') }" test) `shouldReturn` nok
+    (run JavaScript "if (window) { console.log('ok') } else { while(true){} }" test) `shouldReturn` nok
+    (run JavaScript "if (window) { while(true) { } }" test) `shouldReturn` nok
 
   it "evaluates uses `&&`" $ do
     -- (run Haskell "x = y && x" "expectation: uses `&&`") `shouldReturn` ok
