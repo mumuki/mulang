@@ -5,14 +5,14 @@ EDL allows to express more complex expectations by combining existing inspection
 ## Basic syntax
 
 
-```
+```edl
 expectation [<name>]:
   <expectation body>;
 ```
 
 For example, this is the simplest expectation you can declare:
 
-```
+```edl
 expectation:
   calls;
 ```
@@ -21,7 +21,7 @@ This expectation performs a simple _query_ that checks that something is called 
 
 If you want to make it more explicit that you are expecting to call _something_, you can also write it this way...
 
-```
+```edl
 expectation:
   calls something;
 ```
@@ -30,7 +30,7 @@ expectation:
 
 Although you can declare unnamed expectations, it is usually more convenient to add an intention-revealing name:
 
-```
+```edl
 expectation "you should call something":
   calls something;
 ```
@@ -60,7 +60,7 @@ expectation:
 
 More examples:
 
-```
+```edl
 expectation "must declare something":
   declares;
 
@@ -83,7 +83,7 @@ expectation "a function must be declared":
 
 Like with standard expectations, you can use predicates with the inspections. The simplest of them is the _named_ predicate, that matches a name exactly against the given identifier:
 
-```
+```edl
 expectation "`System` must be used":
   %% equivalent to the standard expectation * Uses:=System
   uses `System`;
@@ -108,7 +108,7 @@ expectation "must declare a class aside of `Dog`":
 
 Also, there EDL exposes more predicates:
 
-```
+```edl
 expectation "declares methods apart from getters":
   declares method unlike `get`;
 
@@ -159,7 +159,7 @@ Also, custom expectations mmy be scoped using `within` and `through`,
 which allow inspecting only a given portion of the code: `within` performs intransitive cuts while
 `through` performs transitive cuts.
 
-```
+```edl
 expectation "`HouseBuilder` must raise something":
   %% this will work if within the lexical scope of
   %% HouseBuilder a raise statement is used
@@ -189,7 +189,7 @@ Queries that use a scope operator are called _scoped queries_. Conversely _unsco
 Some inspections support an optional matcher argument, that allow you to provide
 additional conditions using the `with` keyword:
 
-```
+```edl
 expectation "`exit` must be called with value 0":
   %% equivalent to * Calls:exit:WithNumber:0
   calls `exit` with 0;
@@ -211,7 +211,7 @@ expectation "repeats `next()` 3 times":
 
 Most of the matchers are designed to perform literal queries, but some of them allow more complex matching:
 
-```
+```edl
 expectation "the method `getTotalAmount` must return an arithmetic expresion":
   %% equivalent to Intransitive:getTotalAmmount Returns:WithMath
   within `getTotalAmmount` returns with math;
@@ -228,7 +228,7 @@ expectation "`getAge` must not return a hardcoded value:
 As you can see in previous examples, many of the simplest matchers can also be used in the standard expectation syntax. However, EDL also supports the `that` matcher,
 that allows you to build complex, nested queries:
 
-```
+```edl
 expectation "must declare a class that uses an if":
   declares class with something that (uses if);
 
@@ -244,7 +244,7 @@ expectation "`VirtualPet.HappyState` must declare a getter that returns a litera
 
 `that`-queries can be nested, thus allowing you to write quite abstract expectations:
 
-```
+```edl
 expectation "package `tamagochi` must declare a class with a method that returns an arithmethic expression":
 
   within `tamagochi`
@@ -258,7 +258,7 @@ expectation "package `tamagochi` must declare a class with a method that returns
 Previous logical operators may also be used with `that`-queries:
 
 
-```
+```edl
 expectation "must declare a procedure that uses ifs":
   declares procedure
   that (uses if);
@@ -323,7 +323,7 @@ This is the complete list of inspections that support matchers:
 
 EDL allows you to define expectations by counting and comparing matches of another query, by using the `count`, `=`, `>=` and `<=` operators:
 
-```
+```edl
 expectation "must perform at least three calls":
   count(calls) >= 3;
 
@@ -339,7 +339,7 @@ expectation "must declare no more than 4 methods in class `Queue`":
 
 Finally, counters may be added, using the `+` opertor:
 
-```
+```edl
 expectation "The `Bar` must declare 4 or more methods related to beer or whisky":
   within `Bar`
   count (declares method like `whisky`) + count (declares method like `beer`) >= 4;
