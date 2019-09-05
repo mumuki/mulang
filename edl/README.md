@@ -203,10 +203,13 @@ expectation "`play` must be called with this":
   calls `play` with self;
 
 expectation "uses a repeat with a non-literal amount of iterations":
+  %% matches repeat blocks where the repeat count expression is a non-literal
+  %% and the loop body is anything
   uses repeat with (nonliteral, anything);
 
-expectation "repeats `next()` 3 times":
-  uses repeat with (3, something that (calls `next`));
+expectation "uses a repeat with a non-literal amount of iterations":
+  %% shorter version of previous example
+  uses repeat with nonliteral;
 ```
 
 Most of the matchers are designed to perform literal queries, but some of them allow more complex matching:
@@ -240,19 +243,32 @@ expectation "`VirtualPet.HappyState` must declare a getter that returns a litera
   within `VirtualPet.HappyState`
   declares method like `get`
   that (returns with literal);
+
+expectation "uses a c-style for-loop that declares variable `x`":
+  uses for loop with (
+    something that (declares variable `x`),
+    anything,
+    anything,
+    anything);
+
+expectation "uses a c-style for-loop that declares variable `x`":
+  %% even shorter version of previous example
+  uses for loop that (declares variable `x`);
 ```
 
 `that`-queries can be nested, thus allowing you to write quite abstract expectations:
 
 ```edl
 expectation "package `tamagochi` must declare a class with a method that returns an arithmethic expression":
-
   within `tamagochi`
   declares class
   that (
     declares method
     that (
       returns with math));
+
+expectation "repeats `next()` 3 times":
+  uses repeat with (3, something that (calls `next`));
 ```
 
 Previous logical operators may also be used with `that`-queries:
@@ -303,7 +319,7 @@ This is the complete list of inspections that support matchers:
 
 ### Supported matchers
 
-* `(<matcher1>, <matcher2>.., <matcherN>)`: matches a tuple of arguments
+* `(<matcher1>, <matcher2>.., <matcherN>)`: matches a tuple of expressions, like a callable's arguments or a control structure parts. If less elements than required are passed, the list is padded with `anything` matchers.
 * `<character>`: matches a single character
 * `<number>`: matches a number literal
 * `<string>`: matches a single string

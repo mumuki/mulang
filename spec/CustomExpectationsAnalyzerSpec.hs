@@ -231,6 +231,33 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "if (window) { console.log('ok') } else { while(true){} }" test) `shouldReturn` nok
     (run JavaScript "if (window) { while(true) { } }" test) `shouldReturn` nok
 
+  it "evaluates foor-loop with nested matchers" $ do
+    let test = "expectation: uses for loop with (something that (declares variable `x`), anything, anything, anything);"
+
+    (run JavaScript "" test) `shouldReturn` nok
+    (run JavaScript "for (var x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
+    (run JavaScript "for (let x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
+    (run JavaScript "for (let y = 0; y < 10; y++) { y; }" test) `shouldReturn` nok
+    (run JavaScript "for (x = 0; x < 10; x++) { x; }" test) `shouldReturn` nok
+
+  it "evaluates foor-loop with incomplete matchers tuple" $ do
+    let test = "expectation: uses for loop with (something that (declares variable `x`));"
+
+    (run JavaScript "" test) `shouldReturn` nok
+    (run JavaScript "for (var x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
+    (run JavaScript "for (let x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
+    (run JavaScript "for (let y = 0; y < 10; y++) { y; }" test) `shouldReturn` nok
+    (run JavaScript "for (x = 0; x < 10; x++) { x; }" test) `shouldReturn` nok
+
+  it "evaluates foor-loop with one-arg simplified syntax " $ do
+    let test = "expectation: uses for loop that (declares variable `x`);"
+
+    (run JavaScript "" test) `shouldReturn` nok
+    (run JavaScript "for (var x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
+    (run JavaScript "for (let x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
+    (run JavaScript "for (let y = 0; y < 10; y++) { y; }" test) `shouldReturn` nok
+    (run JavaScript "for (x = 0; x < 10; x++) { x; }" test) `shouldReturn` nok
+
   it "evaluates uses `&&`" $ do
     -- (run Haskell "x = y && x" "expectation: uses `&&`") `shouldReturn` ok
     pendingWith "autocorrector does not work with EDL"
