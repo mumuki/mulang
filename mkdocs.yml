@@ -2,9 +2,10 @@ site_name: Mulang
 site_url: https://mumuki.io
 nav:
   - Home: index.md
-  - User Guide: userguide.md
-  - EDL Spec: edlspec.md
   - AST Spec: astspec.md
+  - EDL Spec: edlspec.md
+  - Inspections: inspections.md
+  - Comand Line: clispec.md
   - Try it!: try.md
   - Build: build.md
 extra_css:
