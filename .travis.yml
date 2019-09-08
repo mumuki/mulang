@@ -35,10 +35,3 @@ deploy:
   on:
     tags: true
     repo: mumuki/mulang
-- provider: hackage
-  username: flbulgarelli
-  password:
-    secure: cbjsoSml84SlJsZxcxe93dxGKfVrLp8qtjS2WMPKMcxChniXxpS8o9e6wD4OqfI8lDyHuCJy4drhTdFSxz7AVkBrkUeMrmlCtbnERfDa8e6t4IkSoBGcQ/DzhqN4QD3+Kb35YDuA5xR2B4fTnffWMCWdfY5BLGfgj/jOfToRZzRhN9NGaxoFgKvNpaNanBaD9o+SG9rSkB7kKEhRFWZ4hS9QP+XMK92m7kPQZrmvGx5PpfQO3JAr6pl/MqNYtRTZITs0vsZhZUsfZqM7ikZFtfhxUdkELvoqOlsTY5nIqjZqciH5jFyyTrbH3F2YV7mTAFc/5c3iwabTeKGdHpd7qImbqHdHcbWJy21MtQbfwJkSr8jpQJmn/NhFN9Lm19CAmn4AkSv+qlmqJyJAYUSAlvPpRxh9VtHinwMjyqDqZXC4N2m00DYaWTLOYC/BHY3jNaOmntEA0b1mEel8jY0DyLFctB+MyTbVofOQkXXegDO8LxjN7WobUgNPmhHnvk8G99H2gU2zWSroS1Eioo6K2nlc9oYiQRmzyh4FnwBkRdfmKT/2IbR0fZNvCDg+9T8Zry+TaBdF32G3AfQUh9z1WkdEE5uQqEEZxvISoQpQzCAhQ4irXg0Qf3yZ8VKHKmjegHmSmoL7YjruKwYPfjBHgx0wxqlie545Zx7v18gu+I0=
-  on:
-    tags: true
-    repo: mumuki/mulang
