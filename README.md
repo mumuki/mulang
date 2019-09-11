@@ -13,65 +13,7 @@ Mulang is a tool for analysing source code, which is built on top of five main c
   5. higher level interfaces in [ruby](https://rubygems.org/gems/mulang) and [javascript](https://www.npmjs.com/package/mulang) that are easier to use and provides some additional capabilities like expectations parsing and automatic internationalized humanization.
 
 
-
-
-## Detections
-
-Let's suppose we want to knoe whether something returns null in the following code:
-
-```haskell
-let e = js "var bar = {baz: function(){ return g }, foo: function(){ return null }}"
-```
-
-We could manually check if it is the `foo` method in `bar` or the `baz` method in `bar`:
-
-```haskell
-> scopedList returnsNil ["bar", "foo"] e
-True
-> scopedList returnsNil ["bar", "baz"] e
-False
-```
-
-But instead of asking one by one, we could use `detect` :
-
-```haskell
-> detect returnsNil e
-["bar","foo"]
--- This means that there are null returns within  `bar` and also within `foo`.
-```
-
-`detect` converts an _inspection_ into a _detection_: a function that tells which identifier match a given criteria.
-
-
-## The expectations DSL
-
-In order to pass expectations to the Command Line Tool, you must use a simple DSL that builds the inspections for you.
-
-| Kind              | DSL Sample                         | Haskell Combinators Sample
-|-------------------|------------------------------------|----------------------------
-| Basic             | `* UsesIf`                         | `usesIf`
-| Negated           | `* Not:UsesWhile`                  | `(negative usesWhile)`
-| Predicated        | `* DeclaresClass:Foo`              | `(declaresClass (named "Foo"))`
-|                   | `* DeclaresClass:=Foo`             | `(declaresClass (named "Foo"))`
-|                   | `* DeclaresClass:~Foo`             | `(declaresClass (like "Foo"))`
-|                   | `* DeclaresClass:^Foo`             | `(declaresClass (except "Foo"))`
-|                   | `* DeclaresClass:*`                | `(declaresClass anyone)`
-|                   | `* DeclaresClass`                  | `(declaresClass anyone)`
-| Matching Literals | `* Calls:*:WithChar:'a':WithTrue`  | `(callsMatching (withEvery [isChar 'a', isBool True]) anyone)`
-|                   | `* Calls:*:WithNil`                | `(callsMatching (withEvery [isNil]) anyone)`
-|                   | `* Returns:WithNumber:1`           | `(returnsMatching (withEvery [isNumber 1]) anyone)`
-|                   | `* Returns:WithString:"foo"`       | `(returnsMatching (withEvery [isString "foo"]) anyone)`
-|                   | `* Returns:WithSymbol:"foo"`       | `(returnsMatching (withEvery [isSymbol "foo"]) anyone)`
-| Transitive        | `foo UsesLambda`                   | `(transitive usesLambda "foo")`
-| Scoped            | `Intransitive:foo UsesIf`          | `(scoped usesIf "foo")`
-| Scoped List       | `foo.bar UsesIf`                   | `(scopedList usesIf ["foo", "bar"])`
-
-
-# Customs Expectations and the Expectations Definition Language
-
-Mulang accepts custom-made expectations expressed in an Expectations Definition Language - EDL - which allows to build complex
-expectations by combining existing inspections.
-
+Please the docs at [the Mulang site](https://mumuki.github.io/mulang/).
 
 # Contributors
 
