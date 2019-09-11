@@ -20,31 +20,31 @@ $ mulang '
    "sample" : {
       "tag" : "CodeSample",
       "language" : "Haskell",
-      "content" : "x = 1"
+      "content" : "x = z + 1"
    },
    "spec" : {
       "expectations" : [
          {
-            "binding" : ":Intransitive:x",
-            "inspection" : "Uses:*"
+            "binding" : "Intransitive:x",
+            "inspection" : "Uses:z"
          }
-      ],
-      "smellsSet" : { "tag" : "NoSmells" }
+      ]
    }
 }
 ' | json_pp
 {
+   "tag" : "AnalysisCompleted",
    "expectationResults" : [
       {
          "expectation" : {
-            "binding" : ":Intransitive:x",
-            "inspection" : "Uses:*"
+            "binding" : "Intransitive:x",
+            "inspection" : "Uses:z"
          },
-         "result" : false
+         "result" : true
       }
    ],
    "smells" : [],
-   "tag" : "AnalysisCompleted",
+   "intermediateLanguage" : null,
    "signatures" : []
 }
 ```
@@ -60,7 +60,6 @@ $ mulang '
       "content" : "x = 1"
    },
    "spec" : {
-      "smellsSet" : { "tag" : "NoSmells" },
       "expectations" : [
          {
             "binding" : "*",
@@ -97,8 +96,6 @@ $ mulang '
       "content" : "function foo(x, y) { return x + y; }"
    },
    "spec" : {
-      "expectations" : [],
-      "smellsSet" : { "tag" : "NoSmells" },
       "signatureAnalysisType" : {
         "tag" : "StyledSignatures",
         "style" : "HaskellStyle"
@@ -127,8 +124,6 @@ $ mulang '
       "content" : "function foo(x, y { return x + y; }"
    },
    "spec" : {
-      "expectations" : [],
-      "smellsSet" : { "tag" : "NoSmells" },
       "signatureAnalysisType" : {
         "tag" : "StyledSignatures",
         "style" : "HaskellStyle"
@@ -169,14 +164,10 @@ $ mulang '
       }
    },
    "spec" : {
-      "smellsSet" : {
-        "tag" : "NoSmells"
-      },
       "signatureAnalysisType" : {
          "tag" : "StyledSignatures",
          "style" : "HaskellStyle"
-      },
-      "expectations" : []
+      }
    }
 }
 ' | json_pp
@@ -202,7 +193,6 @@ $ mulang '
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
-      "expectations" : [],
       "smellsSet" : {
         "tag" : "NoSmells",
         "include" : [
@@ -243,7 +233,6 @@ $ mulang '
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
-      "expectations" : [],
       "smellsSet" : {
         "tag" : "AllSmells",
         "exclude" : [
@@ -281,7 +270,6 @@ $ mulang '
       "content" : "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer)."
    },
    "spec" : {
-      "expectations" : [],
       "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : {
          "caseStyle" : "SnakeCase",
@@ -318,7 +306,6 @@ $ mulang  '
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
-      "expectations" : [],
       "smellsSet" : { "tag" : "AllSmells" },
       "domainLanguage" : { "dictionaryFilePath" : "/usr/share/dict/words" }
    }
@@ -339,6 +326,7 @@ $ mulang  '
    ]
 }
 ```
+
 
 
 ### With Intermediate Language Generation
