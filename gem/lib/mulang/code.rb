@@ -25,6 +25,10 @@ module Mulang
       new Mulang::Language::Native.new(language_name), content
     end
 
+    def self.native!(*args)
+      native(*args).tap { |it| it.expect('Parses') }
+    end
+
     def self.external(content, &tool)
       new Mulang::Language::External.new(&tool), content
     end
@@ -32,5 +36,15 @@ module Mulang
     def self.ast(ast)
       new Mulang::Language::External.new, ast
     end
+
+    def expect(binding='*', inspection)
+      result = analyse(expectations: [{binding: binding, inspection: inspection}])
+
+      raise result['reason'] if result['tag'] == 'AnalysisFailed'
+
+      result['expectationResults'].first['result']
+    end
+
+    alias query expect
   end
 end
