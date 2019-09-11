@@ -18,7 +18,7 @@ Expression in Mulang model what you will normally spec in a language as a expres
 
 However, Mulang extends this concept to most kind of elements in a program, regadless they are have an actual value in the original language. For example, class declarations and while statements are modeled as expression, although in many languages they aren't.
 
-As a rule of thumb if something is or can be represented as an statement, declararion or expression, then it is modeled as `Expression` in Mulang AST.
+As a rule of thumb if something is or can be represented as an statement, declararion or expression, the it is modeled as `Expression` in Mulang AST.
 
 ### `Record`
 
@@ -148,19 +148,14 @@ public class Bird {
 ```
 
 
-### `EqualMethod` and `HashMethod`
+### `PrimitiveMethod`
 
-> Declaration of custom equivalance and _hash code_ operations. `EqualMethod` typically corresponds to `equals` or `==` method declarations, while `HashMethod`, typically corresponds
-to `hash` or `hashCode`- like methods.
+> Declaration of custom primitive operators - also known as operator overriding. See [primitive operators](#primitive-operators)
 
 #### Syntax
 
 ```haskell
-(EqualMethod [Equation])
-```
-
-```haskell
-(HashMethod [Equation])
+(PrimitiveMethod Operator [Equation])
 ```
 
 #### Ruby Example
@@ -175,12 +170,12 @@ end
 
 ```haskell
 (Sequence [
-  (EqualMethod (Equation
-                [VariablePatten "other"]
-                (UnguardedBody MuNil))),
-  (HashMethod (Equation
-              []
-              (UnguardedBody MuNil)))]
+  (PrimitiveMethod Equal (Equation
+                         [VariablePatten "other"]
+                         (UnguardedBody MuNil))),
+  (PrimitiveMethod Hash (Equation
+                        []
+                        (UnguardedBody MuNil)))]
 
 ```
 
@@ -547,10 +542,12 @@ foo(bar).
 
 ### `Switch`
 
+> Generic switch expression, composed by the value to switch on, a list of cases and the default
+
 #### Syntax
 
 ```haskell
-(Switch Expression [(Expression, Expression)])
+(Switch Expression [(Expression, Expression)] Expression)
 ```
 
 ### `Try`
@@ -687,15 +684,6 @@ for (var i = 0; i < 10; i++) {
 
 ```haskell
 (Other)
-```
-
-### `Equal` and `NotEqual`
-
-#### Syntax
-
-```haskell
-(Equal)
-(NotEqual)
 ```
 
 ### `Self`
@@ -1068,6 +1056,28 @@ function foo(x, y) { }
 ```haskell
 (OtherPattern)
 ```
+
+## Primitive Operators
+
+Primitive operators represent low-level language operations that are well known and common to most languages, usually in the fashion of operators.
+
+* `Equal`: equal operator
+* `NotEqual`: distinct operator
+* `Negation`: not operator
+* `And`: and operator
+* `Or`: or operator
+* `Hash`: hashcode operator
+* `GreatherOrEqualThan`
+* `GreatherThan`
+* `LessOrEqualThan`
+* `LessThan`
+* `Otherwise`: guard's otherwise operator
+* `Plus`
+* `Minus`
+* `Multiply`
+* `Divide`
+* `ForwardComposition`: `(f >> g)(x) = (g . f)(x) = g(f(x))` operator
+* `BackwardComposition`: `(g << f)(x) = (g . f)(x) = g(f(x))` operator
 
 ## Types
 
