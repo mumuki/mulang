@@ -21,6 +21,19 @@ module Mulang
       Mulang.analyse analysis(spec)
     end
 
+    def expect(binding='*', inspection)
+      expectation_results_for(analyse(expectations: [{binding: binding, inspection: inspection}])).first['result']
+    end
+
+    def custom_expect(edl)
+      expectation_results_for(analyse(customExpectations: edl))
+        .map { |e| [e['expectation']['inspection'], e['result']] }
+        .to_h
+    end
+
+    alias query expect
+    alias custom_query custom_expect
+
     def self.native(language_name, content)
       new Mulang::Language::Native.new(language_name), content
     end
@@ -37,14 +50,11 @@ module Mulang
       new Mulang::Language::External.new, ast
     end
 
-    def expect(binding='*', inspection)
-      result = analyse(expectations: [{binding: binding, inspection: inspection}])
+    private
 
+    def expectation_results_for(result)
       raise result['reason'] if result['tag'] == 'AnalysisFailed'
-
-      result['expectationResults'].first['result']
+      result['expectationResults']
     end
-
-    alias query expect
   end
 end

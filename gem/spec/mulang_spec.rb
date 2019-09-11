@@ -18,6 +18,13 @@ describe Mulang::Code do
     it { expect(code.query '*', 'Assigns:x:WithLiteral').to be true }
     it { expect(code.query '*', 'Assigns:x:WithNumber:1').to be true }
     it { expect(code.query '*', 'Assigns:x:WithNumber:2').to be false }
+
+    it { expect(code.custom_query %q{
+                  expectation "assigns 1":
+                    assigns with 1;
+                  expectation "assigns 2":
+                    assigns with 2}).to eq 'assigns 1' => true,
+                                           'assigns 2' => false }
   end
 
   context 'when language is lowercase' do
