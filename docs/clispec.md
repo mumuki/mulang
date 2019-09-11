@@ -1,12 +1,12 @@
 # Command Line Tool
 
-You can also use Mulang from the Command Line, without having to interact with Haskell code. This tool allows to perform most common analysis out of the box by using a JSON spec. It supports four different kinds of analysis:
+You can also use Mulang from the Command Line, without having to interact with Haskell code. This tool allows to perform most common analysis out of the box by using a JSON spec. It supports five different kinds of analysis:
 
 1. **Expectation analysis**: you can pass _inspections_ that will be tested against the provied program. Expectations answer questions like: _does the function X call the function Y?_ or _does the program use if's?_.
-4. **Smell analysis**: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched.
-2. **Intermediate Language analysis**: you can ask the tool to generate the Mulang AST for a given source code.
-3. **Signature analysis**: report the signatures of the computations present in source code.
-
+2. **Smell analysis**: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched.
+3. **Intermediate Language analysis**: you can ask the tool to generate the Mulang AST for a given source code.
+4. **Signature analysis**: report the signatures of the computations present in source code.
+5. **Test analysis**: run basic unit-like tests over the code.
 
 ## Examples
 
@@ -392,6 +392,168 @@ $ mulang '
          ]
       ]
    }
+}
+
+```
+
+
+## With test running
+
+```bash
+mulang '{
+"sample" : {
+   "tag" : "CodeSample",
+   "language" : "JavaScript",
+   "content" : "function f(x) { return x + 1 }"
+},
+"spec" : {
+   "testAnalysisType" : {
+     "tag" :  "ExternalTests",
+     "test" : {
+       "tag" : "CodeSample",
+       "language" : "JavaScript",
+       "content" : "it(\"f increments by one\", function() { assert.equals(f(1), 2) })"
+     }
+   }
+ }
+}' | json_pp
+{
+   "testResults" : [
+      {
+         "description" : [
+            "f increments by one"
+         ],
+         "status" : {
+            "tag" : "Success"
+         }
+      }
+   ],
+   "signatures" : [],
+   "intermediateLanguage" : null,
+   "tag" : "AnalysisCompleted",
+   "smells" : [],
+   "expectationResults" : []
+}
+```
+For further detail on this spec, see [Code Execution](#code-execution)
+
+## Code Execution
+
+As of v4.4.0, mulang provides basic support for executing its AST.
+This feature can accessed through a `testAnalysisType` spec, such as the one shown in [this section](#with-test-running).
+
+Currently, support is given for executing the following AST elements:
+
+- [Application](#application)
+- [Assert](#testgroup-test-and-assert)
+- [Assignment](#assignment)
+- [ForLoop](#forloop)
+- [If](#if)
+- [Lambda](#lambda)
+- [MuBool](#munumber-mubool-mustring-musymbol-and-muchar)
+- [MuList](#mutuple-and-mulist)
+- [MuNil](#munil)
+- [MuNumber](#munumber-mubool-mustring-musymbol-and-muchar)
+- [MuString](#munumber-mubool-mustring-musymbol-and-muchar)
+- [Print](#print)
+- [Raise](#raise)
+- [Reference](#reference)
+- [Return](#return)
+- [Sequence](#sequence)
+- [Function](#function)
+- [Procedure](#procedure)
+- [Method](#method)
+- [Variable](#variable)
+- [While](#while)
+
+### Examples
+
+```bash
+mulang '{
+  "sample" : {
+    "tag" : "CodeSample",
+    "language" : "JavaScript",
+    "content" : "
+      function f(x) {
+        return x + 1
+      }"
+  },
+  "spec" : {
+    "testAnalysisType" : {
+      "tag" :  "ExternalTests",
+      "test" : {
+        "tag" : "CodeSample",
+        "language" : "JavaScript",
+        "content" : "
+          it(\"f increments by one\", function() {
+            assert.equals(f(1), 2)
+          })"
+      }
+    }
+  }
+}' | json_pp
+{
+   "testResults" : [
+      {
+         "status" : {
+            "tag" : "Success"
+         },
+         "description" : [
+            "f increments by one"
+         ]
+      }
+   ],
+   "signatures" : [],
+   "smells" : [],
+   "intermediateLanguage" : null,
+   "expectationResults" : [],
+   "tag" : "AnalysisCompleted"
+}
+```
+
+Since both the code and tests are parsed to and run as an AST, the two of them needn't be in the same language:
+
+```bash
+mulang '{
+  "sample" : {
+    "tag" : "CodeSample",
+    "language" : "Python",
+    "content" : "def f():
+        x = 0
+        while x < 10:
+          x += 1
+        return x"
+  },
+  "spec" : {
+    "testAnalysisType" : {
+      "tag" :  "ExternalTests",
+      "test" : {
+        "tag" : "CodeSample",
+        "language" : "JavaScript",
+        "content" : "
+          it(\"f returns 10\", function() {
+            assert.equals(f(), 10)
+          })"
+      }
+    }
+  }
+}' | json_pp
+{
+   "signatures" : [],
+   "expectationResults" : [],
+   "testResults" : [
+      {
+         "status" : {
+            "tag" : "Success"
+         },
+         "description" : [
+            "f returns 10"
+         ]
+      }
+   ],
+   "smells" : [],
+   "tag" : "AnalysisCompleted",
+   "intermediateLanguage" : null
 }
 
 ```
