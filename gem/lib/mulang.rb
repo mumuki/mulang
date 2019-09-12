@@ -16,5 +16,6 @@ module Mulang
   end
 end
 
+require_relative './mulang/inspection'
 require_relative './mulang/code'
 require_relative './mulang/language'

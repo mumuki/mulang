@@ -1,5 +1,5 @@
-require "bundler/setup"
 require "mulang"
+require 'mumukit/core/rspec'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -9,3 +9,7 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+
+require "codeclimate-test-reporter"
+SimpleCov.start
