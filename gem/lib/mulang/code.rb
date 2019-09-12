@@ -22,7 +22,9 @@ module Mulang
     end
 
     def expect(binding='*', inspection)
-      expectation_results_for(analyse(expectations: [{binding: binding, inspection: inspection}])).first['result']
+      expectation = {binding: binding, inspection: inspection}
+      Mulang::Expectation.parse expectation
+      expectation_results_for(analyse(expectations: [expectation])).first['result']
     end
 
     def custom_expect(edl)

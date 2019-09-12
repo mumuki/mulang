@@ -26,7 +26,7 @@ describe Mulang::Code do
                     assigns with 2}).to eq 'assigns 1' => true,
                                            'assigns 2' => false }
 
-    pending { expect { code.query 'sadad d sa dasdpsads a' }.to raise_error 'invalid expectation' }
+    it { expect { code.query ':foo' }.to raise_error 'Invalid inspection :foo' }
     pending { expect { code.custom_query 'dfsdfsdf dsfsd sdfsdf' }.to raise_error 'unexpected token dfsdfsdf' }
   end
 
