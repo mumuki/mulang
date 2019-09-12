@@ -1,7 +1,3 @@
-require 'mumukit/core'
-
-I18n.load_translations_path File.join(__dir__, '..', 'locales', '*.yml')
-
 module Mulang
   class Inspection
     attr_accessor :type, :target, :negated
@@ -40,6 +36,4 @@ module Mulang
   end
 end
 
-require_relative '../mulang/inspection/target'
-require_relative '../mulang/inspection/expectation'
-require_relative '../mulang/inspection/i18n'
+require_relative './inspection/target'

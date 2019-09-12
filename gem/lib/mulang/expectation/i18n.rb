@@ -1,4 +1,4 @@
-module Mulang::Inspection::I18n
+module Mulang::Expectation::I18n
   class << self
     DEFAULT_KEYWORDS = {
       keyword_null: :null,

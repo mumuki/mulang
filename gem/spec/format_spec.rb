@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Mulang::Inspection::Expectation do
-  subject { Mulang::Inspection::Expectation }
+describe Mulang::Expectation do
+  subject { Mulang::Expectation }
 
   describe 'it can check old format' do
     it { expect { subject.parse(binding: 'foo', inspection: 'HasBinding').check! }.to_not raise_error }
@@ -26,8 +26,8 @@ describe Mulang::Inspection::Expectation do
   end
 
   describe 'it can guess format' do
-    it { expect(subject.guess_type binding: 'foo', inspection: 'HasBinding').to be Mulang::Inspection::Expectation::V0 }
-    it { expect(subject.guess_type binding: 'foo', inspection: 'Uses:*').to be Mulang::Inspection::Expectation::V2 }
+    it { expect(subject.guess_type binding: 'foo', inspection: 'HasBinding').to be Mulang::Expectation::V0 }
+    it { expect(subject.guess_type binding: 'foo', inspection: 'Uses:*').to be Mulang::Expectation::V2 }
   end
 
   describe 'it can convert back to hash' do

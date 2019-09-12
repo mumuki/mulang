@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Mulang::Inspection::I18n do
+describe Mulang::Expectation::I18n do
 
   def expectation(binding, inspection)
-    Mulang::Inspection::Expectation.parse(binding: binding, inspection: inspection)
+    Mulang::Expectation.parse(binding: binding, inspection: inspection)
   end
 
   context 'en locale' do

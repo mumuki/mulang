@@ -1,7 +1,9 @@
-require 'active_support/all'
+require 'mumukit/core'
 require 'open3'
 
 require_relative './mulang/version'
+
+I18n.load_translations_path File.join(__dir__, 'locales', '*.yml')
 
 module Mulang
   def self.bin_path
@@ -17,5 +19,6 @@ module Mulang
 end
 
 require_relative './mulang/inspection'
+require_relative './mulang/expectation'
 require_relative './mulang/code'
 require_relative './mulang/language'

@@ -1,4 +1,4 @@
-class Mulang::Inspection::Expectation
+class Mulang::Expectation
 
   SMELLS = %w(DiscardsExceptions DoesConsolePrint DoesNilTest DoesNullTest DoesTypeTest
               HasAssignmentReturn HasCodeDuplication HasEmptyIfBranches HasLongParameterList
@@ -22,7 +22,7 @@ class Mulang::Inspection::Expectation
   end
 
   def translate(keywords = nil)
-    Mulang::Inspection::I18n.translate self, keywords
+    Mulang::Expectation::I18n.translate self, keywords
   end
 
   def to_h
@@ -47,7 +47,7 @@ class Mulang::Inspection::Expectation
       Mulang::Inspection.parse(expectation[:inspection]))
   end
 
-  class V0 < Mulang::Inspection::Expectation
+  class V0 < Mulang::Expectation
     INSPECTIONS = %w(HasBinding HasTypeDeclaration HasTypeSignature HasVariable HasArity HasDirectRecursion
                      HasComposition HasComprehension HasForeach HasIf HasGuards HasConditional HasLambda HasRepeat HasWhile
                      HasUsage HasAnonymousVariable HasNot HasForall HasFindall)
@@ -91,7 +91,7 @@ class Mulang::Inspection::Expectation
     end
   end
 
-  class V2 < Mulang::Inspection::Expectation
+  class V2 < Mulang::Expectation
     def binding?
       true
     end
@@ -105,3 +105,5 @@ class Mulang::Inspection::Expectation
     end
   end
 end
+
+require_relative './expectation/i18n'
