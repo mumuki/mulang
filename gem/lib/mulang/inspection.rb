@@ -29,8 +29,8 @@ module Mulang
       end
     end
 
-    def self.parse(insepection_s)
-      raise "Invalid inspection #{insepection_s}" unless insepection_s =~ /^(Not\:)?([^\:]+)\:?(.+)?$/
+    def self.parse(inspection_s)
+      raise "Invalid inspection #{inspection_s}" unless inspection_s =~ /^(Not\:)?([^\:]+)\:?(.+)?$/
       Inspection.new($2, Mulang::Inspection::Target.parse($3), $1.present?)
     end
   end
