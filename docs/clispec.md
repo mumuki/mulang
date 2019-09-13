@@ -182,7 +182,7 @@ $ mulang '
 }
 ```
 
-### With Smell Analysis, by inclusion
+### With smell analysis, by inclusion
 
 ```bash
 $ mulang '
@@ -199,10 +199,6 @@ $ mulang '
           "ReturnsNil",
           "DoesNullTest"
         ]
-      },
-      "signatureAnalysisType" : {
-        "tag" : "StyledSignatures",
-        "style" : "HaskellStyle"
       }
    }
 }
@@ -210,9 +206,6 @@ $ mulang '
 {
    "tag" : "AnalysisCompleted",
    "expectationResults" : [],
-   "signatures" : [
-      "-- foo x y"
-   ],
    "smells" : [
       {
          "binding" : "foo",
@@ -222,7 +215,7 @@ $ mulang '
 }
 ```
 
-### With Smell Analysis, by exclusion
+### With smell analysis, by exclusion
 
 ```bash
 $ mulang '
@@ -238,19 +231,12 @@ $ mulang '
         "exclude" : [
           "ReturnsNil"
         ]
-      },
-      "signatureAnalysisType" : {
-        "tag" : "StyledSignatures",
-        "style" : "HaskellStyle"
       }
    }
 }
 ' | json_pp
 {
    "smells" : [],
-   "signatures" : [
-      "-- foo x y"
-   ],
    "tag" : "AnalysisCompleted",
    "expectationResults" : []
 }
@@ -329,7 +315,7 @@ $ mulang  '
 
 
 
-### With Intermediate Language Generation
+### With intermediate language generation
 
 ```bash
 $ mulang '
@@ -340,8 +326,6 @@ $ mulang '
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
-      "expectations" : [],
-      "smellsSet" : { "tag" : "NoSmells" },
       "includeIntermediateLanguage" : true
    }
 }

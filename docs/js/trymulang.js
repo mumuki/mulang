@@ -25,16 +25,15 @@ const examples = {
     "sample": {
       "tag": "CodeSample",
       "language": "Haskell",
-      "content": "x = 1"
+      "content": "x = z + 1"
     },
     "spec": {
       "expectations": [
         {
-          "binding": ":Intransitive:x",
-          "inspection": "Uses:*"
+          "binding": "Intransitive:x",
+          "inspection": "Uses:z"
         }
       ],
-      "smellsSet": { "tag": "NoSmells" }
     }
   },
   "unscoped": {
@@ -44,7 +43,6 @@ const examples = {
       "content": "x = 1"
     },
     "spec": {
-      "smellsSet": { "tag": "NoSmells" },
       "expectations": [
         {
           "binding": "*",
@@ -60,8 +58,6 @@ const examples = {
       "content": "function foo(x, y) { return x + y; }"
     },
     "spec": {
-      "expectations": [],
-      "smellsSet": { "tag": "NoSmells" },
       "signatureAnalysisType": {
         "tag": "StyledSignatures",
         "style": "HaskellStyle"
@@ -75,8 +71,6 @@ const examples = {
       "content": "function foo(x, y { return x + y; }"
     },
     "spec": {
-      "expectations": [],
-      "smellsSet": { "tag": "NoSmells" },
       "signatureAnalysisType": {
         "tag": "StyledSignatures",
         "style": "HaskellStyle"
@@ -107,14 +101,10 @@ const examples = {
       }
     },
     "spec": {
-      "smellsSet": {
-        "tag": "NoSmells"
-      },
       "signatureAnalysisType": {
         "tag": "StyledSignatures",
         "style": "HaskellStyle"
-      },
-      "expectations": []
+      }
     }
   },
   "smellInclusion": {
@@ -124,17 +114,12 @@ const examples = {
       "content": "function foo(x, y) { return null; }"
     },
     "spec": {
-      "expectations": [],
       "smellsSet": {
         "tag": "NoSmells",
         "include": [
           "ReturnsNil",
           "DoesNullTest"
         ]
-      },
-      "signatureAnalysisType": {
-        "tag": "StyledSignatures",
-        "style": "HaskellStyle"
       }
     }
   },
@@ -145,16 +130,11 @@ const examples = {
       "content": "function foo(x, y) { return null; }"
     },
     "spec": {
-      "expectations": [],
       "smellsSet": {
         "tag": "AllSmells",
         "exclude": [
           "ReturnsNil"
         ]
-      },
-      "signatureAnalysisType": {
-        "tag": "StyledSignatures",
-        "style": "HaskellStyle"
       }
     }
   },
@@ -165,7 +145,6 @@ const examples = {
       "content": "son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer)."
     },
     "spec": {
-      "expectations": [],
       "smellsSet": { "tag": "AllSmells" },
       "domainLanguage": {
         "caseStyle": "SnakeCase",
@@ -175,15 +154,30 @@ const examples = {
     }
   },
   "intermediate": {
-    "sample": {
-      "tag": "CodeSample",
-      "language": "JavaScript",
-      "content": "function foo(x, y) { return null; }"
+    "sample" : {
+       "tag" : "CodeSample",
+       "language" : "JavaScript",
+       "content" : "function foo(x, y) { return null; }"
     },
-    "spec": {
-      "expectations": [],
-      "smellsSet": { "tag": "AllSmells" },
-      "domainLanguage": { "dictionaryFilePath": "/usr/share/dict/words" }
+    "spec" : {
+       "includeIntermediateLanguage" : true
     }
   },
+  "testRunning" : {
+    "sample" : {
+       "tag" : "CodeSample",
+       "language" : "JavaScript",
+       "content" : "function f(x) { return x + 1 }"
+    },
+    "spec" : {
+       "testAnalysisType" : {
+         "tag" :  "ExternalTests",
+         "test" : {
+           "tag" : "CodeSample",
+           "language" : "JavaScript",
+           "content" : "it(\"f increments by one\", function() { assert.equals(f(1), 2) })"
+         }
+       }
+     }
+    }
 };

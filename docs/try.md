@@ -12,10 +12,11 @@
   <option value="signature">With signature analysis</option>
   <option value="broken">With broken input</option>
   <option value="AST">With AST as input</option>
-  <option value="smellInclusion">With Smell Analysis, by inclusion</option>
-  <option value="smellExclusion">With Smell Analysis, by exclusion</option>
+  <option value="smellInclusion">With smell analysis, by inclusion</option>
+  <option value="smellExclusion">With smell analysis, by exclusion</option>
   <option value="expressiveness">With expressiveness smells</option>
-  <option value="intermediate">With Intermediate Language Generation</option>
+  <option value="intermediate">With intermediate language generation</option>
+  <option value="testRunning">With test running</option>
 </select>
 </span>
 
