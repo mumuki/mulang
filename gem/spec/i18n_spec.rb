@@ -99,6 +99,10 @@ describe Mulang::Expectation::I18n do
 
       it { expect(expectation('foo', 'UsesIf').translate(keyword_if: 'si')).to eq('<strong>foo</strong> debe usar <i>si</i>') }
       it { expect(expectation('foo', 'UsesIf').translate(keyword_repeat: 'repetir')).to eq('<strong>foo</strong> debe usar <i>if</i>') }
+
+      pending { expect(expectation('*', "Assigns:WithTrue").translate).to eq('la solucion debe asignar el valor <i>true</i>') }
+      pending { expect(expectation('*', "Returns:WithFalse").translate).to eq('la solucion debe retornar <i>false</i>') }
+      pending { expect(expectation('*', "Returns:WithNumber:3").translate).to eq('la solucion debe retornar el número <i>3</i>') }
     end
 
     describe 'smells' do
