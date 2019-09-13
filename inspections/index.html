@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    <link rel="canonical" href="https://mumuki.io/inspections/">
+    <link rel="../img/favicon.ico">
+
+    
+    <title>Inspections - Mulang</title>
+    
+
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../css/base.min.css" rel="stylesheet">
+    <link href="../css/cinder.min.css" rel="stylesheet">
+    <link href="../css/highlight.min.css" rel="stylesheet">
+    <link href="../css/mumuki-styles.css" rel="stylesheet">
+    <link href="../css/jquery.json-viewer.css" rel="stylesheet">
+    <link href="../css/jsoneditor.min.css" rel="stylesheet">
+    <link href="../css/docstyles.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+        <![endif]-->
+
+    <script src="//ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+    <script>
+    WebFont.load({
+        google: {
+            families: ['Open Sans', 'PT Sans']
+        }
+    });
+    </script>
+
+    
+
+     
+</head>
+
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+
+            <a class="navbar-brand" href="..">Mulang</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../astspec/">AST Spec</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../edlspec/">EDL Spec</a>
+                    </li>
+                
+                
+                
+                    <li class="active">
+                        <a href="./">Inspections</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../clispec/">Comand Line</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../try/">Try it!</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../build/">Build</a>
+                    </li>
+                
+                
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../edlspec/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../clispec/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/mumuki/mulang/edit/master/docs/inspections.md"><i class="fab fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#supported-inspections">Supported inspections</a></li>
+            <li class="second-level"><a href="#generic-inspections">Generic Inspections</a></li>
+                
+            <li class="second-level"><a href="#object-oriented-inspections">Object Oriented Inspections</a></li>
+                
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<h1 id="supported-inspections">Supported inspections</h1>
+<p>The power of Mulang is grounded on more than 90 different kind of inspections</p>
+<h2 id="generic-inspections">Generic Inspections</h2>
+<table>
+<thead>
+<tr>
+<th>Inspection</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>assigns</code></td>
+<td>the given variable or attribute assigned?</td>
+</tr>
+<tr>
+<td><code>assignsMatching</code></td>
+<td>the given variable or attribute assigned matching the given value?</td>
+</tr>
+<tr>
+<td><code>calls</code></td>
+<td>is the given method, function or procedure called?</td>
+</tr>
+<tr>
+<td><code>callsMatching</code></td>
+<td>is the given method, function or procedure called matching the given arguments?</td>
+</tr>
+<tr>
+<td><code>declares</code></td>
+<td>is the given element declared?</td>
+</tr>
+<tr>
+<td><code>declaresComputation</code></td>
+<td>that is, does the given computation  - method, predicate, function, etc - exist?</td>
+</tr>
+<tr>
+<td><code>declaresComputationWithArity</code></td>
+<td>that is, does the given computation have the exact given arity?</td>
+</tr>
+<tr>
+<td><code>declaresEntryPoint</code></td>
+<td>is there a program entry point, like a <code>main</code> procedure?</td>
+</tr>
+</tbody>
+</table>
+<h2 id="object-oriented-inspections">Object Oriented Inspections</h2>
+<table>
+<thead>
+<tr>
+<th>Inspection</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>declaresAttribute</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>declaresClass</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>declaresClassMatching</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>declaresEnumeration</code></td>
+<td>imperative</td>
+</tr>
+<tr>
+<td><code>declaresFact</code></td>
+<td>logic</td>
+</tr>
+<tr>
+<td><code>declaresFunction</code></td>
+<td>functional/imperative</td>
+</tr>
+<tr>
+<td><code>declaresFunctionMatching</code></td>
+<td>functional/imperative</td>
+</tr>
+<tr>
+<td><code>declaresInterface</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>declaresInterfaceMatching</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>declaresMethod</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>declaresMethodMatching</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>declaresObject</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>declaresObjectMatching</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>declaresPredicate</code></td>
+<td>logic</td>
+</tr>
+<tr>
+<td><code>declaresPrimitive</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>declaresProcedure</code></td>
+<td>imperative</td>
+</tr>
+<tr>
+<td><code>declaresProcedureMatching</code></td>
+<td>imperative</td>
+</tr>
+<tr>
+<td><code>declaresRecursively</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>declaresRule</code></td>
+<td>logic</td>
+</tr>
+<tr>
+<td><code>declaresSuperclass</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>declaresTypeAlias</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>declaresTypeSignature</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>declaresVariable</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>declaresVariableMatching</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>delegates</code></td>
+<td>delegates</td>
+</tr>
+<tr>
+<td><code>discardsExceptions</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>doesConsolePrint</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>doesNullTest</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>doesTypeTest</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasAssignmentReturn</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasCodeDuplication</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>hasEmptyIfBranches</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>hasLongParameterList</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>hasMisspelledIdentifiers</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>hasRedundantBooleanComparison</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasRedundantGuards</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasRedundantIf</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>hasRedundantLambda</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasRedundantLocalVariableReturn</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasRedundantParameter</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>hasRedundantReduction</code></td>
+<td>logic</td>
+</tr>
+<tr>
+<td><code>hasTooManyMethods</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>hasTooShortIdentifiers</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>hasUnreachableCode</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>hasWrongCaseIdentifiers</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>implements</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>includes</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>inherits</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>instantiates</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>isLongCode</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>overridesEqualsOrHashButNotBoth</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>raises</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>rescues</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>returnsMatching</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>returnsNil</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>typesAs</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>typesParameterAs</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>typesReturnAs</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>uses</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>usesAnonymousVariable</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesArithmetic</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>usesBooleanLogic</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>usesComposition</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesConditional</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesCut</code></td>
+<td>logic</td>
+</tr>
+<tr>
+<td><code>usesDyamicPolymorphism</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>usesDynamicMethodOverload</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>usesExceptionHandling</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>usesExceptions</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>usesFail</code></td>
+<td>logic</td>
+</tr>
+<tr>
+<td><code>usesFindall</code></td>
+<td>logic</td>
+</tr>
+<tr>
+<td><code>usesFor</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>usesForall</code></td>
+<td>logic</td>
+</tr>
+<tr>
+<td><code>usesForComprehension</code></td>
+<td>functional</td>
+</tr>
+<tr>
+<td><code>usesForEach</code></td>
+<td>procedural</td>
+</tr>
+<tr>
+<td><code>usesForLoop</code></td>
+<td>procedural</td>
+</tr>
+<tr>
+<td><code>usesGuards</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesIf</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>usesInheritance</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>usesLambda</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesLogic</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>usesLoop</code></td>
+<td>procedural</td>
+</tr>
+<tr>
+<td><code>usesMath</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>usesMixins</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>usesNot</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesObjectComposition</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>usesPatternMatching</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesPrimitive</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesPrint</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>usesRepeat</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesStaticMethodOverload</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>usesStaticPolymorphism</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>usesSwitch</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>usesTemplateMethod</code></td>
+<td>object oriented</td>
+</tr>
+<tr>
+<td><code>usesType</code></td>
+<td>any</td>
+</tr>
+<tr>
+<td><code>usesUnificationOperator</code></td>
+<td>logic</td>
+</tr>
+<tr>
+<td><code>usesWhile</code></td>
+<td>imperative</td>
+</tr>
+<tr>
+<td><code>usesYield</code></td>
+<td>functional</td>
+</tr>
+</tbody>
+</table></div>
+        
+        
+    </div>
+
+    <footer class="col-md-12 text-center">
+        
+        <hr>
+        <p>
+        <small>© Copyright 2015-2019 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a><br></small>
+        
+        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
+
+        
+        
+    </footer>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="../js/bootstrap-3.0.3.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>var base_url = ".."</script>
+    
+    <script src="../js/base.js"></script>
+    <script src="../js/edlhighligh.js"></script>
+    <script src="../js/mumuki-styles.js"></script>
+    <script src="../js/mulang.js"></script>
+    <script src="../js/jquery.json-viewer.js"></script>
+    <script src="../js/jsoneditor.min.js"></script>
+    <script src="../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    </body>
+
+</html>

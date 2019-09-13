@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    <link rel="canonical" href="https://mumuki.io/edlspec/">
+    <link rel="../img/favicon.ico">
+
+    
+    <title>EDL Spec - Mulang</title>
+    
+
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../css/base.min.css" rel="stylesheet">
+    <link href="../css/cinder.min.css" rel="stylesheet">
+    <link href="../css/highlight.min.css" rel="stylesheet">
+    <link href="../css/mumuki-styles.css" rel="stylesheet">
+    <link href="../css/jquery.json-viewer.css" rel="stylesheet">
+    <link href="../css/jsoneditor.min.css" rel="stylesheet">
+    <link href="../css/docstyles.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+        <![endif]-->
+
+    <script src="//ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+    <script>
+    WebFont.load({
+        google: {
+            families: ['Open Sans', 'PT Sans']
+        }
+    });
+    </script>
+
+    
+
+     
+</head>
+
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+
+            <a class="navbar-brand" href="..">Mulang</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../astspec/">AST Spec</a>
+                    </li>
+                
+                
+                
+                    <li class="active">
+                        <a href="./">EDL Spec</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../inspections/">Inspections</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../clispec/">Comand Line</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../try/">Try it!</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../build/">Build</a>
+                    </li>
+                
+                
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../astspec/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../inspections/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/mumuki/mulang/edit/master/docs/edlspec.md"><i class="fab fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#expectations-definition-language-reference">Expectations Definition Language Reference</a></li>
+            <li class="second-level"><a href="#basic-syntax">Basic syntax</a></li>
+                
+            <li class="second-level"><a href="#predicates">Predicates</a></li>
+                
+            <li class="second-level"><a href="#boolean-operators-on-unscoped-queries">Boolean operators on unscoped queries</a></li>
+                
+            <li class="second-level"><a href="#scopes">Scopes</a></li>
+                
+            <li class="second-level"><a href="#matchers">Matchers</a></li>
+                
+                <li class="third-level"><a href="#supported-inspections">Supported inspections</a></li>
+                <li class="third-level"><a href="#supported-matchers">Supported matchers</a></li>
+            <li class="second-level"><a href="#counters">Counters</a></li>
+                
+                <li class="third-level"><a href="#supported-counters">Supported counters</a></li>
+            <li class="second-level"><a href="#boolean-operators-on-scoped-queries">Boolean operators on scoped queries</a></li>
+                
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<h1 id="expectations-definition-language-reference">Expectations Definition Language Reference</h1>
+<p>EDL allows to express more complex expectations by combining existing inspection.</p>
+<h2 id="basic-syntax">Basic syntax</h2>
+<pre><code class="edl">expectation [&lt;name&gt;]:
+  &lt;expectation body&gt;;
+</code></pre>
+
+<p>For example, this is the simplest expectation you can declare:</p>
+<pre><code class="edl">expectation:
+  calls;
+</code></pre>
+
+<p>This expectation performs a simple <em>query</em> that checks that something is called - like a function, a procedure - and it behaves exactly as the <code>* Calls:*</code> expectation.</p>
+<p>If you want to make it more explicit that you are expecting to call <em>something</em>, you can also write it this way...</p>
+<pre><code class="edl">expectation:
+  calls something;
+</code></pre>
+
+<p>...which is just syntactic sugar - the <code>something</code> keyword is just a dummy token you can add to make the expectation syntax more human-readable.</p>
+<p>Although you can declare unnamed expectations, it is usually more convenient to add an intention-revealing name:</p>
+<pre><code class="edl">expectation &quot;you should call something&quot;:
+  calls something;
+</code></pre>
+
+<p>The inspection names match exactly with the standard expectation format, but it is more relaxed, you can it write it in three diferent formats:</p>
+<ul>
+<li><code>UpperCamelCase</code>, which is the standard syntax, e.g. <code>UsesIf</code></li>
+<li><code>lowerCamelCase</code>, e.g. <code>usesIf</code></li>
+<li><code>case insensitive words</code>, e.g. <code>uses if</code>, <code>Uses If</code> and <code>uses IF</code></li>
+</ul>
+<p>However, using lower case words - <code>uses if</code> - is the preferred case. This means that all the following declarations are equivalent:</p>
+<pre><code class="edl">% ok
+expectation:
+  UsesIf;
+
+% ok
+expectation:
+  usesIf;
+
+% better
+expectation:
+  uses if;
+</code></pre>
+
+<p>More examples:</p>
+<pre><code class="edl">expectation &quot;must declare something&quot;:
+  declares;
+
+expectation &quot;must declare something&quot;:
+  %% exactly the same as previous example
+  declares something;
+
+expectation &quot;assignment operator must be used&quot;:
+  assigns;
+
+expectation &quot;a class must be declared&quot;:
+  declares class;
+
+expectation &quot;a function must be declared&quot;:
+  declares function;
+
+</code></pre>
+
+<h2 id="predicates">Predicates</h2>
+<p>Like with standard expectations, you can use predicates with the inspections. The simplest of them is the <em>named</em> predicate, that matches a name exactly against the given identifier:</p>
+<pre><code class="edl">expectation &quot;`System` must be used&quot;:
+  %% equivalent to the standard expectation * Uses:=System
+  uses `System`;
+
+expectation &quot;`exit` must be called&quot;:
+  %% equivalent to the standard expectation * Calls:=exit
+  calls `exit`;
+</code></pre>
+
+<p>However, all the predicates are available to EDL:</p>
+<pre><code class="edl">%% matches things like `amount`, `totalAmount` or `amountOfHouses`
+expectation &quot;assignment a variable similar to `amount`&quot;:
+  %% equivalent to * Assigns:~amount
+  assigns something like `amount`;
+
+expectation &quot;must declare a class aside of `Dog`&quot;:
+  %% equivalent to * DeclaresClass:^Dog
+  declares class except `Dog`;
+</code></pre>
+
+<p>Also, there EDL exposes more predicates:</p>
+<pre><code class="edl">expectation &quot;declares methods apart from getters&quot;:
+  declares method unlike `get`;
+
+expectation &quot;must declare `feed` or `bark`&quot;:
+  declares method in (`feed`, `bark`);
+
+expectation &quot;must call `feed` or `bark`&quot;:
+  calls something in (`feed`, `bark`);
+
+expectation &quot;must call something similar to `feed` or `bark`&quot;:
+  calls something like in (`feed`, `bark`);
+
+expectation &quot;must call something apart from `feed` or `bark`&quot;:
+  calls something except in (`feed`, `bark`);
+
+expectation &quot;must declare something apart from classes like `Base` or `Abstract`&quot;:
+  declares class unlike in (`Base`, `Abstract`);
+</code></pre>
+
+<h2 id="boolean-operators-on-unscoped-queries">Boolean operators on unscoped queries</h2>
+<p>EDL allows to use logical operations with - <em>unscoped</em>, more on that later - queries:</p>
+<pre><code class="edl">%% negation
+expectation &quot;must not call anything&quot;:
+  ! calls something;
+
+%% logical-or
+expectation &quot;must declare a class, enum or interface named `Pet`&quot;:
+  declares enumeration `Pet` || declares class `Pet` || declares interface `Pet`;
+
+%% logical-and
+expectation &quot;must declare `Owner` and `Pet`&quot;:
+  %% however in most cases, it is better to declare two different, separate
+  %% expectations
+  declares `Owner` &amp;&amp; declares `Pet`;
+</code></pre>
+
+<p>Such operations don't have an equivalence on the standard expectations, and are unique to EDL.</p>
+<h2 id="scopes">Scopes</h2>
+<p>Also, custom expectations mmy be scoped using <code>within</code> and <code>through</code>,
+which allow inspecting only a given portion of the code: <code>within</code> performs intransitive cuts while
+<code>through</code> performs transitive cuts.</p>
+<pre><code class="edl">expectation &quot;`HouseBuilder` must raise something&quot;:
+  %% this will work if within the lexical scope of
+  %% HouseBuilder a raise statement is used
+  %% equivalent to Intransitive:HouseBuilder Raises
+  within `HouseBuilder` raises something;
+
+expectation &quot;`HouseBuilder` must raise something&quot;:
+  %% this will work if within the lexical scope of
+  %% HouseBuilder a raise statement is used, or if any code outside
+  %% the lexical scope of HouseBuilder raises an exception
+  %% equivalent to HouseBuilder Raises
+  through `HouseBuilder` raises something;
+
+expectation &quot;`HouseBuilder.builder` must create a new `House`&quot;:
+  %% equivalent to Instransitive:HouseBuilder.builder Instantiates:House
+  within `HouseBuilder.builder` instantiates `House`;
+
+expectation &quot;In the context of `Tree`, something other than `foo` is called&quot;:
+  %% equivalent to Tree Calls:^foo
+  through `Tree` calls something except `foo`;
+</code></pre>
+
+<p>Queries that use a scope operator are called <em>scoped queries</em>. Conversely <em>unscoped queries</em> are those that don't use one.</p>
+<h2 id="matchers">Matchers</h2>
+<p>Some inspections support an optional matcher argument, that allow you to provide
+additional conditions using the <code>with</code> keyword:</p>
+<pre><code class="edl">expectation &quot;`exit` must be called with value 0&quot;:
+  %% equivalent to * Calls:exit:WithNumber:0
+  calls `exit` with 0;
+
+expectation &quot;`tell` must be called with value 10 and true&quot;:
+  %% equivalent to * Calls:tell:WithNumber:10:WithTrue
+  calls `tell` with (10, true);
+
+expectation &quot;`play` must be called with this&quot;:
+  %% equivalent to * Calls:play:WithSelf
+  calls `play` with self;
+
+expectation &quot;uses a repeat with a non-literal amount of iterations&quot;:
+  %% matches repeat blocks where the repeat count expression is a non-literal
+  %% and the loop body is anything
+  uses repeat with (nonliteral, anything);
+
+expectation &quot;uses a repeat with a non-literal amount of iterations&quot;:
+  %% shorter version of previous example
+  uses repeat with nonliteral;
+</code></pre>
+
+<p>Most of the matchers are designed to perform literal queries, but some of them allow more complex matching:</p>
+<pre><code class="edl">expectation &quot;the method `getTotalAmount` must return an arithmetic expresion&quot;:
+  %% equivalent to Intransitive:getTotalAmmount Returns:WithMath
+  within `getTotalAmmount` returns with math;
+
+expectation &quot;a method that performs boolean operations must be declared&quot;:
+  %% equivalent to * DeclaresMethod:WithLogic
+  declares method with logic;
+
+expectation &quot;`getAge` must not return a hardcoded value:
+  %% equivalent to Intransitive:getAge Returns:WithNonliteral
+  within `getAge` returns with nonliteral;
+</code></pre>
+
+<p>As you can see in previous examples, many of the simplest matchers can also be used in the standard expectation syntax. However, EDL also supports the <code>that</code> matcher,
+that allows you to build complex, nested queries:</p>
+<pre><code class="edl">expectation &quot;must declare a class that uses an if&quot;:
+  declares class with something that (uses if);
+
+expectation &quot;must declare a class that uses an if&quot;:
+  %% shorter, equivalent version of previous example
+  declares class that (uses if);
+
+expectation &quot;`VirtualPet.HappyState` must declare a getter that returns a literal value&quot;:
+  within `VirtualPet.HappyState`
+  declares method like `get`
+  that (returns with literal);
+
+expectation &quot;uses a c-style for-loop that declares variable `x`&quot;:
+  uses for loop with (
+    something that (declares variable `x`),
+    anything,
+    anything,
+    anything);
+
+expectation &quot;uses a c-style for-loop that declares variable `x`&quot;:
+  %% even shorter version of previous example
+  uses for loop that (declares variable `x`);
+</code></pre>
+
+<p><code>that</code>-queries can be nested, thus allowing you to write quite abstract expectations:</p>
+<pre><code class="edl">expectation &quot;package `tamagochi` must declare a class with a method that returns an arithmethic expression&quot;:
+  within `tamagochi`
+  declares class
+  that (
+    declares method
+    that (
+      returns with math));
+
+expectation &quot;repeats `next()` 3 times&quot;:
+  uses repeat with (3, something that (calls `next`));
+</code></pre>
+
+<p>Previous logical operators may also be used with <code>that</code>-queries:</p>
+<pre><code class="edl">expectation &quot;must declare a procedure that uses ifs&quot;:
+  declares procedure
+  that (uses if);
+
+expectation &quot;must declare a procedure that uses ifs but not while&quot;:
+  declares procedure
+  that (uses if &amp;&amp; ! uses while);
+
+expectation &quot;does not nest a while within an if&quot;:
+  ! uses if with (
+    anything,
+    something that uses while,
+    anything)
+  &amp;&amp; ! uses if with (
+    anything,
+    anything,
+    something that (uses while));
+
+expectation &quot;uses an if that does not nest a while inside it&quot;:
+  uses if with (
+    anything,
+    something that (!uses while),
+    something that (!uses while));
+</code></pre>
+
+<h3 id="supported-inspections">Supported inspections</h3>
+<p>This is the complete list of inspections that support matchers:</p>
+<ul>
+<li><code>assigns</code>: accepts a matcher that matches the assigned value</li>
+<li><code>calls</code>: accepts a matcher that matches the passed arguments</li>
+<li><code>declares attribute</code>: accepts a matcher that matches the initial value</li>
+<li><code>declares class</code>: accepts a matcher that matches any of the body expressions</li>
+<li><code>declares entry point</code>: accepts a matchers that matches the entry point body</li>
+<li><code>declares function</code>: accepts a matcher that matches any of the body expressions</li>
+<li><code>declares interface</code>: accepts a matcher that matches any of the body expressions</li>
+<li><code>declares method</code>: accepts a matcher that matches any of the body expressions</li>
+<li><code>declares object</code>: accepts a matcher that matches any of the body expressions</li>
+<li><code>declares procedure</code>: accepts a matcher that matches any of the body expressions</li>
+<li><code>declares variable</code>: accepts a matcher that matches the initial value</li>
+<li><code>returns</code>: accepts a matcher that matches the returned value</li>
+<li><code>uses for each</code>: accepts a matcher that matches the generator, and the loop body</li>
+<li><code>uses for loop</code>: accepts a matcher that matches the initializer expression, the condition expression, the increment expression and the loop body</li>
+<li><code>uses if</code>: accepts a matcher that matches the condition, the <code>then</code> expression and the <code>else</code> expression</li>
+<li><code>uses lambda</code>: accepts a matcher that matches the lambda body</li>
+<li><code>uses print</code>: accepts a matcher that matchers the printed value</li>
+<li><code>uses repeat</code>: accepts a matcher that matches the repeat expression and the loop body</li>
+<li><code>uses while</code>: accepts a matcher that matches the condition expression and the loop body</li>
+<li><code>uses yield</code>: accepts a matcher that matches the yielded value</li>
+</ul>
+<h3 id="supported-matchers">Supported matchers</h3>
+<ul>
+<li><code>(&lt;matcher1&gt;, &lt;matcher2&gt;.., &lt;matcherN&gt;)</code>: matches a tuple of expressions, like a callable's arguments or a control structure parts. If less elements than required are passed, the list is padded with <code>anything</code> matchers.</li>
+<li><code>&lt;character&gt;</code>: matches a single character</li>
+<li><code>&lt;number&gt;</code>: matches a number literal</li>
+<li><code>&lt;string&gt;</code>: matches a single string</li>
+<li><code>&lt;symbol&gt;</code>: matches a symbol literal</li>
+<li><code>anything</code>: matches anything</li>
+<li><code>false</code> and <code>true</code>: matches the <code>true</code> and <code>false</code> literals</li>
+<li><code>literal</code>: matches any literal</li>
+<li><code>logic</code>: matches a boolean expression</li>
+<li><code>math</code>: matches an arithmetic expresion</li>
+<li><code>nil</code>: matches the nil/null literal</li>
+<li><code>nonliteral</code>: matches a non-literal expression</li>
+<li><code>self</code>: matches the self/this literal</li>
+<li><code>that (&lt;other query&gt;)</code>: matches an expression that makes the given query true</li>
+</ul>
+<h2 id="counters">Counters</h2>
+<p>EDL allows you to define expectations by counting and comparing matches of another query, by using the <code>count</code>, <code>=</code>, <code>&gt;=</code> and <code>&lt;=</code> operators:</p>
+<pre><code class="edl">expectation &quot;must perform at least three calls&quot;:
+  count(calls) &gt;= 3;
+
+expectation &quot;must declare three instances of `Tax`&quot;:
+  count(inherits `Tax`) = 3;
+
+expectation &quot;must declare three subclasses of `Tax` and two subclasses of `Product`&quot;:
+  count(inherits `Tax`) = 3 &amp;&amp; count(inherits `Product`) = 2;
+
+expectation &quot;must declare no more than 4 methods in class `Queue`&quot;:
+  within `Queue` count(declares method) &lt;= 4;
+</code></pre>
+
+<p>Finally, counters may be added, using the <code>+</code> opertor:</p>
+<pre><code class="edl">expectation &quot;The `Bar` must declare 4 or more methods related to beer or whisky&quot;:
+  within `Bar`
+  count (declares method like `whisky`) + count (declares method like `beer`) &gt;= 4;
+</code></pre>
+
+<h3 id="supported-counters">Supported counters</h3>
+<p>Not all inspections can be counted. Currently, only the following are supported:</p>
+<ul>
+<li><code>declares attribute</code></li>
+<li><code>declares class</code></li>
+<li><code>declares function</code></li>
+<li><code>declares interface</code></li>
+<li><code>declares method</code></li>
+<li><code>declares object</code></li>
+<li><code>declares procedure</code></li>
+<li><code>declares variable</code></li>
+<li><code>uses for loop</code></li>
+<li><code>uses for</code></li>
+<li><code>uses if</code></li>
+<li><code>uses repeat</code></li>
+<li><code>uses while</code></li>
+</ul>
+<h2 id="boolean-operators-on-scoped-queries">Boolean operators on scoped queries</h2>
+<p>Finally, EDL allows to use logical operations with scoped queries:</p>
+<pre><code class="edl">%% negation
+expectation &quot;must not assign anything in `main`&quot;:
+  not (within 'main' assigns);
+
+%% logical-or
+expectation &quot;pacakge `vet` must declare a class, enum or interface named `Pet`&quot;:
+  (within `vet` declares enumeration `Pet`)
+  or (within `vet` declares class `Pet`)
+  or (within `vet` declares interface `Pet`);
+
+%% alternate definition, which is equivalent provided package `vet` exists
+expectation &quot;pacakge `vet` must declare a class, enum or interface named `Pet`&quot;:
+  within `vet` declares enumeration `Pet` || declares class `Pet` || declares interface `Pet`;
+
+%% logical-and
+expectation &quot;`Pet` must declare `eat` and `Owner` must send it&quot;:
+  %% however in most cases, it is better to declare two different, separate
+  %% expectations
+  (within `Pet` declares `eat`) and (within `Owner` sends `eat`);
+</code></pre></div>
+        
+        
+    </div>
+
+    <footer class="col-md-12 text-center">
+        
+        <hr>
+        <p>
+        <small>© Copyright 2015-2019 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a><br></small>
+        
+        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
+
+        
+        
+    </footer>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="../js/bootstrap-3.0.3.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>var base_url = ".."</script>
+    
+    <script src="../js/base.js"></script>
+    <script src="../js/edlhighligh.js"></script>
+    <script src="../js/mumuki-styles.js"></script>
+    <script src="../js/mulang.js"></script>
+    <script src="../js/jquery.json-viewer.js"></script>
+    <script src="../js/jsoneditor.min.js"></script>
+    <script src="../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    </body>
+
+</html>

@@ -8401,8 +8401,8 @@ a.list-group-item-danger.active:hover, a.list-group-item-danger.active:focus {
 
 @font-face {
   font-family: "dev-awesome";
-  src: url("../fonts/dev-awesome.eot?a117e1776323fb312913690ebd1177fb");
-  src: url("../fonts/dev-awesome.eot?#iefix") format("embedded-opentype"), url("../fonts/dev-awesome.woff2?a117e1776323fb312913690ebd1177fb") format("woff2"), url("../fonts/dev-awesome.woff?a117e1776323fb312913690ebd1177fb") format("woff"), url("../fonts/dev-awesome.ttf?a117e1776323fb312913690ebd1177fb") format("truetype"), url("../fonts/dev-awesome.svg?a117e1776323fb312913690ebd1177fb#dev-awesome") format("svg");
+  src: url("../fonts/dev-awesome.eot?2f97cbfe09d6840c0f0a90490ad91963");
+  src: url("../fonts/dev-awesome.eot?2f97cbfe09d6840c0f0a90490ad91963#iefix") format("embedded-opentype"), url("../fonts/dev-awesome.woff2?2f97cbfe09d6840c0f0a90490ad91963") format("woff2"), url("../fonts/dev-awesome.woff?2f97cbfe09d6840c0f0a90490ad91963") format("woff"), url("../fonts/dev-awesome.ttf?2f97cbfe09d6840c0f0a90490ad91963") format("truetype"), url("../fonts/dev-awesome.svg?2f97cbfe09d6840c0f0a90490ad91963#dev-awesome") format("svg");
   font-weight: normal;
   font-style: normal; }
 
@@ -9863,8 +9863,7 @@ pre code {
 pre {
   position: relative;
   border: 2px solid #cfd9db;
-  border-width: 1px;
-  padding-top: 32px; }
+  border-width: 1px; }
   pre .mu-clipboard {
     font-size: 85%;
     cursor: pointer;
@@ -9879,15 +9878,46 @@ pre {
     border-bottom: 2px solid #cfd9db;
     border-bottom-width: 1px;
     height: 2em;
-    width: 8em;
+    width: 2em;
     color: #0B465D;
     top: 0;
     right: 0;
-    background-color: #cfd9db; }
+    background-color: #cfd9db;
+    overflow: hidden; }
     pre .mu-clipboard span {
       margin-left: 0.25em;
-      font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+      font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      display: none; }
     pre .mu-clipboard:hover {
-      background-color: #b1c2c6; }
+      background-color: #b1c2c6;
+      width: 8em;
+      animation-duration: 100ms;
+      animation-name: copySliderAnimation; }
+      pre .mu-clipboard:hover span {
+        display: block; }
     pre .mu-clipboard.clicked {
       font-weight: bold; }
+
+@-webkit-keyframes copySliderAnimation {
+  from {
+    width: 2em; }
+  to {
+    width: 8em; } }
+
+@-moz-keyframes copySliderAnimation {
+  from {
+    width: 2em; }
+  to {
+    width: 8em; } }
+
+@-o-keyframes copySliderAnimation {
+  from {
+    width: 2em; }
+  to {
+    width: 8em; } }
+
+@keyframes copySliderAnimation {
+  from {
+    width: 2em; }
+  to {
+    width: 8em; } }

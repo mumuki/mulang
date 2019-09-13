@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    <link rel="canonical" href="https://mumuki.io/clispec/">
+    <link rel="../img/favicon.ico">
+
+    
+    <title>Comand Line - Mulang</title>
+    
+
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
+    <link href='//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
+    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../css/base.min.css" rel="stylesheet">
+    <link href="../css/cinder.min.css" rel="stylesheet">
+    <link href="../css/highlight.min.css" rel="stylesheet">
+    <link href="../css/mumuki-styles.css" rel="stylesheet">
+    <link href="../css/jquery.json-viewer.css" rel="stylesheet">
+    <link href="../css/jsoneditor.min.css" rel="stylesheet">
+    <link href="../css/docstyles.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+        <![endif]-->
+
+    <script src="//ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+    <script>
+    WebFont.load({
+        google: {
+            families: ['Open Sans', 'PT Sans']
+        }
+    });
+    </script>
+
+    
+
+     
+</head>
+
+<body>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+
+            <!-- Main title -->
+
+            <a class="navbar-brand" href="..">Mulang</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                
+                
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../astspec/">AST Spec</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../edlspec/">EDL Spec</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../inspections/">Inspections</a>
+                    </li>
+                
+                
+                
+                    <li class="active">
+                        <a href="./">Comand Line</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../try/">Try it!</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../build/">Build</a>
+                    </li>
+                
+                
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../inspections/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../try/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/mumuki/mulang/edit/master/docs/clispec.md"><i class="fab fa-github"></i> Edit on GitHub</a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        
+        
+        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="first-level active"><a href="#command-line-tool">Command Line Tool</a></li>
+            <li class="second-level"><a href="#examples">Examples</a></li>
+                
+                <li class="third-level"><a href="#with-intransitive-expectations">With intransitive expectations</a></li>
+                <li class="third-level"><a href="#with-unscoped-expectations">With unscoped expectations</a></li>
+                <li class="third-level"><a href="#with-signature-analysis">With signature analysis</a></li>
+                <li class="third-level"><a href="#with-broken-input">With broken input</a></li>
+                <li class="third-level"><a href="#with-ast-as-input">With AST as input</a></li>
+                <li class="third-level"><a href="#with-smell-analysis-by-inclusion">With smell analysis, by inclusion</a></li>
+                <li class="third-level"><a href="#with-smell-analysis-by-exclusion">With smell analysis, by exclusion</a></li>
+                <li class="third-level"><a href="#with-expressiveness-smells">With expressiveness smells</a></li>
+                <li class="third-level"><a href="#with-intermediate-language-generation">With intermediate language generation</a></li>
+            <li class="second-level"><a href="#with-test-running">With test running</a></li>
+                
+            <li class="second-level"><a href="#code-execution">Code Execution</a></li>
+                
+                <li class="third-level"><a href="#examples_1">Examples</a></li>
+    </ul>
+</div></div>
+        <div class="col-md-9" role="main">
+
+<h1 id="command-line-tool">Command Line Tool</h1>
+<p>You can also use Mulang from the Command Line, without having to interact with Haskell code. This tool allows to perform most common analysis out of the box by using a JSON spec. It supports five different kinds of analysis:</p>
+<ol>
+<li><strong>Expectation analysis</strong>: you can pass <em>inspections</em> that will be tested against the provied program. Expectations answer questions like: <em>does the function X call the function Y?</em> or <em>does the program use if's?</em>.</li>
+<li><strong>Smell analysis</strong>: instead of asking explcit questions to the program, the smells analysis implicitly runs specific inspections - that denote bad code - in orden to know if any of them is matched.</li>
+<li><strong>Intermediate Language analysis</strong>: you can ask the tool to generate the Mulang AST for a given source code.</li>
+<li><strong>Signature analysis</strong>: report the signatures of the computations present in source code.</li>
+<li><strong>Test analysis</strong>: run basic unit-like tests over the code.</li>
+</ol>
+<h2 id="examples">Examples</h2>
+<p>Let's see some usage samples:</p>
+<h3 id="with-intransitive-expectations">With intransitive expectations</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;Haskell&quot;,
+      &quot;content&quot; : &quot;x = z + 1&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;expectations&quot; : [
+         {
+            &quot;binding&quot; : &quot;Intransitive:x&quot;,
+            &quot;inspection&quot; : &quot;Uses:z&quot;
+         }
+      ]
+   }
+}
+' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;expectationResults&quot; : [
+      {
+         &quot;expectation&quot; : {
+            &quot;binding&quot; : &quot;Intransitive:x&quot;,
+            &quot;inspection&quot; : &quot;Uses:z&quot;
+         },
+         &quot;result&quot; : true
+      }
+   ],
+   &quot;smells&quot; : [],
+   &quot;intermediateLanguage&quot; : null,
+   &quot;signatures&quot; : []
+}
+</code></pre>
+
+<h3 id="with-unscoped-expectations">With unscoped expectations</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;Haskell&quot;,
+      &quot;content&quot; : &quot;x = 1&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;expectations&quot; : [
+         {
+            &quot;binding&quot; : &quot;*&quot;,
+            &quot;inspection&quot; : &quot;Declares:x&quot;
+         }
+      ]
+   }
+}
+' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;smells&quot; : [],
+   &quot;expectationResults&quot; : [
+      {
+         &quot;result&quot; : true,
+         &quot;expectation&quot; : {
+            &quot;binding&quot; : &quot;*&quot;,
+            &quot;inspection&quot; : &quot;Declares:x&quot;
+         }
+      }
+   ],
+   &quot;signatures&quot; : []
+}
+</code></pre>
+
+<h3 id="with-signature-analysis">With signature analysis</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;JavaScript&quot;,
+      &quot;content&quot; : &quot;function foo(x, y) { return x + y; }&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;signatureAnalysisType&quot; : {
+        &quot;tag&quot; : &quot;StyledSignatures&quot;,
+        &quot;style&quot; : &quot;HaskellStyle&quot;
+      }
+   }
+}
+' | json_pp
+{
+   &quot;expectationResults&quot; : [],
+   &quot;smells&quot; : [],
+   &quot;signatures&quot; : [
+      &quot;-- foo x y&quot;
+   ],
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;
+}
+</code></pre>
+
+<h3 id="with-broken-input">With broken input</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;JavaScript&quot;,
+      &quot;content&quot; : &quot;function foo(x, y { return x + y; }&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;signatureAnalysisType&quot; : {
+        &quot;tag&quot; : &quot;StyledSignatures&quot;,
+        &quot;style&quot; : &quot;HaskellStyle&quot;
+      }
+   }
+}' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisFailed&quot;,
+   &quot;reason&quot; : &quot;Sample code parsing error&quot;
+}
+</code></pre>
+
+<h3 id="with-ast-as-input">With AST as input</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;MulangSample&quot;,
+      &quot;ast&quot; : {
+         &quot;tag&quot; : &quot;Sequence&quot;,
+         &quot;contents&quot; : [
+            {
+              &quot;tag&quot; : &quot;Variable&quot;,
+              &quot;contents&quot; : [
+                &quot;x&quot;,
+                { &quot;tag&quot; : &quot;MuNumber&quot;, &quot;contents&quot; : 1 }
+              ]
+            },
+            {
+              &quot;tag&quot; : &quot;Variable&quot;,
+              &quot;contents&quot; : [
+                &quot;y&quot;,
+                { &quot;tag&quot; : &quot;MuNumber&quot;, &quot;contents&quot; : 2 }
+              ]
+            }
+         ]
+      }
+   },
+   &quot;spec&quot; : {
+      &quot;signatureAnalysisType&quot; : {
+         &quot;tag&quot; : &quot;StyledSignatures&quot;,
+         &quot;style&quot; : &quot;HaskellStyle&quot;
+      }
+   }
+}
+' | json_pp
+{
+   &quot;expectationResults&quot; : [],
+   &quot;smells&quot; : [],
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;signatures&quot; : [
+      &quot;-- x&quot;,
+      &quot;-- y&quot;
+   ]
+}
+</code></pre>
+
+<h3 id="with-smell-analysis-by-inclusion">With smell analysis, by inclusion</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;JavaScript&quot;,
+      &quot;content&quot; : &quot;function foo(x, y) { return null; }&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;smellsSet&quot; : {
+        &quot;tag&quot; : &quot;NoSmells&quot;,
+        &quot;include&quot; : [
+          &quot;ReturnsNil&quot;,
+          &quot;DoesNullTest&quot;
+        ]
+      }
+   }
+}
+' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;expectationResults&quot; : [],
+   &quot;smells&quot; : [
+      {
+         &quot;binding&quot; : &quot;foo&quot;,
+         &quot;inspection&quot; : &quot;ReturnsNil&quot;
+      }
+   ]
+}
+</code></pre>
+
+<h3 id="with-smell-analysis-by-exclusion">With smell analysis, by exclusion</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;JavaScript&quot;,
+      &quot;content&quot; : &quot;function foo(x, y) { return null; }&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;smellsSet&quot; : {
+        &quot;tag&quot; : &quot;AllSmells&quot;,
+        &quot;exclude&quot; : [
+          &quot;ReturnsNil&quot;
+        ]
+      }
+   }
+}
+' | json_pp
+{
+   &quot;smells&quot; : [],
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;expectationResults&quot; : []
+}
+</code></pre>
+
+<h3 id="with-expressiveness-smells">With expressiveness smells</h3>
+<p>Expressivnes smells are like other smells - they can be included or excluded using the <code>smellsSet</code> settings. However, their behaviour is also controlled
+by the <code>domainLanguage</code> setting, which you <em>can</em> configure:</p>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;Prolog&quot;,
+      &quot;content&quot; : &quot;son(Parent, Son):-parentOf(Son, Parent).parentOf(bart, homer).&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;smellsSet&quot; : { &quot;tag&quot; : &quot;AllSmells&quot; },
+      &quot;domainLanguage&quot; : {
+         &quot;caseStyle&quot; : &quot;SnakeCase&quot;,
+         &quot;minimumIdentifierSize&quot; : 4,
+         &quot;jargon&quot; : [&quot;id&quot;]
+      }
+   }
+}' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;signatures&quot; : [],
+   &quot;smells&quot; : [
+      {
+         &quot;inspection&quot; : &quot;HasTooShortIdentifiers&quot;,
+         &quot;binding&quot; : &quot;son&quot;
+      },
+      {
+         &quot;binding&quot; : &quot;parentOf&quot;,
+         &quot;inspection&quot; : &quot;HasWrongCaseIdentifiers&quot;
+      }
+   ],
+   &quot;expectationResults&quot; : []
+}
+</code></pre>
+
+<p>Also, if you want to use <code>HasMisspelledIdentifiers</code> smell, you <em>need</em> to specify a dictionary - with must be ordered, downcased and with unique words only:</p>
+<pre><code class="bash">$ mulang  '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;JavaScript&quot;,
+      &quot;content&quot; : &quot;function foo(x, y) { return null; }&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;smellsSet&quot; : { &quot;tag&quot; : &quot;AllSmells&quot; },
+      &quot;domainLanguage&quot; : { &quot;dictionaryFilePath&quot; : &quot;/usr/share/dict/words&quot; }
+   }
+}' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;expectationResults&quot; : [],
+   &quot;signatures&quot; : [],
+   &quot;smells&quot; : [
+      {
+         &quot;inspection&quot; : &quot;ReturnsNil&quot;,
+         &quot;binding&quot; : &quot;foo&quot;
+      },
+      {
+         &quot;inspection&quot; : &quot;HasMisspelledIdentifiers&quot;,
+         &quot;binding&quot; : &quot;foo&quot;
+      }
+   ]
+}
+</code></pre>
+
+<h3 id="with-intermediate-language-generation">With intermediate language generation</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;JavaScript&quot;,
+      &quot;content&quot; : &quot;function foo(x, y) { return null; }&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;includeIntermediateLanguage&quot; : true
+   }
+}
+' | json_pp
+{
+   &quot;expectationResults&quot; : [],
+   &quot;smells&quot; : [],
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;signatures&quot; : [],
+   &quot;intermediateLanguage&quot; : {
+      &quot;tag&quot; : &quot;Function&quot;,
+      &quot;contents&quot; : [
+         &quot;foo&quot;,
+         [
+            [
+               [
+                  {
+                     &quot;tag&quot; : &quot;VariablePattern&quot;,
+                     &quot;contents&quot; : &quot;x&quot;
+                  },
+                  {
+                     &quot;tag&quot; : &quot;VariablePattern&quot;,
+                     &quot;contents&quot; : &quot;y&quot;
+                  }
+               ],
+               {
+                  &quot;tag&quot; : &quot;UnguardedBody&quot;,
+                  &quot;contents&quot; : {
+                     &quot;contents&quot; : {
+                        &quot;tag&quot; : &quot;MuNil&quot;
+                     },
+                     &quot;tag&quot; : &quot;Return&quot;
+                  }
+               }
+            ]
+         ]
+      ]
+   }
+}
+
+</code></pre>
+
+<h2 id="with-test-running">With test running</h2>
+<pre><code class="bash">mulang '{
+&quot;sample&quot; : {
+   &quot;tag&quot; : &quot;CodeSample&quot;,
+   &quot;language&quot; : &quot;JavaScript&quot;,
+   &quot;content&quot; : &quot;function f(x) { return x + 1 }&quot;
+},
+&quot;spec&quot; : {
+   &quot;testAnalysisType&quot; : {
+     &quot;tag&quot; :  &quot;ExternalTests&quot;,
+     &quot;test&quot; : {
+       &quot;tag&quot; : &quot;CodeSample&quot;,
+       &quot;language&quot; : &quot;JavaScript&quot;,
+       &quot;content&quot; : &quot;it(\&quot;f increments by one\&quot;, function() { assert.equals(f(1), 2) })&quot;
+     }
+   }
+ }
+}' | json_pp
+{
+   &quot;testResults&quot; : [
+      {
+         &quot;description&quot; : [
+            &quot;f increments by one&quot;
+         ],
+         &quot;status&quot; : {
+            &quot;tag&quot; : &quot;Success&quot;
+         }
+      }
+   ],
+   &quot;signatures&quot; : [],
+   &quot;intermediateLanguage&quot; : null,
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;smells&quot; : [],
+   &quot;expectationResults&quot; : []
+}
+</code></pre>
+
+<p>For further detail on this spec, see <a href="#code-execution">Code Execution</a></p>
+<h2 id="code-execution">Code Execution</h2>
+<p>As of v4.4.0, mulang provides basic support for executing its AST.
+This feature can accessed through a <code>testAnalysisType</code> spec, such as the one shown in <a href="#with-test-running">this section</a>.</p>
+<p>Currently, support is given for executing the following AST elements:</p>
+<ul>
+<li><a href="#application">Application</a></li>
+<li><a href="#testgroup-test-and-assert">Assert</a></li>
+<li><a href="#assignment">Assignment</a></li>
+<li><a href="#forloop">ForLoop</a></li>
+<li><a href="#if">If</a></li>
+<li><a href="#lambda">Lambda</a></li>
+<li><a href="#munumber-mubool-mustring-musymbol-and-muchar">MuBool</a></li>
+<li><a href="#mutuple-and-mulist">MuList</a></li>
+<li><a href="#munil">MuNil</a></li>
+<li><a href="#munumber-mubool-mustring-musymbol-and-muchar">MuNumber</a></li>
+<li><a href="#munumber-mubool-mustring-musymbol-and-muchar">MuString</a></li>
+<li><a href="#print">Print</a></li>
+<li><a href="#raise">Raise</a></li>
+<li><a href="#reference">Reference</a></li>
+<li><a href="#return">Return</a></li>
+<li><a href="#sequence">Sequence</a></li>
+<li><a href="#function">Function</a></li>
+<li><a href="#procedure">Procedure</a></li>
+<li><a href="#method">Method</a></li>
+<li><a href="#variable">Variable</a></li>
+<li><a href="#while">While</a></li>
+</ul>
+<h3 id="examples_1">Examples</h3>
+<pre><code class="bash">mulang '{
+  &quot;sample&quot; : {
+    &quot;tag&quot; : &quot;CodeSample&quot;,
+    &quot;language&quot; : &quot;JavaScript&quot;,
+    &quot;content&quot; : &quot;
+      function f(x) {
+        return x + 1
+      }&quot;
+  },
+  &quot;spec&quot; : {
+    &quot;testAnalysisType&quot; : {
+      &quot;tag&quot; :  &quot;ExternalTests&quot;,
+      &quot;test&quot; : {
+        &quot;tag&quot; : &quot;CodeSample&quot;,
+        &quot;language&quot; : &quot;JavaScript&quot;,
+        &quot;content&quot; : &quot;
+          it(\&quot;f increments by one\&quot;, function() {
+            assert.equals(f(1), 2)
+          })&quot;
+      }
+    }
+  }
+}' | json_pp
+{
+   &quot;testResults&quot; : [
+      {
+         &quot;status&quot; : {
+            &quot;tag&quot; : &quot;Success&quot;
+         },
+         &quot;description&quot; : [
+            &quot;f increments by one&quot;
+         ]
+      }
+   ],
+   &quot;signatures&quot; : [],
+   &quot;smells&quot; : [],
+   &quot;intermediateLanguage&quot; : null,
+   &quot;expectationResults&quot; : [],
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;
+}
+</code></pre>
+
+<p>Since both the code and tests are parsed to and run as an AST, the two of them needn't be in the same language:</p>
+<pre><code class="bash">mulang '{
+  &quot;sample&quot; : {
+    &quot;tag&quot; : &quot;CodeSample&quot;,
+    &quot;language&quot; : &quot;Python&quot;,
+    &quot;content&quot; : &quot;def f():
+        x = 0
+        while x &lt; 10:
+          x += 1
+        return x&quot;
+  },
+  &quot;spec&quot; : {
+    &quot;testAnalysisType&quot; : {
+      &quot;tag&quot; :  &quot;ExternalTests&quot;,
+      &quot;test&quot; : {
+        &quot;tag&quot; : &quot;CodeSample&quot;,
+        &quot;language&quot; : &quot;JavaScript&quot;,
+        &quot;content&quot; : &quot;
+          it(\&quot;f returns 10\&quot;, function() {
+            assert.equals(f(), 10)
+          })&quot;
+      }
+    }
+  }
+}' | json_pp
+{
+   &quot;signatures&quot; : [],
+   &quot;expectationResults&quot; : [],
+   &quot;testResults&quot; : [
+      {
+         &quot;status&quot; : {
+            &quot;tag&quot; : &quot;Success&quot;
+         },
+         &quot;description&quot; : [
+            &quot;f returns 10&quot;
+         ]
+      }
+   ],
+   &quot;smells&quot; : [],
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;intermediateLanguage&quot; : null
+}
+
+</code></pre></div>
+        
+        
+    </div>
+
+    <footer class="col-md-12 text-center">
+        
+        <hr>
+        <p>
+        <small>© Copyright 2015-2019 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a><br></small>
+        
+        <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
+
+        
+        
+    </footer>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="../js/bootstrap-3.0.3.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>var base_url = ".."</script>
+    
+    <script src="../js/base.js"></script>
+    <script src="../js/edlhighligh.js"></script>
+    <script src="../js/mumuki-styles.js"></script>
+    <script src="../js/mulang.js"></script>
+    <script src="../js/jquery.json-viewer.js"></script>
+    <script src="../js/jsoneditor.min.js"></script>
+    <script src="../search/main.js"></script>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+    </body>
+
+</html>

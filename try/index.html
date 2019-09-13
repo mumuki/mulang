@@ -80,20 +80,32 @@
                 
                 
                 
-                    <li class="active">
-                        <a href="./">Try it!</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../userguide/">User Guide</a>
-                    </li>
-                
-                
-                
                     <li >
                         <a href="../astspec/">AST Spec</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../edlspec/">EDL Spec</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../inspections/">Inspections</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../clispec/">Comand Line</a>
+                    </li>
+                
+                
+                
+                    <li class="active">
+                        <a href="./">Try it!</a>
                     </li>
                 
                 
@@ -112,12 +124,12 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="..">
+                        <a rel="prev" href="../clispec/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../userguide/">
+                        <a rel="next" href="../build/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -149,10 +161,11 @@
   <option value="signature">With signature analysis</option>
   <option value="broken">With broken input</option>
   <option value="AST">With AST as input</option>
-  <option value="smellInclusion">With Smell Analysis, by inclusion</option>
-  <option value="smellExclusion">With Smell Analysis, by exclusion</option>
+  <option value="smellInclusion">With smell analysis, by inclusion</option>
+  <option value="smellExclusion">With smell analysis, by exclusion</option>
   <option value="expressiveness">With expressiveness smells</option>
-  <option value="intermediate">With Intermediate Language Generation</option>
+  <option value="intermediate">With intermediate language generation</option>
+  <option value="testRunning">With test running</option>
 </select>
 </span></p>
 <div id="try-container">
@@ -167,7 +180,7 @@
         
         <hr>
         <p>
-        <small>© Copyright 2015-2018 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a><br></small>
+        <small>© Copyright 2015-2019 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a><br></small>
         
         <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
 
@@ -181,6 +194,7 @@
     <script>var base_url = ".."</script>
     
     <script src="../js/base.js"></script>
+    <script src="../js/edlhighligh.js"></script>
     <script src="../js/mumuki-styles.js"></script>
     <script src="../js/mulang.js"></script>
     <script src="../js/jquery.json-viewer.js"></script>

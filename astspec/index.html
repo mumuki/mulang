@@ -80,20 +80,32 @@
                 
                 
                 
-                    <li >
-                        <a href="../try/">Try it!</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../userguide/">User Guide</a>
-                    </li>
-                
-                
-                
                     <li class="active">
                         <a href="./">AST Spec</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../edlspec/">EDL Spec</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../inspections/">Inspections</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../clispec/">Comand Line</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../try/">Try it!</a>
                     </li>
                 
                 
@@ -112,12 +124,12 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../userguide/">
+                        <a rel="prev" href="..">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../build/">
+                        <a rel="next" href="../edlspec/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -143,7 +155,7 @@
                 <li class="third-level"><a href="#function">Function</a></li>
                 <li class="third-level"><a href="#procedure">Procedure</a></li>
                 <li class="third-level"><a href="#method">Method</a></li>
-                <li class="third-level"><a href="#equalmethod-and-hashmethod">EqualMethod and HashMethod</a></li>
+                <li class="third-level"><a href="#primitivemethod">PrimitiveMethod</a></li>
                 <li class="third-level"><a href="#variable">Variable</a></li>
                 <li class="third-level"><a href="#assignment">Assignment</a></li>
                 <li class="third-level"><a href="#attribute">Attribute</a></li>
@@ -177,7 +189,6 @@
                 <li class="third-level"><a href="#forloop">ForLoop</a></li>
                 <li class="third-level"><a href="#sequence">Sequence</a></li>
                 <li class="third-level"><a href="#other">Other</a></li>
-                <li class="third-level"><a href="#equal-and-notequal">Equal and NotEqual</a></li>
                 <li class="third-level"><a href="#self">Self</a></li>
                 <li class="third-level"><a href="#none">None</a></li>
                 <li class="third-level"><a href="#munil">MuNil</a></li>
@@ -187,7 +198,7 @@
                 <li class="third-level"><a href="#testgroup-test-and-assert">TestGroup, Test and Assert</a></li>
             <li class="second-level"><a href="#assertion">Assertion</a></li>
                 
-                <li class="third-level"><a href="#syntax_47">Syntax</a></li>
+                <li class="third-level"><a href="#syntax_46">Syntax</a></li>
                 <li class="third-level"><a href="#javascript-examples">Javascript Examples</a></li>
             <li class="second-level"><a href="#patterns">Patterns</a></li>
                 
@@ -203,6 +214,8 @@
                 <li class="third-level"><a href="#wildcardpattern">WildcardPattern</a></li>
                 <li class="third-level"><a href="#unionpattern">UnionPattern</a></li>
                 <li class="third-level"><a href="#otherpattern">OtherPattern</a></li>
+            <li class="second-level"><a href="#primitive-operators">Primitive Operators</a></li>
+                
             <li class="second-level"><a href="#types">Types</a></li>
                 
                 <li class="third-level"><a href="#typealias">TypeAlias</a></li>
@@ -226,7 +239,7 @@
 <p>Expressions are the most important element kind, since contain most of the information of a Mulang program and are always the root element of it. In fact, this implementation does not contain an <code>AST</code> or <code>Program</code> datatype - it is instead types as <code>Expression</code>.</p>
 <p>Expression in Mulang model what you will normally spec in a language as a expression, that is something that holds a value and a type. For example, <code>4 + 5</code> and <code>[2, 3].toString()</code> are typical expresion.</p>
 <p>However, Mulang extends this concept to most kind of elements in a program, regadless they are have an actual value in the original language. For example, class declarations and while statements are modeled as expression, although in many languages they aren't.</p>
-<p>As a rule of thumb if something is or can be represented as an statement, declararion or expression, then it is modeled as <code>Expression</code> in Mulang AST.</p>
+<p>As a rule of thumb if something is or can be represented as an statement, declararion or expression, the it is modeled as <code>Expression</code> in Mulang AST.</p>
 <h3 id="record"><code>Record</code></h3>
 <blockquote>
 <p>A <code>Record</code> represents a record, data or struct declaration,
@@ -324,16 +337,12 @@ end
           (UnguardedBody (Print (MuString &quot;singing in the dead of night&quot;))))))
 </code></pre>
 
-<h3 id="equalmethod-and-hashmethod"><code>EqualMethod</code> and <code>HashMethod</code></h3>
+<h3 id="primitivemethod"><code>PrimitiveMethod</code></h3>
 <blockquote>
-<p>Declaration of custom equivalance and <em>hash code</em> operations. <code>EqualMethod</code> typically corresponds to <code>equals</code> or <code>==</code> method declarations, while <code>HashMethod</code>, typically corresponds
-to <code>hash</code> or <code>hashCode</code>- like methods.</p>
+<p>Declaration of custom primitive operators - also known as operator overriding. See <a href="#primitive-operators">primitive operators</a></p>
 </blockquote>
 <h4 id="syntax_5">Syntax</h4>
-<pre><code class="haskell">(EqualMethod [Equation])
-</code></pre>
-
-<pre><code class="haskell">(HashMethod [Equation])
+<pre><code class="haskell">(PrimitiveMethod Operator [Equation])
 </code></pre>
 
 <h4 id="ruby-example_1">Ruby Example</h4>
@@ -345,12 +354,12 @@ end
 </code></pre>
 
 <pre><code class="haskell">(Sequence [
-  (EqualMethod (Equation
-                [VariablePatten &quot;other&quot;]
-                (UnguardedBody MuNil))),
-  (HashMethod (Equation
-              []
-              (UnguardedBody MuNil)))]
+  (PrimitiveMethod Equal (Equation
+                         [VariablePatten &quot;other&quot;]
+                         (UnguardedBody MuNil))),
+  (PrimitiveMethod Hash (Equation
+                        []
+                        (UnguardedBody MuNil)))]
 
 </code></pre>
 
@@ -618,8 +627,11 @@ selector and arguments</p>
 </code></pre>
 
 <h3 id="switch"><code>Switch</code></h3>
+<blockquote>
+<p>Generic switch expression, composed by the value to switch on, a list of cases and the default</p>
+</blockquote>
 <h4 id="syntax_31">Syntax</h4>
-<pre><code class="haskell">(Switch Expression [(Expression, Expression)])
+<pre><code class="haskell">(Switch Expression [(Expression, Expression)] Expression)
 </code></pre>
 
 <h3 id="try"><code>Try</code></h3>
@@ -728,17 +740,11 @@ selector and arguments</p>
 <pre><code class="haskell">(Other)
 </code></pre>
 
-<h3 id="equal-and-notequal"><code>Equal</code> and <code>NotEqual</code></h3>
-<h4 id="syntax_39">Syntax</h4>
-<pre><code class="haskell">(Equal)
-(NotEqual)
-</code></pre>
-
 <h3 id="self"><code>Self</code></h3>
 <blockquote>
 <p>Object oriented self-reference, like  C-like <code>this</code> and Smalltalk-derived <code>self</code></p>
 </blockquote>
-<h4 id="syntax_40">Syntax</h4>
+<h4 id="syntax_39">Syntax</h4>
 <pre><code class="haskell">(Self)
 </code></pre>
 
@@ -746,7 +752,7 @@ selector and arguments</p>
 <blockquote>
 <p>Used as a placeholder for empty bodies.</p>
 </blockquote>
-<h4 id="syntax_41">Syntax</h4>
+<h4 id="syntax_40">Syntax</h4>
 <pre><code class="haskell">(None)
 </code></pre>
 
@@ -754,7 +760,7 @@ selector and arguments</p>
 <blockquote>
 <p>Generic nothing value literal - <code>nil</code>, <code>null</code>, <code>()</code> or <code>unit</code>.</p>
 </blockquote>
-<h4 id="syntax_42">Syntax</h4>
+<h4 id="syntax_41">Syntax</h4>
 <pre><code class="haskell">(MuNil)
 </code></pre>
 
@@ -762,7 +768,7 @@ selector and arguments</p>
 <blockquote>
 <p>Object oriented unnamed object literal</p>
 </blockquote>
-<h4 id="syntax_43">Syntax</h4>
+<h4 id="syntax_42">Syntax</h4>
 <pre><code class="haskell">(MuObject Expression)
 </code></pre>
 
@@ -783,7 +789,7 @@ selector and arguments</p>
 <blockquote>
 <p>Generic number, boolean, string, symbol (atoms) and char literals</p>
 </blockquote>
-<h4 id="syntax_44">Syntax</h4>
+<h4 id="syntax_43">Syntax</h4>
 <pre><code class="haskell">(MuNumber Double)
 </code></pre>
 
@@ -818,7 +824,7 @@ true
 <p>They represent tuples - generic non-uniform fixed-size collection of elements - and lists - generic uniform variable-size collection of elements.
 Lists typically map to arrays, lists or sequence-like structures.</p>
 </blockquote>
-<h4 id="syntax_45">Syntax</h4>
+<h4 id="syntax_44">Syntax</h4>
 <pre><code class="haskell">(MuTuple [Expression])
 </code></pre>
 
@@ -832,7 +838,7 @@ TestGroup represents a test grouping expression such as <code>describe</code>, <
 Test represents a test expression such as <code>it</code>, etc
 Assert represents a test's assertion, such as <code>assert.equals(...)</code>, etc. It receives a boolean that represents whether the assertion is negated or not.</p>
 </blockquote>
-<h4 id="syntax_46">Syntax</h4>
+<h4 id="syntax_45">Syntax</h4>
 <pre><code class="haskell">(TestGroup Expression Expression)
 </code></pre>
 
@@ -872,7 +878,7 @@ Assert represents a test's assertion, such as <code>assert.equals(...)</code>, e
  * <code>Truth</code>: Assert the truthfulness of a given expression.
  * <code>Equality</code>: Assert the equality of two given expressions.
  * <code>Failure</code>: Assert a given expression fails with a given error.</p>
-<h4 id="syntax_47">Syntax</h4>
+<h4 id="syntax_46">Syntax</h4>
 <pre><code class="haskell">(Truth Expression)
 </code></pre>
 
@@ -909,7 +915,7 @@ patterns in imperative <code>case</code> or <code>switch</code> statements, func
 <p>Variable pattern represent a variable match. It corresponds to normal formal parameters in precedural languages,
 and to simple pattern matching against a free identifier.</p>
 </blockquote>
-<h4 id="syntax_48">Syntax</h4>
+<h4 id="syntax_47">Syntax</h4>
 <pre><code class="haskell">(VariablePattern String)
 </code></pre>
 
@@ -927,7 +933,7 @@ and to simple pattern matching against a free identifier.</p>
 <blockquote>
 <p>Literal constant pattern</p>
 </blockquote>
-<h4 id="syntax_49">Syntax</h4>
+<h4 id="syntax_48">Syntax</h4>
 <pre><code class="haskell">(LiteralPattern String)
 </code></pre>
 
@@ -936,7 +942,7 @@ and to simple pattern matching against a free identifier.</p>
 <blockquote>
 <p>Infix application pattern like <code>4:X</code></p>
 </blockquote>
-<h4 id="syntax_50">Syntax</h4>
+<h4 id="syntax_49">Syntax</h4>
 <pre><code class="haskell">(InfixApplicationPattern Pattern String Pattern)
 </code></pre>
 
@@ -946,7 +952,7 @@ and to simple pattern matching against a free identifier.</p>
 <blockquote>
 <p>prefix application pattern like <code>f _</code></p>
 </blockquote>
-<h4 id="syntax_51">Syntax</h4>
+<h4 id="syntax_50">Syntax</h4>
 <pre><code class="haskell">(ApplicationPattern String [Pattern])
 </code></pre>
 
@@ -955,7 +961,7 @@ and to simple pattern matching against a free identifier.</p>
 <blockquote>
 <p>tuple pattern like <code>(3, _)</code></p>
 </blockquote>
-<h4 id="syntax_52">Syntax</h4>
+<h4 id="syntax_51">Syntax</h4>
 <pre><code class="haskell">(TuplePattern [Pattern])
 </code></pre>
 
@@ -964,7 +970,7 @@ and to simple pattern matching against a free identifier.</p>
 <blockquote>
 <p>list pattern like <code>[x, y, _]</code></p>
 </blockquote>
-<h4 id="syntax_53">Syntax</h4>
+<h4 id="syntax_52">Syntax</h4>
 <pre><code class="haskell">(ListPattern [Pattern])
 </code></pre>
 
@@ -973,13 +979,13 @@ and to simple pattern matching against a free identifier.</p>
 <blockquote>
 <p>Prolog-like functor pattern, like <code>f(X, 6)</code>.</p>
 </blockquote>
-<h4 id="syntax_54">Syntax</h4>
+<h4 id="syntax_53">Syntax</h4>
 <pre><code class="haskell">(FunctorPattern Identifier [Pattern])
 </code></pre>
 
 <h4 id="example_26">Example</h4>
 <h3 id="aspattern"><code>AsPattern</code></h3>
-<h4 id="syntax_55">Syntax</h4>
+<h4 id="syntax_54">Syntax</h4>
 <pre><code class="haskell">(AsPattern Identifier Pattern)
 </code></pre>
 
@@ -988,7 +994,7 @@ and to simple pattern matching against a free identifier.</p>
 <blockquote>
 <p>A type pattern, like in exception handling constructs in most object-oriented languages</p>
 </blockquote>
-<h4 id="syntax_56">Syntax</h4>
+<h4 id="syntax_55">Syntax</h4>
 <pre><code class="haskell">(TypePattern Identifier)
 </code></pre>
 
@@ -997,12 +1003,12 @@ and to simple pattern matching against a free identifier.</p>
 <blockquote>
 <p>Wildcard pattern, typically <code>_</code> in functional an logic programming languages.</p>
 </blockquote>
-<h4 id="syntax_57">Syntax</h4>
+<h4 id="syntax_56">Syntax</h4>
 <pre><code class="haskell">(WildcardPattern)
 </code></pre>
 
 <h3 id="unionpattern"><code>UnionPattern</code></h3>
-<h4 id="syntax_58">Syntax</h4>
+<h4 id="syntax_57">Syntax</h4>
 <pre><code class="haskell">(UnionPattern [Pattern])
 </code></pre>
 
@@ -1010,10 +1016,31 @@ and to simple pattern matching against a free identifier.</p>
 <blockquote>
 <p>Other unrecognized pattern</p>
 </blockquote>
-<h4 id="syntax_59">Syntax</h4>
+<h4 id="syntax_58">Syntax</h4>
 <pre><code class="haskell">(OtherPattern)
 </code></pre>
 
+<h2 id="primitive-operators">Primitive Operators</h2>
+<p>Primitive operators represent low-level language operations that are well known and common to most languages, usually in the fashion of operators.</p>
+<ul>
+<li><code>Equal</code>: equal operator</li>
+<li><code>NotEqual</code>: distinct operator</li>
+<li><code>Negation</code>: not operator</li>
+<li><code>And</code>: and operator</li>
+<li><code>Or</code>: or operator</li>
+<li><code>Hash</code>: hashcode operator</li>
+<li><code>GreatherOrEqualThan</code></li>
+<li><code>GreatherThan</code></li>
+<li><code>LessOrEqualThan</code></li>
+<li><code>LessThan</code></li>
+<li><code>Otherwise</code>: guard's otherwise operator</li>
+<li><code>Plus</code></li>
+<li><code>Minus</code></li>
+<li><code>Multiply</code></li>
+<li><code>Divide</code></li>
+<li><code>ForwardComposition</code>: <code>(f &gt;&gt; g)(x) = (g . f)(x) = g(f(x))</code> operator</li>
+<li><code>BackwardComposition</code>: <code>(g &lt;&lt; f)(x) = (g . f)(x) = g(f(x))</code> operator</li>
+</ul>
 <h2 id="types">Types</h2>
 <p>When processing statically-typed languages, all type-information - regardless we are typing a function, a variable or a class - is represented with the <code>Type</code> ADT, can be one of:</p>
 <ul>
@@ -1028,7 +1055,7 @@ and to simple pattern matching against a free identifier.</p>
 <p>A <code>TypeAlias</code> represents a synonym for a type, like the <code>type</code> declaration in Haskell and Scala or C's <code>typedef</code>.
 It is a typical statically typed functional programming feature.</p>
 </blockquote>
-<h4 id="syntax_60">Syntax</h4>
+<h4 id="syntax_59">Syntax</h4>
 <pre><code class="haskell">(TypeAlias Identifier Identifier)
 </code></pre>
 
@@ -1044,7 +1071,7 @@ It is a typical statically typed functional programming feature.</p>
 <p>A <code>TypeSignature</code> represents an explicit type annotation for a computation,
 variable or module, as you can find in Java or Haskell.</p>
 </blockquote>
-<h4 id="syntax_61">Syntax</h4>
+<h4 id="syntax_60">Syntax</h4>
 <pre><code class="haskell">(TypeSignature Identifier Type)
 </code></pre>
 
@@ -1115,7 +1142,7 @@ variable or module, as you can find in Java or Haskell.</p>
 which may have static or dynamic impact on the program. It is aimed to represent
 type-casts in c-like languages and inline type signatures in functional languages.</p>
 </blockquote>
-<h4 id="syntax_62">Syntax</h4>
+<h4 id="syntax_61">Syntax</h4>
 <pre><code class="haskell">(TypeCast Expression Type)
 </code></pre>
 
@@ -1162,7 +1189,7 @@ not any other kind of constraints the cast uses. That is whay the following Java
         
         <hr>
         <p>
-        <small>© Copyright 2015-2018 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a><br></small>
+        <small>© Copyright 2015-2019 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a><br></small>
         
         <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
 
@@ -1176,6 +1203,7 @@ not any other kind of constraints the cast uses. That is whay the following Java
     <script>var base_url = ".."</script>
     
     <script src="../js/base.js"></script>
+    <script src="../js/edlhighligh.js"></script>
     <script src="../js/mumuki-styles.js"></script>
     <script src="../js/mulang.js"></script>
     <script src="../js/jquery.json-viewer.js"></script>

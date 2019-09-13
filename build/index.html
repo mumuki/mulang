@@ -81,19 +81,31 @@
                 
                 
                     <li >
-                        <a href="../try/">Try it!</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../userguide/">User Guide</a>
-                    </li>
-                
-                
-                
-                    <li >
                         <a href="../astspec/">AST Spec</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../edlspec/">EDL Spec</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../inspections/">Inspections</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../clispec/">Comand Line</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../try/">Try it!</a>
                     </li>
                 
                 
@@ -112,7 +124,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../astspec/">
+                        <a rel="prev" href="../try/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
@@ -146,7 +158,19 @@
             <li class="second-level"><a href="#loading-mulang-in-the-repl">Loading mulang in the REPL</a></li>
                 
         <li class="first-level "><a href="#ruby-wrapper">Ruby wrapper</a></li>
+            <li class="second-level"><a href="#building">Building</a></li>
+                
+            <li class="second-level"><a href="#installing-from-rubygems">Installing from rubygems</a></li>
+                
         <li class="first-level "><a href="#javascript-library">JavaScript library</a></li>
+            <li class="second-level"><a href="#building_1">Building</a></li>
+                
+            <li class="second-level"><a href="#loading">Loading</a></li>
+                
+            <li class="second-level"><a href="#running">Running</a></li>
+                
+            <li class="second-level"><a href="#installing-from-npm">Installing from npm</a></li>
+                
         <li class="first-level "><a href="#tagging-and-releasing">Tagging and releasing</a></li>
         <li class="first-level "><a href="#updating-docs">Updating docs</a></li>
     </ul>
@@ -180,31 +204,69 @@ $ mulang
 </code></pre>
 
 <h1 id="ruby-wrapper">Ruby wrapper</h1>
-<p>This module can also be deployed a ruby gem. <code>mulang</code> works with Ruby 2.3.1</p>
+<p>This module can also be deployed a ruby gem. <code>mulang</code> works with Ruby 2.3+</p>
+<h2 id="building">Building</h2>
 <pre><code class="bash">cd gem
 rake wrapper:wrap
 bundle install
 bundle exec rspec
 </code></pre>
 
+<h2 id="installing-from-rubygems">Installing from rubygems</h2>
+<p>Mulang is already shipped as a ruby gem:</p>
+<pre><code>gem install mulang
+</code></pre>
+
 <p>See <code>gem/README</code> for more details.</p>
 <h1 id="javascript-library">JavaScript library</h1>
 <p><code>mulang</code> can also be compiled to JavaScript library using <a href="https://github.com/ghcjs/ghcjs">ghcjs</a> and <a href="https://github.com/flbulgarelli/ghcjslib">ghcjslib</a>, which allows you to use it from <code>node</code> or the browser.</p>
+<h2 id="building_1">Building</h2>
 <blockquote>
 <p>:warning: you will need <code>node &gt;= 7</code> installed on your system. If you have <code>nvm</code>, before starting run the following:</p>
 <p><code>sh
 $ nvm use $(cat ghcjslib/.nvmrc)</code></p>
 </blockquote>
+<pre><code class="bash"># 1. Swap to GHCJS compiler
+ghcjslib/swap.sh
+# 2. Build ghcjslib release. It will be placed on ghcjslib/build/mulang.js
+ghcjslib/build.sh
+# 3. Run both mocha and hspec tests.
+ghcjslib/test.sh
+# 4. Run again for swapping back to ghc
+ghcjslib/swap.sh
+</code></pre>
+
+<h2 id="loading">Loading</h2>
 <ol>
-<li>Run <code>ghcjslib/swap.sh</code> for swapping to GHCJS compiler</li>
-<li>Run <code>ghcjslib/build.sh</code> for building the <code>ghcjslib</code> release. It will be placed on <code>ghcjslib/build/mulang.js</code></li>
-<li>Run <code>ghcjslib/test.sh</code> for running both mocha and hspec tests.</li>
-<li>Load it:</li>
 <li>in the browser: <code>google-chrome ghcjslib/index.html</code></li>
 <li>in <code>node</code>: run <code>node</code>, and then, within the interpreter, run: <code>let mulang = require('./ghcjslib/build/mulang.js');</code></li>
-<li>Try it: <code>mulang.analyse(...pass here a spec as described in the README....)</code></li>
-<li>Run <code>ghcjslib/swap.sh</code> again for swapping back to ghc</li>
 </ol>
+<h2 id="running">Running</h2>
+<p>Try it using <code>mulang.analyse(...pass here a spec as described in the README....)</code>. For example:</p>
+<pre><code class="javascript">&gt; mulang.analyse({
+    &quot;sample&quot; : {
+        &quot;tag&quot; : &quot;CodeSample&quot;,
+        &quot;language&quot; : &quot;Haskell&quot;,
+        &quot;content&quot; : &quot;x = 1&quot;
+      },
+    &quot;spec&quot; : {
+        &quot;smellsSet&quot; : { &quot;tag&quot; : &quot;NoSmells&quot; },
+        &quot;expectations&quot; : [
+            {
+                &quot;binding&quot; : &quot;*&quot;,
+                &quot;inspection&quot; : &quot;Declares:x&quot;
+              }
+        ]
+      }
+})
+</code></pre>
+
+<h2 id="installing-from-npm">Installing from npm</h2>
+<p>Mulang is already shipped as an npm package:</p>
+<pre><code>npm install mulang
+</code></pre>
+
+<p>See <code>ghcjslib/README</code> and https://www.npmjs.com/package/mulang for more details.</p>
 <h1 id="tagging-and-releasing">Tagging and releasing</h1>
 <pre><code class="bash">./tag.sh
 </code></pre>
@@ -223,7 +285,7 @@ $ nvm use $(cat ghcjslib/.nvmrc)</code></p>
         
         <hr>
         <p>
-        <small>© Copyright 2015-2018 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a><br></small>
+        <small>© Copyright 2015-2019 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a><br></small>
         
         <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
 
@@ -237,6 +299,7 @@ $ nvm use $(cat ghcjslib/.nvmrc)</code></p>
     <script>var base_url = ".."</script>
     
     <script src="../js/base.js"></script>
+    <script src="../js/edlhighligh.js"></script>
     <script src="../js/mumuki-styles.js"></script>
     <script src="../js/mulang.js"></script>
     <script src="../js/jquery.json-viewer.js"></script>
