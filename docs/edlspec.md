@@ -43,8 +43,7 @@ The inspection names match exactly with the standard expectation format, but it 
 
 However, using lower case words - `uses if` - is the preferred case. This means that all the following declarations are equivalent:
 
-```
-
+```edl
 % ok
 expectation:
   UsesIf;
@@ -95,7 +94,7 @@ expectation "`exit` must be called":
 
 However, all the predicates are available to EDL:
 
-```
+```edl
 %% matches things like `amount`, `totalAmount` or `amountOfHouses`
 expectation "assignment a variable similar to `amount`":
   %% equivalent to * Assigns:~amount
@@ -132,19 +131,16 @@ expectation "must declare something apart from classes like `Base` or `Abstract`
 
 EDL allows to use logical operations with - _unscoped_, more on that later - queries:
 
-```
+```edl
 %% negation
-
 expectation "must not call anything":
   ! calls something;
 
 %% logical-or
-
 expectation "must declare a class, enum or interface named `Pet`":
   declares enumeration `Pet` || declares class `Pet` || declares interface `Pet`;
 
 %% logical-and
-
 expectation "must declare `Owner` and `Pet`":
   %% however in most cases, it is better to declare two different, separate
   %% expectations
@@ -164,18 +160,18 @@ expectation "`HouseBuilder` must raise something":
   %% this will work if within the lexical scope of
   %% HouseBuilder a raise statement is used
   %% equivalent to Intransitive:HouseBuilder Raises
-  within `HouseBuilder` raises something";
+  within `HouseBuilder` raises something;
 
 expectation "`HouseBuilder` must raise something":
   %% this will work if within the lexical scope of
   %% HouseBuilder a raise statement is used, or if any code outside
   %% the lexical scope of HouseBuilder raises an exception
   %% equivalent to HouseBuilder Raises
-  through `HouseBuilder` raises something";
+  through `HouseBuilder` raises something;
 
 expectation "`HouseBuilder.builder` must create a new `House`":
   %% equivalent to Instransitive:HouseBuilder.builder Instantiates:House
-  within `HouseBuilder.builder` instantiates `House`";
+  within `HouseBuilder.builder` instantiates `House`;
 
 expectation "In the context of `Tree`, something other than `foo` is called":
   %% equivalent to Tree Calls:^foo
@@ -284,11 +280,20 @@ expectation "must declare a procedure that uses ifs but not while":
   that (uses if && ! uses while);
 
 expectation "does not nest a while within an if":
-  ! uses if with (anything, something that uses while, anything)
-    && ! uses if with (anything, anything, something that (uses while));
+  ! uses if with (
+    anything,
+    something that uses while,
+    anything)
+  && ! uses if with (
+    anything,
+    anything,
+    something that (uses while));
 
 expectation "uses an if that does not nest a while inside it":
-  uses if with (anything, something that (!uses while), something that (!uses while));
+  uses if with (
+    anything,
+    something that (!uses while),
+    something that (!uses while));
 ```
 
 
@@ -383,14 +388,12 @@ Not all inspections can be counted. Currently, only the following are supported:
 
 Finally, EDL allows to use logical operations with scoped queries:
 
-```
+```edl
 %% negation
-
 expectation "must not assign anything in `main`":
   not (within 'main' assigns);
 
 %% logical-or
-
 expectation "pacakge `vet` must declare a class, enum or interface named `Pet`":
   (within `vet` declares enumeration `Pet`)
   or (within `vet` declares class `Pet`)
@@ -401,7 +404,6 @@ expectation "pacakge `vet` must declare a class, enum or interface named `Pet`":
   within `vet` declares enumeration `Pet` || declares class `Pet` || declares interface `Pet`;
 
 %% logical-and
-
 expectation "`Pet` must declare `eat` and `Owner` must send it":
   %% however in most cases, it is better to declare two different, separate
   %% expectations

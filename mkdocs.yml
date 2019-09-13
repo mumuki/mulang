@@ -14,6 +14,7 @@ extra_css:
   - "css/jsoneditor.min.css"
   - "css/docstyles.css"
 extra_javascript:
+  - "js/edlhighligh.js"
   - "js/mumuki-styles.js"
   - "js/mulang.js"
   - "js/jquery.json-viewer.js"
