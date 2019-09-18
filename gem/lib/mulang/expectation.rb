@@ -47,6 +47,10 @@ class Mulang::Expectation
       Mulang::Inspection.parse(expectation[:inspection]))
   end
 
+  def self.valid?(expectation)
+    !!Mulang::Inspection.parse(expectation['inspection']) rescue false
+  end
+
   class V0 < Mulang::Expectation
     INSPECTIONS = %w(HasBinding HasTypeDeclaration HasTypeSignature HasVariable HasArity HasDirectRecursion
                      HasComposition HasComprehension HasForeach HasIf HasGuards HasConditional HasLambda HasRepeat HasWhile
