@@ -91,7 +91,7 @@ class Mulang::Expectation
     end
 
     def new_inspection(type, target)
-      Mulang::Inspection.new(type, target, inspection.negated?)
+      Mulang::Inspection.new(type, target, negated: inspection.negated?)
     end
   end
 

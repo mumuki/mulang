@@ -1,4 +1,6 @@
 class Mulang::Inspection::Target
+  include Mulang::Inspection::Compacted
+
   attr_accessor :type, :value
 
   def initialize(type, value=nil)

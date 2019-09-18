@@ -47,65 +47,65 @@ describe Mulang::Expectation do
 
   describe 'it can adapt to latest format' do
     it { expect(subject.parse(binding: '*', inspection: 'Declares:foo').as_v2)
-          .to json_like binding: '*', inspection: {type: 'Declares', target: {type: :unknown, value: 'foo'}, negated: false   }  }
+          .to json_like binding: '*', inspection: {type: 'Declares', target: {type: :unknown, value: 'foo'}, negated: false }  }
     it { expect(subject.parse(binding: 'foo', inspection: 'HasBinding').as_v2)
           .to json_like binding: '*', inspection: {type: 'Declares', target: {type: :named, value: 'foo'}, negated: false}   }
     it { expect(subject.parse(binding: 'foo', inspection: 'Not:HasBinding').as_v2)
-          .to json_like binding: '*', inspection: {type: 'Declares', target: {type: :named, value: 'foo'}, negated: true}   }
+          .to json_like binding: '*', inspection: {type: 'Declares', target: {type: :named, value: 'foo'}, negated: true }   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasTypeDeclaration').as_v2)
           .to json_like binding: '*', inspection: {type: 'DeclaresTypeAlias', target: {type: :named, value: 'foo'}, negated: false}   }
     it { expect(subject.parse(binding: 'foo', inspection: 'Not:HasTypeDeclaration').as_v2)
-          .to json_like binding: '*', inspection: {type: 'DeclaresTypeAlias', target: {type: :named, value: 'foo'}, negated: true}   }
+          .to json_like binding: '*', inspection: {type: 'DeclaresTypeAlias', target: {type: :named, value: 'foo'}, negated: true }   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasTypeSignature').as_v2)
           .to json_like binding: '*', inspection: {type: 'DeclaresTypeSignature', target: {type: :named, value: 'foo'}, negated: false}   }
     it { expect(subject.parse(binding: 'foo', inspection: 'Not:HasTypeSignature').as_v2)
-          .to json_like binding: '*', inspection: {type: 'DeclaresTypeSignature', target: {type: :named, value: 'foo'}, negated: true}   }
+          .to json_like binding: '*', inspection: {type: 'DeclaresTypeSignature', target: {type: :named, value: 'foo'}, negated: true }   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasVariable').as_v2)
           .to json_like binding: '*', inspection: {type: 'DeclaresVariable', target: {type: :named, value: 'foo'}, negated: false}   }
     it { expect(subject.parse(binding: 'foo', inspection: 'Not:HasVariable').as_v2)
-          .to json_like binding: '*', inspection: {type: 'DeclaresVariable', target: {type: :named, value: 'foo'}, negated: true}   }
+          .to json_like binding: '*', inspection: {type: 'DeclaresVariable', target: {type: :named, value: 'foo'}, negated: true }   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasArity:1').as_v2)
           .to json_like binding: '*', inspection: {type: 'DeclaresComputationWithArity1', target: {type: :named, value: 'foo'}, negated: false}   }
     it { expect(subject.parse(binding: 'foo', inspection: 'Not:HasArity:3').as_v2)
-          .to json_like binding: '*', inspection: {type: 'DeclaresComputationWithArity3', target: {type: :named, value: 'foo'}, negated: true}   }
+          .to json_like binding: '*', inspection: {type: 'DeclaresComputationWithArity3', target: {type: :named, value: 'foo'}, negated: true }   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasDirectRecursion').as_v2)
           .to json_like binding: '*', inspection: {type: 'DeclaresRecursively', target: {type: :named, value: 'foo'}, negated: false}   }
     it { expect(subject.parse(binding: 'foo', inspection: 'Not:HasDirectRecursion').as_v2)
-          .to json_like binding: '*', inspection: {type: 'DeclaresRecursively', target: {type: :named, value: 'foo'}, negated: true}   }
+          .to json_like binding: '*', inspection: {type: 'DeclaresRecursively', target: {type: :named, value: 'foo'}, negated: true }   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasComposition').as_v2)
-          .to json_like binding: 'foo', inspection: {type: 'UsesComposition', target: nil, negated: false}   }
+          .to json_like binding: 'foo', inspection: {type: 'UsesComposition', negated: false}   }
     it { expect(subject.parse(binding: 'foo', inspection: 'Not:HasComposition').as_v2)
-          .to json_like binding: 'foo', inspection: {type: 'UsesComposition', target: nil, negated: true}   }
+          .to json_like binding: 'foo', inspection: {type: 'UsesComposition', negated: true }   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasComprehension').as_v2)
-          .to json_like binding: 'foo', inspection: {type: 'UsesComprehension', target: nil, negated: false}   }
+          .to json_like binding: 'foo', inspection: {type: 'UsesComprehension', negated: false}   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasForeach').as_v2)
-          .to json_like binding: 'foo', inspection: {type: 'UsesForeach', target: nil, negated: false}   }
+          .to json_like binding: 'foo', inspection: {type: 'UsesForeach', negated: false}   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasIf').as_v2)
-          .to json_like binding: 'foo', inspection: {type: 'UsesIf', target: nil, negated: false}   }
+          .to json_like binding: 'foo', inspection: {type: 'UsesIf', negated: false}   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasGuards').as_v2)
-          .to json_like binding: 'foo', inspection: {type: 'UsesGuards', target: nil, negated: false}   }
+          .to json_like binding: 'foo', inspection: {type: 'UsesGuards', negated: false}   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasConditional').as_v2)
-          .to json_like binding: 'foo', inspection: {type: 'UsesConditional', target: nil, negated: false}   }
+          .to json_like binding: 'foo', inspection: {type: 'UsesConditional', negated: false}   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasLambda').as_v2)
-          .to json_like binding: 'foo', inspection: {type: 'UsesLambda', target: nil, negated: false}   }
+          .to json_like binding: 'foo', inspection: {type: 'UsesLambda', negated: false}   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasRepeat').as_v2)
-          .to json_like binding: 'foo', inspection: {type: 'UsesRepeat', target: nil, negated: false}   }
+          .to json_like binding: 'foo', inspection: {type: 'UsesRepeat', negated: false}   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasWhile').as_v2)
-          .to json_like binding: 'foo', inspection: {type: 'UsesWhile', target: nil, negated: false}   }
+          .to json_like binding: 'foo', inspection: {type: 'UsesWhile', negated: false}   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasUsage:bar').as_v2)
           .to json_like binding: 'foo', inspection: {type: 'Uses', target: {type: :named, value: 'bar'}, negated: false}   }

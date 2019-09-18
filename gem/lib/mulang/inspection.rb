@@ -1,12 +1,30 @@
 module Mulang
   class Inspection
-    attr_accessor :type, :target, :negated
+    module Compacted
+      def as_json(*args)
+        super(*args).compact
+      end
+    end
+
+    include Mulang::Inspection::Compacted
+
+    REGEXP = Regexp.new %q{
+      ^(?<negation>Not\:)?
+      (
+        ((?<type>[^\:]+)) |
+        ((?<type>[^\:]+)\:(?<matcher>WithLiteral|WithNonliteral|WithLogic|WithMath|WithFalse|WithNil|WithTrue)) |
+        ((?<type>[^\:]+)\:(?<matcher>WithChar|WithNumber|WithString|WithSymbol)\:(?<value>[^\:]+)) |
+        ((?<type>[^\:]+)\:(?<target>[^\:]+)(\:(?<matcher>[^\:]+)(\:(?<value>[^\:]+))?)?)
+      )$}.gsub(/\s/, '')
+
+    attr_accessor :type, :target, :matcher, :negated
     alias negated? negated
 
-    def initialize(type, target, negated=false)
+    def initialize(type, target, negated: false, matcher: nil)
       @type = type
       @target = target
       @negated = negated
+      @matcher = matcher
     end
 
     def to_s
@@ -30,10 +48,16 @@ module Mulang
     end
 
     def self.parse(inspection_s)
-      raise "Invalid inspection #{inspection_s}" unless inspection_s =~ /^(Not\:)?([^\:]+)\:?(.+)?$/
-      Inspection.new($2, Mulang::Inspection::Target.parse($3), $1.present?)
+      match = REGEXP.match inspection_s
+      raise "Invalid inspection #{inspection_s}" unless match
+      Inspection.new(
+        match['type'],
+        Mulang::Inspection::Target.parse(match['target']),
+        matcher: Mulang::Inspection::Matcher.parse(match['matcher'], match['value']),
+        negated: match['negation'].present?)
     end
   end
 end
 
 require_relative './inspection/target'
+require_relative './inspection/matcher'
