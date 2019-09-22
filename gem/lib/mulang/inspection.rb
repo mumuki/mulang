@@ -9,13 +9,13 @@ module Mulang
     include Mulang::Inspection::Compacted
 
     REGEXP = Regexp.new %q{
-      ^(?<negation>Not\:)?
+      ^(?<negation>Not:)?
+      (?<type>[^:]+)
       (
-        ((?<type>[^\:]+)) |
-        ((?<type>[^\:]+)\:(?<matcher>WithLiteral|WithNonliteral|WithLogic|WithMath|WithFalse|WithNil|WithTrue)) |
-        ((?<type>[^\:]+)\:(?<matcher>WithChar|WithNumber|WithString|WithSymbol)\:(?<value>[^\:]+)) |
-        ((?<type>[^\:]+)\:(?<target>[^\:]+)(\:(?<matcher>[^\:]+)(\:(?<value>[^\:]+))?)?)
-      )$}.gsub(/\s/, '')
+        :(?<matcher>WithLiteral|WithNonliteral|WithLogic|WithMath|WithFalse|WithNil|WithTrue) |
+        :(?<matcher>WithChar|WithNumber|WithString|WithSymbol):(?<value>[^:]+) |
+        :(?<target>[^:]+)(:(?<matcher>[^:]+)(:(?<value>[^:]+))?)?
+      )?$}.gsub(/\s/, '')
 
     attr_accessor :type, :target, :matcher, :negated
     alias negated? negated
