@@ -51,6 +51,16 @@ const examples = {
       ]
     }
   },
+  "custom": {
+    "sample" : {
+       "tag" : "CodeSample",
+       "language" : "JavaScript",
+       "content" : "function plusOne(x) { return x + 1 }"
+    },
+    "spec" : {
+       "customExpectations" : "expectation: declares function `plusOne` that (returns with math);\nexpectation: !declares variable with literal"
+    }
+  },
   "signature": {
     "sample": {
       "tag": "CodeSample",

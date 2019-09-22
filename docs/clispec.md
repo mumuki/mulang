@@ -85,6 +85,39 @@ $ mulang '
 }
 ```
 
+### With custom expectations
+
+> For more information about EDL syntax see [EDL Spec](../edlspec)
+
+```bash
+$ mulang '
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "JavaScript",
+      "content" : "function plusOne(x) { return x + 1 }"
+   },
+   "spec" : {
+      "customExpectations" : "expectation: declares function `plusOne` that (returns with math);\nexpectation: !declares variable with literal"
+   }
+}
+' | json_pp
+{
+   "tag" : "AnalysisCompleted",
+   "smells" : [],
+   "expectationResults" : [
+      {
+         "result" : true,
+         "expectation" : {
+            "binding" : "*",
+            "inspection" : "Declares:x"
+         }
+      }
+   ],
+   "signatures" : []
+}
+```
+
 ### With signature analysis
 
 ```bash
@@ -104,12 +137,27 @@ $ mulang '
 }
 ' | json_pp
 {
-   "expectationResults" : [],
+   "tag" : "AnalysisCompleted",
+   "intermediateLanguage" : null,
    "smells" : [],
-   "signatures" : [
-      "-- foo x y"
+   "signatures" : [],
+   "expectationResults" : [
+      {
+         "expectation" : {
+            "binding" : "<<custom>>",
+            "inspection" : "E0"
+         },
+         "result" : true
+      },
+      {
+         "expectation" : {
+            "inspection" : "E1",
+            "binding" : "<<custom>>"
+         },
+         "result" : true
+      }
    ],
-   "tag" : "AnalysisCompleted"
+   "testResults" : []
 }
 ```
 
