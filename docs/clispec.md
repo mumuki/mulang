@@ -42,10 +42,7 @@ $ mulang '
          },
          "result" : true
       }
-   ],
-   "smells" : [],
-   "intermediateLanguage" : null,
-   "signatures" : []
+   ]
 }
 ```
 
@@ -71,7 +68,6 @@ $ mulang '
 ' | json_pp
 {
    "tag" : "AnalysisCompleted",
-   "smells" : [],
    "expectationResults" : [
       {
          "result" : true,
@@ -80,10 +76,56 @@ $ mulang '
             "inspection" : "Declares:x"
          }
       }
-   ],
-   "signatures" : []
+   ]
 }
 ```
+
+### With expectations with matchers
+
+```bash
+$ mulang '
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "Python3",
+      "content" : "print(\"bye\")\nexit(1)"
+   },
+   "spec" : {
+      "expectations" : [
+         {
+            "binding" : "*",
+            "inspection" : "Calls:exit:WithNumber:0"
+         },
+         {
+            "binding" : "*",
+            "inspection" : "Prints:WithString:\"bye\""
+         }
+      ]
+   }
+}
+' | json_pp
+{
+   "tag" : "AnalysisCompleted",
+   "expectationResults" : [
+      {
+         "expectation" : {
+            "inspection" : "Calls:exit:WithNumber:0",
+            "binding" : "*"
+         },
+         "result" : false
+      },
+      {
+         "expectation" : {
+            "inspection" : "Prints:WithString:\"bye\"",
+            "binding" : "*"
+         },
+         "result" : true
+      }
+   ]
+}
+
+```
+
 
 ### With custom expectations
 
@@ -104,7 +146,6 @@ $ mulang '
 ' | json_pp
 {
    "tag" : "AnalysisCompleted",
-   "smells" : [],
    "expectationResults" : [
       {
          "result" : true,
@@ -113,8 +154,7 @@ $ mulang '
             "inspection" : "Declares:x"
          }
       }
-   ],
-   "signatures" : []
+   ]
 }
 ```
 
@@ -138,9 +178,6 @@ $ mulang '
 ' | json_pp
 {
    "tag" : "AnalysisCompleted",
-   "intermediateLanguage" : null,
-   "smells" : [],
-   "signatures" : [],
    "expectationResults" : [
       {
          "expectation" : {
@@ -156,8 +193,7 @@ $ mulang '
          },
          "result" : true
       }
-   ],
-   "testResults" : []
+   ]
 }
 ```
 
@@ -220,8 +256,6 @@ $ mulang '
 }
 ' | json_pp
 {
-   "expectationResults" : [],
-   "smells" : [],
    "tag" : "AnalysisCompleted",
    "signatures" : [
       "-- x",
@@ -253,7 +287,6 @@ $ mulang '
 ' | json_pp
 {
    "tag" : "AnalysisCompleted",
-   "expectationResults" : [],
    "smells" : [
       {
          "binding" : "foo",
@@ -284,9 +317,8 @@ $ mulang '
 }
 ' | json_pp
 {
-   "smells" : [],
    "tag" : "AnalysisCompleted",
-   "expectationResults" : []
+   "smells" : [],
 }
 ```
 
@@ -314,7 +346,6 @@ $ mulang '
 }' | json_pp
 {
    "tag" : "AnalysisCompleted",
-   "signatures" : [],
    "smells" : [
       {
          "inspection" : "HasTooShortIdentifiers",
@@ -324,8 +355,7 @@ $ mulang '
          "binding" : "parentOf",
          "inspection" : "HasWrongCaseIdentifiers"
       }
-   ],
-   "expectationResults" : []
+   ]
 }
 ```
 
@@ -346,8 +376,6 @@ $ mulang  '
 }' | json_pp
 {
    "tag" : "AnalysisCompleted",
-   "expectationResults" : [],
-   "signatures" : [],
    "smells" : [
       {
          "inspection" : "ReturnsNil",
@@ -379,10 +407,7 @@ $ mulang '
 }
 ' | json_pp
 {
-   "expectationResults" : [],
-   "smells" : [],
    "tag" : "AnalysisCompleted",
-   "signatures" : [],
    "intermediateLanguage" : {
       "tag" : "Function",
       "contents" : [
@@ -438,6 +463,7 @@ mulang '{
  }
 }' | json_pp
 {
+   "tag" : "AnalysisCompleted",
    "testResults" : [
       {
          "description" : [
@@ -447,12 +473,7 @@ mulang '{
             "tag" : "Success"
          }
       }
-   ],
-   "signatures" : [],
-   "intermediateLanguage" : null,
-   "tag" : "AnalysisCompleted",
-   "smells" : [],
-   "expectationResults" : []
+   ]
 }
 ```
 For further detail on this spec, see [Code Execution](#code-execution)
@@ -513,6 +534,7 @@ mulang '{
   }
 }' | json_pp
 {
+   "tag" : "AnalysisCompleted",
    "testResults" : [
       {
          "status" : {
@@ -522,12 +544,7 @@ mulang '{
             "f increments by one"
          ]
       }
-   ],
-   "signatures" : [],
-   "smells" : [],
-   "intermediateLanguage" : null,
-   "expectationResults" : [],
-   "tag" : "AnalysisCompleted"
+   ]
 }
 ```
 
@@ -559,8 +576,7 @@ mulang '{
   }
 }' | json_pp
 {
-   "signatures" : [],
-   "expectationResults" : [],
+   "tag" : "AnalysisCompleted",
    "testResults" : [
       {
          "status" : {
@@ -570,10 +586,7 @@ mulang '{
             "f returns 10"
          ]
       }
-   ],
-   "smells" : [],
-   "tag" : "AnalysisCompleted",
-   "intermediateLanguage" : null
+   ]
 }
 
 ```

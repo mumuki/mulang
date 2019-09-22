@@ -51,6 +51,25 @@ const examples = {
       ]
     }
   },
+  "matchers": {
+    "sample" : {
+       "tag" : "CodeSample",
+       "language" : "Python3",
+       "content" : "print(\"bye\")\nexit(1)"
+    },
+    "spec" : {
+       "expectations" : [
+          {
+             "binding" : "*",
+             "inspection" : "Calls:exit:WithNumber:0"
+          },
+          {
+             "binding" : "*",
+             "inspection" : "Prints:WithString:\"bye\""
+          }
+       ]
+    }
+  },
   "custom": {
     "sample" : {
        "tag" : "CodeSample",

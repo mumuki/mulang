@@ -144,10 +144,41 @@ Finally, does `aBird` declares an attribute that is not named `weight`?
 => true # because it also declares position
 ```
 
+### Matchers
+
+Finally, you can provide a _matcher_ to many of the available expectations, that allows to match specific parts of code with some patterns.
+
+```ruby
+> code.expect 'DeclaresAttribute:WithNumber:20'
+=> true  # because weight is initialized with that value
+> code.expect 'DeclaresAttribute:WithNumber:21'
+=> false
+> code.expect 'DeclaresAttribute:position:WithNonliteral'
+=> true # because position is initialized with a non-literal value
+> code.expect 'DeclaresAttribute:WithLiteral'
+=> true # because weight is initialized with a literal value
+> code.expect 'DeclaresAttribute:WithNil'
+=> false # because no attribute is initialied with null
+```
+
+The complete list of supported matchers is the following:
+
+  * `WithFalse`
+  * `WithLiteral`
+  * `WithLogic`
+  * `WithMath`
+  * `WithNil`
+  * `WithNonliteral`
+  * `WithTrue`
+  * `WithChar:'value'`
+  * `WithSymbol:value`
+  * `WithNumber:value`
+  * `WithString:"value"`
+
 
 # Contributors
 
- * Franco Bulgarelli @flbulgarelli [Mumuki](@mumuki)
+ * Franco Bulgarelli @flbulgarelli @ [Mumuki](@mumuki)
  * Julian Berbel Alt @julian-berbel @ [Mumuki](@mumuki)
  * Federico Lochbaum @FedeLochbaum @ [UNQ](http://www.unq.edu.ar/)
  * Lucas Traverso @ludat @ [10Pines](@10pines)

@@ -9,6 +9,7 @@
   <option selected="selected"></option>
   <option value="intransitive">With intransitive expectations</option>
   <option value="unscoped">With unscoped expectations</option>
+  <option value="matchers">With expectations with matchers</option>
   <option value="custom">With custom expectations</option>
   <option value="signature">With signature analysis</option>
   <option value="broken">With broken input</option>
