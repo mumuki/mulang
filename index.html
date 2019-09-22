@@ -154,6 +154,7 @@
                 <li class="third-level"><a href="#inspections">Inspections</a></li>
                 <li class="third-level"><a href="#contexts">Contexts</a></li>
                 <li class="third-level"><a href="#predicates">Predicates</a></li>
+                <li class="third-level"><a href="#matchers">Matchers</a></li>
         <li class="first-level "><a href="#contributors">Contributors</a></li>
     </ul>
 </div></div>
@@ -277,9 +278,37 @@ var aBird = {position: aPlace, weight: 20};
 =&gt; true # because it also declares position
 </code></pre>
 
+<h3 id="matchers">Matchers</h3>
+<p>Finally, you can provide a <em>matcher</em> to many of the available expectations, that allows to match specific parts of code with some patterns.</p>
+<pre><code class="ruby">&gt; code.expect 'DeclaresAttribute:WithNumber:20'
+=&gt; true  # because weight is initialized with that value
+&gt; code.expect 'DeclaresAttribute:WithNumber:21'
+=&gt; false
+&gt; code.expect 'DeclaresAttribute:position:WithNonliteral'
+=&gt; true # because position is initialized with a non-literal value
+&gt; code.expect 'DeclaresAttribute:WithLiteral'
+=&gt; true # because weight is initialized with a literal value
+&gt; code.expect 'DeclaresAttribute:WithNil'
+=&gt; false # because no attribute is initialied with null
+</code></pre>
+
+<p>The complete list of supported matchers is the following:</p>
+<ul>
+<li><code>WithFalse</code></li>
+<li><code>WithLiteral</code></li>
+<li><code>WithLogic</code></li>
+<li><code>WithMath</code></li>
+<li><code>WithNil</code></li>
+<li><code>WithNonliteral</code></li>
+<li><code>WithTrue</code></li>
+<li><code>WithChar:'value'</code></li>
+<li><code>WithSymbol:value</code></li>
+<li><code>WithNumber:value</code></li>
+<li><code>WithString:"value"</code></li>
+</ul>
 <h1 id="contributors">Contributors</h1>
 <ul>
-<li>Franco Bulgarelli @flbulgarelli <a href="@mumuki">Mumuki</a></li>
+<li>Franco Bulgarelli @flbulgarelli @ <a href="@mumuki">Mumuki</a></li>
 <li>Julian Berbel Alt @julian-berbel @ <a href="@mumuki">Mumuki</a></li>
 <li>Federico Lochbaum @FedeLochbaum @ <a href="http://www.unq.edu.ar/">UNQ</a></li>
 <li>Lucas Traverso @ludat @ <a href="@10pines">10Pines</a></li>
@@ -382,5 +411,5 @@ var aBird = {position: aPlace, weight: 20};
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-09-13 04:11:56
+Build Date UTC : 2019-09-22 23:30:40
 -->

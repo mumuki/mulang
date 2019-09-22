@@ -51,6 +51,35 @@ const examples = {
       ]
     }
   },
+  "matchers": {
+    "sample" : {
+       "tag" : "CodeSample",
+       "language" : "Python3",
+       "content" : "print(\"bye\")\nexit(1)"
+    },
+    "spec" : {
+       "expectations" : [
+          {
+             "binding" : "*",
+             "inspection" : "Calls:exit:WithNumber:0"
+          },
+          {
+             "binding" : "*",
+             "inspection" : "Prints:WithString:\"bye\""
+          }
+       ]
+    }
+  },
+  "custom": {
+    "sample" : {
+       "tag" : "CodeSample",
+       "language" : "JavaScript",
+       "content" : "function plusOne(x) { return x + 1 }"
+    },
+    "spec" : {
+       "customExpectations" : "expectation: declares function `plusOne` that (returns with math);\nexpectation: !declares variable with literal"
+    }
+  },
   "signature": {
     "sample": {
       "tag": "CodeSample",

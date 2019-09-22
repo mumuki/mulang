@@ -151,6 +151,8 @@
                 
                 <li class="third-level"><a href="#with-intransitive-expectations">With intransitive expectations</a></li>
                 <li class="third-level"><a href="#with-unscoped-expectations">With unscoped expectations</a></li>
+                <li class="third-level"><a href="#with-expectations-with-matchers">With expectations with matchers</a></li>
+                <li class="third-level"><a href="#with-custom-expectations">With custom expectations</a></li>
                 <li class="third-level"><a href="#with-signature-analysis">With signature analysis</a></li>
                 <li class="third-level"><a href="#with-broken-input">With broken input</a></li>
                 <li class="third-level"><a href="#with-ast-as-input">With AST as input</a></li>
@@ -206,10 +208,7 @@
          },
          &quot;result&quot; : true
       }
-   ],
-   &quot;smells&quot; : [],
-   &quot;intermediateLanguage&quot; : null,
-   &quot;signatures&quot; : []
+   ]
 }
 </code></pre>
 
@@ -233,7 +232,6 @@
 ' | json_pp
 {
    &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
-   &quot;smells&quot; : [],
    &quot;expectationResults&quot; : [
       {
          &quot;result&quot; : true,
@@ -242,8 +240,81 @@
             &quot;inspection&quot; : &quot;Declares:x&quot;
          }
       }
-   ],
-   &quot;signatures&quot; : []
+   ]
+}
+</code></pre>
+
+<h3 id="with-expectations-with-matchers">With expectations with matchers</h3>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;Python3&quot;,
+      &quot;content&quot; : &quot;print(\&quot;bye\&quot;)\nexit(1)&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;expectations&quot; : [
+         {
+            &quot;binding&quot; : &quot;*&quot;,
+            &quot;inspection&quot; : &quot;Calls:exit:WithNumber:0&quot;
+         },
+         {
+            &quot;binding&quot; : &quot;*&quot;,
+            &quot;inspection&quot; : &quot;Prints:WithString:\&quot;bye\&quot;&quot;
+         }
+      ]
+   }
+}
+' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;expectationResults&quot; : [
+      {
+         &quot;expectation&quot; : {
+            &quot;inspection&quot; : &quot;Calls:exit:WithNumber:0&quot;,
+            &quot;binding&quot; : &quot;*&quot;
+         },
+         &quot;result&quot; : false
+      },
+      {
+         &quot;expectation&quot; : {
+            &quot;inspection&quot; : &quot;Prints:WithString:\&quot;bye\&quot;&quot;,
+            &quot;binding&quot; : &quot;*&quot;
+         },
+         &quot;result&quot; : true
+      }
+   ]
+}
+
+</code></pre>
+
+<h3 id="with-custom-expectations">With custom expectations</h3>
+<blockquote>
+<p>For more information about EDL syntax see <a href="../edlspec">EDL Spec</a></p>
+</blockquote>
+<pre><code class="bash">$ mulang '
+{
+   &quot;sample&quot; : {
+      &quot;tag&quot; : &quot;CodeSample&quot;,
+      &quot;language&quot; : &quot;JavaScript&quot;,
+      &quot;content&quot; : &quot;function plusOne(x) { return x + 1 }&quot;
+   },
+   &quot;spec&quot; : {
+      &quot;customExpectations&quot; : &quot;expectation: declares function `plusOne` that (returns with math);\nexpectation: !declares variable with literal&quot;
+   }
+}
+' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;expectationResults&quot; : [
+      {
+         &quot;result&quot; : true,
+         &quot;expectation&quot; : {
+            &quot;binding&quot; : &quot;*&quot;,
+            &quot;inspection&quot; : &quot;Declares:x&quot;
+         }
+      }
+   ]
 }
 </code></pre>
 
@@ -264,12 +335,23 @@
 }
 ' | json_pp
 {
-   &quot;expectationResults&quot; : [],
-   &quot;smells&quot; : [],
-   &quot;signatures&quot; : [
-      &quot;-- foo x y&quot;
-   ],
-   &quot;tag&quot; : &quot;AnalysisCompleted&quot;
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;expectationResults&quot; : [
+      {
+         &quot;expectation&quot; : {
+            &quot;binding&quot; : &quot;&lt;&lt;custom&gt;&gt;&quot;,
+            &quot;inspection&quot; : &quot;E0&quot;
+         },
+         &quot;result&quot; : true
+      },
+      {
+         &quot;expectation&quot; : {
+            &quot;inspection&quot; : &quot;E1&quot;,
+            &quot;binding&quot; : &quot;&lt;&lt;custom&gt;&gt;&quot;
+         },
+         &quot;result&quot; : true
+      }
+   ]
 }
 </code></pre>
 
@@ -328,8 +410,6 @@
 }
 ' | json_pp
 {
-   &quot;expectationResults&quot; : [],
-   &quot;smells&quot; : [],
    &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
    &quot;signatures&quot; : [
       &quot;-- x&quot;,
@@ -359,7 +439,6 @@
 ' | json_pp
 {
    &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
-   &quot;expectationResults&quot; : [],
    &quot;smells&quot; : [
       {
          &quot;binding&quot; : &quot;foo&quot;,
@@ -388,9 +467,8 @@
 }
 ' | json_pp
 {
-   &quot;smells&quot; : [],
    &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
-   &quot;expectationResults&quot; : []
+   &quot;smells&quot; : [],
 }
 </code></pre>
 
@@ -415,7 +493,6 @@ by the <code>domainLanguage</code> setting, which you <em>can</em> configure:</p
 }' | json_pp
 {
    &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
-   &quot;signatures&quot; : [],
    &quot;smells&quot; : [
       {
          &quot;inspection&quot; : &quot;HasTooShortIdentifiers&quot;,
@@ -425,8 +502,7 @@ by the <code>domainLanguage</code> setting, which you <em>can</em> configure:</p
          &quot;binding&quot; : &quot;parentOf&quot;,
          &quot;inspection&quot; : &quot;HasWrongCaseIdentifiers&quot;
       }
-   ],
-   &quot;expectationResults&quot; : []
+   ]
 }
 </code></pre>
 
@@ -445,8 +521,6 @@ by the <code>domainLanguage</code> setting, which you <em>can</em> configure:</p
 }' | json_pp
 {
    &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
-   &quot;expectationResults&quot; : [],
-   &quot;signatures&quot; : [],
    &quot;smells&quot; : [
       {
          &quot;inspection&quot; : &quot;ReturnsNil&quot;,
@@ -474,10 +548,7 @@ by the <code>domainLanguage</code> setting, which you <em>can</em> configure:</p
 }
 ' | json_pp
 {
-   &quot;expectationResults&quot; : [],
-   &quot;smells&quot; : [],
    &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
-   &quot;signatures&quot; : [],
    &quot;intermediateLanguage&quot; : {
       &quot;tag&quot; : &quot;Function&quot;,
       &quot;contents&quot; : [
@@ -530,6 +601,7 @@ by the <code>domainLanguage</code> setting, which you <em>can</em> configure:</p
  }
 }' | json_pp
 {
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
    &quot;testResults&quot; : [
       {
          &quot;description&quot; : [
@@ -539,12 +611,7 @@ by the <code>domainLanguage</code> setting, which you <em>can</em> configure:</p
             &quot;tag&quot; : &quot;Success&quot;
          }
       }
-   ],
-   &quot;signatures&quot; : [],
-   &quot;intermediateLanguage&quot; : null,
-   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
-   &quot;smells&quot; : [],
-   &quot;expectationResults&quot; : []
+   ]
 }
 </code></pre>
 
@@ -601,6 +668,7 @@ This feature can accessed through a <code>testAnalysisType</code> spec, such as 
   }
 }' | json_pp
 {
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
    &quot;testResults&quot; : [
       {
          &quot;status&quot; : {
@@ -610,12 +678,7 @@ This feature can accessed through a <code>testAnalysisType</code> spec, such as 
             &quot;f increments by one&quot;
          ]
       }
-   ],
-   &quot;signatures&quot; : [],
-   &quot;smells&quot; : [],
-   &quot;intermediateLanguage&quot; : null,
-   &quot;expectationResults&quot; : [],
-   &quot;tag&quot; : &quot;AnalysisCompleted&quot;
+   ]
 }
 </code></pre>
 
@@ -645,8 +708,7 @@ This feature can accessed through a <code>testAnalysisType</code> spec, such as 
   }
 }' | json_pp
 {
-   &quot;signatures&quot; : [],
-   &quot;expectationResults&quot; : [],
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
    &quot;testResults&quot; : [
       {
          &quot;status&quot; : {
@@ -656,10 +718,7 @@ This feature can accessed through a <code>testAnalysisType</code> spec, such as 
             &quot;f returns 10&quot;
          ]
       }
-   ],
-   &quot;smells&quot; : [],
-   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
-   &quot;intermediateLanguage&quot; : null
+   ]
 }
 
 </code></pre></div>
