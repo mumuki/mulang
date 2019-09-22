@@ -13,6 +13,23 @@ describe Mulang::Expectation::I18n do
     it { expect(expectation('foo', 'Not:Uses:baz').translate).to eq('<strong>foo</strong> must not use <strong>baz</strong>') }
     it { expect(expectation('foo', 'Not:UsesLambda').translate).to eq('<strong>foo</strong> must not use lambda expressions') }
     it { expect(expectation('*', 'UsesStaticPolymorphism').translate).to eq('solution must use polymorphism') }
+
+    it { expect(expectation('*', "Calls:x:WithString:'foo'").translate).to eq("solution must use <strong>x</strong> with string <i>'foo'</i>") }
+    it { expect(expectation('*', "Returns:WithNumber:3").translate).to eq('solution must return with number <i>3</i>') }
+    it { expect(expectation('*', "Calls:g:WithNumber:1").translate).to eq('solution must use <strong>g</strong> with number <i>1</i>') }
+    it { expect(expectation('*', "Calls:x:WithTrue").translate).to eq('solution must use <strong>x</strong> with value <i>true</i>') }
+    it { expect(expectation('*', "Assigns:WithTrue").translate).to eq('solution must perform assignments with value <i>true</i>') }
+    it { expect(expectation('*', "DeclaresAttribute:WithTrue").translate).to eq('solution must declare attributes with value <i>true</i>') }
+    it { expect(expectation('*', "Returns:WithFalse").translate).to eq('solution must return with value <i>false</i>') }
+    it { expect(expectation('*', "UsesRepeat:WithMath").translate).to eq('solution must use <i>repeat</i> with a math expression') }
+    it { expect(expectation('*', "Calls:g:WithLiteral").translate).to eq('solution must use <strong>g</strong> with a literal value') }
+    it { expect(expectation('*', "Calls:g:WithNonliteral").translate).to eq('solution must use <strong>g</strong> with a non-literal expresson') }
+    it { expect(expectation('*', "Calls:g:WithLogic").translate).to eq('solution must use <strong>g</strong> with a boolean expression') }
+    it { expect(expectation('*', "DeclaresVariable:x:WithNumber:4").translate).to eq('solution must declare a variable <strong>x</strong> with number <i>4</i>') }
+    it { expect(expectation('*', "Assigns:x:WithSymbol:bar").translate).to eq('solution must assign <strong>x</strong> with symbol <i>bar</i>') }
+    it { expect(expectation('*', "Assigns:x:WithChar:'a'").translate).to eq("solution must assign <strong>x</strong> with character <i>'a'</i>") }
+    it { expect(expectation('*', "Assigns:*:WithString:\"hello\"").translate).to eq("solution must perform assignments with string <i>\"hello\"</i>") }
+    it { expect(expectation('*', "Returns:WithNumber:9").translate).to eq('solution must return with number <i>9</i>') }
   end
 
   context 'pt locale' do
@@ -23,6 +40,9 @@ describe Mulang::Expectation::I18n do
     it { expect(expectation('foo', 'Not:UsesLambda').translate).to eq('<strong>foo</strong> não deve usar expressões lambda') }
     it { expect(expectation('*', 'UsesStaticPolymorphism').translate).to eq('a solução deve usar polimorfismo') }
 
+    it { expect(expectation('*', "Returns:WithFalse").translate).to eq('a solução deve retornar com o valor <i>false</i>') }
+    it { expect(expectation('*', "UsesRepeat:WithMath").translate).to eq('a solução deve usar <i>repeat</i> com uma expressão matemática') }
+    it { expect(expectation('*', "Calls:g:WithLiteral").translate).to eq('a solução deve usar <strong>g</strong> com um valor literal') }
   end
 
   context 'es locale' do
@@ -100,22 +120,18 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'UsesIf').translate(keyword_if: 'si')).to eq('<strong>foo</strong> debe usar <i>si</i>') }
       it { expect(expectation('foo', 'UsesIf').translate(keyword_repeat: 'repetir')).to eq('<strong>foo</strong> debe usar <i>if</i>') }
 
-
-
       it { expect(expectation('*', "Calls:x:WithString:'foo'").translate).to eq("la solución debe utilizar <strong>x</strong> con la cadena <i>'foo'</i>") }
-      it { expect(expectation('*', "Calls:x:WithString:'foo'").translate).to eq("la solución debe utilizar <strong>x</strong> con la cadena <i>'foo'</i>") }
-
       it { expect(expectation('*', "Returns:WithNumber:3").translate).to eq('la solución debe retornar con el número <i>3</i>') }
       it { expect(expectation('*', "Calls:g:WithNumber:1").translate).to eq('la solución debe utilizar <strong>g</strong> con el número <i>1</i>') }
       it { expect(expectation('*', "Calls:x:WithTrue").translate).to eq('la solución debe utilizar <strong>x</strong> con el valor <i>true</i>') }
       it { expect(expectation('*', "Assigns:WithTrue").translate).to eq('la solución debe realizar asignaciones con el valor <i>true</i>') }
-      it { expect(expectation('*', "Assigns:WithTrue").translate).to eq('la solución debe realizar asignaciones con el valor <i>true</i>') }
+      it { expect(expectation('*', "DeclaresAttribute:WithTrue").translate).to eq('la solución debe declarar atributos con el valor <i>true</i>') }
       it { expect(expectation('*', "Returns:WithFalse").translate).to eq('la solución debe retornar con el valor <i>false</i>') }
-      it { expect(expectation('*', "Calls:g:WithMath").translate).to eq('la solución debe utilizar <strong>g</strong>con una expresión matemática') }
+      it { expect(expectation('*', "UsesRepeat:WithMath").translate).to eq('la solución debe usar <i>repeat</i>con una expresión matemática') }
       it { expect(expectation('*', "Calls:g:WithLiteral").translate).to eq('la solución debe utilizar <strong>g</strong> con un valor literal') }
       it { expect(expectation('*', "Calls:g:WithNonliteral").translate).to eq("la solución debe utilizar <strong>g</strong> con una expresión no literal") }
       it { expect(expectation('*', "Calls:g:WithLogic").translate).to eq('la solución debe utilizar <strong>g</strong> con una expresión booleana') }
-      it { expect(expectation('*', "Assigns:x:WithNumber:4").translate).to eq('la solución debe asignar <strong>x</strong> con el número <i>4</i>') }
+      it { expect(expectation('*', "DeclaresVariable:x:WithNumber:4").translate).to eq('la solución debe declarar una variable <strong>x</strong> con el número <i>4</i>') }
       it { expect(expectation('*', "Assigns:x:WithSymbol:bar").translate).to eq('la solución debe asignar <strong>x</strong> con el símbolo <i>bar</i>') }
       it { expect(expectation('*', "Assigns:x:WithChar:'a'").translate).to eq("la solución debe asignar <strong>x</strong> con el carácter <i>'a'</i>") }
       it { expect(expectation('*', "Assigns:*:WithString:\"hello\"").translate).to eq("la solución debe realizar asignaciones con la cadena <i>\"hello\"</i>") }
