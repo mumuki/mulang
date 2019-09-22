@@ -100,9 +100,26 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'UsesIf').translate(keyword_if: 'si')).to eq('<strong>foo</strong> debe usar <i>si</i>') }
       it { expect(expectation('foo', 'UsesIf').translate(keyword_repeat: 'repetir')).to eq('<strong>foo</strong> debe usar <i>if</i>') }
 
-      pending { expect(expectation('*', "Assigns:WithTrue").translate).to eq('la solucion debe asignar el valor <i>true</i>') }
-      pending { expect(expectation('*', "Returns:WithFalse").translate).to eq('la solucion debe retornar <i>false</i>') }
-      pending { expect(expectation('*', "Returns:WithNumber:3").translate).to eq('la solucion debe retornar el número <i>3</i>') }
+
+
+      it { expect(expectation('*', "Calls:x:WithString:'foo'").translate).to eq("la solución debe utilizar <strong>x</strong> con la cadena <i>'foo'</i>") }
+      it { expect(expectation('*', "Calls:x:WithString:'foo'").translate).to eq("la solución debe utilizar <strong>x</strong> con la cadena <i>'foo'</i>") }
+
+      it { expect(expectation('*', "Returns:WithNumber:3").translate).to eq('la solución debe retornar con el número <i>3</i>') }
+      it { expect(expectation('*', "Calls:g:WithNumber:1").translate).to eq('la solución debe utilizar <strong>g</strong> con el número <i>1</i>') }
+      it { expect(expectation('*', "Calls:x:WithTrue").translate).to eq('la solución debe utilizar <strong>x</strong> con el valor <i>true</i>') }
+      it { expect(expectation('*', "Assigns:WithTrue").translate).to eq('la solución debe realizar asignaciones con el valor <i>true</i>') }
+      it { expect(expectation('*', "Assigns:WithTrue").translate).to eq('la solución debe realizar asignaciones con el valor <i>true</i>') }
+      it { expect(expectation('*', "Returns:WithFalse").translate).to eq('la solución debe retornar con el valor <i>false</i>') }
+      it { expect(expectation('*', "Calls:g:WithMath").translate).to eq('la solución debe utilizar <strong>g</strong>con una expresión matemática') }
+      it { expect(expectation('*', "Calls:g:WithLiteral").translate).to eq('la solución debe utilizar <strong>g</strong> con un valor literal') }
+      it { expect(expectation('*', "Calls:g:WithNonliteral").translate).to eq("la solución debe utilizar <strong>g</strong> con una expresión no literal") }
+      it { expect(expectation('*', "Calls:g:WithLogic").translate).to eq('la solución debe utilizar <strong>g</strong> con una expresión booleana') }
+      it { expect(expectation('*', "Assigns:x:WithNumber:4").translate).to eq('la solución debe asignar <strong>x</strong> con el número <i>4</i>') }
+      it { expect(expectation('*', "Assigns:x:WithSymbol:bar").translate).to eq('la solución debe asignar <strong>x</strong> con el símbolo <i>bar</i>') }
+      it { expect(expectation('*', "Assigns:x:WithChar:'a'").translate).to eq("la solución debe asignar <strong>x</strong> con el carácter <i>'a'</i>") }
+      it { expect(expectation('*', "Assigns:*:WithString:\"hello\"").translate).to eq("la solución debe realizar asignaciones con la cadena <i>\"hello\"</i>") }
+      it { expect(expectation('*', "Returns:WithNumber:9").translate).to eq('la solución debe retornar con el número <i>9</i>') }
     end
 
     describe 'smells' do
