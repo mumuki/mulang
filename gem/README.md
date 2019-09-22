@@ -44,6 +44,9 @@ Mulang.analyse sample: {
 ```ruby
 code = Mulang::Code.new(Mulang::Language::Native.new('JavaScript'),  'var x = 1')
 
+# shortcut
+code = Mulang::Code.native('JavaScript',  'var x = 1')
+
 # generate ast
 code.ast
 # => {"tag"=>"Variable", "contents"=>["x", {"tag"=>"MuNumber", "contents"=>1}]}
@@ -53,6 +56,22 @@ code.analysis expectations: [], smellsSet: { tag: 'NoSmells' }
 
 code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }
 # => {"tag"=>"AnalysisCompleted", "intermediateLanguage"=>nil, "signatures"=>[], "smells"=>[], "expectationResults"=>[]}
+```
+
+### Quick code query
+
+```ruby
+code = Mulang::Code.native('JavaScript',  'function plusOne(x) { return x + 1 }')
+
+code.query 'plusOne', 'Not:DeclaresVariable'
+# => true
+
+code.custom_query %q{
+  expectation "declares the `plusOne` function":
+    declares function `plusOne` that (returns with math);
+  expectation "not uses variables for literals":
+    !declares variable with literal}
+# => {"declares the `plusOne` function"=>true, "not uses variables for literals"=>true}
 ```
 
 ## Development
