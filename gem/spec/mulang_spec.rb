@@ -12,6 +12,22 @@ describe Mulang::Code do
                                                                                       'expectationResults'=>[],
                                                                                       'testResults' => [] }
 
+    it { expect(code.query 'Assigns:x').to be true }
+    it { expect(code.query 'Assigns:y').to be false }
+
+    it { expect(code.query '*', 'Assigns:x:WithLiteral').to be true }
+    it { expect(code.query '*', 'Assigns:x:WithNumber:1').to be true }
+    it { expect(code.query '*', 'Assigns:x:WithNumber:2').to be false }
+
+    it { expect(code.custom_query %q{
+                  expectation "assigns 1":
+                    assigns with 1;
+                  expectation "assigns 2":
+                    assigns with 2}).to eq 'assigns 1' => true,
+                                           'assigns 2' => false }
+
+    it { expect { code.query ':foo' }.to raise_error 'Invalid inspection :foo' }
+    pending { expect { code.custom_query 'dfsdfsdf dsfsd sdfsdf' }.to raise_error 'unexpected token dfsdfsdf' }
   end
 
   context 'when language is lowercase' do
@@ -34,10 +50,22 @@ describe Mulang::Code do
   end
 
   context 'when code is ill-formed' do
-    let(:code) { Mulang::Code.native('Haskell', '= 1') }
+    let(:source) {  '= 1' }
+    describe '.native' do
+      let(:code) { Mulang::Code.native('Haskell', source) }
+
+      it { expect(code.ast).to be nil }
+    end
+
+    describe '.native!' do
+      it { expect { Mulang::Code.native!('Haskell', source) }.to raise_error 'Parse error' }
+    end
+
+    let(:code) { Mulang::Code.native('Haskell', source) }
 
     it { expect(code.ast).to be nil }
   end
+
 
   context 'when code is well-formed but mulang does not support it' do
     before { allow(JSON).to receive(:parse).and_raise(JSON::ParserError) }

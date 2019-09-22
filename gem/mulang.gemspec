@@ -18,6 +18,9 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib', 'bin']
 
+  spec.add_dependency "mumukit-core", '> 1.0'
+
+  spec.add_development_dependency 'codeclimate-test-reporter'
   spec.add_development_dependency "activesupport", "~> 5.0"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
