@@ -8401,174 +8401,163 @@ a.list-group-item-danger.active:hover, a.list-group-item-danger.active:focus {
 
 @font-face {
   font-family: "dev-awesome";
-  src: url("../fonts/dev-awesome.eot?2f97cbfe09d6840c0f0a90490ad91963");
-  src: url("../fonts/dev-awesome.eot?2f97cbfe09d6840c0f0a90490ad91963#iefix") format("embedded-opentype"), url("../fonts/dev-awesome.woff2?2f97cbfe09d6840c0f0a90490ad91963") format("woff2"), url("../fonts/dev-awesome.woff?2f97cbfe09d6840c0f0a90490ad91963") format("woff"), url("../fonts/dev-awesome.ttf?2f97cbfe09d6840c0f0a90490ad91963") format("truetype"), url("../fonts/dev-awesome.svg?2f97cbfe09d6840c0f0a90490ad91963#dev-awesome") format("svg");
+  src: url("../fonts/dev-awesome.eot?051add259336c2ad2d67c7767fdcabe9?#iefix") format("embedded-opentype"), url("../fonts/dev-awesome.woff2?051add259336c2ad2d67c7767fdcabe9") format("woff2"), url("../fonts/dev-awesome.woff?051add259336c2ad2d67c7767fdcabe9") format("woff");
   font-weight: normal;
   font-style: normal; }
 
 .da {
-  font-family: "dev-awesome";
-  display: inline-block;
-  font-weight: normal;
+  line-height: 1; }
+
+.da:before {
+  font-family: dev-awesome;
   font-style: normal;
-  speak: none;
-  text-decoration: inherit;
+  font-weight: normal;
   text-transform: none;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale; }
+  text-rendering: auto; }
 
 .da-bash:before {
-  content: "\f115"; }
+  content: "\f101"; }
 
 .da-bash-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/bash.svg"); }
+  background-image: url("../fonts/svg/colored/bash.svg"); }
 
 .da-c:before {
-  content: "\f101"; }
+  content: "\f102"; }
 
 .da-c-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/c.svg"); }
+  background-image: url("../fonts/svg/colored/c.svg"); }
 
 .da-code:before {
-  content: "\f114"; }
+  content: "\f103"; }
 
 .da-code-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/code.svg"); }
+  background-image: url("../fonts/svg/colored/code.svg"); }
 
 .da-cpp:before {
-  content: "\f102"; }
+  content: "\f104"; }
 
 .da-cpp-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/cpp.svg"); }
+  background-image: url("../fonts/svg/colored/cpp.svg"); }
 
 .da-css:before {
-  content: "\f103"; }
+  content: "\f105"; }
 
 .da-css-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/css.svg"); }
+  background-image: url("../fonts/svg/colored/css.svg"); }
 
 .da-elixir:before {
-  content: "\f104"; }
+  content: "\f106"; }
 
 .da-elixir-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/elixir.svg"); }
+  background-image: url("../fonts/svg/colored/elixir.svg"); }
 
 .da-gobstones:before {
-  content: "\f105"; }
+  content: "\f107"; }
 
 .da-gobstones-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/gobstones.svg"); }
+  background-image: url("../fonts/svg/colored/gobstones.svg"); }
 
 .da-haskell:before {
-  content: "\f106"; }
+  content: "\f108"; }
 
 .da-haskell-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/haskell.svg"); }
+  background-image: url("../fonts/svg/colored/haskell.svg"); }
 
 .da-html:before {
-  content: "\f107"; }
+  content: "\f109"; }
 
 .da-html-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/html.svg"); }
+  background-image: url("../fonts/svg/colored/html.svg"); }
 
 .da-java:before {
-  content: "\f108"; }
+  content: "\f10a"; }
 
 .da-java-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/java.svg"); }
+  background-image: url("../fonts/svg/colored/java.svg"); }
 
 .da-javascript:before {
-  content: "\f109"; }
+  content: "\f10b"; }
 
 .da-javascript-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/javascript.svg"); }
-
-.da-mongodb:before {
-  content: "\f10a"; }
-
-.da-mongodb-c:before {
-  content: "\2001";
-  background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/mongodb.svg"); }
+  background-image: url("../fonts/svg/colored/javascript.svg"); }
 
 .da-mumuki-circle:before {
-  content: "\f10b"; }
+  content: "\f10c"; }
 
 .da-mumuki-circle-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/mumuki-circle.svg"); }
+  background-image: url("../fonts/svg/colored/mumuki-circle.svg"); }
 
 .da-mumuki:before {
-  content: "\f10c"; }
+  content: "\f10d"; }
 
 .da-mumuki-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/mumuki.svg"); }
+  background-image: url("../fonts/svg/colored/mumuki.svg"); }
 
 .da-php:before {
-  content: "\f116"; }
+  content: "\f10e"; }
 
 .da-php-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/php.svg"); }
+  background-image: url("../fonts/svg/colored/php.svg"); }
 
 .da-prolog:before {
-  content: "\f10d"; }
+  content: "\f10f"; }
 
 .da-prolog-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/prolog.svg"); }
+  background-image: url("../fonts/svg/colored/prolog.svg"); }
 
 .da-python:before {
-  content: "\f10e"; }
+  content: "\f110"; }
 
 .da-python-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/python.svg"); }
+  background-image: url("../fonts/svg/colored/python.svg"); }
 
 .da-qsim:before {
-  content: "\f10f"; }
+  content: "\f111"; }
 
 .da-qsim-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/qsim.svg"); }
+  background-image: url("../fonts/svg/colored/qsim.svg"); }
 
 .da-ruby:before {
-  content: "\f110"; }
+  content: "\f112"; }
 
 .da-ruby-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/ruby.svg"); }
+  background-image: url("../fonts/svg/colored/ruby.svg"); }
 
 .da-sql:before {
   content: "\f113"; }
@@ -8576,23 +8565,23 @@ a.list-group-item-danger.active:hover, a.list-group-item-danger.active:focus {
 .da-sql-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/sql.svg"); }
+  background-image: url("../fonts/svg/colored/sql.svg"); }
 
 .da-text:before {
-  content: "\f111"; }
+  content: "\f114"; }
 
 .da-text-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/text.svg"); }
+  background-image: url("../fonts/svg/colored/text.svg"); }
 
 .da-wollok:before {
-  content: "\f112"; }
+  content: "\f115"; }
 
 .da-wollok-c:before {
   content: "\2001";
   background-size: 100% 100%;
-  background-image: url("../fonts/dev-awesome/svg/colored/wollok.svg"); }
+  background-image: url("../fonts/svg/colored/wollok.svg"); }
 
 .checkbox {
   padding-left: 20px; }
@@ -9428,28 +9417,26 @@ pre code {
       flex-flow: row;
       align-items: center;
       justify-content: flex-start; }
-      .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item {
-        padding-top: 19px; }
-        .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item:before {
-          content: '/';
-          margin: 0 8px;
-          color: #AAAAAA; }
-        .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item.brand {
-          padding-top: 2px;
-          padding-left: 3px;
-          font-size: 38px; }
-          .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item.brand:before {
-            content: '';
-            margin: 0; }
-          .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item.brand a {
-            color: #0B465D; }
-            .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item.brand a:active {
-              color: #06242f; }
-            .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item.brand a:hover {
-              color: #083546;
-              text-decoration: none; }
-        .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item.last a {
-          color: #AAAAAA; }
+      .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item:before {
+        content: '/';
+        margin: 0 8px;
+        color: #AAAAAA; }
+      .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item.brand {
+        padding-top: 2px;
+        padding-left: 3px;
+        font-size: 38px; }
+        .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item.brand:before {
+          content: '';
+          margin: 0; }
+        .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item.brand a {
+          color: #0B465D; }
+          .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item.brand a:active {
+            color: #06242f; }
+          .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item.brand a:hover {
+            color: #083546;
+            text-decoration: none; }
+      .mu-navbar .mu-navbar-breadcrumb .mu-breadcrumb-list .mu-breadcrumb-list-item.last a {
+        color: #AAAAAA; }
   .mu-navbar .mu-navbar-avatar {
     display: flex;
     flex-flow: row nowrap;
@@ -9488,6 +9475,9 @@ pre code {
   padding: 14px 0;
   margin: 0 14px;
   border-left: 1px solid #ecf0f1; }
+
+.nav-tabs > li > a {
+  cursor: pointer; }
 
 .mu-browser {
   width: 100%;

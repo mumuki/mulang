@@ -160,18 +160,14 @@
         <li class="first-level "><a href="#ruby-wrapper">Ruby wrapper</a></li>
             <li class="second-level"><a href="#building">Building</a></li>
                 
-            <li class="second-level"><a href="#installing-from-rubygems">Installing from rubygems</a></li>
+            <li class="second-level"><a href="#loading">Loading</a></li>
                 
         <li class="first-level "><a href="#javascript-library">JavaScript library</a></li>
             <li class="second-level"><a href="#building_1">Building</a></li>
                 
-            <li class="second-level"><a href="#loading">Loading</a></li>
+            <li class="second-level"><a href="#loading_1">Loading</a></li>
                 
-            <li class="second-level"><a href="#running">Running</a></li>
-                
-            <li class="second-level"><a href="#installing-from-npm">Installing from npm</a></li>
-                
-        <li class="first-level "><a href="#tagging-and-releasing">Tagging and releasing</a></li>
+        <li class="first-level "><a href="#releasing">Releasing</a></li>
         <li class="first-level "><a href="#updating-docs">Updating docs</a></li>
     </ul>
 </div></div>
@@ -204,6 +200,9 @@ $ mulang
 </code></pre>
 
 <h1 id="ruby-wrapper">Ruby wrapper</h1>
+<blockquote>
+<p>See <a href="https://github.com/mumuki/mulang/blob/master/gem/README.md"><code>gem/README</code></a> for more details.</p>
+</blockquote>
 <p>This module can also be deployed a ruby gem. <code>mulang</code> works with Ruby 2.3+</p>
 <h2 id="building">Building</h2>
 <pre><code class="bash">cd gem
@@ -212,13 +211,12 @@ bundle install
 bundle exec rspec
 </code></pre>
 
-<h2 id="installing-from-rubygems">Installing from rubygems</h2>
-<p>Mulang is already shipped as a ruby gem:</p>
-<pre><code>gem install mulang
-</code></pre>
-
-<p>See <code>gem/README</code> for more details.</p>
+<h2 id="loading">Loading</h2>
+<p>Run <code>bin/console</code> in the <code>gem</code> directory.</p>
 <h1 id="javascript-library">JavaScript library</h1>
+<blockquote>
+<p>See <a href="https://github.com/mumuki/mulang/blob/master/ghcjslib/README.md"><code>ghcjslib/README</code></a> and <a href="https://www.npmjs.com/package/mulang">https://www.npmjs.com/package/mulang</a> for more details.</p>
+</blockquote>
 <p><code>mulang</code> can also be compiled to JavaScript library using <a href="https://github.com/ghcjs/ghcjs">ghcjs</a> and <a href="https://github.com/flbulgarelli/ghcjslib">ghcjslib</a>, which allows you to use it from <code>node</code> or the browser.</p>
 <h2 id="building_1">Building</h2>
 <blockquote>
@@ -236,39 +234,13 @@ ghcjslib/test.sh
 ghcjslib/swap.sh
 </code></pre>
 
-<h2 id="loading">Loading</h2>
+<h2 id="loading_1">Loading</h2>
 <ol>
 <li>in the browser: <code>google-chrome ghcjslib/index.html</code></li>
 <li>in <code>node</code>: run <code>node</code>, and then, within the interpreter, run: <code>let mulang = require('./ghcjslib/build/mulang.js');</code></li>
 </ol>
-<h2 id="running">Running</h2>
-<p>Try it using <code>mulang.analyse(...pass here a spec as described in the README....)</code>. For example:</p>
-<pre><code class="javascript">&gt; mulang.analyse({
-    &quot;sample&quot; : {
-        &quot;tag&quot; : &quot;CodeSample&quot;,
-        &quot;language&quot; : &quot;Haskell&quot;,
-        &quot;content&quot; : &quot;x = 1&quot;
-      },
-    &quot;spec&quot; : {
-        &quot;smellsSet&quot; : { &quot;tag&quot; : &quot;NoSmells&quot; },
-        &quot;expectations&quot; : [
-            {
-                &quot;binding&quot; : &quot;*&quot;,
-                &quot;inspection&quot; : &quot;Declares:x&quot;
-              }
-        ]
-      }
-})
-</code></pre>
-
-<h2 id="installing-from-npm">Installing from npm</h2>
-<p>Mulang is already shipped as an npm package:</p>
-<pre><code>npm install mulang
-</code></pre>
-
-<p>See <code>ghcjslib/README</code> and https://www.npmjs.com/package/mulang for more details.</p>
-<h1 id="tagging-and-releasing">Tagging and releasing</h1>
-<pre><code class="bash">./tag.sh
+<h1 id="releasing">Releasing</h1>
+<pre><code class="bash">./release.sh
 </code></pre>
 
 <h1 id="updating-docs">Updating docs</h1>
@@ -276,7 +248,7 @@ ghcjslib/swap.sh
 <pre><code class="bash">$ pip install mkdocs
 </code></pre>
 
-<p>From the project root folder, running <code>mkdocs serve</code> will serve the files in a local server, <code>mkdocs build</code> will build the static site to a foldes called <code>site</code>, and deploys to the <code>gh-pages</code> branch are done by running <code>mkdocs gh-deploy</code> directly.</p></div>
+<p>From the project root folder, running <code>./docs/devinit</code> will setup the docs, <code>./docs/devstart</code> start the site locally, and <code>mkdocs gh-deploy</code> will deploy the documentation.</p></div>
         
         
     </div>
