@@ -22,13 +22,21 @@ sed -i -r "s/MULANG_VERSION=${VERSION_REGEXP}/MULANG_VERSION=${NEW_VERSION}/" do
 echo "[Mulang] Running tests..."
 stack test
 
+echo "[Mulang] Running ghcjslib tests..."
+./ghcjslib/swap.js
+./ghcjslib/test.js
+
+echo "[Mulang] Deploying to NPM..."
+./ghcjslib/deploy.js
+./ghcjslib/swap.js
+
 echo "[Mulang] Commiting files..."
 git commit mulang.cabal app/Version.hs gem/lib/mulang/version.rb gem/lib/mulang/version.rb ghcjslib/package.json -m "Welcome ${NEW_VERSION}!"
 
 echo "[Mulang] Tagging v$NEW_VERSION..."
 git tag "v${NEW_VERSION}"
 
-echo "[Mulang] Pushing..."
+echo "[Mulang] Pushing to github..."
 git push origin HEAD --tags
 
-echo "[Mulang] Pushed. Travis will do the rest"
+echo "[Mulang] Pushed. Travis will deploy mulang binaries and gem"

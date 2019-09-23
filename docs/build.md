@@ -39,7 +39,7 @@ stack ghci
 
 # Ruby wrapper
 
-> See `gem/README` for more details.
+> See [`gem/README`](https://github.com/mumuki/mulang/blob/master/gem/README.md) for more details.
 
 This module can also be deployed a ruby gem. `mulang` works with Ruby 2.3+
 
@@ -58,7 +58,7 @@ Run `bin/console` in the `gem` directory.
 
 # JavaScript library
 
-> See `ghcjslib/README` and https://www.npmjs.com/package/mulang for more details.
+> See [`ghcjslib/README`](https://github.com/mumuki/mulang/blob/master/ghcjslib/README.md) and [https://www.npmjs.com/package/mulang](https://www.npmjs.com/package/mulang) for more details.
 
 `mulang` can also be compiled to JavaScript library using [ghcjs](https://github.com/ghcjs/ghcjs) and [ghcjslib](https://github.com/flbulgarelli/ghcjslib), which allows you to use it from `node` or the browser.
 
@@ -86,10 +86,10 @@ ghcjslib/swap.sh
 1. in the browser: `google-chrome ghcjslib/index.html`
 2. in `node`: run `node`, and then, within the interpreter, run: `let mulang = require('./ghcjslib/build/mulang.js');`
 
-# Tagging and releasing
+# Releasing
 
 ```bash
-./tag.sh
+./release.sh
 ```
 
 # Updating docs
