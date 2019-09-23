@@ -39,6 +39,8 @@ stack ghci
 
 # Ruby wrapper
 
+> See `gem/README` for more details.
+
 This module can also be deployed a ruby gem. `mulang` works with Ruby 2.3+
 
 ## Building
@@ -50,17 +52,13 @@ bundle install
 bundle exec rspec
 ```
 
-## Installing from rubygems
+## Loading
 
-Mulang is already shipped as a ruby gem:
-
-```
-gem install mulang
-```
-
-See `gem/README` for more details.
+Run `bin/console` in the `gem` directory.
 
 # JavaScript library
+
+> See `ghcjslib/README` and https://www.npmjs.com/package/mulang for more details.
 
 `mulang` can also be compiled to JavaScript library using [ghcjs](https://github.com/ghcjs/ghcjs) and [ghcjslib](https://github.com/flbulgarelli/ghcjslib), which allows you to use it from `node` or the browser.
 
@@ -88,39 +86,6 @@ ghcjslib/swap.sh
 1. in the browser: `google-chrome ghcjslib/index.html`
 2. in `node`: run `node`, and then, within the interpreter, run: `let mulang = require('./ghcjslib/build/mulang.js');`
 
-## Running
-
-Try it using `mulang.analyse(...pass here a spec as described in the README....)`. For example:
-
-```javascript
-> mulang.analyse({
-    "sample" : {
-        "tag" : "CodeSample",
-        "language" : "Haskell",
-        "content" : "x = 1"
-      },
-    "spec" : {
-        "smellsSet" : { "tag" : "NoSmells" },
-        "expectations" : [
-            {
-                "binding" : "*",
-                "inspection" : "Declares:x"
-              }
-        ]
-      }
-})
-```
-
-## Installing from npm
-
-Mulang is already shipped as an npm package:
-
-```
-npm install mulang
-```
-
-See `ghcjslib/README` and https://www.npmjs.com/package/mulang for more details.
-
 # Tagging and releasing
 
 ```bash
@@ -135,4 +100,4 @@ These site is build using `mkdocs >= 0.17`. You can install it using  `pip`:
 $ pip install mkdocs
 ```
 
-From the project root folder, running `mkdocs serve` will serve the files in a local server, `mkdocs build` will build the static site to a foldes called `site`, and deploys to the `gh-pages` branch are done by running `mkdocs gh-deploy` directly.
+From the project root folder, running `./docs/devinit` will setup the docs, `./docs/devstart` start the site locally, and `mkdocs gh-deploy` will deploy the documentation.
