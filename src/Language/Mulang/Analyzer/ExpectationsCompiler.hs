@@ -9,7 +9,8 @@ import           Language.Mulang (Inspection)
 import           Language.Mulang.Analyzer.EdlQueryCompiler (compileTopQuery)
 import qualified Language.Mulang.Analyzer.Analysis as A
 
-import Data.List.Split (splitOn)
+import qualified Data.Map.Strict as Map
+import           Data.List.Split (splitOn)
 
 compileExpectation :: A.Expectation -> Inspection
 compileExpectation (A.Expectation s i) = compileTopQuery . negator . scope $ baseQuery
@@ -31,9 +32,7 @@ compileScope _                     q = Decontextualize q
 compileCQuery :: [String] -> CQuery
 compileCQuery []                            = compileCQuery ["Parses","*"]
 compileCQuery [verb]                        = compileCQuery [verb,"*"]
-compileCQuery [verb,"WithFalse"]            = compileCQuery [verb,"*","WithFalse"]
-compileCQuery [verb,"WithNil"]              = compileCQuery [verb,"*","WithNil"]
-compileCQuery [verb,"WithTrue"]             = compileCQuery [verb,"*","WithTrue"]
+compileCQuery [verb,name]                   | Map.member name nullaryMatchers = compileCQuery [verb,"*",name]
 compileCQuery (verb:"WithChar":args)        = compileCQuery (verb:"*":"WithChar":args)
 compileCQuery (verb:"WithNumber":args)      = compileCQuery (verb:"*":"WithNumber":args)
 compileCQuery (verb:"WithString":args)      = compileCQuery (verb:"*":"WithString":args)
@@ -54,15 +53,20 @@ compileMatcher = matching . f
     matching xs = Matching xs
 
     f :: [String] -> [Clause]
-    f ("WithFalse":args)        =  IsFalse : f args
-    f ("WithLiteral":args)      =  IsLiteral : f args
-    f ("WithLogic":args)        =  IsLogic   : f args
-    f ("WithMath":args)         =  IsMath : f args
-    f ("WithNil":args)          =  IsNil : f args
-    f ("WithNonliteral":args)   =  IsNonliteral : f args
-    f ("WithTrue":args)         =  IsTrue : f args
+    f (name:args)               |  Just matcher <- Map.lookup name nullaryMatchers = matcher : f args
     f ("WithChar":value:args)   =  IsChar (read value) : f args
     f ("WithNumber":value:args) =  IsNumber (read value) : f args
     f ("WithString":value:args) =  IsString (read value) : f args
     f ("WithSymbol":value:args) =  IsSymbol (read ("\""++value++"\"")) : f args
     f []                        = []
+
+nullaryMatchers =
+  Map.fromList [
+    ("WithFalse", IsFalse),
+    ("WithLiteral", IsLiteral),
+    ("WithLogic", IsLogic),
+    ("WithMath", IsMath),
+    ("WithNil", IsNil),
+    ("WithNonliteral", IsNonliteral),
+    ("WithTrue", IsTrue)
+  ]

@@ -1,0 +1,26 @@
+site_name: Mulang
+site_url: https://mumuki.io
+nav:
+  - Home: index.md
+  - AST Spec: astspec.md
+  - EDL Spec: edlspec.md
+  - Inspections: inspections.md
+  - Comand Line: clispec.md
+  - Try it!: try.md
+  - Build: build.md
+extra_css:
+  - "css/mumuki-styles.css"
+  - "css/jquery.json-viewer.css"
+  - "css/jsoneditor.min.css"
+  - "css/docstyles.css"
+extra_javascript:
+  - "js/edlhighligh.js"
+  - "js/mumuki-styles.js"
+  - "js/mulang.js"
+  - "js/jquery.json-viewer.js"
+  - "js/jsoneditor.min.js"
+repo_url: "https://github.com/mumuki/mulang"
+copyright: '© Copyright 2015-2019 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a>'
+theme:
+  name: null
+  custom_dir: 'docs/themes/cinder'

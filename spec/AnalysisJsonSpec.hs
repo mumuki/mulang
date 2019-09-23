@@ -65,6 +65,24 @@ spec = describe "AnalysisJson" $ do
 
     run json `shouldBe` analysis
 
+  it "works with custom expectations" $ do
+      let json = [text|
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "JavaScript",
+      "content" : "function plusOne(x) { return x + 1 }"
+   },
+   "spec" : {
+      "customExpectations" : "expectation: declares function `plusOne` that (returns with math);\nexpectation: !declares variable with literal"
+   }
+} |]
+      let analysis = Analysis (CodeSample JavaScript "function plusOne(x) { return x + 1 }")
+                              (emptyAnalysisSpec {
+                                customExpectations = Just "expectation: declares function `plusOne` that (returns with math);\nexpectation: !declares variable with literal" })
+
+      run json `shouldBe` analysis
+
   it "works with signature analysis" $ do
     let json = [text|
 {

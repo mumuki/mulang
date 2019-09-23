@@ -17,7 +17,7 @@ npm install -g mulang
 ### As a node/webpack library
 
 ```javascript
-let mulang = require('mulang')
+const mulang = require('mulang')
 mulang.analyse({
                 "sample": {
                   "tag": "CodeSample",
@@ -32,7 +32,26 @@ mulang.analyse({
                     }
                   ],
                   "smellsSet": { "tag": "NoSmells" }
-                });
+                }
+              });
+
+const code = mulang.code("JavaScript", "x = 1");
+
+code.expect("*", "Assigns:x");
+// => true
+
+code.expect("*", "Assigns:y");
+// => false
+
+code.expect("*", "Assigns:x:WithNumber:1");
+// => true
+
+code.customExpect(`
+  expectation "assigns 1":
+    assigns with 1;
+  expectation "assigns 2":
+    assigns with 2`);
+// => [['assigns 1', true], ['assigns 2', false]])
 ```
 
 ### As a CLI

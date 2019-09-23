@@ -2,6 +2,27 @@ var should = require('should');
 let mulang = require('../build/mulang');
 
 describe("mulang", () => {
+  it("can run quick queries over code", () => {
+    const code = mulang.code("JavaScript", "x = 1");
+
+    should(code.expect("*", "Assigns:x")).be.true()
+    should(code.expect("*", "Assigns:y")).be.false()
+    should(code.expect("*", "Assigns:x:WithLiteral")).be.true()
+    should(code.expect("*", "Assigns:x:WithNumber:1")).be.true()
+    should(code.expect("*", "Assigns:x:WithNumber:2")).be.false()
+  });
+
+  it("can run quick custom queries over code", () => {
+    const code = mulang.code("JavaScript", "x = 1");
+
+    should(code.customExpect(`
+  expectation "assigns 1":
+    assigns with 1;
+  expectation "assigns 2":
+    assigns with 2`)).be.eql([['assigns 1', true], ['assigns 2', false]]);
+
+  });
+
   it("can do basic analyis", () => {
     should(mulang.analyse({
       "sample": {

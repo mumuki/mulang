@@ -159,17 +159,20 @@ spec = do
     run (hs "f a b = g True") "f" "Calls:g:WithNumber:1:WithFalse" `shouldBe` False
 
   it "works with Calls WithMath" $ do
+    run (hs "f a = g (a + 2)") "f" "Calls:WithMath" `shouldBe` True
     run (hs "f a = g (a + 2)") "f" "Calls:g:WithMath" `shouldBe` True
     run (hs "f a = g a") "f" "Calls:g:WithMath" `shouldBe` False
     run (hs "f a = g 2") "f" "Calls:g:WithMath" `shouldBe` False
 
   it "works with Calls WithLiteral" $ do
+    run (hs "f a = g (a + 2)") "f" "Calls:WithLiteral" `shouldBe` False
     run (hs "f a = g (a + 2)") "f" "Calls:g:WithLiteral" `shouldBe` False
     run (hs "f a = g a") "f" "Calls:g:WithLiteral" `shouldBe` False
     run (hs "f a = g 2") "f" "Calls:g:WithLiteral" `shouldBe` True
     run (hs "f a = g 'a'") "f" "Calls:g:WithLiteral" `shouldBe` True
 
   it "works with Calls WithNonliteral" $ do
+    run (hs "f a = g (a + 2)") "f" "Calls:WithNonliteral" `shouldBe` True
     run (hs "f a = g (a + 2)") "f" "Calls:g:WithNonliteral" `shouldBe` True
     run (hs "f a = g a") "f" "Calls:g:WithNonliteral" `shouldBe` True
     run (hs "f a = g 2") "f" "Calls:g:WithNonliteral" `shouldBe` False
