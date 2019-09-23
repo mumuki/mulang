@@ -12,22 +12,22 @@ describe Mulang::Code do
                                                                                       'expectationResults'=>[],
                                                                                       'testResults' => [] }
 
-    it { expect(code.query 'Assigns:x').to be true }
-    it { expect(code.query 'Assigns:y').to be false }
+    it { expect(code.expect 'Assigns:x').to be true }
+    it { expect(code.expect 'Assigns:y').to be false }
 
-    it { expect(code.query '*', 'Assigns:x:WithLiteral').to be true }
-    it { expect(code.query '*', 'Assigns:x:WithNumber:1').to be true }
-    it { expect(code.query '*', 'Assigns:x:WithNumber:2').to be false }
+    it { expect(code.expect '*', 'Assigns:x:WithLiteral').to be true }
+    it { expect(code.expect '*', 'Assigns:x:WithNumber:1').to be true }
+    it { expect(code.expect '*', 'Assigns:x:WithNumber:2').to be false }
 
-    it { expect(code.custom_query %q{
+    it { expect(code.custom_expect %q{
                   expectation "assigns 1":
                     assigns with 1;
                   expectation "assigns 2":
                     assigns with 2}).to eq 'assigns 1' => true,
                                            'assigns 2' => false }
 
-    it { expect { code.query ':foo' }.to raise_error 'Invalid inspection :foo' }
-    pending { expect { code.custom_query 'dfsdfsdf dsfsd sdfsdf' }.to raise_error 'unexpected token dfsdfsdf' }
+    it { expect { code.expect ':foo' }.to raise_error 'Invalid inspection :foo' }
+    pending { expect { code.custom_expect 'dfsdfsdf dsfsd sdfsdf' }.to raise_error 'unexpected token dfsdfsdf' }
   end
 
   context 'when language is lowercase' do
