@@ -31,12 +31,12 @@ allSmells = [
   "HasMisspelledIdentifiers",
   "HasRedundantBooleanComparison",
   "HasRedundantGuards",
-  "ShouldUseOtherwise",
   "HasRedundantIf",
   "HasRedundantLambda",
   "HasRedundantLocalVariableReturn",
   "HasRedundantParameter",
   "HasRedundantReduction",
+  "HasRedundantRepeat",
   "HasTooManyMethods",
   "HasTooShortIdentifiers",
   "HasUnreachableCode",
@@ -44,6 +44,7 @@ allSmells = [
   "IsLongCode",
   "OverridesEqualOrHashButNotBoth",
   "ReturnsNil",
+  "ShouldUseOtherwise",
   "UsesCut",
   "UsesFail",
   "UsesUnificationOperator" ]
@@ -62,12 +63,12 @@ detectionFor "HasMisspelledBindings"           = withLanguage hasMisspelledIdent
 detectionFor "HasMisspelledIdentifiers"        = withLanguage hasMisspelledIdentifiers
 detectionFor "HasRedundantBooleanComparison"   = simple hasRedundantBooleanComparison
 detectionFor "HasRedundantGuards"              = simple hasRedundantGuards
-detectionFor "ShouldUseOtherwise"              = simple shouldUseOtherwise
 detectionFor "HasRedundantIf"                  = simple hasRedundantIf
 detectionFor "HasRedundantLambda"              = simple hasRedundantLambda
 detectionFor "HasRedundantLocalVariableReturn" = simple hasRedundantLocalVariableReturn
 detectionFor "HasRedundantParameter"           = simple hasRedundantParameter
 detectionFor "HasRedundantReduction"           = simple hasRedundantReduction
+detectionFor "HasRedundantRepeat"              = simple hasRedundantRepeat
 detectionFor "HasTooManyMethods"               = simple hasTooManyMethods
 detectionFor "HasTooShortBindings"             = withLanguage hasTooShortIdentifiers
 detectionFor "HasTooShortIdentifiers"          = withLanguage hasTooShortIdentifiers
@@ -78,6 +79,7 @@ detectionFor "IsLongCode"                      = unsupported
 detectionFor "OverridesEqualOrHashButNotBoth"  = simple overridesEqualOrHashButNotBoth
 detectionFor "ReturnsNil"                      = simple returnsNil
 detectionFor "ReturnsNull"                     = simple returnsNil
+detectionFor "ShouldUseOtherwise"              = simple shouldUseOtherwise
 detectionFor "UsesCut"                         = simple usesCut
 detectionFor "UsesFail"                        = simple usesFail
 detectionFor "UsesUnificationOperator"         = simple usesUnificationOperator

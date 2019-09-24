@@ -127,6 +127,7 @@ es:
       HasRedundantLocalVariableReturn: '%{binding} usa variables locales innecesarias; podés retornar directamente la expresión'
       HasRedundantParameter: '%{binding} tiene parámetros innecesarios (se pueden eliminar mediante point-free)'
       HasRedundantReduction: '%{binding} usa <i>%{keyword_is}</i>, pero no realiza cálculos'
+      HasRedundantRepeat: '%{binding} tiene un <i>%{keyword_repeat}</i> innecesario'
       HasTooManyMethods: '%{binding} tiene demasiados métodos'
       HasTooShortBindings: '%{binding} es un identificador muy corto'
       HasTooShortIdentifiers: '%{binding} es un identificador muy corto'

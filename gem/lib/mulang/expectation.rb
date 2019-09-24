@@ -1,7 +1,7 @@
 class Mulang::Expectation
 
   SMELLS = %w(DiscardsExceptions DoesConsolePrint DoesNilTest DoesNullTest DoesTypeTest
-              HasAssignmentReturn HasCodeDuplication HasEmptyIfBranches HasLongParameterList
+              HasAssignmentReturn HasCodeDuplication HasEmptyIfBranches HasRedundantRepeat HasLongParameterList
               HasMisspelledBindings HasMisspelledIdentifiers
               HasRedundantBooleanComparison HasRedundantGuards HasRedundantIf
               HasRedundantLambda HasRedundantLocalVariableReturn HasRedundantParameter

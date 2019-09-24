@@ -1,15 +1,16 @@
 {-# LANGUAGE ViewPatterns #-}
 
 module Language.Mulang.Inspector.Generic.Smell (
-  hasRedundantBooleanComparison,
-  hasRedundantIf,
-  hasRedundantGuards,
-  shouldUseOtherwise,
-  hasRedundantLambda,
-  hasRedundantParameter,
-  hasRedundantLocalVariableReturn,
   hasAssignmentReturn,
   hasEmptyIfBranches,
+  hasRedundantBooleanComparison,
+  hasRedundantGuards,
+  hasRedundantIf,
+  hasRedundantLambda,
+  hasRedundantLocalVariableReturn,
+  hasRedundantParameter,
+  hasRedundantRepeat,
+  shouldUseOtherwise,
   doesNilTest,
   doesTypeTest,
   isLongCode,
@@ -29,6 +30,11 @@ import           Language.Mulang.Inspector.Primitive
 -- | Inspection that tells whether an expression has expressions like 'x == True'
 hasRedundantBooleanComparison :: Inspection
 hasRedundantBooleanComparison = compares isBooleanLiteral
+
+hasRedundantRepeat :: Inspection
+hasRedundantRepeat = containsExpression f
+  where f (Repeat (MuNumber 1) _) = True
+        f _                       = False
 
 doesNilTest :: Inspection
 doesNilTest = compares f
