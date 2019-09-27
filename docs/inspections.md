@@ -33,6 +33,7 @@ The power of Mulang is grounded on more than 90 different kind of inspections
 | `hasRedundantBooleanComparison`   |
 | `hasRedundantIf`                  | can a combination of `if`s, `assignment`s and `return`s be replaced by a boolean expression?
 | `hasRedundantLocalVariableReturn` |
+| `hasRedundantRepeat`              | has the given code an unnecesary - 1 iteration - `repeat` statement?
 | `hasTooShortIdentifiers`          | whether an identifier is too short and not part of domain language's jargon
 | `hasUnreachableCode`              | is there unreachable code?
 | `hasWrongCaseIdentifiers`         | whether an identifier does not match the domain language's case style

@@ -287,6 +287,14 @@ spec = do
     it "is False when if branch is not empty" $ do
       hasEmptyIfBranches (javaStatement "if(true) { j++; } else { i++; }") `shouldBe` False
 
+  describe "hasRedundantRepeat" $ do
+    it "is True when it contains a repeat with just one iteration" $ do
+      hasRedundantRepeat (Repeat (MuNumber 1) (Print (MuString "hello"))) `shouldBe` True
+    it "is False when it contains a repeat with two iterations" $ do
+      hasRedundantRepeat (Repeat (MuNumber 2) (Print (MuString "hello"))) `shouldBe` False
+    it "is False when it contains a repeat with a non-literal expression" $ do
+      hasRedundantRepeat (Repeat (Reference "times") (Print (MuString "hello"))) `shouldBe` False
+
   describe "hasUnreachableCode" $ do
     it "is True when there's an equation following one which matches any values" $ do
       hasUnreachableCode (runHaskell [text|

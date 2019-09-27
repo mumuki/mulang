@@ -123,6 +123,7 @@ en:
       HasRedundantLocalVariableReturn: '%{binding} has unnecesary local variables; please try returning the expression directly'
       HasRedundantParameter: '%{binding} has unnecessary parameters, that can be removed using point-free'
       HasRedundantReduction: '%{binding} uses <i>%{keyword_is}</i>, but it does not artihmetic'
+      HasRedundantRepeat: '%{binding} has an unnecesary <i>%{keyword_repeat}</i>'
       HasTooManyMethods: '%{binding} has too many methods'
       HasTooShortBindings: '%{binding} is a too short identifier'
       HasTooShortIdentifiers: '%{binding} is a too short identifier'
