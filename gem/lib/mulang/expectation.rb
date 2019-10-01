@@ -22,11 +22,16 @@ class Mulang::Expectation
   end
 
   def translate(keywords = nil)
+    return inspection.to_s if custom?
     Mulang::Expectation::I18n.translate self, keywords
   end
 
   def to_h
     {binding: binding, inspection: inspection.to_s}
+  end
+
+  def custom?
+    binding == '<<custom>>'
   end
 
   def self.guess_type(expectation)

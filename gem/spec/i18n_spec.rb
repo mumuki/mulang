@@ -76,6 +76,10 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'HasIf').translate(keyword_repeat: 'repetir')).to eq('<strong>foo</strong> debe usar <i>if</i>') }
     end
 
+    describe 'custom expectations' do
+      it { expect(expectation('<<custom>>', 'La solución debe declarar `foo`').translate).to eq('La solución debe declarar `foo`') }
+    end
+
     describe 'v2 expectations' do
       it { expect(expectation('*', 'Declares:foo').translate).to eq('la solución debe declarar <strong>foo</strong>') }
       it { expect(expectation('*', 'DeclaresClass:foo').translate).to eq('la solución debe declarar una clase <strong>foo</strong>') }
