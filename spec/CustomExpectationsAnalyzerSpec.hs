@@ -19,6 +19,12 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "" "expectation \"must use if\": UsesIf") `shouldReturn` (result [failed "must use if"] [])
     (run JavaScript "if (true) {}" "expectation \"must use if\": UsesIf") `shouldReturn` (result [passed "must use if"] [])
 
+  it "evaluates count (calls `esMultiploDe`)" $ do
+    let test = "expectation: count(calls `esMultiploDe`) = 2;\n"
+    (run JavaScript "function esNumeroDeLaSuerte(x) {\r\n  return x > 0 && x != 15 ; \r\n} " test) `shouldReturn`  nok;
+    (run JavaScript "function esNumeroDeLaSuerte(x) {\r\n  return x > 0 && esMultiploDe(2, x) && x != 15 ; \r\n} " test) `shouldReturn`  nok;
+    (run JavaScript "function esNumeroDeLaSuerte(x) {\r\n  return x > 0 && (esMultiploDe(2, x) || esMultiploDe(3, x)) && x != 15 ; \r\n} " test) `shouldReturn`  ok;
+
   it "evaluates count (uses for)" $ do
     (run JavaScript "for (let x in []) {}" "expectation: count (uses for) = 0") `shouldReturn` nok
     (run JavaScript "for (let x in []) {}" "expectation: count (uses for) = 1") `shouldReturn` ok

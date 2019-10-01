@@ -3,6 +3,7 @@ module Language.Mulang.Inspector.Generic (
   countFors,
   countFunctions,
   countVariables,
+  countCalls,
   assigns,
   assignsMatching,
   calls,
@@ -80,7 +81,10 @@ calls :: BoundInspection
 calls = unmatching callsMatching
 
 callsMatching :: Matcher -> BoundInspection
-callsMatching matcher p = containsExpression f
+callsMatching = uncounting countCalls
+
+countCalls :: Matcher -> BoundCounter
+countCalls matcher p = countExpressions f
   where f (Call (Reference id) arguments) = p id && matcher arguments
         f _                               = False
 

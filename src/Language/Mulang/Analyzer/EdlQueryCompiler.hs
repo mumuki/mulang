@@ -85,6 +85,7 @@ compileCounter = f
   f "DeclaresObject"      m            = boundMatching countObjects m
   f "DeclaresProcedure"   m            = boundMatching countProcedures m
   f "DeclaresVariable"    m            = boundMatching countVariables m
+  f "Calls"               m            = boundMatching countCalls m
 
 compileInspection :: String -> E.Matcher -> Maybe ContextualizedBoundInspection
 compileInspection = f

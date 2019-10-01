@@ -383,6 +383,7 @@ Not all inspections can be counted. Currently, only the following are supported:
 * `uses if`
 * `uses repeat`
 * `uses while`
+* `calls`
 
 ## Boolean operators on scoped queries
 
