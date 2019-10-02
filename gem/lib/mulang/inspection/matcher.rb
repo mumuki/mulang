@@ -10,6 +10,10 @@ class Mulang::Inspection::Matcher
     @value = value
   end
 
+  def to_s
+    "#{type.to_s.camelcase}#{value ? ":#{value}" : nil}"
+  end
+
   def self.parse(type, value)
     return nil unless type
     raise "Invalid matcher #{type}" unless type.in? TYPES

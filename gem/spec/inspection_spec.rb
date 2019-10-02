@@ -2,6 +2,11 @@ require_relative './spec_helper'
 
 
 describe Mulang::Inspection do
+  it { expect(Mulang::Inspection.parse('Assigns').to_s).to eq 'Assigns' }
+  it { expect(Mulang::Inspection.parse('Assigns:x').to_s).to eq 'Assigns:x' }
+  it { expect(Mulang::Inspection.parse('Assigns:WithNumber:2').to_s).to eq 'Assigns:WithNumber:2' }
+  it { expect(Mulang::Inspection.parse('Assigns:x:WithNumber:2').to_s).to eq 'Assigns:x:WithNumber:2' }
+
   it { expect(Mulang::Inspection.parse('Declares')).to json_like(type: 'Declares',
                                                                 negated: false) }
 

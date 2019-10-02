@@ -28,7 +28,7 @@ module Mulang
     end
 
     def to_s
-      "#{negated_to_s}#{type}#{target_to_s}"
+      "#{negated_to_s}#{type}#{target_to_s}#{matcher_to_s}"
     end
 
     def negated_to_s
@@ -37,6 +37,10 @@ module Mulang
 
     def target_to_s
       target ? ":#{target.to_s}" : nil
+    end
+
+    def matcher_to_s
+      matcher ? ":#{matcher.to_s}" : nil
     end
 
     def self.parse_binding_name(binding_s)
