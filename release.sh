@@ -23,12 +23,12 @@ echo "[Mulang] Running tests..."
 stack test
 
 echo "[Mulang] Running ghcjslib tests..."
-./ghcjslib/swap.js
-./ghcjslib/test.js
+./ghcjslib/swap.sh
+./ghcjslib/test.sh
 
 echo "[Mulang] Deploying to NPM..."
-./ghcjslib/deploy.js
-./ghcjslib/swap.js
+./ghcjslib/deploy.sh
+./ghcjslib/swap.sh
 
 echo "[Mulang] Commiting files..."
 git commit mulang.cabal app/Version.hs gem/lib/mulang/version.rb gem/lib/mulang/version.rb ghcjslib/package.json -m "Welcome ${NEW_VERSION}!"
