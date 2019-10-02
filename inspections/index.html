@@ -173,203 +173,207 @@
 </thead>
 <tbody>
 <tr>
-<td><code>assigns</code></td>
+<td><code>Assigns</code></td>
 <td>the given variable or attribute assigned?</td>
 </tr>
 <tr>
-<td><code>assignsMatching</code></td>
-<td>the given variable or attribute assigned matching the given value?</td>
-</tr>
-<tr>
-<td><code>calls</code></td>
+<td><code>Calls</code></td>
 <td>is the given method, function or procedure called?</td>
 </tr>
 <tr>
-<td><code>callsMatching</code></td>
-<td>is the given method, function or procedure called matching the given arguments?</td>
-</tr>
-<tr>
-<td><code>declares</code></td>
+<td><code>Declares</code></td>
 <td>is the given element declared?</td>
 </tr>
 <tr>
-<td><code>declaresComputation</code></td>
-<td>that is, does the given computation  - method, predicate, function, etc - exist?</td>
+<td><code>DeclaresComputation</code></td>
+<td>does the given computation  - method, predicate, function, etc - exist?</td>
 </tr>
 <tr>
-<td><code>declaresComputationWithArity</code></td>
-<td>that is, does the given computation have the exact given arity?</td>
+<td><code>DeclaresComputationWithArity0</code></td>
+<td>does the given computation have no arguments?</td>
 </tr>
 <tr>
-<td><code>declaresEntryPoint</code></td>
+<td><code>DeclaresComputationWithArity1</code></td>
+<td>does the given computation have 1 argument?</td>
+</tr>
+<tr>
+<td><code>DeclaresComputationWithArity2</code></td>
+<td>does the given computation have 2 arguments?</td>
+</tr>
+<tr>
+<td><code>DeclaresComputationWithArity3</code></td>
+<td>does the given computation have 3 arguments?</td>
+</tr>
+<tr>
+<td><code>DeclaresComputationWithArity4</code></td>
+<td>does the given computation have 4 arguments?</td>
+</tr>
+<tr>
+<td><code>DeclaresComputationWithArity5</code></td>
+<td>does the given computation have 5 arguments?</td>
+</tr>
+<tr>
+<td><code>DeclaresEntryPoint</code></td>
 <td>is there a program entry point, like a <code>main</code> procedure?</td>
 </tr>
 <tr>
-<td><code>declaresFunction</code></td>
+<td><code>DeclaresFunction</code></td>
 <td>is a given function declared?</td>
 </tr>
 <tr>
-<td><code>declaresFunctionMatching</code></td>
-<td>is a given function declared matching the given body expressions?</td>
-</tr>
-<tr>
-<td><code>declaresRecursively</code></td>
+<td><code>DeclaresRecursively</code></td>
 <td>is a given computation declared using recusion?</td>
 </tr>
 <tr>
-<td><code>declaresTypeAlias</code></td>
+<td><code>DeclaresTypeAlias</code></td>
 <td>is a given type synonym declared?</td>
 </tr>
 <tr>
-<td><code>declaresTypeSignature</code></td>
+<td><code>DeclaresTypeSignature</code></td>
 <td>is a given computation type signature declared?</td>
 </tr>
 <tr>
-<td><code>declaresVariable</code></td>
+<td><code>DeclaresVariable</code></td>
 <td>is a given local or global variable declared?</td>
 </tr>
 <tr>
-<td><code>declaresVariableMatching</code></td>
-<td>is a given local or global variable declared matching the given expression?</td>
-</tr>
-<tr>
-<td><code>delegates</code></td>
+<td><code>Delegates</code></td>
 <td>is a method, function or procedure declared AND called?</td>
 </tr>
 <tr>
-<td><code>discardsExceptions</code></td>
+<td><code>DiscardsExceptions</code></td>
 <td>are exceptions discarded within an empty catch block?</td>
 </tr>
 <tr>
-<td><code>doesConsolePrint</code></td>
+<td><code>DoesConsolePrint</code></td>
 <td>is there any console-print-statement like <code>System.out.println</code>, <code>puts</code> or <code>console.log</code>?</td>
 </tr>
 <tr>
-<td><code>doesTypeTest</code></td>
+<td><code>DoesTypeTest</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>hasAssignmentReturn</code></td>
+<td><code>HasAssignmentReturn</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>hasCodeDuplication</code></td>
+<td><code>HasCodeDuplication</code></td>
 <td>has the given code simple literal code duplication?</td>
 </tr>
 <tr>
-<td><code>hasEmptyIfBranches</code></td>
+<td><code>HasEmptyIfBranches</code></td>
 <td>has the given code an empty if branch?</td>
 </tr>
 <tr>
-<td><code>hasLongParameterList</code></td>
+<td><code>HasLongParameterList</code></td>
 <td>does a given method/function/predicate take too many parameters?</td>
 </tr>
 <tr>
-<td><code>hasMisspelledIdentifiers</code></td>
+<td><code>HasMisspelledIdentifiers</code></td>
 <td>an identifier is not a domain language dictionary's word and not part of its jargon</td>
 </tr>
 <tr>
-<td><code>hasRedundantBooleanComparison</code></td>
+<td><code>HasRedundantBooleanComparison</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>hasRedundantIf</code></td>
+<td><code>HasRedundantIf</code></td>
 <td>can a combination of <code>if</code>s, <code>assignment</code>s and <code>return</code>s be replaced by a boolean expression?</td>
 </tr>
 <tr>
-<td><code>hasRedundantLocalVariableReturn</code></td>
+<td><code>HasRedundantLocalVariableReturn</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>hasTooShortIdentifiers</code></td>
+<td><code>HasRedundantRepeat</code></td>
+<td>has the given code an unnecesary - 1 iteration - <code>repeat</code> statement?</td>
+</tr>
+<tr>
+<td><code>HasTooShortIdentifiers</code></td>
 <td>whether an identifier is too short and not part of domain language's jargon</td>
 </tr>
 <tr>
-<td><code>hasUnreachableCode</code></td>
+<td><code>HasUnreachableCode</code></td>
 <td>is there unreachable code?</td>
 </tr>
 <tr>
-<td><code>hasWrongCaseIdentifiers</code></td>
+<td><code>HasWrongCaseIdentifiers</code></td>
 <td>whether an identifier does not match the domain language's case style</td>
 </tr>
 <tr>
-<td><code>isLongCode</code></td>
+<td><code>IsLongCode</code></td>
 <td>has the code long sequences of statements?</td>
 </tr>
 <tr>
-<td><code>raises</code></td>
+<td><code>Raises</code></td>
 <td>is the given <em>exception type</em> raised?</td>
 </tr>
 <tr>
-<td><code>rescues</code></td>
+<td><code>Rescues</code></td>
 <td>is the given <em>exception type</em> rescued?</td>
 </tr>
 <tr>
-<td><code>returnsMatching</code></td>
-<td>is a return used matching the given value?</td>
-</tr>
-<tr>
-<td><code>typesAs</code></td>
+<td><code>TypesAs</code></td>
 <td>is the given type used to type a variable?</td>
 </tr>
 <tr>
-<td><code>typesParameterAs</code></td>
+<td><code>TypesParameterAs</code></td>
 <td>is a parameter typed as a given type?</td>
 </tr>
 <tr>
-<td><code>typesReturnAs</code></td>
+<td><code>TypesReturnAs</code></td>
 <td>is the given type used to type a return?</td>
 </tr>
 <tr>
-<td><code>uses</code></td>
+<td><code>Uses</code></td>
 <td>is there any reference to the given element?</td>
 </tr>
 <tr>
-<td><code>usesArithmetic</code></td>
+<td><code>UsesArithmetic</code></td>
 <td>are arithmetic operators used?</td>
 </tr>
 <tr>
-<td><code>usesBooleanLogic</code></td>
+<td><code>UsesBooleanLogic</code></td>
 <td>are logical operators used?</td>
 </tr>
 <tr>
-<td><code>usesConditional</code></td>
+<td><code>UsesConditional</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>usesExceptionHandling</code></td>
+<td><code>UsesExceptionHandling</code></td>
 <td>is any <em>exception</em> handlded?</td>
 </tr>
 <tr>
-<td><code>usesExceptions</code></td>
+<td><code>UsesExceptions</code></td>
 <td>is any <em>exception</em> raised?</td>
 </tr>
 <tr>
-<td><code>usesFor</code></td>
+<td><code>UsesFor</code></td>
 <td>is any kind of comprehension or indexed repetition used?</td>
 </tr>
 <tr>
-<td><code>usesIf</code></td>
+<td><code>UsesIf</code></td>
 <td>is an <code>if</code> control structure used?</td>
 </tr>
 <tr>
-<td><code>usesLogic</code></td>
+<td><code>UsesLogic</code></td>
 <td>are boolean operators used?</td>
 </tr>
 <tr>
-<td><code>usesMath</code></td>
+<td><code>UsesMath</code></td>
 <td>are artithmetic operators used?</td>
 </tr>
 <tr>
-<td><code>usesPrimitive</code></td>
+<td><code>UsesPrimitive</code></td>
 <td>is the given primitive operator used?</td>
 </tr>
 <tr>
-<td><code>usesPrint</code></td>
+<td><code>UsesPrint</code></td>
 <td>is a print statement used?</td>
 </tr>
 <tr>
-<td><code>usesType</code></td>
+<td><code>UsesType</code></td>
 <td>is the given typed used in a signature?</td>
 </tr>
 </tbody>
@@ -384,39 +388,35 @@
 </thead>
 <tbody>
 <tr>
-<td><code>declaresEnumeration</code></td>
+<td><code>DeclaresEnumeration</code></td>
 <td>is a given enumeration declared?</td>
 </tr>
 <tr>
-<td><code>declaresProcedure</code></td>
+<td><code>DeclaresProcedure</code></td>
 <td>is a given procedure declared?</td>
 </tr>
 <tr>
-<td><code>declaresProcedureMatching</code></td>
-<td>is a given procedure declared matching the given body expressions?</td>
-</tr>
-<tr>
-<td><code>usesForEach</code></td>
+<td><code>UsesForEach</code></td>
 <td>is the procedural indexed repetition used?</td>
 </tr>
 <tr>
-<td><code>usesForLoop</code></td>
+<td><code>UsesForLoop</code></td>
 <td>is a c-style for loop used?</td>
 </tr>
 <tr>
-<td><code>usesLoop</code></td>
+<td><code>UsesLoop</code></td>
 <td>are any of: repeat / for loop / foreach / while used?</td>
 </tr>
 <tr>
-<td><code>usesRepeat</code></td>
+<td><code>UsesRepeat</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>usesSwitch</code></td>
+<td><code>UsesSwitch</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>usesWhile</code></td>
+<td><code>UsesWhile</code></td>
 <td>is a <code>while</code> control structure used?</td>
 </tr>
 </tbody>
@@ -431,111 +431,95 @@
 </thead>
 <tbody>
 <tr>
-<td><code>declaresAttribute</code></td>
+<td><code>DeclaresAttribute</code></td>
 <td>is a given attribute declared?</td>
 </tr>
 <tr>
-<td><code>declaresClass</code></td>
+<td><code>DeclaresClass</code></td>
 <td>is a given class declared?</td>
 </tr>
 <tr>
-<td><code>declaresClassMatching</code></td>
-<td>is a given class declared matching the given body expressions?</td>
-</tr>
-<tr>
-<td><code>declaresInterface</code></td>
+<td><code>DeclaresInterface</code></td>
 <td>is a given interface declared?</td>
 </tr>
 <tr>
-<td><code>declaresInterfaceMatching</code></td>
-<td>is a given interface declared matching the given body expressions?</td>
-</tr>
-<tr>
-<td><code>declaresMethod</code></td>
+<td><code>DeclaresMethod</code></td>
 <td>is a given method declared?</td>
 </tr>
 <tr>
-<td><code>declaresMethodMatching</code></td>
-<td>is a given method declared matching the given body expressions?</td>
-</tr>
-<tr>
-<td><code>declaresObject</code></td>
+<td><code>DeclaresObject</code></td>
 <td>is a given named object declared?</td>
 </tr>
 <tr>
-<td><code>declaresObjectMatching</code></td>
-<td>is a given named object declared matching the given body expressions?</td>
-</tr>
-<tr>
-<td><code>declaresPrimitive</code></td>
+<td><code>DeclaresPrimitive</code></td>
 <td>Is the given primitive operator overriden?</td>
 </tr>
 <tr>
-<td><code>declaresSuperclass</code></td>
+<td><code>DeclaresSuperclass</code></td>
 <td>is a given class declared as superclass?</td>
 </tr>
 <tr>
-<td><code>doesNullTest</code></td>
+<td><code>DoesNullTest</code></td>
 <td>is there a test agains a null value, like <code>if x == nil then puts 'is nil'</code></td>
 </tr>
 <tr>
-<td><code>hasTooManyMethods</code></td>
+<td><code>HasTooManyMethods</code></td>
 <td>does a given class/object/interface have too many methods?</td>
 </tr>
 <tr>
-<td><code>implements</code></td>
+<td><code>Implements</code></td>
 <td>is the given interface implemented?</td>
 </tr>
 <tr>
-<td><code>includes</code></td>
+<td><code>Includes</code></td>
 <td>is a given mixins included?</td>
 </tr>
 <tr>
-<td><code>inherits</code></td>
+<td><code>Inherits</code></td>
 <td>is a given class declared as superclass? - alias of <code>declaresSuperclass</code></td>
 </tr>
 <tr>
-<td><code>instantiates</code></td>
+<td><code>Instantiates</code></td>
 <td>is the given class instantiated?</td>
 </tr>
 <tr>
-<td><code>overridesEqualsOrHashButNotBoth</code></td>
+<td><code>OverridesEqualsOrHashButNotBoth</code></td>
 <td>does a given class override equals but not hash? or hash but not equals?</td>
 </tr>
 <tr>
-<td><code>returnsNil</code></td>
+<td><code>ReturnsNil</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>usesDyamicPolymorphism</code></td>
+<td><code>UsesDyamicPolymorphism</code></td>
 <td>are there two or more methods definitions for some sent selector?</td>
 </tr>
 <tr>
-<td><code>usesDynamicMethodOverload</code></td>
+<td><code>UsesDynamicMethodOverload</code></td>
 <td>is there a class that defined two methods with different arity but with the same name?</td>
 </tr>
 <tr>
-<td><code>usesInheritance</code></td>
+<td><code>UsesInheritance</code></td>
 <td>is any superclass explicitly declared?</td>
 </tr>
 <tr>
-<td><code>usesMixins</code></td>
+<td><code>UsesMixins</code></td>
 <td>is any mixins explicitly included?</td>
 </tr>
 <tr>
-<td><code>usesObjectComposition</code></td>
+<td><code>UsesObjectComposition</code></td>
 <td>is there a class that declares an attributes and sends a message to it?</td>
 </tr>
 <tr>
-<td><code>usesStaticMethodOverload</code></td>
+<td><code>UsesStaticMethodOverload</code></td>
 <td>is there a class that defined two method signatures but with the same name?</td>
 </tr>
 <tr>
-<td><code>usesStaticPolymorphism</code></td>
+<td><code>UsesStaticPolymorphism</code></td>
 <td>is there an interface with at least a method signature that is implemented by two or more classes and used in the code?</td>
 </tr>
 <tr>
-<td><code>usesTemplateMethod</code></td>
+<td><code>UsesTemplateMethod</code></td>
 <td>is there a class that sends a message whose corresonding method is not declared?</td>
 </tr>
 </tbody>
@@ -550,43 +534,39 @@
 </thead>
 <tbody>
 <tr>
-<td><code>hasRedundantGuards</code></td>
+<td><code>HasRedundantGuards</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>hasRedundantLambda</code></td>
+<td><code>HasRedundantLambda</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>hasRedundantParameter</code></td>
+<td><code>HasRedundantParameter</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>usesAnonymousVariable</code></td>
+<td><code>UsesAnonymousVariable</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>usesComposition</code></td>
+<td><code>UsesComposition</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>usesForComprehension</code></td>
+<td><code>UsesForComprehension</code></td>
 <td>is the functional for/do/list comprehension used?</td>
 </tr>
 <tr>
-<td><code>usesGuards</code></td>
+<td><code>UsesGuards</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>usesLambda</code></td>
+<td><code>UsesLambda</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>usesPatternMatching</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>usesYield</code></td>
+<td><code>UsesYield</code></td>
 <td>is an expression yielded within a comprehension?</td>
 </tr>
 </tbody>
@@ -601,43 +581,43 @@
 </thead>
 <tbody>
 <tr>
-<td><code>declaresFact</code></td>
+<td><code>DeclaresFact</code></td>
 <td>is a given logic fact declared?</td>
 </tr>
 <tr>
-<td><code>declaresPredicate</code></td>
+<td><code>DeclaresPredicate</code></td>
 <td>is a given rule o fact declared?</td>
 </tr>
 <tr>
-<td><code>declaresRule</code></td>
+<td><code>DeclaresRule</code></td>
 <td>is a given logic rule declared?</td>
 </tr>
 <tr>
-<td><code>hasRedundantReduction</code></td>
+<td><code>HasRedundantReduction</code></td>
 <td>is a is-operator used to unify individuals that don't require a reduction, like <code>X is 4</code></td>
 </tr>
 <tr>
-<td><code>usesCut</code></td>
+<td><code>UsesCut</code></td>
 <td>is the logic <code>!</code> consult used?</td>
 </tr>
 <tr>
-<td><code>usesFail</code></td>
+<td><code>UsesFail</code></td>
 <td>is the logic <code>fail</code> consult used?</td>
 </tr>
 <tr>
-<td><code>usesFindall</code></td>
+<td><code>UsesFindall</code></td>
 <td>is the logic <code>findall</code> consult used?</td>
 </tr>
 <tr>
-<td><code>usesForall</code></td>
+<td><code>UsesForall</code></td>
 <td>is the logic <code>forall</code> consult used?</td>
 </tr>
 <tr>
-<td><code>usesNot</code></td>
+<td><code>UsesNot</code></td>
 <td></td>
 </tr>
 <tr>
-<td><code>usesUnificationOperator</code></td>
+<td><code>UsesUnificationOperator</code></td>
 <td>is the logic unification operator <code>=</code> used?</td>
 </tr>
 </tbody>
