@@ -22,8 +22,7 @@ module Mulang
     end
 
     def expect(binding='*', inspection)
-      expectation = {binding: binding, inspection: inspection}
-      Mulang::Expectation.parse expectation
+      expectation = Mulang::Expectation.parse(binding: binding, inspection: inspection).as_v2.to_h
       expectation_results_for(analyse(expectations: [expectation])).first['result']
     end
 
