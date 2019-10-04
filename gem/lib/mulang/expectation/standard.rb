@@ -15,6 +15,10 @@ class Mulang::Expectation::Standard
     Mulang::Expectation::I18n.translate self, keywords
   end
 
+  def translate!(keywords = nil)
+    Mulang::Expectation::I18n.translate! self, keywords
+  end
+
   def to_h
     {binding: binding, inspection: inspection.to_s}
   end

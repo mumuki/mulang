@@ -9,6 +9,8 @@ class Mulang::Expectation::Custom
     name
   end
 
+  alias translate! translate
+
   def to_h
     {binding: '<<custom>>', inspection: name}
   end
