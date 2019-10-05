@@ -5,17 +5,18 @@ import Data.Maybe (fromMaybe)
 
 import Language.Mulang
 import Language.Mulang.Analyzer.Finding
+import Language.Mulang.Analyzer.ExpectationsEvaluator (ExpectationsEvaluator)
 import Language.Mulang.Analyzer.Analysis (customExpectationResult, ExpectationResult(..))
 import Language.Mulang.Analyzer.EdlQueryCompiler (compileTopQuery)
 
 import Language.Mulang.Edl (parseExpectations, Expectation (..))
 
-analyseCustomExpectations :: Expression -> Maybe String -> Finding [ExpectationResult]
-analyseCustomExpectations ast  = fromMaybe (return []) . fmap (analyseCustomExpectations' ast)
+analyseCustomExpectations :: ExpectationsEvaluator -> Expression -> Maybe String -> Finding [ExpectationResult]
+analyseCustomExpectations evaluator ast  = fromMaybe (return []) . fmap (analyseCustomExpectations' evaluator ast)
 
-analyseCustomExpectations' :: Expression -> String -> Finding [ExpectationResult]
-analyseCustomExpectations' ast = mapFindings (analyseExpectation ast) . parseExpectations
+analyseCustomExpectations' :: ExpectationsEvaluator -> Expression -> String -> Finding [ExpectationResult]
+analyseCustomExpectations' evaluator ast = mapFindings (analyseExpectation evaluator ast) . parseExpectations
 
-analyseExpectation :: Expression -> Expectation -> Finding ExpectationResult
-analyseExpectation ast (Expectation name q) = fmap (customExpectationResult name) compileAndEval
-  where compileAndEval = fmap ($ ast) (compileTopQuery q)
+analyseExpectation :: ExpectationsEvaluator -> Expression -> Expectation -> Finding ExpectationResult
+analyseExpectation evaluator ast (Expectation name q) = fmap (customExpectationResult name) compileAndEval
+  where compileAndEval = evaluator ast (compileTopQuery q)

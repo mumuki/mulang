@@ -79,6 +79,7 @@ library
     Language.Mulang.Analyzer.CustomExpectationsAnalyzer
     Language.Mulang.Analyzer.DomainLanguageCompiler
     Language.Mulang.Analyzer.EdlQueryCompiler
+    Language.Mulang.Analyzer.ExpectationsEvaluator
     Language.Mulang.Analyzer.ExpectationsAnalyzer
     Language.Mulang.Analyzer.ExpectationsCompiler
     Language.Mulang.Analyzer.Finding

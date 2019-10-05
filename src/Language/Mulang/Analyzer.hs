@@ -4,6 +4,7 @@ module Language.Mulang.Analyzer (
 
 import Language.Mulang
 import Language.Mulang.Analyzer.Analysis hiding (Inspection)
+import Language.Mulang.Analyzer.ExpectationsEvaluator (lenientMode, strictMode)
 import Language.Mulang.Analyzer.DomainLanguageCompiler (compileDomainLanguage)
 import Language.Mulang.Analyzer.ExpectationsAnalyzer (analyseExpectations)
 import Language.Mulang.Analyzer.CustomExpectationsAnalyzer (analyseCustomExpectations)
@@ -28,10 +29,11 @@ analyse' (Analysis sample spec) = analyseSample . parseFragment $ sample
 
 analyseAst :: Expression -> AnalysisSpec -> IO AnalysisResult
 analyseAst ast spec = do
+  let evaluator = compileExpectationsEvaluator (expectationsEvaluator spec)
   domaingLang <- compileDomainLanguage (domainLanguage spec)
   testResults <- analyseTests ast (testAnalysisType spec)
-  return $ buildAnalysis (analyseExpectations ast (expectations spec))
-                         (analyseCustomExpectations ast (customExpectations spec))
+  return $ buildAnalysis (analyseExpectations evaluator ast (expectations spec))
+                         (analyseCustomExpectations evaluator ast (customExpectations spec))
                          (analyseSmells ast domaingLang (smellsSet spec))
                          (analyseSignatures ast (signatureAnalysisType spec))
                          testResults
@@ -45,3 +47,7 @@ analyzeIntermediateLanguage :: Expression -> AnalysisSpec -> Maybe Expression
 analyzeIntermediateLanguage ast spec
   | fromMaybe False (includeIntermediateLanguage spec) = Just ast
   | otherwise = Nothing
+
+
+compileExpectationsEvaluator (Just StrictMode) = strictMode
+compileExpectationsEvaluator _                 = lenientMode

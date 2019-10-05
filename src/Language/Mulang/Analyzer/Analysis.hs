@@ -36,6 +36,7 @@ module Language.Mulang.Analyzer.Analysis (
   Smell,
   SmellsSet(..),
   TestAnalysisType(..),
+  ExpectationsEvaluator(..),
 
   AnalysisResult(..),
   ExpectationResult(..)) where
@@ -78,7 +79,8 @@ data AnalysisSpec = AnalysisSpec {
   domainLanguage :: Maybe DomainLanguage,
   includeIntermediateLanguage :: Maybe Bool,
   originalLanguage :: Maybe Language,
-  autocorrectionRules :: Maybe AutocorrectionRules
+  autocorrectionRules :: Maybe AutocorrectionRules,
+  expectationsEvaluator :: Maybe ExpectationsEvaluator
 } deriving (Show, Eq, Generic)
 
 data DomainLanguage = DomainLanguage {
@@ -87,6 +89,10 @@ data DomainLanguage = DomainLanguage {
   minimumIdentifierSize :: Maybe Int,
   jargon :: Maybe [String]
 } deriving (Show, Eq, Generic)
+
+data ExpectationsEvaluator
+  = LenientMode
+  | StrictMode deriving (Show, Eq, Generic)
 
 data CaseStyle
   = CamelCase
@@ -175,7 +181,7 @@ allSmellsBut :: [Smell] -> Maybe SmellsSet
 allSmellsBut = Just . AllSmells . Just
 
 emptyAnalysisSpec :: AnalysisSpec
-emptyAnalysisSpec = AnalysisSpec Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+emptyAnalysisSpec = AnalysisSpec Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 emptyAnalysis :: Fragment -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec
@@ -184,10 +190,10 @@ domainLanguageAnalysis :: Fragment -> DomainLanguage -> Analysis
 domainLanguageAnalysis code domainLanguage = Analysis code (emptyAnalysisSpec { domainLanguage = Just domainLanguage, smellsSet = allSmells })
 
 customExpectationsAnalysis :: Fragment -> String -> Analysis
-customExpectationsAnalysis code es = Analysis code (emptyAnalysisSpec { customExpectations = Just es })
+customExpectationsAnalysis code es = Analysis code (emptyAnalysisSpec { customExpectations = Just es, expectationsEvaluator = Just StrictMode })
 
 expectationsAnalysis :: Fragment -> [Expectation] -> Analysis
-expectationsAnalysis code es = Analysis code (emptyAnalysisSpec { expectations = Just es })
+expectationsAnalysis code es = Analysis code (emptyAnalysisSpec { expectations = Just es, expectationsEvaluator = Just StrictMode })
 
 smellsAnalysis :: Fragment -> Maybe SmellsSet -> Analysis
 smellsAnalysis code set = Analysis code (emptyAnalysisSpec { smellsSet = set })
