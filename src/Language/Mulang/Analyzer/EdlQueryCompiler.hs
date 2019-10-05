@@ -17,6 +17,7 @@ import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclar
 import qualified Language.Mulang.Edl.Expectation as E
 
 import Data.Either (either)
+import Control.Monad.Except
 import Data.List.Split (splitOn)
 
 type Scope = (ContextualizedInspection -> ContextualizedInspection, IdentifierPredicate -> IdentifierPredicate)
@@ -87,7 +88,7 @@ compileCounter = f
   f "DeclaresProcedure"   m            = boundMatching countProcedures m
   f "DeclaresVariable"    m            = boundMatching countVariables m
   f "Calls"               m            = boundMatching countCalls m
-  f other                 m            = Left $ "Can not count over " ++ other ++ " with matcher " ++ show m
+  f other                 m            = throwError $ "Can not count over " ++ other ++ " with matcher " ++ show m
 
 compileInspection :: String -> E.Matcher -> Compilation ContextualizedBoundInspection
 compileInspection = f
@@ -167,22 +168,22 @@ compileInspection = f
   f "UsesYield"                        m              = plainMatching usesYieldMatching m
   f (primitiveDeclaration -> Just p)   E.Unmatching   = plain (declaresPrimitive p)
   f (primitiveUsage -> Just p)         E.Unmatching   = plain (usesPrimitive p)
-  f other                              m              = Left $ "Unknown inspection " ++ other  ++ " with matcher " ++ show m
+  f other                              m              = throwError $ "Unknown inspection " ++ other  ++ " with matcher " ++ show m
 
   primitiveUsage = decodeUsageInspection
   primitiveDeclaration = decodeDeclarationInspection
 
 contextual :: ContextualizedConsult a -> Compilation (ContextualizedBoundConsult a)
-contextual = Right . contextualizedBind
+contextual = return . contextualizedBind
 
 contextualizedBound :: ContextualizedBoundConsult a -> Compilation (ContextualizedBoundConsult a)
-contextualizedBound = Right
+contextualizedBound = return
 
 plain :: Consult a -> Compilation (ContextualizedBoundConsult a)
-plain = Right . contextualizedBind . contextualize
+plain = return . contextualizedBind . contextualize
 
 bound :: BoundConsult a -> Compilation (ContextualizedBoundConsult a)
-bound = Right . boundContextualize
+bound = return . boundContextualize
 
 boundMatching :: (Matcher -> BoundConsult a) -> E.Matcher -> Compilation (ContextualizedBoundConsult a)
 boundMatching f m = bound (f (compileMatcher m))
