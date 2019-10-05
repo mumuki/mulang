@@ -15,7 +15,7 @@ import           Data.List.Split (splitOn)
 import           Control.Monad.Except
 
 compileExpectation :: A.Expectation -> Finding Inspection
-compileExpectation (A.Expectation s i) = fmap (compileTopQuery . negator . scope) baseQuery
+compileExpectation (A.Expectation s i) = baseQuery >>= compileTopQuery . negator . scope
   where
     (inspectionParts, negator) = compileInspectionPartsAndNegator (splitOn ":" i)
     scope = compileScope (splitOn ":" s)

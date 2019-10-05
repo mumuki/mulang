@@ -37,8 +37,9 @@ analyseAst ast spec = do
                          testResults
                          (analyzeIntermediateLanguage ast spec)
 
-buildAnalysis (Left message)             _                        = \_ _ _ _ -> AnalysisFailed message
-buildAnalysis (Right expectationResults) customExpectationResults = AnalysisCompleted (expectationResults ++ customExpectationResults)
+buildAnalysis (Left message)             _                                = \_ _ _ _ -> AnalysisFailed message
+buildAnalysis _                          (Left message)                   = \_ _ _ _ -> AnalysisFailed message
+buildAnalysis (Right expectationResults) (Right customExpectationResults) = AnalysisCompleted (expectationResults ++ customExpectationResults)
 
 analyzeIntermediateLanguage :: Expression -> AnalysisSpec -> Maybe Expression
 analyzeIntermediateLanguage ast spec

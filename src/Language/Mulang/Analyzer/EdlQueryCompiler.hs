@@ -23,8 +23,8 @@ import Data.List.Split (splitOn)
 
 type Scope = (ContextualizedInspection -> ContextualizedInspection, IdentifierPredicate -> IdentifierPredicate)
 
-compileTopQuery :: E.Query -> Inspection
-compileTopQuery = either (const lenient) id . compileQuery
+compileTopQuery :: E.Query -> Finding Inspection
+compileTopQuery = compileQuery
 
 compileQuery :: E.Query -> Finding Inspection
 compileQuery (E.Decontextualize query) = compileCQuery id query >>= (return . decontextualize)
@@ -186,31 +186,31 @@ bound :: BoundConsult a -> Finding (ContextualizedBoundConsult a)
 bound = return . boundContextualize
 
 boundMatching :: (Matcher -> BoundConsult a) -> E.Matcher -> Finding (ContextualizedBoundConsult a)
-boundMatching f m = bound . f . compileMatcher $ m
+boundMatching f m = (fmap f . compileMatcher) m >>= bound
 
 plainMatching :: (Matcher -> Consult a) -> E.Matcher -> Finding (ContextualizedBoundConsult a)
-plainMatching f m = plain . f . compileMatcher $ m
+plainMatching f m = (fmap f . compileMatcher) m >>= plain
 
-compileMatcher :: E.Matcher -> Matcher
+compileMatcher :: E.Matcher -> Finding Matcher
 compileMatcher (E.Matching clauses) = compileClauses clauses
-compileMatcher _                    = const True
+compileMatcher _                    = return $ const True
 
-compileClauses :: [E.Clause] -> Matcher
-compileClauses = withEvery . f
+compileClauses :: [E.Clause] -> Finding Matcher
+compileClauses = fmap withEvery . f
   where
-    f :: [E.Clause] -> [Inspection]
-    f (E.IsAnything:args)       = lenient : (f args)
-    f (E.IsChar value:args)     = isChar value : (f args)
-    f (E.IsFalse:args)          = isBool False : (f args)
-    f (E.IsLiteral:args)        = isLiteral : (f args)
-    f (E.IsLogic:args)          = usesLogic : (f args)
-    f (E.IsMath:args)           = usesMath : (f args)
-    f (E.IsNil:args)            = isNil : (f args)
-    f (E.IsNonliteral:args)     = isNonliteral : (f args)
-    f (E.IsSelf:args)           = isSelf : (f args)
-    f (E.IsTrue:args)           = isBool True : (f args)
-    f (E.IsNumber value:args)   = isNumber value : (f args)
-    f (E.IsString value:args)   = isString value : (f args)
-    f (E.IsSymbol value:args)   = isSymbol value : (f args)
-    f (E.That expectation:args) = compileTopQuery expectation : (f args)
-    f []                        = []
+    f :: [E.Clause] -> Finding [Inspection]
+    f (E.IsAnything:args)       = fmap (lenient :) (f args)
+    f (E.IsChar value:args)     = fmap (isChar value :) (f args)
+    f (E.IsFalse:args)          = fmap (isBool False :) (f args)
+    f (E.IsLiteral:args)        = fmap (isLiteral :) (f args)
+    f (E.IsLogic:args)          = fmap (usesLogic :) (f args)
+    f (E.IsMath:args)           = fmap (usesMath :) (f args)
+    f (E.IsNil:args)            = fmap (isNil :) (f args)
+    f (E.IsNonliteral:args)     = fmap (isNonliteral :) (f args)
+    f (E.IsSelf:args)           = fmap (isSelf :) (f args)
+    f (E.IsTrue:args)           = fmap (isBool True :) (f args)
+    f (E.IsNumber value:args)   = fmap (isNumber value :) (f args)
+    f (E.IsString value:args)   = fmap (isString value :) (f args)
+    f (E.IsSymbol value:args)   = fmap (isSymbol value :) (f args)
+    f (E.That expectation:args) = (:) <$> compileTopQuery expectation <*> (f args)
+    f []                        = return []
