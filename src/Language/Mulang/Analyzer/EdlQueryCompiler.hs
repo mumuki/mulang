@@ -10,9 +10,10 @@ import Data.Function.Extra (orElse, andAlso, never)
 import Language.Mulang
 import Language.Mulang.Consult (Consult)
 import Language.Mulang.Counter (plus)
-import Language.Mulang.Inspector.Primitive (atLeast, atMost, exactly)
+import Language.Mulang.Inspector.Primitive (lenient, atLeast, atMost, exactly)
 import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol, isSelf)
 import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
+import Language.Mulang.Analyzer.Finding (Finding)
 
 import qualified Language.Mulang.Edl.Expectation as E
 
@@ -21,12 +22,11 @@ import Control.Monad.Except
 import Data.List.Split (splitOn)
 
 type Scope = (ContextualizedInspection -> ContextualizedInspection, IdentifierPredicate -> IdentifierPredicate)
-type Compilation e = Either String e
 
 compileTopQuery :: E.Query -> Inspection
-compileTopQuery = either (const (const True)) id . compileQuery
+compileTopQuery = either (const lenient) id . compileQuery
 
-compileQuery :: E.Query -> Compilation Inspection
+compileQuery :: E.Query -> Finding Inspection
 compileQuery (E.Decontextualize query) = compileCQuery id query >>= (return . decontextualize)
 compileQuery (E.Within name query)     | (scope, p) <- compileWithin name  = fmap (decontextualize.scope) (compileCQuery p query)
 compileQuery (E.Through name query)    | (scope, p) <- compileThrough name = fmap (decontextualize.scope) (compileCQuery p query)
@@ -42,7 +42,7 @@ scopeFor :: ([Identifier] -> Inspection -> Inspection) -> Identifier -> Scope
 scopeFor f name = (contextualized (f names), andAlso (except (last names)))
   where names = splitOn "." name
 
-compileCQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.CQuery -> Compilation ContextualizedInspection
+compileCQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.CQuery -> Finding ContextualizedInspection
 compileCQuery pm (E.Inspection i p m) = ($ (compilePredicate pm p))         <$> compileInspection (compileVerb i) m
 compileCQuery pm (E.AtLeast n q)      = contextualized (atLeast (encode n)) <$> compileTQuery pm q
 compileCQuery pm (E.AtMost n q)       = contextualized (atMost (encode n))  <$> compileTQuery pm q
@@ -51,7 +51,7 @@ compileCQuery pm (E.CNot q)           = contextualized never                <$> 
 compileCQuery pm (E.CAnd q1 q2)       = contextualized2 andAlso             <$> compileCQuery pm q1 <*> compileCQuery pm q2
 compileCQuery pm (E.COr q1 q2)        = contextualized2 orElse              <$> compileCQuery pm q1 <*> compileCQuery pm q2
 
-compileTQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.TQuery -> Compilation ContextualizedCounter
+compileTQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.TQuery -> Finding ContextualizedCounter
 compileTQuery pm (E.Counter i p m) = ($ (compilePredicate pm p)) <$> compileCounter (compileVerb i) m
 compileTQuery pm (E.Plus q1 q2)    = contextualized2 plus        <$> (compileTQuery pm q1) <*> (compileTQuery pm q2)
 
@@ -71,7 +71,7 @@ compileVerb :: String -> String
 compileVerb = concat . map headToUpper . words
   where headToUpper (x:xs) = toUpper x : xs
 
-compileCounter :: String -> E.Matcher -> Compilation (ContextualizedBoundCounter)
+compileCounter :: String -> E.Matcher -> Finding (ContextualizedBoundCounter)
 compileCounter = f
   where
   f "UsesIf"              m            = plainMatching countIfs m
@@ -90,7 +90,7 @@ compileCounter = f
   f "Calls"               m            = boundMatching countCalls m
   f other                 m            = throwError $ "Can not count over " ++ other ++ " with matcher " ++ show m
 
-compileInspection :: String -> E.Matcher -> Compilation ContextualizedBoundInspection
+compileInspection :: String -> E.Matcher -> Finding ContextualizedBoundInspection
 compileInspection = f
   where
   f "Assigns"                          m              = boundMatching assignsMatching m
@@ -173,22 +173,22 @@ compileInspection = f
   primitiveUsage = decodeUsageInspection
   primitiveDeclaration = decodeDeclarationInspection
 
-contextual :: ContextualizedConsult a -> Compilation (ContextualizedBoundConsult a)
+contextual :: ContextualizedConsult a -> Finding (ContextualizedBoundConsult a)
 contextual = return . contextualizedBind
 
-contextualizedBound :: ContextualizedBoundConsult a -> Compilation (ContextualizedBoundConsult a)
+contextualizedBound :: ContextualizedBoundConsult a -> Finding (ContextualizedBoundConsult a)
 contextualizedBound = return
 
-plain :: Consult a -> Compilation (ContextualizedBoundConsult a)
+plain :: Consult a -> Finding (ContextualizedBoundConsult a)
 plain = return . contextualizedBind . contextualize
 
-bound :: BoundConsult a -> Compilation (ContextualizedBoundConsult a)
+bound :: BoundConsult a -> Finding (ContextualizedBoundConsult a)
 bound = return . boundContextualize
 
-boundMatching :: (Matcher -> BoundConsult a) -> E.Matcher -> Compilation (ContextualizedBoundConsult a)
+boundMatching :: (Matcher -> BoundConsult a) -> E.Matcher -> Finding (ContextualizedBoundConsult a)
 boundMatching f m = bound (f (compileMatcher m))
 
-plainMatching :: (Matcher -> Consult a) -> E.Matcher -> Compilation (ContextualizedBoundConsult a)
+plainMatching :: (Matcher -> Consult a) -> E.Matcher -> Finding (ContextualizedBoundConsult a)
 plainMatching f m = plain (f (compileMatcher m))
 
 compileMatcher :: E.Matcher -> Matcher
@@ -199,7 +199,7 @@ compileClauses :: [E.Clause] -> Matcher
 compileClauses = withEvery . f
   where
     f :: [E.Clause] -> [Inspection]
-    f (E.IsAnything:args)       = isAnything : (f args)
+    f (E.IsAnything:args)       = lenient : (f args)
     f (E.IsChar value:args)     = isChar value : (f args)
     f (E.IsFalse:args)          = isBool False : (f args)
     f (E.IsLiteral:args)        = isLiteral : (f args)

@@ -30,11 +30,15 @@ analyseAst :: Expression -> AnalysisSpec -> IO AnalysisResult
 analyseAst ast spec = do
   domaingLang <- compileDomainLanguage (domainLanguage spec)
   testResults <- analyseTests ast (testAnalysisType spec)
-  return $ AnalysisCompleted (analyseExpectations ast (expectations spec) ++ analyseCustomExpectations ast (customExpectations spec))
-                             (analyseSmells ast domaingLang (smellsSet spec))
-                             (analyseSignatures ast (signatureAnalysisType spec))
-                             testResults
-                             (analyzeIntermediateLanguage ast spec)
+  return $ buildAnalysis (analyseExpectations ast (expectations spec))
+                         (analyseCustomExpectations ast (customExpectations spec))
+                         (analyseSmells ast domaingLang (smellsSet spec))
+                         (analyseSignatures ast (signatureAnalysisType spec))
+                         testResults
+                         (analyzeIntermediateLanguage ast spec)
+
+buildAnalysis (Left m)    _    _ _   _  _    = AnalysisFailed m
+buildAnalysis (Right ers) ecrs s sg trs ilrs = AnalysisCompleted (ers ++ ecrs) s sg trs ilrs
 
 analyzeIntermediateLanguage :: Expression -> AnalysisSpec -> Maybe Expression
 analyzeIntermediateLanguage ast spec

@@ -8,16 +8,14 @@ import           Language.Mulang.Edl.Expectation
 import           Language.Mulang (Inspection)
 import           Language.Mulang.Analyzer.EdlQueryCompiler (compileTopQuery)
 import qualified Language.Mulang.Analyzer.Analysis as A
+import           Language.Mulang.Analyzer.Finding (Finding)
 
 import qualified Data.Map.Strict as Map
 import           Data.List.Split (splitOn)
 import           Control.Monad.Except
-import           Data.Either (either)
 
-type Compilation e = Either String e
-
-compileExpectation :: A.Expectation -> Inspection
-compileExpectation (A.Expectation s i) = either (const (const True)) id (fmap (compileTopQuery . negator . scope) baseQuery)
+compileExpectation :: A.Expectation -> Finding Inspection
+compileExpectation (A.Expectation s i) = fmap (compileTopQuery . negator . scope) baseQuery
   where
     (inspectionParts, negator) = compileInspectionPartsAndNegator (splitOn ":" i)
     scope = compileScope (splitOn ":" s)
@@ -33,7 +31,7 @@ compileScope ["Intransitive",name] q = Within name q
 compileScope [name]                q = Through name q
 compileScope _                     q = Decontextualize q
 
-compileCQuery :: [String] -> Compilation CQuery
+compileCQuery :: [String] -> Finding CQuery
 compileCQuery []                            = compileCQuery ["Parses","*"]
 compileCQuery [verb]                        = compileCQuery [verb,"*"]
 compileCQuery [verb,name]                   | Map.member name nullaryMatchers = compileCQuery [verb,"*",name]
@@ -50,13 +48,13 @@ compileBinding ('~':name)   = Like name
 compileBinding ('=':name)   = Named name
 compileBinding name         = Named name
 
-compileMatcher :: [String] -> Compilation Matcher
+compileMatcher :: [String] -> Finding Matcher
 compileMatcher = fmap matching . f
   where
     matching [] = Unmatching
     matching xs = Matching xs
 
-    f :: [String] -> Compilation [Clause]
+    f :: [String] -> Finding [Clause]
     f (name:args)        | Just matcher <- Map.lookup name nullaryMatchers = fmap (matcher :) (f args)
     f (name:value:args)  | Just matcher <- Map.lookup name binaryMatchers =  fmap (matcher value :) (f args)
     f []                 = return []
