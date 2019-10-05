@@ -186,10 +186,10 @@ bound :: BoundConsult a -> Finding (ContextualizedBoundConsult a)
 bound = return . boundContextualize
 
 boundMatching :: (Matcher -> BoundConsult a) -> E.Matcher -> Finding (ContextualizedBoundConsult a)
-boundMatching f m = bound (f (compileMatcher m))
+boundMatching f m = bound . f . compileMatcher $ m
 
 plainMatching :: (Matcher -> Consult a) -> E.Matcher -> Finding (ContextualizedBoundConsult a)
-plainMatching f m = plain (f (compileMatcher m))
+plainMatching f m = plain . f . compileMatcher $ m
 
 compileMatcher :: E.Matcher -> Matcher
 compileMatcher (E.Matching clauses) = compileClauses clauses
