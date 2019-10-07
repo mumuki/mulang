@@ -48,22 +48,6 @@ describe Mulang::Expectation::I18n do
   context 'es locale' do
     before { I18n.locale = :es }
 
-    describe 'css inspections' do
-      before { Mulang::Inspection.register_extension! Mulang::Inspection::Css }
-      after { Mulang::Inspection.unregister_extension! Mulang::Inspection::Css }
-
-      it { expect(expectation('css:span', 'DeclaresStyle:background-color:yellow').translate!).to eq '<strong>css:span</strong> debe declarar un estilo <strong>background-color:yellow</strong>' }
-      it { expect(expectation('html/body/section/article/h4', 'DeclaresAttribute:class="titulo-pelicula"').translate!).to eq '<strong>html/body/section/article/h4</strong> debe declarar un atributo <strong>class="titulo-pelicula"</strong>' }
-      it { expect(expectation('html/body/section/nav', 'DeclaresTag:ul').translate!).to eq '<strong>html/body/section/nav</strong> debe declarar un elemento <strong>ul</strong>' }
-    end
-
-    describe 'source exectations' do
-      it { expect(expectation('*', 'SourceRepeats:foo(X)').translate).to eq('la solución debe usar <strong>foo(X)</strong> más de una vez') }
-      it { expect(expectation('*', 'SourceContains:foo(X)').translate).to eq('la solución debe usar <strong>foo(X)</strong>') }
-      it { expect(expectation('*', 'SourceEquals:foo(X)').translate).to eq('la solución debe ser igual a <strong>foo(X)</strong>') }
-      it { expect(expectation('*', 'SourceEqualsIgnoreSpaces:foo(X)').translate).to eq('la solución debe ser igual a <strong>foo(X)</strong>') }
-    end
-
     describe 'v0 exectations' do
       it { expect(expectation('foo', 'HasBinding').translate).to eq('la solución debe declarar <strong>foo</strong>') }
       it { expect(expectation('foo', 'HasUsage:bar').translate).to eq('<strong>foo</strong> debe utilizar <strong>bar</strong>') }

@@ -20,11 +20,12 @@ module Mulang
     attr_accessor :type, :target, :matcher, :negated
     alias negated? negated
 
-    def initialize(type, target, negated: false, matcher: nil)
+    def initialize(type, target, negated: false, matcher: nil, i18n_namespace: nil)
       @type = type
       @target = target
       @negated = negated
       @matcher = matcher
+      @i18n_namespace = i18n_namespace
     end
 
     def to_s
@@ -41,6 +42,10 @@ module Mulang
 
     def matcher_to_s
       matcher ? ":#{matcher.to_s}" : nil
+    end
+
+    def i18n_namespace
+      @i18n_namespace || 'mulang.inspection'
     end
 
     def self.parse_binding_name(binding_s)
@@ -80,13 +85,6 @@ module Mulang
     def self.unregister_extension!(extension)
       extensions.delete extension
     end
-  end
-end
-
-module Mulang::Inspection::Css
-  def self.parse(inspection_s)
-    match = /^(?<negation>Not:)?DeclaresStyle:(?<target>.*)$/.match(inspection_s)
-    Mulang::Inspection.new 'DeclaresStyle', Mulang::Inspection::Target.new(:unknown, match['target']), negated: match['negation'].present? if match
   end
 end
 

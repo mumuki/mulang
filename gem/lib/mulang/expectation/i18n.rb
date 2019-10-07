@@ -43,7 +43,7 @@ module Mulang::Expectation::I18n
     end
 
     def key_for(binding, inspection)
-      "mulang.inspection.#{inspection.type}#{inspection.target ? inspection.target.i18n_suffix : nil}"
+      "#{inspection.i18n_namespace}.#{inspection.type}#{inspection.target ? inspection.target.i18n_suffix : nil}"
     end
 
     def t_binding(binding)

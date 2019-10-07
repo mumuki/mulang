@@ -2,18 +2,6 @@ require_relative './spec_helper'
 
 
 describe Mulang::Inspection do
-  context 'with extension' do
-    let(:inspection_s) { 'DeclaresStyle:background-color:yellow' }
-
-    before { Mulang::Inspection.register_extension! Mulang::Inspection::Css }
-    after { Mulang::Inspection.unregister_extension! Mulang::Inspection::Css }
-
-    it { expect(Mulang::Inspection.parse(inspection_s)).to json_like(type: 'DeclaresStyle',
-                                                                     target: { type: :unknown, value: 'background-color:yellow' },
-                                                                     negated: false) }
-    it { expect(Mulang::Inspection.parse(inspection_s).to_s).to eq inspection_s }
-  end
-
   it { expect(Mulang::Inspection.parse('Assigns').to_s).to eq 'Assigns' }
   it { expect(Mulang::Inspection.parse('Assigns:x').to_s).to eq 'Assigns:x' }
   it { expect(Mulang::Inspection.parse('Assigns:WithNumber:2').to_s).to eq 'Assigns:WithNumber:2' }
