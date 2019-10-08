@@ -19,11 +19,15 @@ module Mulang::Expectation::I18n
     }
 
     def translate(e, keywords = nil)
+      translate!(e, keywords)
+    rescue
+      '<unknown expectation>'
+    end
+
+    def translate!(e, keywords = nil)
       e = e.as_v2
       key = key_for e.binding, e.inspection
       ::I18n.t key, translation_params(e, keywords)
-    rescue
-      '<unknown expectation>'
     end
 
     alias t translate
@@ -39,7 +43,7 @@ module Mulang::Expectation::I18n
     end
 
     def key_for(binding, inspection)
-      "mulang.inspection.#{inspection.type}#{inspection.target ? inspection.target.i18n_suffix : nil}"
+      "#{inspection.i18n_namespace}.#{inspection.type}#{inspection.target ? inspection.target.i18n_suffix : nil}"
     end
 
     def t_binding(binding)

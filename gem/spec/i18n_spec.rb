@@ -48,13 +48,6 @@ describe Mulang::Expectation::I18n do
   context 'es locale' do
     before { I18n.locale = :es }
 
-    describe 'source exectations' do
-      it { expect(expectation('*', 'SourceRepeats:foo(X)').translate).to eq('la solución debe usar <strong>foo(X)</strong> más de una vez') }
-      it { expect(expectation('*', 'SourceContains:foo(X)').translate).to eq('la solución debe usar <strong>foo(X)</strong>') }
-      it { expect(expectation('*', 'SourceEquals:foo(X)').translate).to eq('la solución debe ser igual a <strong>foo(X)</strong>') }
-      it { expect(expectation('*', 'SourceEqualsIgnoreSpaces:foo(X)').translate).to eq('la solución debe ser igual a <strong>foo(X)</strong>') }
-    end
-
     describe 'v0 exectations' do
       it { expect(expectation('foo', 'HasBinding').translate).to eq('la solución debe declarar <strong>foo</strong>') }
       it { expect(expectation('foo', 'HasUsage:bar').translate).to eq('<strong>foo</strong> debe utilizar <strong>bar</strong>') }
