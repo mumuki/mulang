@@ -2,8 +2,25 @@ var should = require('should');
 let mulang = require('../build/mulang');
 
 describe("mulang", () => {
-  it("can run quick queries over code", () => {
+  it("can run quick queries over native code", () => {
     const code = mulang.code("JavaScript", "x = 1");
+
+    should(code.expect("*", "Assigns:x")).be.true()
+    should(code.expect("*", "Assigns:y")).be.false()
+    should(code.expect("*", "Assigns:x:WithLiteral")).be.true()
+    should(code.expect("*", "Assigns:x:WithNumber:1")).be.true()
+    should(code.expect("*", "Assigns:x:WithNumber:2")).be.false()
+  });
+
+  it("can compute ast",  () => {
+    const nativeCode = mulang.nativeCode("Python", "print(4)");
+
+    should(nativeCode.ast).eql({ tag: 'Print', contents: { tag: 'MuNumber', contents: 4 } });
+  })
+
+  it("can run quick queries over ast code", () => {
+    const nativeCode = mulang.code("JavaScript", "x = 1");
+    const code = mulang.astCode(nativeCode.ast);
 
     should(code.expect("*", "Assigns:x")).be.true()
     should(code.expect("*", "Assigns:y")).be.false()
