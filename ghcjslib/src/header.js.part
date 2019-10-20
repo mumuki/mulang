@@ -1,1 +1,2 @@
 let mulang = (function() {
+  let ghcjsExports = {};
