@@ -154,16 +154,29 @@ const DEFAULT_KEYWORDS = {
 }
 
 function translate(binding, inspection) {
-  const named = inspection.match(/^(Not:)?([^:]+):([^:]+)$/);
-  const bindingHtml = binding === '*' ? 'la solución' : `<strong>${binding}</strong>`;
-  if(named) {
-    return es[named[2] + "_named"](bindingHtml, (named[1] ? "no debe" : "debe"), `<strong>${named[3]}</strong>`, DEFAULT_KEYWORDS);
+  const bindingHtml = binding === '*' ? 'la solución' : `<strong>${binding.replace('Intransitive:', '')}</strong>`;
+  const match = inspection.match(/^(Not:)?([^:]+)(:([^:]+))?$/);
+
+  if (!match) throw `unsupported inspection ${inspection}`;
+
+  let key;
+  let targetHtml;
+
+  if (match[3] && match[4] !== '*') {
+    key = `${match[2]}_named`;
+    targetHtml = `<strong>${match[4]}</strong>`
+  } else {
+    key = match[2];
+    targetHtml = null;
   }
-  const unnamed = inspection.match(/^(Not:)?([^:]+)$/);
-  if(unnamed) {
-    return es[unnamed[2]](bindingHtml, (unnamed[1] ? "no debe" : "debe"), null, DEFAULT_KEYWORDS);
-  }
-  return "no soportado " + inspection;
+
+  if (!es[key]) throw `unsupported inspection ${inspection} - ${match[1]} - ${match[2]}`;
+
+  return es[key](bindingHtml, translateMust(match), targetHtml, DEFAULT_KEYWORDS);
+}
+
+function translateMust(match) {
+  return match[1] ? "no debe" : "debe";
 }
 
 describe('v2 expectations', () => {
@@ -181,14 +194,12 @@ describe('v2 expectations', () => {
 
   it('', () => should(translate('Intransitive:foo', 'Not:UsesLambda')).eql('<strong>foo</strong> no debe emplear expresiones lambda'));
 
-  it('', () => should(translate('foo', 'Uses:=baz')).eql('<strong>foo</strong> debe utilizar <strong>baz</strong>'));
   it('', () => should(translate('foo', 'Uses:*')).eql('<strong>foo</strong> debe delegar'));
   it('', () => should(translate('foo', 'DeclaresMethod:*')).eql('<strong>foo</strong> debe declarar métodos'));
   it('', () => should(translate('foo', 'Uses:baz')).eql('<strong>foo</strong> debe utilizar <strong>baz</strong>'));
   it('', () => should(translate('foo', 'Uses')).eql('<strong>foo</strong> debe delegar'));
   it('', () => should(translate('foo', 'UsesForall')).eql('<strong>foo</strong> debe utilizar <i>forall</i>'));
 
-  it('', () => should(translate('foo', 'Not:Uses:=baz')).eql('<strong>foo</strong> no debe utilizar <strong>baz</strong>'));
   it('', () => should(translate('foo', 'Not:Uses:*')).eql('<strong>foo</strong> no debe delegar'));
   it('', () => should(translate('foo', 'Not:Uses')).eql('<strong>foo</strong> no debe delegar'));
   it('', () => should(translate('foo', 'Not:Uses:baz')).eql('<strong>foo</strong> no debe utilizar <strong>baz</strong>'));
@@ -200,7 +211,6 @@ describe('v2 expectations', () => {
 
   it('', () => should(translate('foo', 'DeclaresObject')).eql('<strong>foo</strong> debe declarar objetos'));
   it('', () => should(translate('*', 'Not:DeclaresClass')).eql('la solución no debe declarar clases'));
-  it('', () => should(translate('foo', 'HasAnonymousVariable')).eql('<strong>foo</strong> debe utilizar una variable anónima'));
   it('', () => should(translate('foo', 'UsesAnonymousVariable')).eql('<strong>foo</strong> debe utilizar una variable anónima'));
   it('', () => should(translate('*', 'UsesStaticPolymorphism')).eql('la solución debe usar polimorfismo'));
 });
