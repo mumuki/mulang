@@ -1,0 +1,18 @@
+require "bundler/gem_tasks"
+require "rspec/core/rake_task"
+
+RSpec::Core::RakeTask.new(:spec)
+
+task :default => :spec
+
+namespace :wrapper do
+  desc 'Wrap assets into this gem'
+  task wrap: :clean do
+    cp '../build/mulang.js', 'app/assets/javascripts/mulang.js'
+  end
+
+  task :clean do
+    rm_rf 'app'
+    mkdir_p 'app/assets/javascripts'
+  end
+end
