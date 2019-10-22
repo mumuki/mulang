@@ -41,6 +41,7 @@ transitive identifier inspection code = any (`scopedInspection` code) . transiti
   where scopedInspection = scoped' inspection
 
 transitiveList :: [Identifier] -> Inspection -> Inspection
-transitiveList identifiers i = transitive (last identifiers) (scopedList (init identifiers) i)
+transitiveList [identifier] i = transitive identifier i
+transitiveList identifiers i  = scopedList identifiers i
 
 scoped' = flip scoped
