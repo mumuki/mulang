@@ -35,7 +35,7 @@ mulang.analyse({
                 }
               });
 
-const code = mulang.code("JavaScript", "x = 1");
+const code = mulang.nativeCode("JavaScript", "x = 1");
 
 code.expect("*", "Assigns:x");
 // => true
@@ -52,6 +52,15 @@ code.customExpect(`
   expectation "assigns 2":
     assigns with 2`);
 // => [['assigns 1', true], ['assigns 2', false]])
+
+code.ast
+// => { tag: 'Assignment', contents: [ 'x', { tag: 'MuNumber', contents: 1 } ] }
+
+code.analyse({expectations: [{binding: '*', inspection: 'Declares'}, {binding: '*', inspection: 'Assigns'}]}).expectationResults
+// => [
+//  { expectation: { binding: '*', inspection: 'Declares' }, result: false },
+//  { expectation: { binding: '*', inspection: 'Assigns' },  result: true }
+//]
 ```
 
 ### As a CLI
