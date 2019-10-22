@@ -30,7 +30,9 @@ append2Lib $STACK_BUILD_PATH/rts.js
 append2Lib $STACK_BUILD_PATH/lib.js
 append2Lib $STACK_BUILD_PATH/out.js
 append2Lib $GHCJSLIB_SRC_PATH/binding.js
-append2Lib $GHCJSLIB_SRC_PATH/exports.js
+append2Lib $GHCJSLIB_SRC_PATH/main.js
+append2Lib $GHCJSLIB_SRC_PATH/code.js
+append2Lib $GHCJSLIB_SRC_PATH/i18n.js
 append2Lib $GHCJSLIB_SRC_PATH/footer.js.part
 
 echo "Generating compressed bundle $GHCJSLIB_BUNDLE.zip..."

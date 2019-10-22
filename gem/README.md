@@ -20,7 +20,69 @@ Or install it yourself as:
 
 ## Usage
 
-### Basic analysis execution
+### Expectations checking
+
+```ruby
+code = Mulang::Code.native('JavaScript',  'function plusOne(x) { return x + 1 }')
+
+code.expect 'plusOne', 'Not:DeclaresVariable'
+# => true
+
+code.custom_expect %q{
+  expectation "declares the `plusOne` function":
+    declares function `plusOne` that (returns with math);
+  expectation "not uses variables for literals":
+    !declares variable with literal}
+# => {"declares the `plusOne` function"=>true, "not uses variables for literals"=>true}
+```
+
+### AST Generation
+
+```ruby
+code = Mulang::Code.new(Mulang::Language::Native.new('JavaScript'),  'var x = 1')
+
+# shortcut
+code = Mulang::Code.native('JavaScript',  'var x = 1')
+
+# generate ast
+code.ast
+# => {"tag"=>"Variable", "contents"=>["x", {"tag"=>"MuNumber", "contents"=>1}]}
+```
+
+### Build and run analysis
+
+```ruby
+code = Mulang::Code.native('JavaScript',  'var x = 1')
+
+code.analysis expectations: [], smellsSet: { tag: 'NoSmells' }
+# => {:sample=>{:tag=>"CodeSample", :language=>"JavaScript", :content=>"var x = 1"}, :spec=>{:expectations=>[], :smellsSet=>{:tag=>"NoSmells"}}}
+
+code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }
+# => {"tag"=>"AnalysisCompleted", "intermediateLanguage"=>nil, "signatures"=>[], "smells"=>[], "expectationResults"=>[]}
+```
+
+### Build and run analysis
+
+```ruby
+code = Mulang::Code.native('JavaScript',  'var x = 1')
+
+code.analysis expectations: [], smellsSet: { tag: 'NoSmells' }
+# => {:sample=>{:tag=>"CodeSample", :language=>"JavaScript", :content=>"var x = 1"}, :spec=>{:expectations=>[], :smellsSet=>{:tag=>"NoSmells"}}}
+
+code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }
+# => {"tag"=>"AnalysisCompleted", "intermediateLanguage"=>nil, "signatures"=>[], "smells"=>[], "expectationResults"=>[]}
+```
+
+### Internationalization
+
+```ruby
+I18n.locale = :en
+
+Mulang::Expectation.parse(binding:  '*', inspection:'Declares:foo').translate
+# => solution must declare <strong>foo</strong>
+```
+
+### Raw mulang execution
 
 ```ruby
 require 'mulang'
@@ -39,40 +101,6 @@ Mulang.analyse sample: {
 # => {"tag"=>"AnalysisCompleted", "intermediateLanguage"=>nil, "signatures"=>[], "smells"=>[], "expectationResults"=>[]}
 ```
 
-### Code manipulation
-
-```ruby
-code = Mulang::Code.new(Mulang::Language::Native.new('JavaScript'),  'var x = 1')
-
-# shortcut
-code = Mulang::Code.native('JavaScript',  'var x = 1')
-
-# generate ast
-code.ast
-# => {"tag"=>"Variable", "contents"=>["x", {"tag"=>"MuNumber", "contents"=>1}]}
-
-code.analysis expectations: [], smellsSet: { tag: 'NoSmells' }
-# => {:sample=>{:tag=>"CodeSample", :language=>"JavaScript", :content=>"var x = 1"}, :spec=>{:expectations=>[], :smellsSet=>{:tag=>"NoSmells"}}}
-
-code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }
-# => {"tag"=>"AnalysisCompleted", "intermediateLanguage"=>nil, "signatures"=>[], "smells"=>[], "expectationResults"=>[]}
-```
-
-### Quick code query
-
-```ruby
-code = Mulang::Code.native('JavaScript',  'function plusOne(x) { return x + 1 }')
-
-code.query 'plusOne', 'Not:DeclaresVariable'
-# => true
-
-code.custom_query %q{
-  expectation "declares the `plusOne` function":
-    declares function `plusOne` that (returns with math);
-  expectation "not uses variables for literals":
-    !declares variable with literal}
-# => {"declares the `plusOne` function"=>true, "not uses variables for literals"=>true}
-```
 
 ## Development
 
