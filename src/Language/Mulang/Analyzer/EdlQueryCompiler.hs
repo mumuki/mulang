@@ -26,19 +26,21 @@ compileTopQuery = fromMaybe (const True) . compileQuery
 
 compileQuery :: E.Query -> Maybe Inspection
 compileQuery (E.Decontextualize query) = compileCQuery id query >>= (return . decontextualize)
-compileQuery (E.Within name query)     | (scope, p) <- compileWithin name  = fmap (decontextualize.scope) (compileCQuery p query)
-compileQuery (E.Through name query)    | (scope, p) <- compileThrough name = fmap (decontextualize.scope) (compileCQuery p query)
+compileQuery (E.Within name query)     | (scope, p) <- compileScope within name  = fmap (decontextualize.scope) (compileCQuery p query)
+compileQuery (E.Through name query)    | (scope, p) <- compileScope through name = fmap (decontextualize.scope) (compileCQuery p query)
 compileQuery (E.Not query)             = fmap never (compileQuery query)
 compileQuery (E.And query1 query2)     = andAlso <$> (compileQuery query1) <*> (compileQuery query2)
 compileQuery (E.Or query1 query2)      = orElse <$> (compileQuery query1) <*> (compileQuery query2)
 
-compileWithin, compileThrough :: String -> Scope
-compileWithin name  = scopeFor scopedList name
-compileThrough name = scopeFor transitiveList name
+compileScope f = f . splitOn "."
 
-scopeFor :: ([Identifier] -> Inspection -> Inspection) -> Identifier -> Scope
-scopeFor f name = (contextualized (f names), andAlso (except (last names)))
-  where names = splitOn "." name
+within, through :: [Identifier] -> Scope
+within  names       = scopeFor scopedList names
+through (names@[_]) = scopeFor transitiveList names
+through names       = scopeFor scopedList names
+
+scopeFor :: ([Identifier] -> Inspection -> Inspection) -> [Identifier] -> Scope
+scopeFor f names = (contextualized (f names), andAlso (except (last names)))
 
 compileCQuery :: (IdentifierPredicate -> IdentifierPredicate) -> E.CQuery -> Maybe ContextualizedInspection
 compileCQuery pm (E.Inspection i p m) = ($ (compilePredicate pm p))         <$> compileInspection (compileVerb i) m

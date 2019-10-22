@@ -621,6 +621,15 @@ spec = do
     it "is False on usage in wrong method, scoped twice" $ do
       scopedList ["o", "z"] (uses (named "m")) (js "var o = {p: function(x) { m }}") `shouldBe` False
 
+    it "is True on usage in method, scoped twice" $ do
+      transitiveList ["o", "z"] (uses (named "m")) (js "var o = {z: function(x) { m }}") `shouldBe` True
+
+    it "is False on missing usage in method, scoped twice" $ do
+      transitiveList ["o", "z"] (uses (named "p")) (js "var o = {z: function(x) { m }}") `shouldBe` False
+
+    it "is False on usage in wrong method, scoped twice" $ do
+      transitiveList ["o", "z"] (uses (named "m")) (js "var o = {p: function(x) { m }}") `shouldBe` False
+
     it "is True through function application in function" $ do
       transitive "f" (uses (named "m")) (js "function g() { m }; function f(x) { g() }") `shouldBe` True
 

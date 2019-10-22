@@ -159,3 +159,19 @@ spec = describe "ExpectationsAnalyzer" $ do
   it "works with operators" $ do
     let usesNegation = Expectation "*" "UsesNegation"
     run Haskell "x = not True" [usesNegation] `shouldReturn` (result [passed usesNegation] [])
+
+  it "works with scoped bindings" $ do
+    let birdWeightUsesPlace = Expectation "bird.weight" "Uses:place"
+    let birdPositionUsesPlace = Expectation "bird.position" "Uses:place"
+    let code = "var place = buenosAires; var bird = {position: place, weight: 20};";
+
+    run JavaScript code [birdWeightUsesPlace] `shouldReturn` (result [failed birdWeightUsesPlace] [])
+    run JavaScript code [birdPositionUsesPlace] `shouldReturn` (result [passed birdPositionUsesPlace] [])
+
+  it "works with scoped intransitive bindings" $ do
+    let birdWeightUsesPlace = Expectation "Intransitive:bird.weight" "Uses:place"
+    let birdPositionUsesPlace = Expectation "Intransitive:bird.position" "Uses:place"
+    let code = "var place = buenosAires; var bird = {position: place, weight: 20};";
+
+    run JavaScript code [birdWeightUsesPlace] `shouldReturn` (result [failed birdWeightUsesPlace] [])
+    run JavaScript code [birdPositionUsesPlace] `shouldReturn` (result [passed birdPositionUsesPlace] [])
