@@ -29,7 +29,7 @@ In addition, through external tools, it offers support for the following languag
 
 If you want to use it with a different language, you will have to:
 
-* either add explicit support in this repo - we love Pull Requests :hearth: -, or
+* either add explicit support in this repo - we love Pull Requests :heart: -, or
 * translate your language into one of the natively supported ones, or
 * translate your language to the Mulang JSON AST
 
@@ -38,7 +38,7 @@ If you want to use it with a different language, you will have to:
 > The following section uses the [ruby interface](https://rubygems.org/gems/mulang) for demonstration purposes.
 > However, you also can run all the examples either using the [comand line tool](./clispec/), or the [javascript](https://www.npmjs.com/package/mulang) interface.
 
-Better than explaining what Mulang is, let's see what can do it for you.
+Better than explaining what Mulang is, let's see what it can do for you.
 
 ### Inspections
 
@@ -56,7 +56,7 @@ var aBird = {position: aPlace, weight: 20};
 > code = Mulang::Code.native "JavaScript", "var aPlace = buenosAires; var aBird = {position: aPlace, weight: 20};"
 ```
 
-Now want to know if the code expression _uses_ - that is, contains any reference to - a given _identifier_. Such identifier could be a variable, function, or anything that has a name:
+Now we want to know if the code expression _uses_ - that is, contains any reference to - a given _identifier_. Such identifier could be a variable, function, or anything that has a name:
 
 ```ruby
 > code.expect 'Uses:buenosAires'
@@ -65,7 +65,7 @@ Now want to know if the code expression _uses_ - that is, contains any reference
 => false # no reference to the identifier `rosario` is found on the code
 ```
 
-`Uses:buenosAires` is our first _inspection_: a function that takes a Mulang AST and answers a boolan question about it. That _seems_ easy, but just in case you are wondering: no, Mulang doesn't perform a `string.contains` or something like that :stuck_out_tongue: :
+`Uses:buenosAires` is our first _inspection_: a function that takes a Mulang AST and answers a boolean question about it. That _seems_ easy, but just in case you are wondering: no, Mulang doesn't perform a `string.contains` or something like that :stuck_out_tongue: :
 
 ```ruby
 > code.expect 'Uses:BuenosAires'
@@ -83,7 +83,7 @@ So let's ask something more interesting - does `aPlace` _use_ the identifier `bu
 => false # because `...aPlace = buenosAires...` does not reference `aBird`...
 ```
 
-Here we have contextualized the inspection, so it runs only withing the contexts of the given binding.
+Here we have contextualized the inspection, so it runs only within the contexts of the given binding.
 
 Let's tray again: does `"aPlace"` _use_ `rosario`? And what about the object `aBird`? Does it use `aPlace` or `rosario`?
 
@@ -116,15 +116,15 @@ _Contexts_ can be nested, too: for example, if you want to know whether `aBird.p
 
 ### Predicates
 
-Many inspections support an _identifier predicate_, that is, a matcher for identifier.
+Many inspections support an _identifier predicate_, that is, a matcher for the identifier.
 
 For example, does the former piece of code declare any attribute?
 
 ```ruby
 > code.expect 'DeclaresAttribute:*'
-=> True
+=> true
 > code.expect 'DeclaresAttribute' # shorter version
-=> True
+=> true
 ```
 
 Does it declare an attribute like `eight`?
@@ -134,8 +134,7 @@ Does it declare an attribute like `eight`?
 > code.expect "DeclaresAttribute:~eight"
 => true
 ```
-
-> Notice: like in mulang means that it contains that case-insensitive substring
+> Notice: like in Mulang means that it contains that case-insensitive substring
 
 Finally, does `aBird` declares an attribute that is not named `weight`?
 
