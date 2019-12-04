@@ -17,7 +17,7 @@ Please the docs at [the Mulang site](https://mumuki.github.io/mulang/).
 
 # Contributors
 
- * Franco Bulgarelli @flbulgarelli [Mumuki](https://www.mumuki.org)
- * Julian Berbel Alt @julian-berbel @ [Mumuki](https://www.mumuki.org)
+ * Franco Bulgarelli @flbulgarelli [Mumuki](https://mumuki.org)
+ * Julian Berbel Alt @julian-berbel @ [Mumuki](https://mumuki.org)
  * Federico Lochbaum @FedeLochbaum @ [UNQ](http://www.unq.edu.ar/)
  * Lucas Traverso @ludat @ [10Pines](https://www.10pines.com)
