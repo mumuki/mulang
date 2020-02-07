@@ -86,7 +86,30 @@ public static main(String[] args) {}
 (Function Identifier [Equation])
 ```
 
-#### Example
+#### Python Example
+
+```python
+def foo():
+  return 1
+```
+
+```haskell
+(Function "foo" [
+  (Equation []
+    (UnguardedBody (Return (MuNumber 1.0))))])
+```
+
+```python
+def foo(bar):
+  return bar
+```
+
+```haskell
+(Function "foo" [
+  (Equation [VariablePattern "bar"]
+    (UnguardedBody (Return (Reference "bar"))))])
+```
+
 
 ### `Procedure`
 
@@ -120,12 +143,10 @@ end
 ```
 
 ```haskell
-(Class
-  "Bird" Nothing
-  (Method
-      "sing!"
-      (Equation []
-          (UnguardedBody (Print (MuString "singing in the dead of night"))))))
+(Class "Bird" Nothing
+  (Method "sing!" [
+    (Equation []
+      (UnguardedBody (Print (MuString "singing in the dead of night"))))]))
 ```
 
 #### Java Example
@@ -139,12 +160,10 @@ public class Bird {
 ```
 
 ```haskell
-(Class
-  "Bird" Nothing
-  (Method
-      "sing"
-      (Equation []
-          (UnguardedBody (Print (MuString "singing in the dead of night"))))))
+(Class "Bird" Nothing
+  (Method "sing" [
+    (Equation []
+      (UnguardedBody (Print (MuString "singing in the dead of night"))))]))
 ```
 
 
@@ -170,13 +189,13 @@ end
 
 ```haskell
 (Sequence [
-  (PrimitiveMethod Equal (Equation
-                         [VariablePatten "other"]
-                         (UnguardedBody MuNil))),
-  (PrimitiveMethod Hash (Equation
-                        []
-                        (UnguardedBody MuNil)))]
+  (PrimitiveMethod Equal
+    (Equation [VariablePatten "other"]
+      (UnguardedBody MuNil))),
 
+  (PrimitiveMethod Hash
+    (Equation []
+      (UnguardedBody MuNil)))])
 ```
 
 ### `Variable`
@@ -189,7 +208,15 @@ end
 (Variable Identifier Expression)
 ```
 
-#### Example
+#### JavaScript Example
+
+```javascript
+let x = 1;
+```
+
+```haskell
+(Variable "x" (MuNumber 1))
+```
 
 ### `Assignment`
 
@@ -199,7 +226,15 @@ end
 (Assignment Identifier Expression)
 ```
 
-#### Example
+#### Ruby Example
+
+```ruby
+m = 3.4
+```
+
+```haskell
+(Assignment "m" (MuNumber 3.4))
+```
 
 ### `Attribute`
 
@@ -211,7 +246,20 @@ end
 (Attribute Identifier Expression)
 ```
 
-#### Example
+#### Java Example
+
+```java
+public class Foo {
+  private int bar = 4;
+}
+```
+
+```haskell
+(Class "Foo" Nothing
+  (Sequence [
+    (VariableSignature "bar" "int" []),
+    (Attribute "bar" (MuNumber 4))]))
+```
 
 ### `Object`
 
@@ -371,9 +419,6 @@ foo(bar).
 (Not Expression)
 ```
 
-
-#### Example
-
 ### `Findall`
 
 > Logic programming findall
@@ -383,9 +428,6 @@ foo(bar).
 ```haskell
 (Findall Expression Expression Expression)
 ```
-
-
-#### Example
 
 ### `Forall`
 
@@ -397,9 +439,6 @@ foo(bar).
 (Forall Expression Expression)
 ```
 
-
-#### Example
-
 ### `Reference`
 
 > Generic variable
@@ -410,8 +449,18 @@ foo(bar).
 (Reference Identifier)
 ```
 
+#### JavaScript Example
 
-#### Example
+```javascript
+const x = 4;
+x
+```
+
+```haskell
+(Sequence [
+  (Variable "x" (MuNumber 4.0),
+  (Reference "x"))])
+```
 
 ### `Application`
 
@@ -456,9 +505,6 @@ foo(bar).
 ```haskell
 (New Identifier [Expression])
 ```
-
-#### Example
-
 ### `Implement`
 
 > Object oriented instantiation, interface implementation
@@ -469,9 +515,6 @@ foo(bar).
 (Implement Identifier)
 ```
 
-
-#### Example
-
 ### `Include`
 
 > Object oriented instantiation, mixin inclusion
@@ -481,9 +524,6 @@ foo(bar).
 ```haskell
 (Include Identifier)
 ```
-
-
-#### Example
 
 ### `If`
 
@@ -518,8 +558,6 @@ foo(bar).
 (While Expression Expression)
 ```
 
-#### Example
-
 ### `Repeat`
 
 > Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
@@ -529,8 +567,6 @@ foo(bar).
 ```haskell
 (Repeat Expression Expression)
 ```
-
-#### Example
 
 ### `Match`
 
@@ -560,12 +596,9 @@ foo(bar).
 (Try Expression [(Pattern, Expression)] Expression)
 ```
 
-
-#### Example
-
 ### `Raise`
 
-> Generic raise expression, like a throw or raise statament, composed by the raised expression
+> Generic raise expression, like a `throw` or `raise` statament, composed by the raised expression
 
 #### Syntax
 
@@ -573,7 +606,15 @@ foo(bar).
 (Raise Expression)
 ```
 
-#### Example
+#### JavaScript Example
+
+```javascript
+throw 'abc';
+```
+
+```haskell
+(Raise (MuString "abc"))
+```
 
 ### `Print`
 
@@ -676,15 +717,28 @@ for (var i = 0; i < 10; i++) {
 (Sequence [Expression])
 ```
 
-#### Example
-
 ### `Other`
+
+> Unrecognized expression, with optional description and body
 
 #### Syntax
 
 ```haskell
-(Other)
+(Other (Maybe Code) (Maybe Expression))
 ```
+
+### `Arrow`
+
+> Generic arrow - AKA pair or entry - that is typically used to build dictionaries.
+> It corresponds to ruby's, perl's and php's `=>` operator, or ruby's and javascript's `:` operator
+
+#### Syntax
+
+```haskell
+(Arrow Expression Expression)
+```
+
+See [MuDict](#mudict) for more details
 
 ### `Self`
 
@@ -714,6 +768,36 @@ for (var i = 0; i < 10; i++) {
 
 ```haskell
 (MuNil)
+```
+
+### `MuDict`
+
+> Generic dictionary - AKA hash, table or map - value literal.
+> Its expressions are normally a sequence of `Arrow`s
+
+##### Syntax
+
+```haskell
+(MuDict Expression)
+```
+#### Python Example
+
+```python
+{'foo': 1}
+```
+
+```haskell
+(MuDict (Arrow (MuString "foo") (MuNumber 1)))
+```
+
+```python
+{'foo': 1, 'bar': 2}
+```
+
+```haskell
+(MuDict (Sequence [
+  (Arrow (MuString "foo") (MuNumber 1)),
+  (Arrow (MuString "bar") (MuNumber 2))])
 ```
 
 ### `MuObject`

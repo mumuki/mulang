@@ -61,6 +61,7 @@ expressions :: Generator Expression
 expressions expr = expr : concatMap expressions (subExpressions expr)
   where
     subExpressions :: Generator Expression
+    subExpressions (Arrow e1 e2)           = [e1, e2]
     subExpressions (Assignment _ e)        = [e]
     subExpressions (Attribute _ v)         = [v]
     subExpressions (Call op args)          = op:args
@@ -76,6 +77,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Interface _ _ v)       = [v]
     subExpressions (Lambda _ a)            = [a]
     subExpressions (Match e1 equations)    = e1:equationsExpressions equations
+    subExpressions (MuDict es)             = [es]
     subExpressions (MuList as)             = as
     subExpressions (MuObject es)           = [es]
     subExpressions (MuTuple as)            = as

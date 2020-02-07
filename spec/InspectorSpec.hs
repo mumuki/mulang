@@ -471,12 +471,22 @@ spec = do
       usesLogic (hs "f x y = or x")  `shouldBe` False
 
   describe "usesMath" $ do
-    it "is when it is used" $ do
+    it "is when it is used in function bodies" $ do
       usesMath (hs "f x y = x + y")    `shouldBe` True
       usesMath (hs "f x y = x * y")    `shouldBe` True
       usesMath (hs "f x y = x / x")    `shouldBe` True
       usesMath (hs "f x y = div x z")  `shouldBe` False -- TODO support mod/div operators in the future
       usesMath (hs "f x y = x - y")    `shouldBe` True
+
+    it "is when it is used in composite literals" $ do
+      usesMath (py3 "{'hello': 4 + 5}") `shouldBe` True
+      usesMath (py3 "{'hello': 4}")     `shouldBe` False
+
+      usesMath (js "{x: 4 + 5}")        `shouldBe` True
+      usesMath (js "{x: 4}")            `shouldBe` False
+
+      usesMath (js "[4+5, 0]")          `shouldBe` True
+      usesMath (js "[9, 0]")            `shouldBe` False
 
     it "is is not used otherwise" $ do
       usesMath (hs "f x y = x")       `shouldBe` False
