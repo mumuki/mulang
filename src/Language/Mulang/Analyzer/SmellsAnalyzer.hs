@@ -44,6 +44,7 @@ allSmells = [
   "IsLongCode",
   "OverridesEqualOrHashButNotBoth",
   "ReturnsNil",
+  "ShouldInvertIfCondition",
   "ShouldUseOtherwise",
   "UsesCut",
   "UsesFail",
@@ -77,6 +78,7 @@ detectionFor "HasWrongCaseBinding"             = withLanguage hasWrongCaseIdenti
 detectionFor "HasWrongCaseIdentifiers"         = withLanguage hasWrongCaseIdentifiers
 detectionFor "IsLongCode"                      = unsupported
 detectionFor "OverridesEqualOrHashButNotBoth"  = simple overridesEqualOrHashButNotBoth
+detectionFor "ShouldInvertIfCondition"         = simple shouldInvertIfCondition
 detectionFor "ReturnsNil"                      = simple returnsNil
 detectionFor "ReturnsNull"                     = simple returnsNil
 detectionFor "ShouldUseOtherwise"              = simple shouldUseOtherwise

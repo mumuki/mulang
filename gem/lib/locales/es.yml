@@ -155,6 +155,7 @@ es:
       Returns: '%{binding} %{must} retornar%{matching}'
       ReturnsNil: '%{binding} retorna null, lo cual es una mala práctica'
       ReturnsNull: '%{binding} retorna null, lo cual es una mala práctica'
+      ShouldInvertIfCondition: '%{binding} debería invertir la condición del <i>%{keyword_if}</i> e intercambiar las ramas'
       TypesAs_named: '%{binding} %{must} ser de tipo %{target}'
       TypesAs: '%{binding} %{must} tipar'
       TypesParameterAs_except: '%{binding} %{must} tipar parámetros con un tipo diferente a %{target}'

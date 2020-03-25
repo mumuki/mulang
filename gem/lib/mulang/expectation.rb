@@ -6,7 +6,7 @@ module Mulang::Expectation
               HasRedundantLambda HasRedundantLocalVariableReturn HasRedundantParameter
               HasRedundantReduction HasTooManyMethods HasTooShortBindings HasTooShortIdentifiers HasUnreachableCode
               HasWrongCaseBinding HasWrongCaseIdentifiers IsLongCode OverridesEqualOrHashButNotBoth
-              ReturnsNil ReturnsNull UsesCut UsesFail UsesUnificationOperator)
+              ReturnsNil ReturnsNull ShouldInvertIfCondition UsesCut UsesFail UsesUnificationOperator)
 
   def self.guess_type(expectation)
     if expectation[:binding] == '<<custom>>'

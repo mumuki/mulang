@@ -1,8 +1,13 @@
 {-# LANGUAGE ViewPatterns #-}
 
 module Language.Mulang.Inspector.Generic.Smell (
+  discardsExceptions,
+  doesConsolePrint,
+  doesNilTest,
+  doesTypeTest,
   hasAssignmentReturn,
   hasEmptyIfBranches,
+  hasLongParameterList,
   hasRedundantBooleanComparison,
   hasRedundantGuards,
   hasRedundantIf,
@@ -10,17 +15,13 @@ module Language.Mulang.Inspector.Generic.Smell (
   hasRedundantLocalVariableReturn,
   hasRedundantParameter,
   hasRedundantRepeat,
-  shouldUseOtherwise,
-  doesNilTest,
-  doesTypeTest,
-  isLongCode,
-  returnsNil,
-  discardsExceptions,
-  doesConsolePrint,
-  hasLongParameterList,
   hasTooManyMethods,
+  hasUnreachableCode,
+  isLongCode,
   overridesEqualOrHashButNotBoth,
-  hasUnreachableCode) where
+  returnsNil,
+  shouldInvertIfCondition,
+  shouldUseOtherwise) where
 
 import           Language.Mulang.Ast
 import qualified Language.Mulang.Ast.Operator as O
@@ -165,10 +166,15 @@ overridesEqualOrHashButNotBoth = containsExpression f
         isHash (HashMethod _)             = True -- deprecated
         isHash _ = False
 
-hasEmptyIfBranches :: Inspection
-hasEmptyIfBranches = containsExpression f
+shouldInvertIfCondition :: Inspection
+shouldInvertIfCondition = containsExpression f
   where f (If _ None elseBranch) = elseBranch /= None
         f _                        = False
+
+hasEmptyIfBranches :: Inspection
+hasEmptyIfBranches = containsExpression f
+  where f (If _ None None) = True
+        f _                = False
 
 hasUnreachableCode :: Inspection
 hasUnreachableCode = containsExpression f

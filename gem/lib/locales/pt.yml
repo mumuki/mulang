@@ -143,6 +143,7 @@ pt:
       Raises_except: '%{binding} %{must} lançar exceções diferentes de %{target}'
       Raises_like: '%{binding} %{must} lançar exceções semelhantes a %{target}'
       Raises_named: '%{binding} %{must} launch %{target}'
+      ShouldInvertIfCondition: '%{binding} deve inverter a condição da <i>%{keyword_if}</i> e trocar as ramos'
       Raises: '%{binding} %{must} lançar exceções'
       Rescues_except: '%{binding} %{must} capturar exceções que não sejam %{target}'
       Rescues_like: '%{binding} %{must} capturar exceções semelhantes a %{target}'

@@ -76,4 +76,4 @@ spec = describe "SmellsAnalyzer" $ do
       (runOnly Haskell "f x = if x then True else False" []) `shouldReturn` (result [])
 
     it "works with empty set, in python" $ do
-      (runExcept Python "def funcion():\n  if True:\n    pass\n  else:\n    return 1" []) `shouldReturn` (result [Expectation "funcion" "HasEmptyIfBranches"])
+      (runExcept Python "def funcion():\n  if True:\n    pass\n  else:\n    return 1" []) `shouldReturn` (result [Expectation "funcion" "ShouldInvertIfCondition"])
