@@ -179,6 +179,7 @@ hasEmptyIfBranches = containsExpression f
 hasUnreachableCode :: Inspection
 hasUnreachableCode = containsExpression f
   where f (Subroutine _ equations) = any equationMatchesAnyValue . init $ equations
+        f (Sequence expressions)   = (> 1) . length . filter isReturn $ expressions
         f _                        = False
 
         equationMatchesAnyValue (Equation patterns body) = all patternMatchesAnyValue patterns && bodyMatchesAnyValue body
@@ -193,3 +194,6 @@ hasUnreachableCode = containsExpression f
         isTruthy (MuBool True)           = True
         isTruthy (Primitive O.Otherwise) = True
         isTruthy _                       = False
+
+        isReturn (Return _) = True
+        isReturn _          = False
