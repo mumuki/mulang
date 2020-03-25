@@ -294,12 +294,15 @@ spec = do
   describe "hasEmptyIfBranches" $ do
     it "is True when if branch is empty but else isn't" $ do
       hasEmptyIfBranches (javaStatement "if(true) { } else { i++; }") `shouldBe` False
+      hasEmptyIfBranches (js "if(true) { } else { i++; }") `shouldBe` False
 
     it "is True when it has no branches" $ do
       hasEmptyIfBranches (javaStatement "if(true);") `shouldBe` True
+      hasEmptyIfBranches (js "if(true);") `shouldBe` True
 
     it "is False when if branch is not empty" $ do
       hasEmptyIfBranches (javaStatement "if(true) { j++; } else { i++; }") `shouldBe` False
+      hasEmptyIfBranches (js "if(true) { j++; } else { i++; }") `shouldBe` False
 
   describe "hasRedundantRepeat" $ do
     it "is True when it contains a repeat with just one iteration" $ do
