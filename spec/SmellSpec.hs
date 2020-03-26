@@ -380,7 +380,7 @@ spec = do
     it "is True when there are consecutive returns plain code" $ do
       hasUnreachableCode (js "return 4; return 5;") `shouldBe` True
 
-    it "is True when it has no branches" $ do
+    it "is False when it has only a single return" $ do
       hasUnreachableCode (js "function foo() { return 4; }") `shouldBe` False
 
     it "is False when if branch is not empty" $ do
