@@ -109,6 +109,7 @@ pt:
       HasAssignmentReturn: '%{binding}  retorna o resultado de uma tarefa'
       HasCodeDuplication: '%{binding}  tem código repetido'
       HasEmptyIfBranches: '%{binding} tem vazio <i>%{keyword_if}</i> ramos'
+      HasEmptyRepeat: '%{binding} tem um <i>%{keyword_repeat}</i> vazio'
       HasLongParameterList: '%{binding} tem muitos parâmetros. Você pode estar perdendo uma abstração.'
       HasMisspelledBindings: '%{binding}  está incorreto. Verifique a ortografia e tente não usar abreviaturas'
       HasMisspelledIdentifiers: '%{binding}  está incorreto. Verifique a ortografia e tente não usar abreviaturas'
