@@ -280,12 +280,40 @@ spec = do
     it "is False when both are overriden" $ do
       overridesEqualOrHashButNotBoth (java "public class A{ public void equals(){}\npublic void hashCode(){} }") `shouldBe` False
 
+
+  describe "shouldInvertIfCondition" $ do
+    it "is True when if branch is empty but else isn't" $ do
+      shouldInvertIfCondition (javaStatement "if(true) { } else { i++; }") `shouldBe` True
+      shouldInvertIfCondition (js "if(true) { } else { i++; }") `shouldBe` True
+
+    it "is False when it has no branches" $ do
+      shouldInvertIfCondition (javaStatement "if(true);") `shouldBe` False
+      shouldInvertIfCondition (js "if(true);") `shouldBe` False
+
+    it "is False when it has empty branches" $ do
+      shouldInvertIfCondition (javaStatement "if(true) {} else {}") `shouldBe` False
+      shouldInvertIfCondition (js "if(true) {} else {}") `shouldBe` False
+
+    it "is False when if branch is not empty" $ do
+      shouldInvertIfCondition (javaStatement "if(true) { j++; } else { i++; }") `shouldBe` False
+      shouldInvertIfCondition (js "if(true) { j++; } else { i++; }") `shouldBe` False
+
   describe "hasEmptyIfBranches" $ do
     it "is True when if branch is empty but else isn't" $ do
-      hasEmptyIfBranches (javaStatement "if(true) { } else { i++; }") `shouldBe` True
+      hasEmptyIfBranches (javaStatement "if(true) { } else { i++; }") `shouldBe` False
+      hasEmptyIfBranches (js "if(true) { } else { i++; }") `shouldBe` False
+
+    it "is True when it has no branches" $ do
+      hasEmptyIfBranches (javaStatement "if(true);") `shouldBe` True
+      hasEmptyIfBranches (js "if(true);") `shouldBe` True
+
+    it "is True when it has empty branches" $ do
+      hasEmptyIfBranches (javaStatement "if(true) {}") `shouldBe` True
+      hasEmptyIfBranches (js "if(true) {}") `shouldBe` True
 
     it "is False when if branch is not empty" $ do
       hasEmptyIfBranches (javaStatement "if(true) { j++; } else { i++; }") `shouldBe` False
+      hasEmptyIfBranches (js "if(true) { j++; } else { i++; }") `shouldBe` False
 
   describe "hasRedundantRepeat" $ do
     it "is True when it contains a repeat with just one iteration" $ do

@@ -143,6 +143,7 @@ en:
       Returns: '%{binding} %{must} return%{matching}'
       ReturnsNil: '%{binding} retuns <i>%{keyword_null}</i>, which is a bad practice'
       ReturnsNull: '%{binding} retuns <i>%{keyword_null}</i>, which is a bad practice'
+      ShouldInvertIfCondition: '%{binding} should invert <i>%{keyword_if}</i> condition and swap branches'
       TypesAs_named: '%{binding} %{must} type as %{target}'
       TypesAs: '%{binding} %{must} type'
       TypesParameterAs_except: '%{binding} %{must} type parameters with a type distinct from %{target}'

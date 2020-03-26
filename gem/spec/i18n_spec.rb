@@ -140,6 +140,7 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'HasRedundantBooleanComparison').translate).to eq('<strong>foo</strong> hace comparaciones booleanas innecesarias') }
       it { expect(expectation('bar', 'UsesFail').translate).to eq('<strong>bar</strong> usa <i>fail</li>, lo cual es una mala práctica') }
       it { expect(expectation('foo', 'HasEmptyIfBranches').translate).to eq('<strong>foo</strong> tiene ramas de <i>if</i> vacías') }
+      it { expect(expectation('foo', 'ShouldInvertIfCondition').translate).to eq('<strong>foo</strong> debería invertir la condición del <i>if</i> e intercambiar las ramas') }
       it { expect(expectation('foo', 'HasRedundantRepeat').translate).to eq('<strong>foo</strong> tiene un <i>repeat</i> innecesario') }
       it { expect(expectation('foo', 'HasUnreachableCode').translate).to eq('<strong>foo</strong> tiene código inalcanzable') }
       it { expect(expectation('foo', 'HasLongParameterList').translate).to eq('<strong>foo</strong> tiene demasiados parámetros. Te podría estar faltando una abstracción') }
