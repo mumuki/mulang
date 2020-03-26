@@ -7,6 +7,7 @@ module Language.Mulang.Inspector.Generic.Smell (
   doesTypeTest,
   hasAssignmentReturn,
   hasEmptyIfBranches,
+  hasUnusedParameters,
   hasEmptyRepeat,
   hasLongParameterList,
   hasRedundantBooleanComparison,
@@ -26,7 +27,7 @@ module Language.Mulang.Inspector.Generic.Smell (
 
 import           Language.Mulang.Ast
 import qualified Language.Mulang.Ast.Operator as O
-import           Language.Mulang.Generator (identifierReferences)
+import           Language.Mulang.Generator (identifierReferences, expressions)
 import           Language.Mulang.Inspector.Primitive
 
 -- | Inspection that tells whether an expression has expressions like 'x == True'
@@ -171,6 +172,16 @@ shouldInvertIfCondition :: Inspection
 shouldInvertIfCondition = containsExpression f
   where f (If _ None elseBranch) = elseBranch /= None
         f _                        = False
+
+hasUnusedParameters :: Inspection
+hasUnusedParameters = containsExpression f
+  where f (SimpleFunction _ params body) = not . all (`elem` (expressions body)) . variables $  params
+        f _                              = False
+
+        variables ps = do
+          VariablePattern v <- ps
+          return (Reference v)
+
 
 hasEmptyIfBranches :: Inspection
 hasEmptyIfBranches = containsExpression f

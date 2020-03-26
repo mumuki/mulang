@@ -145,6 +145,23 @@ spec = do
     it "is False when not does type test" $ do
       doesTypeTest (js "function x(m) { return 1 }") `shouldBe` False
 
+  describe "hasUnusedParameters" $ do
+    it "is False for methods of all kinds" $ do
+      hasUnusedParameters (js "var o = {x: function(m) { return 4; }}") `shouldBe` False
+      hasUnusedParameters (js "var o = {x: function(m) { return m; }}") `shouldBe` False
+
+    it "is True when has unused parameter" $ do
+      hasUnusedParameters (js "function x(m) { return 4; } ") `shouldBe` True
+
+    it "is False when uses its single parameter" $ do
+      hasUnusedParameters (js "function x(m) { return m } ") `shouldBe` False
+
+    it "is False when uses all its parameters in different places" $ do
+      hasUnusedParameters (js "function x(m2, m2) { g(m1); return m2 } ") `shouldBe` False
+
+    it "is False when uses all its parameters in return" $ do
+      hasUnusedParameters (js "function x(m2, m2) { return m1 + m2 } ") `shouldBe` False
+
   describe "hasRedundantLambda" $ do
     it "is True whn etha-conversion applies, hs" $ do
       hasRedundantLambda (hs "g = map (\\m -> f m)") `shouldBe` True
