@@ -27,6 +27,7 @@ allSmells = [
   "HasAssignmentReturn",
   "HasCodeDuplication",
   "HasEmptyIfBranches",
+  "HasEmptyRepeat",
   "HasLongParameterList",
   "HasMisspelledIdentifiers",
   "HasRedundantBooleanComparison",
@@ -44,6 +45,7 @@ allSmells = [
   "IsLongCode",
   "OverridesEqualOrHashButNotBoth",
   "ReturnsNil",
+  "ShouldInvertIfCondition",
   "ShouldUseOtherwise",
   "UsesCut",
   "UsesFail",
@@ -58,6 +60,7 @@ detectionFor "DoesTypeTest"                    = simple doesTypeTest
 detectionFor "HasAssignmentReturn"             = simple hasAssignmentReturn
 detectionFor "HasCodeDuplication"              = unsupported
 detectionFor "HasEmptyIfBranches"              = simple hasEmptyIfBranches
+detectionFor "HasEmptyRepeat"                  = simple hasEmptyRepeat
 detectionFor "HasLongParameterList"            = simple hasLongParameterList
 detectionFor "HasMisspelledBindings"           = withLanguage hasMisspelledIdentifiers
 detectionFor "HasMisspelledIdentifiers"        = withLanguage hasMisspelledIdentifiers
@@ -77,6 +80,7 @@ detectionFor "HasWrongCaseBinding"             = withLanguage hasWrongCaseIdenti
 detectionFor "HasWrongCaseIdentifiers"         = withLanguage hasWrongCaseIdentifiers
 detectionFor "IsLongCode"                      = unsupported
 detectionFor "OverridesEqualOrHashButNotBoth"  = simple overridesEqualOrHashButNotBoth
+detectionFor "ShouldInvertIfCondition"         = simple shouldInvertIfCondition
 detectionFor "ReturnsNil"                      = simple returnsNil
 detectionFor "ReturnsNull"                     = simple returnsNil
 detectionFor "ShouldUseOtherwise"              = simple shouldUseOtherwise

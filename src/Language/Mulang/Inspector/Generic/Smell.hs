@@ -1,8 +1,15 @@
 {-# LANGUAGE ViewPatterns #-}
 
 module Language.Mulang.Inspector.Generic.Smell (
+  discardsExceptions,
+  doesConsolePrint,
+  doesNilTest,
+  doesTypeTest,
   hasAssignmentReturn,
   hasEmptyIfBranches,
+  hasUnusedParameters,
+  hasEmptyRepeat,
+  hasLongParameterList,
   hasRedundantBooleanComparison,
   hasRedundantGuards,
   hasRedundantIf,
@@ -10,21 +17,17 @@ module Language.Mulang.Inspector.Generic.Smell (
   hasRedundantLocalVariableReturn,
   hasRedundantParameter,
   hasRedundantRepeat,
-  shouldUseOtherwise,
-  doesNilTest,
-  doesTypeTest,
-  isLongCode,
-  returnsNil,
-  discardsExceptions,
-  doesConsolePrint,
-  hasLongParameterList,
   hasTooManyMethods,
+  hasUnreachableCode,
+  isLongCode,
   overridesEqualOrHashButNotBoth,
-  hasUnreachableCode) where
+  returnsNil,
+  shouldInvertIfCondition,
+  shouldUseOtherwise) where
 
 import           Language.Mulang.Ast
 import qualified Language.Mulang.Ast.Operator as O
-import           Language.Mulang.Generator (identifierReferences)
+import           Language.Mulang.Generator (identifierReferences, expressions)
 import           Language.Mulang.Inspector.Primitive
 
 -- | Inspection that tells whether an expression has expressions like 'x == True'
@@ -165,14 +168,35 @@ overridesEqualOrHashButNotBoth = containsExpression f
         isHash (HashMethod _)             = True -- deprecated
         isHash _ = False
 
-hasEmptyIfBranches :: Inspection
-hasEmptyIfBranches = containsExpression f
+shouldInvertIfCondition :: Inspection
+shouldInvertIfCondition = containsExpression f
   where f (If _ None elseBranch) = elseBranch /= None
         f _                        = False
+
+hasUnusedParameters :: Inspection
+hasUnusedParameters = containsExpression f
+  where f (SimpleFunction _ params body) = not . all (`elem` (expressions body)) . variables $  params
+        f _                              = False
+
+        variables ps = do
+          VariablePattern v <- ps
+          return (Reference v)
+
+
+hasEmptyIfBranches :: Inspection
+hasEmptyIfBranches = containsExpression f
+  where f (If _ None None) = True
+        f _                = False
+
+hasEmptyRepeat :: Inspection
+hasEmptyRepeat = containsExpression f
+  where f (Repeat _ None) = True
+        f _               = False
 
 hasUnreachableCode :: Inspection
 hasUnreachableCode = containsExpression f
   where f (Subroutine _ equations) = any equationMatchesAnyValue . init $ equations
+        f (Sequence expressions)   = hasCodeAfterReturn expressions
         f _                        = False
 
         equationMatchesAnyValue (Equation patterns body) = all patternMatchesAnyValue patterns && bodyMatchesAnyValue body
@@ -187,3 +211,8 @@ hasUnreachableCode = containsExpression f
         isTruthy (MuBool True)           = True
         isTruthy (Primitive O.Otherwise) = True
         isTruthy _                       = False
+
+        hasCodeAfterReturn []           = False
+        hasCodeAfterReturn [_]          = False
+        hasCodeAfterReturn (Return _:_) = True
+        hasCodeAfterReturn (_:xs)       = hasCodeAfterReturn xs

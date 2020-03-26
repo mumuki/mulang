@@ -145,6 +145,23 @@ spec = do
     it "is False when not does type test" $ do
       doesTypeTest (js "function x(m) { return 1 }") `shouldBe` False
 
+  describe "hasUnusedParameters" $ do
+    it "is False for methods of all kinds" $ do
+      hasUnusedParameters (js "var o = {x: function(m) { return 4; }}") `shouldBe` False
+      hasUnusedParameters (js "var o = {x: function(m) { return m; }}") `shouldBe` False
+
+    it "is True when has unused parameter" $ do
+      hasUnusedParameters (js "function x(m) { return 4; } ") `shouldBe` True
+
+    it "is False when uses its single parameter" $ do
+      hasUnusedParameters (js "function x(m) { return m } ") `shouldBe` False
+
+    it "is False when uses all its parameters in different places" $ do
+      hasUnusedParameters (js "function x(m2, m2) { g(m1); return m2 } ") `shouldBe` False
+
+    it "is False when uses all its parameters in return" $ do
+      hasUnusedParameters (js "function x(m2, m2) { return m1 + m2 } ") `shouldBe` False
+
   describe "hasRedundantLambda" $ do
     it "is True whn etha-conversion applies, hs" $ do
       hasRedundantLambda (hs "g = map (\\m -> f m)") `shouldBe` True
@@ -280,12 +297,40 @@ spec = do
     it "is False when both are overriden" $ do
       overridesEqualOrHashButNotBoth (java "public class A{ public void equals(){}\npublic void hashCode(){} }") `shouldBe` False
 
+
+  describe "shouldInvertIfCondition" $ do
+    it "is True when if branch is empty but else isn't" $ do
+      shouldInvertIfCondition (javaStatement "if(true) { } else { i++; }") `shouldBe` True
+      shouldInvertIfCondition (js "if(true) { } else { i++; }") `shouldBe` True
+
+    it "is False when it has no branches" $ do
+      shouldInvertIfCondition (javaStatement "if(true);") `shouldBe` False
+      shouldInvertIfCondition (js "if(true);") `shouldBe` False
+
+    it "is False when it has empty branches" $ do
+      shouldInvertIfCondition (javaStatement "if(true) {} else {}") `shouldBe` False
+      shouldInvertIfCondition (js "if(true) {} else {}") `shouldBe` False
+
+    it "is False when if branch is not empty" $ do
+      shouldInvertIfCondition (javaStatement "if(true) { j++; } else { i++; }") `shouldBe` False
+      shouldInvertIfCondition (js "if(true) { j++; } else { i++; }") `shouldBe` False
+
   describe "hasEmptyIfBranches" $ do
     it "is True when if branch is empty but else isn't" $ do
-      hasEmptyIfBranches (javaStatement "if(true) { } else { i++; }") `shouldBe` True
+      hasEmptyIfBranches (javaStatement "if(true) { } else { i++; }") `shouldBe` False
+      hasEmptyIfBranches (js "if(true) { } else { i++; }") `shouldBe` False
+
+    it "is True when it has no branches" $ do
+      hasEmptyIfBranches (javaStatement "if(true);") `shouldBe` True
+      hasEmptyIfBranches (js "if(true);") `shouldBe` True
+
+    it "is True when it has empty branches" $ do
+      hasEmptyIfBranches (javaStatement "if(true) {}") `shouldBe` True
+      hasEmptyIfBranches (js "if(true) {}") `shouldBe` True
 
     it "is False when if branch is not empty" $ do
       hasEmptyIfBranches (javaStatement "if(true) { j++; } else { i++; }") `shouldBe` False
+      hasEmptyIfBranches (js "if(true) { j++; } else { i++; }") `shouldBe` False
 
   describe "hasRedundantRepeat" $ do
     it "is True when it contains a repeat with just one iteration" $ do
@@ -294,6 +339,13 @@ spec = do
       hasRedundantRepeat (Repeat (MuNumber 2) (Print (MuString "hello"))) `shouldBe` False
     it "is False when it contains a repeat with a non-literal expression" $ do
       hasRedundantRepeat (Repeat (Reference "times") (Print (MuString "hello"))) `shouldBe` False
+
+  describe "hasEmptyRepeat" $ do
+    it "is True when it contains a repeat with an empty block" $ do
+      hasEmptyRepeat (Repeat (MuNumber 2) None) `shouldBe` True
+
+    it "is False when it contains a repeat with a non-empty block" $ do
+      hasEmptyRepeat (Repeat (MuNumber 2) (Print (MuString "hello"))) `shouldBe` False
 
   describe "hasUnreachableCode" $ do
     it "is True when there's an equation following one which matches any values" $ do
@@ -327,3 +379,33 @@ spec = do
           | otherwise = 5
         foo 1 2 = 3
         |]) `shouldBe` True
+
+    it "is True when there are consecutive returns in function" $ do
+      hasUnreachableCode (js "function foo() { return 4; return 5; }") `shouldBe` True
+
+    it "is True when there is code after return" $ do
+      hasUnreachableCode (js "function foo() { return 4; console.log('hello') }") `shouldBe` True
+
+    it "is False when there is code before return" $ do
+        hasUnreachableCode (js "function foo() { console.log('hello'); return 4;  }") `shouldBe` False
+
+    it "is True when there are non-consecutive returns in function" $ do
+      hasUnreachableCode (js "function foo() { return 4; console.log('hello'); return 5; }") `shouldBe` True
+
+    it "is False when there return in different sequences" $ do
+      hasUnreachableCode (js "function foo() { if (true) { return 4; } console.log('hello'); return 5; }") `shouldBe` False
+
+    it "is True when there are consecutive returns within a control structure" $ do
+      hasUnreachableCode (js "function foo() { if (true) { return 4; return 5; } }") `shouldBe` True
+
+    it "is False when there are no consecutive returns within a control structure" $ do
+      hasUnreachableCode (js "function foo() { if (true) { return 4 } }") `shouldBe` False
+
+    it "is True when there are consecutive returns plain code" $ do
+      hasUnreachableCode (js "return 4; return 5;") `shouldBe` True
+
+    it "is False when it has only a single return" $ do
+      hasUnreachableCode (js "function foo() { return 4; }") `shouldBe` False
+
+    it "is False when if branch is not empty" $ do
+      hasUnreachableCode (js "if(true) { j++; } else { i++; }") `shouldBe` False
