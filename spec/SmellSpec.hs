@@ -285,7 +285,7 @@ spec = do
     it "is True when if branch is empty but else isn't" $ do
       shouldInvertIfCondition (javaStatement "if(true) { } else { i++; }") `shouldBe` True
 
-    it "is True when it has no branches" $ do
+    it "is False when it has no branches" $ do
       shouldInvertIfCondition (javaStatement "if(true);") `shouldBe` False
 
     it "is False when if branch is not empty" $ do
