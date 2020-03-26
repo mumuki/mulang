@@ -355,3 +355,33 @@ spec = do
           | otherwise = 5
         foo 1 2 = 3
         |]) `shouldBe` True
+
+    it "is True when there are consecutive returns in function" $ do
+      hasUnreachableCode (js "function foo() { return 4; return 5; }") `shouldBe` True
+
+    it "is True when there is code after return" $ do
+      hasUnreachableCode (js "function foo() { return 4; console.log('hello') }") `shouldBe` True
+
+    it "is False when there is code before return" $ do
+        hasUnreachableCode (js "function foo() { console.log('hello'); return 4;  }") `shouldBe` False
+
+    it "is True when there are non-consecutive returns in function" $ do
+      hasUnreachableCode (js "function foo() { return 4; console.log('hello'); return 5; }") `shouldBe` True
+
+    it "is False when there return in different sequences" $ do
+      hasUnreachableCode (js "function foo() { if (true) { return 4; } console.log('hello'); return 5; }") `shouldBe` False
+
+    it "is True when there are consecutive returns within a control structure" $ do
+      hasUnreachableCode (js "function foo() { if (true) { return 4; return 5; } }") `shouldBe` True
+
+    it "is False when there are no consecutive returns within a control structure" $ do
+      hasUnreachableCode (js "function foo() { if (true) { return 4 } }") `shouldBe` False
+
+    it "is True when there are consecutive returns plain code" $ do
+      hasUnreachableCode (js "return 4; return 5;") `shouldBe` True
+
+    it "is False when it has only a single return" $ do
+      hasUnreachableCode (js "function foo() { return 4; }") `shouldBe` False
+
+    it "is False when if branch is not empty" $ do
+      hasUnreachableCode (js "if(true) { j++; } else { i++; }") `shouldBe` False
