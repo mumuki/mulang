@@ -30,6 +30,8 @@ describe Mulang::Expectation::I18n do
     it { expect(expectation('*', "Assigns:x:WithChar:'a'").translate).to eq("solution must assign <strong>x</strong> with character <i>'a'</i>") }
     it { expect(expectation('*', "Assigns:*:WithString:\"hello\"").translate).to eq("solution must perform assignments with string <i>\"hello\"</i>") }
     it { expect(expectation('*', "Returns:WithNumber:9").translate).to eq('solution must return with number <i>9</i>') }
+
+    it { expect(expectation('foo', 'HasEmptyRepeat').translate).to eq('<strong>foo</strong> has empty <i>repeat</i>') }
   end
 
   context 'pt locale' do
@@ -43,6 +45,8 @@ describe Mulang::Expectation::I18n do
     it { expect(expectation('*', "Returns:WithFalse").translate).to eq('a solução deve retornar com o valor <i>false</i>') }
     it { expect(expectation('*', "UsesRepeat:WithMath").translate).to eq('a solução deve usar <i>repeat</i> com uma expressão matemática') }
     it { expect(expectation('*', "Calls:g:WithLiteral").translate).to eq('a solução deve usar <strong>g</strong> com um valor literal') }
+
+    it { expect(expectation('foo', 'HasEmptyRepeat').translate).to eq('<strong>foo</strong> tem um <i>repeat</i> vazio') }
   end
 
   context 'es locale' do
@@ -140,6 +144,7 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'HasRedundantBooleanComparison').translate).to eq('<strong>foo</strong> hace comparaciones booleanas innecesarias') }
       it { expect(expectation('bar', 'UsesFail').translate).to eq('<strong>bar</strong> usa <i>fail</li>, lo cual es una mala práctica') }
       it { expect(expectation('foo', 'HasEmptyIfBranches').translate).to eq('<strong>foo</strong> tiene ramas de <i>if</i> vacías') }
+      it { expect(expectation('foo', 'HasEmptyRepeat').translate).to eq('<strong>foo</strong> tiene un <i>repeat</i> vacío') }
       it { expect(expectation('foo', 'ShouldInvertIfCondition').translate).to eq('<strong>foo</strong> debería invertir la condición del <i>if</i> e intercambiar las ramas') }
       it { expect(expectation('foo', 'HasRedundantRepeat').translate).to eq('<strong>foo</strong> tiene un <i>repeat</i> innecesario') }
       it { expect(expectation('foo', 'HasUnreachableCode').translate).to eq('<strong>foo</strong> tiene código inalcanzable') }

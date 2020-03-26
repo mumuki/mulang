@@ -105,6 +105,7 @@ en:
       HasAssignmentReturn: '%{binding} returns the result of an assignment'
       HasCodeDuplication: '%{binding} has code duplication'
       HasEmptyIfBranches: '%{binding} has empty <i>%{keyword_if}</i> branches'
+      HasEmptyRepeat: '%{binding} has empty <i>%{keyword_repeat}</i>'
       HasLongParameterList: '%{binding} has too many parameters. You may be missing an abstraction.'
       HasMisspelledBindings: '%{binding} is misspelled'
       HasMisspelledIdentifiers: '%{binding} is misspelled'
