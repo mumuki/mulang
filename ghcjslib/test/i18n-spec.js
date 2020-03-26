@@ -42,6 +42,7 @@ describe('es', () => {
   it('HasRedundantBooleanComparison', () => should(mulang.I18n.translate('foo', 'HasRedundantBooleanComparison')).eql('<strong>foo</strong> hace comparaciones booleanas innecesarias'));
   it('UsesFail', () => should(mulang.I18n.translate('bar', 'UsesFail')).eql('<strong>bar</strong> usa <i>fail</li>, lo cual es una mala práctica'));
   it('HasEmptyIfBranches', () => should(mulang.I18n.translate('foo', 'HasEmptyIfBranches')).eql('<strong>foo</strong> tiene ramas de <i>if</i> vacías'));
+  it('HasEmptyRepeat', () => should(mulang.I18n.translate('foo', 'HasEmptyRepeat')).eql('<strong>foo</strong> tiene un <i>repeat</i> vacío'));
   it('ShouldInvertIfCondition', () => should(mulang.I18n.translate('foo', 'ShouldInvertIfCondition')).eql('<strong>foo</strong> debería invertir la condición del <i>if</i> e intercambiar las ramas'));
   it('HasRedundantRepeat', () => should(mulang.I18n.translate('foo', 'HasRedundantRepeat')).eql('<strong>foo</strong> tiene un <i>repeat</i> innecesario'));
   it('HasUnreachableCode', () => should(mulang.I18n.translate('foo', 'HasUnreachableCode')).eql('<strong>foo</strong> tiene código inalcanzable'));

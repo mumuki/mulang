@@ -7,6 +7,7 @@ module Language.Mulang.Inspector.Generic.Smell (
   doesTypeTest,
   hasAssignmentReturn,
   hasEmptyIfBranches,
+  hasEmptyRepeat,
   hasLongParameterList,
   hasRedundantBooleanComparison,
   hasRedundantGuards,
@@ -175,6 +176,11 @@ hasEmptyIfBranches :: Inspection
 hasEmptyIfBranches = containsExpression f
   where f (If _ None None) = True
         f _                = False
+
+hasEmptyRepeat :: Inspection
+hasEmptyRepeat = containsExpression f
+  where f (Repeat _ None) = True
+        f _               = False
 
 hasUnreachableCode :: Inspection
 hasUnreachableCode = containsExpression f

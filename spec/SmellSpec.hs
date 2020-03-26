@@ -323,6 +323,13 @@ spec = do
     it "is False when it contains a repeat with a non-literal expression" $ do
       hasRedundantRepeat (Repeat (Reference "times") (Print (MuString "hello"))) `shouldBe` False
 
+  describe "hasEmptyRepeat" $ do
+    it "is True when it contains a repeat with an empty block" $ do
+      hasEmptyRepeat (Repeat (MuNumber 2) None) `shouldBe` True
+
+    it "is False when it contains a repeat with a non-empty block" $ do
+      hasEmptyRepeat (Repeat (MuNumber 2) (Print (MuString "hello"))) `shouldBe` False
+
   describe "hasUnreachableCode" $ do
     it "is True when there's an equation following one which matches any values" $ do
       hasUnreachableCode (runHaskell [text|
