@@ -93,10 +93,14 @@ delegates = decontextualize . delegates'
 
 delegates' :: ContextualizedBoundInspection
 delegates' p context expression = inspect $ do
-  (Subroutine name1 _)       <- declarations context
+  (Subroutine name1 body)    <- declarations context
   (Call (Reference name2) _) <- expressions expression
+  select (nonEmptyBody body)
   select (name1 == name2)
   select (p name1)
+
+  where nonEmptyBody [Equation _ (UnguardedBody None)] = False
+        nonEmptyBody _                                 = True
 
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
