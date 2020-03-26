@@ -101,6 +101,7 @@ es:
       DeclaresVariable_like: '%{binding} %{must} declarar una variable parecida a %{target}%{matching}'
       DeclaresVariable_named: '%{binding} %{must} declarar una variable %{target}%{matching}'
       DeclaresVariable: '%{binding} %{must} debe declarar variables%{matching}'
+      Delegates: '%{binding} %{must} delegar'
       DiscardsExceptions: '%{binding} está ignorando excepciones silenciosamiente'
       DoesConsolePrint: '%{binding} está realizando impresiones por pantalla'
       DoesNilTest: '%{binding} hace comparaciones contra <i>%{keyword_null}</i>'

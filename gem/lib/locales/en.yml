@@ -97,6 +97,7 @@ en:
       DeclaresVariable_like: '%{binding} %{must} declare a variable similar to %{target}%{matching}'
       DeclaresVariable_named: '%{binding} %{must} declare a variable %{target}%{matching}'
       DeclaresVariable: '%{binding} %{must} debe declare variables%{matching}'
+      Delegates: '%{binding} %{must} delegate'
       DiscardsExceptions: '%{binding} is ignoring exceptions silently'
       DoesConsolePrint: '%{binding} is printing to the console'
       DoesNilTest: '%{binding} does <i>%{keyword_null}</i> tests'
