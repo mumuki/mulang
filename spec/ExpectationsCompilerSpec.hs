@@ -10,7 +10,7 @@ import           Language.Mulang.Parsers.Java
 
 spec :: Spec
 spec = do
-  let run code scope inspection = compileExpectation (Expectation scope inspection) code
+  let run code scope inspection | Right f <- compileExpectation (Expectation scope inspection) = f code
 
   it "works with DeclaresEntryPoint" $ do
     run (hs "f x = 2") "*" "DeclaresEntryPoint" `shouldBe` False

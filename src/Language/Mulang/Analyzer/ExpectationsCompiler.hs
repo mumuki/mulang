@@ -8,12 +8,14 @@ import           Language.Mulang.Edl.Expectation
 import           Language.Mulang (Inspection)
 import           Language.Mulang.Analyzer.EdlQueryCompiler (compileTopQuery)
 import qualified Language.Mulang.Analyzer.Analysis as A
+import           Language.Mulang.Analyzer.Finding (Finding)
 
 import qualified Data.Map.Strict as Map
 import           Data.List.Split (splitOn)
+import           Control.Monad.Except
 
-compileExpectation :: A.Expectation -> Inspection
-compileExpectation (A.Expectation s i) = compileTopQuery . negator . scope $ baseQuery
+compileExpectation :: A.Expectation -> Finding Inspection
+compileExpectation (A.Expectation s i) = baseQuery >>= compileTopQuery . negator . scope
   where
     (inspectionParts, negator) = compileInspectionPartsAndNegator (splitOn ":" i)
     scope = compileScope (splitOn ":" s)
@@ -29,7 +31,7 @@ compileScope ["Intransitive",name] q = Within name q
 compileScope [name]                q = Through name q
 compileScope _                     q = Decontextualize q
 
-compileCQuery :: [String] -> CQuery
+compileCQuery :: [String] -> Finding CQuery
 compileCQuery []                            = compileCQuery ["Parses","*"]
 compileCQuery [verb]                        = compileCQuery [verb,"*"]
 compileCQuery [verb,name]                   | Map.member name nullaryMatchers = compileCQuery [verb,"*",name]
@@ -37,7 +39,7 @@ compileCQuery (verb:"WithChar":args)        = compileCQuery (verb:"*":"WithChar"
 compileCQuery (verb:"WithNumber":args)      = compileCQuery (verb:"*":"WithNumber":args)
 compileCQuery (verb:"WithString":args)      = compileCQuery (verb:"*":"WithString":args)
 compileCQuery (verb:"WithSymbol":args)      = compileCQuery (verb:"*":"WithSymbol":args)
-compileCQuery (verb:object:args)            = Inspection verb (compileBinding object) (compileMatcher args)
+compileCQuery (verb:object:args)            = fmap (Inspection verb (compileBinding object)) (compileMatcher args)
 
 compileBinding :: String -> Predicate
 compileBinding "*"          = Any
@@ -46,19 +48,25 @@ compileBinding ('~':name)   = Like name
 compileBinding ('=':name)   = Named name
 compileBinding name         = Named name
 
-compileMatcher :: [String] -> Matcher
-compileMatcher = matching . f
+compileMatcher :: [String] -> Finding Matcher
+compileMatcher = fmap matching . f
   where
     matching [] = Unmatching
     matching xs = Matching xs
 
-    f :: [String] -> [Clause]
-    f (name:args)               |  Just matcher <- Map.lookup name nullaryMatchers = matcher : f args
-    f ("WithChar":value:args)   =  IsChar (read value) : f args
-    f ("WithNumber":value:args) =  IsNumber (read value) : f args
-    f ("WithString":value:args) =  IsString (read value) : f args
-    f ("WithSymbol":value:args) =  IsSymbol (read ("\""++value++"\"")) : f args
-    f []                        = []
+    f :: [String] -> Finding [Clause]
+    f (name:args)        | Just matcher <- Map.lookup name nullaryMatchers = fmap (matcher :) (f args)
+    f (name:value:args)  | Just matcher <- Map.lookup name binaryMatchers =  fmap (matcher value :) (f args)
+    f []                 = return []
+    f (other:args)       = throwError $ "unsupported matcher " ++ other ++ " with args " ++ show args
+
+binaryMatchers =
+  Map.fromList [
+    ("WithChar", (IsChar . read)),
+    ("WithNumber", (IsNumber . read)),
+    ("WithString", (IsString . read)),
+    ("WithSymbol", (\ v-> IsSymbol (read ("\""++v++"\""))))
+  ]
 
 nullaryMatchers =
   Map.fromList [

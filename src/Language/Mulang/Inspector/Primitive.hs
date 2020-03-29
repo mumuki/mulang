@@ -1,4 +1,5 @@
 module Language.Mulang.Inspector.Primitive (
+  lenient,
   containsExpression,
   containsDeclaration,
   containsBody,
@@ -21,6 +22,9 @@ import Language.Mulang.Identifier (IdentifierPredicate)
 import Language.Mulang.Generator (expressions, equationBodies, declarations)
 
 type Inspection = Consult Bool
+
+lenient :: Inspection
+lenient = const True
 
 containsExpression :: Inspection -> Inspection
 containsExpression f = has f expressions

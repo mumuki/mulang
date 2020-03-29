@@ -158,9 +158,12 @@ spec = describe "ExpectationsAnalyzer" $ do
 
     (run JavaScript "if (true) {}; if(true) {}; if (false) {}" "expectation: count (UsesIf) >= 3") `shouldReturn` ok
 
+  it "rejects unsupported counters" $ do
+    (run JavaScript "if (true) {}; " "expectation: count (declares) >= 3") `shouldReturn` AnalysisFailed "Can not count over Declares with matcher Unmatching"
+
   it "is case sensitive in standard syntax" $ do
     (run JavaScript "" "expectation: UsesIf") `shouldReturn` nok
-    (run JavaScript "" "expectation: usesif") `shouldReturn` ok
+    (run JavaScript "" "expectation: usesif") `shouldReturn` AnalysisFailed "Unknown inspection Usesif with matcher Unmatching"
 
   it "accepts titlecase in standard syntax" $ do
     (run JavaScript "" "expectation: UsesIf") `shouldReturn` nok

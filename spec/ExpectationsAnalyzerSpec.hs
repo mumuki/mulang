@@ -20,11 +20,11 @@ spec = describe "ExpectationsAnalyzer" $ do
 
   it "evaluates unknown basic expectations" $ do
     let hasTurtle = Expectation "x" "HasTurtle"
-    (run Haskell "x = 2" [hasTurtle]) `shouldReturn` (result [passed hasTurtle] [])
+    (run Haskell "x = 2" [hasTurtle]) `shouldReturn` AnalysisFailed "Unknown inspection HasTurtle with matcher Unmatching"
 
   it "evaluates unknown basic negated expectations" $ do
     let notHasTurtle = Expectation "x" "Not:HasTurtle"
-    (run Haskell "x = 2" [notHasTurtle]) `shouldReturn` (result [passed notHasTurtle] [])
+    (run Haskell "x = 2" [notHasTurtle]) `shouldReturn` AnalysisFailed "Unknown inspection HasTurtle with matcher Unmatching"
 
   it "evaluates empty expectations" $ do
     (run Haskell "x = 2" []) `shouldReturn` (result [] [])
