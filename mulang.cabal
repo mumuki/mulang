@@ -103,6 +103,7 @@ library
     hashable                  ,
     haskell-src               ,
     inflections               <= 0.2.0.1,
+    language-c                ,
     language-java             ,
     language-javascript       ,
     language-python           ,
