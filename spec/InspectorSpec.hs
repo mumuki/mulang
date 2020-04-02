@@ -848,3 +848,39 @@ spec = do
 
     it "is False if there is only a comment" $ do
       usesAnonymousVariable (hs "--") `shouldBe` False
+
+
+  describe "subordinatesDeclatationsTo" $ do
+    it "is True when procedure is declared and there are no other declarations" $ do
+      subordinatesDeclatationsTo "init"  (js "function init() {}") `shouldBe` True
+
+    it "is True when function is declared and there are no other declarations" $ do
+      subordinatesDeclatationsTo "main"  (js "function main() { return 0; }") `shouldBe` True
+
+    it "is False when there is no such computation" $ do
+      subordinatesDeclatationsTo "init"  (js "function main() { return 0; }") `shouldBe` False
+
+    it "is False when start point is a variable" $ do
+      subordinatesDeclatationsTo "init"  (js "let init = 0") `shouldBe` False
+
+    it "is True when procedure is declared and there are other declarations directly called from it" $ do
+      subordinatesDeclatationsTo "interact"  (js "function interact() { askForName(); askForAge() } \n\
+                                  \function askForAge() {}\n\
+                                  \function askForName() {}") `shouldBe` True
+
+    it "is True when procedure is declared and all declarations are transitively called from it" $ do
+      subordinatesDeclatationsTo "interact"  (js "function interact() { askForName(); askForAge() } \n\
+                                  \function askForAge() {}\n\
+                                  \function askForName() { read() }\n\
+                                  \function read()") `shouldBe` True
+
+    it "is False when procedure is declared and there are other declarations not called from it" $ do
+      subordinatesDeclatationsTo "interact"  (js "function interact() { askForName() } \n\
+                                  \function askForAge() {}\n\
+                                  \function askForName() {}") `shouldBe` False
+
+    it "is False when procedure is declared and not all declarations are transitively called from it" $ do
+      subordinatesDeclatationsTo "interact"  (js "function interact() { askForName(); askForAge() } \n\
+                                  \function askForAge() {}\n\
+                                  \function askForName() {}\n\
+                                  \function read()") `shouldBe` False
