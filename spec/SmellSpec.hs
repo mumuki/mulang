@@ -36,6 +36,16 @@ spec = do
     it "is True when return an if with boolean literals, in method" $ do
       hasRedundantIf (js "var y = {x: function(m){ return m ? true : false }}") `shouldBe` True
 
+    it "is True when in incomplete if structures with return" $ do
+      hasRedundantIf (js "function x() { if(m) { return true }; return false; }") `shouldBe` True
+
+    it "is True when in incomplete if structures with return, negated" $ do
+      hasRedundantIf (js "function x() { if(m) { return false }; return true; }") `shouldBe` True
+
+    it "is False when in incomplete if structures with non consecutive returns" $ do
+      hasRedundantIf (js "function x() { if(m) { return false }; console.log('hello'); return true; }") `shouldBe` False
+      hasRedundantIf (js "function x() { if(m) { console.log('hello'); return false }; return true; }") `shouldBe` False
+
     it "is False when there is no if" $ do
       hasRedundantIf (js "var x = false") `shouldBe` False
 

@@ -76,7 +76,12 @@ hasRedundantIf = containsExpression f
         f (If _ (Return x) (Return y))               = all isBooleanLiteral [x, y]
         f (If _ (Yield x) (Yield y))                 = all isBooleanLiteral [x, y]
         f (If _ x y)                                 = all isBooleanLiteral [x, y]
+        f (Sequence expressions)                     = containsUnstructuredBooleanReturn expressions
         f _                                          = False
+
+        containsUnstructuredBooleanReturn (If _ (Return x) None:Return y:_) | all isBooleanLiteral [x, y] = True
+        containsUnstructuredBooleanReturn (_:xs)                            = containsUnstructuredBooleanReturn xs
+        containsUnstructuredBooleanReturn []                                = False
 
 -- | Inspection that tells whether an expression has guards where both branches return
 -- boolean literals
