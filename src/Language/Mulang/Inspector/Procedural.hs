@@ -1,27 +1,30 @@
 module Language.Mulang.Inspector.Procedural (
   countProcedures,
-  countWhiles,
   countForLoops,
-  usesRepeat,
   countRepeats,
-  usesRepeatMatching,
-  usesWhile,
-  usesWhileMatching,
-  usesSwitch,
+  countWhiles,
+  declaresProcedure,
+  declaresProcedureMatching,
+  subordinatesDeclatationsTo,
   usesForEach,
   usesForEachMatching,
   usesForLoop,
   usesForLoopMatching,
   usesLoop,
-  declaresProcedure,
-  declaresProcedureMatching) where
+  usesRepeat,
+  usesRepeatMatching,
+  usesSwitch,
+  usesWhile,
+  usesWhileMatching) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Generator (equationsExpandedExpressions, statementsExpressions)
+import Language.Mulang.Generator (equationsExpandedExpressions, statementsExpressions, declaredIdentifiers)
 import Language.Mulang.Inspector.Matcher (Matcher, unmatching, matches)
 import Language.Mulang.Inspector.Primitive (Inspection, Counter, containsExpression, positive, countExpressions)
 import Language.Mulang.Inspector.Bound (BoundCounter, BoundInspection, countBoundDeclarations, uncounting)
-import Language.Mulang.Inspector.Generic (usesYield)
+import Language.Mulang.Inspector.Generic (usesYield, declares, uses)
+import Language.Mulang.Inspector.Combiner (transitive)
+import Language.Mulang.Identifier (named)
 
 declaresProcedure :: BoundInspection
 declaresProcedure = unmatching declaresProcedureMatching
@@ -90,3 +93,10 @@ countForLoops matcher = countExpressions f
 
 usesLoop :: Inspection
 usesLoop e = usesRepeat e || usesWhile e || usesForLoop e || usesForEach e
+
+
+subordinatesDeclatationsTo :: BoundInspection
+subordinatesDeclatationsTo main expression =  declares main expression && all referenced (declaredIdentifiers expression)
+  where
+    referenced :: Identifier -> Bool
+    referenced identifier = uses (named identifier) expression
