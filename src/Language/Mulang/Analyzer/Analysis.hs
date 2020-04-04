@@ -140,6 +140,7 @@ data Language
   |  Python3
   |  Ruby
   |  Php
+  |  C
   deriving (Show, Eq, Generic)
 
 --

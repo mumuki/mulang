@@ -7,6 +7,7 @@ import        Control.Fallible (orFail)
 import        Language.Mulang
 import        Language.Mulang.Parsers (EitherParser, maybeToEither)
 import        Language.Mulang.Parsers.Haskell
+import        Language.Mulang.Parsers.C (parseC)
 import        Language.Mulang.Parsers.JavaScript (parseJavaScript)
 import        Language.Mulang.Parsers.Prolog (parseProlog)
 import        Language.Mulang.Parsers.Java (parseJava)
@@ -22,6 +23,7 @@ parseFragment (CodeSample language content) = (parserFor language) content
 parseFragment (MulangSample ast options)    = Right . (normalizerFor options) $ ast
 
 parserFor :: Language -> EitherParser
+parserFor C              = parseC
 parserFor Haskell        = parseHaskell
 parserFor Java           = parseJava
 parserFor JavaScript     = maybeToEither parseJavaScript
