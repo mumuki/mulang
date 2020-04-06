@@ -22,8 +22,17 @@ spec = do
     it "is False when there is no such computation" $ do
       subordinatesDeclatationsTo (named "init")  (js "function main() { return 0; }") `shouldBe` False
 
-    it "is False when start point is a variable" $ do
-      subordinatesDeclatationsTo (named "init")  (js "let init = 0") `shouldBe` False
+    it "is True when variable is declared and there are no other declarations" $ do
+      subordinatesDeclatationsTo (named "init")  (js "let init = 0") `shouldBe` True
+
+    it "is True when variable is declared and all other variables are used from it" $ do
+      subordinatesDeclatationsTo (named "init")  (js "let init = x; let x = 2;") `shouldBe` True
+
+    it "is True when variable is declared and all other functions are used from it" $ do
+      subordinatesDeclatationsTo (named "init")  (js "let init = x(); function x() { return 2 }") `shouldBe` True
+
+    it "is False when variable is declared and there are other variables not used from it" $ do
+        subordinatesDeclatationsTo (named "init")  (js "let init = y; let x = 2;") `shouldBe` False
 
     it "is True when procedure is declared and there are other declarations directly called from it" $ do
       subordinatesDeclatationsTo (named "interact")  (js "function interact() { askForName(); askForAge() } \n\
@@ -34,7 +43,7 @@ spec = do
       subordinatesDeclatationsTo (named "interact")  (js "function interact() { askForName(); askForAge() } \n\
                                   \function askForAge() {}\n\
                                   \function askForName() { read() }\n\
-                                  \function read()") `shouldBe` True
+                                  \function read() {}") `shouldBe` True
 
     it "is False when procedure is declared and there are other declarations not called from it" $ do
       subordinatesDeclatationsTo (named "interact")  (js "function interact() { askForName() } \n\
@@ -45,7 +54,7 @@ spec = do
       subordinatesDeclatationsTo (named "interact")  (js "function interact() { askForName(); askForAge() } \n\
                                   \function askForAge() {}\n\
                                   \function askForName() {}\n\
-                                  \function read()") `shouldBe` False
+                                  \function read() {}") `shouldBe` False
 
   describe "usesForLoop" $ do
     it "is True when present in function" $ do
