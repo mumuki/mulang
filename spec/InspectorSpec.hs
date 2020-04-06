@@ -382,7 +382,7 @@ spec = do
       decontextualize (contextualized (scoped "main") (delegates' anyone)) (
         Sequence [
           EntryPoint "main" (Application (Reference "m") []),
-          SimpleProcedure "m" [] None]) `shouldBe` True
+          SimpleProcedure "m" [] (Return (MuNumber 4))]) `shouldBe` True
 
   describe "delegates" $ do
     context "when subroutine is declared" $ do
@@ -390,37 +390,42 @@ spec = do
         scoped "main" (delegates anyone) (
           Sequence [
             EntryPoint "main" (Application (Reference "m") []),
-            SimpleProcedure "m" [] None]) `shouldBe` False
+            SimpleProcedure "m" [] (Return (MuNumber 4))]) `shouldBe` False
 
       it "is True on function application in entry point" $ do
         delegates (named "m") (Sequence [
                                   EntryPoint "main" (Application (Reference "m") []),
-                                  SimpleProcedure "m" [] None]) `shouldBe` True
+                                  SimpleProcedure "m" [] (Return (MuNumber 4))]) `shouldBe` True
 
-      it "is True on message send application in entry point" $ do
+      it "is True on message send in entry point" $ do
         delegates (named "m") (Sequence [
                                   EntryPoint "main" (Send Self (Reference "m") []),
-                                  SimpleMethod "m" [] None]) `shouldBe` True
+                                  SimpleMethod "m" [] (Return (MuNumber 4))]) `shouldBe` True
+
+      it "is False on message send in entry point to an empty method" $ do
+        delegates (named "m") (Sequence [
+                                  EntryPoint "main" (Send Self (Reference "m") []),
+                                  SimpleMethod "m" [] None]) `shouldBe` False
 
       it "is False on direct usage in entry point" $ do
         delegates (named "m") (Sequence [
                                   EntryPoint "main" (Reference "m"),
-                                  Class "m" Nothing None]) `shouldBe` False
+                                  Class "m" Nothing (Return (MuNumber 4))]) `shouldBe` False
 
       it "is False if there is no usage" $ do
         delegates (named "m") (Sequence [
                                   EntryPoint "main" (Reference "f"),
-                                  SimpleProcedure "m" [] None]) `shouldBe` False
+                                  SimpleProcedure "m" [] (Return (MuNumber 4))]) `shouldBe` False
 
       it "is True when delegated and a wildcard is used" $ do
         delegates anyone (Sequence [
                               EntryPoint "main" (Application (Reference "m") []),
-                              SimpleProcedure "m" [] None]) `shouldBe` True
+                              SimpleProcedure "m" [] (Return (MuNumber 4))]) `shouldBe` True
 
       it "is False when not delegated and a wildcard is used" $ do
         delegates anyone (Sequence [
                               EntryPoint "main" (Application (Reference "g") []),
-                              SimpleProcedure "m" [] None]) `shouldBe` False
+                              SimpleProcedure "m" [] (Return (MuNumber 4))]) `shouldBe` False
 
 
     context "when subroutine is not declared" $ do

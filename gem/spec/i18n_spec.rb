@@ -99,6 +99,7 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'DeclaresMethod:*').translate).to eq('<strong>foo</strong> debe declarar métodos') }
       it { expect(expectation('foo', 'Uses:baz').translate).to eq('<strong>foo</strong> debe utilizar <strong>baz</strong>') }
       it { expect(expectation('foo', 'Uses').translate).to eq('<strong>foo</strong> debe delegar') }
+      it { expect(expectation('foo', 'Delegates').translate).to eq('<strong>foo</strong> debe delegar') }
       it { expect(expectation('foo', 'UsesForall').translate).to eq('<strong>foo</strong> debe utilizar <i>forall</i>') }
 
       it { expect(expectation('foo', 'Not:Uses:=baz').translate).to eq('<strong>foo</strong> no debe utilizar <strong>baz</strong>') }
