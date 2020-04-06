@@ -552,3 +552,47 @@ spec = do
       let code = js "function f(x){return 1;}"
 
       usesIf code  `shouldBe` False
+
+  describe "subordinatesDeclarationsTo" $ do
+    it "is True when procedure is declared and there are no other declarations" $ do
+      subordinatesDeclarationsTo (named "init")  (js "function init() {}") `shouldBe` True
+
+    it "is True when function is declared and there are no other declarations" $ do
+      subordinatesDeclarationsTo (named "main")  (js "function main() { return 0; }") `shouldBe` True
+
+    it "is False when there is no such computation" $ do
+      subordinatesDeclarationsTo (named "init")  (js "function main() { return 0; }") `shouldBe` False
+
+    it "is True when variable is declared and there are no other declarations" $ do
+      subordinatesDeclarationsTo (named "init")  (js "let init = 0") `shouldBe` True
+
+    it "is True when variable is declared and all other variables are used from it" $ do
+      subordinatesDeclarationsTo (named "init")  (js "let init = x; let x = 2;") `shouldBe` True
+
+    it "is True when variable is declared and all other functions are used from it" $ do
+      subordinatesDeclarationsTo (named "init")  (js "let init = x(); function x() { return 2 }") `shouldBe` True
+
+    it "is False when variable is declared and there are other variables not used from it" $ do
+        subordinatesDeclarationsTo (named "init")  (js "let init = y; let x = 2;") `shouldBe` False
+
+    it "is True when procedure is declared and there are other declarations directly called from it" $ do
+      subordinatesDeclarationsTo (named "interact")  (js "function interact() { askForName(); askForAge() } \n\
+                                  \function askForAge() {}\n\
+                                  \function askForName() {}") `shouldBe` True
+
+    it "is True when procedure is declared and all declarations are transitively called from it" $ do
+      subordinatesDeclarationsTo (named "interact")  (js "function interact() { askForName(); askForAge() } \n\
+                                  \function askForAge() {}\n\
+                                  \function askForName() { read() }\n\
+                                  \function read() {}") `shouldBe` True
+
+    it "is False when procedure is declared and there are other declarations not called from it" $ do
+      subordinatesDeclarationsTo (named "interact")  (js "function interact() { askForName() } \n\
+                                  \function askForAge() {}\n\
+                                  \function askForName() {}") `shouldBe` False
+
+    it "is False when procedure is declared and not all declarations are transitively called from it" $ do
+      subordinatesDeclarationsTo (named "interact")  (js "function interact() { askForName(); askForAge() } \n\
+                                  \function askForAge() {}\n\
+                                  \function askForName() {}\n\
+                                  \function read() {}") `shouldBe` False
