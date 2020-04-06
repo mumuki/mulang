@@ -1,14 +1,20 @@
 {-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
 
-module InspectorSpec (spec) where
+module GenericSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang hiding (Equal, NotEqual)
+import           Language.Mulang.Ast
 import           Language.Mulang.Ast.Operator
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Java (java)
 import           Language.Mulang.Parsers.Python (py2, py3)
+import           Language.Mulang.Identifier
+import           Language.Mulang.Inspector.Literal
+import           Language.Mulang.Inspector.Matcher
+import           Language.Mulang.Inspector.Combiner
+import           Language.Mulang.Inspector.Contextualized
+import           Language.Mulang.Inspector.Generic
 import           Language.Mulang.Inspector.Generic.Smell
 
 spec :: Spec
@@ -24,94 +30,6 @@ spec = do
         let code = js "function(){}"
 
         declaresEntryPoint anyone code `shouldBe` False
-
-  describe "declaresProcedure" $ do
-    describe "with procedure declarations" $ do
-      it "is True when procedure is declared" $ do
-        let code =  js "function f(){}"
-
-        declaresProcedure (named "f") code `shouldBe` True
-
-      it "is False when procedures is not declared" $ do
-        let code = js "function f(){}"
-
-        declaresProcedure (named "g") code `shouldBe` False
-
-      it "is False when using a matcher and procedure does not have a body" $ do
-        (declaresProcedureMatching (with . isNumber $ 2) anyone) (js "function f() {}") `shouldBe` False
-
-  describe "usesWhile" $ do
-    it "is True when present in function" $ do
-      usesWhile (js "function f() { while(true) { console.log('foo') }  }")  `shouldBe` True
-
-    it "is True when present in lambda" $ do
-      usesWhile (js "var f = function() { while(true) { console.log('foo') }  }")  `shouldBe` True
-
-    it "is True when present in object" $ do
-      usesWhile (js "var x = {f: function() { while(true) { console.log('foo') } }}")  `shouldBe` True
-
-    it "is True when present in method" $ do
-      usesWhile (js "var o = {f: function() { while(true) { console.log('foo') }  }}")  `shouldBe` True
-
-    it "is False when not present in function" $ do
-      usesWhile (js "function f() {}")  `shouldBe` False
-
-  describe "usesSwitch" $ do
-    it "is True when present in function" $ do
-      let code = Switch (Reference "x") [(None, MuNumber 0)] None
-
-      usesSwitch code  `shouldBe` True
-
-    it "is False when not present in function" $ do
-      let code = js "function f(x){return 1;}"
-
-      usesSwitch code  `shouldBe` False
-
-  describe "usesRepeat" $ do
-    it "is True when present in function" $ do
-      let code = SimpleFunction "f" [] (Sequence [Repeat (MuNumber 2) None, Return (MuNumber 2)])
-
-      usesRepeat code  `shouldBe` True
-
-    it "is False when not present in function" $ do
-      let code = js "function f(x){return 1;}"
-
-      usesRepeat code  `shouldBe` False
-
-  describe "usesLoop" $ do
-    it "is True when repeat is present" $ do
-      let code = SimpleFunction "f" [] (Sequence [Repeat (MuNumber 2) None, Return (MuNumber 2)])
-
-      usesLoop code `shouldBe` True
-
-    it "is True when foreach is present" $ do
-      let code = SimpleFunction "f" [] (Sequence [
-                                          For [Generator (VariablePattern "x") (MuList [MuNumber 2])] None,
-                                          Return (MuNumber 2)
-                                        ])
-
-      usesLoop code `shouldBe` True
-
-    it "is True when for is present" $ do
-      let code = js "function f() { for(;;); }"
-
-      usesLoop code `shouldBe` True
-
-    it "is True when while is present" $ do
-      let code = js "function f() { while(true); }"
-
-      usesLoop code `shouldBe` True
-
-    it "is True when a for-of is present" $ do
-      let code = js "function printAll(list) { for (let e of list) { console.log(e) } }"
-
-      usesForEach code `shouldBe` True
-      usesLoop code `shouldBe` True
-
-    it "is False when none of the aforementioned are present" $ do
-      let code = js "function f(x){return 1;}"
-
-      usesLoop code `shouldBe` False
 
   describe "declaresVariable" $ do
     it "is True when declare a variable" $ do
@@ -240,135 +158,6 @@ spec = do
 
     it "is True when the program contains 16 or more nodes" $ do
       isLongCode (js "function f(){Poner(Verde) Mover(Norte) Poner(Verde)Mover(Norte) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) Poner(Verde) Mover(Norte) Poner(Verde)Mover(Norte) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde)}")  `shouldBe` True
-
-  describe "declaresObject" $ do
-    it "is True when present" $ do
-      declaresObject (named "f")  (js "var f = {x: 6}")  `shouldBe` True
-
-    it "is False when not present" $ do
-      declaresObject (named "f") (js "var f = 6")  `shouldBe` False
-
-    it "is False when not present, scoped" $ do
-      declaresObject (named "f") (js "var g = {}")  `shouldBe` False
-
-    it "is True when present, scoped" $ do
-      declaresObject (named "g") (js "var g = {}")  `shouldBe` True
-
-    it "is True when anyone present, scoped" $ do
-      declaresObject anyone (js "var g = {}")  `shouldBe` True
-
-  describe "declaresEnumeration" $ do
-    it "is True when present" $ do
-      declaresEnumeration (named "Direction") (Enumeration "Direction" ["SOUTH", "EAST", "WEST", "NORTH"]) `shouldBe` True
-
-    it "is False when not present" $ do
-      declaresEnumeration (named "Bird") (Class "Bird" (Just "Animal") None) `shouldBe` False
-
-  describe "declaresInterface" $ do
-    it "is True when present" $ do
-      declaresInterface (named "Optional") (java "interface Optional { Object get(); }") `shouldBe` True
-
-    it "is False when not present" $ do
-      declaresInterface (named "Bird") (java "class Bird extends Animal {}") `shouldBe` False
-
-  describe "instantiates" $ do
-    it "is True when instantiates" $ do
-      instantiates (named "Bird") (java "class Main {  void main(String[] args) { Animal a = new Bird(); }  }") `shouldBe` True
-
-    it "is False when not instantiates" $ do
-      instantiates (named "Bird") (java "class Main {  void main(String[] args) { Animal a = new Mammal(); }  }") `shouldBe` False
-
-  describe "implements" $ do
-    it "is True when implements" $ do
-      implements (named "Bird") (java "class Eagle implements Bird {}") `shouldBe` True
-
-    it "is False when implements declaration not present" $ do
-      implements (named "Bird") (java "class Cell {}") `shouldBe` False
-
-    it "is False when a superinterface is declares" $ do
-      implements (named "Iterable") (java "interface Collection extends Iterable {}") `shouldBe` False
-
-  describe "usesInheritance" $ do
-    it "is True when present" $ do
-      usesInheritance (Class "Bird" (Just "Animal") None) `shouldBe` True
-
-    it "is False when not present" $ do
-      usesInheritance (Class "Bird" Nothing None) `shouldBe` False
-
-    it "is True when present, scoped" $ do
-      (scoped "Bird" usesInheritance) (Sequence [Class "Bird" (Just "Animal") None, Class "Fox" (Just "Animal") None])  `shouldBe` True
-
-    it "is True when present, scoped" $ do
-      (scoped "Hercules" usesInheritance) (Sequence [Class "Hercules" Nothing None, Class "Fox" (Just "Animal") None])  `shouldBe` False
-
-  describe "usesMixins" $ do
-    it "is True when include present" $ do
-      usesMixins (Class "Dragon" Nothing (Include (Reference "FlyingCreature"))) `shouldBe` True
-
-    it "is False when include not present" $ do
-      usesMixins (Class "Dragon" Nothing (Implement (Reference "FlyingCreature"))) `shouldBe` False
-
-  describe "declaresMethod" $ do
-    it "is True when present" $ do
-      declaresMethod (named "x") (js "var f = {x: function(){}}")  `shouldBe` True
-
-    it "is works with except" $ do
-      declaresMethod (except "x") (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (except "a") (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (except "y") (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (except "b") (js "var obj = {b: function(){}}")  `shouldBe` False
-
-    it "is works with anyOf" $ do
-      declaresMethod (anyOf ["x", "y"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` False
-      declaresMethod (anyOf ["a", "y"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (anyOf ["x", "b"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (anyOf ["a", "b"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-
-    it "is works with noneOf" $ do
-      declaresMethod (noneOf ["x", "y"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (noneOf ["x", "b"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (noneOf ["a", "y"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (noneOf ["a", "b"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` False
-
-    it "is True when any present" $ do
-      declaresMethod anyone (js "var f = {x: function(){}}")  `shouldBe` True
-
-    it "is True when scoped in a class" $ do
-      scoped "A" (declaresMethod (named "foo")) (java "class A { void foo() {} }")  `shouldBe` True
-
-    it "is False when scoped in a class and not present" $ do
-      scoped "A" (declaresMethod (named "foo")) (java "class A { void foobar() {} }") `shouldBe` False
-
-    it "is False when not present" $ do
-      declaresMethod (named "m") (js "var f = {x: function(){}}")  `shouldBe` False
-
-    it "is False when not a method" $ do
-      declaresMethod (named "m") (js "var f = {x: 6}")  `shouldBe` False
-
-    it "is True when object present, scoped" $ do
-      scoped "f" (declaresMethod (named "x")) (js "var f = {x: function(){}}")  `shouldBe` True
-
-    it "is False when object not present, scoped" $ do
-      scoped "p" (declaresMethod (named "x")) (js "var f = {x: function(){}}")  `shouldBe` False
-
-  describe "declaresAttribute" $ do
-    it "is True when present" $ do
-      declaresAttribute (named "x") (js "var f = {x: 6}")  `shouldBe` True
-
-    it "is True when present and there are many" $ do
-      declaresAttribute (named "x") (js "var f = {j: 20, x: 6}")  `shouldBe` True
-
-    it "is False when not present" $ do
-      declaresAttribute (named "m") (js "var f = {x: 6}")  `shouldBe` False
-
-    it "is True when attribute present, scoped" $ do
-      scoped "f" (declaresAttribute (named "x"))  (js "var f = {x: 6}")  `shouldBe` True
-
-    it "is True when any attribute present, scoped" $ do
-      scoped "f" (declaresAttribute anyone) (js "var f = {x: 6}")  `shouldBe` True
-
-    it "is False when attribute not present, scoped" $ do
-      scoped "g" (declaresAttribute (named "x")) (js "var f = {x: 6}")  `shouldBe` False
 
   describe "uses" $ do
     it "is True on direct usage in entry point" $ do
@@ -719,39 +508,6 @@ spec = do
       it "is False when reference doesnt exists" $ do
         declares (named "y") (hs "x m = 1") `shouldBe` False
 
-  describe "usesForComprehension" $ do
-    it "is True when list comprehension exists" $ do
-      usesForComprehension (hs "x = [m|m<-t]") `shouldBe` True
-
-    it "is False when comprehension doesnt exists" $ do
-      usesForComprehension (hs "x = []") `shouldBe` False
-
-    it "is True when do syntax is used" $ do
-      usesForComprehension (hs "y = do { x <- xs; return x }") `shouldBe` True
-
-  describe "usesComprehension" $ do
-    it "is True when list comprehension exists" $ do
-      usesComprehension (hs "x = [m|m<-t]") `shouldBe` True
-
-    it "is False when comprehension doesnt exists" $ do
-      usesComprehension (hs "x = []") `shouldBe` False
-
-  describe "usesForLoop" $ do
-    it "is True when present in function" $ do
-      usesForLoop (js "function f() { for(;;) { console.log('foo') }  }")  `shouldBe` True
-
-    it "is True when present in lambda" $ do
-      usesForLoop (js "var f = function() { for(;;) { console.log('foo') }  }")  `shouldBe` True
-
-    it "is True when present in object" $ do
-      usesForLoop (js "var x = {f: function() { for(;;) { console.log('foo') } }}")  `shouldBe` True
-
-    it "is True when present in method" $ do
-      usesForLoop (js "var o = {f: function() { for(;;) { console.log('foo') }  }}")  `shouldBe` True
-
-    it "is False when not present in function" $ do
-      usesForLoop (js "function f() {}")  `shouldBe` False
-
   describe "parses" $ do
     it "is True when similar" $ do
       parses hs "x = map f . map g" (hs "x = map f.map g") `shouldBe` True
@@ -779,16 +535,6 @@ spec = do
     it "is False when there is no recursion" $ do
       declaresRecursively anyone (hs "y x = 3") `shouldBe` False
 
-
-  describe "usesGuards" $ do
-    describe "detects guards when" $ do
-      it "is present" $ do
-        usesGuards (hs "f x | c x = 2\n\
-                      \    | otherwise = 4") `shouldBe` True
-
-      it "is present" $ do
-        usesGuards (hs "f x = c x == 2") `shouldBe` False
-
   describe "usesIf, hs" $ do
     it "is True when present" $ do
       usesIf (hs "f x = if c x then 2 else 3") `shouldBe` True
@@ -806,81 +552,3 @@ spec = do
       let code = js "function f(x){return 1;}"
 
       usesIf code  `shouldBe` False
-
-
-  describe "lambda analyzer" $ do
-    describe "detects lambdas when" $ do
-      it "is present" $ do
-        usesLambda (hs "f x = \\y -> 4") `shouldBe` True
-
-      it "is present" $ do
-        usesLambda (hs "f x = 4") `shouldBe` False
-
-
-  describe "usesAnonymousVariable" $ do
-    it "is True if _ is present in paramenters" $ do
-      usesAnonymousVariable (hs "foo _ = 1") `shouldBe` True
-
-    it "is True if _ is present in nested list patterns" $ do
-      usesAnonymousVariable (hs "foo [3, _] = 1") `shouldBe` True
-
-    it "is True if _ is present in nested infix application patterns" $ do
-      usesAnonymousVariable (hs "foo (x:_) = 1") `shouldBe` True
-
-    it "is True if _ is present in nested application patterns" $ do
-      usesAnonymousVariable (hs "foo (F _ 1) = 1") `shouldBe` True
-
-    it "is True if _ is present in nested tuple patterns" $ do
-      usesAnonymousVariable (hs "foo (_, 1) = 1") `shouldBe` True
-
-    it "is True if _ is present in nested at patterns" $ do
-      usesAnonymousVariable (hs "foo x@(_, 1) = 1") `shouldBe` True
-
-    it "is False if _ is not present in parameters" $ do
-      usesAnonymousVariable (hs "foo x = 1") `shouldBe` False
-
-    it "is False if _ is present only in seccond equation" $ do
-      let code = hs . unlines $ ["foo False bool = bool", "foo True _ = True"]
-      usesAnonymousVariable code `shouldBe` True
-
-    it "is False if there is no _ but a comment" $ do
-      usesAnonymousVariable (hs "foo x = 1\n--") `shouldBe` False
-
-    it "is False if there is only a comment" $ do
-      usesAnonymousVariable (hs "--") `shouldBe` False
-
-
-  describe "subordinatesDeclatationsTo" $ do
-    it "is True when procedure is declared and there are no other declarations" $ do
-      subordinatesDeclatationsTo (named "init")  (js "function init() {}") `shouldBe` True
-
-    it "is True when function is declared and there are no other declarations" $ do
-      subordinatesDeclatationsTo (named "main")  (js "function main() { return 0; }") `shouldBe` True
-
-    it "is False when there is no such computation" $ do
-      subordinatesDeclatationsTo (named "init")  (js "function main() { return 0; }") `shouldBe` False
-
-    it "is False when start point is a variable" $ do
-      subordinatesDeclatationsTo (named "init")  (js "let init = 0") `shouldBe` False
-
-    it "is True when procedure is declared and there are other declarations directly called from it" $ do
-      subordinatesDeclatationsTo (named "interact")  (js "function interact() { askForName(); askForAge() } \n\
-                                  \function askForAge() {}\n\
-                                  \function askForName() {}") `shouldBe` True
-
-    it "is True when procedure is declared and all declarations are transitively called from it" $ do
-      subordinatesDeclatationsTo (named "interact")  (js "function interact() { askForName(); askForAge() } \n\
-                                  \function askForAge() {}\n\
-                                  \function askForName() { read() }\n\
-                                  \function read()") `shouldBe` True
-
-    it "is False when procedure is declared and there are other declarations not called from it" $ do
-      subordinatesDeclatationsTo (named "interact")  (js "function interact() { askForName() } \n\
-                                  \function askForAge() {}\n\
-                                  \function askForName() {}") `shouldBe` False
-
-    it "is False when procedure is declared and not all declarations are transitively called from it" $ do
-      subordinatesDeclatationsTo (named "interact")  (js "function interact() { askForName(); askForAge() } \n\
-                                  \function askForAge() {}\n\
-                                  \function askForName() {}\n\
-                                  \function read()") `shouldBe` False
