@@ -18,12 +18,13 @@ module Language.Mulang.Inspector.Procedural (
   usesWhileMatching) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Generator (equationsExpandedExpressions, statementsExpressions, declaredIdentifiers)
+import Language.Mulang.Generator (equationsExpandedExpressions, statementsExpressions, declaredIdentifiers, boundDeclarators)
 import Language.Mulang.Inspector.Matcher (Matcher, unmatching, matches)
 import Language.Mulang.Inspector.Primitive (Inspection, Counter, containsExpression, positive, countExpressions)
 import Language.Mulang.Inspector.Bound (BoundCounter, BoundInspection, countBoundDeclarations, uncounting)
 import Language.Mulang.Inspector.Generic (usesYield, declares, uses)
 import Language.Mulang.Inspector.Combiner (transitive)
+import Language.Mulang.Inspector.Query (select, inspect)
 import Language.Mulang.Identifier (named)
 
 declaresProcedure :: BoundInspection
@@ -96,7 +97,10 @@ usesLoop e = usesRepeat e || usesWhile e || usesForLoop e || usesForEach e
 
 
 subordinatesDeclatationsTo :: BoundInspection
-subordinatesDeclatationsTo main expression =  declares main expression && all referenced (declaredIdentifiers expression)
+subordinatesDeclatationsTo main expression = inspect $ do
+  (name, _) <- boundDeclarators main expression
+  select (all (referencedFrom name) (declaredIdentifiers expression))
+
   where
-    referenced :: Identifier -> Bool
-    referenced identifier = uses (named identifier) expression
+    referencedFrom :: Identifier -> Identifier -> Bool
+    referencedFrom main identifier = transitive main (uses (named identifier)) expression
