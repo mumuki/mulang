@@ -17,6 +17,7 @@ module Language.Mulang.Inspector.Generic.Smell (
   hasRedundantParameter,
   hasRedundantRepeat,
   hasTooManyMethods,
+  hasTypo,
   hasUnreachableCode,
   isLongCode,
   overridesEqualOrHashButNotBoth,
@@ -26,8 +27,11 @@ module Language.Mulang.Inspector.Generic.Smell (
 
 import           Language.Mulang.Ast
 import qualified Language.Mulang.Ast.Operator as O
-import           Language.Mulang.Generator (identifierReferences)
+import           Language.Mulang.Generator (identifierReferences, declaredIdentifiers)
 import           Language.Mulang.Inspector.Primitive
+
+import           Data.Text.Metrics (damerauLevenshtein)
+import           Data.Text (pack)
 
 -- | Inspection that tells whether an expression has expressions like 'x == True'
 hasRedundantBooleanComparison :: Inspection
@@ -210,3 +214,10 @@ hasUnreachableCode = containsExpression f
         hasCodeAfterReturn [_]          = False
         hasCodeAfterReturn (Return _:_) = True
         hasCodeAfterReturn (_:xs)       = hasCodeAfterReturn xs
+
+
+hasTypo :: Identifier -> Inspection
+hasTypo name expression = notElem name identifiers && any (similar name) identifiers
+  where
+      identifiers  = declaredIdentifiers expression
+      similar one other = damerauLevenshtein (pack one) (pack other) == 1

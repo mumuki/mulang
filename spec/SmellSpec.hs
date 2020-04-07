@@ -402,3 +402,22 @@ spec = do
 
     it "is False when if branch is not empty" $ do
       hasUnreachableCode (js "if(true) { j++; } else { i++; }") `shouldBe` False
+
+  describe "hasTypo" $ do
+    it "is False when the identifier has been declared" $ do
+      hasTypo "foo" (js "function foo() {}") `shouldBe` False
+
+    it "is False when the identifier has been declared even if there is a similar declaration" $ do
+      hasTypo "foo" (js "function foo() {}\nfunction Foo() {}") `shouldBe` False
+
+    it "is False when the identifier has not been declared but there is no other declaration" $ do
+      hasTypo "foobar" (js "function foo() {}") `shouldBe` False
+
+    it "is False when the identifier has not been declared but there is no similar declaration" $ do
+      hasTypo "foobar" (js "function foo() {}\nfunction bar() {}") `shouldBe` False
+
+    it "is True when the identifier has not been declared and there isa similar declaration" $ do
+      hasTypo "foo"  (js "function Foo() {}\nfunction bar() {}") `shouldBe` True
+      hasTypo "baar" (js "function Foo() {}\nfunction bar() {}") `shouldBe` True
+      hasTypo "br"   (js "function Foo() {}\nfunction bar() {}") `shouldBe` True
+      hasTypo "baz"  (js "function Foo() {}\nfunction bar() {}") `shouldBe` True
