@@ -8,11 +8,13 @@ import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage, Inspection, all
 import Data.List ((\\))
 import Data.Maybe (fromMaybe)
 
-analyseSmells :: Expression -> DomainLanguage -> Maybe SmellsSet -> [Expectation]
-analyseSmells ast language = concatMap (\smell -> detectSmell smell language ast) . smellsFor . fromMaybe (NoSmells Nothing)
+type SmellsContext = ([ExpectationResult], DomainLanguage)
 
-detectSmell :: Smell -> DomainLanguage -> Expression -> [Expectation]
-detectSmell smell language =  map (exectationFor smell) . detectionFor smell language
+analyseSmells :: Expression -> SmellsContext -> Maybe SmellsSet -> [Expectation]
+analyseSmells ast context = concatMap (\smell -> detectSmell smell context ast) . smellsFor . fromMaybe (NoSmells Nothing)
+
+detectSmell :: Smell -> SmellsContext -> Expression -> [Expectation]
+detectSmell smell context =  map (exectationFor smell) . detectionFor smell context
 
 smellsFor :: SmellsSet -> [Smell]
 smellsFor (NoSmells included)    = fromMaybe [] included
@@ -90,7 +92,7 @@ detectionFor "UsesUnificationOperator"         = simple usesUnificationOperator
 detectionFor "HasDeclarationTypos"             = const (detectDeclarationTypos "foo")
 detectionFor _                                 = unsupported
 
-type Detection = DomainLanguage -> Expression -> [Identifier]
+type Detection = SmellsContext -> Expression -> [Identifier]
 
 unsupported :: Detection
 unsupported _ _ = []
@@ -99,7 +101,7 @@ simple :: Inspection -> Detection
 simple inspection _ = locate' inspection
 
 withLanguage :: (DomainLanguage -> Inspection) -> Detection
-withLanguage inspection language = locate' (inspection language)
+withLanguage inspection context = locate' (inspection (snd context))
 
 exectationFor :: Smell -> Identifier -> Expectation
 exectationFor smell identifier = Expectation identifier smell

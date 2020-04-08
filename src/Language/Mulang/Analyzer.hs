@@ -28,10 +28,11 @@ analyse' (Analysis sample spec) = analyseSample . parseFragment $ sample
 
 analyseAst :: Expression -> AnalysisSpec -> IO AnalysisResult
 analyseAst ast spec = do
-  domaingLang <- compileDomainLanguage (domainLanguage spec)
+  domainLang <- compileDomainLanguage (domainLanguage spec)
   testResults <- analyseTests ast (testAnalysisType spec)
-  return $ AnalysisCompleted (analyseExpectations ast (expectations spec) ++ analyseCustomExpectations ast (customExpectations spec))
-                             (analyseSmells ast domaingLang (smellsSet spec))
+  let expectationResults = (analyseExpectations ast (expectations spec) ++ analyseCustomExpectations ast (customExpectations spec))
+  return $ AnalysisCompleted expectationResults
+                             (analyseSmells ast (expectationResults, domainLang) (smellsSet spec))
                              (analyseSignatures ast (signatureAnalysisType spec))
                              testResults
                              (analyzeIntermediateLanguage ast spec)
