@@ -87,9 +87,11 @@ detectionFor "ShouldUseOtherwise"              = simple shouldUseOtherwise
 detectionFor "UsesCut"                         = simple usesCut
 detectionFor "UsesFail"                        = simple usesFail
 detectionFor "UsesUnificationOperator"         = simple usesUnificationOperator
+detectionFor "HasDeclarationTypos"             = const (detectDeclarationTypos "foo")
 detectionFor _                                 = unsupported
 
 type Detection = DomainLanguage -> Expression -> [Identifier]
+
 unsupported :: Detection
 unsupported _ _ = []
 
