@@ -8,7 +8,7 @@ import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage, Inspection, all
 import Data.List ((\\))
 import Data.Maybe (fromMaybe)
 
-type SmellsContext = ([ExpectationResult], DomainLanguage)
+type SmellsContext = ([QueryResult], DomainLanguage)
 
 analyseSmells :: Expression -> SmellsContext -> Maybe SmellsSet -> [Expectation]
 analyseSmells ast context = concatMap (\smell -> detectSmell smell context ast) . smellsFor . fromMaybe (NoSmells Nothing)

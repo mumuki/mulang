@@ -30,9 +30,13 @@ analyseAst :: Expression -> AnalysisSpec -> IO AnalysisResult
 analyseAst ast spec = do
   domainLang <- compileDomainLanguage (domainLanguage spec)
   testResults <- analyseTests ast (testAnalysisType spec)
-  let expectationResults = (analyseExpectations ast (expectations spec) ++ analyseCustomExpectations ast (customExpectations spec))
+
+  let queryResults = (analyseExpectations ast (expectations spec) ++ analyseCustomExpectations ast (customExpectations spec))
+  let expectationResults = map snd queryResults
+  let context = (queryResults, domainLang)
+
   return $ AnalysisCompleted expectationResults
-                             (analyseSmells ast (expectationResults, domainLang) (smellsSet spec))
+                             (analyseSmells ast context (smellsSet spec))
                              (analyseSignatures ast (signatureAnalysisType spec))
                              testResults
                              (analyzeIntermediateLanguage ast spec)
