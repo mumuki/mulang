@@ -16,6 +16,21 @@ runWithTypos language content expectations = do
   return $ smells result
 
 spec = describe "SmellsAnalyzer" $ do
+  describe "using usage typos" $ do
+    it "works when there are missing usages and typos" $ do
+      runWithTypos JavaScript "baz()" [Expectation "*" "Uses:bar"] `shouldReturn` [Expectation "baz" "HasUsagesTypos:bar"]
+
+    it "works when there are missing usages and multiple potential typos" $ do
+      let typos = [ Expectation "Bar" "HasUsagesTypos:bar", Expectation "baz" "HasUsagesTypos:bar" ]
+
+      runWithTypos JavaScript "baz()\nBar() {}" [Expectation "*" "Uses:bar"] `shouldReturn` typos
+
+    it "works when there are missing usages but no typos" $ do
+      runWithTypos JavaScript "goo()" [Expectation "*" "Uses:bar"] `shouldReturn` []
+
+    it "works when there are no missing usages and potential typos" $ do
+        runWithTypos JavaScript "bar()\nbaz()\n" [Expectation "*" "Uses:bar"] `shouldReturn` []
+
   describe "using declaration typos" $ do
     it "works when there are missing declarations and typos" $ do
       runWithTypos JavaScript "function baz() {}" [Expectation "*" "Declares:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]

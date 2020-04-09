@@ -421,3 +421,22 @@ spec = do
       detectDeclarationTypos "bar"  (js "function Foo() {}\nfunction baar() {}") `shouldBe` ["baar"]
       detectDeclarationTypos "br"   (js "function Foo() {}\nfunction bar() {}") `shouldBe` ["bar"]
       detectDeclarationTypos "baz"  (js "function Foo() {}\nfunction bar() {}\nfunction baaz() {}") `shouldBe` ["baaz", "bar"]
+
+  describe "detectUsageTypos" $ do
+    it "is [] when the identifier has been used" $ do
+      detectUsageTypos "foo" (js "foo()") `shouldBe` []
+
+    it "is [] when the identifier has been used even if there is a similar declaration" $ do
+      detectUsageTypos "foo" (js "foo()\nFoo()") `shouldBe` []
+
+    it "is [] when the identifier has not been used but there is no other declaration" $ do
+      detectUsageTypos "foobar" (js "foo()") `shouldBe` []
+
+    it "is [] when the identifier has not been used but there is no similar declaration" $ do
+      detectUsageTypos "foobar" (js "foo()\nbar()") `shouldBe` []
+
+    it "is non empty when the identifier has not been used and there is a similar declaration" $ do
+      detectUsageTypos "foo"  (js "Foo()\nbar()") `shouldBe` ["Foo"]
+      detectUsageTypos "bar"  (js "Foo()\nbaar()") `shouldBe` ["baar"]
+      detectUsageTypos "br"   (js "Foo()\nbar()") `shouldBe` ["bar"]
+      detectUsageTypos "baz"  (js "Foo()\nbar()\nbaaz()") `shouldBe` ["baaz", "bar"]

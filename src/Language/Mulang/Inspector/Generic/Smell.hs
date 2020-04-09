@@ -18,6 +18,7 @@ module Language.Mulang.Inspector.Generic.Smell (
   hasRedundantRepeat,
   hasTooManyMethods,
   detectDeclarationTypos,
+  detectUsageTypos,
   hasUnreachableCode,
   isLongCode,
   overridesEqualOrHashButNotBoth,
@@ -219,6 +220,14 @@ hasUnreachableCode = containsExpression f
 detectDeclarationTypos :: Identifier -> Expression -> [Identifier]
 detectDeclarationTypos name expression | elem name identifiers = []
                                        | otherwise = filter (similar name) identifiers
+  where
+      identifiers  = declaredIdentifiers expression
+      similar one other = damerauLevenshtein (pack one) (pack other) == 1
+
+
+detectUsageTypos :: Identifier -> Expression -> [Identifier]
+detectUsageTypos name expression | elem name identifiers = []
+                                        | otherwise = filter (similar name) identifiers
   where
       identifiers  = declaredIdentifiers expression
       similar one other = damerauLevenshtein (pack one) (pack other) == 1
