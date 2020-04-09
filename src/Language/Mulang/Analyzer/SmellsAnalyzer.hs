@@ -1,12 +1,20 @@
+{-# LANGUAGE ViewPatterns #-}
+
 module Language.Mulang.Analyzer.SmellsAnalyzer (
   analyseSmells) where
 
-import Language.Mulang
-import Language.Mulang.Inspector.Generic.Smell
+import Language.Mulang.Ast (Expression, Identifier)
 import Language.Mulang.DomainLanguage
+import Language.Mulang.Inspector.Primitive
+import Language.Mulang.Inspector.Logic
+import Language.Mulang.Inspector.Generic.Smell
+import Language.Mulang.Inspector.Combiner (Location(..), locate)
+import Language.Mulang.Edl.Expectation (Query (..), CQuery (..), Matcher(..), Predicate(..))
+
 import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage, Inspection, allSmells)
+
 import Data.List ((\\))
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, mapMaybe)
 
 type SmellsContext = ([QueryResult], DomainLanguage)
 
@@ -89,7 +97,7 @@ detectionFor "ShouldUseOtherwise"              = simple shouldUseOtherwise
 detectionFor "UsesCut"                         = simple usesCut
 detectionFor "UsesFail"                        = simple usesFail
 detectionFor "UsesUnificationOperator"         = simple usesUnificationOperator
-detectionFor "HasDeclarationTypos"             = const (detectDeclarationTypos "foo")
+detectionFor "HasDeclarationTypos"             = failedDeclarations detectDeclarationTypos
 detectionFor _                                 = unsupported
 
 type Detection = SmellsContext -> Expression -> [Identifier]
@@ -102,6 +110,24 @@ simple inspection _ = locate' inspection
 
 withLanguage :: (DomainLanguage -> Inspection) -> Detection
 withLanguage inspection context = locate' (inspection (snd context))
+
+failedDeclarations :: (Identifier -> Expression -> [Identifier]) -> Detection
+failedDeclarations detection = undefined -- map (detection . missingDeclarations . fst
+-- failedDeclarations inspection context = filter (\x -> y) . fst $ context
+
+missingDeclarations :: [QueryResult] -> [Identifier]
+missingDeclarations = mapMaybe missingDeclaration
+  where
+    missingDeclaration (inspection -> Just ("Declares", name), (ExpectationResult _ False)) = Just name
+    missingDeclaration _                                                                    = Nothing
+
+    inspection (cQuery -> Just (Inspection name (Named arg) Unmatching)) = Just (name, arg)
+    inspection _                                                         = Nothing
+
+    cQuery (Decontextualize q) = Just q
+    cQuery (Within _ q)        = Just q
+    cQuery (Through _ q)       = Just q
+    cQuery _                   = Nothing
 
 exectationFor :: Smell -> Identifier -> Expectation
 exectationFor smell identifier = Expectation identifier smell
