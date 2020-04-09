@@ -439,4 +439,4 @@ spec = do
       detectUsageTypos "foo"  (js "Foo()\nbar()") `shouldBe` ["Foo"]
       detectUsageTypos "bar"  (js "Foo()\nbaar()") `shouldBe` ["baar"]
       detectUsageTypos "br"   (js "Foo()\nbar()") `shouldBe` ["bar"]
-      detectUsageTypos "baz"  (js "Foo()\nbar()\nbaaz()") `shouldBe` ["baaz", "bar"]
+      detectUsageTypos "baz"  (js "Foo()\nbar()\nbaaz()") `shouldBe` ["bar", "baaz"]

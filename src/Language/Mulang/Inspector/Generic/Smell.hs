@@ -28,7 +28,7 @@ module Language.Mulang.Inspector.Generic.Smell (
 
 import           Language.Mulang.Ast
 import qualified Language.Mulang.Ast.Operator as O
-import           Language.Mulang.Generator (identifierReferences, declaredIdentifiers)
+import           Language.Mulang.Generator (identifierReferences, declaredIdentifiers, referencedIdentifiers)
 import           Language.Mulang.Inspector.Primitive
 
 import           Data.Text.Metrics (damerauLevenshtein)
@@ -227,7 +227,7 @@ detectDeclarationTypos name expression | elem name identifiers = []
 
 detectUsageTypos :: Identifier -> Expression -> [Identifier]
 detectUsageTypos name expression | elem name identifiers = []
-                                        | otherwise = filter (similar name) identifiers
+                                 | otherwise = filter (similar name) identifiers
   where
-      identifiers  = declaredIdentifiers expression
+      identifiers  = referencedIdentifiers expression
       similar one other = damerauLevenshtein (pack one) (pack other) == 1
