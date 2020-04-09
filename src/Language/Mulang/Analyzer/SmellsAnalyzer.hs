@@ -90,25 +90,23 @@ instantiateSmell :: SmellsContext -> Smell -> [SmellInstance]
 instantiateSmell context smell = map (smell,) . targetsFor $ smell
   where
     targetsFor :: Smell -> [Maybe Identifier]
-    targetsFor "HasDeclarationTypos" = map Just . missingDeclarations . fst $ context
-    targetsFor "HasUsageTypos"       = map Just . missingUsages . fst $ context
+    targetsFor "HasDeclarationTypos" = justTargets missingDeclaration
+    targetsFor "HasUsageTypos"       = justTargets missingUsage
     targetsFor _                     = [Nothing]
 
-missingDeclarations :: [QueryResult] -> [Identifier]
-missingDeclarations = mapMaybe missingDeclaration
-  where
+    justTargets f = map Just . mapMaybe f . fst $ context
+
+    missingDeclaration :: QueryResult -> Maybe Identifier
     missingDeclaration (failedQuery -> Just (name, target)) | isDeclaration name = Just target
     missingDeclaration _                                    = Nothing
+
+    missingUsage :: QueryResult -> Maybe Identifier
+    missingUsage (failedQuery -> Just ("Uses", target)) = Just target
+    missingUsage _                                      = Nothing
 
     isDeclaration "Delegates"                  = True
     isDeclaration "SubordinatesDeclarationsTo" = True
     isDeclaration name                         = isPrefixOf "Declares" name
-
-missingUsages :: [QueryResult] -> [Identifier]
-missingUsages = mapMaybe missingUsage
-  where
-    missingUsage (failedQuery -> Just ("Uses", target)) = Just target
-    missingUsage _                                      = Nothing
 
 failedQuery :: QueryResult -> Maybe (String, Identifier)
 failedQuery (plainInspection -> Just (name, target), (ExpectationResult _ False)) = Just (name, target)
