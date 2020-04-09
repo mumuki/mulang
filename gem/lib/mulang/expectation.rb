@@ -7,6 +7,7 @@ module Mulang::Expectation
     DoesTypeTest
     HasAssignmentReturn
     HasCodeDuplication
+    HasDeclarationTypos
     HasEmptyIfBranches
     HasEmptyRepeat
     HasLongParameterList
@@ -24,6 +25,7 @@ module Mulang::Expectation
     HasTooShortBindings
     HasTooShortIdentifiers
     HasUnreachableCode
+    HasUsageTypos
     HasWrongCaseBinding
     HasWrongCaseIdentifiers
     IsLongCode
@@ -31,6 +33,7 @@ module Mulang::Expectation
     ReturnsNil
     ReturnsNull
     ShouldInvertIfCondition
+    ShouldUseOtherwise
     UsesCut
     UsesFail
     UsesUnificationOperator)
