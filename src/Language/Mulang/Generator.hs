@@ -1,5 +1,6 @@
 module Language.Mulang.Generator (
   boundDeclarations,
+  boundDeclarators,
   declarators,
   declarations,
   declarationsOf,
@@ -53,7 +54,12 @@ declarations = map snd . declarators
 -- | Returns all declarations bound to the given identifier predicate
 -- |
 boundDeclarations :: IdentifierPredicate -> Generator Expression
-boundDeclarations f = map snd . filter (f.fst) . declarators
+boundDeclarations f = map snd . boundDeclarators f
+
+-- | Returns all declarators bound to the given identifier predicate
+-- |
+boundDeclarators :: IdentifierPredicate -> Generator Declarator
+boundDeclarators f = filter (f.fst) . declarators
 
 -- | Returns the given expression and all its subexpressions
 -- For example: in 'f x = x + 1', it returns 'f x = x + 1', 'x + 1', 'x' and '1'

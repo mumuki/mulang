@@ -1,20 +1,20 @@
 module Language.Mulang.Inspector.Procedural (
   countProcedures,
-  countWhiles,
   countForLoops,
-  usesRepeat,
   countRepeats,
-  usesRepeatMatching,
-  usesWhile,
-  usesWhileMatching,
-  usesSwitch,
+  countWhiles,
+  declaresProcedure,
+  declaresProcedureMatching,
   usesForEach,
   usesForEachMatching,
   usesForLoop,
   usesForLoopMatching,
   usesLoop,
-  declaresProcedure,
-  declaresProcedureMatching) where
+  usesRepeat,
+  usesRepeatMatching,
+  usesSwitch,
+  usesWhile,
+  usesWhileMatching) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (equationsExpandedExpressions, statementsExpressions)
@@ -90,3 +90,4 @@ countForLoops matcher = countExpressions f
 
 usesLoop :: Inspection
 usesLoop e = usesRepeat e || usesWhile e || usesForLoop e || usesForEach e
+  

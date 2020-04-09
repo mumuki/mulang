@@ -1,6 +1,7 @@
 module Mulang::Expectation::I18n
   class << self
     DEFAULT_KEYWORDS = {
+      keyword_entry_point: :program,
       keyword_fail: :fail,
       keyword_false: :false,
       keyword_findall: :findall,

@@ -25,6 +25,8 @@ module Language.Mulang.Inspector.Generic (
   raises,
   rescues,
   returnsMatching,
+  subordinatesDeclarationsTo,
+  subordinatesDeclarationsToEntryPoint,
   uses,
   usesAnonymousVariable,
   usesLogic,
@@ -42,7 +44,7 @@ module Language.Mulang.Inspector.Generic (
 
 import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
-import Language.Mulang.Generator (declaredIdentifiers, expressions, declarations, referencedIdentifiers, equationsExpandedExpressions)
+import Language.Mulang.Generator (Generator, declaredIdentifiers, expressions, declarations, referencedIdentifiers, equationsExpandedExpressions, declarators, boundDeclarators)
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Bound (uncounting, containsBoundDeclaration, countBoundDeclarations, BoundInspection, BoundCounter)
 import Language.Mulang.Inspector.Contextualized (decontextualize, ContextualizedBoundInspection)
@@ -50,6 +52,7 @@ import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Inspector.Matcher (unmatching, matches, Matcher)
 import Language.Mulang.Inspector.Query (inspect, select)
 import Language.Mulang.Inspector.Literal (isMath, isLogic)
+import Language.Mulang.Inspector.Combiner (transitive)
 
 import Data.Maybe (listToMaybe)
 import Data.List.Extra (has)
@@ -252,3 +255,22 @@ usesAnonymousVariable = containsExpression f
         isOrContainsWildcard (AsPattern _ p)                   = isOrContainsWildcard p
         isOrContainsWildcard WildcardPattern                   = True
         isOrContainsWildcard _                                 = False
+
+subordinatesDeclarationsTo :: BoundInspection
+subordinatesDeclarationsTo main expression = inspect $ do
+  (name, _) <- boundDeclarators main expression
+  select (allDeclarationsReferencesFrom name expression)
+
+subordinatesDeclarationsToEntryPoint :: Inspection
+subordinatesDeclarationsToEntryPoint expression = inspect $ do
+  (name, EntryPoint _ _) <- declarators expression
+  select (allDeclarationsReferencesFrom name expression)
+
+allDeclarationsReferencesFrom :: Identifier -> Inspection
+allDeclarationsReferencesFrom name expression = all (referencedFrom name) (otherDeclaredIdentifiers name expression)
+  where
+    otherDeclaredIdentifiers :: Identifier -> Generator Identifier
+    otherDeclaredIdentifiers name = filter (/=name) . declaredIdentifiers
+
+    referencedFrom :: Identifier -> Identifier -> Bool
+    referencedFrom main identifier = transitive main (uses (named identifier)) expression
