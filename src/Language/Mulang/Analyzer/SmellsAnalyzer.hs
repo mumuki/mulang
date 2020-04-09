@@ -9,7 +9,7 @@ import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Inspector.Logic
 import Language.Mulang.Inspector.Generic.Smell
 import Language.Mulang.Inspector.Combiner (Location(..), locate)
-import Language.Mulang.Edl.Expectation (cQuery, CQuery (..), Matcher(..), Predicate(..))
+import Language.Mulang.Edl.Expectation (cQuery, Query(..), CQuery (..), Matcher(..), Predicate(..))
 
 import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage, Inspection, allSmells)
 
@@ -38,28 +38,9 @@ type Detection = SmellsContext -> Expression -> [Identifier]
 analyseSmells :: Expression -> SmellsContext -> Maybe SmellsSet -> [Expectation]
 analyseSmells ast context = concatMap (evalSmellInstance context ast) . concatMap (instantiateSmell context) . smellsFor
 
-instantiateSmell :: SmellsContext -> Smell -> [SmellInstance]
-instantiateSmell context smell = map (smell,) . targetsFor $ smell
-  where
-    targetsFor :: Smell -> [Maybe Identifier]
-    targetsFor "HasDeclarationTypos" = map Just . missingDeclarations . fst $ context
-    targetsFor _                     = [Nothing]
-
-missingDeclarations :: [QueryResult] -> [Identifier]
-missingDeclarations = mapMaybe missingDeclaration
-  where
-    missingDeclaration (inspection -> Just (name, target), (ExpectationResult _ False)) | isDeclaration name = Just target
-    missingDeclaration _                                                                = Nothing
-
-    inspection (cQuery -> Just (Inspection name (Named arg) Unmatching)) = Just (name, arg)
-    inspection _                                                         = Nothing
-
-    isDeclaration "Delegates"                  = True
-    isDeclaration "SubordinatesDeclarationsTo" = True
-    isDeclaration name                         = isPrefixOf "Declares" name
-
-evalSmellInstance :: SmellsContext -> Expression -> SmellInstance -> [Expectation]
-evalSmellInstance context expression smellInstance =  map (exectationFor smellInstance) . detectionFor smellInstance context $ expression
+---
+--- Selection
+---
 
 smellsFor :: Maybe SmellsSet -> [Smell]
 smellsFor (Just (NoSmells included))    = intersect allSmells (fromMaybe [] included)
@@ -90,6 +71,7 @@ allSmells = [
   "HasTooManyMethods",
   "HasTooShortIdentifiers",
   "HasUnreachableCode",
+  "HasUsageTypos",
   "HasWrongCaseIdentifiers",
   "IsLongCode",
   "OverridesEqualOrHashButNotBoth",
@@ -99,6 +81,49 @@ allSmells = [
   "UsesCut",
   "UsesFail",
   "UsesUnificationOperator" ]
+
+---
+--- Instantiation
+---
+
+instantiateSmell :: SmellsContext -> Smell -> [SmellInstance]
+instantiateSmell context smell = map (smell,) . targetsFor $ smell
+  where
+    targetsFor :: Smell -> [Maybe Identifier]
+    targetsFor "HasDeclarationTypos" = map Just . missingDeclarations . fst $ context
+    targetsFor "HasUsageTypos"       = map Just . missingUsages . fst $ context
+    targetsFor _                     = [Nothing]
+
+missingDeclarations :: [QueryResult] -> [Identifier]
+missingDeclarations = mapMaybe missingDeclaration
+  where
+    missingDeclaration (failedQuery -> Just (name, target)) | isDeclaration name = Just target
+    missingDeclaration _                                    = Nothing
+
+    isDeclaration "Delegates"                  = True
+    isDeclaration "SubordinatesDeclarationsTo" = True
+    isDeclaration name                         = isPrefixOf "Declares" name
+
+missingUsages :: [QueryResult] -> [Identifier]
+missingUsages = mapMaybe missingUsage
+  where
+    missingUsage (failedQuery -> Just ("Uses", target)) = Just target
+    missingUsage _                                      = Nothing
+
+failedQuery :: QueryResult -> Maybe (String, Identifier)
+failedQuery (plainInspection -> Just (name, target), (ExpectationResult _ False)) = Just (name, target)
+failedQuery _                                                                     = Nothing
+
+plainInspection :: Query -> Maybe (String, Identifier)
+plainInspection (cQuery -> Just (Inspection name (Named arg) Unmatching)) = Just (name, arg)
+plainInspection _                                                         = Nothing
+
+---
+--- Evaluation
+---
+
+evalSmellInstance :: SmellsContext -> Expression -> SmellInstance -> [Expectation]
+evalSmellInstance context expression smellInstance =  map (exectationFor smellInstance) . detectionFor smellInstance context $ expression
 
 detectionFor :: SmellInstance -> Detection
 detectionFor ("DiscardsExceptions", Nothing)              = simple discardsExceptions
@@ -126,13 +151,14 @@ detectionFor ("HasTooManyMethods", Nothing)               = simple hasTooManyMet
 detectionFor ("HasTooShortBindings", Nothing)             = withLanguage hasTooShortIdentifiers
 detectionFor ("HasTooShortIdentifiers", Nothing)          = withLanguage hasTooShortIdentifiers
 detectionFor ("HasUnreachableCode", Nothing)              = simple hasUnreachableCode
+detectionFor ("HasUsageTypos", Just target)               = raw (detectUsageTypos target)
 detectionFor ("HasWrongCaseBinding", Nothing)             = withLanguage hasWrongCaseIdentifiers
 detectionFor ("HasWrongCaseIdentifiers", Nothing)         = withLanguage hasWrongCaseIdentifiers
 detectionFor ("IsLongCode", Nothing)                      = unsupported
 detectionFor ("OverridesEqualOrHashButNotBoth", Nothing)  = simple overridesEqualOrHashButNotBoth
-detectionFor ("ShouldInvertIfCondition", Nothing)         = simple shouldInvertIfCondition
 detectionFor ("ReturnsNil", Nothing)                      = simple returnsNil
 detectionFor ("ReturnsNull", Nothing)                     = simple returnsNil
+detectionFor ("ShouldInvertIfCondition", Nothing)         = simple shouldInvertIfCondition
 detectionFor ("ShouldUseOtherwise", Nothing)              = simple shouldUseOtherwise
 detectionFor ("UsesCut", Nothing)                         = simple usesCut
 detectionFor ("UsesFail", Nothing)                        = simple usesFail
