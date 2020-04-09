@@ -1,12 +1,39 @@
 module Mulang::Expectation
-  SMELLS = %w(DiscardsExceptions DoesConsolePrint DoesNilTest DoesNullTest DoesTypeTest
-              HasAssignmentReturn HasCodeDuplication HasEmptyIfBranches HasEmptyRepeat HasRedundantRepeat HasLongParameterList
-              HasMisspelledBindings HasMisspelledIdentifiers
-              HasRedundantBooleanComparison HasRedundantGuards HasRedundantIf
-              HasRedundantLambda HasRedundantLocalVariableReturn HasRedundantParameter
-              HasRedundantReduction HasTooManyMethods HasTooShortBindings HasTooShortIdentifiers HasUnreachableCode
-              HasWrongCaseBinding HasWrongCaseIdentifiers IsLongCode OverridesEqualOrHashButNotBoth
-              ReturnsNil ReturnsNull ShouldInvertIfCondition UsesCut UsesFail UsesUnificationOperator)
+  SMELLS = %w(
+    DiscardsExceptions
+    DoesConsolePrint
+    DoesNilTest
+    DoesNullTest
+    DoesTypeTest
+    HasAssignmentReturn
+    HasCodeDuplication
+    HasEmptyIfBranches
+    HasEmptyRepeat
+    HasLongParameterList
+    HasMisspelledBindings
+    HasMisspelledIdentifiers
+    HasRedundantBooleanComparison
+    HasRedundantGuards
+    HasRedundantIf
+    HasRedundantLambda
+    HasRedundantLocalVariableReturn
+    HasRedundantParameter
+    HasRedundantReduction
+    HasRedundantRepeat
+    HasTooManyMethods
+    HasTooShortBindings
+    HasTooShortIdentifiers
+    HasUnreachableCode
+    HasWrongCaseBinding
+    HasWrongCaseIdentifiers
+    IsLongCode
+    OverridesEqualOrHashButNotBoth
+    ReturnsNil
+    ReturnsNull
+    ShouldInvertIfCondition
+    UsesCut
+    UsesFail
+    UsesUnificationOperator)
 
   def self.guess_type(expectation)
     if expectation[:binding] == '<<custom>>'
