@@ -13,7 +13,7 @@ import Language.Mulang.Edl.Expectation (cQuery, CQuery (..), Matcher(..), Predic
 
 import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage, Inspection, allSmells)
 
-import Data.List ((\\), intersect)
+import Data.List ((\\), intersect, isPrefixOf)
 import Data.Maybe (fromMaybe, mapMaybe)
 
 -- the runtime context of a smell analysis,
@@ -48,11 +48,15 @@ instantiateSmell context smell = map (smell,) . targetsFor $ smell
 missingDeclarations :: [QueryResult] -> [Identifier]
 missingDeclarations = mapMaybe missingDeclaration
   where
-    missingDeclaration (inspection -> Just ("Declares", name), (ExpectationResult _ False)) = Just name
-    missingDeclaration _                                                                    = Nothing
+    missingDeclaration (inspection -> Just (name, target), (ExpectationResult _ False)) | isDeclaration name = Just target
+    missingDeclaration _                                                                = Nothing
 
     inspection (cQuery -> Just (Inspection name (Named arg) Unmatching)) = Just (name, arg)
     inspection _                                                         = Nothing
+
+    isDeclaration "Delegates"                  = True
+    isDeclaration "SubordinatesDeclarationsTo" = True
+    isDeclaration name                         = isPrefixOf "Declares" name
 
 evalSmellInstance :: SmellsContext -> Expression -> SmellInstance -> [Expectation]
 evalSmellInstance context expression smellInstance =  map (exectationFor smellInstance) . detectionFor smellInstance context $ expression

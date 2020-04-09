@@ -416,7 +416,7 @@ spec = do
     it "is [] when the identifier has not been declared but there is no similar declaration" $ do
       detectDeclarationTypos "foobar" (js "function foo() {}\nfunction bar() {}") `shouldBe` []
 
-    it "is non empty when the identifier has not been declared and there isa similar declaration" $ do
+    it "is non empty when the identifier has not been declared and there is a similar declaration" $ do
       detectDeclarationTypos "foo"  (js "function Foo() {}\nfunction bar() {}") `shouldBe` ["Foo"]
       detectDeclarationTypos "bar"  (js "function Foo() {}\nfunction baar() {}") `shouldBe` ["baar"]
       detectDeclarationTypos "br"   (js "function Foo() {}\nfunction bar() {}") `shouldBe` ["bar"]
