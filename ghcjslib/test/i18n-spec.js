@@ -67,4 +67,9 @@ describe('en', () => {
   it('Not:Uses:baz', () => should(mulang.I18n.translate('foo', 'Not:Uses:baz')).eql('<strong>foo</strong> must not use <strong>baz</strong>'));
   it('Not:UsesLambda', () => should(mulang.I18n.translate('foo', 'Not:UsesLambda')).eql('<strong>foo</strong> must not use lambda expressions'));
   it('UsesStaticPolymorphism', () => should(mulang.I18n.translate('*', 'UsesStaticPolymorphism')).eql('solution must use polymorphism'));
+
+  it('HasDeclarationTypos:foo', () =>
+    should(mulang.I18n.translate('Foo', 'HasDeclarationTypos:foo')).eql('Solution must declare <strong>foo</strong>, but declares <strong>Foo</strong>. May you have made a typo?'));
+  it('HasUsageTypos:foo', () =>
+    should(mulang.I18n.translate('Foo', 'HasUsageTypos:foo')).eql('Solution must use <strong>foo</strong>, but it uses <strong>Foo</strong>. May you have made a typo?'));
 });

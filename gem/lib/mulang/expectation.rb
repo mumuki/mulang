@@ -49,7 +49,7 @@ module Mulang::Expectation
   end
 
   def self.has_smell?(smell)
-    SMELLS.include? smell
+    SMELLS.include? smell.split(':').first
   end
 
   def self.parse(expectation)
