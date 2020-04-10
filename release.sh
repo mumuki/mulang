@@ -11,6 +11,11 @@ if [[ ! $NEW_VERSION =~ $FULL_VERSION_REGEXP ]]; then
   exit 1
 fi
 
+if [[ -z $CHANGELOG_GITHUB_TOKEN ]]; then
+  echo "Please set your CHANGELOG_GITHUB_TOKEN env variable first"
+  exit 1
+fi
+
 echo "[Mulang] Updating version..."
 sed -i -r "s/version:             ${VERSION_REGEXP}/version:             ${NEW_VERSION}/" mulang.cabal
 sed -i -r "s/version = \"${VERSION_REGEXP}\"/version = \"${NEW_VERSION}\"/"               app/Version.hs
@@ -45,5 +50,12 @@ git tag "v${NEW_VERSION}"
 
 echo "[Mulang] Pushing to github..."
 git push origin HEAD --tags
+
+echo "[Mulang] Updating CHANGELOG.md..."
+github_changelog_generator --user mumuki --project mulang --token $CHANGELOG_GITHUB_TOKEN
+git commit CHANGELOG.md -m "Updating CHANGELOG.md"
+
+echo "[Mulang] Pushing CHANGELOG.md..."
+git push origin HEAD
 
 echo "[Mulang] Pushed. Travis will deploy mulang binaries and gem"
