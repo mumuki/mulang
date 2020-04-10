@@ -182,6 +182,22 @@ const examples = {
       }
     }
   },
+  "typosSmells": {
+    "sample": {
+      "tag": "CodeSample",
+      "language": "JavaScript",
+      "content": "function pls(x, y) { return x + y; }"
+    },
+    "spec": {
+      "expectations": [
+        { "binding": "*", "inspection": "Declares:plus" }
+      ],
+      "smellsSet": {
+        "tag": "NoSmells",
+        "include": [ "HasDeclarationTypos" ]
+      }
+    }
+  },
   "intermediate": {
     "sample" : {
        "tag" : "CodeSample",

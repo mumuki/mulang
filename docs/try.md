@@ -17,6 +17,7 @@
   <option value="smellInclusion">With smell analysis, by inclusion</option>
   <option value="smellExclusion">With smell analysis, by exclusion</option>
   <option value="expressiveness">With expressiveness smells</option>
+  <option value="typosSmells">With typos smells</option>
   <option value="intermediate">With intermediate language generation</option>
   <option value="testRunning">With test running</option>
 </select>

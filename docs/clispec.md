@@ -389,6 +389,54 @@ $ mulang  '
 }
 ```
 
+### With typos smells
+
+Smell typos are special since they interact with some expectations:
+
+* `HasDeclarationTypos` is a smell that will be activated after a `Declares` - or any similar expectation like `DecaresProcedure` or `Delegates` - expectation is set.
+* `HasUsageTypos` will be activated after a `Uses` expectation is set.
+
+```bash
+mulang '
+{
+  "sample": {
+    "tag": "CodeSample",
+    "language": "JavaScript",
+    "content": "function pls(x, y) { return x + y; }"
+  },
+  "spec": {
+    "expectations": [
+      { "binding": "*", "inspection": "Declares:plus" }
+    ],
+    "smellsSet": {
+      "tag": "NoSmells",
+      "include": [ "HasDeclarationTypos" ]
+    }
+  }
+}
+' | json_pp
+{
+   "intermediateLanguage" : null,
+   "tag" : "AnalysisCompleted",
+   "expectationResults" : [
+      {
+         "expectation" : {
+            "inspection" : "Declares:plus",
+            "binding" : "*"
+         },
+         "result" : false
+      }
+   ],
+   "smells" : [
+      {
+         "inspection" : "HasDeclarationTypos:plus",
+         "binding" : "pls"
+      }
+   ],
+   "testResults" : [],
+   "signatures" : []
+}
+```
 
 
 ### With intermediate language generation
