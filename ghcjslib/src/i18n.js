@@ -236,7 +236,7 @@
       HasTooShortBindings: (binding, must, target, keyword) => `${binding} is too short an identifier`,
       HasTooShortIdentifiers: (binding, must, target, keyword) => `${binding} is too short an identifier`,
       HasUnreachableCode: (binding, must, target, keyword) => `${binding} has unreachable code`,
-      HasUsageTypos_named: (binding, must, target, keyword) => `'Solution must use ${target}, but it uses ${binding}. May you have made a typo?`,
+      HasUsageTypos_named: (binding, must, target, keyword) => `Solution must use ${target}, but it uses ${binding}. May you have made a typo?`,
       HasWrongCaseBindings: (binding, must, target, keyword) => `${binding} does not honor case conventions`,
       HasWrongCaseIdentifiers: (binding, must, target, keyword) => `${binding} does not honor case conventions`,
       Implements_named: (binding, must, target, keyword) => `${binding} ${must} implement ${target}`,
