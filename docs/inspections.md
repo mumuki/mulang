@@ -1,6 +1,6 @@
 # Supported inspections
 
-The power of Mulang is grounded on more than 90 different kind of inspections
+The power of Mulang is grounded on more than 100 different kind of inspections
 
 ## Generic Inspections
 

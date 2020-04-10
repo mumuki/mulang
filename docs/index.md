@@ -135,7 +135,7 @@ Does it declare an attribute like `eight`?
 > code.expect "DeclaresAttribute:~eight"
 => true
 ```
-> Notice: like in Mulang means that it contains that case-insensitive substring
+> Notice: `like` in Mulang means that it contains that case-insensitive substring
 
 Finally, does `aBird` declares an attribute that is not named `weight`?
 
