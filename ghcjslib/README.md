@@ -52,10 +52,32 @@ code.ast
 ```javascript
 const code = mulang.nativeCode("Python", "x = 1");
 
-code.analyse({expectations: [{binding: '*', inspection: 'Declares'}, {binding: '*', inspection: 'Assigns'}]}).expectationResults
+const result = code.analyse({expectations: [{binding: '*', inspection: 'Declares'}, {binding: '*', inspection: 'Assigns'}]})
+
+result.expectationResults
 // => [
 //  { expectation: { binding: '*', inspection: 'Declares' }, result: false },
 //  { expectation: { binding: '*', inspection: 'Assigns' },  result: true }
+//]
+```
+
+You can also compute code smells:
+
+```javascript
+const code = mulang.nativeCode("Python", "def increment():\n\tx += 1");
+
+const result = code.analyse({
+                expectations: [ {binding: '*', inspection: 'DeclaresProcedure:Increment'} ],
+                smellsSet: { tag: 'AllSmells' }})
+
+result.expectationResults
+// => [
+//  { expectation: { binding: '*', inspection: 'DeclaresProcedure:Increment' }, result: false }
+// ]
+
+result.smells
+// => [
+//  { binding: 'increment', inspection: 'HasDeclarationTypos:Increment' }
 //]
 ```
 
