@@ -37,6 +37,7 @@ If you want to use it with a different language, you will have to:
 
 > The following section uses the [ruby interface](https://rubygems.org/gems/mulang) for demonstration purposes.
 > However, you also can run all the examples either using the [comand line tool](./clispec/), or the [javascript](https://www.npmjs.com/package/mulang) interface.
+> The javascript version is also available as [a ruby gem](https://rubygems.org/gems/mulangjs), suitable for Rails integration
 
 Better than explaining what Mulang is, let's see what it can do for you.
 

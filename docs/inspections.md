@@ -22,13 +22,15 @@ The power of Mulang is grounded on more than 90 different kind of inspections
 | `DeclaresTypeAlias`               | is a given type synonym declared?
 | `DeclaresTypeSignature`           | is a given computation type signature declared?
 | `DeclaresVariable`                | is a given local or global variable declared?
-| `Delegates`                       | is a method, function or procedure declared AND called?
+| `Delegates`                       | is a non-empty method, function or procedure declared *and* called?
 | `DiscardsExceptions`              | are exceptions discarded within an empty catch block?
 | `DoesConsolePrint`                | is there any console-print-statement like `System.out.println`, `puts` or `console.log`?
 | `DoesTypeTest`                    |
 | `HasAssignmentReturn`             |
 | `HasCodeDuplication`              | has the given code simple literal code duplication?
-| `HasEmptyIfBranches`              | has the given code an empty if branch?
+| `HasDeclarationTypos`             | is an identifier *not* declared but a very similar one declared instead?
+| `HasEmptyIfBranches`              | has the given code an empty `if` branch?
+| `HasEmptyRepeat`                  | has the given code a `repeat` with empty body?
 | `HasLongParameterList`            | does a given method/function/predicate take too many parameters?
 | `HasMisspelledIdentifiers`        | an identifier is not a domain language dictionary's word and not part of its jargon
 | `HasRedundantBooleanComparison`   |
@@ -37,10 +39,14 @@ The power of Mulang is grounded on more than 90 different kind of inspections
 | `HasRedundantRepeat`              | has the given code an unnecesary - 1 iteration - `repeat` statement?
 | `HasTooShortIdentifiers`          | whether an identifier is too short and not part of domain language's jargon
 | `HasUnreachableCode`              | is there unreachable code?
+| `HasUsageTypos`                   | is an identifier *not* called but a very similar one called instead?
 | `HasWrongCaseIdentifiers`         | whether an identifier does not match the domain language's case style
 | `IsLongCode`                      | has the code long sequences of statements?
 | `Raises`                          | is the given _exception type_ raised?
 | `Rescues`                         | is the given _exception type_ rescued?
+| `ShouldInvertIfCondition`         | has the given code an `if` with an empty `then` but a non-empty `else`?
+| `SubordinatesDeclarationsTo`      | are all the declarations in the code called from the given declaration?
+| `SubordinatesDeclarationsToEntryPoint` | are all the declarations in the code called from an entry point?
 | `TypesAs`                         | is the given type used to type a variable?
 | `TypesParameterAs`                | is a parameter typed as a given type?
 | `TypesReturnAs`                   | is the given type used to type a return?
