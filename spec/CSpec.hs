@@ -14,7 +14,7 @@ run :: Text -> Expression
 run = c . unpack
 
 cContext :: Expression -> Expression
-cContext expr = Sequence [SubroutineSignature "main" [] "int" [], SimpleFunction "main" [] (Sequence [expr])]
+cContext expr = Sequence [SubroutineSignature "main" [] "int" [], SimpleFunction "main" [] expr]
 
 spec :: Spec
 spec = do
@@ -78,3 +78,30 @@ spec = do
 
       it "parses references" $ do
         run "int main () { a; }" `shouldBe` cContext (Reference "a")
+
+      it "parses if" $ do
+        run [text|
+          int main () {
+            if(1) {
+              2;
+            } else {
+              3;
+            }
+          }
+          |] `shouldBe` cContext (If (MuNumber 1) (MuNumber 2) (MuNumber 3))
+
+      it "parses for" $ do
+        run [text|
+          int main () {
+            for(i; i; i) {
+              i;
+            }
+          }
+          |] `shouldBe` cContext (ForLoop (Reference "i") (Reference "i") (Reference "i") (Reference "i"))
+
+      it "parses return" $ do
+        run [text|
+          int main () {
+            return 123;
+          }
+          |] `shouldBe` cContext (Return (MuNumber 123))
