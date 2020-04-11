@@ -130,23 +130,27 @@ muCDecl :: CDecl -> String
 muCDecl (CDecl _ [(maybeDeclarator, _, _)] _) = muMaybeTypeDeclarator maybeDeclarator
 
 muStatement :: CStat -> Expression
-muStatement (CCompound _ sentences _) = Sequence $ map muCompoundBlockItem sentences
-muStatement (CExpr maybeExpression _) = fmapOrNone muExpression maybeExpression
-muStatement a = debug a
+muStatement (CCompound _ sentences _)                           = compactMap muCompoundBlockItem sentences
+muStatement (CExpr maybeExpression _)                           = fmapOrNone muExpression maybeExpression
+muStatement (CIf condition trueBranch maybeFalseBranch _)       = If (muExpression condition) (muStatement trueBranch) (fmapOrNone muStatement maybeFalseBranch)
+muStatement (CFor forInitValue maybeCondition maybeAcum body _) = ForLoop (muForInitValue forInitValue) (fmapOrNone muExpression maybeCondition) (fmapOrNone muExpression maybeAcum) (muStatement body)
+muStatement (CReturn maybeExpression _)                         = Return $ fmapOrNone muExpression maybeExpression
+muStatement a                                                   = debug a
 --muStatement CLabel Ident (CStatement a) [CAttribute a] a
 --muStatement CCase (CExpression a) (CStatement a) a
 --muStatement CCases (CExpression a) (CExpression a) (CStatement a) a
 --muStatement CDefault (CStatement a) a
---muStatement CIf (CExpression a) (CStatement a) (Maybe (CStatement a)) a
 --muStatement CSwitch (CExpression a) (CStatement a) a
 --muStatement CWhile (CExpression a) (CStatement a) Bool a
---muStatement CFor (Either (Maybe (CExpression a)) (CDeclaration a)) (Maybe (CExpression a)) (Maybe (CExpression a)) (CStatement a) a
 --muStatement CGoto Ident a
 --muStatement CGotoPtr (CExpression a) a
 --muStatement CCont a
 --muStatement CBreak a
---muStatement CReturn (Maybe (CExpression a)) a
 --muStatement CAsm (CAssemblyStatement a) a
+
+muForInitValue :: Either (Maybe CExpr) CDecl -> Expression
+muForInitValue (Left maybeExpression) = fmapOrNone muExpression maybeExpression
+muForInitValue (Right declaration)    = muDeclaration declaration
 
 muCompoundBlockItem :: CBlockItem -> Expression
 muCompoundBlockItem (CBlockStmt statement) = muStatement statement
