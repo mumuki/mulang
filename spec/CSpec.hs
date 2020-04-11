@@ -13,29 +13,68 @@ import           NeatInterpolation (text)
 run :: Text -> Expression
 run = c . unpack
 
+cContext :: Expression -> Expression
+cContext expr = Sequence [SubroutineSignature "main" [] "int" [], SimpleFunction "main" [] (Sequence [expr])]
+
 spec :: Spec
 spec = do
   describe "parse" $ do
-    it "parses var declaration" $ do
-      run "int a;" `shouldBe` Sequence [
-          TypeSignature "a" (SimpleType "int" []),
-          Variable "a" None
-        ]
 
-    it "parses pointer to var declaration" $ do
-      run "int *a;" `shouldBe` Sequence [
-          TypeSignature "*a" (SimpleType "int" []),
-          Variable "a" None
-        ]
+    context "declare variabels" $ do
 
-    it "parses array without size var declaration" $ do
-      run "int a[];" `shouldBe` Sequence [
-          TypeSignature "a[]" (SimpleType "int" []),
-          Variable "a" None
-        ]
+      it "parses simple variable" $ do
+        run "int a;" `shouldBe` Sequence [
+            TypeSignature "a" (SimpleType "int" []),
+            Variable "a" None
+          ]
 
-    it "parses array with size var declaration" $ do
-      run "int a[10];" `shouldBe` Sequence [
-          TypeSignature "a[10]" (SimpleType "int" []),
-          Variable "a" None
-        ]
+      it "parses pointer to variable" $ do
+        run "int * a;" `shouldBe` Sequence [
+            TypeSignature "*a" (SimpleType "int" []),
+            Variable "a" None
+          ]
+
+      it "parses array without size variable" $ do
+        run "int a[];" `shouldBe` Sequence [
+            TypeSignature "a[]" (SimpleType "int" []),
+            Variable "a" None
+          ]
+
+      it "parses array with size variable" $ do
+        run "int a[10];" `shouldBe` Sequence [
+            TypeSignature "a[10]" (SimpleType "int" []),
+            Variable "a" None
+          ]
+
+      it "parses int with inicialization" $ do
+        run "int a = 10;" `shouldBe` Sequence [
+            TypeSignature "a" (SimpleType "int" []),
+            Variable "a" (MuNumber 10.0)
+          ]
+
+      it "parses char with initialization" $ do
+        run "char a = 'a';" `shouldBe` Sequence [
+            TypeSignature "a" (SimpleType "char" []),
+            Variable "a" (MuChar 'a')
+          ]
+
+      it "parses string with initialization" $ do
+        run "char *a = \"Hello\";" `shouldBe` Sequence [
+            TypeSignature "*a" (SimpleType "char" []),
+            Variable "a" (MuString "Hello")
+          ]
+
+      it "parses double with initialization" $ do
+        run "double a = 0.1;" `shouldBe` Sequence [
+            TypeSignature "a" (SimpleType "double" []),
+            Variable "a" (MuNumber 0.1)
+          ]
+
+      it "parses array with initialization" $ do
+        run "int a[3] = {1, 2, 3};" `shouldBe` Sequence [
+            TypeSignature "a[3]" (SimpleType "int" []),
+            Variable "a" (MuList [MuNumber 1, MuNumber 2, MuNumber 3])
+          ]
+
+      it "parses references" $ do
+        run "int main () { a; }" `shouldBe` cContext (Reference "a")
