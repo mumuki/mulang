@@ -42,6 +42,7 @@ muExternalDeclaration e                      = debug e
 
 muDeclaration :: CDecl -> Expression
 muDeclaration (CDecl declarationSpecifiers declarations _) = compactConcatMap (muDeclarationSpecifier declarationSpecifiers) declarations
+muDeclaration e                                            = debug e
 
 muDeclarationSpecifier :: [CDeclSpec] -> (Maybe CDeclr, Maybe CInit, Maybe CExpr) -> [Expression]
 muDeclarationSpecifier declarationSpecifiers (maybeDeclarator, maybeInitializer, _) = [
@@ -167,22 +168,25 @@ muFunction (CFunDef declarationSpecifiers declarator _ body _) = Sequence [
   SimpleFunction (muDeclaratorId declarator) (muParams declarator) (muStatement body)]
 
 muParams :: CDeclr -> [Pattern]
-muParams = map muParam . muFunctionParams
+muParams = mapMaybes muParam . muFunctionParams
 
 muParamTypes :: CDeclr -> [String]
-muParamTypes = map muParamType . muFunctionParams
+muParamTypes = mapMaybes muParamType . muFunctionParams
 
-muParamType :: CDecl -> String
-muParamType (CDecl declarationSpecifiers _ _) = intercalateMaybes " " muDecl declarationSpecifiers
+muParamType :: CDecl -> Maybe String
+muParamType (CDecl declarationSpecifiers _ _) = Just $ intercalateMaybes " " muDecl declarationSpecifiers
+muParamType _                                 = Nothing
 
 muFunctionParams :: CDeclr -> [CDecl]
 muFunctionParams (CDeclr _ [CFunDeclr (Right (params, False)) [] _] _ _ _) = params
+muFunctionParams _                                                         = []
 
-muParam :: CDecl -> Pattern
-muParam declaration = VariablePattern (muCDecl declaration)
+muParam :: CDecl -> Maybe Pattern
+muParam declaration = fmap VariablePattern (muCDecl declaration)
 
-muCDecl :: CDecl -> String
-muCDecl (CDecl _ [(maybeDeclarator, _, _)] _) = muMaybeTypeDeclarator maybeDeclarator
+muCDecl :: CDecl -> Maybe String
+muCDecl (CDecl _ [(maybeDeclarator, _, _)] _) = Just $ muMaybeTypeDeclarator maybeDeclarator
+muCDecl _                                     = Nothing
 
 muStatement :: CStat -> Expression
 muStatement (CCompound _ sentences _)                           = compactMap muCompoundBlockItem sentences
@@ -214,6 +218,7 @@ muMapCases (def, cases) = (map muCase cases, compactMap muStatement def)
 
 muCase :: CStat -> (Expression, Expression)
 muCase (CCase pattern statement _) = (muExpression pattern, muStatement statement)
+muCase e                           = (debug e, None)
 
 isDefault :: CStat -> Bool
 isDefault (CDefault _ _) = True
