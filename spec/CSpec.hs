@@ -141,6 +141,15 @@ spec = do
           }
           |] `shouldBe` cContext (Assignment "a" (MuNumber 123))
 
+      it "parses while" $ do
+        run [text|
+          int main () {
+            while(1) {
+              2;
+            }
+          }
+          |] `shouldBe` cContext (While (MuNumber 1) (MuNumber 2))
+
       it "parses simple assignment" $ do
         run [text|
           int cantidadDeNumerosImpares(int unosNumeros[]) {
