@@ -155,14 +155,14 @@ spec = do
           int main () {
             switch(a) {
               case 1:
-                1;
+                break;
               case 2:
-                1;
+                continue;
               default:
                 1;
             }
           }
-          |] `shouldBe` cContext (Switch (Reference "a") [(MuNumber 1, MuNumber 1), (MuNumber 2, MuNumber 1)] (MuNumber 1))
+          |] `shouldBe` cContext (Switch (Reference "a") [(MuNumber 1, Break), (MuNumber 2, Continue)] (MuNumber 1))
 
       it "parses simple assignment" $ do
         run [text|

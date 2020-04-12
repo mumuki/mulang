@@ -193,12 +193,12 @@ muStatement (CReturn maybeExpression _)                         = Return $ fmapO
 muStatement (CWhile condition body _ _)                         = While (muExpression condition) (muStatement body)
 muStatement (CSwitch value cases _)                             = muSwitch (muExpression value) $ muCases cases
 muStatement (CDefault statement _)                              = muStatement statement
+muStatement (CBreak _)                                          = Break
+muStatement (CCont _)                                           = Continue
 muStatement a                                                   = debug a
 --muStatement CCases (CExpression a) (CExpression a) (CStatement a) a
---muStatement CBreak a
 --muStatement CGoto Ident a
 --muStatement CGotoPtr (CExpression a) a
---muStatement CCont a
 --muStatement CLabel Ident (CStatement a) [CAttribute a] a
 --muStatement CAsm (CAssemblyStatement a) a
 
