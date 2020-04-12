@@ -110,7 +110,7 @@ muExp This                              = Self
 muExp (BinOp arg1 op arg2)              = Send (muExp arg1) (muOp op) [muExp arg2]
 muExp (Cond cond ifTrue ifFalse)        = If (muExp cond) (muExp ifTrue) (muExp ifFalse)
 muExp (ExpName name)                    = muName name
-muExp (Assign lhs EqualA exp)           = Assignment (muLhs lhs) (muExp exp)
+muExp (Assign (NameLhs n) EqualA exp)   = muAssignment n (muExp exp)
 muExp (InstanceCreation _ clazz args _) = New (Reference $ r clazz) (map muExp args)
 muExp (PreNot exp)                      = PrimitiveSend (muExp exp) O.Negation []
 muExp (Lambda params exp)               = M.Lambda (muLambdaParams params) (muLambdaExp exp)
@@ -127,7 +127,12 @@ muLambdaParams (LambdaFormalParams params)  = map muFormalParam params
 muCatch :: Catch -> (Pattern, Expression)
 muCatch (Catch param block) = (TypePattern (muFormalParamType param), muBlock block)
 
-muLhs (NameLhs (Name names)) = ns names
+muAssignment (Name [name]) exp           = Assignment (i name) exp
+muAssignment (Name ns) exp               = FieldAssignment r f exp
+  where
+    (r, f) = foldReferences . map i $ ns
+    foldReferences (n:ns) = (foldl (\a e -> FieldReference a e) (Reference n) (init ns), last ns)
+
 
 muName (Name names) = Reference . ns $ names
 
@@ -219,4 +224,5 @@ r (ClassType [(name, _)]) = i name
 
 j = parser compilationUnit
 
+ns :: [Ident] -> String
 ns = intercalate "." . map i
