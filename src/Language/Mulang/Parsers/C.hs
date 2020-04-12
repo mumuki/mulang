@@ -6,7 +6,7 @@ module Language.Mulang.Parsers.C (c, parseC) where
 import Language.Mulang.Ast
 import qualified Language.Mulang.Ast.Operator as O
 import Language.Mulang.Parsers
-import Language.Mulang.Builder (compactMap, normalize)
+import Language.Mulang.Builder (compactMap, compactConcatMap, normalize)
 
 import qualified Language.C.Parser as C
 import Language.C.Syntax
@@ -41,7 +41,7 @@ muExternalDeclaration (CFDefExt function)    = muFunction function
 muExternalDeclaration e                      = debug e
 
 muDeclaration :: CDecl -> Expression
-muDeclaration (CDecl declarationSpecifiers declarations _) = Sequence $ concatMap (muDeclarationSpecifier declarationSpecifiers) declarations
+muDeclaration (CDecl declarationSpecifiers declarations _) = compactConcatMap (muDeclarationSpecifier declarationSpecifiers) declarations
 
 muDeclarationSpecifier :: [CDeclSpec] -> (Maybe CDeclr, Maybe CInit, Maybe CExpr) -> [Expression]
 muDeclarationSpecifier declarationSpecifiers (maybeDeclarator, maybeInitializer, _) = [
@@ -98,7 +98,10 @@ muExpression (CBinary operator leftArgument rightArgument _ ) = Application (muB
 muExpression (CUnary operator argument _ )                    = muUnaryOp operator (muExpression argument)
 muExpression (CAssign CAssignOp (CVar i _) rightArgument _ )  = Assignment (muIdent i) $ muExpression rightArgument
 muExpression (CAssign operator l@(CVar i _) rightArgument _ ) = Assignment (muIdent i) $ Application (muAssignOp operator) [muExpression l, muExpression rightArgument]
+muExpression (CCall callee arguments _  )                     = Application (muExpression callee) (map muExpression arguments)
+muExpression (CIndex callee argument _   )                    = Application (Reference "[]") [muExpression callee, muExpression argument]
 muExpression a                                                = debug a
+--muExpression (CMember (CExpression _) Ident Bool _   ) = undefined
 --muExpression (CComma [CExpression _] _   ) = undefined
 --muExpression (CCond (CExpression _) (Maybe (CExpression _)) (CExpression _) _  ) = undefined
 --muExpression (CCast (CDeclaration _) (CExpression _) _   ) = undefined
@@ -108,9 +111,6 @@ muExpression a                                                = debug a
 --muExpression (CAlignofType (CDeclaration _) _  ) = undefined
 --muExpression (CComplexReal (CExpression _) _   ) = undefined
 --muExpression (CComplexImag (CExpression _) _   ) = undefined
---muExpression (CIndex (CExpression _) (CExpression _) _   ) = undefined
---muExpression (CCall (CExpression _) [CExpression _] _  ) = undefined
---muExpression (CMember (CExpression _) Ident Bool _   ) = undefined
 --muExpression (CCompoundLit (CDeclaration _) (CInitializerList _) _  ) = undefined
 --muExpression (CGenericSelection (CExpression _) [(Maybe (CDeclaration _), CExpression _)] _ ) = undefined
 --muExpression (CStatExpr (CStatement _) _  ) = undefined
@@ -128,14 +128,14 @@ muBinaryOp CLeqOp = Primitive O.LessOrEqualThan
 muBinaryOp CGeqOp = Primitive O.GreatherOrEqualThan
 muBinaryOp CEqOp  = Primitive O.Equal
 muBinaryOp CNeqOp = Primitive O.NotEqual
-muBinaryOp CAndOp = Primitive O.And
-muBinaryOp COrOp  = Primitive O.Or
+muBinaryOp CLndOp = Primitive O.And
+muBinaryOp CLorOp = Primitive O.Or
+muBinaryOp CAndOp = Reference "&"
+muBinaryOp COrOp  = Reference "|"
 muBinaryOp CRmdOp = Reference "%"
---muBinaryOp CShlOp
---muBinaryOp CShrOp
---muBinaryOp CXorOp
---muBinaryOp CLndOp
---muBinaryOp CLorOp
+muBinaryOp CShlOp = Reference "<<"
+muBinaryOp CShrOp = Reference ">>"
+muBinaryOp CXorOp = Reference "^"
 
 muUnaryOp :: CUnaryOp -> Expression -> Expression
 muUnaryOp CPreIncOp  argument = Application (Primitive O.Plus)     [argument, MuNumber 1]
@@ -157,23 +157,26 @@ muAssignOp CSubAssOp = Primitive O.Minus
 muAssignOp CAndAssOp = Primitive O.And
 muAssignOp COrAssOp  = Primitive O.Or
 muAssignOp CRmdAssOp = Reference "%"
---muAssignOp CShlAssOp =
---muAssignOp CShrAssOp =
---muAssignOp CXorAssOp =
+muAssignOp CShlAssOp = Reference "<<"
+muAssignOp CShrAssOp = Reference ">>"
+muAssignOp CXorAssOp = Reference "^"
 
 muFunction :: CFunDef -> Expression
-muFunction (CFunDef declarationSpecifiers declarator params body _) = Sequence [
-  SubroutineSignature (muTypeDeclarator declarator) (muParamTypes params) (intercalateMaybes " " muDecl declarationSpecifiers) [],
-  SimpleFunction (muDeclaratorId declarator) (muParams params) (muStatement body)]
+muFunction (CFunDef declarationSpecifiers declarator _ body _) = Sequence [
+  SubroutineSignature (muTypeDeclarator declarator) (muParamTypes declarator) (intercalateMaybes " " muDecl declarationSpecifiers) [],
+  SimpleFunction (muDeclaratorId declarator) (muParams declarator) (muStatement body)]
 
-muParams :: [CDecl] -> [Pattern]
-muParams = map muParam
+muParams :: CDeclr -> [Pattern]
+muParams = map muParam . muFunctionParams
 
-muParamTypes :: [CDecl] -> [String]
-muParamTypes = map muParamType
+muParamTypes :: CDeclr -> [String]
+muParamTypes = map muParamType . muFunctionParams
 
 muParamType :: CDecl -> String
 muParamType (CDecl declarationSpecifiers _ _) = intercalateMaybes " " muDecl declarationSpecifiers
+
+muFunctionParams :: CDeclr -> [CDecl]
+muFunctionParams (CDeclr _ [CFunDeclr (Right (params, False)) [] _] _ _ _) = params
 
 muParam :: CDecl -> Pattern
 muParam declaration = VariablePattern (muCDecl declaration)
@@ -187,17 +190,17 @@ muStatement (CExpr maybeExpression _)                           = fmapOrNone muE
 muStatement (CIf condition trueBranch maybeFalseBranch _)       = If (muExpression condition) (muStatement trueBranch) (fmapOrNone muStatement maybeFalseBranch)
 muStatement (CFor forInitValue maybeCondition maybeAcum body _) = ForLoop (muForInitValue forInitValue) (fmapOrNone muExpression maybeCondition) (fmapOrNone muExpression maybeAcum) (muStatement body)
 muStatement (CReturn maybeExpression _)                         = Return $ fmapOrNone muExpression maybeExpression
+--muStatement (CWhile (CExpression a) (CStatement a) Bool _)
+--muStatement CSwitch (CExpression a) (CStatement a) a
 muStatement a                                                   = debug a
---muStatement CLabel Ident (CStatement a) [CAttribute a] a
 --muStatement CCase (CExpression a) (CStatement a) a
 --muStatement CCases (CExpression a) (CExpression a) (CStatement a) a
---muStatement CDefault (CStatement a) a
---muStatement CSwitch (CExpression a) (CStatement a) a
---muStatement CWhile (CExpression a) (CStatement a) Bool a
 --muStatement CGoto Ident a
 --muStatement CGotoPtr (CExpression a) a
 --muStatement CCont a
 --muStatement CBreak a
+--muStatement CLabel Ident (CStatement a) [CAttribute a] a
+--muStatement CDefault (CStatement a) a
 --muStatement CAsm (CAssemblyStatement a) a
 
 muForInitValue :: Either (Maybe CExpr) CDecl -> Expression

@@ -127,9 +127,49 @@ spec = do
           }
           |] `shouldBe` cContext (Assignment "a" (Application (Primitive Multiply) [Reference "a", MuNumber 2]))
 
+      it "parses logical operators" $ do
+        run [text|
+          int main () {
+            a || b;
+          }
+          |] `shouldBe` cContext (Application (Primitive Or) [Reference "a", Reference "b"])
+
       it "parses simple assignment" $ do
         run [text|
           int main () {
             a = 123;
           }
           |] `shouldBe` cContext (Assignment "a" (MuNumber 123))
+
+      it "parses simple assignment" $ do
+        run [text|
+          int cantidadDeNumerosImpares(int unosNumeros[]) {
+            int cantidadDeImpares;
+            for (int indice = 0; unosNumeros[indice] != NULL; indice++) {
+              if (esNumeroImpar(c[b])) {
+                cantidadDeImpares++;
+              }
+            }
+            return cantidadDeImpares;
+          }
+          |] `shouldBe` Sequence [
+                          TypeSignature "cantidadDeNumerosImpares" (ParameterizedType ["int"] "int" []),
+                          Function "cantidadDeNumerosImpares" [Equation [VariablePattern "unosNumeros[]"] (UnguardedBody (
+                            Sequence [
+                              Sequence [
+                                TypeSignature "cantidadDeImpares" (SimpleType "int" []),
+                                Variable "cantidadDeImpares" None
+                              ],
+                              ForLoop
+                                (Sequence [
+                                  TypeSignature "indice" (SimpleType "int" []),
+                                  Variable "indice" (MuNumber 0.0)
+                                ])
+                                (Application (Primitive NotEqual) [Application (Reference "[]") [Reference "unosNumeros",Reference "indice"],Reference "NULL"])
+                                (Application (Primitive Plus) [Reference "indice",MuNumber 1.0])
+                                (If
+                                  (Application (Reference "esNumeroImpar") [Application (Reference "[]") [Reference "c",Reference "b"]])
+                                  (Application (Primitive Plus) [Reference "cantidadDeImpares",MuNumber 1.0])
+                                  None
+                                ),
+                              Return (Reference "cantidadDeImpares")]))]]
