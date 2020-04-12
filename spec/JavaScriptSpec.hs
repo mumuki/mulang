@@ -70,7 +70,7 @@ spec = do
       js "x = 8" `shouldBe` (Assignment "x" (MuNumber 8))
 
     it "update should be Assignment" $ do
-      js "x += 8" `shouldBe` (Assignment "x" (Application (Primitive Plus) [Reference "x",MuNumber 8.0]))
+      js "x += 8" `shouldBe` (Assignment "x" (Application (Primitive Plus) [Reference "x", MuNumber 8.0]))
 
     it "increment should be Assignment" $ do
       js "x++" `shouldBe` (Assignment "x" (Application (Primitive Plus) [Reference "x", MuNumber 1]))

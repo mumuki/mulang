@@ -105,3 +105,31 @@ spec = do
             return 123;
           }
           |] `shouldBe` cContext (Return (MuNumber 123))
+
+      it "parses binary operators" $ do
+        run [text|
+          int main () {
+            a + b;
+          }
+          |] `shouldBe` cContext (Application (Primitive Plus) [Reference "a", Reference "b"])
+
+      it "parses unary operators" $ do
+        run [text|
+          int main () {
+            !a;
+          }
+          |] `shouldBe` cContext (Application (Primitive Negation) [Reference "a"])
+
+      it "parses assign operators" $ do
+        run [text|
+          int main () {
+            a *= 2;
+          }
+          |] `shouldBe` cContext (Assignment "a" (Application (Primitive Multiply) [Reference "a", MuNumber 2]))
+
+      it "parses simple assignment" $ do
+        run [text|
+          int main () {
+            a = 123;
+          }
+          |] `shouldBe` cContext (Assignment "a" (MuNumber 123))

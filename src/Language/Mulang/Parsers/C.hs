@@ -4,6 +4,7 @@
 module Language.Mulang.Parsers.C (c, parseC) where
 
 import Language.Mulang.Ast
+import qualified Language.Mulang.Ast.Operator as O
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compactMap, normalize)
 
@@ -87,13 +88,15 @@ muInitializer (CInitList initList _) = muInitList initList
 
 muExpression :: CExpr -> Expression
 muExpression (CConst constant) = muConst constant
-muExpression (CVar i _) = Reference $ muIdent i
+muExpression (CVar i _)                                       = Reference $ muIdent i
+muExpression (CBinary operator leftArgument rightArgument _ ) = Application (muBinaryOp operator) [muExpression leftArgument, muExpression rightArgument]
+muExpression (CUnary operator argument _ )                    = muUnaryOp operator (muExpression argument)
+muExpression (CAssign CAssignOp (CVar i _) rightArgument _ )  = Assignment (muIdent i) $ muExpression rightArgument
+muExpression (CAssign operator l@(CVar i _) rightArgument _ ) = Assignment (muIdent i) $ Application (muAssignOp operator) [muExpression l, muExpression rightArgument]
+muExpression a                                                = debug a
 --muExpression (CComma [CExpression _] _   ) = undefined
---muExpression (CAssign CAssignOp (CExpression _) (CExpression _) _  ) = undefined
 --muExpression (CCond (CExpression _) (Maybe (CExpression _)) (CExpression _) _  ) = undefined
---muExpression (CBinary CBinaryOp (CExpression _) (CExpression _) _  ) = undefined
 --muExpression (CCast (CDeclaration _) (CExpression _) _   ) = undefined
---muExpression (CUnary CUnaryOp (CExpression _) _  ) = undefined
 --muExpression (CSizeofExpr (CExpression _) _  ) = undefined
 --muExpression (CSizeofType (CDeclaration _) _   ) = undefined
 --muExpression (CAlignofExpr (CExpression _) _   ) = undefined
@@ -108,6 +111,50 @@ muExpression (CVar i _) = Reference $ muIdent i
 --muExpression (CStatExpr (CStatement _) _  ) = undefined
 --muExpression (CLabAddrExpr Ident _  ) = undefined
 --muExpression (CBuiltinExpr (CBuiltinThing _)) = undefined
+
+muBinaryOp :: CBinaryOp -> Expression
+muBinaryOp CMulOp = Primitive O.Multiply
+muBinaryOp CDivOp = Primitive O.Divide
+muBinaryOp CAddOp = Primitive O.Plus
+muBinaryOp CSubOp = Primitive O.Minus
+muBinaryOp CLeOp  = Primitive O.LessThan
+muBinaryOp CGrOp  = Primitive O.GreatherThan
+muBinaryOp CLeqOp = Primitive O.LessOrEqualThan
+muBinaryOp CGeqOp = Primitive O.GreatherOrEqualThan
+muBinaryOp CEqOp  = Primitive O.Equal
+muBinaryOp CNeqOp = Primitive O.NotEqual
+muBinaryOp CAndOp = Primitive O.And
+muBinaryOp COrOp  = Primitive O.Or
+muBinaryOp CRmdOp = Reference "%"
+--muBinaryOp CShlOp
+--muBinaryOp CShrOp
+--muBinaryOp CXorOp
+--muBinaryOp CLndOp
+--muBinaryOp CLorOp
+
+muUnaryOp :: CUnaryOp -> Expression -> Expression
+muUnaryOp CPreIncOp  argument = Application (Primitive O.Plus)     [argument, MuNumber 1]
+muUnaryOp CPreDecOp  argument = Application (Primitive O.Minus)    [argument, MuNumber 1]
+muUnaryOp CPostIncOp argument = Application (Primitive O.Plus)     [argument, MuNumber 1]
+muUnaryOp CPostDecOp argument = Application (Primitive O.Minus)    [argument, MuNumber 1]
+muUnaryOp CNegOp     argument = Application (Primitive O.Negation) [argument]
+muUnaryOp CPlusOp    argument = Application (Primitive O.Plus)     [argument]
+muUnaryOp CMinOp     argument = Application (Primitive O.Minus)    [argument]
+muUnaryOp CAdrOp     argument = Application (Reference "&")        [argument]
+muUnaryOp CIndOp     argument = Application (Reference "*")        [argument]
+muUnaryOp CCompOp    argument = Application (Reference "~")        [argument]
+
+muAssignOp :: CAssignOp -> Expression
+muAssignOp CMulAssOp = Primitive O.Multiply
+muAssignOp CDivAssOp = Primitive O.Divide
+muAssignOp CAddAssOp = Primitive O.Plus
+muAssignOp CSubAssOp = Primitive O.Minus
+muAssignOp CAndAssOp = Primitive O.And
+muAssignOp COrAssOp  = Primitive O.Or
+muAssignOp CRmdAssOp = Reference "%"
+--muAssignOp CShlAssOp =
+--muAssignOp CShrAssOp =
+--muAssignOp CXorAssOp =
 
 muFunction :: CFunDef -> Expression
 muFunction (CFunDef declarationSpecifiers declarator params body _) = Sequence [
