@@ -375,8 +375,8 @@ spec = do
                return m.x;
              }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
-                            VariableSignature "foo" "int" [],
-                            Attribute "foo" (MuNumber 4)])
+                            SubroutineSignature "foo" [] "void" ["M"],
+                            (SimpleMethod "foo" [VariablePattern "x"] (FieldReference (Reference "m") "x"))])
 
 
     it "parses attribute assignment" $ do
@@ -385,8 +385,17 @@ spec = do
                 m.x = 3;
              }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
-                            VariableSignature "foo" "int" [],
-                            Attribute "foo" (MuNumber 4)])
+                            SubroutineSignature "foo" ["M"] "void" [],
+                            (SimpleMethod "foo" [VariablePattern "m"] (FieldAssignment (Reference "m") "x" (MuNumber 3)))])
+
+    it "parses complex attribute assignment" $ do
+      run [text|class Foo {
+             public void foo(M m) {
+                m.x.y = 3;
+             }
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            SubroutineSignature "foo" ["M"] "void" [],
+                            (SimpleMethod "foo" [VariablePattern "m"] (FieldAssignment (FieldReference (Reference "m") "x") "y" (MuNumber 3)))])
 
     context "assertions" $ do
       let wrapped expression =  Class "Foo" Nothing (Sequence [

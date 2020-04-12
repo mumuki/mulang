@@ -140,10 +140,10 @@ except:
       py "yield 1" `shouldBe` Yield (MuNumber 1)
 
     it "parses field access" $ do
-      py "x.y" `shouldBe` Yield (MuNumber 1)
+      py "x.y" `shouldBe` (FieldReference (Reference "x") "y")
 
     it "parses field assignment" $ do
-      py "x.y = 2" `shouldBe` Yield (MuNumber 1)
+      py "x.y = 2" `shouldBe` (FieldAssignment (Reference "x") "y" (MuNumber 2))
 
     it "parses test groups" $ do
       run [text|
