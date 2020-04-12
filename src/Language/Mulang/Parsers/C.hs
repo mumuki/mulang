@@ -16,7 +16,7 @@ import Language.C.Data.InputStream
 
 import Control.Fallible
 
-import Data.List(intercalate)
+import Data.List(intercalate, partition)
 import Data.Maybe(catMaybes, maybe, fromJust)
 
 c :: Parser
@@ -191,17 +191,37 @@ muStatement (CIf condition trueBranch maybeFalseBranch _)       = If (muExpressi
 muStatement (CFor forInitValue maybeCondition maybeAcum body _) = ForLoop (muForInitValue forInitValue) (fmapOrNone muExpression maybeCondition) (fmapOrNone muExpression maybeAcum) (muStatement body)
 muStatement (CReturn maybeExpression _)                         = Return $ fmapOrNone muExpression maybeExpression
 muStatement (CWhile condition body _ _)                         = While (muExpression condition) (muStatement body)
---muStatement CSwitch (CExpression a) (CStatement a) a
---muStatement CCase (CExpression a) (CStatement a) a
---muStatement CCases (CExpression a) (CExpression a) (CStatement a) a
+muStatement (CSwitch value cases _)                             = muSwitch (muExpression value) $ muCases cases
+muStatement (CDefault statement _)                              = muStatement statement
 muStatement a                                                   = debug a
+--muStatement CCases (CExpression a) (CExpression a) (CStatement a) a
 --muStatement CBreak a
---muStatement CDefault (CStatement a) a
 --muStatement CGoto Ident a
 --muStatement CGotoPtr (CExpression a) a
 --muStatement CCont a
 --muStatement CLabel Ident (CStatement a) [CAttribute a] a
 --muStatement CAsm (CAssemblyStatement a) a
+
+muSwitch :: Expression -> ([(Expression, Expression)], Expression) -> Expression
+muSwitch value (cases, def) = Switch value cases def
+
+muCases :: CStat -> ([(Expression, Expression)], Expression)
+muCases (CCompound [] statements _) = muMapCases . partition isDefault . mapMaybes muBlockStmt $ statements
+muCases a                           = ([], debug a)
+
+muMapCases :: ([CStat], [CStat]) -> ([(Expression, Expression)], Expression)
+muMapCases (def, cases) = (map muCase cases, compactMap muStatement def)
+
+muCase :: CStat -> (Expression, Expression)
+muCase (CCase pattern statement _) = (muExpression pattern, muStatement statement)
+
+isDefault :: CStat -> Bool
+isDefault (CDefault _ _) = True
+isDefault _              = False
+
+muBlockStmt :: CBlockItem -> Maybe CStat
+muBlockStmt (CBlockStmt statement) = Just statement
+muBlockStmt _                      = Nothing
 
 muForInitValue :: Either (Maybe CExpr) CDecl -> Expression
 muForInitValue (Left maybeExpression) = fmapOrNone muExpression maybeExpression

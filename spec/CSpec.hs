@@ -150,6 +150,20 @@ spec = do
           }
           |] `shouldBe` cContext (While (MuNumber 1) (MuNumber 2))
 
+      it "parses while" $ do
+        run [text|
+          int main () {
+            switch(a) {
+              case 1:
+                1;
+              case 2:
+                1;
+              default:
+                1;
+            }
+          }
+          |] `shouldBe` cContext (Switch (Reference "a") [(MuNumber 1, MuNumber 1), (MuNumber 2, MuNumber 1)] (MuNumber 1))
+
       it "parses simple assignment" $ do
         run [text|
           int cantidadDeNumerosImpares(int unosNumeros[]) {
