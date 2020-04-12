@@ -190,17 +190,17 @@ muStatement (CExpr maybeExpression _)                           = fmapOrNone muE
 muStatement (CIf condition trueBranch maybeFalseBranch _)       = If (muExpression condition) (muStatement trueBranch) (fmapOrNone muStatement maybeFalseBranch)
 muStatement (CFor forInitValue maybeCondition maybeAcum body _) = ForLoop (muForInitValue forInitValue) (fmapOrNone muExpression maybeCondition) (fmapOrNone muExpression maybeAcum) (muStatement body)
 muStatement (CReturn maybeExpression _)                         = Return $ fmapOrNone muExpression maybeExpression
---muStatement (CWhile (CExpression a) (CStatement a) Bool _)
+muStatement (CWhile condition body _ _)                         = While (muExpression condition) (muStatement body)
 --muStatement CSwitch (CExpression a) (CStatement a) a
-muStatement a                                                   = debug a
 --muStatement CCase (CExpression a) (CStatement a) a
 --muStatement CCases (CExpression a) (CExpression a) (CStatement a) a
+muStatement a                                                   = debug a
+--muStatement CBreak a
+--muStatement CDefault (CStatement a) a
 --muStatement CGoto Ident a
 --muStatement CGotoPtr (CExpression a) a
 --muStatement CCont a
---muStatement CBreak a
 --muStatement CLabel Ident (CStatement a) [CAttribute a] a
---muStatement CDefault (CStatement a) a
 --muStatement CAsm (CAssemblyStatement a) a
 
 muForInitValue :: Either (Maybe CExpr) CDecl -> Expression
