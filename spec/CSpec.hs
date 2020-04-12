@@ -162,7 +162,7 @@ spec = do
                 1;
             }
           }
-          |] `shouldBe` cContext (Switch (Reference "a") [(MuNumber 1, Break), (MuNumber 2, Continue)] (MuNumber 1))
+          |] `shouldBe` cContext (Switch (Reference "a") [(MuNumber 1, Break None), (MuNumber 2, Continue None)] (MuNumber 1))
 
       it "parses simple assignment" $ do
         run [text|
