@@ -28,15 +28,19 @@ parseC = parseC'
 parseC' :: EitherParser
 parseC' = fmap (normalize . muTranslationUnit) . toEitherParser . flip (C.parseC) nopos . inputStreamFromString
 
+toEitherParser :: Either C.ParseError CTranslUnit -> Either String CTranslUnit
 toEitherParser (Left (C.ParseError (msgs, _))) = Left $ concat msgs
-toEitherParser (Right right) = Right right
+toEitherParser (Right right)                   = Right right
 
+muTranslationUnit :: CTranslUnit -> Expression
 muTranslationUnit (CTranslUnit externalDeclatarions _) = compactMap muExternalDeclaration $ externalDeclatarions
 
+muExternalDeclaration :: CExtDecl -> Expression
 muExternalDeclaration (CDeclExt declaration) = muDeclaration declaration
 muExternalDeclaration (CFDefExt function)    = muFunction function
-muExternalDeclaration e = debug e
+muExternalDeclaration e                      = debug e
 
+muDeclaration :: CDecl -> Expression
 muDeclaration (CDecl declarationSpecifiers declarations _) = Sequence $ concatMap (muDeclarationSpecifier declarationSpecifiers) declarations
 
 muDeclarationSpecifier :: [CDeclSpec] -> (Maybe CDeclr, Maybe CInit, Maybe CExpr) -> [Expression]
@@ -46,7 +50,7 @@ muDeclarationSpecifier declarationSpecifiers (maybeDeclarator, maybeInitializer,
 
 muDecl :: CDeclSpec -> Maybe String
 muDecl (CTypeSpec decl) = muTypeSpecifier decl
-muDecl _ = Nothing
+muDecl _                = Nothing
 
 muTypeSpecifier :: CTypeSpec -> Maybe String
 muTypeSpecifier (CVoidType   _) = Just "void"
@@ -62,7 +66,7 @@ muTypeSpecifier (CBoolType   _) = Just "bool"
 muTypeSpecifier (CEnumType _ _) = Just "enum"
 muTypeSpecifier (CTypeDef id _) = Just $ muIdent id
 muTypeSpecifier (CSUType sou _) = Just $ muStructureUnionTag sou
-muTypeSpecifier _ = Nothing
+muTypeSpecifier _               = Nothing
 
 -- muStorageSpecifier (CAuto     _) = Just "auto"
 -- muStorageSpecifier (CRegister _) = Just "register"
@@ -76,13 +80,14 @@ muTypeSpecifier _ = Nothing
 -- muTypeQualifier (CRestrQual _) = Just "restrict"
 -- muTypeQualifier _ = Nothing
 
-
-
+muStructureUnionTag :: CStructUnion -> String
 muStructureUnionTag (CStruct structTag _ _ _ _) = muStructTag structTag
 
+muStructTag :: CStructTag -> String
 muStructTag CStructTag = "struct"
 muStructTag CUnionTag  = "union"
 
+muInitializer :: CInit -> Expression
 muInitializer (CInitExpr initExpr _) = muExpression initExpr
 muInitializer (CInitList initList _) = muInitList initList
 
@@ -200,13 +205,15 @@ muForInitValue (Left maybeExpression) = fmapOrNone muExpression maybeExpression
 muForInitValue (Right declaration)    = muDeclaration declaration
 
 muCompoundBlockItem :: CBlockItem -> Expression
-muCompoundBlockItem (CBlockStmt statement) = muStatement statement
+muCompoundBlockItem (CBlockStmt statement)   = muStatement statement
 muCompoundBlockItem (CBlockDecl declaration) = muDeclaration declaration
 muCompoundBlockItem (CNestedFunDef function) = muFunction function
 
+muInitList :: CInitList -> Expression
 muInitList initList = MuList $ map (\(_, initializer) -> muInitializer initializer) initList
 
-muConst (CIntConst   cInt   _)            = MuNumber $ fromIntegral $ getCInteger cInt
+muConst :: CConst -> Expression
+muConst (CIntConst   cInt   _)            = MuNumber . fromIntegral $ getCInteger cInt
 muConst (CStrConst   cStr   _)            = MuString $ getCString cStr
 muConst (CFloatConst (CFloat strF) _)     = MuNumber $ (read strF :: Double)
 muConst (CCharConst  (CChar  char _) _)   = MuChar char
@@ -214,20 +221,27 @@ muConst (CCharConst  (CChars string _) _) = MuString string
 
 -- -- Combinators
 
+fmapOrNone :: (a -> Expression) -> Maybe a -> Expression
 fmapOrNone = maybe None
 
+mapMaybes :: (a -> Maybe b) -> [a] -> [b]
 mapMaybes f = catMaybes . map f
+
+intercalateMaybes :: [a] -> (b -> Maybe [a]) -> [b] -> [a]
 intercalateMaybes sep f = intercalate sep . mapMaybes f
 
 -- -- Helpers
 
-
+muMaybeDeclaratorId :: Maybe CDeclr -> String
 muMaybeDeclaratorId = fromJust . fmap muDeclaratorId
 
 muDeclaratorId :: CDeclr -> String
 muDeclaratorId (CDeclr ident _ _ _ _) = muMaybeIdent ident
 
+muMaybeIdent :: Maybe Ident -> String
 muMaybeIdent (Just ident) = muIdent ident
+
+muIdent :: Ident -> String
 muIdent (Ident name _ _) = name
 
 muMaybeTypeDeclarator :: Maybe CDeclr -> String
@@ -236,12 +250,17 @@ muMaybeTypeDeclarator = fromJust . fmap muTypeDeclarator
 muTypeDeclarator :: CDeclr -> String
 muTypeDeclarator (CDeclr ident ds _ _ _) = ptrDerivedDeclarators ds ++ muMaybeIdent ident ++ arrDerivedDeclarators ds
 
+ptrDerivedDeclarators :: [CDerivedDeclr] -> String
 ptrDerivedDeclarators ds = intercalateMaybes "" ptrs ds
+
+arrDerivedDeclarators :: [CDerivedDeclr] -> String
 arrDerivedDeclarators ds = intercalateMaybes "" arrs ds
 
+ptrs :: CDerivedDeclr -> Maybe String
 ptrs (CPtrDeclr _ _) = Just "*"
-ptrs _ = Nothing
+ptrs _               = Nothing
 
-arrs (CArrDeclr [] (CNoArrSize False) _) = Just "[]"
+arrs :: CDerivedDeclr -> Maybe String
+arrs (CArrDeclr [] (CNoArrSize False) _)                        = Just "[]"
 arrs (CArrDeclr [] (CArrSize False (CConst (CIntConst n _))) _) = Just $ '[': show n ++ "]"
-arrs _ = Nothing
+arrs _                                                          = Nothing
