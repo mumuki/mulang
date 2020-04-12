@@ -139,6 +139,12 @@ except:
     it "parses yields" $ do
       py "yield 1" `shouldBe` Yield (MuNumber 1)
 
+    it "parses field access" $ do
+      py "x.y" `shouldBe` Yield (MuNumber 1)
+
+    it "parses field assignment" $ do
+      py "x.y = 2" `shouldBe` Yield (MuNumber 1)
+
     it "parses test groups" $ do
       run [text|
         class TestGroup(unittest.TestCase):

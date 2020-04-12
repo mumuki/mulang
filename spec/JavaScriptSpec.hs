@@ -93,6 +93,12 @@ spec = do
     it "handles this" $ do
       js "this" `shouldBe` Self
 
+    it "handles field access" $ do
+      js "x.y" `shouldBe` Self
+
+    it "handles field assignment" $ do
+      js "x.y = 4" `shouldBe` Self
+
     it "handles booleans" $ do
       js "true" `shouldBe` MuTrue
 

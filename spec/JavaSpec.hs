@@ -369,6 +369,25 @@ spec = do
                             VariableSignature "foo" "int" [],
                             Attribute "foo" (MuNumber 4)])
 
+    it "parses attribute access" $ do
+      run [text|class Foo {
+             public int foo(M m) {
+               return m.x;
+             }
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            VariableSignature "foo" "int" [],
+                            Attribute "foo" (MuNumber 4)])
+
+
+    it "parses attribute assignment" $ do
+      run [text|class Foo {
+             public void foo(M m) {
+                m.x = 3;
+             }
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            VariableSignature "foo" "int" [],
+                            Attribute "foo" (MuNumber 4)])
+
     context "assertions" $ do
       let wrapped expression =  Class "Foo" Nothing (Sequence [
                                   TypeSignature "test" (ParameterizedType [] "void" []),
