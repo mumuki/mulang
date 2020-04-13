@@ -182,7 +182,7 @@ pt:
       UsesIf: '%{binding} %{must} usar <i>%{keyword_if}</i>%{matching}'
       UsesInheritance: '%{binding} %{must} usar herança'
       UsesLambda: '%{binding} %{must} usar expressões lambda%{matching}'
-      UsesLogic: '%{binding} %{must} usar expressões booleanas'
+      UsesLogic: '%{binding} %{must} usar operadores booleanos'
       UsesLoop: '%{binding} %{must} usar um loop%{matching}'
       UsesMath: '%{binding} %{must} usar expressões matemáticas'
       UsesMixins: '%{binding} %{must} usar mixins'

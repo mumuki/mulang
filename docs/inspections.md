@@ -46,7 +46,6 @@ The power of Mulang is grounded on more than 90 different kind of inspections
 | `TypesReturnAs`                   | is the given type used to type a return?
 | `Uses`                            | is there any reference to the given element?
 | `UsesArithmetic`                  | are arithmetic operators used?
-| `UsesBooleanLogic`                | are logical operators used?
 | `UsesConditional`                 |
 | `UsesExceptionHandling`           | is any _exception_ handlded?
 | `UsesExceptions`                  | is any _exception_ raised?

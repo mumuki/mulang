@@ -190,7 +190,7 @@ es:
       UsesIf: '%{binding} %{must} usar <i>%{keyword_if}</i>%{matching}'
       UsesInheritance: '%{binding} %{must} usar herencia'
       UsesLambda: '%{binding} %{must} emplear expresiones lambda%{matching}'
-      UsesLogic: '%{binding} %{must} usar expresiones booleanas'
+      UsesLogic: '%{binding} %{must} usar operadores booleanos'
       UsesLoop: '%{binding} %{must} usar un bucle'
       UsesMath: '%{binding} %{must} usar expresiones matemáticas'
       UsesMixin: '%{binding} %{must} utilizar mixins'

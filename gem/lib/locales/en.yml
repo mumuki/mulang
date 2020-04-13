@@ -175,7 +175,7 @@ en:
       UsesGuards: '%{binding} %{must} use guards%{matching}'
       UsesIf: '%{binding} %{must} use <i>%{keyword_if}</i>%{matching}'
       UsesLambda: '%{binding} %{must} use lambda expressions%{matching}'
-      UsesLogic: '%{binding} %{must} usar boolean expressions'
+      UsesLogic: '%{binding} %{must} usar boolean operators'
       UsesLoop: '%{binding} %{must} use a loop%{matching}'
       UsesMath: '%{binding} %{must} usar math expressions'
       UsesMixin: '%{binding} %{must} use mixins'
