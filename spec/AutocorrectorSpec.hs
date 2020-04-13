@@ -41,6 +41,11 @@ spec = do
       run Ruby (Expectation "*" "Uses:and") `shouldBe` (Expectation "*" "UsesAnd")
       run Ruby (Expectation "*"  "Uses:&&") `shouldBe` (Expectation "*" "UsesAnd")
 
+    it "corrects JS operators" $ do
+      run JavaScript (Expectation "*" "Uses:+") `shouldBe` (Expectation "*" "UsesPlus")
+      run JavaScript (Expectation "*" "Uses:&&") `shouldBe` (Expectation "*" "UsesAnd")
+      run JavaScript (Expectation "*" "Uses:||") `shouldBe` (Expectation "*" "UsesOr")
+
   describe "correct primitive declarations" $ do
     it "corrects haskell otherwise negated" $ do
       run Haskell (Expectation "*" "Not:Declares:otherwise")  `shouldBe` (Expectation "*" "Not:DeclaresOtherwise")
