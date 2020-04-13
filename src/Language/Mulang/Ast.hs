@@ -13,8 +13,10 @@
 -- |
 module Language.Mulang.Ast (
   module Language.Mulang.Ast.Expression,
-  module Language.Mulang.Ast.HighLevel
+  module Language.Mulang.Ast.HighLevel,
+  module Language.Mulang.Ast.Operator
 ) where
 
 import Language.Mulang.Ast.Expression
 import Language.Mulang.Ast.HighLevel
+import Language.Mulang.Ast.Operator

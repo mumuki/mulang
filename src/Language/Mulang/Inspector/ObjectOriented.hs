@@ -25,7 +25,6 @@ module Language.Mulang.Inspector.ObjectOriented (
   declaresPrimitive)  where
 
 import Language.Mulang.Ast
-import Language.Mulang.Ast.Operator (Operator)
 import Language.Mulang.Generator (equationsExpandedExpressions)
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Matcher (Matcher, matches, unmatching)

@@ -40,8 +40,7 @@ module Language.Mulang.Inspector.Generic (
   usesYield,
   usesYieldMatching) where
 
-import Language.Mulang.Ast hiding (Equal, NotEqual)
-import Language.Mulang.Ast.Operator (Operator (..))
+import Language.Mulang.Ast
 import Language.Mulang.Generator (declaredIdentifiers, expressions, declarations, referencedIdentifiers, equationsExpandedExpressions)
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Bound (uncounting, containsBoundDeclaration, countBoundDeclarations, BoundInspection, BoundCounter)

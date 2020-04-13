@@ -13,7 +13,6 @@ module Language.Mulang.Inspector.Literal (
   isNonliteral) where
 
 import Language.Mulang.Ast
-import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Inspector.Primitive (Inspection)
 
 isAnything :: Inspection

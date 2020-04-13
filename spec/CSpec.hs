@@ -3,8 +3,7 @@
 module CSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Ast hiding (Equal, NotEqual)
-import           Language.Mulang.Ast.Operator
+import           Language.Mulang.Ast
 import           Language.Mulang.Parsers.C
 
 import           Data.Text (Text, unpack)

@@ -3,8 +3,7 @@
 module InspectorSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang hiding (Equal, NotEqual)
-import           Language.Mulang.Ast.Operator
+import           Language.Mulang
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Java (java)

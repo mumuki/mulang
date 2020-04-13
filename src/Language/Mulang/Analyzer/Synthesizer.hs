@@ -12,7 +12,7 @@ module Language.Mulang.Analyzer.Synthesizer (
 import           Language.Mulang.Analyzer.Analysis (Inspection)
 
 import           Language.Mulang.Operators (Token)
-import           Language.Mulang.Ast.Operator (Operator)
+import           Language.Mulang.Ast (Operator)
 
 import           Control.Monad ((>=>))
 

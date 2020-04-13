@@ -7,7 +7,6 @@ module Language.Mulang.Parsers.Python (
   parsePython3) where
 
 import qualified Language.Mulang.Ast as M
-import qualified Language.Mulang.Ast.Operator as O
 import           Language.Mulang.Builder
 import           Language.Mulang.Parsers
 
@@ -209,40 +208,40 @@ muArgument e                            = M.debug e
 --muYieldArg (YieldFrom expr _)(Expr annot) annot -- ^ Yield from a generator (Version 3 only)
 muYieldArg (YieldExpr expr) = muExpr expr
 
-muOp (Equality _)           = M.Primitive O.Equal
-muOp (NotEquals _)          = M.Primitive O.NotEqual
+muOp (Equality _)           = M.Primitive M.Equal
+muOp (NotEquals _)          = M.Primitive M.NotEqual
 muOp op                     = muOpReference op
 
-muOpReference (And _)                = M.Primitive O.And
-muOpReference (Or _)                 = M.Primitive O.Or
-muOpReference (Not _)                = M.Primitive O.Negation
+muOpReference (And _)                = M.Primitive M.And
+muOpReference (Or _)                 = M.Primitive M.Or
+muOpReference (Not _)                = M.Primitive M.Negation
 muOpReference (Exponent _)           = M.Reference "**"
-muOpReference (LessThan _)           = M.Primitive O.LessThan
-muOpReference (GreaterThan _)        = M.Primitive O.GreatherThan
-muOpReference (GreaterThanEquals _)  = M.Primitive O.GreatherOrEqualThan
-muOpReference (LessThanEquals _)     = M.Primitive O.LessOrEqualThan
-muOpReference (NotEqualsV2 _)        = M.Primitive O.NotEqual -- Version 2 only.
+muOpReference (LessThan _)           = M.Primitive M.LessThan
+muOpReference (GreaterThan _)        = M.Primitive M.GreatherThan
+muOpReference (GreaterThanEquals _)  = M.Primitive M.GreatherOrEqualThan
+muOpReference (LessThanEquals _)     = M.Primitive M.LessOrEqualThan
+muOpReference (NotEqualsV2 _)        = M.Primitive M.NotEqual -- Version 2 only.
 muOpReference (In _)                 = M.Reference "in"
 muOpReference (Is _)                 = M.Reference "is"
 muOpReference (IsNot _)              = M.Reference "is not"
 muOpReference (NotIn _)              = M.Reference "not in"
-muOpReference (BinaryOr _)           = M.Primitive O.Or
+muOpReference (BinaryOr _)           = M.Primitive M.Or
 muOpReference (Xor _)                = M.Reference "^"
-muOpReference (BinaryAnd _)          = M.Primitive O.And
+muOpReference (BinaryAnd _)          = M.Primitive M.And
 muOpReference (ShiftLeft _)          = M.Reference "<<"
 muOpReference (ShiftRight _)         = M.Reference ">>"
-muOpReference (Multiply _)           = M.Primitive O.Multiply
-muOpReference (Plus _)               = M.Primitive O.Plus
-muOpReference (Minus _)              = M.Primitive O.Minus
-muOpReference (Divide _)             = M.Primitive O.Divide
+muOpReference (Multiply _)           = M.Primitive M.Multiply
+muOpReference (Plus _)               = M.Primitive M.Plus
+muOpReference (Minus _)              = M.Primitive M.Minus
+muOpReference (Divide _)             = M.Primitive M.Divide
 muOpReference (FloorDivide _)        = M.Reference "//"
 muOpReference (Invert _)             = M.Reference "~"
 muOpReference (Modulo _)             = M.Reference "%"
 
-muAssignOp (PlusAssign _)       = M.Primitive O.Plus
-muAssignOp (MinusAssign _)      = M.Primitive O.Minus
-muAssignOp (MultAssign _)       = M.Primitive O.Multiply
-muAssignOp (DivAssign _)        = M.Primitive O.Divide
+muAssignOp (PlusAssign _)       = M.Primitive M.Plus
+muAssignOp (MinusAssign _)      = M.Primitive M.Minus
+muAssignOp (MultAssign _)       = M.Primitive M.Multiply
+muAssignOp (DivAssign _)        = M.Primitive M.Divide
 muAssignOp (ModAssign _)        = M.Reference "%"
 muAssignOp (PowAssign _)        = M.Reference "**"
 muAssignOp (BinAndAssign _)     = M.Reference "&"
