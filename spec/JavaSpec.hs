@@ -375,8 +375,8 @@ spec = do
                return m.x;
              }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
-                            SubroutineSignature "foo" [] "void" ["M"],
-                            (SimpleMethod "foo" [VariablePattern "x"] (FieldReference (Reference "m") "x"))])
+                            SubroutineSignature "foo" ["M"] "int" [],
+                            (SimpleMethod "foo" [VariablePattern "m"] (Return (FieldReference (Reference "m") "x")))])
 
 
     it "parses attribute assignment" $ do

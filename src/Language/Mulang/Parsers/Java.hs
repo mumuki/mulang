@@ -129,12 +129,16 @@ muCatch (Catch param block) = (TypePattern (muFormalParamType param), muBlock bl
 
 muAssignment (Name [name]) exp           = Assignment (i name) exp
 muAssignment (Name ns) exp               = FieldAssignment r f exp
-  where
-    (r, f) = foldReferences . map i $ ns
-    foldReferences (n:ns) = (foldl (\a e -> FieldReference a e) (Reference n) (init ns), last ns)
+  where (r, f) = foldReferences ns
 
+muName (Name [name]) = Reference (i name)
+muName (Name ns)     = FieldReference r f
+  where (r, f) = foldReferences ns
 
-muName (Name names) = Reference . ns $ names
+foldReferences = foldReferences' . map i
+
+foldReferences' :: [Identifier] -> (Expression, Identifier)
+foldReferences' (n:ns) = (foldl (\a e -> FieldReference a e) (Reference n) (init ns), last ns)
 
 muLit (String s)  = MuString s
 muLit (Char c)    = MuChar c
