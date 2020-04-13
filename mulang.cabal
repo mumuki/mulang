@@ -36,6 +36,8 @@ library
     Text.Inflections.Tokenizer
     Language.Mulang
     Language.Mulang.Ast
+    Language.Mulang.Ast.Expression
+    Language.Mulang.Ast.HighLevel
     Language.Mulang.Ast.Operator
     Language.Mulang.Builder
     Language.Mulang.Consult

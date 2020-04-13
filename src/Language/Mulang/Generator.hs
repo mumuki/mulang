@@ -153,12 +153,6 @@ equationsExpandedExpressions = concatMap expand . equationsExpressions
 declarationsOf :: Identifier -> Generator Expression
 declarationsOf b = boundDeclarations (named b)
 
-extractReference :: Expression -> Maybe Identifier
-extractReference (Reference n)        = Just n
-extractReference (FieldReference _ n) = Just n
-extractReference (Exist n _)          = Just n
-extractReference _                    = Nothing
-
 equationsExpressions :: [Equation] -> [Expression]
 equationsExpressions = concatMap (\(Equation _ body) -> bodyExpressions body)
   where
