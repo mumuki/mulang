@@ -64,6 +64,29 @@ The power of Mulang is grounded on more than 100 different kind of inspections
 | `UsesType`                        | is the given typed used in a signature?
 
 
+## Operator Inspections
+
+| Inspection                       | Meaning
+|----------------------------------|-----------------------
+| UsesEqual                        | is the Equal operator used?
+| UsesNotEqual                     | is the NotEqual operator used?
+| UsesNegation                     | is the Negation operator used?
+| UsesAnd                          | is the And operator used?
+| UsesOr                           | is the Or operator used?
+| UsesHash                         | is the Hash operator used?
+| UsesGreatherOrEqualThan          | is the GreatherOrEqualThan operator used?
+| UsesGreatherThan                 | is the GreatherThan operator used?
+| UsesLessOrEqualThan              | is the LessOrEqualThan operator used?
+| UsesLessThan                     | is the LessThan operator used?
+| UsesOtherwise                    | is the Otherwise operator used?
+| UsesPlus                         | is the Plus operator used?
+| UsesMinus                        | is the Minus operator used?
+| UsesMultiply                     | is the Multiply operator used?
+| UsesDivide                       | is the Divide operator used?
+| UsesForwardComposition           | is the ForwardComposition operator used?
+| UsesBackwardComposition          | is the BackwardComposition operator used?
+
+
 ## Imperative Inspections
 
 | Inspection                        | Meaning
