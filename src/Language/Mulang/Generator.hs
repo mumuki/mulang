@@ -155,6 +155,7 @@ declarationsOf b = boundDeclarations (named b)
 
 extractReference :: Expression -> Maybe Identifier
 extractReference (Reference n)        = Just n
+extractReference (FieldReference _ n) = Just n
 extractReference (Exist n _)          = Just n
 extractReference _                    = Nothing
 

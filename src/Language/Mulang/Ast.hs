@@ -308,10 +308,11 @@ equationPatterns :: Equation -> [Pattern]
 equationPatterns (Equation p _) = p
 
 extractUnification :: Expression -> Maybe (Identifier, Expression)
-extractUnification (Assignment name value)  = Just (name, value)
-extractUnification (Variable name value)    = Just (name, value)
-extractUnification (Attribute name value)   = Just (name, value)
-extractUnification _                        = Nothing
+extractUnification (Assignment name value)        = Just (name, value)
+extractUnification (FieldAssignment _ name value) = Just (name, value)
+extractUnification (Variable name value)          = Just (name, value)
+extractUnification (Attribute name value)         = Just (name, value)
+extractUnification _                              = Nothing
 
 extractSubroutine :: Expression -> Maybe (Identifier, SubroutineBody)
 extractSubroutine (Function name body)        = Just (name, body)

@@ -66,10 +66,19 @@ assignsMatching matcher predicate = containsExpression f
   where f (Unification name value) = predicate name && matcher [value]
         f _                        = False
 
+assignsFieldMatching :: Matcher -> BoundInspection
+assignsFieldMatching matcher predicate = containsExpression f
+  where f (FieldAssignment _ name value) = predicate name && matcher [value]
+        f _                              = False
+
 -- | Inspection that tells whether an expression uses the the given target identifier
 -- in its definition
 uses :: BoundInspection
 uses p = containsExpression f
+  where f = any p . referencedIdentifiers
+
+usesField :: BoundInspection
+usesField p = containsExpression f
   where f = any p . referencedIdentifiers
 
 usesPrimitive :: Operator -> Inspection
