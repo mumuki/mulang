@@ -5,9 +5,10 @@ import           Language.Mulang.Analyzer.Synthesizer (generateOperatorEncodingR
 
 import           Language.Mulang.Operators (Token, OperatorsTable, buildOperatorsTable)
 import           Language.Mulang.Operators.Haskell (haskellTokensTable)
-import           Language.Mulang.Operators.Ruby (rubyTokensTable)
 import           Language.Mulang.Operators.Java (javaTokensTable)
+import           Language.Mulang.Operators.JavaScript (javaScriptTokensTable)
 import           Language.Mulang.Operators.Python (pythonTokensTable)
+import           Language.Mulang.Operators.Ruby (rubyTokensTable)
 
 import           Data.Maybe (fromMaybe, fromJust)
 import qualified Data.Map.Strict as Map
@@ -78,13 +79,14 @@ type Inference a = Language -> a
 inferOperatorsTable :: Inference OperatorsTable
 inferOperatorsTable = buildOperatorsTable . table
   where
-    table Haskell = haskellTokensTable
-    table Java    = javaTokensTable
-    table Ruby    = rubyTokensTable
-    table Python  = pythonTokensTable
-    table Python2 = pythonTokensTable
-    table Python3 = pythonTokensTable
-    table _       = Map.empty
+    table Haskell    = haskellTokensTable
+    table Java       = javaTokensTable
+    table Ruby       = rubyTokensTable
+    table JavaScript = javaScriptTokensTable
+    table Python     = pythonTokensTable
+    table Python2    = pythonTokensTable
+    table Python3    = pythonTokensTable
+    table _          = Map.empty
 
 inferCaseStyle :: Inference CaseStyle
 inferCaseStyle Python  = RubyCase
