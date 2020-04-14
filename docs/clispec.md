@@ -393,7 +393,7 @@ $ mulang  '
 
 Smell typos are special since they interact with some expectations:
 
-* `HasDeclarationTypos` is a smell that will be activated after a `Declares` - or any similar expectation like `DecaresProcedure` or `Delegates` - expectation is set.
+* `HasDeclarationTypos` is a smell that will be activated after a `Declares` - or any similar expectation like `DeclaresProcedure` or `Delegates` - expectation is set.
 * `HasUsageTypos` will be activated after a `Uses` expectation is set.
 
 ```bash
