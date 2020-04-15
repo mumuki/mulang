@@ -6,6 +6,7 @@ module Language.Mulang.Inspector.Generic.Smell (
   doesNilTest,
   doesTypeTest,
   hasAssignmentReturn,
+  hasAssignmentCondition,
   hasEmptyIfBranches,
   hasEmptyRepeat,
   hasLongParameterList,
@@ -132,6 +133,12 @@ hasRedundantLocalVariableReturn = containsExpression f
 
 hasAssignmentReturn :: Inspection
 hasAssignmentReturn = containsExpression f
+  where f (Return (Assignment _ _)) = True
+        f (Return (Variable _ _))   = True
+        f _                         = False
+
+hasAssignmentCondition :: Inspection
+hasAssignmentCondition = containsExpression f
   where f (Return (Assignment _ _)) = True
         f (Return (Variable _ _))   = True
         f _                         = False

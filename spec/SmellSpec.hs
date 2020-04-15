@@ -118,6 +118,22 @@ spec = do
     it "is False when local variable is used as a cache" $ do
       hasRedundantLocalVariableReturn (js "function x(m) { var x = 5; var y = 1 + x; g(y); return x; }") `shouldBe` False
 
+
+  describe "hasAssignmentCondition" $ do
+    it "is True when assigns within an if condition" $ do
+      hasAssignmentCondition (js "if (x = 4) {}") `shouldBe` True
+
+    it "is True when assigns within a while condition" $ do
+      hasAssignmentCondition (js "while (x = 4) {}") `shouldBe` True
+
+    it "is False when not assigns within an if condition" $ do
+      hasAssignmentCondition (js "if (x == 4) {}") `shouldBe` False
+      hasAssignmentCondition (js "if (x === 4) {}") `shouldBe` False
+
+    it "is False when not assigns within a while condition" $ do
+      hasAssignmentCondition (js "while (x == 4) {}") `shouldBe` False
+      hasAssignmentCondition (js "while (x === 4) {}") `shouldBe` False
+
   describe "hasAssignmentReturn" $ do
     it "is True when return contains assignment" $ do
       hasAssignmentReturn (js "function x(m) { return x = 4 }") `shouldBe` True
