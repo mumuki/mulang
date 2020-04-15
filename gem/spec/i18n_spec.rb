@@ -33,8 +33,8 @@ describe Mulang::Expectation::I18n do
 
     it { expect(expectation('foo', 'HasEmptyRepeat').translate).to eq('<strong>foo</strong> has empty <i>repeat</i>') }
 
-    it { expect(expectation('Foo', 'HasDeclarationTypos:foo').translate).to eq('Solution must declare <strong>foo</strong>, but declares <strong>Foo</strong>. May you have made a typo?') }
-    it { expect(expectation('Foo', 'HasUsageTypos:foo').translate).to eq('Solution must use <strong>foo</strong>, but it uses <strong>Foo</strong>. May you have made a typo?') }
+    it { expect(expectation('Foo', 'HasDeclarationTypos:foo').translate).to eq('Solution must declare <strong>foo</strong>, but declares <strong>Foo</strong>. Perhaps you meant <strong>foo</strong>?') }
+    it { expect(expectation('Foo', 'HasUsageTypos:foo').translate).to eq('Solution must use <strong>foo</strong>, but it uses <strong>Foo</strong>. Perhaps you meant <strong>foo</strong>?') }
 
   end
 

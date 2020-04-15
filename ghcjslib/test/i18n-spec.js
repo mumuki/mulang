@@ -69,7 +69,7 @@ describe('en', () => {
   it('UsesStaticPolymorphism', () => should(mulang.I18n.translate('*', 'UsesStaticPolymorphism')).eql('solution must use polymorphism'));
 
   it('HasDeclarationTypos:foo', () =>
-    should(mulang.I18n.translate('Foo', 'HasDeclarationTypos:foo')).eql('Solution must declare <strong>foo</strong>, but declares <strong>Foo</strong>. May you have made a typo?'));
+    should(mulang.I18n.translate('Foo', 'HasDeclarationTypos:foo')).eql('Solution must declare <strong>foo</strong>, but declares <strong>Foo</strong>. Perhaps you meant <strong>foo</strong>?'));
   it('HasUsageTypos:foo', () =>
-    should(mulang.I18n.translate('Foo', 'HasUsageTypos:foo')).eql('Solution must use <strong>foo</strong>, but it uses <strong>Foo</strong>. May you have made a typo?'));
+    should(mulang.I18n.translate('Foo', 'HasUsageTypos:foo')).eql('Solution must use <strong>foo</strong>, but it uses <strong>Foo</strong>. Perhaps you meant <strong>foo</strong>?'));
 });

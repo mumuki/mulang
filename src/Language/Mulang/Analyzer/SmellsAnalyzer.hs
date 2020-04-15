@@ -121,7 +121,7 @@ plainInspection _                                                         = Noth
 ---
 
 evalSmellInstance :: SmellsContext -> Expression -> SmellInstance -> [Expectation]
-evalSmellInstance context expression smellInstance =  map (exectationFor smellInstance) . detectionFor smellInstance context $ expression
+evalSmellInstance context expression smellInstance =  map (expectationFor smellInstance) . detectionFor smellInstance context $ expression
 
 detectionFor :: SmellInstance -> Detection
 detectionFor ("DiscardsExceptions", Nothing)              = simple discardsExceptions
@@ -175,9 +175,9 @@ withLanguage inspection context = locate' (inspection (snd context))
 raw :: (Expression -> [Identifier]) -> Detection
 raw detection _ = detection
 
-exectationFor :: SmellInstance -> Identifier -> Expectation
-exectationFor (smell, Just target) identifier  = Expectation identifier (smell ++ ":" ++ target)
-exectationFor (smell, _          ) identifier  = Expectation identifier smell
+expectationFor :: SmellInstance -> Identifier -> Expectation
+expectationFor (smell, Just target) identifier  = Expectation identifier (smell ++ ":" ++ target)
+expectationFor (smell, _          ) identifier  = Expectation identifier smell
 
 locate' inspection = identifiers . locate inspection
   where identifiers Nowhere      = []

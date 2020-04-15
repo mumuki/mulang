@@ -435,7 +435,7 @@ spec = do
     it "is [] when the identifier has not been used but there is no similar declaration" $ do
       detectUsageTypos "foobar" (js "foo()\nbar()") `shouldBe` []
 
-    it "is non empty when the identifier has not been used and there is a similar declaration" $ do
+    it "is non empty when the identifier has not been used and there is a similar usage" $ do
       detectUsageTypos "foo"  (js "Foo()\nbar()") `shouldBe` ["Foo"]
       detectUsageTypos "bar"  (js "Foo()\nbaar()") `shouldBe` ["baar"]
       detectUsageTypos "br"   (js "Foo()\nbar()") `shouldBe` ["bar"]
