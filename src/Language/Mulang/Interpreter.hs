@@ -152,13 +152,13 @@ evalExpr (M.Application (M.Primitive O.Multiply) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 * n2
 
-evalExpr (M.Application (M.Primitive O.Equal) expressions) = do
+evalExpr (M.Application (M.Primitive O.Equalish) expressions) = do
   params <- mapM evalExpr expressions
   let [r1, r2] = params
   muValuesEqual r1 r2
 
-evalExpr (M.Application (M.Primitive O.NotEqual) expressions) = do
-  evalExpr $ M.Application (M.Primitive O.Negation) [M.Application (M.Primitive O.Equal) expressions]
+evalExpr (M.Application (M.Primitive O.NotEqualish) expressions) = do
+  evalExpr $ M.Application (M.Primitive O.Negation) [M.Application (M.Primitive O.Equalish) expressions]
 
 evalExpr (M.Application (M.Primitive O.LessOrEqualThan) expressions) =
   evalExpressionsWith expressions f
