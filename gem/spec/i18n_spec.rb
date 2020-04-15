@@ -156,8 +156,8 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'HasLongParameterList').translate).to eq('<strong>foo</strong> tiene demasiados parámetros. Te podría estar faltando una abstracción') }
       it { expect(expectation('foo', 'OverridesEqualOrHashButNotBoth').translate).to eq('<strong>foo</strong> redefine los métodos <i>equals</i> o <i>hash</i>, pero no ambos') }
 
-      it { expect(expectation('Foo', 'HasDeclarationTypos:foo').translate).to eq('La solución debe declarar <strong>foo</strong>, pero declara <strong>Foo</strong>. ¿Puede que hayas cometido un error de tipeo?') }
-      it { expect(expectation('Foo', 'HasUsageTypos:foo').translate).to eq('La solución debe usar <strong>foo</strong>, pero usa <strong>Foo</strong>. ¿Puede que hayas cometido un error de tipeo?') }
+      it { expect(expectation('Foo', 'HasDeclarationTypos:foo').translate).to eq('La solución parece tener un error de tipeo: debe declarar <strong>foo</strong>, pero declara <strong>Foo</strong>. ¿Quizás quisiste decir <strong>foo</strong>?') }
+      it { expect(expectation('Foo', 'HasUsageTypos:foo').translate).to eq('La solución parece tener un error de tipeo: debe usar <strong>foo</strong>, pero usa <strong>Foo</strong>. ¿Quizás quisiste decir <strong>foo</strong>?') }
     end
   end
 end
