@@ -96,6 +96,11 @@ spec = do
     it "handles booleans" $ do
       js "true" `shouldBe` MuTrue
 
+    it "handles parenthesis around variables" $ do
+      js "function f() { return (x) } " `shouldBe` (SimpleFunction "f" [] (Return (Reference "x")))
+      js "var y = (x)" `shouldBe` (Variable "y" (Reference "x"))
+      js "(x)" `shouldBe` (Reference "x")
+
     it "handles negation" $ do
       js "!true" `shouldBe` (Application (Primitive Negation) [MuTrue])
 

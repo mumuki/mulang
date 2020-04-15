@@ -76,8 +76,11 @@ normalizeReference e                                                            
 mapJSList :: (a -> b) -> JSCommaList a -> [b]
 mapJSList f = map f . muJSCommaList
 
+muJSExpressionList :: JSCommaList JSExpression -> [Expression]
 muJSExpressionList = mapJSList muJSExpression
-muJSPatternList = mapJSList muPattern
+
+muJSPatternList :: JSCommaList JSExpression -> [Pattern]
+muJSPatternList = mapJSList muExpressionPattern
 
 muJSExpressionFromList = compact . muJSExpressionList
 
@@ -91,6 +94,7 @@ muCase (JSCase _ expression _ statements) = (muJSExpression expression, compactM
 
 muDefault (JSDefault _ _ statements) = compactMap muJSStatement statements
 
+muComputation :: JSIdent -> JSCommaList JSExpression -> JSBlock -> Expression
 muComputation JSIdentNone params body = Lambda (muJSPatternList params) (muJSBlock body)
 muComputation (JSIdentName _ name) params body = (computationFor (muJSBlock body)) name (muEquation (muJSPatternList params) (muJSBlock body))
 
@@ -98,9 +102,14 @@ isDefault:: JSSwitchParts -> Bool
 isDefault (JSDefault _ _ _) = True
 isDefault _                 = False
 
-muPattern:: JSIdent -> Pattern
-muPattern (JSIdentName _ name) = VariablePattern name
+muIdentPattern :: JSIdent -> Pattern
+muIdentPattern (JSIdentName _ name) = VariablePattern name
 
+muExpressionPattern :: JSExpression -> Pattern
+muExpressionPattern (JSIdentifier _ name) = VariablePattern name
+muExpressionPattern other                 = debugPattern other
+
+muEquation :: [Pattern] -> Expression -> SubroutineBody
 muEquation params body = [SimpleEquation params body]
 
 computationFor :: Expression -> Identifier -> [Equation] -> Expression
@@ -137,7 +146,7 @@ muJSExpression (JSExpressionParen _ expression _)                   = muJSExpres
 muJSExpression (JSExpressionPostfix (JSIdentifier _ name) op)       = Assignment name (muJSUnaryOp op name)
 muJSExpression (JSExpressionTernary condition _ trueVal _ falseVal) = If (muJSExpression condition) (muJSExpression trueVal) (muJSExpression falseVal)
 muJSExpression (JSFunctionExpression _ ident _ params _ body)       = muComputation ident params body
-muJSExpression (JSArrowExpression    _ params _ _ body)             = Lambda (muJSPatternList params) (muJSStatement body)
+muJSExpression (JSArrowExpression  params _ body)                   = Lambda (muJSArrowParameterList params) (muJSStatement body)
 muJSExpression (JSMemberDot receptor _ (JSIdentifier _ message))    = Send (muJSExpression receptor) (Reference message) []
 muJSExpression (JSMemberExpression id _ params _)                   = Application (muJSExpression id) (muJSExpressionList params)
 muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _)       = New (Reference name) (muJSExpressionList args)
@@ -248,4 +257,8 @@ muJSCommaList JSLNil             = []
 muJSCommaTrailingList:: JSCommaTrailingList a -> [a]
 muJSCommaTrailingList (JSCTLComma list _) = muJSCommaList list
 muJSCommaTrailingList (JSCTLNone list)    = muJSCommaList list
+
+muJSArrowParameterList :: JSArrowParameterList -> [Pattern]
+muJSArrowParameterList (JSUnparenthesizedArrowParameter ident)        = [muIdentPattern ident]
+muJSArrowParameterList (JSParenthesizedArrowParameterList _ params _) = muJSPatternList params
 
