@@ -103,6 +103,7 @@ en:
       DoesNilTest: '%{binding} does <i>%{keyword_Null}</i> tests'
       DoesNullTest: '%{binding} does <i>%{keyword_Null}</i> tests'
       DoesTypeTest: '%{binding} string type tests'
+      HasAssignmentCondition: '%{binding} evaluates the result of an assignment where a boolean expression is expected. Perhaps you meant to use the <i>%{operator_Equal}</i> operator?'
       HasAssignmentReturn: '%{binding} returns the result of an assignment'
       HasCodeDuplication: '%{binding} has code duplication'
       HasDeclarationTypos_named: 'Solution must declare %{target}, but declares %{binding}. Perhaps you meant %{target}?'

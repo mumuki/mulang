@@ -107,6 +107,7 @@ es:
       DoesNilTest: '%{binding} hace comparaciones contra <i>%{keyword_Null}</i>'
       DoesNullTest: '%{binding} hace comparaciones contra <i>%{keyword_Null}</i>'
       DoesTypeTest: '%{binding} hace comparaciones contra strings'
+      HasAssignmentCondition: '%{binding} evalúa el resultado de una asignación en donde se esperaba una expresión booleana. ¿Quizás quisiste usar el operador <i>%{operator_Equal}</i>?'
       HasAssignmentReturn: '%{binding} devuelve el resultado de una asignación'
       HasCodeDuplication: '%{binding} tiene código repetido'
       HasDeclarationTypos_named: 'La solución parece tener un error de tipeo: debe declarar %{target}, pero declara %{binding}. ¿Quizás quisiste decir %{target}?'
