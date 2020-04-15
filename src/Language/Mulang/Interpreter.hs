@@ -92,13 +92,13 @@ evalExpr (M.Application (M.Primitive O.Negation) expressions) =
 
 evalExpr (M.Application (M.Primitive O.Multiply) expressions) = evalBinaryNumeric expressions (*) createNumber
 
-evalExpr (M.Application (M.Primitive O.Equal) expressions) = do
+evalExpr (M.Application (M.Primitive O.Equalish) expressions) = do
   params <- mapM evalExpr expressions
   let [r1, r2] = params
   muValuesEqual r1 r2
 
-evalExpr (M.Application (M.Primitive O.NotEqual) expressions) = do
-  evalExpr $ M.Application (M.Primitive O.Negation) [M.Application (M.Primitive O.Equal) expressions]
+evalExpr (M.Application (M.Primitive O.NotEqualish) expressions) = do
+  evalExpr $ M.Application (M.Primitive O.Negation) [M.Application (M.Primitive O.Equalish) expressions]
 
 evalExpr (M.Application (M.Primitive O.LessOrEqualThan) expressions) = evalBinaryNumeric expressions (<=) createBool
 evalExpr (M.Application (M.Primitive O.LessThan) expressions) = evalBinaryNumeric expressions (<) createBool

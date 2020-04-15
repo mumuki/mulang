@@ -47,6 +47,12 @@ hasRedundantRepeat = containsExpression f
   where f (Repeat (MuNumber 1) _) = True
         f _                       = False
 
+shouldUseStrictComparators :: Inspection
+shouldUseStrictComparators = containsExpression f
+  where f (Primitive O.Like)    = True
+        f (Primitive O.NotLike) = True
+        f _                     = False
+
 doesNilTest :: Inspection
 doesNilTest = compares f
   where f MuNil = True
@@ -65,11 +71,11 @@ isLongCode = containsExpression f
 compares :: (Expression -> Bool) -> Inspection
 compares f = containsExpression (any f.comparisonOperands)
 
-comparisonOperands (Call Equal                [a1, a2])   = [a1, a2] -- deprecated
-comparisonOperands (Call NotEqual             [a1, a2])   = [a1, a2] -- deprecated
-comparisonOperands (Call (Primitive O.Equal)    [a1, a2])   = [a1, a2]
-comparisonOperands (Call (Primitive O.NotEqual) [a1, a2])   = [a1, a2]
-comparisonOperands _                                      = []
+comparisonOperands (Call Equal                     [a1, a2])   = [a1, a2] -- deprecated
+comparisonOperands (Call NotEqual                  [a1, a2])   = [a1, a2] -- deprecated
+comparisonOperands (Call (Primitive O.Equalish)    [a1, a2])   = [a1, a2]
+comparisonOperands (Call (Primitive O.NotEqualish) [a1, a2])   = [a1, a2]
+comparisonOperands _                                           = []
 
 returnsNil :: Inspection
 returnsNil = containsExpression f
@@ -178,14 +184,14 @@ hasTooManyMethods = containsExpression f
 overridesEqualOrHashButNotBoth :: Inspection
 overridesEqualOrHashButNotBoth = containsExpression f
   where f (Sequence expressions) = (any isEqual expressions) /= (any isHash expressions)
-        f (Class _ _ (PrimitiveMethod O.Equal _)) = True
-        f (Class _ _ (EqualMethod _))             = True
-        f (Class _ _ (PrimitiveMethod O.Hash _))  = True
-        f (Class _ _ (HashMethod _))              = True
+        f (Class _ _ (PrimitiveMethod O.Equalish _)) = True
+        f (Class _ _ (EqualMethod _))                = True
+        f (Class _ _ (PrimitiveMethod O.Hash _))     = True
+        f (Class _ _ (HashMethod _))                 = True
         f _ = False
 
-        isEqual (PrimitiveMethod O.Equal _) = True
-        isEqual (EqualMethod _)             = True -- deprecated
+        isEqual (PrimitiveMethod O.Equalish _) = True
+        isEqual (EqualMethod _)                = True -- deprecated
         isEqual _ = False
 
         isHash (PrimitiveMethod O.Hash _) = True
