@@ -72,7 +72,7 @@ class Mulang::Expectation::V0 < Mulang::Expectation::Standard
   end
 
   def as_v2_use
-    Mulang::Expectation::V2.new binding, new_inspection(inspection.type.gsub('Has', 'Uses'), nil)
+    Mulang::Expectation::V2.new binding, new_inspection(inspection.type.gsub(/^Has/, 'Uses'), nil)
   end
 
   def as_v2_declare(simple_type)

@@ -36,23 +36,23 @@ describe Mulang::Expectation::I18n do
     it { expect(expectation('Foo', 'HasDeclarationTypos:foo').translate).to eq('Solution must declare <strong>foo</strong>, but declares <strong>Foo</strong>. Perhaps you meant <strong>foo</strong>?') }
     it { expect(expectation('Foo', 'HasUsageTypos:foo').translate).to eq('Solution must use <strong>foo</strong>, but it uses <strong>Foo</strong>. Perhaps you meant <strong>foo</strong>?') }
 
-    it { expect(expectation('*', 'UsesEqual').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesNotEqual').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesNegation').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesAnd').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesOr').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesHash').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesGreatherOrEqualThan').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesGreatherThan').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesLessOrEqualThan').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesLessThan').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesOtherwise').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesPlus').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesMinus').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesMultiply').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesDivide').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesForwardComposition').translate).to eq('foo') }
-    it { expect(expectation('*', 'UsesBackwardComposition').translate).to eq('foo') }
+    it { expect(expectation('*', 'UsesEqual').translate).to eq('solution must use <i>==</i>') }
+    it { expect(expectation('*', 'UsesNotEqual').translate).to eq('solution must use <i>!=</i>') }
+    it { expect(expectation('*', 'UsesNegation').translate).to eq('solution must use <i>!</i>') }
+    it { expect(expectation('*', 'UsesAnd').translate).to eq('solution must use <i>&&</i>') }
+    it { expect(expectation('*', 'UsesOr').translate).to eq('solution must use <i>||</i>') }
+    it { expect(expectation('*', 'UsesHash').translate).to eq('solution must use <i>hash</i>') }
+    it { expect(expectation('*', 'UsesGreatherOrEqualThan').translate).to eq('solution must use <i>>=</i>') }
+    it { expect(expectation('*', 'UsesGreatherThan').translate).to eq('solution must use <i>></i>') }
+    it { expect(expectation('*', 'UsesLessOrEqualThan').translate).to eq('solution must use <i><=</i>') }
+    it { expect(expectation('*', 'UsesLessThan').translate).to eq('solution must use <i><</i>') }
+    it { expect(expectation('*', 'UsesOtherwise').translate).to eq('solution must use <i>otherwise</i>') }
+    it { expect(expectation('*', 'UsesPlus').translate).to eq('solution must use <i>+</i>') }
+    it { expect(expectation('*', 'UsesMinus').translate).to eq('solution must use <i>-</i>') }
+    it { expect(expectation('*', 'UsesMultiply').translate).to eq('solution must use <i>*</i>') }
+    it { expect(expectation('*', 'UsesDivide').translate).to eq('solution must use <i>/</i>') }
+    it { expect(expectation('*', 'UsesForwardComposition').translate).to eq('solution must use <i>>></i>') }
+    it { expect(expectation('*', 'UsesBackwardComposition').translate).to eq('solution must use <i>.</i>') }
   end
 
   context 'pt locale' do

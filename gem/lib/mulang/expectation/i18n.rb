@@ -16,7 +16,24 @@ module Mulang::Expectation::I18n
       keyword_switch: :switch,
       keyword_true: :true,
       keyword_while: :while,
-      keyword_yield: :yield
+      keyword_yield: :yield,
+      operator_And: "&&",
+      operator_BackwardComposition: '.',
+      operator_Divide: "/",
+      operator_Equal: "==",
+      operator_ForwardComposition: '>>',
+      operator_GreatherOrEqualThan: ">=",
+      operator_GreatherThan: ">",
+      operator_Hash: 'hash',
+      operator_LessOrEqualThan: "<=",
+      operator_LessThan: "<",
+      operator_Minus: "-",
+      operator_Multiply: "*",
+      operator_Negation: "!",
+      operator_NotEqual: "!=",
+      operator_Or: "||",
+      operator_Otherwise: 'otherwise',
+      operator_Plus: "+"
     }
 
     def translate(e, keywords = nil)
