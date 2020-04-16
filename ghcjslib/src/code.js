@@ -1,4 +1,27 @@
 (() => {
+  const Keywords = {
+    java: {
+      keyword_entry_point: 'main',
+      keyword_foreach: 'for'
+    },
+    javascript: {
+      keyword_equal: '===',
+      keyword_foreach: 'for'
+    },
+    haskell: {
+      keyword_entry_point: 'main',
+      keyword_false: 'False',
+      keyword_true: 'True'
+    },
+    python: {
+      keyword_false: 'False',
+      keyword_null: 'None',
+      keyword_true: 'True',
+    },
+    ruby: {},
+    php: {}
+  }
+
   class MulangNativeLanguage {
     constructor(language) {
       this.language = language;
@@ -70,6 +93,7 @@
     }
   }
 
+  ghcjsExports.Keywords = Keywords;
   ghcjsExports.MulangCode = MulangCode;
   ghcjsExports.MulangNativeLanguage = MulangNativeLanguage;
   ghcjsExports.MulangExternalLanguage = MulangExternalLanguage;

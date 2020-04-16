@@ -1,4 +1,27 @@
 module Mulang::Language
+  KEYWORDS = {
+    java: {
+      keyword_entry_point: :main,
+      keyword_foreach: :for
+    },
+    javascript: {
+      keyword_equal: '===',
+      keyword_foreach: :for
+    },
+    haskell: {
+      keyword_entry_point: :main,
+      keyword_false: :False,
+      keyword_true: :True
+    },
+    python: {
+      keyword_false: :False,
+      keyword_null: :None,
+      keyword_true: :True,
+    },
+    ruby: {},
+    php: {}
+  }
+
   class Native
     def initialize(language)
       @language = language
