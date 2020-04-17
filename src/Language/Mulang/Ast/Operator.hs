@@ -31,10 +31,10 @@ data Operator
     -- (f >> g)(x) = (g . f)(x) = g(f(x)) operator
     | BackwardComposition
     -- (f << g)(x) = (f . g)(x) = f(g(x)) operator
-    | Xor
     | Mod
     | BitwiseOr
     | BitwiseAnd
+    | BitwiseXor
     | BitwiseLeftShift
     | BitwiseRightShift
   deriving (Eq, Show, Read, Generic, Ord, Enum)

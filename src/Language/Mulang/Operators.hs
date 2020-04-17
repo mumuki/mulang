@@ -3,6 +3,7 @@
 module Language.Mulang.Operators (
   buildTokensTable,
   buildOperatorsTable,
+  defaultTokensTable,
   parseOperator,
   unparseOperator,
   Token,

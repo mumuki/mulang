@@ -136,7 +136,7 @@ muBinaryOp COrOp  = Primitive O.BitwiseOr
 muBinaryOp CRmdOp = Primitive O.Mod
 muBinaryOp CShlOp = Primitive O.BitwiseLeftShift
 muBinaryOp CShrOp = Primitive O.BitwiseRightShift
-muBinaryOp CXorOp = Primitive O.Xor
+muBinaryOp CXorOp = Primitive O.BitwiseXor
 
 muUnaryOp :: CUnaryOp -> Expression -> Expression
 muUnaryOp CPreIncOp  argument = Application (Primitive O.Plus)     [argument, MuNumber 1]
@@ -160,7 +160,7 @@ muAssignOp COrAssOp  = Primitive O.Or
 muAssignOp CRmdAssOp = Primitive O.Mod
 muAssignOp CShlAssOp = Primitive O.BitwiseLeftShift
 muAssignOp CShrAssOp = Primitive O.BitwiseRightShift
-muAssignOp CXorAssOp = Primitive O.Xor
+muAssignOp CXorAssOp = Primitive O.BitwiseXor
 
 muFunction :: CFunDef -> Expression
 muFunction (CFunDef declarationSpecifiers declarator _ body _) = Sequence [

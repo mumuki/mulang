@@ -4,6 +4,7 @@ import           Language.Mulang.Analyzer.Analysis
 import           Language.Mulang.Analyzer.Synthesizer (generateOperatorEncodingRules, generateInspectionEncodingRules)
 
 import           Language.Mulang.Operators (Token, OperatorsTable, buildOperatorsTable)
+import           Language.Mulang.Operators.C (cTokensTable)
 import           Language.Mulang.Operators.Haskell (haskellTokensTable)
 import           Language.Mulang.Operators.Java (javaTokensTable)
 import           Language.Mulang.Operators.JavaScript (javaScriptTokensTable)
@@ -79,6 +80,7 @@ type Inference a = Language -> a
 inferOperatorsTable :: Inference OperatorsTable
 inferOperatorsTable = buildOperatorsTable . table
   where
+    table C          = cTokensTable
     table Haskell    = haskellTokensTable
     table Java       = javaTokensTable
     table Ruby       = rubyTokensTable
