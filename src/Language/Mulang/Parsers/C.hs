@@ -131,12 +131,12 @@ muBinaryOp CEqOp  = Primitive O.Equal
 muBinaryOp CNeqOp = Primitive O.NotEqual
 muBinaryOp CLndOp = Primitive O.And
 muBinaryOp CLorOp = Primitive O.Or
-muBinaryOp CAndOp = Reference "&"
-muBinaryOp COrOp  = Reference "|"
-muBinaryOp CRmdOp = Reference "%"
-muBinaryOp CShlOp = Reference "<<"
-muBinaryOp CShrOp = Reference ">>"
-muBinaryOp CXorOp = Reference "^"
+muBinaryOp CAndOp = Primitive O.BitwiseAnd
+muBinaryOp COrOp  = Primitive O.BitwiseOr
+muBinaryOp CRmdOp = Primitive O.Mod
+muBinaryOp CShlOp = Primitive O.BitwiseLeftShift
+muBinaryOp CShrOp = Primitive O.BitwiseRightShift
+muBinaryOp CXorOp = Primitive O.Xor
 
 muUnaryOp :: CUnaryOp -> Expression -> Expression
 muUnaryOp CPreIncOp  argument = Application (Primitive O.Plus)     [argument, MuNumber 1]
@@ -157,10 +157,10 @@ muAssignOp CAddAssOp = Primitive O.Plus
 muAssignOp CSubAssOp = Primitive O.Minus
 muAssignOp CAndAssOp = Primitive O.And
 muAssignOp COrAssOp  = Primitive O.Or
-muAssignOp CRmdAssOp = Reference "%"
-muAssignOp CShlAssOp = Reference "<<"
-muAssignOp CShrAssOp = Reference ">>"
-muAssignOp CXorAssOp = Reference "^"
+muAssignOp CRmdAssOp = Primitive O.Mod
+muAssignOp CShlAssOp = Primitive O.BitwiseLeftShift
+muAssignOp CShrAssOp = Primitive O.BitwiseRightShift
+muAssignOp CXorAssOp = Primitive O.Xor
 
 muFunction :: CFunDef -> Expression
 muFunction (CFunDef declarationSpecifiers declarator _ body _) = Sequence [

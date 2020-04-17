@@ -12,19 +12,19 @@ packages:
   original:
     hackage: aeson-1.2.1.0
 - completed:
-    size: 155434
-    url: https://github.com/erikd/language-javascript/archive/e65815417ffd464bfb6d5444f7ff1ad4778a9417.tar.gz
+    size: 162082
+    url: https://github.com/mumuki/language-javascript/archive/3640442ea562cc125f219b5c60fbc1b77882fd62.tar.gz
     cabal-file:
       size: 3865
-      sha256: 9ff1c682ed92d218877d1180d777c850da10bcb62e0c22b5fac32d1f8f53e976
+      sha256: 3c68380fc4794475ff4ebec608f8cf7ce9b15b9b69eb938d423f8aafdefbe0d7
     name: language-javascript
-    version: 0.6.0.11
-    sha256: 1c6ac4c14ac7fe52f99761c2c27dbbb62d99ed255900ba3291161c73c8e8839f
+    version: 0.7.1.0
+    sha256: 4c9ac2f683f4be52673da8795ae93c0d63d62ac3fe4091e69fb54470f3b774b0
     pantry-tree:
-      size: 3179
-      sha256: e10ba08ed5a0f56989bd675de8075394b1bc1cc0a40693efff3c5a142b2f1c23
+      size: 3229
+      sha256: 9e052a863d218f8db4f55161534ca2caef9d03f5213f452b123576219d606f6c
   original:
-    url: https://github.com/erikd/language-javascript/archive/e65815417ffd464bfb6d5444f7ff1ad4778a9417.tar.gz
+    url: https://github.com/mumuki/language-javascript/archive/3640442ea562cc125f219b5c60fbc1b77882fd62.tar.gz
 - completed:
     size: 56176
     url: https://github.com/julian-berbel/language-python/archive/cbdf9b33cc3c30e66c8455165ed1c7d70a300a3e.tar.gz
