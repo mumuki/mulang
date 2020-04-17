@@ -3,15 +3,15 @@ module Language.Mulang.Analyzer.CustomExpectationsAnalyzer (
 
 import Data.Maybe (fromMaybe)
 
-import Language.Mulang
-import Language.Mulang.Analyzer.Analysis (customExpectationResult, ExpectationResult(..))
+import Language.Mulang.Ast
+import Language.Mulang.Analyzer.Analysis (customExpectationResult, QueryResult)
 import Language.Mulang.Analyzer.EdlQueryCompiler (compileTopQuery)
 
 import Language.Mulang.Edl (parseExpectations, Expectation (..))
 
-analyseCustomExpectations :: Expression -> Maybe String -> [ExpectationResult]
-analyseCustomExpectations ast  = fromMaybe [] . fmap (map (runExpectation ast) . parseExpectations)
+analyseCustomExpectations :: Expression -> Maybe String -> [QueryResult]
+analyseCustomExpectations ast = map (runExpectation ast) . fromMaybe [] . fmap parseExpectations
 
-runExpectation :: Expression -> Expectation -> ExpectationResult
-runExpectation ast (Expectation name q) = customExpectationResult name (compileTopQuery q ast)
+runExpectation :: Expression -> Expectation -> QueryResult
+runExpectation ast (Expectation name q) = (q, customExpectationResult name (compileTopQuery q ast))
 

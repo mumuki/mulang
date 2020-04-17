@@ -12,12 +12,13 @@ import qualified Language.Mulang.Analyzer.Analysis as A
 import qualified Data.Map.Strict as Map
 import           Data.List.Split (splitOn)
 
-compileExpectation :: A.Expectation -> Inspection
-compileExpectation (A.Expectation s i) = compileTopQuery . negator . scope $ baseQuery
+compileExpectation :: A.Expectation -> (Query, Inspection)
+compileExpectation (A.Expectation s i) = (topQuery, compileTopQuery topQuery)
   where
     (inspectionParts, negator) = compileInspectionPartsAndNegator (splitOn ":" i)
     scope = compileScope (splitOn ":" s)
     baseQuery = compileCQuery inspectionParts
+    topQuery = negator . scope $ baseQuery
 
 compileInspectionPartsAndNegator :: [String] -> ([String], Query -> Query)
 compileInspectionPartsAndNegator ("Not":ps) = (ps, Not)

@@ -402,3 +402,41 @@ spec = do
 
     it "is False when if branch is not empty" $ do
       hasUnreachableCode (js "if(true) { j++; } else { i++; }") `shouldBe` False
+
+  describe "detectDeclarationTypos" $ do
+    it "is [] when the identifier has been declared" $ do
+      detectDeclarationTypos "foo" (js "function foo() {}") `shouldBe` []
+
+    it "is [] when the identifier has been declared even if there is a similar declaration" $ do
+      detectDeclarationTypos "foo" (js "function foo() {}\nfunction Foo() {}") `shouldBe` []
+
+    it "is [] when the identifier has not been declared but there is no other declaration" $ do
+      detectDeclarationTypos "foobar" (js "function foo() {}") `shouldBe` []
+
+    it "is [] when the identifier has not been declared but there is no similar declaration" $ do
+      detectDeclarationTypos "foobar" (js "function foo() {}\nfunction bar() {}") `shouldBe` []
+
+    it "is non empty when the identifier has not been declared and there is a similar declaration" $ do
+      detectDeclarationTypos "foo"  (js "function Foo() {}\nfunction bar() {}") `shouldBe` ["Foo"]
+      detectDeclarationTypos "bar"  (js "function Foo() {}\nfunction baar() {}") `shouldBe` ["baar"]
+      detectDeclarationTypos "br"   (js "function Foo() {}\nfunction bar() {}") `shouldBe` ["bar"]
+      detectDeclarationTypos "baz"  (js "function Foo() {}\nfunction bar() {}\nfunction baaz() {}") `shouldBe` ["baaz", "bar"]
+
+  describe "detectUsageTypos" $ do
+    it "is [] when the identifier has been used" $ do
+      detectUsageTypos "foo" (js "foo()") `shouldBe` []
+
+    it "is [] when the identifier has been used even if there is a similar declaration" $ do
+      detectUsageTypos "foo" (js "foo()\nFoo()") `shouldBe` []
+
+    it "is [] when the identifier has not been used but there is no other declaration" $ do
+      detectUsageTypos "foobar" (js "foo()") `shouldBe` []
+
+    it "is [] when the identifier has not been used but there is no similar declaration" $ do
+      detectUsageTypos "foobar" (js "foo()\nbar()") `shouldBe` []
+
+    it "is non empty when the identifier has not been used and there is a similar usage" $ do
+      detectUsageTypos "foo"  (js "Foo()\nbar()") `shouldBe` ["Foo"]
+      detectUsageTypos "bar"  (js "Foo()\nbaar()") `shouldBe` ["baar"]
+      detectUsageTypos "br"   (js "Foo()\nbar()") `shouldBe` ["bar"]
+      detectUsageTypos "baz"  (js "Foo()\nbar()\nbaaz()") `shouldBe` ["bar", "baaz"]

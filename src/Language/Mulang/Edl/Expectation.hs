@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Language.Mulang.Edl.Expectation (
+  cQuery,
   Expectation (..),
   Matcher (..),
   Predicate (..),
@@ -75,3 +76,8 @@ data Clause
   | IsTrue
   deriving (Eq, Show, Generic)
 
+cQuery :: Query -> Maybe CQuery
+cQuery (Decontextualize q) = Just q
+cQuery (Within _ q)        = Just q
+cQuery (Through _ q)       = Just q
+cQuery _                   = Nothing

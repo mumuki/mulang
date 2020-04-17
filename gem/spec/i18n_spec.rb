@@ -32,6 +32,10 @@ describe Mulang::Expectation::I18n do
     it { expect(expectation('*', "Returns:WithNumber:9").translate).to eq('solution must return with number <i>9</i>') }
 
     it { expect(expectation('foo', 'HasEmptyRepeat').translate).to eq('<strong>foo</strong> has empty <i>repeat</i>') }
+
+    it { expect(expectation('Foo', 'HasDeclarationTypos:foo').translate).to eq('Solution must declare <strong>foo</strong>, but declares <strong>Foo</strong>. Perhaps you meant <strong>foo</strong>?') }
+    it { expect(expectation('Foo', 'HasUsageTypos:foo').translate).to eq('Solution must use <strong>foo</strong>, but it uses <strong>Foo</strong>. Perhaps you meant <strong>foo</strong>?') }
+
   end
 
   context 'pt locale' do
@@ -151,6 +155,9 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'HasUnreachableCode').translate).to eq('<strong>foo</strong> tiene código inalcanzable') }
       it { expect(expectation('foo', 'HasLongParameterList').translate).to eq('<strong>foo</strong> tiene demasiados parámetros. Te podría estar faltando una abstracción') }
       it { expect(expectation('foo', 'OverridesEqualOrHashButNotBoth').translate).to eq('<strong>foo</strong> redefine los métodos <i>equals</i> o <i>hash</i>, pero no ambos') }
+
+      it { expect(expectation('Foo', 'HasDeclarationTypos:foo').translate).to eq('La solución parece tener un error de tipeo: debe declarar <strong>foo</strong>, pero declara <strong>Foo</strong>. ¿Quizás quisiste decir <strong>foo</strong>?') }
+      it { expect(expectation('Foo', 'HasUsageTypos:foo').translate).to eq('La solución parece tener un error de tipeo: debe usar <strong>foo</strong>, pero usa <strong>Foo</strong>. ¿Quizás quisiste decir <strong>foo</strong>?') }
     end
   end
 end

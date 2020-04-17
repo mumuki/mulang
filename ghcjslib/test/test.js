@@ -2,6 +2,22 @@ var should = require('should');
 let mulang = require('../build/mulang');
 
 describe("mulang", () => {
+  it("can compute analysis",  () => {
+    const code = mulang.nativeCode("Python", "x = 1\ndef increment():\n\tx += 1");
+    const result = code.analyse({
+      expectations: [
+        {binding: '*', inspection: 'Declares'},
+        {binding: '*', inspection: 'Assigns'},
+        {binding: '*', inspection: 'DeclaresProcedure:Increment'}],
+      smellsSet: { tag: 'AllSmells' }})
+
+    should(result.expectationResults).eql([
+      { expectation: { binding: '*', inspection: 'Declares' }, result: true },
+      { expectation: { binding: '*', inspection: 'Assigns' }, result: true },
+      { expectation: { binding: '*', inspection: 'DeclaresProcedure:Increment' }, result: false }])
+    should(result.smells).eql([{ binding: 'increment', inspection: 'HasDeclarationTypos:Increment' } ])
+  })
+
   it("can run quick queries over native code", () => {
     const code = mulang.code("JavaScript", "x = 1");
 

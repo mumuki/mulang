@@ -3,14 +3,14 @@ module Language.Mulang.Analyzer.ExpectationsAnalyzer (
 
 import Data.Maybe (fromMaybe)
 
-import Language.Mulang
-import Language.Mulang.Analyzer.Analysis (Expectation, ExpectationResult(..))
+import Language.Mulang.Ast (Expression)
+import Language.Mulang.Analyzer.Analysis (Expectation, QueryResult, ExpectationResult(..))
 import Language.Mulang.Analyzer.ExpectationsCompiler (compileExpectation)
 
-analyseExpectations :: Expression -> Maybe [Expectation] -> [ExpectationResult]
+analyseExpectations :: Expression -> Maybe [Expectation] -> [QueryResult]
 analyseExpectations content = map (analyseExpectation content) . (fromMaybe [])
 
-analyseExpectation :: Expression -> Expectation -> ExpectationResult
-analyseExpectation ast e = ExpectationResult e (compileAndEval e)
-  where compileAndEval e = (compileExpectation e) ast
+analyseExpectation :: Expression -> Expectation -> QueryResult
+analyseExpectation ast e = (query, ExpectationResult e (inspection ast))
+  where (query, inspection) = compileExpectation e
 

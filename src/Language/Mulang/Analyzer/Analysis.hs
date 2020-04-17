@@ -37,12 +37,15 @@ module Language.Mulang.Analyzer.Analysis (
   SmellsSet(..),
   TestAnalysisType(..),
 
+  QueryResult,
+
   AnalysisResult(..),
   ExpectationResult(..)) where
 
 import GHC.Generics
 
 import Language.Mulang.Ast
+import Language.Mulang.Edl.Expectation (Query)
 import Language.Mulang.Builder (NormalizationOptions)
 import Language.Mulang.Interpreter.Runner (TestResult)
 import Data.Map.Strict (Map)
@@ -138,6 +141,12 @@ data Language
   |  Ruby
   |  Php
   deriving (Show, Eq, Generic)
+
+--
+-- Analysis Intermidiate structures
+--
+
+type QueryResult = (Query, ExpectationResult)
 
 --
 -- Analysis Output structures

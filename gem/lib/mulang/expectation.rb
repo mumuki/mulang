@@ -1,12 +1,42 @@
 module Mulang::Expectation
-  SMELLS = %w(DiscardsExceptions DoesConsolePrint DoesNilTest DoesNullTest DoesTypeTest
-              HasAssignmentReturn HasCodeDuplication HasEmptyIfBranches HasEmptyRepeat HasRedundantRepeat HasLongParameterList
-              HasMisspelledBindings HasMisspelledIdentifiers
-              HasRedundantBooleanComparison HasRedundantGuards HasRedundantIf
-              HasRedundantLambda HasRedundantLocalVariableReturn HasRedundantParameter
-              HasRedundantReduction HasTooManyMethods HasTooShortBindings HasTooShortIdentifiers HasUnreachableCode
-              HasWrongCaseBinding HasWrongCaseIdentifiers IsLongCode OverridesEqualOrHashButNotBoth
-              ReturnsNil ReturnsNull ShouldInvertIfCondition UsesCut UsesFail UsesUnificationOperator)
+  SMELLS = %w(
+    DiscardsExceptions
+    DoesConsolePrint
+    DoesNilTest
+    DoesNullTest
+    DoesTypeTest
+    HasAssignmentReturn
+    HasCodeDuplication
+    HasDeclarationTypos
+    HasEmptyIfBranches
+    HasEmptyRepeat
+    HasLongParameterList
+    HasMisspelledBindings
+    HasMisspelledIdentifiers
+    HasRedundantBooleanComparison
+    HasRedundantGuards
+    HasRedundantIf
+    HasRedundantLambda
+    HasRedundantLocalVariableReturn
+    HasRedundantParameter
+    HasRedundantReduction
+    HasRedundantRepeat
+    HasTooManyMethods
+    HasTooShortBindings
+    HasTooShortIdentifiers
+    HasUnreachableCode
+    HasUsageTypos
+    HasWrongCaseBinding
+    HasWrongCaseIdentifiers
+    IsLongCode
+    OverridesEqualOrHashButNotBoth
+    ReturnsNil
+    ReturnsNull
+    ShouldInvertIfCondition
+    ShouldUseOtherwise
+    UsesCut
+    UsesFail
+    UsesUnificationOperator)
 
   def self.guess_type(expectation)
     if expectation[:binding] == '<<custom>>'
@@ -19,7 +49,7 @@ module Mulang::Expectation
   end
 
   def self.has_smell?(smell)
-    SMELLS.include? smell
+    SMELLS.include? smell.split(':').first
   end
 
   def self.parse(expectation)

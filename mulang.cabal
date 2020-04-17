@@ -114,6 +114,7 @@ library
     scientific                ,
     split                     ,
     text                      ,
+    text-metrics              ,
     unordered-containers      ,
     utf8-string               ,
     vector                    ,

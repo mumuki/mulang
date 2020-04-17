@@ -10,7 +10,55 @@ result smells
 runExcept language content smells = analyse (smellsAnalysis (CodeSample language content) (allSmellsBut smells))
 runOnly language content smells = analyse (smellsAnalysis (CodeSample language content) (noSmellsBut smells))
 
+runWithTypos language content expectations = do
+  let spec = emptyAnalysisSpec { smellsSet = (allSmellsBut []), expectations = Just expectations }
+  result <- analyse (Analysis (CodeSample language content) spec)
+  return $ smells result
+
 spec = describe "SmellsAnalyzer" $ do
+  describe "using usage typos" $ do
+    it "works when there are missing usages and typos" $ do
+      runWithTypos JavaScript "baz()" [Expectation "*" "Uses:bar"] `shouldReturn` [Expectation "baz" "HasUsageTypos:bar"]
+
+    it "works when there are missing usages and multiple potential typos" $ do
+      let typos = [ Expectation "baz" "HasUsageTypos:bar", Expectation "Bar" "HasUsageTypos:bar" ]
+
+      runWithTypos JavaScript "baz()\nBar() {}" [Expectation "*" "Uses:bar"] `shouldReturn` typos
+
+    it "works when there are missing usages but no typos" $ do
+      runWithTypos JavaScript "goo()" [Expectation "*" "Uses:bar"] `shouldReturn` []
+
+    it "works when there are no missing usages and potential typos" $ do
+        runWithTypos JavaScript "bar()\nbaz()\n" [Expectation "*" "Uses:bar"] `shouldReturn` []
+
+  describe "using declaration typos" $ do
+    it "works when there are missing declarations and typos" $ do
+      runWithTypos JavaScript "function baz() {}" [Expectation "*" "Declares:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]
+      runWithTypos JavaScript "function baz() {}" [Expectation "*" "DeclaresComputation:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]
+      runWithTypos JavaScript "function baz() {}" [Expectation "*" "DeclaresComputationWithArity0:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]
+      runWithTypos JavaScript "function baz() {}" [Expectation "*" "DeclaresComputationWithArity1:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]
+      runWithTypos JavaScript "function baz() {}" [Expectation "*" "DeclaresProcedure:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]
+      runWithTypos JavaScript "function baz() {}" [Expectation "*" "DeclaresFunction:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]
+      runWithTypos JavaScript "function baz() {}" [Expectation "*" "Delegates:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]
+      runWithTypos JavaScript "function baz() {}" [Expectation "*" "SubordinatesDeclarationsTo:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]
+
+    it "works when there are missing declarations and multiple potential typos" $ do
+      let typos = [ Expectation "Bar" "HasDeclarationTypos:bar", Expectation "baz" "HasDeclarationTypos:bar" ]
+
+      runWithTypos JavaScript "function baz() {}\nfunction Bar() {}" [Expectation "*" "Declares:bar"] `shouldReturn` typos
+
+    it "works when there are missing declarations but no typos" $ do
+      runWithTypos JavaScript "function goo() {}" [Expectation "*" "Declares:bar"] `shouldReturn` []
+
+    it "works when there are no missing declarations and potential typos" $ do
+        runWithTypos JavaScript "function bar() {}\nfunction baz() {}\n" [Expectation "*" "Declares:bar"] `shouldReturn` []
+
+    it "works when there are no missing declarations but original expectations fail" $ do
+        runWithTypos JavaScript "function bar() {}" [Expectation "*" "DeclaresClass:bar"] `shouldReturn` []
+        runWithTypos JavaScript "function bar() {}" [Expectation "*" "DeclaresComputationWithArity1:bar"] `shouldReturn` []
+        runWithTypos JavaScript "function bar() {}" [Expectation "*" "Delegates:bar"] `shouldReturn` []
+        runWithTypos JavaScript "function bar() {}\nfunction other(){}" [Expectation "*" "SubordinatesDeclarationsTo:bar"] `shouldReturn` []
+
   it "Using domain language and nested structures" $ do
     let runRuby sample = analyse (domainLanguageAnalysis (MulangSample sample Nothing) (DomainLanguage Nothing (Just RubyCase) (Just 3) Nothing))
     (runRuby (Sequence [
@@ -29,7 +77,7 @@ spec = describe "SmellsAnalyzer" $ do
     let runPython sample = runExcept Python3 sample []
     runPython "def fooBar():\n\tpass\n\ndef foo_baz():\n\tpass\n\n" `shouldReturn` (result [Expectation "fooBar" "HasWrongCaseIdentifiers"])
 
-  it "works inferring caseStyl" $ do
+  it "works inferring caseStyle" $ do
     let runPython sample = analyse (domainLanguageAnalysis (CodeSample Python3 sample) (DomainLanguage Nothing Nothing (Just 3) Nothing))
     runPython "def fooBar():\n\tpass\n\ndef foo_baz():\n\tpass\n\n" `shouldReturn` (result [Expectation "fooBar" "HasWrongCaseIdentifiers"])
 
