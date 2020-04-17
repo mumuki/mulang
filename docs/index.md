@@ -14,6 +14,7 @@ Mulang is a tool for analysing source code, which is built on top of five main c
 
 Mulang can work with many different programming languages. it natively supports:
 
+  * C
   * Haskell
   * Java
   * JavaScript (ES6)
