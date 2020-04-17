@@ -139,16 +139,17 @@ muBinaryOp CShrOp = Primitive O.BitwiseRightShift
 muBinaryOp CXorOp = Primitive O.BitwiseXor
 
 muUnaryOp :: CUnaryOp -> Expression -> Expression
-muUnaryOp CPreIncOp  argument = Application (Primitive O.Plus)     [argument, MuNumber 1]
-muUnaryOp CPreDecOp  argument = Application (Primitive O.Minus)    [argument, MuNumber 1]
-muUnaryOp CPostIncOp argument = Application (Primitive O.Plus)     [argument, MuNumber 1]
-muUnaryOp CPostDecOp argument = Application (Primitive O.Minus)    [argument, MuNumber 1]
-muUnaryOp CNegOp     argument = Application (Primitive O.Negation) [argument]
-muUnaryOp CPlusOp    argument = Application (Primitive O.Plus)     [argument]
-muUnaryOp CMinOp     argument = Application (Primitive O.Minus)    [argument]
-muUnaryOp CAdrOp     argument = Application (Reference "&")        [argument]
-muUnaryOp CIndOp     argument = Application (Reference "*")        [argument]
-muUnaryOp CCompOp    argument = Application (Reference "~")        [argument]
+muUnaryOp CPreIncOp  argument@(Reference arg) = Assignment arg $ Application (Primitive O.Plus)     [argument, MuNumber 1]
+muUnaryOp CPreDecOp  argument@(Reference arg) = Assignment arg $ Application (Primitive O.Minus)    [argument, MuNumber 1]
+muUnaryOp CPostIncOp argument@(Reference arg) = Assignment arg $ Application (Primitive O.Plus)     [argument, MuNumber 1]
+muUnaryOp CPostDecOp argument@(Reference arg) = Assignment arg $ Application (Primitive O.Minus)    [argument, MuNumber 1]
+muUnaryOp CNegOp     argument                 = Application (Primitive O.Negation) [argument]
+muUnaryOp CPlusOp    argument                 = Application (Primitive O.Plus)     [argument]
+muUnaryOp CMinOp     argument                 = Application (Primitive O.Minus)    [argument]
+muUnaryOp CAdrOp     argument                 = Application (Reference "&")        [argument]
+muUnaryOp CIndOp     argument                 = Application (Reference "*")        [argument]
+muUnaryOp CCompOp    argument                 = Application (Reference "~")        [argument]
+muUnaryOp a b                                 = Other (Just $ show a) $ Just b
 
 muAssignOp :: CAssignOp -> Expression
 muAssignOp CMulAssOp = Primitive O.Multiply

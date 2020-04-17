@@ -198,10 +198,10 @@ spec = do
                                   Variable "indice" (MuNumber 0.0)
                                 ])
                                 (Application (Primitive NotEqual) [Application (Reference "[]") [Reference "unosNumeros",Reference "indice"],Reference "NULL"])
-                                (Application (Primitive Plus) [Reference "indice",MuNumber 1.0])
+                                (Assignment "indice" (Application (Primitive Plus) [Reference "indice",MuNumber 1.0]))
                                 (If
                                   (Application (Reference "esNumeroImpar") [Application (Reference "[]") [Reference "c",Reference "b"]])
-                                  (Application (Primitive Plus) [Reference "cantidadDeImpares",MuNumber 1.0])
+                                  (Assignment "cantidadDeImpares" (Application (Primitive Plus) [Reference "cantidadDeImpares",MuNumber 1.0]))
                                   None
                                 ),
                               Return (Reference "cantidadDeImpares")]))]]
