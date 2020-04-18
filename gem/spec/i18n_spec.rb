@@ -53,6 +53,12 @@ describe Mulang::Expectation::I18n do
     it { expect(expectation('*', 'UsesDivide').translate).to eq('solution must use <i>/</i>') }
     it { expect(expectation('*', 'UsesForwardComposition').translate).to eq('solution must use <i>>></i>') }
     it { expect(expectation('*', 'UsesBackwardComposition').translate).to eq('solution must use <i>.</i>') }
+    it { expect(expectation('*', 'UsesModulo').translate).to eq('solution must use <i>%</i>') }
+    it { expect(expectation('*', 'UsesBitwiseOr').translate).to eq('solution must use <i>|</i>') }
+    it { expect(expectation('*', 'UsesBitwiseAnd').translate).to eq('solution must use <i>&</i>') }
+    it { expect(expectation('*', 'UsesBitwiseXor').translate).to eq('solution must use <i>^</i>') }
+    it { expect(expectation('*', 'UsesBitwiseLeftShift').translate).to eq('solution must use <i><<</i>') }
+    it { expect(expectation('*', 'UsesBitwiseRightShift').translate).to eq('solution must use <i>>></i>') }
   end
 
   context 'pt locale' do
