@@ -128,6 +128,40 @@ spec = do
     it "is False when local variable is used as a cache" $ do
       hasRedundantLocalVariableReturn (js "function x(m) { var x = 5; var y = 1 + x; g(y); return x; }") `shouldBe` False
 
+  describe "hasBrokenReturn" $ do
+    it "is False when there are no functions" $ do
+      hasBrokenReturn (js "let y = 0; if (x) { y = 0 } ") `shouldBe` False
+
+    it "is False when there is a function that has only a return" $ do
+      hasBrokenReturn (js "function f(){ return 4 } ") `shouldBe` False
+
+    it "is False when there is a function that has a single flow and return" $ do
+      hasBrokenReturn (js "function f(){ console.log(2); return 4 } ") `shouldBe` False
+
+    it "is False when there is a function that has an if with no returns " $ do
+      hasBrokenReturn (js "function f(){ if (x) { console.log(4) } else { console.log(5) } return 4 } ") `shouldBe` False
+
+    it "is False when there is a function that has an if with no returns and no else " $ do
+        hasBrokenReturn (js "function f(){ if (x) { console.log(4) } return 4 } ") `shouldBe` False
+
+    it "is True when there is a function that has an if with a return and no else and not trailing return " $ do
+        hasBrokenReturn (js "function f(){ if (x) { return 4 } } ") `shouldBe` True
+
+    it "is True when there is a function that has an if with a return in else but not then and not trailing return " $ do
+        hasBrokenReturn (js "function f(){ if (x) { } else { return 4 } }") `shouldBe` True
+
+    it "is True when there is a function that nested ifs with incomplete return and no trailing return " $ do
+        hasBrokenReturn (js "function f(){ if (x) { if (y) { return 5 } } else { return 4 } }") `shouldBe` True
+
+    it "is False when there is a function that has an if with a return and no else and trailing return " $ do
+        hasBrokenReturn (js "function f(){ if (x) { return 4 } return 5; } ") `shouldBe` False
+
+    it "is False when there is a function that has an if with a return in else but not then and trailing return " $ do
+        hasBrokenReturn (js "function f(){ if (x) { } else { return 4 } return 5; } ") `shouldBe` False
+
+    it "is False when there is a function that nested ifs with complete return and no trailing return " $ do
+        hasBrokenReturn (js "function f(){ if (x) { if (y) { return 5 } else { return 6 } } else { return 4 } }") `shouldBe` False
+
 
   describe "hasAssignmentCondition" $ do
     it "is True when assigns within an if condition" $ do

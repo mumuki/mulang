@@ -5,6 +5,7 @@ module Language.Mulang.Inspector.Generic.Smell (
   doesConsolePrint,
   doesNilTest,
   doesTypeTest,
+  hasBrokenReturn,
   hasAssignmentReturn,
   hasAssignmentCondition,
   hasEmptyIfBranches,
@@ -139,6 +140,21 @@ hasRedundantLocalVariableReturn = containsExpression f
   where f (Sequence [ Variable declaredVariable _,
                       Return (Reference returnedVariable)]) = returnedVariable == declaredVariable
         f _                                                 = False
+
+hasBrokenReturn :: Inspection
+hasBrokenReturn = containsDeclaration f
+  where
+    f (SimpleFunction _ _ body) = not . fullyReturns $ body
+    f _                         = False
+
+    fullyReturns :: Expression -> Bool
+    fullyReturns (Sequence (Return _:_))    = True
+    fullyReturns (Sequence (If _ b1 b2:es)) = fullyReturns b1 && fullyReturns b2 || fullyReturns (Sequence es)
+    fullyReturns (Sequence (_:es))          = fullyReturns (Sequence es)
+    fullyReturns (Return _)                 = True
+    fullyReturns (If _ b1 b2)               = fullyReturns b1 && fullyReturns b2
+    fullyReturns _                          = False
+
 
 hasAssignmentCondition :: Inspection
 hasAssignmentCondition = containsExpression f
