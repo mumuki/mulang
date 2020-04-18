@@ -46,6 +46,17 @@ spec = do
       run JavaScript (Expectation "*" "Uses:&&") `shouldBe` (Expectation "*" "UsesAnd")
       run JavaScript (Expectation "*" "Uses:||") `shouldBe` (Expectation "*" "UsesOr")
 
+    it "corrects C operators" $ do
+      run C (Expectation "*" "Uses:+") `shouldBe` (Expectation "*" "UsesPlus")
+      run C (Expectation "*" "Uses:&&") `shouldBe` (Expectation "*" "UsesAnd")
+      run C (Expectation "*" "Uses:||") `shouldBe` (Expectation "*" "UsesOr")
+      run C (Expectation "*" "Uses:%") `shouldBe` (Expectation "*" "UsesMod")
+      run C (Expectation "*" "Uses:&") `shouldBe` (Expectation "*" "UsesBitwiseAnd")
+      run C (Expectation "*" "Uses:|") `shouldBe` (Expectation "*" "UsesBitwiseOr")
+      run C (Expectation "*" "Uses:>>") `shouldBe` (Expectation "*" "UsesBitwiseRightShift")
+      run C (Expectation "*" "Uses:<<") `shouldBe` (Expectation "*" "UsesBitwiseLeftShift")
+      run C (Expectation "*" "Uses:^") `shouldBe` (Expectation "*" "UsesBitwiseXor")
+
   describe "correct primitive declarations" $ do
     it "corrects haskell otherwise negated" $ do
       run Haskell (Expectation "*" "Not:Declares:otherwise")  `shouldBe` (Expectation "*" "Not:DeclaresOtherwise")

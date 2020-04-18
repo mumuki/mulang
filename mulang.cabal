@@ -61,12 +61,14 @@ library
     Language.Mulang.Inspector.Query
     Language.Mulang.Inspector.Typed
     Language.Mulang.Operators
+    Language.Mulang.Operators.C
     Language.Mulang.Operators.Haskell
     Language.Mulang.Operators.Java
     Language.Mulang.Operators.JavaScript
     Language.Mulang.Operators.Python
     Language.Mulang.Operators.Ruby
     Language.Mulang.Parsers
+    Language.Mulang.Parsers.C
     Language.Mulang.Parsers.Haskell
     Language.Mulang.Parsers.Java
     Language.Mulang.Parsers.JavaScript
@@ -104,6 +106,7 @@ library
     hashable                  ,
     haskell-src               ,
     inflections               <= 0.2.0.1,
+    language-c                ,
     language-java             ,
     language-javascript       ,
     language-python           ,

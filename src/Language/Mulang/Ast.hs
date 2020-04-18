@@ -161,6 +161,11 @@ data Expression
     -- ^ Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body
     | Match Expression [Equation]
     | Switch Expression [(Expression, Expression)] Expression
+    -- ^ Generic switch expression, composed by a list of cases and a default case
+    | Break Expression
+    -- ^ Imperative programming break of flow statement
+    | Continue Expression
+    -- ^ Imperative programming step skip statement
     | Try Expression [(Pattern, Expression)] Expression
     -- ^ Generic try expression, composed by a body, a list of exception-handling patterns and statments, and a finally expression
     | Raise Expression

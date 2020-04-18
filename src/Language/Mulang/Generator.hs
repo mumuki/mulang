@@ -102,6 +102,8 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Variable _ v)          = [v]
     subExpressions (While e1 e2)           = [e1, e2]
     subExpressions (Yield v)               = [v]
+    subExpressions (Break e)               = [e]
+    subExpressions (Continue e)            = [e]
     subExpressions _                       = []
 
 

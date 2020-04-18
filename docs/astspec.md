@@ -34,14 +34,14 @@ As a rule of thumb if something is or can be represented as an statement, declar
 #### C Example
 
 ```c
-struct Point {
+struct point {
   int x;
   int y;
 }
 ```
 
 ```haskell
-(Record "Point")
+(Record "point")
 ```
 
 #### Caveats
@@ -86,6 +86,22 @@ public static main(String[] args) {}
 (Function Identifier [Equation])
 ```
 
+#### C Example
+
+```c
+int foo (int bar) {
+  return bar;
+}
+```
+
+```haskell
+Sequence [
+  TypeSignature "foo" (ParameterizedType ["int"] "int" []),
+  Function "foo" [
+    Equation [VariablePattern "bar"]
+      (UnguardedBody (Return (Reference "bar")))]]
+```
+
 #### Python Example
 
 ```python
@@ -109,7 +125,6 @@ def foo(bar):
   (Equation [VariablePattern "bar"]
     (UnguardedBody (Return (Reference "bar"))))])
 ```
-
 
 ### `Procedure`
 
@@ -208,6 +223,18 @@ end
 (Variable Identifier Expression)
 ```
 
+#### C Example
+
+```c
+int a = 10;
+```
+
+```haskell
+(Sequence [
+  TypeSignature "a" (SimpleType "int" []),
+  Variable "a" (MuNumber 10.0)])
+```
+
 #### JavaScript Example
 
 ```javascript
@@ -224,6 +251,16 @@ let x = 1;
 
 ```haskell
 (Assignment Identifier Expression)
+```
+
+#### C Example
+
+```c
+m = 3.4;
+```
+
+```haskell
+(Assignment "m" (MuNumber 3.4))
 ```
 
 #### Ruby Example
@@ -447,6 +484,20 @@ foo(bar).
 
 ```haskell
 (Reference Identifier)
+```
+
+#### C Example
+
+```javascript
+int x = 4;
+x
+```
+
+```haskell
+(Sequence [
+  TypeSignature "x" (SimpleType "int" []),
+  Variable "x" (MuNumber 4.0),
+  Reference "x"])
 ```
 
 #### JavaScript Example
@@ -691,7 +742,25 @@ for (Integer i : ints) {
 (ForLoop Expression Expression Expression Expression)
 ```
 
-#### Example
+#### C Example
+
+```c
+for (int i = 0; i < 10; i++) {
+  foo(i);
+}
+```
+
+```haskell
+(ForLoop
+  (Sequence [
+    TypeSignature "i" (SimpleType "int" []),
+    Variable "i" (MuNumber 0.0)])
+  (Application (Primitive LessThan) [Reference "i",MuNumber 10.0])
+  (Assignment "i" (Application (Primitive Plus) [Reference "i",MuNumber 1.0]))
+  (Application (Reference "foo") [Reference "i"])))
+```
+
+#### JavaScript Example
 
 ```javascript
 for (var i = 0; i < 10; i++) {
@@ -758,6 +827,26 @@ See [MuDict](#mudict) for more details
 
 ```haskell
 (None)
+```
+
+### `Break`
+
+> Used to break out of flow structure
+
+#### Syntax
+
+```haskell
+(Break Expression)
+```
+
+### `Continue`
+
+> Used to jump over to next flow structure step
+
+#### Syntax
+
+```haskell
+(Continue Expression)
 ```
 
 ### `MuNil`
@@ -1162,6 +1251,12 @@ Primitive operators represent low-level language operations that are well known 
 * `Divide`
 * `ForwardComposition`: `(f >> g)(x) = (g . f)(x) = g(f(x))` operator
 * `BackwardComposition`: `(g << f)(x) = (g . f)(x) = g(f(x))` operator
+* `Mod`
+* `BitwiseOr`
+* `BitwiseAnd`
+* `BitwiseXor`
+* `BitwiseLeftShift`
+* `BitwiseRightShift`
 
 ## Types
 
