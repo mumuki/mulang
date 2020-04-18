@@ -45,12 +45,17 @@ spec = do
       run JavaScript (Expectation "*" "Uses:+") `shouldBe` (Expectation "*" "UsesPlus")
       run JavaScript (Expectation "*" "Uses:&&") `shouldBe` (Expectation "*" "UsesAnd")
       run JavaScript (Expectation "*" "Uses:||") `shouldBe` (Expectation "*" "UsesOr")
+      run JavaScript (Expectation "*" "Uses:%") `shouldBe` (Expectation "*" "UsesModulo")
+      run JavaScript (Expectation "*" "Uses:&") `shouldBe` (Expectation "*" "UsesBitwiseAnd")
+      run JavaScript (Expectation "*" "Uses:|") `shouldBe` (Expectation "*" "UsesBitwiseOr")
+      run JavaScript (Expectation "*" "Uses:>>") `shouldBe` (Expectation "*" "UsesBitwiseRightShift")
+      run JavaScript (Expectation "*" "Uses:<<") `shouldBe` (Expectation "*" "UsesBitwiseLeftShift")
 
     it "corrects C operators" $ do
       run C (Expectation "*" "Uses:+") `shouldBe` (Expectation "*" "UsesPlus")
       run C (Expectation "*" "Uses:&&") `shouldBe` (Expectation "*" "UsesAnd")
       run C (Expectation "*" "Uses:||") `shouldBe` (Expectation "*" "UsesOr")
-      run C (Expectation "*" "Uses:%") `shouldBe` (Expectation "*" "UsesMod")
+      run C (Expectation "*" "Uses:%") `shouldBe` (Expectation "*" "UsesModulo")
       run C (Expectation "*" "Uses:&") `shouldBe` (Expectation "*" "UsesBitwiseAnd")
       run C (Expectation "*" "Uses:|") `shouldBe` (Expectation "*" "UsesBitwiseOr")
       run C (Expectation "*" "Uses:>>") `shouldBe` (Expectation "*" "UsesBitwiseRightShift")

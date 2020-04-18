@@ -121,7 +121,7 @@ evalExpr (M.Application (M.Primitive O.GreatherOrEqualThan) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 >= n2
 
-evalExpr (M.Application (M.Primitive O.Mod) expressions) =
+evalExpr (M.Application (M.Primitive O.Modulo) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 `mod'` n2
         f params                     = error $ "Bad parameters, expected two numbers but got " ++ show params

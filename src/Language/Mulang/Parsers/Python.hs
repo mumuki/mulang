@@ -237,13 +237,13 @@ muOpReference (Minus _)              = M.Primitive O.Minus
 muOpReference (Divide _)             = M.Primitive O.Divide
 muOpReference (FloorDivide _)        = M.Reference "//"
 muOpReference (Invert _)             = M.Reference "~"
-muOpReference (Modulo _)             = M.Primitive O.Mod
+muOpReference (Modulo _)             = M.Primitive O.Modulo
 
 muAssignOp (PlusAssign _)       = M.Primitive O.Plus
 muAssignOp (MinusAssign _)      = M.Primitive O.Minus
 muAssignOp (MultAssign _)       = M.Primitive O.Multiply
 muAssignOp (DivAssign _)        = M.Primitive O.Divide
-muAssignOp (ModAssign _)        = M.Primitive O.Mod
+muAssignOp (ModAssign _)        = M.Primitive O.Modulo
 muAssignOp (PowAssign _)        = M.Reference "**"
 muAssignOp (BinAndAssign _)     = M.Primitive O.BitwiseAnd
 muAssignOp (BinOrAssign _)      = M.Primitive O.BitwiseOr

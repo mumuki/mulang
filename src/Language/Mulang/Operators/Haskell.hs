@@ -12,7 +12,7 @@ haskellTokensTable =
     (Otherwise, ["otherwise"]),
     (BackwardComposition, ["."]),
     (Divide, ["/"]),
-    (Mod, ["mod"]),
+    (Modulo, ["mod"]),
     (BitwiseLeftShift, []),
     (BitwiseRightShift, [])
   ]

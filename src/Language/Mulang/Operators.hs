@@ -39,7 +39,7 @@ defaultTokensTable =
     (Minus, ["-"]),
     (Multiply, ["*"]),
     (Divide, ["/"]),
-    (Mod, ["%"]),
+    (Modulo, ["%"]),
     (BitwiseOr, ["|"]),
     (BitwiseAnd, ["&"]),
     (BitwiseLeftShift, ["<<"]),
