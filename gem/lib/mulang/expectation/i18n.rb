@@ -71,7 +71,7 @@ module Mulang::Expectation::I18n
     end
 
     def t_binding(binding)
-      binding == '*' ? ::I18n.t("mulang.expectation.solution") : "<strong>#{Mulang::Inspection.parse_binding_name binding}</strong>"
+      binding == '*' ? ::I18n.t("mulang.expectation.solution") : "<code>#{Mulang::Inspection.parse_binding_name binding}</code>"
     end
 
     def t_must(parsed)
@@ -79,7 +79,7 @@ module Mulang::Expectation::I18n
     end
 
     def t_target(parsed)
-      "<strong>#{parsed.target.value}</strong>" if parsed.target
+      "<code>#{parsed.target.value}</code>" if parsed.target
     end
 
     def t_matching(tokens, parsed)
