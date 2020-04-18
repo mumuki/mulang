@@ -32,11 +32,17 @@ data Operator
     | BackwardComposition
     -- (f << g)(x) = (f . g)(x) = f(g(x)) operator
     | Modulo
+    -- ^ % operator
     | BitwiseOr
+    -- ^ bit-level or operator |
     | BitwiseAnd
+    -- ^ bit-level and operator &
     | BitwiseXor
+    -- ^ bit-level xor operator
     | BitwiseLeftShift
+    -- ^ bit-level left shift operator <<
     | BitwiseRightShift
+    -- ^ bit-level right shift operator >>
   deriving (Eq, Show, Read, Generic, Ord, Enum)
 
 
