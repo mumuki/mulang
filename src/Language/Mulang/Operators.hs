@@ -38,7 +38,12 @@ defaultTokensTable =
     (Plus, ["+"]),
     (Minus, ["-"]),
     (Multiply, ["*"]),
-    (Divide, ["/"])
+    (Divide, ["/"]),
+    (Mod, ["%"]),
+    (BitwiseOr, ["|"]),
+    (BitwiseAnd, ["&"]),
+    (BitwiseLeftShift, ["<<"]),
+    (BitwiseRightShift, [">>"])
   ]
 
 buildTokensTable :: [(Operator, [Token])] -> TokensTable

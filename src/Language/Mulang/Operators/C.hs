@@ -7,10 +7,5 @@ import Language.Mulang.Ast.Operator (Operator (..))
 cTokensTable :: TokensTable
 cTokensTable =
   buildTokensTable [
-    (BitwiseXor, ["^"]),
-    (Mod, ["%"]),
-    (BitwiseOr, ["|"]),
-    (BitwiseAnd, ["&"]),
-    (BitwiseLeftShift, ["<<"]),
-    (BitwiseRightShift, [">>"])
+    (BitwiseXor, ["^"])
   ]
