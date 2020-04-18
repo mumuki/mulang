@@ -4,9 +4,22 @@ import           Test.Hspec
 import           Language.Mulang.Ast hiding (Equal, NotEqual)
 import           Language.Mulang.Ast.Operator
 import           Language.Mulang.Parsers.Haskell
+import           Language.Mulang.Operators.Haskell
+import qualified Data.Map as Map
 
 spec :: Spec
 spec = do
+  describe "tokens table" $ do
+
+    it "excludes some c-like operators" $ do
+      let operators = Map.keys haskellTokensTable
+
+      elem Modulo operators `shouldBe` True
+      elem BitwiseOr operators `shouldBe` False
+      elem BitwiseAnd operators `shouldBe` False
+      elem BitwiseLeftShift operators `shouldBe` False
+      elem BitwiseRightShift operators `shouldBe` False
+
   describe "parse" $ do
     it "parses literal character patterns" $ do
       hs "f 'a' = 1" `shouldBe` (Function "f" [Equation [LiteralPattern "'a'"] (UnguardedBody (Return (MuNumber 1.0)))])
