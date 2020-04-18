@@ -124,29 +124,29 @@ evalExpr (M.Application (M.Primitive O.GreatherOrEqualThan) expressions) =
 evalExpr (M.Application (M.Primitive O.Modulo) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 `mod'` n2
-        f params                     = raiseTypeError $ "expected two numbers but got " ++ show params
+        f params                     = raiseTypeError "expected two numbers" params
 
 evalExpr (M.Application (M.Primitive O.GreatherThan) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 > n2
-        f params                     = raiseTypeError $ "expected two bools but got " ++ show params
+        f params                     = raiseTypeError "expected two bools" params
 
 -- TODO make this evaluation non strict on both parameters
 evalExpr (M.Application (M.Primitive O.Or) expressions) =
   evalExpressionsWith expressions f
   where f [MuBool b1, MuBool b2] = createReference $ MuBool $ b1 || b2
-        f params                 = raiseTypeError $ "expected two bools but got " ++ show params
+        f params                 = raiseTypeError "expected two bools" params
 
 -- TODO make this evaluation non strict on both parameters
 evalExpr (M.Application (M.Primitive O.And) expressions) =
   evalExpressionsWith expressions f
   where f [MuBool b1, MuBool b2] = createReference $ MuBool $ b1 && b2
-        f params                 = raiseTypeError $ "expected two bools but got " ++ show params
+        f params                 = raiseTypeError "expected two bools" params
 
 evalExpr (M.Application (M.Primitive O.Negation) expressions) =
   evalExpressionsWith expressions f
   where f [MuBool b] = createReference $ MuBool $ not b
-        f params     = raiseTypeError $ "expected one bool but got " ++ show params
+        f params     = raiseTypeError "expected one bool" params
 
 evalExpr (M.Application (M.Primitive O.Multiply) expressions) =
   evalExpressionsWith expressions f
@@ -163,22 +163,22 @@ evalExpr (M.Application (M.Primitive O.NotEqual) expressions) = do
 evalExpr (M.Application (M.Primitive O.LessOrEqualThan) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 <= n2
-        f params                     = raiseTypeError $ "expected two numbers but got " ++ show params
+        f params                     = raiseTypeError "expected two numbers" params
 
 evalExpr (M.Application (M.Primitive O.LessThan) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 < n2
-        f params                     = raiseTypeError $ "expected two numbers but got " ++ show params
+        f params                     = raiseTypeError "expected two numbers" params
 
 evalExpr (M.Application (M.Primitive O.Plus) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 + n2
-        f params                     = raiseTypeError $ "expected two numbers but got " ++ show params
+        f params                     = raiseTypeError "expected two numbers" params
 
 evalExpr (M.Application (M.Primitive O.Minus) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 - n2
-        f params                     = raiseTypeError $ "expected two numbers but got " ++ show params
+        f params                     = raiseTypeError "expected two numbers" params
 
 evalExpr (M.MuList expressions) = do
   refs <- forM expressions evalExpr
@@ -280,8 +280,8 @@ raiseString :: String -> Executable a
 raiseString s = do
   raiseInternal =<< (createReference $ MuString s)
 
-raiseTypeError :: String -> Executable a
-raiseTypeError message = raiseString $ "Type error: " ++ message
+raiseTypeError :: String -> [Value] ->Executable a
+raiseTypeError message values = raiseString $ "Type error: " ++ message ++ " but got " ++ show values
 
 muValuesEqual r1 r2
   | r1 == r2 = createReference $ MuBool True
