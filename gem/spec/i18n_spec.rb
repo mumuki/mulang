@@ -96,8 +96,8 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'HasComposition').translate).to eq('<strong>foo</strong> debe usar composición') }
       it { expect(expectation('foo', 'UsesLoop').translate).to eq('<strong>foo</strong> debe usar un bucle') }
 
-      it { expect(expectation('foo', 'HasIf').translate(keyword_if: 'si')).to eq('<strong>foo</strong> debe usar <i>si</i>') }
-      it { expect(expectation('foo', 'HasIf').translate(keyword_repeat: 'repetir')).to eq('<strong>foo</strong> debe usar <i>if</i>') }
+      it { expect(expectation('foo', 'HasIf').translate(keyword_If: 'si')).to eq('<strong>foo</strong> debe usar <i>si</i>') }
+      it { expect(expectation('foo', 'HasIf').translate(keyword_Repeat: 'repetir')).to eq('<strong>foo</strong> debe usar <i>if</i>') }
     end
 
     describe 'custom expectations' do
@@ -146,8 +146,8 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'UsesAnonymousVariable').translate).to eq('<strong>foo</strong> debe utilizar una variable anónima') }
       it { expect(expectation('*', 'UsesStaticPolymorphism').translate).to eq('la solución debe usar polimorfismo') }
 
-      it { expect(expectation('foo', 'UsesIf').translate(keyword_if: 'si')).to eq('<strong>foo</strong> debe usar <i>si</i>') }
-      it { expect(expectation('foo', 'UsesIf').translate(keyword_repeat: 'repetir')).to eq('<strong>foo</strong> debe usar <i>if</i>') }
+      it { expect(expectation('foo', 'UsesIf').translate(keyword_If: 'si')).to eq('<strong>foo</strong> debe usar <i>si</i>') }
+      it { expect(expectation('foo', 'UsesIf').translate(keyword_Repeat: 'repetir')).to eq('<strong>foo</strong> debe usar <i>if</i>') }
 
       it { expect(expectation('*', "Calls:x:WithString:'foo'").translate).to eq("la solución debe utilizar <strong>x</strong> con la cadena <i>'foo'</i>") }
       it { expect(expectation('*', "Returns:WithNumber:3").translate).to eq('la solución debe retornar con el número <i>3</i>') }
