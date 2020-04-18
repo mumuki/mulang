@@ -125,12 +125,10 @@ spec = do
         lastRef (runpy "7 % 4") `shouldReturn` MuNumber 3
 
       it "evals and" $ do
-        --lastRef (runpy "true && true") `shouldReturn` MuBool True
-        pending
+        lastRef (runpy "True and True") `shouldReturn` MuBool True
 
       it "evals or" $ do
-        --lastRef (runpy "false || false") `shouldReturn` MuBool False
-        pending
+        lastRef (runpy "False or False") `shouldReturn` MuBool False
 
       it "evals comparison" $ do
         lastRef (runpy "7 > 4") `shouldReturn` MuBool True
@@ -175,5 +173,4 @@ spec = do
           a|]) `shouldReturn` MuNumber 10
 
       it "evals not" $ do
-        --lastRef (runpy "not false") `shouldReturn` MuBool True
-        pending
+        lastRef (runpy "not False") `shouldReturn` MuBool True
