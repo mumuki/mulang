@@ -1,6 +1,6 @@
 module Mulang::Expectation::I18n
   class << self
-    DEFAULT_KEYWORDS = {
+    DEFAULT_TOKENS = {
       keyword_entry_point: :program,
       keyword_fail: :fail,
       keyword_false: :false,
@@ -33,37 +33,37 @@ module Mulang::Expectation::I18n
       operator_NotEqual: "!=",
       operator_Or: "||",
       operator_Otherwise: 'otherwise',
-      operator_Plus: "+"
+      operator_Plus: "+",
       operator_Modulo: '%',
       operator_BitwiseOr: '|',
       operator_BitwiseAnd: '&',
       operator_BitwiseXor: '^',
       operator_BitwiseLeftShift: '<<',
-      operator_BitwiseRightShift: '>>',
+      operator_BitwiseRightShift: '>>'
     }
 
-    def translate(e, keywords = nil)
-      translate!(e, keywords)
+    def translate(e, tokens = nil)
+      translate!(e, tokens)
     rescue
       '<unknown expectation>'
     end
 
-    def translate!(e, keywords = nil)
+    def translate!(e, tokens = nil)
       e = e.as_v2
       key = key_for e.binding, e.inspection
-      ::I18n.t key, translation_params(e, keywords)
+      ::I18n.t key, translation_params(e, tokens)
     end
 
     alias t translate
 
     private
 
-    def translation_params(e, keywords)
-      with_keywords keywords,
+    def translation_params(e, tokens)
+      with_tokens tokens,
                     binding: t_binding(e.binding),
                     target: t_target(e.inspection),
                     must: t_must(e.inspection),
-                    matching: t_matching(keywords, e.inspection)
+                    matching: t_matching(tokens, e.inspection)
     end
 
     def key_for(binding, inspection)
@@ -82,12 +82,12 @@ module Mulang::Expectation::I18n
       "<strong>#{parsed.target.value}</strong>" if parsed.target
     end
 
-    def t_matching(keywords, parsed)
-      ::I18n.t("mulang.expectation.#{parsed.matcher.type}", with_keywords(keywords, value: parsed.matcher.value)) if parsed.matcher
+    def t_matching(tokens, parsed)
+      ::I18n.t("mulang.expectation.#{parsed.matcher.type}", with_tokens(tokens, value: parsed.matcher.value)) if parsed.matcher
     end
 
-    def with_keywords(keywords, params)
-      params.merge(DEFAULT_KEYWORDS).merge(keywords || {})
+    def with_tokens(tokens, params)
+      params.merge(DEFAULT_TOKENS).merge(tokens || {})
     end
   end
 end
