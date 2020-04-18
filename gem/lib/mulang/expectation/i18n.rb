@@ -34,6 +34,12 @@ module Mulang::Expectation::I18n
       operator_Or: "||",
       operator_Otherwise: 'otherwise',
       operator_Plus: "+"
+      operator_Modulo: '%',
+      operator_BitwiseOr: '|',
+      operator_BitwiseAnd: '&',
+      operator_BitwiseXor: '^',
+      operator_BitwiseLeftShift: '<<',
+      operator_BitwiseRightShift: '>>',
     }
 
     def translate(e, keywords = nil)
