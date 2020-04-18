@@ -21,6 +21,12 @@ spec :: Spec
 spec = do
   describe "evalExpr" $ do
     context "javascript" $ do
+      it "rejects logic on number" $ do
+        lastRef (runjs "1 || 2") `shouldThrow` (errorCall "Exception thrown outside try: MuString \"Bad parameters, expected two bools but got [MuNumber 1.0,MuNumber 2.0]\"")
+
+      it "rejects math on bools" $ do
+        lastRef (runjs "true + false") `shouldThrow` (errorCall "Exception thrown outside try: MuString \"Bad parameters, expected two numbers but got [MuBool True,MuBool False]\"")
+
       it "evals addition" $ do
         lastRef (runjs "1 + 2") `shouldReturn` MuNumber 3
 

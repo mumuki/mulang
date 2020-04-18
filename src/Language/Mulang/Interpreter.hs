@@ -124,29 +124,29 @@ evalExpr (M.Application (M.Primitive O.GreatherOrEqualThan) expressions) =
 evalExpr (M.Application (M.Primitive O.Modulo) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 `mod'` n2
-        f params                     = error $ "Bad parameters, expected two numbers but got " ++ show params
+        f params                     = raiseString $ "Bad parameters, expected two numbers but got " ++ show params
 
 evalExpr (M.Application (M.Primitive O.GreatherThan) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 > n2
-        f params                     = error $ "Bad parameters, expected two bools but got " ++ show params
+        f params                     = raiseString $ "Bad parameters, expected two bools but got " ++ show params
 
 -- TODO make this evaluation non strict on both parameters
 evalExpr (M.Application (M.Primitive O.Or) expressions) =
   evalExpressionsWith expressions f
   where f [MuBool b1, MuBool b2] = createReference $ MuBool $ b1 || b2
-        f params                 = error $ "Bad parameters, expected two bools but got " ++ show params
+        f params                 = raiseString $ "Bad parameters, expected two bools but got " ++ show params
 
 -- TODO make this evaluation non strict on both parameters
 evalExpr (M.Application (M.Primitive O.And) expressions) =
   evalExpressionsWith expressions f
   where f [MuBool b1, MuBool b2] = createReference $ MuBool $ b1 && b2
-        f params                 = error $ "Bad parameters, expected two bools but got " ++ show params
+        f params                 = raiseString $ "Bad parameters, expected two bools but got " ++ show params
 
 evalExpr (M.Application (M.Primitive O.Negation) expressions) =
   evalExpressionsWith expressions f
   where f [MuBool b] = createReference $ MuBool $ not b
-        f params     = error $ "Bad parameters, expected one bool but got " ++ show params
+        f params     = raiseString $ "Bad parameters, expected one bool but got " ++ show params
 
 evalExpr (M.Application (M.Primitive O.Multiply) expressions) =
   evalExpressionsWith expressions f
@@ -173,10 +173,12 @@ evalExpr (M.Application (M.Primitive O.LessThan) expressions) =
 evalExpr (M.Application (M.Primitive O.Plus) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 + n2
+        f params                     = raiseString $ "Bad parameters, expected two numbers but got " ++ show params
 
 evalExpr (M.Application (M.Primitive O.Minus) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 - n2
+        f params                     = raiseString $ "Bad parameters, expected two numbers but got " ++ show params
 
 evalExpr (M.MuList expressions) = do
   refs <- forM expressions evalExpr
