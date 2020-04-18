@@ -39,26 +39,26 @@ describe Mulang::Expectation::I18n do
     it { expect(expectation('*', 'UsesEqual').translate).to eq('solution must use <i>==</i>') }
     it { expect(expectation('*', 'UsesNotEqual').translate).to eq('solution must use <i>!=</i>') }
     it { expect(expectation('*', 'UsesNegation').translate).to eq('solution must use <i>!</i>') }
-    it { expect(expectation('*', 'UsesAnd').translate).to eq('solution must use <i>&&</i>') }
+    it { expect(expectation('*', 'UsesAnd').translate).to eq('solution must use <i>&amp;&amp;</i>') }
     it { expect(expectation('*', 'UsesOr').translate).to eq('solution must use <i>||</i>') }
     it { expect(expectation('*', 'UsesHash').translate).to eq('solution must use <i>hash</i>') }
-    it { expect(expectation('*', 'UsesGreatherOrEqualThan').translate).to eq('solution must use <i>>=</i>') }
-    it { expect(expectation('*', 'UsesGreatherThan').translate).to eq('solution must use <i>></i>') }
-    it { expect(expectation('*', 'UsesLessOrEqualThan').translate).to eq('solution must use <i><=</i>') }
-    it { expect(expectation('*', 'UsesLessThan').translate).to eq('solution must use <i><</i>') }
+    it { expect(expectation('*', 'UsesGreatherOrEqualThan').translate).to eq('solution must use <i>&gt;=</i>') }
+    it { expect(expectation('*', 'UsesGreatherThan').translate).to eq('solution must use <i>&gt;</i>') }
+    it { expect(expectation('*', 'UsesLessOrEqualThan').translate).to eq('solution must use <i>&lt;=</i>') }
+    it { expect(expectation('*', 'UsesLessThan').translate).to eq('solution must use <i>&lt;</i>') }
     it { expect(expectation('*', 'UsesOtherwise').translate).to eq('solution must use <i>otherwise</i>') }
     it { expect(expectation('*', 'UsesPlus').translate).to eq('solution must use <i>+</i>') }
     it { expect(expectation('*', 'UsesMinus').translate).to eq('solution must use <i>-</i>') }
     it { expect(expectation('*', 'UsesMultiply').translate).to eq('solution must use <i>*</i>') }
     it { expect(expectation('*', 'UsesDivide').translate).to eq('solution must use <i>/</i>') }
-    it { expect(expectation('*', 'UsesForwardComposition').translate).to eq('solution must use <i>>></i>') }
+    it { expect(expectation('*', 'UsesForwardComposition').translate).to eq('solution must use <i>&gt;&gt;</i>') }
     it { expect(expectation('*', 'UsesBackwardComposition').translate).to eq('solution must use <i>.</i>') }
     it { expect(expectation('*', 'UsesModulo').translate).to eq('solution must use <i>%</i>') }
     it { expect(expectation('*', 'UsesBitwiseOr').translate).to eq('solution must use <i>|</i>') }
-    it { expect(expectation('*', 'UsesBitwiseAnd').translate).to eq('solution must use <i>&</i>') }
+    it { expect(expectation('*', 'UsesBitwiseAnd').translate).to eq('solution must use <i>&amp;</i>') }
     it { expect(expectation('*', 'UsesBitwiseXor').translate).to eq('solution must use <i>^</i>') }
-    it { expect(expectation('*', 'UsesBitwiseLeftShift').translate).to eq('solution must use <i><<</i>') }
-    it { expect(expectation('*', 'UsesBitwiseRightShift').translate).to eq('solution must use <i>>></i>') }
+    it { expect(expectation('*', 'UsesBitwiseLeftShift').translate).to eq('solution must use <i>&lt;&lt;</i>') }
+    it { expect(expectation('*', 'UsesBitwiseRightShift').translate).to eq('solution must use <i>&gt;&gt;</i>') }
   end
 
   context 'pt locale' do
