@@ -32,6 +32,11 @@ spec = do
     it "corrects java and" $ do
       run Java (Expectation "*" "Uses:and") `shouldBe` (Expectation "*" "Uses:and")
       run Java (Expectation "*"  "Uses:&&") `shouldBe` (Expectation "*" "UsesAnd")
+      run Java (Expectation "*" "Uses:%") `shouldBe` (Expectation "*" "UsesModulo")
+      run Java (Expectation "*" "Uses:&") `shouldBe` (Expectation "*" "UsesBitwiseAnd")
+      run Java (Expectation "*" "Uses:|") `shouldBe` (Expectation "*" "UsesBitwiseOr")
+      run Java (Expectation "*" "Uses:>>") `shouldBe` (Expectation "*" "UsesBitwiseRightShift")
+      run Java (Expectation "*" "Uses:<<") `shouldBe` (Expectation "*" "UsesBitwiseLeftShift")
 
     it "corrects python and" $ do
       run Python (Expectation "*" "Uses:and") `shouldBe` (Expectation "*" "UsesAnd")
