@@ -108,6 +108,7 @@ library
     Language.Mulang.Edl.Parser
     Language.Mulang.Interpreter
     Language.Mulang.Interpreter.Internals
+    Language.Mulang.Interpreter.Repl
     Language.Mulang.Interpreter.Runner
     Language.Mulang.Transform.Normalizer
     Language.Mulang.Transform.Renamer
