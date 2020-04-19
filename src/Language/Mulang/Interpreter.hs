@@ -128,43 +128,19 @@ evalExpr (M.Assert negated (M.Equality expected actual)) =
           | muEquals v1 v2 /= negated = return nullRef
           | otherwise                 = raiseString $ "Expected " ++ show v1 ++ " but got: " ++ show v2
 
-evalExpr (M.Application (M.Primitive O.GreatherOrEqualThan) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createBool $ n1 >= n2
-        f params                     = raiseTypeError "expected two numbers" params
+evalExpr (M.Application (M.Primitive O.GreatherOrEqualThan) expressions) = evalBinaryNumeric expressions (>=) createBool
+evalExpr (M.Application (M.Primitive O.Modulo) expressions) = evalBinaryNumeric expressions (mod') createNumber
+evalExpr (M.Application (M.Primitive O.GreatherThan) expressions) = evalBinaryNumeric expressions (>) createBool
 
-
-evalExpr (M.Application (M.Primitive O.Modulo) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createNumber $ n1 `mod'` n2
-        f params                     = raiseTypeError "expected two numbers" params
-
-evalExpr (M.Application (M.Primitive O.GreatherThan) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createBool $ n1 > n2
-        f params                     = raiseTypeError "expected two numbers" params
-
--- TODO make this evaluation non strict on both parameters
-evalExpr (M.Application (M.Primitive O.Or) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuBool b1, MuBool b2] = createBool $ b1 || b2
-        f params                 = raiseTypeError "expected two booleans" params
-
--- TODO make this evaluation non strict on both parameters
-evalExpr (M.Application (M.Primitive O.And) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuBool b1, MuBool b2] = createBool $ b1 && b2
-        f params                 = raiseTypeError "expected two booleans" params
+evalExpr (M.Application (M.Primitive O.Or) expressions) = evalBinaryBoolean expressions (||)
+evalExpr (M.Application (M.Primitive O.And) expressions) = evalBinaryBoolean expressions (&&)
 
 evalExpr (M.Application (M.Primitive O.Negation) expressions) =
   evalExpressionsWith expressions f
   where f [MuBool b] = createBool $ not b
         f params     = raiseTypeError "expected one boolean" params
 
-evalExpr (M.Application (M.Primitive O.Multiply) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createNumber $ n1 * n2
-        f params                     = raiseTypeError "expected two numbers" params
+evalExpr (M.Application (M.Primitive O.Multiply) expressions) = evalBinaryNumeric expressions (*) createNumber
 
 evalExpr (M.Application (M.Primitive O.Equal) expressions) = do
   params <- mapM evalExpr expressions
@@ -174,25 +150,10 @@ evalExpr (M.Application (M.Primitive O.Equal) expressions) = do
 evalExpr (M.Application (M.Primitive O.NotEqual) expressions) = do
   evalExpr $ M.Application (M.Primitive O.Negation) [M.Application (M.Primitive O.Equal) expressions]
 
-evalExpr (M.Application (M.Primitive O.LessOrEqualThan) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createBool $ n1 <= n2
-        f params                     = raiseTypeError "expected two numbers" params
-
-evalExpr (M.Application (M.Primitive O.LessThan) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createBool $ n1 < n2
-        f params                     = raiseTypeError "expected two numbers" params
-
-evalExpr (M.Application (M.Primitive O.Plus) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createNumber $ n1 + n2
-        f params                     = raiseTypeError "expected two numbers" params
-
-evalExpr (M.Application (M.Primitive O.Minus) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createNumber $ n1 - n2
-        f params                     = raiseTypeError "expected two numbers" params
+evalExpr (M.Application (M.Primitive O.LessOrEqualThan) expressions) = evalBinaryNumeric expressions (<=) createBool
+evalExpr (M.Application (M.Primitive O.LessThan) expressions) = evalBinaryNumeric expressions (<) createBool
+evalExpr (M.Application (M.Primitive O.Plus) expressions) = evalBinaryNumeric expressions (+) createNumber
+evalExpr (M.Application (M.Primitive O.Minus) expressions) = evalBinaryNumeric expressions (-) createNumber
 
 evalExpr (M.MuList expressions) = do
   refs <- forM expressions evalExpr
@@ -270,6 +231,17 @@ evalExpr (M.Raise expr) = raiseInternal =<< evalExpr expr
 evalExpr (M.Reference name) = findReferenceForName name
 evalExpr (M.None) = return nullRef
 evalExpr e = raiseString $ "Unkown expression: " ++ show e
+
+-- TODO make this evaluation non strict on both parameters
+evalBinaryBoolean :: [M.Expression] -> (Bool -> Bool -> Bool) -> Executable Reference
+evalBinaryBoolean expressions op = evalExpressionsWith expressions f
+  where f [MuBool b1, MuBool b2] = createBool $ op b1 b2
+        f params                 = raiseTypeError "expected two booleans" params
+
+evalBinaryNumeric :: [M.Expression] -> (Double -> Double -> a) -> (a -> Executable Reference) -> Executable Reference
+evalBinaryNumeric expressions op pack = evalExpressionsWith expressions f
+  where f [MuNumber n1, MuNumber n2] = pack $ op n1 n2
+        f params                     = raiseTypeError "expected two numbers" params
 
 evalCondition :: M.Expression -> Executable Bool
 evalCondition cond = evalExpr cond >>= dereference >>= muBool
