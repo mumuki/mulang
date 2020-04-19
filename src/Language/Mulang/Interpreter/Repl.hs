@@ -1,37 +1,48 @@
 module Language.Mulang.Interpreter.Repl (
+  Session (..),
+  newSession,
   repl,
-  newSession) where
+  dump,
+  load,
+  reload) where
 
-import Data.Map ((!))
-import Language.Mulang.Interpreter (Reference, ExecutionContext (..), globalObjects, defaultContext, eval)
+import           Language.Mulang.Ast (Expression)
+import           Language.Mulang.Interpreter (eval)
+import           Language.Mulang.Interpreter.Internals (Value, Reference (..), ExecutionContext (..), defaultContext)
+
+import qualified Data.Map as Map
+import           Data.Map ((!))
 
 type SessionState = ([(Int, Value)], [Int])
-type SessionLanguage = (String -> Expression)
+type Language = (String -> Expression)
 
 data Session = Session { language :: Language, context :: ExecutionContext }
 
 newSession :: Language -> Session
 newSession language = Session language defaultContext
 
-repl :: Session -> String -> IO (Session, Value)
-repl session line = do
-  (ref, newContext) <- eval (context session) (language . session $ line)
-  return (globalObjects newContext ! ref, newContext)
+repl :: String -> Session -> IO (Value, Session)
+repl line session = do
+  (ref, newContext) <- eval (context session) (language session line)
+  return (globalObjects newContext ! ref, session { context = newContext } )
 
 dump :: Session -> SessionState
-dump (Session _ (ExecutationContext globals scopes _ _ _ )) = (dumpGlobals globals, dumpScopes scopes)
+dump (Session _ (ExecutionContext globals scopes _ _ _ )) = (dumpGlobals globals, dumpScopes scopes)
   where
     dumpGlobals = Map.toList . Map.mapKeys asInt
     dumpScopes = map asInt
 
-load :: SessionLanguage -> SessionState -> Session
-load language (globalsState, scopesState) = Session language (defaultContext { globalObjects = loadGlobals state, scopes = loadScopes state } )
+load :: Language -> SessionState -> Session
+load language (globalsState, scopesState) = Session language (defaultContext { globalObjects = loadGlobals globalsState, scopes = loadScopes scopesState } )
   where
-    loadGlobals = Map.fromList . map fromInt
+    loadGlobals = Map.mapKeys fromInt . Map.fromList
     loadScopes  = map fromInt
+
+reload :: Session -> Session
+reload s@(Session l _) = load l (dump s)
 
 fromInt :: Int -> Reference
 fromInt = Reference
 
-toInt :: Reference -> Int
-toInt (Reference i) = i
+asInt :: Reference -> Int
+asInt (Reference i) = i
