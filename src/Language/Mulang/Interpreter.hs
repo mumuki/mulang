@@ -14,9 +14,8 @@ module Language.Mulang.Interpreter (
 ) where
 
 import           Data.Map.Strict (Map)
-import           Data.Maybe (fromMaybe, fromJust)
-import           Data.List (find, intercalate)
 import qualified Data.Map.Strict as Map
+import           Data.List (find, intercalate)
 import           Control.Monad (forM)
 import           Control.Monad.State.Class
 import           Control.Monad.Loops
@@ -26,56 +25,7 @@ import           Data.Fixed (mod')
 
 import qualified Language.Mulang.Ast as M
 import qualified Language.Mulang.Ast.Operator as O
-
-type Executable m = ContT Reference (StateT ExecutionContext IO) m
-
-type Callback = Reference -> Executable ()
-
-newtype Reference = Reference Int deriving (Show, Eq, Ord)
-
-type ObjectSpace = Map Reference Value
-
-instance Show ExecutionContext where
-  show (ExecutionContext globalObjects scopes _ _ _) =
-    "ExecutionContext { globalObjects = " ++ show globalObjects ++ ", scopes = " ++ show scopes ++ " }"
-
-data ExecutionContext = ExecutionContext { globalObjects :: ObjectSpace
-                                         , scopes :: [Reference]
-                                         , currentException :: Maybe Reference
-                                         , currentReturnCallback :: Callback
-                                         , currentRaiseCallback :: Callback
-                                         }
-
-data Value = MuString String
-           | MuFunction [Reference] M.SubroutineBody
-           | MuList [Reference]
-           -- | The reference is the reference to the localScope
-           | MuNumber Double
-           | MuBool Bool
-           | MuObject (Map String Reference)
-           | MuNull
-           deriving (Show, Eq)
-
-defaultContext = ExecutionContext
-  { globalObjects = Map.singleton (Reference 1) (MuObject Map.empty)
-  , scopes = [Reference 1]
-  , currentException = Nothing
-  , currentRaiseCallback = \r -> do
-      v <- dereference r
-      error $ "Exception thrown outside try: " ++ asString v
-  , currentReturnCallback = \_r -> error "Called return from outside a function"
-  }
-
-asString :: Value -> String
-asString (MuString v) = v
-asString other        = debug other
-
-debug :: Value -> String
-debug (MuString v)   = "(string) " ++ v
-debug (MuBool True)  = "(boolean) true"
-debug (MuBool False) = "(boolean) false"
-debug (MuNumber v)   = "(number) " ++ show v
-
+import           Language.Mulang.Interpreter.Internals
 
 eval' :: ExecutionContext -> Executable Reference -> IO (Reference, ExecutionContext)
 eval' ctx ref = runStateT (runContT ref return) ctx
@@ -320,55 +270,20 @@ findReferenceForName name = do
   (MuObject context) <- dereference ref
   return $ context Map.! name
 
-getMaxKey :: Map k a -> Maybe k
-getMaxKey m = case Map.maxViewWithKey m of
-  Just ((k, _a), _) -> Just k
-  _ -> Nothing
-
 nullRef = Reference 0
-
-dereference' :: ObjectSpace -> Reference -> Value
-dereference' _ (Reference 0) = MuNull
-dereference' objectSpace ref = do
-  fromMaybe (error $ "Failed to find ref " ++ show ref ++ " in " ++ show objectSpace) .
-    Map.lookup ref $
-    objectSpace
-
-dereference :: Reference -> Executable Value
-dereference ref = do
-  objectSpace <- gets globalObjects
-  return $ dereference' objectSpace ref
-
-updateGlobalObjects f context =
-  context { globalObjects = f $ globalObjects context }
-
-incrementRef (Reference n) = Reference $ n + 1
 
 createBool = createReference . MuBool
 createNumber = createReference . MuNumber
-
-createReference :: Value -> Executable Reference
-createReference value = do
-  nextReferenceId :: Reference <- gets (fromJust . fmap incrementRef . getMaxKey . globalObjects)
-  modify (updateGlobalObjects $ Map.insert nextReferenceId value)
-  return nextReferenceId
-
-currentFrame :: Executable Reference
-currentFrame = gets (head . scopes)
 
 setLocalVariable :: String -> Reference -> Executable ()
 setLocalVariable name ref = do
   frame <- currentFrame
   updateRef frame (addAttrToObject name ref)
 
+  where
+      currentFrame :: Executable Reference
+      currentFrame = gets (head . scopes)
+
 addAttrToObject :: String -> Reference -> Value -> Value
 addAttrToObject k r (MuObject map) = MuObject $ Map.insert k r map
 addAttrToObject k _r v = error $ "Tried adding " ++ k ++ " to a non object: " ++ show v
-
-putRef :: Reference -> Value -> Executable ()
-putRef ref = modify . updateGlobalObjects . Map.insert ref
-
-updateRef :: Reference -> (Value -> Value) -> Executable ()
-updateRef ref f = do
-  val <- dereference ref
-  putRef ref (f val)
