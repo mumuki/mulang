@@ -22,10 +22,10 @@ spec = do
   describe "evalExpr" $ do
     context "javascript" $ do
       it "rejects logic on number" $ do
-        lastRef (runjs "1 || 2") `shouldThrow` (errorCall "Exception thrown outside try: MuString \"Type error: expected two bools but got [MuNumber 1.0,MuNumber 2.0]\"")
+        lastRef (runjs "1 || 2") `shouldThrow` (errorCall "Exception thrown outside try: Type error: expected two booleans but got (number) 1.0, (number) 2.0")
 
       it "rejects math on bools" $ do
-        lastRef (runjs "true + false") `shouldThrow` (errorCall "Exception thrown outside try: MuString \"Type error: expected two numbers but got [MuBool True,MuBool False]\"")
+        lastRef (runjs "true + false") `shouldThrow` (errorCall "Exception thrown outside try: Type error: expected two numbers but got (boolean) true, (boolean) false")
 
       it "evals addition" $ do
         lastRef (runjs "1 + 2") `shouldReturn` MuNumber 3
@@ -79,7 +79,7 @@ spec = do
             }|]) `shouldReturn` MuNumber 456
 
         it "condition is non bool, fails" $ do
-          lastRef (runjs "if (6) { 123 } else { 456 }") `shouldThrow` (errorCall "Exception thrown outside try: MuString \"Boolean expected, got: MuNumber 6.0\"")
+          lastRef (runjs "if (6) { 123 } else { 456 }") `shouldThrow` (errorCall "Exception thrown outside try: Type error: expected boolean but got (number) 6.0")
 
       it "evals functions" $ do
         lastRef (runjs [text|
@@ -93,7 +93,7 @@ spec = do
           function a() {
             function b(){}
           }
-          b()|]) `shouldThrow` (errorCall "Exception thrown outside try: MuString \"Reference not found for name 'b'\"")
+          b()|]) `shouldThrow` (errorCall "Exception thrown outside try: Reference not found for name 'b'")
 
       it "handles whiles" $ do
         lastRef (runjs [text|
@@ -157,7 +157,7 @@ spec = do
         it "condition is non bool, fails" $ do
           lastRef (runpy [text|
             if 6: 123
-            else: 456|]) `shouldThrow` (errorCall "Exception thrown outside try: MuString \"Boolean expected, got: MuNumber 6.0\"")
+            else: 456|]) `shouldThrow` (errorCall "Exception thrown outside try: Type error: expected boolean but got (number) 6.0")
 
       it "evals functions" $ do
         lastRef (runpy [text|

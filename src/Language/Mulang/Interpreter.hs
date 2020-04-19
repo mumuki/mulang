@@ -15,7 +15,7 @@ module Language.Mulang.Interpreter (
 
 import           Data.Map.Strict (Map)
 import           Data.Maybe (fromMaybe, fromJust)
-import           Data.List (find)
+import           Data.List (find, intercalate)
 import qualified Data.Map.Strict as Map
 import           Control.Monad (forM)
 import           Control.Monad.State.Class
@@ -62,9 +62,20 @@ defaultContext = ExecutionContext
   , currentException = Nothing
   , currentRaiseCallback = \r -> do
       v <- dereference r
-      error $ "Exception thrown outside try: " ++ show v
+      error $ "Exception thrown outside try: " ++ asString v
   , currentReturnCallback = \_r -> error "Called return from outside a function"
   }
+
+asString :: Value -> String
+asString (MuString v) = v
+asString other        = debug other
+
+debug :: Value -> String
+debug (MuString v)   = "(string) " ++ v
+debug (MuBool True)  = "(boolean) true"
+debug (MuBool False) = "(boolean) false"
+debug (MuNumber v)   = "(number) " ++ show v
+
 
 eval' :: ExecutionContext -> Executable Reference -> IO (Reference, ExecutionContext)
 eval' ctx ref = runStateT (runContT ref return) ctx
@@ -129,24 +140,24 @@ evalExpr (M.Application (M.Primitive O.Modulo) expressions) =
 evalExpr (M.Application (M.Primitive O.GreatherThan) expressions) =
   evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 > n2
-        f params                     = raiseTypeError "expected two bools" params
+        f params                     = raiseTypeError "expected two booleans" params
 
 -- TODO make this evaluation non strict on both parameters
 evalExpr (M.Application (M.Primitive O.Or) expressions) =
   evalExpressionsWith expressions f
   where f [MuBool b1, MuBool b2] = createReference $ MuBool $ b1 || b2
-        f params                 = raiseTypeError "expected two bools" params
+        f params                 = raiseTypeError "expected two booleans" params
 
 -- TODO make this evaluation non strict on both parameters
 evalExpr (M.Application (M.Primitive O.And) expressions) =
   evalExpressionsWith expressions f
   where f [MuBool b1, MuBool b2] = createReference $ MuBool $ b1 && b2
-        f params                 = raiseTypeError "expected two bools" params
+        f params                 = raiseTypeError "expected two booleans" params
 
 evalExpr (M.Application (M.Primitive O.Negation) expressions) =
   evalExpressionsWith expressions f
   where f [MuBool b] = createReference $ MuBool $ not b
-        f params     = raiseTypeError "expected one bool" params
+        f params     = raiseTypeError "expected one boolean" params
 
 evalExpr (M.Application (M.Primitive O.Multiply) expressions) =
   evalExpressionsWith expressions f
@@ -261,7 +272,7 @@ evalCondition :: M.Expression -> Executable Bool
 evalCondition cond = evalExpr cond >>= dereference >>= muBool
   where
     muBool (MuBool value) = return value
-    muBool v              = raiseString $ "Boolean expected, got: " ++ show v
+    muBool v              = raiseTypeError "expected boolean" [v]
 
 evalParams :: [M.Pattern] -> [M.Expression] -> Executable Reference
 evalParams params arguments = do
@@ -281,7 +292,7 @@ raiseString s = do
   raiseInternal =<< (createReference $ MuString s)
 
 raiseTypeError :: String -> [Value] ->Executable a
-raiseTypeError message values = raiseString $ "Type error: " ++ message ++ " but got " ++ show values
+raiseTypeError message values = raiseString $ "Type error: " ++ message ++ " but got " ++ (intercalate ", " . map debug $ values)
 
 muValuesEqual r1 r2
   | r1 == r2 = createReference $ MuBool True
