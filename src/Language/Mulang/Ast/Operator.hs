@@ -6,43 +6,83 @@ import           GHC.Generics
 
 data Operator
     = Equal
-    -- equal operator
+    -- ^ `==`-like equal operator
     | NotEqual
-    -- ^ distinct operator
+    -- ^ `!==`-like distinct operator
     | Negation
-    -- ^ not operator
+    -- ^ `!`-like not operator
     | And
-    -- ^ and operator
+    -- ^ `&&`-like and operator
     | Or
-    -- ^ or operator
+    -- ^ `||`-like or operator
     | Hash
     -- ^ hashcode operator
     | GreatherOrEqualThan
+    -- ^ `>=` operator
     | GreatherThan
+    -- ^ `>` operator
     | LessOrEqualThan
+    -- ^ `<=` operator
     | LessThan
+    -- ^ `<` operator
     | Otherwise
     -- ^ guard's otherwise operator
     | Plus
+    -- ^ numeric `+` operator
     | Minus
+    -- ^ numeric `-` operator
     | Multiply
+    -- ^ numeric `*` operator
     | Divide
+    -- ^ numeric `/` operator
     | ForwardComposition
     -- (f >> g)(x) = (g . f)(x) = g(f(x)) operator
     | BackwardComposition
     -- (f << g)(x) = (f . g)(x) = f(g(x)) operator
     | Modulo
-    -- ^ % operator
+    -- ^ numeric `%-like` modulo operator
     | BitwiseOr
-    -- ^ bit-level or operator |
+    -- ^ bit-level `|`-like or operator
     | BitwiseAnd
-    -- ^ bit-level and operator &
+    -- ^ bit-level `&`-like and operator
     | BitwiseXor
-    -- ^ bit-level xor operator
+    -- ^ bit-level `^`-like xor operator
     | BitwiseLeftShift
-    -- ^ bit-level left shift operator <<
+    -- ^ bit-level left `<<`-like shift operator
     | BitwiseRightShift
-    -- ^ bit-level right shift operator >>
+    -- ^ bit-level right `>>`-like shift operator
+    | Absolute
+    -- ^ numeric `abs`-like absolute operator
+    | Round
+    -- ^ numeric `round`-like round operator
+    | Ceil
+    -- ^ numeric `ceil`-like ceiling operator
+    | Floor
+    -- ^ numeric `ceil`-like floor operator
+    | Max
+    -- ^ `max`-like maximum value binary operator
+    | Min
+    -- ^ `min`-like minimum value binary operator
+    | Size
+    -- ^ collection `length`-like size operator
+    | Detect
+    -- ^ collection `find`-like search operator
+    | DetectMax
+    -- ^ collection `max`-like maximum operator
+    | DetectMin
+    -- ^ collection `min`-like minumum operator
+    | Count
+    -- ^ collection `count`-like operator
+    | Select
+    -- ^ collection `filter`-like operator
+    | Collect
+    -- ^ collection `map`-like operator
+    | Inject
+    -- ^ collection `reduce`-like / `fold`-like operator
+    | AllSatisfy
+    -- ^ collection `all`-like / `every`-like operator
+    | AnySatisfy
+    -- ^ collection `any`-like / `some`-like operator
   deriving (Eq, Show, Read, Generic, Ord, Enum)
 
 
