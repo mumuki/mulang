@@ -98,6 +98,7 @@ library
     Language.Mulang.Interpreter
     Language.Mulang.Interpreter.Internals
     Language.Mulang.Interpreter.Runner
+    Language.Mulang.Interpreter.Repl
 
   build-depends:
     base                      <= 5,
