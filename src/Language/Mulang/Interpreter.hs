@@ -130,38 +130,41 @@ evalExpr (M.Assert negated (M.Equality expected actual)) =
 
 evalExpr (M.Application (M.Primitive O.GreatherOrEqualThan) expressions) =
   evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 >= n2
+  where f [MuNumber n1, MuNumber n2] = createBool $ n1 >= n2
+        f params                     = raiseTypeError "expected two numbers" params
+
 
 evalExpr (M.Application (M.Primitive O.Modulo) expressions) =
   evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 `mod'` n2
+  where f [MuNumber n1, MuNumber n2] = createNumber $ n1 `mod'` n2
         f params                     = raiseTypeError "expected two numbers" params
 
 evalExpr (M.Application (M.Primitive O.GreatherThan) expressions) =
   evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 > n2
-        f params                     = raiseTypeError "expected two booleans" params
+  where f [MuNumber n1, MuNumber n2] = createBool $ n1 > n2
+        f params                     = raiseTypeError "expected two numbers" params
 
 -- TODO make this evaluation non strict on both parameters
 evalExpr (M.Application (M.Primitive O.Or) expressions) =
   evalExpressionsWith expressions f
-  where f [MuBool b1, MuBool b2] = createReference $ MuBool $ b1 || b2
+  where f [MuBool b1, MuBool b2] = createBool $ b1 || b2
         f params                 = raiseTypeError "expected two booleans" params
 
 -- TODO make this evaluation non strict on both parameters
 evalExpr (M.Application (M.Primitive O.And) expressions) =
   evalExpressionsWith expressions f
-  where f [MuBool b1, MuBool b2] = createReference $ MuBool $ b1 && b2
+  where f [MuBool b1, MuBool b2] = createBool $ b1 && b2
         f params                 = raiseTypeError "expected two booleans" params
 
 evalExpr (M.Application (M.Primitive O.Negation) expressions) =
   evalExpressionsWith expressions f
-  where f [MuBool b] = createReference $ MuBool $ not b
+  where f [MuBool b] = createBool $ not b
         f params     = raiseTypeError "expected one boolean" params
 
 evalExpr (M.Application (M.Primitive O.Multiply) expressions) =
   evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 * n2
+  where f [MuNumber n1, MuNumber n2] = createNumber $ n1 * n2
+        f params                     = raiseTypeError "expected two numbers" params
 
 evalExpr (M.Application (M.Primitive O.Equal) expressions) = do
   params <- mapM evalExpr expressions
@@ -173,22 +176,22 @@ evalExpr (M.Application (M.Primitive O.NotEqual) expressions) = do
 
 evalExpr (M.Application (M.Primitive O.LessOrEqualThan) expressions) =
   evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 <= n2
+  where f [MuNumber n1, MuNumber n2] = createBool $ n1 <= n2
         f params                     = raiseTypeError "expected two numbers" params
 
 evalExpr (M.Application (M.Primitive O.LessThan) expressions) =
   evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 < n2
+  where f [MuNumber n1, MuNumber n2] = createBool $ n1 < n2
         f params                     = raiseTypeError "expected two numbers" params
 
 evalExpr (M.Application (M.Primitive O.Plus) expressions) =
   evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 + n2
+  where f [MuNumber n1, MuNumber n2] = createNumber $ n1 + n2
         f params                     = raiseTypeError "expected two numbers" params
 
 evalExpr (M.Application (M.Primitive O.Minus) expressions) =
   evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 - n2
+  where f [MuNumber n1, MuNumber n2] = createNumber $ n1 - n2
         f params                     = raiseTypeError "expected two numbers" params
 
 evalExpr (M.MuList expressions) = do
@@ -213,9 +216,9 @@ evalExpr (M.If cond thenBranch elseBranch) = do
   v <- evalCondition cond
   if v then evalExpr thenBranch else evalExpr elseBranch
 
-evalExpr (M.MuNumber n) = createReference $ MuNumber n
+evalExpr (M.MuNumber n) = createNumber n
 evalExpr (M.MuNil) = return nullRef
-evalExpr (M.MuBool b) = createReference $ MuBool b
+evalExpr (M.MuBool b) = createBool b
 evalExpr (M.MuString s) = createReference $ MuString s
 evalExpr (M.Return e) = do
   ref <- evalExpr e
@@ -299,7 +302,7 @@ muValuesEqual r1 r2
   | otherwise = do
       v1 <- dereference r1
       v2 <- dereference r2
-      createReference $ MuBool $ muEquals v1 v2
+      createBool $ muEquals v1 v2
 
 muEquals (MuBool b1)   (MuBool b2)   = b1 == b2
 muEquals (MuNumber n1) (MuNumber n2) = n1 == n2
@@ -368,6 +371,9 @@ updateGlobalObjects f context =
   context { globalObjects = f $ globalObjects context }
 
 incrementRef (Reference n) = Reference $ n + 1
+
+createBool = createReference . MuBool
+createNumber = createReference . MuNumber
 
 createReference :: Value -> Executable Reference
 createReference value = do
