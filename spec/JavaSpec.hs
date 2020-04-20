@@ -400,5 +400,6 @@ spec = do
         runOp "4 >> 2" (Send (MuNumber 4.0)  (Primitive BitwiseRightShift) [MuNumber 2.0])
         runOp "4 & 2"  (Send (MuNumber 4.0)  (Primitive BitwiseAnd)        [MuNumber 2.0])
         runOp "4 | 2"  (Send (MuNumber 4.0)  (Primitive BitwiseOr)         [MuNumber 2.0])
+        runOp "4 ^ 2"  (Send (MuNumber 4.0)  (Primitive BitwiseXor)        [MuNumber 2.0])
         runOp "x && y" (Send (Reference "x") (Primitive And)               [Reference "y"])
         runOp "x || y" (Send (Reference "x") (Primitive Or)                [Reference "y"])

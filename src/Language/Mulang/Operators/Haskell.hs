@@ -15,6 +15,7 @@ haskellTokensTable =
     (Modulo, ["mod"]),
     (BitwiseOr, []),
     (BitwiseAnd, []),
+    (BitwiseXor, []),
     (BitwiseLeftShift, []),
     (BitwiseRightShift, [])
   ]

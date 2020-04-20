@@ -42,6 +42,7 @@ defaultTokensTable =
     (Modulo, ["%"]),
     (BitwiseOr, ["|"]),
     (BitwiseAnd, ["&"]),
+    (BitwiseXor, ["^"]),
     (BitwiseLeftShift, ["<<"]),
     (BitwiseRightShift, [">>"])
   ]

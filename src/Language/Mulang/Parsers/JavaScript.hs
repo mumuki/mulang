@@ -165,7 +165,7 @@ muJSBinOp:: JSBinOp -> Expression
 muJSBinOp (JSBinOpAnd _)        = Primitive And
 muJSBinOp (JSBinOpBitAnd _)     = Primitive And
 muJSBinOp (JSBinOpBitOr _)      = Primitive Or
-muJSBinOp (JSBinOpBitXor _)     = Reference "^"
+muJSBinOp (JSBinOpBitXor _)     = Primitive BitwiseXor
 muJSBinOp (JSBinOpDivide _)     = Primitive Divide
 muJSBinOp (JSBinOpEq _)         = Primitive Equal
 muJSBinOp (JSBinOpGe _)         = Primitive GreatherOrEqualThan

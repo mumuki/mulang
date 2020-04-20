@@ -15,6 +15,8 @@ spec = do
       let operators = Map.keys haskellTokensTable
 
       elem Modulo operators `shouldBe` True
+
+      elem BitwiseXor operators `shouldBe` False
       elem BitwiseOr operators `shouldBe` False
       elem BitwiseAnd operators `shouldBe` False
       elem BitwiseLeftShift operators `shouldBe` False

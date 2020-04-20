@@ -160,6 +160,7 @@ muOp Or     = M.Primitive O.BitwiseOr
 muOp Rem    = M.Primitive O.Modulo
 muOp RShift = M.Primitive O.BitwiseRightShift
 muOp Sub    = M.Primitive O.Minus
+muOp Xor    = M.Primitive O.BitwiseXor
 muOp e      = debug e
 
 muVarDecl typ (VarDecl id init) = [
