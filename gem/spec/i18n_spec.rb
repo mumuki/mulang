@@ -36,6 +36,29 @@ describe Mulang::Expectation::I18n do
     it { expect(expectation('Foo', 'HasDeclarationTypos:foo').translate).to eq('Solution must declare <strong>foo</strong>, but declares <strong>Foo</strong>. Perhaps you meant <strong>foo</strong>?') }
     it { expect(expectation('Foo', 'HasUsageTypos:foo').translate).to eq('Solution must use <strong>foo</strong>, but it uses <strong>Foo</strong>. Perhaps you meant <strong>foo</strong>?') }
 
+    it { expect(expectation('*', 'UsesEqual').translate).to eq('solution must use <i>==</i>') }
+    it { expect(expectation('*', 'UsesNotEqual').translate).to eq('solution must use <i>!=</i>') }
+    it { expect(expectation('*', 'UsesNegation').translate).to eq('solution must use <i>!</i>') }
+    it { expect(expectation('*', 'UsesAnd').translate).to eq('solution must use <i>&amp;&amp;</i>') }
+    it { expect(expectation('*', 'UsesOr').translate).to eq('solution must use <i>||</i>') }
+    it { expect(expectation('*', 'UsesHash').translate).to eq('solution must use <i>hash</i>') }
+    it { expect(expectation('*', 'UsesGreatherOrEqualThan').translate).to eq('solution must use <i>&gt;=</i>') }
+    it { expect(expectation('*', 'UsesGreatherThan').translate).to eq('solution must use <i>&gt;</i>') }
+    it { expect(expectation('*', 'UsesLessOrEqualThan').translate).to eq('solution must use <i>&lt;=</i>') }
+    it { expect(expectation('*', 'UsesLessThan').translate).to eq('solution must use <i>&lt;</i>') }
+    it { expect(expectation('*', 'UsesOtherwise').translate).to eq('solution must use <i>otherwise</i>') }
+    it { expect(expectation('*', 'UsesPlus').translate).to eq('solution must use <i>+</i>') }
+    it { expect(expectation('*', 'UsesMinus').translate).to eq('solution must use <i>-</i>') }
+    it { expect(expectation('*', 'UsesMultiply').translate).to eq('solution must use <i>*</i>') }
+    it { expect(expectation('*', 'UsesDivide').translate).to eq('solution must use <i>/</i>') }
+    it { expect(expectation('*', 'UsesForwardComposition').translate).to eq('solution must use <i>&gt;&gt;</i>') }
+    it { expect(expectation('*', 'UsesBackwardComposition').translate).to eq('solution must use <i>.</i>') }
+    it { expect(expectation('*', 'UsesModulo').translate).to eq('solution must use <i>%</i>') }
+    it { expect(expectation('*', 'UsesBitwiseOr').translate).to eq('solution must use <i>|</i>') }
+    it { expect(expectation('*', 'UsesBitwiseAnd').translate).to eq('solution must use <i>&amp;</i>') }
+    it { expect(expectation('*', 'UsesBitwiseXor').translate).to eq('solution must use <i>^</i>') }
+    it { expect(expectation('*', 'UsesBitwiseLeftShift').translate).to eq('solution must use <i>&lt;&lt;</i>') }
+    it { expect(expectation('*', 'UsesBitwiseRightShift').translate).to eq('solution must use <i>&gt;&gt;</i>') }
   end
 
   context 'pt locale' do
@@ -73,8 +96,8 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'HasComposition').translate).to eq('<strong>foo</strong> debe usar composición') }
       it { expect(expectation('foo', 'UsesLoop').translate).to eq('<strong>foo</strong> debe usar un bucle') }
 
-      it { expect(expectation('foo', 'HasIf').translate(keyword_if: 'si')).to eq('<strong>foo</strong> debe usar <i>si</i>') }
-      it { expect(expectation('foo', 'HasIf').translate(keyword_repeat: 'repetir')).to eq('<strong>foo</strong> debe usar <i>if</i>') }
+      it { expect(expectation('foo', 'HasIf').translate(keyword_If: 'si')).to eq('<strong>foo</strong> debe usar <i>si</i>') }
+      it { expect(expectation('foo', 'HasIf').translate(keyword_Repeat: 'repetir')).to eq('<strong>foo</strong> debe usar <i>if</i>') }
     end
 
     describe 'custom expectations' do
@@ -123,8 +146,8 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'UsesAnonymousVariable').translate).to eq('<strong>foo</strong> debe utilizar una variable anónima') }
       it { expect(expectation('*', 'UsesStaticPolymorphism').translate).to eq('la solución debe usar polimorfismo') }
 
-      it { expect(expectation('foo', 'UsesIf').translate(keyword_if: 'si')).to eq('<strong>foo</strong> debe usar <i>si</i>') }
-      it { expect(expectation('foo', 'UsesIf').translate(keyword_repeat: 'repetir')).to eq('<strong>foo</strong> debe usar <i>if</i>') }
+      it { expect(expectation('foo', 'UsesIf').translate(keyword_If: 'si')).to eq('<strong>foo</strong> debe usar <i>si</i>') }
+      it { expect(expectation('foo', 'UsesIf').translate(keyword_Repeat: 'repetir')).to eq('<strong>foo</strong> debe usar <i>if</i>') }
 
       it { expect(expectation('*', "Calls:x:WithString:'foo'").translate).to eq("la solución debe utilizar <strong>x</strong> con la cadena <i>'foo'</i>") }
       it { expect(expectation('*', "Returns:WithNumber:3").translate).to eq('la solución debe retornar con el número <i>3</i>') }

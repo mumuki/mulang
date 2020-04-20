@@ -1,6 +1,6 @@
 # Supported inspections
 
-The power of Mulang is grounded on more than 100 different kind of inspections
+The power of Mulang is grounded on more than 120 different kind of inspections
 
 ## Generic Inspections
 
@@ -62,6 +62,35 @@ The power of Mulang is grounded on more than 100 different kind of inspections
 | `UsesPrimitive`                   | is the given primitive operator used?
 | `UsesPrint`                       | is a print statement used?
 | `UsesType`                        | is the given typed used in a signature?
+
+
+## Operator Inspections
+
+| Inspection                       | Meaning
+|----------------------------------|-----------------------
+| `UsesAnd`                        | is the `&&`-like logic operator used?
+| `UsesBackwardComposition`        | is the `.`-like functional backward composition operator used?
+| `UsesBitwiseAnd`                 | is the `&`-like bit-level and operator used?
+| `UsesBitwiseLeftShift`           | is the `<<`-like bit-level left shift operator used?
+| `UsesBitwiseOr`                  | is the `|`-like bit-level or operator used?
+| `UsesBitwiseRightShift`          | is the `>>`-like bit-level right shift operator used?
+| `UsesBitwiseXor`                 | is the `^`-like bit-level xor operator used?
+| `UsesDivide`                     | is the `/`-like aritmetic operator used?
+| `UsesEqual`                      | is the `==`-like operator used?
+| `UsesForwardComposition`         | is the `<<`-like functional forward composition operator used?
+| `UsesGreatherOrEqualThan`        | is the `>=` operator used?
+| `UsesGreatherThan`               | is the `>` operator used?
+| `UsesHash`                       | is the `hash`-like operator used?
+| `UsesLessOrEqualThan`            | is the `>=` operator used?
+| `UsesLessThan`                   | is the `>` operator used?
+| `UsesMinus`                      | is the `-` aritmetic operator used?
+| `UsesModulo`                     | is the `%`-like modulo operator used?
+| `UsesMultiply`                   | is the `*` aritmetic operator used?
+| `UsesNegation`                   | is the `!`-like logic operator used?
+| `UsesNotEqual`                   | is the `!=`-like operator used?
+| `UsesOr`                         | is the `||`-like logic operator used?
+| `UsesOtherwise`                  | is the `otherwise` operator used?
+| `UsesPlus`                       | is the `+` aritmetic operator used?
 
 
 ## Imperative Inspections

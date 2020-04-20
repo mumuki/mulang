@@ -11,12 +11,12 @@ class Mulang::Expectation::Standard
     raise "Wrong inspection #{to_h}" unless inspection?
   end
 
-  def translate(keywords = nil)
-    Mulang::Expectation::I18n.translate self, keywords
+  def translate(tokens = nil)
+    Mulang::Expectation::I18n.translate self, tokens
   end
 
-  def translate!(keywords = nil)
-    Mulang::Expectation::I18n.translate! self, keywords
+  def translate!(tokens = nil)
+    Mulang::Expectation::I18n.translate! self, tokens
   end
 
   def to_h
@@ -72,7 +72,7 @@ class Mulang::Expectation::V0 < Mulang::Expectation::Standard
   end
 
   def as_v2_use
-    Mulang::Expectation::V2.new binding, new_inspection(inspection.type.gsub('Has', 'Uses'), nil)
+    Mulang::Expectation::V2.new binding, new_inspection(inspection.type.gsub(/^Has/, 'Uses'), nil)
   end
 
   def as_v2_declare(simple_type)
