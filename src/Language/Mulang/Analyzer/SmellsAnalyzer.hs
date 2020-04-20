@@ -53,6 +53,7 @@ allSmells = [
   "DoesConsolePrint",
   "DoesNilTest",
   "DoesTypeTest",
+  "HasAssignmentCondition",
   "HasAssignmentReturn",
   "HasCodeDuplication",
   "HasDeclarationTypos",
@@ -129,6 +130,7 @@ detectionFor ("DoesConsolePrint", Nothing)                = simple doesConsolePr
 detectionFor ("DoesNilTest", Nothing)                     = simple doesNilTest
 detectionFor ("DoesNullTest", Nothing)                    = simple doesNilTest
 detectionFor ("DoesTypeTest", Nothing)                    = simple doesTypeTest
+detectionFor ("HasAssignmentCondition", Nothing)          = simple hasAssignmentCondition
 detectionFor ("HasAssignmentReturn", Nothing)             = simple hasAssignmentReturn
 detectionFor ("HasCodeDuplication", Nothing)              = unsupported
 detectionFor ("HasDeclarationTypos", Just target)         = raw (detectDeclarationTypos target)

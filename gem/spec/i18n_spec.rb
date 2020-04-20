@@ -181,6 +181,9 @@ describe Mulang::Expectation::I18n do
 
       it { expect(expectation('Foo', 'HasDeclarationTypos:foo').translate).to eq('La solución parece tener un error de tipeo: debe declarar <strong>foo</strong>, pero declara <strong>Foo</strong>. ¿Quizás quisiste decir <strong>foo</strong>?') }
       it { expect(expectation('Foo', 'HasUsageTypos:foo').translate).to eq('La solución parece tener un error de tipeo: debe usar <strong>foo</strong>, pero usa <strong>Foo</strong>. ¿Quizás quisiste decir <strong>foo</strong>?') }
+
+      it { expect(expectation('Foo', 'HasAssignmentReturn').translate).to eq('<strong>Foo</strong> devuelve el resultado de una asignación. ¿Quizás quisiste usar el operador <i>==</i>?') }
+      it { expect(expectation('Foo', 'HasAssignmentCondition').translate).to eq('<strong>Foo</strong> evalúa el resultado de una asignación en donde se esperaba una expresión booleana. ¿Quizás quisiste usar el operador <i>==</i>?') }
     end
   end
 end

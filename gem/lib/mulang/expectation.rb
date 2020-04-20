@@ -6,6 +6,7 @@ module Mulang::Expectation
     DoesNullTest
     DoesTypeTest
     HasAssignmentReturn
+    HasAssignmentCondition
     HasCodeDuplication
     HasDeclarationTypos
     HasEmptyIfBranches
