@@ -42,6 +42,7 @@ git commit mulang.cabal \
            app/Version.hs \
            gem/lib/mulang/version.rb \
            ghcjslib/package.json \
+           ghcjslib/package-lock.json \
            ghcjslib/gem/lib/mulangjs/version.rb \
            docs/devinit -m "Welcome ${NEW_VERSION}!"
 
