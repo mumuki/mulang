@@ -1,12 +1,24 @@
 # Changelog
 
-## [Unreleased](https://github.com/mumuki/mulang/tree/HEAD)
+## [v5.3.0](https://github.com/mumuki/mulang/tree/v5.3.0) (2020-04-20)
 
-[Full Changelog](https://github.com/mumuki/mulang/compare/v5.2.0...HEAD)
+[Full Changelog](https://github.com/mumuki/mulang/compare/v5.2.0...v5.3.0)
+
+**Closed issues:**
+
+- Can not parse JS code with variables surrounded by parenthesis [\#276](https://github.com/mumuki/mulang/issues/276)
 
 **Merged pull requests:**
 
+- Feature improve new operators support [\#283](https://github.com/mumuki/mulang/pull/283) ([flbulgarelli](https://github.com/flbulgarelli))
+- Documenting and translating operators [\#280](https://github.com/mumuki/mulang/pull/280) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature assignment condition [\#278](https://github.com/mumuki/mulang/pull/278) ([flbulgarelli](https://github.com/flbulgarelli))
+- Updating js-dep version [\#277](https://github.com/mumuki/mulang/pull/277) ([flbulgarelli](https://github.com/flbulgarelli))
+- Adding missing tokens table [\#275](https://github.com/mumuki/mulang/pull/275) ([flbulgarelli](https://github.com/flbulgarelli))
+- Chore update docs [\#272](https://github.com/mumuki/mulang/pull/272) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature typos detection [\#271](https://github.com/mumuki/mulang/pull/271) ([flbulgarelli](https://github.com/flbulgarelli))
 - Feature subordinated declarations [\#270](https://github.com/mumuki/mulang/pull/270) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature language c support [\#269](https://github.com/mumuki/mulang/pull/269) ([fedescarpa](https://github.com/fedescarpa))
 - Extending expectation to unstructured boolean ifs [\#267](https://github.com/mumuki/mulang/pull/267) ([flbulgarelli](https://github.com/flbulgarelli))
 - Fix dont admit empty subroutines on delegation [\#265](https://github.com/mumuki/mulang/pull/265) ([flbulgarelli](https://github.com/flbulgarelli))
 
