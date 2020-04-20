@@ -175,6 +175,7 @@
 <h2 id="supported-languages">Supported languages</h2>
 <p>Mulang can work with many different programming languages. it natively supports:</p>
 <ul>
+<li>C</li>
 <li>Haskell</li>
 <li>Java</li>
 <li>JavaScript (ES6)</li>
@@ -190,16 +191,17 @@
 </ul>
 <p>If you want to use it with a different language, you will have to:</p>
 <ul>
-<li>either add explicit support in this repo - we love Pull Requests :hearth: -, or</li>
+<li>either add explicit support in this repo - we love Pull Requests :heart: -, or</li>
 <li>translate your language into one of the natively supported ones, or</li>
 <li>translate your language to the Mulang JSON AST</li>
 </ul>
 <h2 id="quick-start">Quick start</h2>
 <blockquote>
 <p>The following section uses the <a href="https://rubygems.org/gems/mulang">ruby interface</a> for demonstration purposes.
-However, you also can run all the examples either using the <a href="./clispec/">comand line tool</a>, or the <a href="https://www.npmjs.com/package/mulang">javascript</a> interface.</p>
+However, you also can run all the examples either using the <a href="./clispec/">comand line tool</a>, or the <a href="https://www.npmjs.com/package/mulang">javascript</a> interface.
+The javascript version is also available as <a href="https://rubygems.org/gems/mulangjs">a ruby gem</a>, suitable for Rails integration</p>
 </blockquote>
-<p>Better than explaining what Mulang is, let's see what can do it for you.</p>
+<p>Better than explaining what Mulang is, let's see what it can do for you.</p>
 <h3 id="inspections">Inspections</h3>
 <p>Let's suppose we have the following JS code...</p>
 <pre><code class="javascript">var aPlace = buenosAires;
@@ -211,14 +213,14 @@ var aBird = {position: aPlace, weight: 20};
 &gt; code = Mulang::Code.native &quot;JavaScript&quot;, &quot;var aPlace = buenosAires; var aBird = {position: aPlace, weight: 20};&quot;
 </code></pre>
 
-<p>Now want to know if the code expression <em>uses</em> - that is, contains any reference to - a given <em>identifier</em>. Such identifier could be a variable, function, or anything that has a name:</p>
+<p>Now we want to know if the code expression <em>uses</em> - that is, contains any reference to - a given <em>identifier</em>. Such identifier could be a variable, function, or anything that has a name:</p>
 <pre><code class="ruby">&gt; code.expect 'Uses:buenosAires'
 =&gt; true # because of the reference in `...aPlace = buenosAires...`
 &gt; code.expect 'Uses:rosario'
 =&gt; false # no reference to the identifier `rosario` is found on the code
 </code></pre>
 
-<p><code>Uses:buenosAires</code> is our first <em>inspection</em>: a function that takes a Mulang AST and answers a boolan question about it. That <em>seems</em> easy, but just in case you are wondering: no, Mulang doesn't perform a <code>string.contains</code> or something like that :stuck_out_tongue: :</p>
+<p><code>Uses:buenosAires</code> is our first <em>inspection</em>: a function that takes a Mulang AST and answers a boolean question about it. That <em>seems</em> easy, but just in case you are wondering: no, Mulang doesn't perform a <code>string.contains</code> or something like that :stuck_out_tongue: :</p>
 <pre><code class="ruby">&gt; code.expect 'Uses:BuenosAires'
 =&gt; false # no reference to the identifier `buenos` is found on the code
 </code></pre>
@@ -231,7 +233,7 @@ var aBird = {position: aPlace, weight: 20};
 =&gt; false # because `...aPlace = buenosAires...` does not reference `aBird`...
 </code></pre>
 
-<p>Here we have contextualized the inspection, so it runs only withing the contexts of the given binding.</p>
+<p>Here we have contextualized the inspection, so it runs only within the contexts of the given binding.</p>
 <p>Let's tray again: does <code>"aPlace"</code> <em>use</em> <code>rosario</code>? And what about the object <code>aBird</code>? Does it use <code>aPlace</code> or <code>rosario</code>?</p>
 <pre><code class="ruby">&gt; code.expect &quot;aPlace&quot;, &quot;Uses:rosario&quot;
 =&gt; false
@@ -257,12 +259,12 @@ var aBird = {position: aPlace, weight: 20};
 <p>Inspections do not only allow you to consult usages. They can tell you much more things. See the <a href="'./inspections/">supported inspections list</a>.</p>
 </blockquote>
 <h3 id="predicates">Predicates</h3>
-<p>Many inspections support an <em>identifier predicate</em>, that is, a matcher for identifier.</p>
+<p>Many inspections support an <em>identifier predicate</em>, that is, a matcher for the identifier.</p>
 <p>For example, does the former piece of code declare any attribute?</p>
 <pre><code class="ruby">&gt; code.expect 'DeclaresAttribute:*'
-=&gt; True
+=&gt; true
 &gt; code.expect 'DeclaresAttribute' # shorter version
-=&gt; True
+=&gt; true
 </code></pre>
 
 <p>Does it declare an attribute like <code>eight</code>?</p>
@@ -271,7 +273,7 @@ var aBird = {position: aPlace, weight: 20};
 </code></pre>
 
 <blockquote>
-<p>Notice: like in mulang means that it contains that case-insensitive substring</p>
+<p>Notice: <code>like</code> in Mulang means that it contains that case-insensitive substring</p>
 </blockquote>
 <p>Finally, does <code>aBird</code> declares an attribute that is not named <code>weight</code>?</p>
 <pre><code class="ruby">&gt; code.expect &quot;DeclaresAttribute:^weight&quot;
@@ -411,5 +413,5 @@ var aBird = {position: aPlace, weight: 20};
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-10-02 12:53:44
+Build Date UTC : 2020-04-20 18:30:55
 -->

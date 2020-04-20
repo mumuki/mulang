@@ -189,16 +189,20 @@
                 <li class="third-level"><a href="#forloop">ForLoop</a></li>
                 <li class="third-level"><a href="#sequence">Sequence</a></li>
                 <li class="third-level"><a href="#other">Other</a></li>
+                <li class="third-level"><a href="#arrow">Arrow</a></li>
                 <li class="third-level"><a href="#self">Self</a></li>
                 <li class="third-level"><a href="#none">None</a></li>
+                <li class="third-level"><a href="#break">Break</a></li>
+                <li class="third-level"><a href="#continue">Continue</a></li>
                 <li class="third-level"><a href="#munil">MuNil</a></li>
+                <li class="third-level"><a href="#mudict">MuDict</a></li>
                 <li class="third-level"><a href="#muobject">MuObject</a></li>
                 <li class="third-level"><a href="#munumber-mubool-mustring-musymbol-and-muchar">MuNumber, MuBool, MuString, MuSymbol and MuChar</a></li>
                 <li class="third-level"><a href="#mutuple-and-mulist">MuTuple and MuList</a></li>
                 <li class="third-level"><a href="#testgroup-test-and-assert">TestGroup, Test and Assert</a></li>
             <li class="second-level"><a href="#assertion">Assertion</a></li>
                 
-                <li class="third-level"><a href="#syntax_46">Syntax</a></li>
+                <li class="third-level"><a href="#syntax_50">Syntax</a></li>
                 <li class="third-level"><a href="#javascript-examples">Javascript Examples</a></li>
             <li class="second-level"><a href="#patterns">Patterns</a></li>
                 
@@ -250,13 +254,13 @@ as found in most procedural and functional languages, like the C-like <code>stru
 </code></pre>
 
 <h4 id="c-example">C Example</h4>
-<pre><code class="c">struct Point {
+<pre><code class="c">struct point {
   int x;
   int y;
 }
 </code></pre>
 
-<pre><code class="haskell">(Record &quot;Point&quot;)
+<pre><code class="haskell">(Record &quot;point&quot;)
 </code></pre>
 
 <h4 id="caveats">Caveats</h4>
@@ -288,7 +292,38 @@ It is is composed by an identifier and one or more equations</p>
 <pre><code class="haskell">(Function Identifier [Equation])
 </code></pre>
 
-<h4 id="example">Example</h4>
+<h4 id="c-example_1">C Example</h4>
+<pre><code class="c">int foo (int bar) {
+  return bar;
+}
+</code></pre>
+
+<pre><code class="haskell">Sequence [
+  TypeSignature &quot;foo&quot; (ParameterizedType [&quot;int&quot;] &quot;int&quot; []),
+  Function &quot;foo&quot; [
+    Equation [VariablePattern &quot;bar&quot;]
+      (UnguardedBody (Return (Reference &quot;bar&quot;)))]]
+</code></pre>
+
+<h4 id="python-example">Python Example</h4>
+<pre><code class="python">def foo():
+  return 1
+</code></pre>
+
+<pre><code class="haskell">(Function &quot;foo&quot; [
+  (Equation []
+    (UnguardedBody (Return (MuNumber 1.0))))])
+</code></pre>
+
+<pre><code class="python">def foo(bar):
+  return bar
+</code></pre>
+
+<pre><code class="haskell">(Function &quot;foo&quot; [
+  (Equation [VariablePattern &quot;bar&quot;]
+    (UnguardedBody (Return (Reference &quot;bar&quot;))))])
+</code></pre>
+
 <h3 id="procedure"><code>Procedure</code></h3>
 <blockquote>
 <p>Imperative programming procedure declaration. It is composed by an identifier and one or more equations</p>
@@ -313,12 +348,10 @@ It is is composed by an identifier and one or more equations</p>
 end
 </code></pre>
 
-<pre><code class="haskell">(Class
-  &quot;Bird&quot; Nothing
-  (Method
-      &quot;sing!&quot;
-      (Equation []
-          (UnguardedBody (Print (MuString &quot;singing in the dead of night&quot;))))))
+<pre><code class="haskell">(Class &quot;Bird&quot; Nothing
+  (Method &quot;sing!&quot; [
+    (Equation []
+      (UnguardedBody (Print (MuString &quot;singing in the dead of night&quot;))))]))
 </code></pre>
 
 <h4 id="java-example_1">Java Example</h4>
@@ -329,12 +362,10 @@ end
 }
 </code></pre>
 
-<pre><code class="haskell">(Class
-  &quot;Bird&quot; Nothing
-  (Method
-      &quot;sing&quot;
-      (Equation []
-          (UnguardedBody (Print (MuString &quot;singing in the dead of night&quot;))))))
+<pre><code class="haskell">(Class &quot;Bird&quot; Nothing
+  (Method &quot;sing&quot; [
+    (Equation []
+      (UnguardedBody (Print (MuString &quot;singing in the dead of night&quot;))))]))
 </code></pre>
 
 <h3 id="primitivemethod"><code>PrimitiveMethod</code></h3>
@@ -354,13 +385,13 @@ end
 </code></pre>
 
 <pre><code class="haskell">(Sequence [
-  (PrimitiveMethod Equal (Equation
-                         [VariablePatten &quot;other&quot;]
-                         (UnguardedBody MuNil))),
-  (PrimitiveMethod Hash (Equation
-                        []
-                        (UnguardedBody MuNil)))]
+  (PrimitiveMethod Equal
+    (Equation [VariablePatten &quot;other&quot;]
+      (UnguardedBody MuNil))),
 
+  (PrimitiveMethod Hash
+    (Equation []
+      (UnguardedBody MuNil)))])
 </code></pre>
 
 <h3 id="variable"><code>Variable</code></h3>
@@ -371,13 +402,41 @@ end
 <pre><code class="haskell">(Variable Identifier Expression)
 </code></pre>
 
-<h4 id="example_1">Example</h4>
+<h4 id="c-example_2">C Example</h4>
+<pre><code class="c">int a = 10;
+</code></pre>
+
+<pre><code class="haskell">(Sequence [
+  TypeSignature &quot;a&quot; (SimpleType &quot;int&quot; []),
+  Variable &quot;a&quot; (MuNumber 10.0)])
+</code></pre>
+
+<h4 id="javascript-example">JavaScript Example</h4>
+<pre><code class="javascript">let x = 1;
+</code></pre>
+
+<pre><code class="haskell">(Variable &quot;x&quot; (MuNumber 1))
+</code></pre>
+
 <h3 id="assignment"><code>Assignment</code></h3>
 <h4 id="syntax_7">Syntax</h4>
 <pre><code class="haskell">(Assignment Identifier Expression)
 </code></pre>
 
-<h4 id="example_2">Example</h4>
+<h4 id="c-example_3">C Example</h4>
+<pre><code class="c">m = 3.4;
+</code></pre>
+
+<pre><code class="haskell">(Assignment &quot;m&quot; (MuNumber 3.4))
+</code></pre>
+
+<h4 id="ruby-example_2">Ruby Example</h4>
+<pre><code class="ruby">m = 3.4
+</code></pre>
+
+<pre><code class="haskell">(Assignment &quot;m&quot; (MuNumber 3.4))
+</code></pre>
+
 <h3 id="attribute"><code>Attribute</code></h3>
 <blockquote>
 <p>Object oriented programming attribute declaration, composed by an identifier and an initializer</p>
@@ -386,7 +445,18 @@ end
 <pre><code class="haskell">(Attribute Identifier Expression)
 </code></pre>
 
-<h4 id="example_3">Example</h4>
+<h4 id="java-example_2">Java Example</h4>
+<pre><code class="java">public class Foo {
+  private int bar = 4;
+}
+</code></pre>
+
+<pre><code class="haskell">(Class &quot;Foo&quot; Nothing
+  (Sequence [
+    (VariableSignature &quot;bar&quot; &quot;int&quot; []),
+    (Attribute &quot;bar&quot; (MuNumber 4))]))
+</code></pre>
+
 <h3 id="object"><code>Object</code></h3>
 <blockquote>
 <p>Object oriented programming global, named object declaration, like Scala's <code>object</code>, composed by a name and a body.</p>
@@ -395,7 +465,7 @@ end
 <pre><code class="haskell">(Object Identifier Expression)
 </code></pre>
 
-<h4 id="example_4">Example</h4>
+<h4 id="example">Example</h4>
 <h3 id="class"><code>Class</code></h3>
 <blockquote>
 <p>Object oriented programming global, class declaration,
@@ -405,7 +475,7 @@ composed by a name, an optional superclass and a body</p>
 <pre><code class="haskell">(Class Identifier (Maybe Identifier) Expression)
 </code></pre>
 
-<h4 id="ruby-example_2">Ruby Example</h4>
+<h4 id="ruby-example_3">Ruby Example</h4>
 <pre><code class="ruby">class Bird &lt; Animal
 end
 </code></pre>
@@ -428,7 +498,7 @@ end
 <pre><code class="haskell">(Enumeration Identifier [Identifier])
 </code></pre>
 
-<h4 id="java-example_2">Java Example</h4>
+<h4 id="java-example_3">Java Example</h4>
 <pre><code class="java">public enum Fuzzy {
   YES, NO, MAYBE
 }
@@ -445,7 +515,7 @@ end
 <pre><code class="haskell">(Interface Identifier [Identifier] Expression)
 </code></pre>
 
-<h4 id="java-example_3">Java Example</h4>
+<h4 id="java-example_4">Java Example</h4>
 <pre><code class="java">public interface Foo extends Bar, Baz {
   void foo();
 }
@@ -465,7 +535,7 @@ end
 <pre><code class="haskell">(Rule Identifier [Pattern] [Expression])
 </code></pre>
 
-<h4 id="example_5">Example</h4>
+<h4 id="example_1">Example</h4>
 <pre><code class="prolog">baz(bar) :- foo(bar)
 </code></pre>
 
@@ -483,7 +553,7 @@ end
 <pre><code class="haskell">(Fact Identifier [Pattern])
 </code></pre>
 
-<h4 id="example_6">Example</h4>
+<h4 id="example_2">Example</h4>
 <pre><code class="prolog">foo(bar).
 </code></pre>
 
@@ -498,7 +568,7 @@ end
 <pre><code class="haskell">(Exist Identifier [Pattern])
 </code></pre>
 
-<h4 id="example_7">Example</h4>
+<h4 id="example_3">Example</h4>
 <h3 id="not"><code>Not</code></h3>
 <blockquote>
 <p>Logic programming negation</p>
@@ -507,7 +577,6 @@ end
 <pre><code class="haskell">(Not Expression)
 </code></pre>
 
-<h4 id="example_8">Example</h4>
 <h3 id="findall"><code>Findall</code></h3>
 <blockquote>
 <p>Logic programming findall</p>
@@ -516,7 +585,6 @@ end
 <pre><code class="haskell">(Findall Expression Expression Expression)
 </code></pre>
 
-<h4 id="example_9">Example</h4>
 <h3 id="forall"><code>Forall</code></h3>
 <blockquote>
 <p>Logic programming universal cuantification</p>
@@ -525,7 +593,6 @@ end
 <pre><code class="haskell">(Forall Expression Expression)
 </code></pre>
 
-<h4 id="example_10">Example</h4>
 <h3 id="reference"><code>Reference</code></h3>
 <blockquote>
 <p>Generic variable</p>
@@ -534,7 +601,27 @@ end
 <pre><code class="haskell">(Reference Identifier)
 </code></pre>
 
-<h4 id="example_11">Example</h4>
+<h4 id="c-example_4">C Example</h4>
+<pre><code class="javascript">int x = 4;
+x
+</code></pre>
+
+<pre><code class="haskell">(Sequence [
+  TypeSignature &quot;x&quot; (SimpleType &quot;int&quot; []),
+  Variable &quot;x&quot; (MuNumber 4.0),
+  Reference &quot;x&quot;])
+</code></pre>
+
+<h4 id="javascript-example_1">JavaScript Example</h4>
+<pre><code class="javascript">const x = 4;
+x
+</code></pre>
+
+<pre><code class="haskell">(Sequence [
+  (Variable &quot;x&quot; (MuNumber 4.0),
+  (Reference &quot;x&quot;))])
+</code></pre>
+
 <h3 id="application"><code>Application</code></h3>
 <blockquote>
 <p>Generic, non-curried application of a function or procedure,
@@ -544,7 +631,7 @@ composed by the applied element itself, and the application arguments</p>
 <pre><code class="haskell">(Application Expression [Expression])
 </code></pre>
 
-<h4 id="example_12">Example</h4>
+<h4 id="example_4">Example</h4>
 <h3 id="send"><code>Send</code></h3>
 <blockquote>
 <p>Object oriented programming message send, composed by the reciever,
@@ -554,7 +641,7 @@ selector and arguments</p>
 <pre><code class="haskell">(Send Expression Expression [Expression])
 </code></pre>
 
-<h4 id="ruby-example_3">Ruby Example</h4>
+<h4 id="ruby-example_4">Ruby Example</h4>
 <pre><code class="ruby">1 + 5
 </code></pre>
 
@@ -569,7 +656,6 @@ selector and arguments</p>
 <pre><code class="haskell">(New Identifier [Expression])
 </code></pre>
 
-<h4 id="example_13">Example</h4>
 <h3 id="implement"><code>Implement</code></h3>
 <blockquote>
 <p>Object oriented instantiation, interface implementation</p>
@@ -578,7 +664,6 @@ selector and arguments</p>
 <pre><code class="haskell">(Implement Identifier)
 </code></pre>
 
-<h4 id="example_14">Example</h4>
 <h3 id="include"><code>Include</code></h3>
 <blockquote>
 <p>Object oriented instantiation, mixin inclusion</p>
@@ -587,7 +672,6 @@ selector and arguments</p>
 <pre><code class="haskell">(Include Identifier)
 </code></pre>
 
-<h4 id="example_15">Example</h4>
 <h3 id="if"><code>If</code></h3>
 <h4 id="syntax_25">Syntax</h4>
 <pre><code class="haskell">(If Expression Expression Expression)
@@ -611,7 +695,6 @@ selector and arguments</p>
 <pre><code class="haskell">(While Expression Expression)
 </code></pre>
 
-<h4 id="example_16">Example</h4>
 <h3 id="repeat"><code>Repeat</code></h3>
 <blockquote>
 <p>Imperative programming fixed repetition control structure, composed by a repetition count expression, and a body</p>
@@ -620,7 +703,6 @@ selector and arguments</p>
 <pre><code class="haskell">(Repeat Expression Expression)
 </code></pre>
 
-<h4 id="example_17">Example</h4>
 <h3 id="match"><code>Match</code></h3>
 <h4 id="syntax_30">Syntax</h4>
 <pre><code class="haskell">(Match Expression [Equation])
@@ -642,16 +724,21 @@ selector and arguments</p>
 <pre><code class="haskell">(Try Expression [(Pattern, Expression)] Expression)
 </code></pre>
 
-<h4 id="example_18">Example</h4>
 <h3 id="raise"><code>Raise</code></h3>
 <blockquote>
-<p>Generic raise expression, like a throw or raise statament, composed by the raised expression</p>
+<p>Generic raise expression, like a <code>throw</code> or <code>raise</code> statament, composed by the raised expression</p>
 </blockquote>
 <h4 id="syntax_33">Syntax</h4>
 <pre><code class="haskell">(Raise Expression)
 </code></pre>
 
-<h4 id="example_19">Example</h4>
+<h4 id="javascript-example_2">JavaScript Example</h4>
+<pre><code class="javascript">throw 'abc';
+</code></pre>
+
+<pre><code class="haskell">(Raise (MuString &quot;abc&quot;))
+</code></pre>
+
 <h3 id="print"><code>Print</code></h3>
 <blockquote>
 <p>Generic print expression</p>
@@ -660,7 +747,7 @@ selector and arguments</p>
 <pre><code class="haskell">(Print Expression)
 </code></pre>
 
-<h4 id="ruby-example_4">Ruby Example</h4>
+<h4 id="ruby-example_5">Ruby Example</h4>
 <pre><code class="ruby">puts &quot;Hello World&quot;
 </code></pre>
 
@@ -692,7 +779,7 @@ selector and arguments</p>
       (Application (Reference &quot;f&quot;) [(Reference &quot;x&quot;)]))))
 </code></pre>
 
-<h4 id="java-example_4">Java Example</h4>
+<h4 id="java-example_5">Java Example</h4>
 <pre><code class="java">for (Integer i : ints) {
   System.out.println(i);
 }
@@ -713,7 +800,22 @@ selector and arguments</p>
 <pre><code class="haskell">(ForLoop Expression Expression Expression Expression)
 </code></pre>
 
-<h4 id="example_20">Example</h4>
+<h4 id="c-example_5">C Example</h4>
+<pre><code class="c">for (int i = 0; i &lt; 10; i++) {
+  foo(i);
+}
+</code></pre>
+
+<pre><code class="haskell">(ForLoop
+  (Sequence [
+    TypeSignature &quot;i&quot; (SimpleType &quot;int&quot; []),
+    Variable &quot;i&quot; (MuNumber 0.0)])
+  (Application (Primitive LessThan) [Reference &quot;i&quot;,MuNumber 10.0])
+  (Assignment &quot;i&quot; (Application (Primitive Plus) [Reference &quot;i&quot;,MuNumber 1.0]))
+  (Application (Reference &quot;foo&quot;) [Reference &quot;i&quot;])))
+</code></pre>
+
+<h4 id="javascript-example_3">JavaScript Example</h4>
 <pre><code class="javascript">for (var i = 0; i &lt; 10; i++) {
   console.log(i);
 }
@@ -734,17 +836,29 @@ selector and arguments</p>
 <pre><code class="haskell">(Sequence [Expression])
 </code></pre>
 
-<h4 id="example_21">Example</h4>
 <h3 id="other"><code>Other</code></h3>
+<blockquote>
+<p>Unrecognized expression, with optional description and body</p>
+</blockquote>
 <h4 id="syntax_38">Syntax</h4>
-<pre><code class="haskell">(Other)
+<pre><code class="haskell">(Other (Maybe Code) (Maybe Expression))
 </code></pre>
 
+<h3 id="arrow"><code>Arrow</code></h3>
+<blockquote>
+<p>Generic arrow - AKA pair or entry - that is typically used to build dictionaries.
+It corresponds to ruby's, perl's and php's <code>=&gt;</code> operator, or ruby's and javascript's <code>:</code> operator</p>
+</blockquote>
+<h4 id="syntax_39">Syntax</h4>
+<pre><code class="haskell">(Arrow Expression Expression)
+</code></pre>
+
+<p>See <a href="#mudict">MuDict</a> for more details</p>
 <h3 id="self"><code>Self</code></h3>
 <blockquote>
 <p>Object oriented self-reference, like  C-like <code>this</code> and Smalltalk-derived <code>self</code></p>
 </blockquote>
-<h4 id="syntax_39">Syntax</h4>
+<h4 id="syntax_40">Syntax</h4>
 <pre><code class="haskell">(Self)
 </code></pre>
 
@@ -752,27 +866,67 @@ selector and arguments</p>
 <blockquote>
 <p>Used as a placeholder for empty bodies.</p>
 </blockquote>
-<h4 id="syntax_40">Syntax</h4>
+<h4 id="syntax_41">Syntax</h4>
 <pre><code class="haskell">(None)
+</code></pre>
+
+<h3 id="break"><code>Break</code></h3>
+<blockquote>
+<p>Used to break out of flow structure</p>
+</blockquote>
+<h4 id="syntax_42">Syntax</h4>
+<pre><code class="haskell">(Break Expression)
+</code></pre>
+
+<h3 id="continue"><code>Continue</code></h3>
+<blockquote>
+<p>Used to jump over to next flow structure step</p>
+</blockquote>
+<h4 id="syntax_43">Syntax</h4>
+<pre><code class="haskell">(Continue Expression)
 </code></pre>
 
 <h3 id="munil"><code>MuNil</code></h3>
 <blockquote>
 <p>Generic nothing value literal - <code>nil</code>, <code>null</code>, <code>()</code> or <code>unit</code>.</p>
 </blockquote>
-<h4 id="syntax_41">Syntax</h4>
+<h4 id="syntax_44">Syntax</h4>
 <pre><code class="haskell">(MuNil)
+</code></pre>
+
+<h3 id="mudict"><code>MuDict</code></h3>
+<blockquote>
+<p>Generic dictionary - AKA hash, table or map - value literal.
+Its expressions are normally a sequence of <code>Arrow</code>s</p>
+</blockquote>
+<h5 id="syntax_45">Syntax</h5>
+<pre><code class="haskell">(MuDict Expression)
+</code></pre>
+
+<h4 id="python-example_1">Python Example</h4>
+<pre><code class="python">{'foo': 1}
+</code></pre>
+
+<pre><code class="haskell">(MuDict (Arrow (MuString &quot;foo&quot;) (MuNumber 1)))
+</code></pre>
+
+<pre><code class="python">{'foo': 1, 'bar': 2}
+</code></pre>
+
+<pre><code class="haskell">(MuDict (Sequence [
+  (Arrow (MuString &quot;foo&quot;) (MuNumber 1)),
+  (Arrow (MuString &quot;bar&quot;) (MuNumber 2))])
 </code></pre>
 
 <h3 id="muobject"><code>MuObject</code></h3>
 <blockquote>
 <p>Object oriented unnamed object literal</p>
 </blockquote>
-<h4 id="syntax_42">Syntax</h4>
+<h4 id="syntax_46">Syntax</h4>
 <pre><code class="haskell">(MuObject Expression)
 </code></pre>
 
-<h4 id="javascript-example">JavaScript Example</h4>
+<h4 id="javascript-example_4">JavaScript Example</h4>
 <pre><code class="javascript">{}
 {foo: 1}
 {foo: 1, bar: 2}
@@ -789,7 +943,7 @@ selector and arguments</p>
 <blockquote>
 <p>Generic number, boolean, string, symbol (atoms) and char literals</p>
 </blockquote>
-<h4 id="syntax_43">Syntax</h4>
+<h4 id="syntax_47">Syntax</h4>
 <pre><code class="haskell">(MuNumber Double)
 </code></pre>
 
@@ -805,7 +959,7 @@ selector and arguments</p>
 <pre><code class="haskell">(MuChar Char)
 </code></pre>
 
-<h4 id="ruby-example_5">Ruby Example</h4>
+<h4 id="ruby-example_6">Ruby Example</h4>
 <pre><code class="ruby">1
 true
 &quot;hello&quot;
@@ -824,7 +978,7 @@ true
 <p>They represent tuples - generic non-uniform fixed-size collection of elements - and lists - generic uniform variable-size collection of elements.
 Lists typically map to arrays, lists or sequence-like structures.</p>
 </blockquote>
-<h4 id="syntax_44">Syntax</h4>
+<h4 id="syntax_48">Syntax</h4>
 <pre><code class="haskell">(MuTuple [Expression])
 </code></pre>
 
@@ -838,7 +992,7 @@ TestGroup represents a test grouping expression such as <code>describe</code>, <
 Test represents a test expression such as <code>it</code>, etc
 Assert represents a test's assertion, such as <code>assert.equals(...)</code>, etc. It receives a boolean that represents whether the assertion is negated or not.</p>
 </blockquote>
-<h4 id="syntax_45">Syntax</h4>
+<h4 id="syntax_49">Syntax</h4>
 <pre><code class="haskell">(TestGroup Expression Expression)
 </code></pre>
 
@@ -848,7 +1002,7 @@ Assert represents a test's assertion, such as <code>assert.equals(...)</code>, e
 <pre><code class="haskell">(Assert Bool Assertion)
 </code></pre>
 
-<h4 id="javascript-example_1">Javascript Example</h4>
+<h4 id="javascript-example_5">Javascript Example</h4>
 <pre><code class="javascript">describe(&quot;succ&quot;, function() {
   it(&quot;succ of 3 is 4&quot;, function() {
     assert.equals(succ(3), 4)
@@ -861,7 +1015,7 @@ Assert represents a test's assertion, such as <code>assert.equals(...)</code>, e
     (Assert False (Equality (Application (Reference &quot;succ&quot;) [MuNumber 3.0]) (MuNumber 4.0))))
 </code></pre>
 
-<h4 id="python-example">Python Example</h4>
+<h4 id="python-example_2">Python Example</h4>
 <pre><code class="python">class TestGroup(unittest.TestCase):
   def test_succ_of_3_is_4():
     self.assertEqual(succ(3), 4)
@@ -878,7 +1032,7 @@ Assert represents a test's assertion, such as <code>assert.equals(...)</code>, e
  * <code>Truth</code>: Assert the truthfulness of a given expression.
  * <code>Equality</code>: Assert the equality of two given expressions.
  * <code>Failure</code>: Assert a given expression fails with a given error.</p>
-<h4 id="syntax_46">Syntax</h4>
+<h4 id="syntax_50">Syntax</h4>
 <pre><code class="haskell">(Truth Expression)
 </code></pre>
 
@@ -915,11 +1069,11 @@ patterns in imperative <code>case</code> or <code>switch</code> statements, func
 <p>Variable pattern represent a variable match. It corresponds to normal formal parameters in precedural languages,
 and to simple pattern matching against a free identifier.</p>
 </blockquote>
-<h4 id="syntax_47">Syntax</h4>
+<h4 id="syntax_51">Syntax</h4>
 <pre><code class="haskell">(VariablePattern String)
 </code></pre>
 
-<h4 id="javascript-example_2">JavaScript Example</h4>
+<h4 id="javascript-example_6">JavaScript Example</h4>
 <pre><code class="javascript">function foo(x, y) { }
 </code></pre>
 
@@ -933,16 +1087,16 @@ and to simple pattern matching against a free identifier.</p>
 <blockquote>
 <p>Literal constant pattern</p>
 </blockquote>
-<h4 id="syntax_48">Syntax</h4>
+<h4 id="syntax_52">Syntax</h4>
 <pre><code class="haskell">(LiteralPattern String)
 </code></pre>
 
-<h4 id="example_22">Example</h4>
+<h4 id="example_5">Example</h4>
 <h3 id="infixapplicationpattern"><code>InfixApplicationPattern</code></h3>
 <blockquote>
 <p>Infix application pattern like <code>4:X</code></p>
 </blockquote>
-<h4 id="syntax_49">Syntax</h4>
+<h4 id="syntax_53">Syntax</h4>
 <pre><code class="haskell">(InfixApplicationPattern Pattern String Pattern)
 </code></pre>
 
@@ -952,63 +1106,63 @@ and to simple pattern matching against a free identifier.</p>
 <blockquote>
 <p>prefix application pattern like <code>f _</code></p>
 </blockquote>
-<h4 id="syntax_50">Syntax</h4>
+<h4 id="syntax_54">Syntax</h4>
 <pre><code class="haskell">(ApplicationPattern String [Pattern])
 </code></pre>
 
-<h4 id="example_23">Example</h4>
+<h4 id="example_6">Example</h4>
 <h3 id="tuplepattern"><code>TuplePattern</code></h3>
 <blockquote>
 <p>tuple pattern like <code>(3, _)</code></p>
 </blockquote>
-<h4 id="syntax_51">Syntax</h4>
+<h4 id="syntax_55">Syntax</h4>
 <pre><code class="haskell">(TuplePattern [Pattern])
 </code></pre>
 
-<h4 id="example_24">Example</h4>
+<h4 id="example_7">Example</h4>
 <h3 id="listpattern"><code>ListPattern</code></h3>
 <blockquote>
 <p>list pattern like <code>[x, y, _]</code></p>
 </blockquote>
-<h4 id="syntax_52">Syntax</h4>
+<h4 id="syntax_56">Syntax</h4>
 <pre><code class="haskell">(ListPattern [Pattern])
 </code></pre>
 
-<h4 id="example_25">Example</h4>
+<h4 id="example_8">Example</h4>
 <h3 id="functorpattern"><code>FunctorPattern</code></h3>
 <blockquote>
 <p>Prolog-like functor pattern, like <code>f(X, 6)</code>.</p>
 </blockquote>
-<h4 id="syntax_53">Syntax</h4>
+<h4 id="syntax_57">Syntax</h4>
 <pre><code class="haskell">(FunctorPattern Identifier [Pattern])
 </code></pre>
 
-<h4 id="example_26">Example</h4>
+<h4 id="example_9">Example</h4>
 <h3 id="aspattern"><code>AsPattern</code></h3>
-<h4 id="syntax_54">Syntax</h4>
+<h4 id="syntax_58">Syntax</h4>
 <pre><code class="haskell">(AsPattern Identifier Pattern)
 </code></pre>
 
-<h4 id="example_27">Example</h4>
+<h4 id="example_10">Example</h4>
 <h3 id="typepattern"><code>TypePattern</code></h3>
 <blockquote>
 <p>A type pattern, like in exception handling constructs in most object-oriented languages</p>
 </blockquote>
-<h4 id="syntax_55">Syntax</h4>
+<h4 id="syntax_59">Syntax</h4>
 <pre><code class="haskell">(TypePattern Identifier)
 </code></pre>
 
-<h4 id="example_28">Example</h4>
+<h4 id="example_11">Example</h4>
 <h3 id="wildcardpattern"><code>WildcardPattern</code></h3>
 <blockquote>
 <p>Wildcard pattern, typically <code>_</code> in functional an logic programming languages.</p>
 </blockquote>
-<h4 id="syntax_56">Syntax</h4>
+<h4 id="syntax_60">Syntax</h4>
 <pre><code class="haskell">(WildcardPattern)
 </code></pre>
 
 <h3 id="unionpattern"><code>UnionPattern</code></h3>
-<h4 id="syntax_57">Syntax</h4>
+<h4 id="syntax_61">Syntax</h4>
 <pre><code class="haskell">(UnionPattern [Pattern])
 </code></pre>
 
@@ -1016,7 +1170,7 @@ and to simple pattern matching against a free identifier.</p>
 <blockquote>
 <p>Other unrecognized pattern</p>
 </blockquote>
-<h4 id="syntax_58">Syntax</h4>
+<h4 id="syntax_62">Syntax</h4>
 <pre><code class="haskell">(OtherPattern)
 </code></pre>
 
@@ -1040,6 +1194,12 @@ and to simple pattern matching against a free identifier.</p>
 <li><code>Divide</code></li>
 <li><code>ForwardComposition</code>: <code>(f &gt;&gt; g)(x) = (g . f)(x) = g(f(x))</code> operator</li>
 <li><code>BackwardComposition</code>: <code>(g &lt;&lt; f)(x) = (g . f)(x) = g(f(x))</code> operator</li>
+<li><code>Mod</code></li>
+<li><code>BitwiseOr</code></li>
+<li><code>BitwiseAnd</code></li>
+<li><code>BitwiseXor</code></li>
+<li><code>BitwiseLeftShift</code></li>
+<li><code>BitwiseRightShift</code></li>
 </ul>
 <h2 id="types">Types</h2>
 <p>When processing statically-typed languages, all type-information - regardless we are typing a function, a variable or a class - is represented with the <code>Type</code> ADT, can be one of:</p>
@@ -1055,7 +1215,7 @@ and to simple pattern matching against a free identifier.</p>
 <p>A <code>TypeAlias</code> represents a synonym for a type, like the <code>type</code> declaration in Haskell and Scala or C's <code>typedef</code>.
 It is a typical statically typed functional programming feature.</p>
 </blockquote>
-<h4 id="syntax_59">Syntax</h4>
+<h4 id="syntax_63">Syntax</h4>
 <pre><code class="haskell">(TypeAlias Identifier Identifier)
 </code></pre>
 
@@ -1071,7 +1231,7 @@ It is a typical statically typed functional programming feature.</p>
 <p>A <code>TypeSignature</code> represents an explicit type annotation for a computation,
 variable or module, as you can find in Java or Haskell.</p>
 </blockquote>
-<h4 id="syntax_60">Syntax</h4>
+<h4 id="syntax_64">Syntax</h4>
 <pre><code class="haskell">(TypeSignature Identifier Type)
 </code></pre>
 
@@ -1142,7 +1302,7 @@ variable or module, as you can find in Java or Haskell.</p>
 which may have static or dynamic impact on the program. It is aimed to represent
 type-casts in c-like languages and inline type signatures in functional languages.</p>
 </blockquote>
-<h4 id="syntax_61">Syntax</h4>
+<h4 id="syntax_65">Syntax</h4>
 <pre><code class="haskell">(TypeCast Expression Type)
 </code></pre>
 

@@ -149,6 +149,8 @@
         <li class="first-level active"><a href="#supported-inspections">Supported inspections</a></li>
             <li class="second-level"><a href="#generic-inspections">Generic Inspections</a></li>
                 
+            <li class="second-level"><a href="#operator-inspections">Operator Inspections</a></li>
+                
             <li class="second-level"><a href="#imperative-inspections">Imperative Inspections</a></li>
                 
             <li class="second-level"><a href="#object-oriented-inspections">Object Oriented Inspections</a></li>
@@ -162,7 +164,7 @@
         <div class="col-md-9" role="main">
 
 <h1 id="supported-inspections">Supported inspections</h1>
-<p>The power of Mulang is grounded on more than 90 different kind of inspections</p>
+<p>The power of Mulang is grounded on more than 120 different kind of inspections</p>
 <h2 id="generic-inspections">Generic Inspections</h2>
 <table>
 <thead>
@@ -238,7 +240,7 @@
 </tr>
 <tr>
 <td><code>Delegates</code></td>
-<td>is a method, function or procedure declared AND called?</td>
+<td>is a non-empty method, function or procedure declared <em>and</em> called?</td>
 </tr>
 <tr>
 <td><code>DiscardsExceptions</code></td>
@@ -254,15 +256,27 @@
 </tr>
 <tr>
 <td><code>HasAssignmentReturn</code></td>
-<td></td>
+<td>is the code returning the result of an assignment?</td>
+</tr>
+<tr>
+<td><code>HasAssignmentCondition</code></td>
+<td>is the code evaluating the result of an assignment where a boolean condition is expected?</td>
 </tr>
 <tr>
 <td><code>HasCodeDuplication</code></td>
 <td>has the given code simple literal code duplication?</td>
 </tr>
 <tr>
+<td><code>HasDeclarationTypos</code></td>
+<td>is an identifier <em>not</em> declared but a very similar one declared instead?</td>
+</tr>
+<tr>
 <td><code>HasEmptyIfBranches</code></td>
-<td>has the given code an empty if branch?</td>
+<td>has the given code an empty <code>if</code> branch?</td>
+</tr>
+<tr>
+<td><code>HasEmptyRepeat</code></td>
+<td>has the given code a <code>repeat</code> with empty body?</td>
 </tr>
 <tr>
 <td><code>HasLongParameterList</code></td>
@@ -297,6 +311,10 @@
 <td>is there unreachable code?</td>
 </tr>
 <tr>
+<td><code>HasUsageTypos</code></td>
+<td>is an identifier <em>not</em> called but a very similar one called instead?</td>
+</tr>
+<tr>
 <td><code>HasWrongCaseIdentifiers</code></td>
 <td>whether an identifier does not match the domain language's case style</td>
 </tr>
@@ -311,6 +329,18 @@
 <tr>
 <td><code>Rescues</code></td>
 <td>is the given <em>exception type</em> rescued?</td>
+</tr>
+<tr>
+<td><code>ShouldInvertIfCondition</code></td>
+<td>has the given code an <code>if</code> with an empty <code>then</code> but a non-empty <code>else</code>?</td>
+</tr>
+<tr>
+<td><code>SubordinatesDeclarationsTo</code></td>
+<td>are all the declarations in the code called from the given declaration?</td>
+</tr>
+<tr>
+<td><code>SubordinatesDeclarationsToEntryPoint</code></td>
+<td>are all the declarations in the code called from an entry point?</td>
 </tr>
 <tr>
 <td><code>TypesAs</code></td>
@@ -331,10 +361,6 @@
 <tr>
 <td><code>UsesArithmetic</code></td>
 <td>are arithmetic operators used?</td>
-</tr>
-<tr>
-<td><code>UsesBooleanLogic</code></td>
-<td>are logical operators used?</td>
 </tr>
 <tr>
 <td><code>UsesConditional</code></td>
@@ -375,6 +401,109 @@
 <tr>
 <td><code>UsesType</code></td>
 <td>is the given typed used in a signature?</td>
+</tr>
+</tbody>
+</table>
+<h2 id="operator-inspections">Operator Inspections</h2>
+<table>
+<thead>
+<tr>
+<th>Inspection</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UsesAnd</code></td>
+<td>is the <code>&amp;&amp;</code>-like logic operator used?</td>
+</tr>
+<tr>
+<td><code>UsesBackwardComposition</code></td>
+<td>is the <code>.</code>-like functional backward composition operator used?</td>
+</tr>
+<tr>
+<td><code>UsesBitwiseAnd</code></td>
+<td>is the <code>&amp;</code>-like bit-level and operator used?</td>
+</tr>
+<tr>
+<td><code>UsesBitwiseLeftShift</code></td>
+<td>is the <code>&lt;&lt;</code>-like bit-level left shift operator used?</td>
+</tr>
+<tr>
+<td><code>UsesBitwiseOr</code></td>
+<td>is the <code>|</code>-like bit-level or operator used?</td>
+</tr>
+<tr>
+<td><code>UsesBitwiseRightShift</code></td>
+<td>is the <code>&gt;&gt;</code>-like bit-level right shift operator used?</td>
+</tr>
+<tr>
+<td><code>UsesBitwiseXor</code></td>
+<td>is the <code>^</code>-like bit-level xor operator used?</td>
+</tr>
+<tr>
+<td><code>UsesDivide</code></td>
+<td>is the <code>/</code>-like aritmetic operator used?</td>
+</tr>
+<tr>
+<td><code>UsesEqual</code></td>
+<td>is the <code>==</code>-like operator used?</td>
+</tr>
+<tr>
+<td><code>UsesForwardComposition</code></td>
+<td>is the <code>&lt;&lt;</code>-like functional forward composition operator used?</td>
+</tr>
+<tr>
+<td><code>UsesGreatherOrEqualThan</code></td>
+<td>is the <code>&gt;=</code> operator used?</td>
+</tr>
+<tr>
+<td><code>UsesGreatherThan</code></td>
+<td>is the <code>&gt;</code> operator used?</td>
+</tr>
+<tr>
+<td><code>UsesHash</code></td>
+<td>is the <code>hash</code>-like operator used?</td>
+</tr>
+<tr>
+<td><code>UsesLessOrEqualThan</code></td>
+<td>is the <code>&gt;=</code> operator used?</td>
+</tr>
+<tr>
+<td><code>UsesLessThan</code></td>
+<td>is the <code>&gt;</code> operator used?</td>
+</tr>
+<tr>
+<td><code>UsesMinus</code></td>
+<td>is the <code>-</code> aritmetic operator used?</td>
+</tr>
+<tr>
+<td><code>UsesModulo</code></td>
+<td>is the <code>%</code>-like modulo operator used?</td>
+</tr>
+<tr>
+<td><code>UsesMultiply</code></td>
+<td>is the <code>*</code> aritmetic operator used?</td>
+</tr>
+<tr>
+<td><code>UsesNegation</code></td>
+<td>is the <code>!</code>-like logic operator used?</td>
+</tr>
+<tr>
+<td><code>UsesNotEqual</code></td>
+<td>is the <code>!=</code>-like operator used?</td>
+</tr>
+<tr>
+<td><code>UsesOr</code></td>
+<td>is the <code>||</code>-like logic operator used?</td>
+</tr>
+<tr>
+<td><code>UsesOtherwise</code></td>
+<td>is the <code>otherwise</code> operator used?</td>
+</tr>
+<tr>
+<td><code>UsesPlus</code></td>
+<td>is the <code>+</code> aritmetic operator used?</td>
 </tr>
 </tbody>
 </table>

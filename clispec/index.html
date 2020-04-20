@@ -159,6 +159,7 @@
                 <li class="third-level"><a href="#with-smell-analysis-by-inclusion">With smell analysis, by inclusion</a></li>
                 <li class="third-level"><a href="#with-smell-analysis-by-exclusion">With smell analysis, by exclusion</a></li>
                 <li class="third-level"><a href="#with-expressiveness-smells">With expressiveness smells</a></li>
+                <li class="third-level"><a href="#with-typos-smells">With typos smells</a></li>
                 <li class="third-level"><a href="#with-intermediate-language-generation">With intermediate language generation</a></li>
             <li class="second-level"><a href="#with-test-running">With test running</a></li>
                 
@@ -531,6 +532,53 @@ by the <code>domainLanguage</code> setting, which you <em>can</em> configure:</p
          &quot;binding&quot; : &quot;foo&quot;
       }
    ]
+}
+</code></pre>
+
+<h3 id="with-typos-smells">With typos smells</h3>
+<p>Smell typos are special since they interact with some expectations:</p>
+<ul>
+<li><code>HasDeclarationTypos</code> is a smell that will be activated after a <code>Declares</code> - or any similar expectation like <code>DeclaresProcedure</code> or <code>Delegates</code> - expectation is set.</li>
+<li><code>HasUsageTypos</code> will be activated after a <code>Uses</code> expectation is set.</li>
+</ul>
+<pre><code class="bash">mulang '
+{
+  &quot;sample&quot;: {
+    &quot;tag&quot;: &quot;CodeSample&quot;,
+    &quot;language&quot;: &quot;JavaScript&quot;,
+    &quot;content&quot;: &quot;function pls(x, y) { return x + y; }&quot;
+  },
+  &quot;spec&quot;: {
+    &quot;expectations&quot;: [
+      { &quot;binding&quot;: &quot;*&quot;, &quot;inspection&quot;: &quot;Declares:plus&quot; }
+    ],
+    &quot;smellsSet&quot;: {
+      &quot;tag&quot;: &quot;NoSmells&quot;,
+      &quot;include&quot;: [ &quot;HasDeclarationTypos&quot; ]
+    }
+  }
+}
+' | json_pp
+{
+   &quot;intermediateLanguage&quot; : null,
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;expectationResults&quot; : [
+      {
+         &quot;expectation&quot; : {
+            &quot;inspection&quot; : &quot;Declares:plus&quot;,
+            &quot;binding&quot; : &quot;*&quot;
+         },
+         &quot;result&quot; : false
+      }
+   ],
+   &quot;smells&quot; : [
+      {
+         &quot;inspection&quot; : &quot;HasDeclarationTypos:plus&quot;,
+         &quot;binding&quot; : &quot;pls&quot;
+      }
+   ],
+   &quot;testResults&quot; : [],
+   &quot;signatures&quot; : []
 }
 </code></pre>
 
