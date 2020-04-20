@@ -60,3 +60,8 @@ echo "[Mulang] Pushing CHANGELOG.md..."
 git push origin HEAD
 
 echo "[Mulang] Pushed. Travis will deploy mulang binaries and gem"
+echo "[Mulang] Please don't forget the following manual steps:"
+echo ""
+echo "                1. upload to Github ghcjslib/build/mulang.js.zip"
+echo "                2. run docs/devinit"
+echo "                3. run mkdocs gh-deploy"
