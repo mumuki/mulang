@@ -391,3 +391,15 @@ spec = do
                 assertEquals(2, 2);
               }
             }|] `shouldBe` wrapped (Assert False (Equality (MuNumber 2) (MuNumber 2)))
+
+      describe "operators" $ do
+        let runOp code e = it code (java ("public class Foo { static { int x = "++ code ++"; } }")  `shouldBe` Class "Foo" Nothing (Sequence [VariableSignature "x" "int" [],Variable "x" e]))
+
+        runOp "4 % 5"  (Send (MuNumber 4.0)  (Primitive Modulo)            [MuNumber 5.0])
+        runOp "4 << 2" (Send (MuNumber 4.0)  (Primitive BitwiseLeftShift)  [MuNumber 2.0])
+        runOp "4 >> 2" (Send (MuNumber 4.0)  (Primitive BitwiseRightShift) [MuNumber 2.0])
+        runOp "4 & 2"  (Send (MuNumber 4.0)  (Primitive BitwiseAnd)        [MuNumber 2.0])
+        runOp "4 | 2"  (Send (MuNumber 4.0)  (Primitive BitwiseOr)         [MuNumber 2.0])
+        runOp "4 ^ 2"  (Send (MuNumber 4.0)  (Primitive BitwiseXor)        [MuNumber 2.0])
+        runOp "x && y" (Send (Reference "x") (Primitive And)               [Reference "y"])
+        runOp "x || y" (Send (Reference "x") (Primitive Or)                [Reference "y"])

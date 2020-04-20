@@ -38,11 +38,17 @@ defaultTokensTable =
     (Plus, ["+"]),
     (Minus, ["-"]),
     (Multiply, ["*"]),
-    (Divide, ["/"])
+    (Divide, ["/"]),
+    (Modulo, ["%"]),
+    (BitwiseOr, ["|"]),
+    (BitwiseAnd, ["&"]),
+    (BitwiseXor, ["^"]),
+    (BitwiseLeftShift, ["<<"]),
+    (BitwiseRightShift, [">>"])
   ]
 
 buildTokensTable :: [(Operator, [Token])] -> TokensTable
-buildTokensTable = flip Map.union defaultTokensTable  . Map.fromList
+buildTokensTable = Map.filter (not . null) . flip Map.union defaultTokensTable  . Map.fromList
 
 buildOperatorsTable :: TokensTable -> OperatorsTable
 buildOperatorsTable =  Map.fromList . concatMap (fill . swap) . Map.toList

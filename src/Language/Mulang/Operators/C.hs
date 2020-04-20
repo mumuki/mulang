@@ -5,12 +5,4 @@ import Language.Mulang.Operators (TokensTable, buildTokensTable)
 import Language.Mulang.Ast.Operator (Operator (..))
 
 cTokensTable :: TokensTable
-cTokensTable =
-  buildTokensTable [
-    (BitwiseXor, ["^"]),
-    (Mod, ["%"]),
-    (BitwiseOr, ["|"]),
-    (BitwiseAnd, ["&"]),
-    (BitwiseLeftShift, ["<<"]),
-    (BitwiseRightShift, [">>"])
-  ]
+cTokensTable = buildTokensTable []

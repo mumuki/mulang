@@ -11,5 +11,11 @@ haskellTokensTable =
     (Negation, ["not"]),
     (Otherwise, ["otherwise"]),
     (BackwardComposition, ["."]),
-    (Divide, ["/"])
+    (Divide, ["/"]),
+    (Modulo, ["mod"]),
+    (BitwiseOr, []),
+    (BitwiseAnd, []),
+    (BitwiseXor, []),
+    (BitwiseLeftShift, []),
+    (BitwiseRightShift, [])
   ]
