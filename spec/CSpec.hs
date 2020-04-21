@@ -169,9 +169,7 @@ spec = do
           int main () {
             person.age;
           }
-          |] `shouldBe` cContext (Other (Just ("CMember (CVar (Ident \"person\" 243067487 (NodeInfo <no file> (<no file>,6) (Name {nameId = 4}))) " ++
-                                                "(NodeInfo <no file> (<no file>,6) (Name {nameId = 5}))) (Ident \"age\" 1668065 (NodeInfo <no file> (<no file>,3) " ++
-                                                "(Name {nameId = 6}))) False (NodeInfo <no file> (<no file>,3) (Name {nameId = 7}))")) Nothing)
+          |] `shouldBe` cContext (FieldReference (Reference "person") "age")
 
       it "parses simple assignment" $ do
         run [text|
