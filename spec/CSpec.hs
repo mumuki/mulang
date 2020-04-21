@@ -164,12 +164,40 @@ spec = do
           }
           |] `shouldBe` cContext (Switch (Reference "a") [(MuNumber 1, Break None), (MuNumber 2, Continue None)] (MuNumber 1))
 
-      it "does not parse structs access" $ do
+      it "does parse structs access" $ do
         run [text|
           int main () {
             person.age;
           }
           |] `shouldBe` cContext (FieldReference (Reference "person") "age")
+
+      it "does parse expression struct access" $ do
+        run [text|
+          int main () {
+            f_person().age;
+          }
+          |] `shouldBe` cContext (FieldReference (Application (Reference "f_person") []) "age")
+
+      it "does parse struct field assignment" $ do
+        run [text|
+          int main () {
+            person.age = 10;
+          }
+          |] `shouldBe` cContext (FieldAssignment (Reference "person") "age" (MuNumber 10))
+
+      it "does parse struct pointer field assignment" $ do
+        run [text|
+          int main () {
+            person->age = 10;
+          }
+          |] `shouldBe` cContext (FieldAssignment (Reference "person") "age" (MuNumber 10))
+
+      it "does parse struct pointer field assignment operation" $ do
+        run [text|
+          int main () {
+            person.age += 10;
+          }
+          |] `shouldBe` cContext (FieldAssignment (Reference "person") "age" (Application (Primitive Plus) [Reference "age", MuNumber 10]))
 
       it "parses simple assignment" $ do
         run [text|
