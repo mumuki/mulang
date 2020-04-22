@@ -190,7 +190,7 @@ spec = do
           int main () {
             person->age = 10;
           }
-          |] `shouldBe` cContext (FieldAssignment (Reference "person") "age" (MuNumber 10))
+          |] `shouldBe` cContext (Other (Just "CMember (CVar (Ident \"person\" 243067487 (NodeInfo <no file> (<no file>,6) (Name {nameId = 4}))) (NodeInfo <no file> (<no file>,6) (Name {nameId = 5}))) (Ident \"age\" 1668065 (NodeInfo <no file> (<no file>,3) (Name {nameId = 6}))) True (NodeInfo <no file> (<no file>,3) (Name {nameId = 7}))") Nothing)
 
       it "does parse struct pointer field assignment operation" $ do
         run [text|
@@ -199,7 +199,7 @@ spec = do
           }
           |] `shouldBe` cContext (FieldAssignment (Reference "person") "age" (Application (Primitive Plus) [Reference "age", MuNumber 10]))
 
-      it "parses simple assignment" $ do
+      it "parses complex c example" $ do
         run [text|
           int cantidadDeNumerosImpares(int unosNumeros[]) {
             int cantidadDeImpares;

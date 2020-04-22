@@ -100,7 +100,7 @@ muExpression (CUnary operator argument _ )                    = muUnaryOp operat
 muExpression (CAssign operator leftArgument rightArgument _ ) = muAssignmentExpression operator leftArgument rightArgument
 muExpression (CCall callee arguments _  )                     = Application (muExpression callee) (map muExpression arguments)
 muExpression (CIndex callee argument _   )                    = Application (Reference "[]") [muExpression callee, muExpression argument]
-muExpression (CMember expr ident _ _)                         = FieldReference (muExpression expr) (muIdent ident)
+muExpression (CMember expr ident False _)                     = FieldReference (muExpression expr) (muIdent ident)
 muExpression a                                                = debug a
 --muExpression (CComma [CExpression _] _   ) = undefined
 --muExpression (CCond (CExpression _) (Maybe (CExpression _)) (CExpression _) _  ) = undefined
@@ -118,10 +118,11 @@ muExpression a                                                = debug a
 --muExpression (CBuiltinExpr (CBuiltinThing _)) = undefined
 
 muAssignmentExpression :: CAssignOp -> CExpr -> CExpr -> Expression
-muAssignmentExpression CAssignOp (CVar i _)          argument = Assignment (muIdent i) $ muExpression argument
-muAssignmentExpression CAssignOp (CMember exp i _ _) argument = FieldAssignment (muExpression exp) (muIdent i) $ muExpression argument
-muAssignmentExpression operator  l@(CVar i _)        argument = Assignment (muIdent i) $ Application (muAssignOp operator) [muExpression l, muExpression argument]
-muAssignmentExpression operator  (CMember exp i _ _) argument = FieldAssignment (muExpression exp) (muIdent i) $ Application (muAssignOp operator) [Reference (muIdent i), muExpression argument]
+muAssignmentExpression CAssignOp (CVar i _)              argument = Assignment (muIdent i) $ muExpression argument
+muAssignmentExpression CAssignOp (CMember exp i False _) argument = FieldAssignment (muExpression exp) (muIdent i) $ muExpression argument
+muAssignmentExpression operator  l@(CVar i _)            argument = Assignment (muIdent i) $ Application (muAssignOp operator) [muExpression l, muExpression argument]
+muAssignmentExpression operator  (CMember exp i False _) argument = FieldAssignment (muExpression exp) (muIdent i) $ Application (muAssignOp operator) [Reference (muIdent i), muExpression argument]
+muAssignmentExpression _         e                   _            = debug e
 
 muBinaryOp :: CBinaryOp -> Expression
 muBinaryOp CMulOp = Primitive O.Multiply
