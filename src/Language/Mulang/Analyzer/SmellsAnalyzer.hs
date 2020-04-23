@@ -13,7 +13,7 @@ import Language.Mulang.Edl.Expectation (cQuery, Query(..), CQuery (..), Matcher(
 
 import Language.Mulang.Analyzer.Analysis hiding (DomainLanguage, Inspection, allSmells)
 
-import Data.List ((\\), intersect, isPrefixOf)
+import Data.List ((\\), intersect, isPrefixOf, nub)
 import Data.Maybe (fromMaybe, mapMaybe)
 
 -- the runtime context of a smell analysis,
@@ -36,7 +36,7 @@ type Detection = SmellsContext -> Expression -> [Identifier]
 -- 2. Smells instantiation: for each selected smell, one ore more concrete smells will be instantiated
 -- 3. Smells evaluation: for each smell instance, it will be evaluated and zero or more Expectations will be synthesized
 analyseSmells :: Expression -> SmellsContext -> Maybe SmellsSet -> [Expectation]
-analyseSmells ast context = concatMap (evalSmellInstance context ast) . concatMap (instantiateSmell context) . smellsFor
+analyseSmells ast context = nub . concatMap (evalSmellInstance context ast) . concatMap (instantiateSmell context) . smellsFor
 
 ---
 --- Selection
