@@ -30,11 +30,13 @@ type SmellInstance = (Smell, Maybe Identifier)
 -- A Detection is an executable representation of an SmellInstance
 type Detection = SmellsContext -> Expression -> [Identifier]
 
--- Smell detection has three phases:
+-- Smell detection has four phases:
 --
 -- 1. Smells selection: dependening on the given SmellSet, differents lists of smells may be generated
 -- 2. Smells instantiation: for each selected smell, one ore more concrete smells will be instantiated
 -- 3. Smells evaluation: for each smell instance, it will be evaluated and zero or more Expectations will be synthesized
+-- 4. Duplicates removal: context-sensitive smells may be activated more than once, thus nubbing is required.
+--                        The same applies to smells that apply to both declarations and type signatures
 analyseSmells :: Expression -> SmellsContext -> Maybe SmellsSet -> [Expectation]
 analyseSmells ast context = nub . concatMap (evalSmellInstance context ast) . concatMap (instantiateSmell context) . smellsFor
 
