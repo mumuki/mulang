@@ -14,9 +14,8 @@ module Language.Mulang.Interpreter (
 ) where
 
 import           Data.Map.Strict (Map)
-import           Data.Maybe (fromMaybe, fromJust)
-import           Data.List (find)
 import qualified Data.Map.Strict as Map
+import           Data.List (find, intercalate)
 import           Control.Monad (forM)
 import           Control.Monad.State.Class
 import           Control.Monad.Loops
@@ -26,45 +25,7 @@ import           Data.Fixed (mod')
 
 import qualified Language.Mulang.Ast as M
 import qualified Language.Mulang.Ast.Operator as O
-
-type Executable m = ContT Reference (StateT ExecutionContext IO) m
-
-type Callback = Reference -> Executable ()
-
-newtype Reference = Reference Int deriving (Show, Eq, Ord)
-
-type ObjectSpace = Map Reference Value
-
-instance Show ExecutionContext where
-  show (ExecutionContext globalObjects scopes _ _ _) =
-    "ExecutionContext { globalObjects = " ++ show globalObjects ++ ", scopes = " ++ show scopes ++ " }"
-
-data ExecutionContext = ExecutionContext { globalObjects :: ObjectSpace
-                                         , scopes :: [Reference]
-                                         , currentException :: Maybe Reference
-                                         , currentReturnCallback :: Callback
-                                         , currentRaiseCallback :: Callback
-                                         }
-
-data Value = MuString String
-           | MuFunction [Reference] M.SubroutineBody
-           | MuList [Reference]
-           -- | The reference is the reference to the localScope
-           | MuNumber Double
-           | MuBool Bool
-           | MuObject (Map String Reference)
-           | MuNull
-           deriving (Show, Eq)
-
-defaultContext = ExecutionContext
-  { globalObjects = Map.singleton (Reference 1) (MuObject Map.empty)
-  , scopes = [Reference 1]
-  , currentException = Nothing
-  , currentRaiseCallback = \r -> do
-      v <- dereference r
-      error $ "Exception thrown outside try: " ++ show v
-  , currentReturnCallback = \_r -> error "Called return from outside a function"
-  }
+import           Language.Mulang.Interpreter.Internals
 
 eval' :: ExecutionContext -> Executable Reference -> IO (Reference, ExecutionContext)
 eval' ctx ref = runStateT (runContT ref return) ctx
@@ -117,40 +78,19 @@ evalExpr (M.Assert negated (M.Equality expected actual)) =
           | muEquals v1 v2 /= negated = return nullRef
           | otherwise                 = raiseString $ "Expected " ++ show v1 ++ " but got: " ++ show v2
 
-evalExpr (M.Application (M.Primitive O.GreatherOrEqualThan) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 >= n2
+evalExpr (M.Application (M.Primitive O.GreatherOrEqualThan) expressions) = evalBinaryNumeric expressions (>=) createBool
+evalExpr (M.Application (M.Primitive O.Modulo) expressions) = evalBinaryNumeric expressions (mod') createNumber
+evalExpr (M.Application (M.Primitive O.GreatherThan) expressions) = evalBinaryNumeric expressions (>) createBool
 
-evalExpr (M.Application (M.Primitive O.Modulo) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 `mod'` n2
-        f params                     = error $ "Bad parameters, expected two numbers but got " ++ show params
-
-evalExpr (M.Application (M.Primitive O.GreatherThan) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 > n2
-        f params                     = error $ "Bad parameters, expected two bools but got " ++ show params
-
--- TODO make this evaluation non strict on both parameters
-evalExpr (M.Application (M.Primitive O.Or) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuBool b1, MuBool b2] = createReference $ MuBool $ b1 || b2
-        f params                 = error $ "Bad parameters, expected two bools but got " ++ show params
-
--- TODO make this evaluation non strict on both parameters
-evalExpr (M.Application (M.Primitive O.And) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuBool b1, MuBool b2] = createReference $ MuBool $ b1 && b2
-        f params                 = error $ "Bad parameters, expected two bools but got " ++ show params
+evalExpr (M.Application (M.Primitive O.Or) expressions) = evalBinaryBoolean expressions (||)
+evalExpr (M.Application (M.Primitive O.And) expressions) = evalBinaryBoolean expressions (&&)
 
 evalExpr (M.Application (M.Primitive O.Negation) expressions) =
   evalExpressionsWith expressions f
-  where f [MuBool b] = createReference $ MuBool $ not b
-        f params     = error $ "Bad parameters, expected one bool but got " ++ show params
+  where f [MuBool b] = createBool $ not b
+        f params     = raiseTypeError "expected one boolean" params
 
-evalExpr (M.Application (M.Primitive O.Multiply) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 * n2
+evalExpr (M.Application (M.Primitive O.Multiply) expressions) = evalBinaryNumeric expressions (*) createNumber
 
 evalExpr (M.Application (M.Primitive O.Equal) expressions) = do
   params <- mapM evalExpr expressions
@@ -160,23 +100,10 @@ evalExpr (M.Application (M.Primitive O.Equal) expressions) = do
 evalExpr (M.Application (M.Primitive O.NotEqual) expressions) = do
   evalExpr $ M.Application (M.Primitive O.Negation) [M.Application (M.Primitive O.Equal) expressions]
 
-evalExpr (M.Application (M.Primitive O.LessOrEqualThan) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 <= n2
-        f params                     = raiseString $ "Bad parameters, expected two numbers but got " ++ show params
-
-evalExpr (M.Application (M.Primitive O.LessThan) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuBool $ n1 < n2
-        f params                     = raiseString $ "Bad parameters, expected two numbers but got " ++ show params
-
-evalExpr (M.Application (M.Primitive O.Plus) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 + n2
-
-evalExpr (M.Application (M.Primitive O.Minus) expressions) =
-  evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = createReference $ MuNumber $ n1 - n2
+evalExpr (M.Application (M.Primitive O.LessOrEqualThan) expressions) = evalBinaryNumeric expressions (<=) createBool
+evalExpr (M.Application (M.Primitive O.LessThan) expressions) = evalBinaryNumeric expressions (<) createBool
+evalExpr (M.Application (M.Primitive O.Plus) expressions) = evalBinaryNumeric expressions (+) createNumber
+evalExpr (M.Application (M.Primitive O.Minus) expressions) = evalBinaryNumeric expressions (-) createNumber
 
 evalExpr (M.MuList expressions) = do
   refs <- forM expressions evalExpr
@@ -200,9 +127,9 @@ evalExpr (M.If cond thenBranch elseBranch) = do
   v <- evalCondition cond
   if v then evalExpr thenBranch else evalExpr elseBranch
 
-evalExpr (M.MuNumber n) = createReference $ MuNumber n
+evalExpr (M.MuNumber n) = createNumber n
 evalExpr (M.MuNil) = return nullRef
-evalExpr (M.MuBool b) = createReference $ MuBool b
+evalExpr (M.MuBool b) = createBool b
 evalExpr (M.MuString s) = createReference $ MuString s
 evalExpr (M.Return e) = do
   ref <- evalExpr e
@@ -255,11 +182,22 @@ evalExpr (M.Reference name) = findReferenceForName name
 evalExpr (M.None) = return nullRef
 evalExpr e = raiseString $ "Unkown expression: " ++ show e
 
+-- TODO make this evaluation non strict on both parameters
+evalBinaryBoolean :: [M.Expression] -> (Bool -> Bool -> Bool) -> Executable Reference
+evalBinaryBoolean expressions op = evalExpressionsWith expressions f
+  where f [MuBool b1, MuBool b2] = createBool $ op b1 b2
+        f params                 = raiseTypeError "expected two booleans" params
+
+evalBinaryNumeric :: [M.Expression] -> (Double -> Double -> a) -> (a -> Executable Reference) -> Executable Reference
+evalBinaryNumeric expressions op pack = evalExpressionsWith expressions f
+  where f [MuNumber n1, MuNumber n2] = pack $ op n1 n2
+        f params                     = raiseTypeError "expected two numbers" params
+
 evalCondition :: M.Expression -> Executable Bool
 evalCondition cond = evalExpr cond >>= dereference >>= muBool
   where
     muBool (MuBool value) = return value
-    muBool v              = raiseString $ "Boolean expected, got: " ++ show v
+    muBool v              = raiseTypeError "expected boolean" [v]
 
 evalParams :: [M.Pattern] -> [M.Expression] -> Executable Reference
 evalParams params arguments = do
@@ -278,12 +216,15 @@ raiseString :: String -> Executable a
 raiseString s = do
   raiseInternal =<< (createReference $ MuString s)
 
+raiseTypeError :: String -> [Value] ->Executable a
+raiseTypeError message values = raiseString $ "Type error: " ++ message ++ " but got " ++ (intercalate ", " . map debug $ values)
+
 muValuesEqual r1 r2
   | r1 == r2 = createReference $ MuBool True
   | otherwise = do
       v1 <- dereference r1
       v2 <- dereference r2
-      createReference $ MuBool $ muEquals v1 v2
+      createBool $ muEquals v1 v2
 
 muEquals (MuBool b1)   (MuBool b2)   = b1 == b2
 muEquals (MuNumber n1) (MuNumber n2) = n1 == n2
@@ -329,52 +270,20 @@ findReferenceForName name = do
   (MuObject context) <- dereference ref
   return $ context Map.! name
 
-getMaxKey :: Map k a -> Maybe k
-getMaxKey m = case Map.maxViewWithKey m of
-  Just ((k, _a), _) -> Just k
-  _ -> Nothing
-
 nullRef = Reference 0
 
-dereference' :: ObjectSpace -> Reference -> Value
-dereference' _ (Reference 0) = MuNull
-dereference' objectSpace ref = do
-  fromMaybe (error $ "Failed to find ref " ++ show ref ++ " in " ++ show objectSpace) .
-    Map.lookup ref $
-    objectSpace
-
-dereference :: Reference -> Executable Value
-dereference ref = do
-  objectSpace <- gets globalObjects
-  return $ dereference' objectSpace ref
-
-updateGlobalObjects f context =
-  context { globalObjects = f $ globalObjects context }
-
-incrementRef (Reference n) = Reference $ n + 1
-
-createReference :: Value -> Executable Reference
-createReference value = do
-  nextReferenceId :: Reference <- gets (fromJust . fmap incrementRef . getMaxKey . globalObjects)
-  modify (updateGlobalObjects $ Map.insert nextReferenceId value)
-  return nextReferenceId
-
-currentFrame :: Executable Reference
-currentFrame = gets (head . scopes)
+createBool = createReference . MuBool
+createNumber = createReference . MuNumber
 
 setLocalVariable :: String -> Reference -> Executable ()
 setLocalVariable name ref = do
   frame <- currentFrame
   updateRef frame (addAttrToObject name ref)
 
+  where
+      currentFrame :: Executable Reference
+      currentFrame = gets (head . scopes)
+
 addAttrToObject :: String -> Reference -> Value -> Value
 addAttrToObject k r (MuObject map) = MuObject $ Map.insert k r map
 addAttrToObject k _r v = error $ "Tried adding " ++ k ++ " to a non object: " ++ show v
-
-putRef :: Reference -> Value -> Executable ()
-putRef ref = modify . updateGlobalObjects . Map.insert ref
-
-updateRef :: Reference -> (Value -> Value) -> Executable ()
-updateRef ref f = do
-  val <- dereference ref
-  putRef ref (f val)
