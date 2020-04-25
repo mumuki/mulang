@@ -5,11 +5,16 @@ module Language.Mulang.Inspector.Combiner (
   scopedList,
   transitive,
   transitiveList,
+  derive,
+  InspectionFamily,
   Location (..)) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (transitiveReferencedIdentifiers, declarationsOf, declaredIdentifiers)
 import Language.Mulang.Inspector.Primitive
+import Language.Mulang.Inspector.Matcher (unmatching, Matcher)
+
+type InspectionFamily = (Inspection, Matcher -> Inspection, Matcher -> Counter)
 
 data Location
   = Nowhere                   -- ^ No subexpression match, nor the whole expression
@@ -43,5 +48,14 @@ transitive identifier inspection code = any (`scopedInspection` code) . transiti
 transitiveList :: [Identifier] -> Inspection -> Inspection
 transitiveList [identifier] i = transitive identifier i
 transitiveList identifiers i  = scopedList identifiers i
+
+-- | Derives a family of inspections from a primal inspection,
+-- which consist of a simple inspection, a matching inspection and a counter
+derive :: (Matcher -> Inspection) -> InspectionFamily
+derive f = (uses, usesMatching, count)
+  where
+    uses = unmatching usesMatching
+    usesMatching matcher = positive (count matcher)
+    count matcher = countExpressions (f matcher)
 
 scoped' = flip scoped
