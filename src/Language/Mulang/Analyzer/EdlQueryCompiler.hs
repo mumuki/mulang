@@ -83,10 +83,17 @@ compileCounter = f
   f "DeclaresVariable"    = boundMatching countVariables
   f "Returns"             = plainMatching countReturns
   f "UsesFor"             = plainMatching countFors
+  f "UsesForEach"         = plainMatching countForEaches
   f "UsesForLoop"         = plainMatching countForLoops
   f "UsesIf"              = plainMatching countIfs
+  f "UsesLambda"          = plainMatching countLambdas
+  f "UsesPrint"           = plainMatching countPrints
   f "UsesRepeat"          = plainMatching countRepeats
+  f "UsesTry"             = plainMatching countTries
   f "UsesWhile"           = plainMatching countWhiles
+  f "UsesYield"           = plainMatching countYiels
+  f _                     = const Nothing
+
 
 compileInspection :: String -> E.Matcher -> Maybe ContextualizedBoundInspection
 compileInspection = f
@@ -141,7 +148,7 @@ compileInspection = f
   f "UsesExceptionHandling"            E.Unmatching   = plain usesExceptionHandling
   f "UsesExceptions"                   E.Unmatching   = plain usesExceptions
   f "UsesFindall"                      E.Unmatching   = plain usesFindall
-  f "UsesFor"                          E.Unmatching   = plain usesFor
+  f "UsesFor"                          m              = plainMatching usesForMatching m
   f "UsesForall"                       E.Unmatching   = plain usesForall
   f "UsesForComprehension"             E.Unmatching   = plain usesForComprehension
   f "UsesForeach"                      m              = plainMatching usesForEachMatching m
@@ -161,8 +168,9 @@ compileInspection = f
   f "UsesRepeat"                       m              = plainMatching usesRepeatMatching m
   f "UsesStaticMethodOverload"         E.Unmatching   = plain usesStaticMethodOverload
   f "UsesStaticPolymorphism"           E.Unmatching   = contextual usesStaticPolymorphism'
-  f "UsesSwitch"                       E.Unmatching   = plain usesSwitch
+  f "UsesSwitch"                       m              = plainMatching usesSwitchMatching m
   f "UsesTemplateMethod"               E.Unmatching   = plain usesTemplateMethod
+  f "UsesTry"                          m              = plainMatching usesTryMatching m
   f "UsesType"                         E.Unmatching   = bound usesType
   f "UsesWhile"                        m              = plainMatching usesWhileMatching m
   f "UsesYield"                        m              = plainMatching usesYieldMatching m

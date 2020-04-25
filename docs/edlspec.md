@@ -383,11 +383,16 @@ Not all inspections can be counted. Currently, only the following are supported:
 * `declares procedure`
 * `declares variable`
 * `returns`
+* `uses for each`
 * `uses for loop`
 * `uses for`
 * `uses if`
+* `uses lambda`
+* `uses print`
 * `uses repeat`
+* `uses try`
 * `uses while`
+* `uses yield`
 
 ## Boolean operators on scoped queries
 
