@@ -264,8 +264,8 @@ spec = do
     run (hs "f 3 = 3") "f" "UsesConditional" `shouldBe` False
 
   it "works with returns" $ do
-    run (js "function m() { }") "f" "Returns" `shouldBe` False
-    run (js "function m() { return 3 }") "f" "Returns" `shouldBe` True
+    run (js "function m() { }") "m" "Returns" `shouldBe` False
+    run (js "function m() { return 3 }") "m" "Returns" `shouldBe` True
 
   it "works with UsesLambda" $ do
     run (hs "f 3 = 3") "f" "UsesLambda" `shouldBe` False
