@@ -73,6 +73,7 @@ compileCounter :: String -> E.Matcher -> Maybe (ContextualizedBoundCounter)
 compileCounter = f
   where
   f "UsesIf"              m            = plainMatching countIfs m
+  f "Returns"             m            = plainMatching countReturns m
   f "UsesRepeat"          m            = plainMatching countRepeats m
   f "UsesWhile"           m            = plainMatching countWhiles m
   f "UsesForLoop"         m            = plainMatching countForLoops m
@@ -124,7 +125,7 @@ compileInspection = f
   f "Instantiates"                     E.Unmatching   = bound instantiates
   f "Raises"                           E.Unmatching   = bound raises
   f "Rescues"                          E.Unmatching   = bound rescues
-  f "Returns"                          m@(E.Matching _) = plainMatching returnsMatching m
+  f "Returns"                          m              = plainMatching returnsMatching m
   f "SubordinatesDeclarationsTo"       E.Unmatching   = bound subordinatesDeclarationsTo
   f "SubordinatesDeclarationsToEntryPoint" E.Unmatching = plain subordinatesDeclarationsToEntryPoint
   f "TypesAs"                          E.Unmatching   = bound typesAs
