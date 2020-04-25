@@ -19,9 +19,10 @@ module Language.Mulang.Inspector.Procedural (
 import Language.Mulang.Ast
 import Language.Mulang.Generator (equationsExpandedExpressions, statementsExpressions)
 import Language.Mulang.Inspector.Matcher (Matcher, unmatching, matches)
-import Language.Mulang.Inspector.Primitive (Inspection, Counter, containsExpression, positive, countExpressions)
+import Language.Mulang.Inspector.Primitive (Inspection)
 import Language.Mulang.Inspector.Bound (BoundCounter, BoundInspection, countBoundDeclarations, uncounting)
 import Language.Mulang.Inspector.Generic (usesYield)
+import Language.Mulang.Inspector.Combiner (derive, InspectionFamily)
 
 declaresProcedure :: BoundInspection
 declaresProcedure = unmatching declaresProcedureMatching
@@ -36,58 +37,29 @@ countProcedures matcher = countBoundDeclarations f
 
 -- | Inspection that tells whether an expression uses while
 -- in its definition
-usesWhile :: Inspection
-usesWhile = unmatching usesWhileMatching
-
--- | Inspection that tells whether an expression uses while
--- in its definition
-usesWhileMatching :: Matcher -> Inspection
-usesWhileMatching matcher = positive (countWhiles matcher)
-
-countWhiles :: Matcher -> Counter
-countWhiles matcher = countExpressions f
-  where f (While c a) = matcher [c, a]
-        f _ = False
+(usesWhile, usesWhileMatching, countWhiles) = derive f :: InspectionFamily
+  where f matcher (While c a) = matcher [c, a]
+        f _        _ = False
 
 -- | Inspection that tells whether an expression uses Switch
 -- in its definition
-usesSwitch :: Inspection
-usesSwitch = containsExpression f
-  where f (Switch _ _ _) = True
-        f _ = False
+(usesSwitch, usesSwitchMatching, countSwitches) = derive f :: InspectionFamily
+  where f matcher (Switch value cases orElse) = matcher [value, (Sequence . map snd $ cases), orElse]
+        f _        _                          = False
 
 -- | Inspection that tells whether an expression uses reoeat
 -- in its definition
-usesRepeat :: Inspection
-usesRepeat = unmatching usesRepeatMatching
+(usesRepeat, usesRepeatMatching, countRepeats) = derive f :: InspectionFamily
+  where f matcher (Repeat c a) = matcher [c, a]
+        f _       _            = False
 
-usesRepeatMatching :: Matcher -> Inspection
-usesRepeatMatching matcher = positive (countRepeats matcher)
+(usesForEach, usesForEachMatching, countForEaches) = derive f :: InspectionFamily
+  where f matcher (For ss e) = not (usesYield e) && matcher [Sequence (statementsExpressions ss), e]
+        f _       _          = False
 
-countRepeats :: Matcher -> Counter
-countRepeats matcher = countExpressions f
-  where f (Repeat c a) = matcher [c, a]
-        f _ = False
-
-usesForEach :: Inspection
-usesForEach = unmatching usesForEachMatching
-
-usesForEachMatching :: Matcher -> Inspection
-usesForEachMatching matcher = containsExpression f
-  where f (For ss e) = not (usesYield e) && matcher [Sequence (statementsExpressions ss), e]
-        f _          = False
-
-usesForLoop :: Inspection
-usesForLoop = unmatching usesForLoopMatching
-
-usesForLoopMatching :: Matcher -> Inspection
-usesForLoopMatching matcher = positive (countForLoops matcher)
-
-countForLoops :: Matcher -> Counter
-countForLoops matcher = countExpressions f
-  where f (ForLoop i c incr e) = matcher [i, c, incr, e]
-        f _                    = False
+(usesForLoop, usesForLoopMatching, countForLoops) = derive f :: InspectionFamily
+  where f matcher (ForLoop i c incr e) = matcher [i, c, incr, e]
+        f _       _                    = False
 
 usesLoop :: Inspection
 usesLoop e = usesRepeat e || usesWhile e || usesForLoop e || usesForEach e
-  
