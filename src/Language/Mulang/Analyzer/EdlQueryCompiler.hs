@@ -72,12 +72,7 @@ compileVerb = concat . map headToUpper . words
 compileCounter :: String -> E.Matcher -> Maybe (ContextualizedBoundCounter)
 compileCounter = f
   where
-  f "UsesIf"              m            = plainMatching countIfs m
-  f "Returns"             m            = plainMatching countReturns m
-  f "UsesRepeat"          m            = plainMatching countRepeats m
-  f "UsesWhile"           m            = plainMatching countWhiles m
-  f "UsesForLoop"         m            = plainMatching countForLoops m
-  f "UsesFor"             E.Unmatching = plain countFors
+  f "Calls"               m            = boundMatching countCalls m
   f "DeclaresAttribute"   m            = boundMatching countAttributes m
   f "DeclaresClass"       m            = boundMatching countClasses m
   f "DeclaresFunction"    m            = boundMatching countFunctions m
@@ -86,7 +81,12 @@ compileCounter = f
   f "DeclaresObject"      m            = boundMatching countObjects m
   f "DeclaresProcedure"   m            = boundMatching countProcedures m
   f "DeclaresVariable"    m            = boundMatching countVariables m
-  f "Calls"               m            = boundMatching countCalls m
+  f "Returns"             m            = plainMatching countReturns m
+  f "UsesFor"             E.Unmatching = plain countFors
+  f "UsesForLoop"         m            = plainMatching countForLoops m
+  f "UsesIf"              m            = plainMatching countIfs m
+  f "UsesRepeat"          m            = plainMatching countRepeats m
+  f "UsesWhile"           m            = plainMatching countWhiles m
 
 compileInspection :: String -> E.Matcher -> Maybe ContextualizedBoundInspection
 compileInspection = f
