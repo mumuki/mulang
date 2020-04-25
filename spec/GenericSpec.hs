@@ -553,6 +553,16 @@ spec = do
 
       usesIf code  `shouldBe` False
 
+  describe "returns, js" $ do
+    it "is True when returns with value" $ do
+      returns (js "function f(){ return 4 }")  `shouldBe` True
+
+    it "is True when returns without value" $ do
+      returns (js "function f(){ return }")  `shouldBe` True
+
+    it "is False when not present" $ do
+      returns (js "function f(x){ }") `shouldBe` False
+
   describe "subordinatesDeclarationsTo" $ do
     it "is True when procedure is declared and there are no other declarations" $ do
       subordinatesDeclarationsTo (named "init")  (js "function init() {}") `shouldBe` True

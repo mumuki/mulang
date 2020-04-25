@@ -1,13 +1,14 @@
 module Language.Mulang.Inspector.Generic (
-  countIfs,
-  countFors,
-  countFunctions,
-  countVariables,
-  countCalls,
   assigns,
   assignsMatching,
   calls,
   callsMatching,
+  countCalls,
+  countFors,
+  countFunctions,
+  countIfs,
+  countReturns,
+  countVariables,
   declares,
   declaresComputation,
   declaresComputationWithArity,
@@ -24,18 +25,19 @@ module Language.Mulang.Inspector.Generic (
   parses,
   raises,
   rescues,
+  returns,
   returnsMatching,
   subordinatesDeclarationsTo,
   subordinatesDeclarationsToEntryPoint,
   uses,
   usesAnonymousVariable,
-  usesLogic,
-  usesMath,
   usesExceptionHandling,
   usesExceptions,
   usesFor,
   usesIf,
   usesIfMatching,
+  usesLogic,
+  usesMath,
   usesPrimitive,
   usesPrint,
   usesPrintMatching,
@@ -142,9 +144,14 @@ countFors = countExpressions f
   where f (For _ _) = True
         f _         = False
 
+returns :: Inspection
+returns = unmatching returnsMatching
 
 returnsMatching :: Matcher -> Inspection
-returnsMatching matcher = containsExpression f
+returnsMatching matcher = positive (countReturns matcher)
+
+countReturns :: Matcher -> Counter
+countReturns matcher = countExpressions f
   where f (Return body) = matcher [body]
         f _             = False
 

@@ -24,3 +24,16 @@ spec = do
     it "counts across procedures" $ do
       (unmatching countIfs) (js "function f1() {if (true) {} else {}}\n\
                                 \function f2() {if (true) {} else {}}\n" ) `shouldBe` 2
+
+  describe "countReturns" $ do
+    it "counts 0" $ do
+      (unmatching countReturns) (js "") `shouldBe` 0
+      (unmatching countReturns) (js "function foo(){}") `shouldBe` 0
+
+    it "counts 1" $ do
+      (unmatching countReturns) (js "function foo() { return }" ) `shouldBe` 1
+      (unmatching countReturns) (js "function foo() { return } function foo() { }") `shouldBe` 1
+
+    it "counts 2 or more" $ do
+      (unmatching countReturns) (js "function foo() { return }\n\
+                                    \function bar() { return 4 }" ) `shouldBe` 2
