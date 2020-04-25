@@ -83,6 +83,10 @@ data Operator
     -- ^ collection `all`-like / `every`-like operator
     | AnySatisfy
     -- ^ collection `any`-like / `some`-like operator
+    | Flatten
+    -- ^ collection `flatten`-like operator
+    | Gather
+    -- ^ collection `flatmap`-like operator
   deriving (Eq, Show, Read, Generic, Ord, Enum)
 
 
