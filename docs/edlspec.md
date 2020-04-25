@@ -356,6 +356,9 @@ expectation "must declare three subclasses of `Tax` and two subclasses of `Produ
 
 expectation "must declare no more than 4 methods in class `Queue`":
   within `Queue` count(declares method) <= 4;
+
+expectation "`max` must have 2 returns":
+  within `max` count(returns) = 2;
 ```
 
 Finally, counters may be added, using the `+` opertor:

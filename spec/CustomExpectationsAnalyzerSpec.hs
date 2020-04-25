@@ -68,6 +68,14 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function totalAmount() { return 2 }" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() { return null }" test) `shouldReturn` ok
 
+  it "evaluates returns" $ do
+    let test = "expectation: returns"
+
+    (run JavaScript "function totalAmount() { return 2 }" test) `shouldReturn` ok
+    (run JavaScript "function totalAmount() { return null }" test) `shouldReturn` ok
+    (run JavaScript "function totalAmount() { return }" test) `shouldReturn` ok
+    (run JavaScript "function totalAmount() {  }" test) `shouldReturn` nok
+
   it "evaluates returns with nil" $ do
     let test = "expectation: returns with nil"
 
@@ -157,6 +165,11 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "if (true) {}; if (false) {}" "expectation: count (UsesIf) >= 2") `shouldReturn` ok
 
     (run JavaScript "if (true) {}; if(true) {}; if (false) {}" "expectation: count (UsesIf) >= 3") `shouldReturn` ok
+
+  it "evaluates count (returns)" $ do
+    (run JavaScript "" "expectation: count (returns) = 0") `shouldReturn` ok
+    (run JavaScript "function foo(x) { if (x) return 1 else return 3 }" "expectation: within `foo` count (returns) = 1") `shouldReturn` nok
+    (run JavaScript "function foo(x) { if (x) return 1 else return 3 }" "expectation: within `foo` count (returns) = 2") `shouldReturn` ok
 
   it "is case sensitive in standard syntax" $ do
     (run JavaScript "" "expectation: UsesIf") `shouldReturn` nok
