@@ -370,6 +370,7 @@ expectation "The `Bar` must declare 4 or more methods related to beer or whisky"
 
 Not all inspections can be counted. Currently, only the following are supported:
 
+* `calls`
 * `declares attribute`
 * `declares class`
 * `declares function`
@@ -378,12 +379,12 @@ Not all inspections can be counted. Currently, only the following are supported:
 * `declares object`
 * `declares procedure`
 * `declares variable`
+* `returns`
 * `uses for loop`
 * `uses for`
 * `uses if`
 * `uses repeat`
 * `uses while`
-* `calls`
 
 ## Boolean operators on scoped queries
 
