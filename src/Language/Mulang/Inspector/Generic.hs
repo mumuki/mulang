@@ -9,7 +9,6 @@ module Language.Mulang.Inspector.Generic (
   countIfs,
   countPrints,
   countReturns,
-  countTries,
   countVariables,
   countYiels,
   declares,
@@ -45,8 +44,6 @@ module Language.Mulang.Inspector.Generic (
   usesPrimitive,
   usesPrint,
   usesPrintMatching,
-  usesTry,
-  usesTryMatching,
   usesYield,
   usesYieldMatching) where
 
@@ -136,11 +133,9 @@ delegates' p context expression = inspect $ do
         f _       _             = False
 
 usesExceptionHandling :: Inspection
-usesExceptionHandling  = usesTry
-
-(usesTry, usesTryMatching, countTries) = derive f :: InspectionFamily
-  where f matcher (Try body cases finally) = matcher [body, (Sequence . map snd $ cases), finally]
-        f _       _                        = False
+usesExceptionHandling  = containsExpression f
+  where f (Try _ _ _) = True
+        f _           = False
 
 -- | Inspection that tells whether a top level declaration exists
 declares :: BoundInspection

@@ -54,7 +54,7 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `Uses`                            | is there any reference to the given element?
 | `UsesArithmetic`                  | are arithmetic operators used?
 | `UsesConditional`                 |
-| `UsesExceptionHandling`           | is any _exception_ handlded? Alias of `UsesTry`
+| `UsesExceptionHandling`           | is any _exception_ handlded?
 | `UsesExceptions`                  | is any _exception_ raised?
 | `UsesFor`                         | is any kind of comprehension or indexed repetition used?
 | `UsesIf`                          | is an `if` control structure used?
@@ -62,7 +62,6 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `UsesMath`                        | are artithmetic operators used?
 | `UsesPrimitive`                   | is the given primitive operator used?
 | `UsesPrint`                       | is a print statement used?
-| `UsesTry`                         | is a `try-catch-finally` block used?
 | `UsesType`                        | is the given typed used in a signature?
 
 
