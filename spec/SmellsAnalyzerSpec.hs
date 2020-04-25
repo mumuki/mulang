@@ -42,6 +42,15 @@ spec = describe "SmellsAnalyzer" $ do
       runWithTypos JavaScript "function baz() {}" [Expectation "*" "Delegates:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]
       runWithTypos JavaScript "function baz() {}" [Expectation "*" "SubordinatesDeclarationsTo:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]
 
+    it "works when there are duplicated expectations" $ do
+      runWithTypos JavaScript "function baz() {}" [Expectation "*" "Declares:bar", Expectation "*" "Declares:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]
+
+    it "works when there are duplicated expectation results" $ do
+      runWithTypos Java "class Foo {  void baz() {} }" [Expectation "*" "Declares:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]
+
+    it "works when there are similar declares expectations results" $ do
+      runWithTypos Java "class Foo {  void baz() {} }" [Expectation "*" "Declares:bar", Expectation "*" "DeclaresComputationWithArity0:bar"] `shouldReturn` [Expectation "baz" "HasDeclarationTypos:bar"]
+
     it "works when there are missing declarations and multiple potential typos" $ do
       let typos = [ Expectation "Bar" "HasDeclarationTypos:bar", Expectation "baz" "HasDeclarationTypos:bar" ]
 
