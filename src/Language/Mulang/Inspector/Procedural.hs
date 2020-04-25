@@ -1,6 +1,7 @@
 module Language.Mulang.Inspector.Procedural (
-  countProcedures,
+  countForEaches,
   countForLoops,
+  countProcedures,
   countRepeats,
   countWhiles,
   declaresProcedure,
@@ -13,6 +14,7 @@ module Language.Mulang.Inspector.Procedural (
   usesRepeat,
   usesRepeatMatching,
   usesSwitch,
+  usesSwitchMatching,
   usesWhile,
   usesWhileMatching) where
 

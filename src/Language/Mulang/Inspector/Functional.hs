@@ -1,12 +1,13 @@
 module Language.Mulang.Inspector.Functional (
-  usesGuards,
+  countLambdas,
   usesComposition,
+  usesComprehension,
+  usesConditional,
+  usesForComprehension,
+  usesGuards,
   usesLambda,
   usesLambdaMatching,
-  usesPatternMatching,
-  usesForComprehension,
-  usesComprehension,
-  usesConditional) where
+  usesPatternMatching) where
 
 import Data.Function.Extra (orElse)
 
@@ -14,7 +15,6 @@ import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Inspector.Primitive (Inspection, containsExpression, containsBody)
 import Language.Mulang.Inspector.Generic (usesIf, usesYield)
-import Language.Mulang.Inspector.Matcher (unmatching, Matcher)
 import Language.Mulang.Inspector.Combiner (derive, InspectionFamily)
 
 usesConditional :: Inspection

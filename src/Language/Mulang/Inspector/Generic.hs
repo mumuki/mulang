@@ -7,8 +7,11 @@ module Language.Mulang.Inspector.Generic (
   countFors,
   countFunctions,
   countIfs,
+  countPrints,
   countReturns,
+  countTries,
   countVariables,
+  countYiels,
   declares,
   declaresComputation,
   declaresComputationWithArity,
@@ -34,6 +37,7 @@ module Language.Mulang.Inspector.Generic (
   usesExceptionHandling,
   usesExceptions,
   usesFor,
+  usesForMatching,
   usesIf,
   usesIfMatching,
   usesLogic,
@@ -41,6 +45,8 @@ module Language.Mulang.Inspector.Generic (
   usesPrimitive,
   usesPrint,
   usesPrintMatching,
+  usesTry,
+  usesTryMatching,
   usesYield,
   usesYieldMatching) where
 
