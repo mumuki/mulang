@@ -104,7 +104,7 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `UsesForLoop`                     | is a c-style for loop used?
 | `UsesLoop`                        | are any of: repeat / for loop / foreach / while used?
 | `UsesRepeat`                      |
-| `UsesSwitch`                      |
+| `UsesSwitch`                      | is a `swhich` control structure used?
 | `UsesWhile`                       | is a `while` control structure used?
 
 ## Object Oriented Inspections

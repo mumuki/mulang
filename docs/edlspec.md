@@ -390,6 +390,7 @@ Not all inspections can be counted. Currently, only the following are supported:
 * `uses lambda`
 * `uses print`
 * `uses repeat`
+* `uses switch`
 * `uses try`
 * `uses while`
 * `uses yield`

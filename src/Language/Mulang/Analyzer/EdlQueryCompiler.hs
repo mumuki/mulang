@@ -89,6 +89,7 @@ compileCounter = f
   f "UsesLambda"          = plainMatching countLambdas
   f "UsesPrint"           = plainMatching countPrints
   f "UsesRepeat"          = plainMatching countRepeats
+  f "UsesSwitch"          = plainMatching countSwitches
   f "UsesWhile"           = plainMatching countWhiles
   f "UsesYield"           = plainMatching countYiels
   f _                     = const Nothing

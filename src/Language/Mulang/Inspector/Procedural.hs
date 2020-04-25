@@ -2,6 +2,7 @@ module Language.Mulang.Inspector.Procedural (
   countForEaches,
   countForLoops,
   countProcedures,
+  countSwitches,
   countRepeats,
   countWhiles,
   declaresProcedure,
