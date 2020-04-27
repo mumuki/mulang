@@ -116,6 +116,7 @@ describe Mulang::Expectation::I18n do
 
       it { expect(expectation('foo.bar', 'DeclaresMethod').translate).to eq('<code>foo.bar</code> debe declarar métodos') }
       it { expect(expectation('foo.bar', 'UsesIf').translate).to eq('<code>foo.bar</code> debe usar <code>if</code>') }
+      it { expect(expectation('foo', 'Returns').translate).to eq('<code>foo</code> debe retornar') }
 
       it { expect(expectation('Intransitive:foo', 'Not:UsesLambda').translate).to eq('<code>foo</code> no debe emplear expresiones lambda') }
 

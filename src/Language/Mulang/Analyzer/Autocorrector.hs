@@ -109,12 +109,14 @@ inferAutocorrectionRules = buildRules . rules
       ]
     rules Java = [
         ("if", "UsesIf"),
+        ("return", "Returns"),
         ("class", "DeclaresClass"),
         ("interface", "DeclaresInterface"),
         ("for", "UsesForLoop")
       ]
     rules Ruby = [
         ("if", "UsesIf"),
+        ("return", "Returns"),
         ("class", "DeclaresClass"),
         ("def", "DeclaresComputation"),
         ("for", "UsesForeach"),
@@ -122,6 +124,7 @@ inferAutocorrectionRules = buildRules . rules
       ]
     rules Python = [
         ("if", "UsesIf"),
+        ("return", "Returns"),
         ("class", "DeclaresClass"),
         ("def", "DeclaresComputation"),
         ("for", "UsesForeach")
