@@ -31,7 +31,7 @@ deriveUses f = (uses, usesMatching, countUses)
     countUses :: Matcher -> Counter
     countUses matcher = countExpressions (f matcher)
 
--- | Derives a family of declarration inspections from a primal inspection,
+-- | Derives a family of declaration inspections from a primal inspection,
 -- which consist of a simple inspection, a matching inspection and a counter
 deriveDeclares :: (Matcher -> Inspection) -> BoundInspectionFamily
 deriveDeclares f = (declares, declaresMatching, countDeclares)
