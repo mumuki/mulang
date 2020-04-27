@@ -15,7 +15,7 @@ import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Inspector.Primitive (Inspection, containsExpression, containsBody)
 import Language.Mulang.Inspector.Generic (usesIf, usesYield)
-import Language.Mulang.Inspector.Combiner (derive, InspectionFamily)
+import Language.Mulang.Inspector.Combiner (deriveUses, InspectionFamily)
 
 usesConditional :: Inspection
 usesConditional = orElse usesIf usesGuards
@@ -57,7 +57,7 @@ usesComprehension = usesForComprehension
 
 -- | Inspection that tells whether an expression uses a lambda expression
 -- in its definition
-(usesLambda, usesLambdaMatching, countLambdas) = derive f :: InspectionFamily
+(usesLambda, usesLambdaMatching, countLambdas) = deriveUses f :: InspectionFamily
   where f matcher (Lambda _ e) = matcher [e]
         f _       _            = False
 

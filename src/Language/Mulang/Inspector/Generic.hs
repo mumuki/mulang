@@ -57,7 +57,7 @@ import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Inspector.Matcher (unmatching, matches, Matcher)
 import Language.Mulang.Inspector.Query (inspect, select)
 import Language.Mulang.Inspector.Literal (isMath, isLogic)
-import Language.Mulang.Inspector.Combiner (transitive, derive, InspectionFamily)
+import Language.Mulang.Inspector.Combiner (transitive, deriveUses, InspectionFamily)
 
 import Data.Maybe (listToMaybe)
 import Data.List.Extra (has)
@@ -112,23 +112,23 @@ delegates' p context expression = inspect $ do
 
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
-(usesIf, usesIfMatching, countIfs) = derive f :: InspectionFamily
+(usesIf, usesIfMatching, countIfs) = deriveUses f :: InspectionFamily
   where f matcher (If c t e) = matcher [c, t, e]
         f _       _          = False
 
-(usesYield, usesYieldMatching, countYiels) = derive f :: InspectionFamily
+(usesYield, usesYieldMatching, countYiels) = deriveUses f :: InspectionFamily
   where f matcher (Yield e) = matcher [e]
         f _       _         = False
 
-(usesPrint, usesPrintMatching, countPrints) = derive f :: InspectionFamily
+(usesPrint, usesPrintMatching, countPrints) = deriveUses f :: InspectionFamily
   where f matcher (Print e) = matcher [e]
         f _       _         = False
 
-(usesFor, usesForMatching, countFors) = derive f :: InspectionFamily
+(usesFor, usesForMatching, countFors) = deriveUses f :: InspectionFamily
   where f matcher (For _ e) = matcher [e]
         f _      _          = False
 
-(returns, returnsMatching, countReturns) = derive f :: InspectionFamily
+(returns, returnsMatching, countReturns) = deriveUses f :: InspectionFamily
   where f matcher (Return body) = matcher [body]
         f _       _             = False
 

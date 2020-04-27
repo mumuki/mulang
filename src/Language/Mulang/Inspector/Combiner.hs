@@ -5,7 +5,7 @@ module Language.Mulang.Inspector.Combiner (
   scopedList,
   transitive,
   transitiveList,
-  derive,
+  deriveUses,
   InspectionFamily,
   Location (..)) where
 
@@ -13,8 +13,10 @@ import Language.Mulang.Ast
 import Language.Mulang.Generator (transitiveReferencedIdentifiers, declarationsOf, declaredIdentifiers)
 import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Inspector.Matcher (unmatching, Matcher)
+import Language.Mulang.Inspector.Bound (countBoundDeclarations, uncounting, BoundCounter, BoundInspection)
 
 type InspectionFamily = (Inspection, Matcher -> Inspection, Matcher -> Counter)
+type BoundInspectionFamily = (BoundInspection, Matcher -> BoundInspection, Matcher -> BoundCounter)
 
 data Location
   = Nowhere                   -- ^ No subexpression match, nor the whole expression
@@ -49,13 +51,31 @@ transitiveList :: [Identifier] -> Inspection -> Inspection
 transitiveList [identifier] i = transitive identifier i
 transitiveList identifiers i  = scopedList identifiers i
 
+scoped' = flip scoped
+
+
 -- | Derives a family of inspections from a primal inspection,
 -- which consist of a simple inspection, a matching inspection and a counter
-derive :: (Matcher -> Inspection) -> InspectionFamily
-derive f = (uses, usesMatching, count)
+deriveUses :: (Matcher -> Inspection) -> InspectionFamily
+deriveUses f = (uses, usesMatching, countUses)
   where
+    uses :: Inspection
     uses = unmatching usesMatching
-    usesMatching matcher = positive (count matcher)
-    count matcher = countExpressions (f matcher)
 
-scoped' = flip scoped
+    usesMatching :: Matcher -> Inspection
+    usesMatching matcher = positive (countUses matcher)
+
+    countUses :: Matcher -> Counter
+    countUses matcher = countExpressions (f matcher)
+
+deriveDeclares :: (Matcher -> Inspection) -> BoundInspectionFamily
+deriveDeclares f = (declares, declaresMatching, countDeclares)
+  where
+    declares :: BoundInspection
+    declares = unmatching declaresMatching
+
+    declaresMatching :: Matcher -> BoundInspection
+    declaresMatching = uncounting countDeclares
+
+    countDeclares :: Matcher -> BoundCounter
+    countDeclares matcher = countBoundDeclarations (f matcher)
