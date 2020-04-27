@@ -23,7 +23,6 @@ import Language.Mulang.Ast
 import Language.Mulang.Generator (equationsExpandedExpressions, statementsExpressions)
 import Language.Mulang.Inspector.Matcher (matches)
 import Language.Mulang.Inspector.Primitive (Inspection)
-import Language.Mulang.Inspector.Bound (BoundCounter, BoundInspection, countBoundDeclarations, uncounting)
 import Language.Mulang.Inspector.Generic (usesYield)
 import Language.Mulang.Inspector.Family (deriveUses, deriveDeclares, InspectionFamily, BoundInspectionFamily)
 

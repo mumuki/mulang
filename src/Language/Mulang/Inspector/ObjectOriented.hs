@@ -28,8 +28,8 @@ import Language.Mulang.Ast
 import Language.Mulang.Ast.Operator (Operator)
 import Language.Mulang.Generator (equationsExpandedExpressions)
 import Language.Mulang.Identifier
-import Language.Mulang.Inspector.Matcher (Matcher, matches)
-import Language.Mulang.Inspector.Bound (BoundInspection, BoundCounter, containsBoundDeclaration)
+import Language.Mulang.Inspector.Matcher (matches)
+import Language.Mulang.Inspector.Bound (BoundInspection, containsBoundDeclaration)
 import Language.Mulang.Inspector.Primitive (Inspection, containsExpression, containsDeclaration)
 import Language.Mulang.Inspector.Family (deriveDeclares, BoundInspectionFamily)
 
