@@ -15,8 +15,9 @@ import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Inspector.Matcher (unmatching, Matcher)
 import Language.Mulang.Inspector.Bound (countBoundDeclarations, uncounting, BoundCounter, BoundInspection)
 
-type InspectionFamily = (Inspection, Matcher -> Inspection, Matcher -> Counter)
-type BoundInspectionFamily = (BoundInspection, Matcher -> BoundInspection, Matcher -> BoundCounter)
+type Family a b = (a, Matcher -> a, Matcher -> b)
+type InspectionFamily = Family Inspection Counter
+type BoundInspectionFamily = Family BoundInspection BoundCounter
 
 data Location
   = Nowhere                   -- ^ No subexpression match, nor the whole expression
