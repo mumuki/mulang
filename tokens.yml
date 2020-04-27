@@ -1,0 +1,95 @@
+# with this file the following files will be generated:
+# - Operators/*.hs: Haskell Operator Tables
+# - Keywords/*.hs: Haskell Operator Tables
+# - operators.yml and keywords.yml: Translations for Ruby
+# - operators.js and keywords.js: Translations for JavaScript
+# - tokens.js: Ruby Tokens Tables
+# - tokens.rb: JavaScript Tokens Tables
+#
+# Notice: if there are more than one variants of the same token, put the preferred first
+C:
+  keywords:
+    False: 'FALSE'
+    For: 'for'
+    If: 'if'
+    Null: 'NULL'
+    Switch: 'switch'
+    True: 'TRUE'
+    While: 'while'
+  operators: &c_operators
+    And: '&&'
+    Divide: '/'
+    Equal: '=='
+    GreatherOrEqualThan: '>='
+    GreatherThan: '>'
+    LessOrEqualThan: '<='
+    LessThan: '<'
+    Minus: '-'
+    Multiply: '*'
+    Negation: '!'
+    NotEqual: '!='
+    Or: '||'
+    Plus: '+'
+    Modulo: '%'
+    BitwiseOr: '|'
+    BitwiseAnd: '&'
+    BitwiseXor: '^'
+    BitwiseLeftShift: '<<'
+    BitwiseRightShift: '>>'
+Haskell:
+  operators:
+    And: '&&'
+    Divide:
+      - '/'
+      - 'div'
+    Equal: '=='
+    GreatherOrEqualThan: '>='
+    GreatherThan: '>'
+    LessOrEqualThan: '<='
+    LessThan: '<'
+    Minus: '-'
+    Multiply: '*'
+    Negation: 'not'
+    NotEqual: '/='
+    Or: '||'
+    Plus: '+'
+    Modulo: 'mod'
+    Otherwise: 'otherwise'
+    BackwardComposition: '.'
+Java:
+  operators:
+    <<: *c_operators
+    Hash: 'hashCode'
+JavaScript:
+  operators:
+    <<: *c_operators
+    Equal:
+      - "==="
+      - "=="
+    NotEqual:
+      - "!=="
+      - "!="
+Python:
+  operators:
+    <<: *c_operators
+    NotEqual:
+      - "!="
+      - "<>"
+    Negation: "not"
+    And: "and"
+    Or: "or"
+    Hash: "hash"
+Ruby:
+  operators:
+    <<: *c_operators
+    And:
+      - "&&"
+      - "and"
+    Or:
+      - "||"
+      - "or"
+    Hash: "hash"
+    ForwardComposition: ">>"
+    BackwardComposition: "<<"
+Php: {}
+

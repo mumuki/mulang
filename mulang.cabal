@@ -66,6 +66,7 @@ library
     Language.Mulang.Operators.Haskell
     Language.Mulang.Operators.Java
     Language.Mulang.Operators.JavaScript
+    Language.Mulang.Operators.Php
     Language.Mulang.Operators.Python
     Language.Mulang.Operators.Ruby
     Language.Mulang.Parsers

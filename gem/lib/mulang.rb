@@ -18,6 +18,7 @@ module Mulang
   end
 end
 
+require_relative './mulang/tokens'
 require_relative './mulang/inspection'
 require_relative './mulang/expectation'
 require_relative './mulang/code'

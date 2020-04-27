@@ -15,6 +15,7 @@ install:
 - travis_wait stack --no-terminal --skip-ghc-check build haskell-src
 - travis_wait stack --no-terminal --skip-ghc-check build -j 1 language-python
 script:
+- ./generators/run
 - stack --no-terminal --skip-ghc-check test
 - stack --no-terminal --skip-ghc-check install
 - cd gem && ./bin/setup && bundle exec rake

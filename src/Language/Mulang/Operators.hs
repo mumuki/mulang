@@ -3,7 +3,6 @@
 module Language.Mulang.Operators (
   buildTokensTable,
   buildOperatorsTable,
-  defaultTokensTable,
   parseOperator,
   unparseOperator,
   Token,
@@ -22,33 +21,8 @@ type Token = String
 type TokensTable = Map Operator [Token]
 type OperatorsTable = Map Token Operator
 
--- C-style tokens
-defaultTokensTable :: TokensTable
-defaultTokensTable =
-  Map.fromList [
-    (Equal, ["=="]),
-    (NotEqual, ["!="]),
-    (Negation, ["!"]),
-    (And, ["&&"]),
-    (Or, ["||"]),
-    (GreatherOrEqualThan, [">="]),
-    (GreatherThan, [">"]),
-    (LessOrEqualThan, ["<="]),
-    (LessThan, ["<"]),
-    (Plus, ["+"]),
-    (Minus, ["-"]),
-    (Multiply, ["*"]),
-    (Divide, ["/"]),
-    (Modulo, ["%"]),
-    (BitwiseOr, ["|"]),
-    (BitwiseAnd, ["&"]),
-    (BitwiseXor, ["^"]),
-    (BitwiseLeftShift, ["<<"]),
-    (BitwiseRightShift, [">>"])
-  ]
-
 buildTokensTable :: [(Operator, [Token])] -> TokensTable
-buildTokensTable = Map.filter (not . null) . flip Map.union defaultTokensTable  . Map.fromList
+buildTokensTable = Map.filter (not . null) . Map.fromList
 
 buildOperatorsTable :: TokensTable -> OperatorsTable
 buildOperatorsTable =  Map.fromList . concatMap (fill . swap) . Map.toList
