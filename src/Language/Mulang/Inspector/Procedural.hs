@@ -21,22 +21,15 @@ module Language.Mulang.Inspector.Procedural (
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (equationsExpandedExpressions, statementsExpressions)
-import Language.Mulang.Inspector.Matcher (Matcher, unmatching, matches)
+import Language.Mulang.Inspector.Matcher (matches)
 import Language.Mulang.Inspector.Primitive (Inspection)
 import Language.Mulang.Inspector.Bound (BoundCounter, BoundInspection, countBoundDeclarations, uncounting)
 import Language.Mulang.Inspector.Generic (usesYield)
-import Language.Mulang.Inspector.Family (deriveUses, InspectionFamily)
+import Language.Mulang.Inspector.Family (deriveUses, deriveDeclares, InspectionFamily, BoundInspectionFamily)
 
-declaresProcedure :: BoundInspection
-declaresProcedure = unmatching declaresProcedureMatching
-
-declaresProcedureMatching :: Matcher -> BoundInspection
-declaresProcedureMatching = uncounting countProcedures
-
-countProcedures :: Matcher -> BoundCounter
-countProcedures matcher = countBoundDeclarations f
-  where f (Procedure _ equations) = matches matcher equationsExpandedExpressions $ equations
-        f _                       = False
+(declaresProcedure, declaresProcedureMatching, countProcedures) = deriveDeclares f :: BoundInspectionFamily
+  where f matcher (Procedure _ equations) = matches matcher equationsExpandedExpressions $ equations
+        f _        _                       = False
 
 -- | Inspection that tells whether an expression uses while
 -- in its definition

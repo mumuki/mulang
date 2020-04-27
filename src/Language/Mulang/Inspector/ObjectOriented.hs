@@ -28,9 +28,10 @@ import Language.Mulang.Ast
 import Language.Mulang.Ast.Operator (Operator)
 import Language.Mulang.Generator (equationsExpandedExpressions)
 import Language.Mulang.Identifier
-import Language.Mulang.Inspector.Matcher (Matcher, matches, unmatching)
-import Language.Mulang.Inspector.Bound (BoundInspection, BoundCounter, containsBoundDeclaration, countBoundDeclarations, uncounting)
+import Language.Mulang.Inspector.Matcher (Matcher, matches)
+import Language.Mulang.Inspector.Bound (BoundInspection, BoundCounter, containsBoundDeclaration)
 import Language.Mulang.Inspector.Primitive (Inspection, containsExpression, containsDeclaration)
+import Language.Mulang.Inspector.Family (deriveDeclares, BoundInspectionFamily)
 
 implements :: BoundInspection
 implements predicate = containsExpression f
@@ -58,69 +59,33 @@ usesInheritance = declaresSuperclass anyone
 usesMixins :: Inspection
 usesMixins = includes anyone
 
-declaresObject :: BoundInspection
-declaresObject = unmatching declaresObjectMatching
-
-declaresObjectMatching :: Matcher -> BoundInspection
-declaresObjectMatching = uncounting countObjects
-
-countObjects :: Matcher -> BoundCounter
-countObjects matcher = countBoundDeclarations f
-  where f (Object _ body) = matches matcher id [body]
-        f _               = False
+(declaresObject, declaresObjectMatching, countObjects) = deriveDeclares f :: BoundInspectionFamily
+  where f matcher (Object _ body) = matches matcher id [body]
+        f _        _              = False
 
 declaresSuperclass :: BoundInspection
 declaresSuperclass = inherits
 
-declaresClass :: BoundInspection
-declaresClass = unmatching declaresClassMatching
-
-declaresClassMatching :: Matcher -> BoundInspection
-declaresClassMatching = uncounting countClasses
-
-countClasses :: Matcher -> BoundCounter
-countClasses matcher = countBoundDeclarations f
-  where f (Class _ _ body) = matches matcher id [body]
-        f _                = False
+(declaresClass, declaresClassMatching, countClasses) = deriveDeclares f :: BoundInspectionFamily
+  where f matcher (Class _ _ body) = matches matcher id [body]
+        f _        _               = False
 
 declaresEnumeration :: BoundInspection
 declaresEnumeration =  containsBoundDeclaration f
   where f (Enumeration _ _) = True
         f _                 = False
 
-declaresInterface :: BoundInspection
-declaresInterface = unmatching declaresInterfaceMatching
+(declaresInterface, declaresInterfaceMatching, countInterfaces) = deriveDeclares f :: BoundInspectionFamily
+  where f matcher (Interface _ _ body) = matches matcher id [body]
+        f _        _                    = False
 
-declaresInterfaceMatching :: Matcher -> BoundInspection
-declaresInterfaceMatching = uncounting countInterfaces
+(declaresAttribute, declaresAttributeMatching, countAttributes) = deriveDeclares f :: BoundInspectionFamily
+  where f matcher (Attribute _ body) = matches matcher id [body]
+        f _ _                        = False
 
-countInterfaces :: Matcher -> BoundCounter
-countInterfaces matcher = countBoundDeclarations f
-  where f (Interface _ _ body) = matches matcher id [body]
-        f _                    = False
-
-declaresAttribute :: BoundInspection
-declaresAttribute = unmatching declaresAttributeMatching
-
-declaresAttributeMatching :: Matcher -> BoundInspection
-declaresAttributeMatching = uncounting countAttributes
-
-countAttributes :: Matcher -> BoundCounter
-countAttributes matcher = countBoundDeclarations f
-  where f (Attribute _ body) = matches matcher id [body]
-        f _                  = False
-
-
-declaresMethod :: BoundInspection
-declaresMethod = unmatching declaresMethodMatching
-
-declaresMethodMatching :: Matcher -> BoundInspection
-declaresMethodMatching = uncounting countMethods
-
-countMethods :: Matcher -> BoundCounter
-countMethods matcher = countBoundDeclarations f
-  where f (Method _ equations) = matches matcher equationsExpandedExpressions $ equations
-        f _                    = False
+(declaresMethod, declaresMethodMatching, countMethods) = deriveDeclares f :: BoundInspectionFamily
+  where f matcher (Method _ equations) = matches matcher equationsExpandedExpressions $ equations
+        f _       _                    = False
 
 -- primitive can only be declared as methods
 declaresPrimitive :: Operator -> Inspection

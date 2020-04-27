@@ -51,14 +51,14 @@ import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Generator (Generator, declaredIdentifiers, expressions, declarations, referencedIdentifiers, equationsExpandedExpressions, declarators, boundDeclarators)
 import Language.Mulang.Identifier
-import Language.Mulang.Inspector.Bound (uncounting, containsBoundDeclaration, countBoundDeclarations, BoundInspection, BoundCounter)
+import Language.Mulang.Inspector.Bound (uncounting, containsBoundDeclaration, BoundInspection, BoundCounter)
 import Language.Mulang.Inspector.Contextualized (decontextualize, ContextualizedBoundInspection)
 import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Inspector.Matcher (unmatching, matches, Matcher)
 import Language.Mulang.Inspector.Query (inspect, select)
 import Language.Mulang.Inspector.Literal (isMath, isLogic)
 import Language.Mulang.Inspector.Combiner (transitive)
-import Language.Mulang.Inspector.Family (deriveUses, InspectionFamily)
+import Language.Mulang.Inspector.Family (deriveUses, deriveDeclares, InspectionFamily, BoundInspectionFamily)
 
 import Data.Maybe (listToMaybe)
 import Data.List.Extra (has)
@@ -153,27 +153,13 @@ declaresRecursively = containsBoundDeclaration f
         nameOf :: Expression -> Maybe Identifier
         nameOf = listToMaybe . declaredIdentifiers
 
-declaresFunction :: BoundInspection
-declaresFunction = unmatching declaresFunctionMatching
+(declaresFunction, declaresFunctionMatching, countFunctions) = deriveDeclares f :: BoundInspectionFamily
+  where f matcher (Function _ equations) = matches matcher equationsExpandedExpressions $ equations
+        f _       _                      = False
 
-declaresFunctionMatching :: Matcher -> BoundInspection
-declaresFunctionMatching = uncounting countFunctions
-
-countFunctions :: Matcher -> BoundCounter
-countFunctions matcher = countBoundDeclarations f
-  where f (Function _ equations) = matches matcher equationsExpandedExpressions $ equations
-        f _                      = False
-
-declaresVariable :: BoundInspection
-declaresVariable = unmatching declaresVariableMatching
-
-declaresVariableMatching :: Matcher -> BoundInspection
-declaresVariableMatching = uncounting countVariables
-
-countVariables :: Matcher -> BoundCounter
-countVariables matcher = countBoundDeclarations f
-  where f (Variable _ body) = matches matcher id [body]
-        f _                 = False
+(declaresVariable, declaresVariableMatching, countVariables) = deriveDeclares f :: BoundInspectionFamily
+  where f matcher (Variable _ body) = matches matcher id [body]
+        f _       _                 = False
 
 declaresEntryPoint :: BoundInspection
 declaresEntryPoint = unmatching declaresEntryPointMatching
