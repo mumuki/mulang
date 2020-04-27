@@ -57,7 +57,8 @@ import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Inspector.Matcher (unmatching, matches, Matcher)
 import Language.Mulang.Inspector.Query (inspect, select)
 import Language.Mulang.Inspector.Literal (isMath, isLogic)
-import Language.Mulang.Inspector.Combiner (transitive, deriveUses, InspectionFamily)
+import Language.Mulang.Inspector.Combiner (transitive)
+import Language.Mulang.Inspector.Family (deriveUses, InspectionFamily)
 
 import Data.Maybe (listToMaybe)
 import Data.List.Extra (has)

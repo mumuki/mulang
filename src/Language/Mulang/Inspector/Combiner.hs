@@ -5,19 +5,11 @@ module Language.Mulang.Inspector.Combiner (
   scopedList,
   transitive,
   transitiveList,
-  deriveUses,
-  InspectionFamily,
   Location (..)) where
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (transitiveReferencedIdentifiers, declarationsOf, declaredIdentifiers)
 import Language.Mulang.Inspector.Primitive
-import Language.Mulang.Inspector.Matcher (unmatching, Matcher)
-import Language.Mulang.Inspector.Bound (countBoundDeclarations, uncounting, BoundCounter, BoundInspection)
-
-type Family a b = (a, Matcher -> a, Matcher -> b)
-type InspectionFamily = Family Inspection Counter
-type BoundInspectionFamily = Family BoundInspection BoundCounter
 
 data Location
   = Nowhere                   -- ^ No subexpression match, nor the whole expression
@@ -53,30 +45,3 @@ transitiveList [identifier] i = transitive identifier i
 transitiveList identifiers i  = scopedList identifiers i
 
 scoped' = flip scoped
-
-
--- | Derives a family of inspections from a primal inspection,
--- which consist of a simple inspection, a matching inspection and a counter
-deriveUses :: (Matcher -> Inspection) -> InspectionFamily
-deriveUses f = (uses, usesMatching, countUses)
-  where
-    uses :: Inspection
-    uses = unmatching usesMatching
-
-    usesMatching :: Matcher -> Inspection
-    usesMatching matcher = positive (countUses matcher)
-
-    countUses :: Matcher -> Counter
-    countUses matcher = countExpressions (f matcher)
-
-deriveDeclares :: (Matcher -> Inspection) -> BoundInspectionFamily
-deriveDeclares f = (declares, declaresMatching, countDeclares)
-  where
-    declares :: BoundInspection
-    declares = unmatching declaresMatching
-
-    declaresMatching :: Matcher -> BoundInspection
-    declaresMatching = uncounting countDeclares
-
-    countDeclares :: Matcher -> BoundCounter
-    countDeclares matcher = countBoundDeclarations (f matcher)

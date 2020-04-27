@@ -15,7 +15,7 @@ import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Inspector.Primitive (Inspection, containsExpression, containsBody)
 import Language.Mulang.Inspector.Generic (usesIf, usesYield)
-import Language.Mulang.Inspector.Combiner (deriveUses, InspectionFamily)
+import Language.Mulang.Inspector.Family (deriveUses, InspectionFamily)
 
 usesConditional :: Inspection
 usesConditional = orElse usesIf usesGuards

@@ -25,7 +25,7 @@ import Language.Mulang.Inspector.Matcher (Matcher, unmatching, matches)
 import Language.Mulang.Inspector.Primitive (Inspection)
 import Language.Mulang.Inspector.Bound (BoundCounter, BoundInspection, countBoundDeclarations, uncounting)
 import Language.Mulang.Inspector.Generic (usesYield)
-import Language.Mulang.Inspector.Combiner (deriveUses, InspectionFamily)
+import Language.Mulang.Inspector.Family (deriveUses, InspectionFamily)
 
 declaresProcedure :: BoundInspection
 declaresProcedure = unmatching declaresProcedureMatching
