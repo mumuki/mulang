@@ -446,7 +446,7 @@
       return LOCALES[this.locale];
     }
 
-    translate(binding, inspection) {
+    translate(binding, inspection, tokens) {
       const match = inspection.match(/^(Not:)?([^:]+)(:([^:]+))?$/);
 
       if (!match) throw `unsupported inspection ${inspection}`;
@@ -463,8 +463,23 @@
       }
 
       if (!this._translations[key]) throw `unsupported inspection ${inspection} - ${match[1]} - ${match[2]}`;
+      return this._translations[key](this._translateBinding(binding), this._translateMust(match), targetHtml, this._translationTokens(tokens));
+    }
 
-      return this._translations[key](this._translateBinding(binding), this._translateMust(match), targetHtml, DEFAULT_KEYWORDS);
+    _translationTokens(tokens) {
+      let givenTokens;
+      if (!tokens) {
+        givenTokens = {};
+      } else if (typeof(tokens) == 'object') {
+        givenTokens = tokens;
+      } else {
+        givenTokens = ghcjsExports.Tokens.TOKENS[tokens];
+      }
+
+      let actualTokens = {};
+      Object.assign(actualTokens, ghcjsExports.Tokens.DEFAULT_TOKENS);
+      Object.assign(actualTokens, givenTokens);
+      return actualTokens;
     }
 
     _translateBinding(binding) {

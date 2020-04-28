@@ -4,13 +4,19 @@ require 'yaml'
 ## Common
 ## ======
 
-def generate_frontend_tokens_table(tokens)
-  tokens.map do |key, values|
-    tokens = generate_frontend_tokens_list(values, 'keyword') + generate_frontend_tokens_list(values, 'operator')
-    "  #{key}: {\n#{
-      tokens.map { |k, v| "        #{k}: '#{v}'" }.join(",\n")
-    }\n      }"
-  end.join(",\n    ")
+def generate_frontend_tokens_table(tokens, polyfills: false)
+  tokens
+    .transform_values do |values|
+      polyfills ? values['polyfills'] : values
+    end
+    .compact
+    .map do |key, values|
+      tokens = generate_frontend_tokens_list(values, 'keyword') + generate_frontend_tokens_list(values, 'operator')
+      "  #{key}: {\n#{
+        tokens.map { |k, v| "        #{k}: '#{v}'" }.join(",\n")
+      }\n      }"
+    end
+    .join(",\n    ")
 end
 
 def generate_frontend_tokens_list(values, kind)
@@ -23,6 +29,7 @@ end
 
 $tokens = YAML.load(File.read('./tokens.yml'))
 $frontend_tokens_table = generate_frontend_tokens_table($tokens)
+$frontend_polyfills_table = generate_frontend_tokens_table($tokens, polyfills: true)
 
 ## =============================
 ## Haskell Operators Generation
@@ -79,32 +86,42 @@ end
 ## ============================
 
 
-def generate_tokens_rb(ruby_tokens)
+def generate_tokens_rb(tokens, polyfills)
   %Q{module Mulang
   module Tokens
     TOKENS = {
-    #{ruby_tokens}
+    #{tokens}
     }.transform_values { |v| v.transform_values { |v| CGI::escapeHTML(v) } }.freeze
 
-    DEFAULT_TOKENS = TOKENS[:Common].freeze
+    POLYFILLS = {
+    #{polyfills}
+    }.transform_values { |v| v.transform_values { |v| CGI::escapeHTML(v) } }.freeze
+
+    DEFAULT_TOKENS = TOKENS[:Common].merge(POLYFILLS[:Common]).freeze
   end
 end}
 end
 
 puts '[Mulang::Generator::Tokens] Generating Ruby Tokens Table...'
-File.write "./gem/lib/mulang/tokens.rb", generate_tokens_rb($frontend_tokens_table)
+File.write "./gem/lib/mulang/tokens.rb", generate_tokens_rb($frontend_tokens_table, $frontend_polyfills_table)
 
 ## ==================================
 ## JavaScript Tokens Table Generation
 ## ==================================
 
-def generate_tokens_js(javascript_tokens)
+def generate_tokens_js(tokens, polyfills)
   %Q{(() => {
   const TOKENS = {
-  #{javascript_tokens}
+  #{tokens}
   }
 
-  const DEFAULT_TOKENS = TOKENS.Common;
+  const POLYFILLS = {
+  #{polyfills}
+  }
+
+  const DEFAULT_TOKENS = {};
+  Object.assign(DEFAULT_TOKENS, TOKENS.Common);
+  Object.assign(DEFAULT_TOKENS, POLYFILLS.Common);
 
   ghcjsExports.Tokens = {
     TOKENS = TOKENS,
@@ -114,4 +131,4 @@ def generate_tokens_js(javascript_tokens)
 end
 
 puts '[Mulang::Generator::Tokens] Generating JavaScript Tokens Table...'
-File.write "./ghcjslib/src/tokens.js", generate_tokens_js($frontend_tokens_table)
+File.write "./ghcjslib/src/tokens.js", generate_tokens_js($frontend_tokens_table, $frontend_polyfills_table)

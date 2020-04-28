@@ -2,9 +2,13 @@ module Mulang
   module Tokens
     TOKENS = {
       Common: {
-        keyword_false: 'false',
+        keyword_False: 'false',
+        keyword_Null: 'null',
+        keyword_True: 'true',
+        keyword_For: 'for',
         keyword_If: 'if',
-        keyword_true: 'true',
+        keyword_Return: 'return',
+        keyword_While: 'while',
         operator_And: '&&',
         operator_Divide: '/',
         operator_Equal: '==',
@@ -26,13 +30,14 @@ module Mulang
         operator_BitwiseRightShift: '>>'
       },
       C: {
-        keyword_false: 'FALSE',
-        keyword_If: 'if',
-        keyword_true: 'TRUE',
+        keyword_False: 'FALSE',
+        keyword_Null: 'NULL',
+        keyword_True: 'TRUE',
         keyword_For: 'for',
-        keyword_: 'NULL',
-        keyword_Switch: 'switch',
+        keyword_If: 'if',
+        keyword_Return: 'return',
         keyword_While: 'while',
+        keyword_Switch: 'switch',
         operator_And: '&&',
         operator_Divide: '/',
         operator_Equal: '==',
@@ -54,6 +59,9 @@ module Mulang
         operator_BitwiseRightShift: '>>'
       },
       Haskell: {
+        keyword_False: 'False',
+        keyword_True: 'True',
+        keyword_If: 'if',
         keyword_TypeAlias: 'type',
         operator_And: '&&',
         operator_Divide: '/',
@@ -73,17 +81,17 @@ module Mulang
         operator_BackwardComposition: '.'
       },
       Java: {
-        keyword_false: 'false',
-        keyword_If: 'if',
-        keyword_true: 'true',
+        keyword_False: 'false',
+        keyword_Null: 'null',
+        keyword_True: 'true',
         keyword_For: 'for',
-        keyword_ForEach: 'for',
-        keyword_: 'null',
-        keyword_Switch: 'switch',
-        keyword_While: 'while',
+        keyword_If: 'if',
         keyword_Return: 'return',
+        keyword_While: 'while',
         keyword_Class: 'class',
+        keyword_ForEach: 'for',
         keyword_Interface: 'interface',
+        keyword_Switch: 'switch',
         operator_And: '&&',
         operator_Divide: '/',
         operator_Equal: '==',
@@ -106,9 +114,13 @@ module Mulang
         operator_Hash: 'hashCode'
       },
       JavaScript: {
-        keyword_false: 'false',
+        keyword_False: 'false',
+        keyword_Null: 'null',
+        keyword_True: 'true',
+        keyword_For: 'for',
         keyword_If: 'if',
-        keyword_true: 'true',
+        keyword_Return: 'return',
+        keyword_While: 'while',
         operator_And: '&&',
         operator_Divide: '/',
         operator_Equal: '===',
@@ -130,9 +142,13 @@ module Mulang
         operator_BitwiseRightShift: '>>'
       },
       Python: {
-        keyword_false: 'false',
+        keyword_False: 'False',
+        keyword_Null: 'None',
+        keyword_True: 'True',
+        keyword_For: 'for',
         keyword_If: 'if',
-        keyword_true: 'true',
+        keyword_Return: 'return',
+        keyword_While: 'while',
         operator_And: 'and',
         operator_Divide: '/',
         operator_Equal: '==',
@@ -155,17 +171,17 @@ module Mulang
         operator_Hash: 'hash'
       },
       Ruby: {
-        keyword_false: 'false',
-        keyword_If: 'if',
-        keyword_true: 'true',
-        keyword_Class: 'class',
+        keyword_False: 'false',
+        keyword_Null: 'null',
+        keyword_True: 'true',
         keyword_For: 'for',
+        keyword_If: 'if',
+        keyword_Return: 'return',
+        keyword_While: 'while',
+        keyword_Class: 'class',
         keyword_ForEach: 'for',
         keyword_Include: 'include',
-        keyword_: 'nil',
-        keyword_Return: 'return',
         keyword_Switch: 'case',
-        keyword_While: 'while',
         operator_And: '&&',
         operator_Divide: '/',
         operator_Equal: '==',
@@ -190,9 +206,13 @@ module Mulang
         operator_BackwardComposition: '<<'
       },
       Php: {
-        keyword_false: 'false',
+        keyword_False: 'false',
+        keyword_Null: 'null',
+        keyword_True: 'true',
+        keyword_For: 'for',
         keyword_If: 'if',
-        keyword_true: 'true',
+        keyword_Return: 'return',
+        keyword_While: 'while',
         operator_And: '&&',
         operator_Divide: '/',
         operator_Equal: '==',
@@ -212,9 +232,38 @@ module Mulang
         operator_BitwiseXor: '^',
         operator_BitwiseLeftShift: '<<',
         operator_BitwiseRightShift: '>>'
+      },
+      Prolog: {
+        keyword_Fail: 'fail',
+        keyword_Findall: 'findall',
+        keyword_Forall: 'forall',
+        keyword_Not: 'not',
+        keyword_Is: 'is',
+        operator_Divide: '/',
+        operator_GreatherOrEqualThan: '>=',
+        operator_GreatherThan: '>',
+        operator_LessOrEqualThan: '=<',
+        operator_LessThan: '<',
+        operator_Minus: '-',
+        operator_Multiply: '*',
+        operator_NotEqual: '/=',
+        operator_Plus: '+'
       }
     }.transform_values { |v| v.transform_values { |v| CGI::escapeHTML(v) } }.freeze
 
-    DEFAULT_TOKENS = TOKENS[:Common].freeze
+    POLYFILLS = {
+      Common: {
+        keyword_EntryPoint: 'program',
+        keyword_ForEach: 'foreach',
+        keyword_Repeat: 'repeat',
+        keyword_Switch: 'switch',
+        keyword_Yield: 'yield',
+        operator_Hash: 'hash',
+        operator_BackwardComposition: '.',
+        operator_ForwardComposition: '>>'
+      }
+    }.transform_values { |v| v.transform_values { |v| CGI::escapeHTML(v) } }.freeze
+
+    DEFAULT_TOKENS = TOKENS[:Common].merge(POLYFILLS[:Common]).freeze
   end
 end

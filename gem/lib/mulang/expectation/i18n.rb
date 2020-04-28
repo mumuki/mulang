@@ -45,11 +45,15 @@ module Mulang::Expectation::I18n
     end
 
     def with_tokens(tokens, params)
-      if tokens.nil? || tokens.is_a?(Hash)
-        params.merge(Mulang::Tokens::DEFAULT_TOKENS.merge(tokens || {}))
+      hash = if tokens.nil?
+        {}
+      elsif tokens.is_a?(Hash)
+        tokens
       else
-        params.merge(Mulang::TOKENS.indifferent_get(tokens))
+        params.merge(Mulang::Tokens::TOKENS.indifferent_get(tokens))
       end
+
+      params.merge(Mulang::Tokens::DEFAULT_TOKENS.merge(hash))
     end
   end
 end

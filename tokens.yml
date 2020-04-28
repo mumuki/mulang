@@ -9,9 +9,13 @@
 # Notice: if there are more than one variants of the same token, put the preferred first
 Common:
   keywords: &common_keywords
-    False: 'false'
+    'False': 'false'
+    'Null': 'null'
+    'True': 'true'
+    For: 'for'
     If: 'if'
-    True: 'true'
+    Return: 'return'
+    While: 'while'
   operators: &common_operators
     And: '&&'
     Divide: '/'
@@ -32,14 +36,24 @@ Common:
     BitwiseXor: '^'
     BitwiseLeftShift: '<<'
     BitwiseRightShift: '>>'
+  polyfills: # not common, but kept for backward compatibilty
+    keywords:
+      EntryPoint: 'program'
+      ForEach: 'foreach'
+      Repeat: 'repeat'
+      Switch: 'switch'
+      Yield: 'yield'
+    operators:
+      Hash: 'hash'
+      BackwardComposition: '.'
+      ForwardComposition:  '>>'
 C:
   keywords:
     <<: *common_keywords
-    False: 'FALSE'
-    For: 'for'
-    Null: 'NULL'
+    'False': 'FALSE'
+    'Null': 'NULL'
+    'True': 'TRUE'
     Switch: 'switch'
-    True: 'TRUE'
     While: 'while'
   operators:
     And: '&&'
@@ -63,6 +77,9 @@ C:
     BitwiseRightShift: '>>'
 Haskell:
   keywords:
+    'False': 'False'
+    'True': 'True'
+    If: 'if'
     TypeAlias: 'type'
   operators:
     And: '&&'
@@ -86,14 +103,10 @@ Haskell:
 Java:
   keywords:
     <<: *common_keywords
-    For: 'for'
-    ForEach: 'for'
-    Null: 'null'
-    Switch: 'switch'
-    While: 'while'
-    Return: 'return'
     Class: 'class'
+    ForEach: 'for'
     Interface: 'interface'
+    Switch: 'switch'
   operators:
     <<: *common_operators
     Hash: 'hashCode'
@@ -111,6 +124,9 @@ JavaScript:
 Python:
   keywords:
     <<: *common_keywords
+    'False': 'False'
+    'Null': 'None'
+    'True': 'True'
   operators:
     <<: *common_operators
     NotEqual:
@@ -124,13 +140,9 @@ Ruby:
   keywords:
     <<: *common_keywords
     Class: 'class'
-    For: 'for'
     ForEach: 'for'
     Include: 'include'
-    Null: 'nil'
-    Return: 'return'
     Switch: 'case'
-    While: 'while'
   operators:
     <<: *common_operators
     And:
@@ -147,4 +159,20 @@ Php:
     <<: *common_keywords
   operators:
     <<: *common_operators
-
+Prolog:
+  keywords:
+    Fail: 'fail'
+    Findall: 'findall'
+    Forall: 'forall'
+    Not: 'not'
+    Is: 'is'
+  operators:
+    Divide: '/'
+    GreatherOrEqualThan: '>='
+    GreatherThan: '>'
+    LessOrEqualThan: '=<'
+    LessThan: '<'
+    Minus: '-'
+    Multiply: '*'
+    NotEqual: '/='
+    Plus: '+'
