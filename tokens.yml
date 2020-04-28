@@ -91,5 +91,7 @@ Ruby:
     Hash: "hash"
     ForwardComposition: ">>"
     BackwardComposition: "<<"
-Php: {}
+Php:
+  operators:
+    <<: *c_operators
 
