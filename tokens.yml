@@ -7,16 +7,41 @@
 # - tokens.rb: JavaScript Tokens Tables
 #
 # Notice: if there are more than one variants of the same token, put the preferred first
+Common:
+  keywords: &common_keywords
+    False: 'false'
+    If: 'if'
+    True: 'true'
+  operators: &common_operators
+    And: '&&'
+    Divide: '/'
+    Equal: '=='
+    GreatherOrEqualThan: '>='
+    GreatherThan: '>'
+    LessOrEqualThan: '<='
+    LessThan: '<'
+    Minus: '-'
+    Multiply: '*'
+    Negation: '!'
+    NotEqual: '!='
+    Or: '||'
+    Plus: '+'
+    Modulo: '%'
+    BitwiseOr: '|'
+    BitwiseAnd: '&'
+    BitwiseXor: '^'
+    BitwiseLeftShift: '<<'
+    BitwiseRightShift: '>>'
 C:
   keywords:
+    <<: *common_keywords
     False: 'FALSE'
     For: 'for'
-    If: 'if'
     Null: 'NULL'
     Switch: 'switch'
     True: 'TRUE'
     While: 'while'
-  operators: &c_operators
+  operators:
     And: '&&'
     Divide: '/'
     Equal: '=='
@@ -37,6 +62,8 @@ C:
     BitwiseLeftShift: '<<'
     BitwiseRightShift: '>>'
 Haskell:
+  keywords:
+    TypeAlias: 'type'
   operators:
     And: '&&'
     Divide:
@@ -57,12 +84,24 @@ Haskell:
     Otherwise: 'otherwise'
     BackwardComposition: '.'
 Java:
+  keywords:
+    <<: *common_keywords
+    For: 'for'
+    ForEach: 'for'
+    Null: 'null'
+    Switch: 'switch'
+    While: 'while'
+    Return: 'return'
+    Class: 'class'
+    Interface: 'interface'
   operators:
-    <<: *c_operators
+    <<: *common_operators
     Hash: 'hashCode'
 JavaScript:
+  keywords:
+    <<: *common_keywords
   operators:
-    <<: *c_operators
+    <<: *common_operators
     Equal:
       - "==="
       - "=="
@@ -70,8 +109,10 @@ JavaScript:
       - "!=="
       - "!="
 Python:
+  keywords:
+    <<: *common_keywords
   operators:
-    <<: *c_operators
+    <<: *common_operators
     NotEqual:
       - "!="
       - "<>"
@@ -80,8 +121,18 @@ Python:
     Or: "or"
     Hash: "hash"
 Ruby:
+  keywords:
+    <<: *common_keywords
+    Class: 'class'
+    For: 'for'
+    ForEach: 'for'
+    Include: 'include'
+    Null: 'nil'
+    Return: 'return'
+    Switch: 'case'
+    While: 'while'
   operators:
-    <<: *c_operators
+    <<: *common_operators
     And:
       - "&&"
       - "and"
@@ -92,6 +143,8 @@ Ruby:
     ForwardComposition: ">>"
     BackwardComposition: "<<"
 Php:
+  keywords:
+    <<: *common_keywords
   operators:
-    <<: *c_operators
+    <<: *common_operators
 

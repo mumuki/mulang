@@ -1,13 +1,37 @@
 module Mulang
   module Tokens
     TOKENS = {
+      Common: {
+        keyword_false: 'false',
+        keyword_If: 'if',
+        keyword_true: 'true',
+        operator_And: '&&',
+        operator_Divide: '/',
+        operator_Equal: '==',
+        operator_GreatherOrEqualThan: '>=',
+        operator_GreatherThan: '>',
+        operator_LessOrEqualThan: '<=',
+        operator_LessThan: '<',
+        operator_Minus: '-',
+        operator_Multiply: '*',
+        operator_Negation: '!',
+        operator_NotEqual: '!=',
+        operator_Or: '||',
+        operator_Plus: '+',
+        operator_Modulo: '%',
+        operator_BitwiseOr: '|',
+        operator_BitwiseAnd: '&',
+        operator_BitwiseXor: '^',
+        operator_BitwiseLeftShift: '<<',
+        operator_BitwiseRightShift: '>>'
+      },
       C: {
         keyword_false: 'FALSE',
-        keyword_For: 'for',
         keyword_If: 'if',
+        keyword_true: 'TRUE',
+        keyword_For: 'for',
         keyword_: 'NULL',
         keyword_Switch: 'switch',
-        keyword_true: 'TRUE',
         keyword_While: 'while',
         operator_And: '&&',
         operator_Divide: '/',
@@ -30,6 +54,7 @@ module Mulang
         operator_BitwiseRightShift: '>>'
       },
       Haskell: {
+        keyword_TypeAlias: 'type',
         operator_And: '&&',
         operator_Divide: '/',
         operator_Equal: '==',
@@ -48,6 +73,17 @@ module Mulang
         operator_BackwardComposition: '.'
       },
       Java: {
+        keyword_false: 'false',
+        keyword_If: 'if',
+        keyword_true: 'true',
+        keyword_For: 'for',
+        keyword_ForEach: 'for',
+        keyword_: 'null',
+        keyword_Switch: 'switch',
+        keyword_While: 'while',
+        keyword_Return: 'return',
+        keyword_Class: 'class',
+        keyword_Interface: 'interface',
         operator_And: '&&',
         operator_Divide: '/',
         operator_Equal: '==',
@@ -70,6 +106,9 @@ module Mulang
         operator_Hash: 'hashCode'
       },
       JavaScript: {
+        keyword_false: 'false',
+        keyword_If: 'if',
+        keyword_true: 'true',
         operator_And: '&&',
         operator_Divide: '/',
         operator_Equal: '===',
@@ -91,6 +130,9 @@ module Mulang
         operator_BitwiseRightShift: '>>'
       },
       Python: {
+        keyword_false: 'false',
+        keyword_If: 'if',
+        keyword_true: 'true',
         operator_And: 'and',
         operator_Divide: '/',
         operator_Equal: '==',
@@ -113,6 +155,17 @@ module Mulang
         operator_Hash: 'hash'
       },
       Ruby: {
+        keyword_false: 'false',
+        keyword_If: 'if',
+        keyword_true: 'true',
+        keyword_Class: 'class',
+        keyword_For: 'for',
+        keyword_ForEach: 'for',
+        keyword_Include: 'include',
+        keyword_: 'nil',
+        keyword_Return: 'return',
+        keyword_Switch: 'case',
+        keyword_While: 'while',
         operator_And: '&&',
         operator_Divide: '/',
         operator_Equal: '==',
@@ -137,10 +190,31 @@ module Mulang
         operator_BackwardComposition: '<<'
       },
       Php: {
-
+        keyword_false: 'false',
+        keyword_If: 'if',
+        keyword_true: 'true',
+        operator_And: '&&',
+        operator_Divide: '/',
+        operator_Equal: '==',
+        operator_GreatherOrEqualThan: '>=',
+        operator_GreatherThan: '>',
+        operator_LessOrEqualThan: '<=',
+        operator_LessThan: '<',
+        operator_Minus: '-',
+        operator_Multiply: '*',
+        operator_Negation: '!',
+        operator_NotEqual: '!=',
+        operator_Or: '||',
+        operator_Plus: '+',
+        operator_Modulo: '%',
+        operator_BitwiseOr: '|',
+        operator_BitwiseAnd: '&',
+        operator_BitwiseXor: '^',
+        operator_BitwiseLeftShift: '<<',
+        operator_BitwiseRightShift: '>>'
       }
-    }.transform_values { |v| CGI::escapeHTML(v) }.freeze
+    }.transform_values { |v| v.transform_values { |v| CGI::escapeHTML(v) } }.freeze
 
-    DEFAULT_TOKENS = TOKENS[:Haskell].merge(TOKENS[:C]).freeze
+    DEFAULT_TOKENS = TOKENS[:Common].freeze
   end
 end

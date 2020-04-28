@@ -84,9 +84,9 @@ def generate_tokens_rb(ruby_tokens)
   module Tokens
     TOKENS = {
     #{ruby_tokens}
-    }.transform_values { |v| CGI::escapeHTML(v) }.freeze
+    }.transform_values { |v| v.transform_values { |v| CGI::escapeHTML(v) } }.freeze
 
-    DEFAULT_TOKENS = TOKENS[:Haskell].merge(TOKENS[:C]).freeze
+    DEFAULT_TOKENS = TOKENS[:Common].freeze
   end
 end}
 end
@@ -104,9 +104,7 @@ def generate_tokens_js(javascript_tokens)
   #{javascript_tokens}
   }
 
-  const DEFAULT_TOKENS = {};
-  Object.assign(DEFAULT_TOKENS, TOKENS.Haskell);
-  Object.assign(DEFAULT_TOKENS, TOKENS.C);
+  const DEFAULT_TOKENS = TOKENS.Common;
 
   ghcjsExports.Tokens = {
     TOKENS = TOKENS,
