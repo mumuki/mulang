@@ -33,9 +33,12 @@ import Language.Mulang.Ast.Operator (Operator (..))
 }
 end
 
+puts '[Mulang::Generator::Tokens] Generating Haskell Operator Tables...'
 $tokens.each do |language_module, values|
   language = language_module[0].downcase + language_module[1..-1]
-  File.write "./src/Language/Mulang/Operators/#{language_module}.hs", generate_operators_hs(language, language_module, (values['operators'] || {}))
+  destination = "./src/Language/Mulang/Operators/#{language_module}.hs"
+  puts "  Generating #{destination}..."
+  File.write destination, generate_operators_hs(language, language_module, (values['operators'] || {}))
 end
 
 ## ===========================
@@ -73,6 +76,7 @@ def generate_tokens_rb(ruby_tokens)
 end}
 end
 
+puts '[Mulang::Generator::Tokens] Generating Ruby Tokens Table...'
 File.write "./gem/lib/mulang/tokens.rb", generate_tokens_rb($tokens.map do |key, values|
   tokens = generate_ruby_tokens_list(values, 'keyword') + generate_ruby_tokens_list(values, 'operator')
   "  #{key}: {\n#{
@@ -84,3 +88,4 @@ end.join(",\n    "))
 ## JavaScript Tokens Table Generation
 ## ==================================
 
+puts '[Mulang::Generator::Tokens] Generating JavaScript Tokens Table...'
