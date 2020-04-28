@@ -30,6 +30,14 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "for (let x in []) {}" "expectation: count (uses for) = 1") `shouldReturn` ok
     (run JavaScript "for (let x in []) {}" "expectation: count (uses for) = 2") `shouldReturn` nok
 
+  it "evaluates count (uses for each)" $ do
+    (run JavaScript "for (let x in []) {}" "expectation: count (uses for each) = 0") `shouldReturn` nok
+    (run JavaScript "for (let x in []) {}" "expectation: count (uses for each) = 1") `shouldReturn` ok
+
+  it "evaluates count (uses print)" $ do
+    (run JavaScript "console.log('hello')" "expectation: count (uses print) = 1") `shouldReturn` ok
+    (run JavaScript "console.log('hello')" "expectation: count (uses print) = 2") `shouldReturn` nok
+
   it "evaluates count (declares variable)" $ do
     (run JavaScript "var x = 1" "expectation: count (declares variable) = 0") `shouldReturn` nok
     (run JavaScript "var x = 1" "expectation: count (declares variable) = 1") `shouldReturn` ok

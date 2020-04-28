@@ -47,6 +47,7 @@ library
     Language.Mulang.Inspector.Bound
     Language.Mulang.Inspector.Combiner
     Language.Mulang.Inspector.Contextualized
+    Language.Mulang.Inspector.Family
     Language.Mulang.Inspector.Functional
     Language.Mulang.Inspector.Generic
     Language.Mulang.Inspector.Generic.Duplication

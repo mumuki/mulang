@@ -1,12 +1,13 @@
 module Language.Mulang.Inspector.Functional (
-  usesGuards,
+  countLambdas,
   usesComposition,
+  usesComprehension,
+  usesConditional,
+  usesForComprehension,
+  usesGuards,
   usesLambda,
   usesLambdaMatching,
-  usesPatternMatching,
-  usesForComprehension,
-  usesComprehension,
-  usesConditional) where
+  usesPatternMatching) where
 
 import Data.Function.Extra (orElse)
 
@@ -14,7 +15,7 @@ import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Inspector.Primitive (Inspection, containsExpression, containsBody)
 import Language.Mulang.Inspector.Generic (usesIf, usesYield)
-import Language.Mulang.Inspector.Matcher (unmatching, Matcher)
+import Language.Mulang.Inspector.Family (deriveUses, InspectionFamily)
 
 usesConditional :: Inspection
 usesConditional = orElse usesIf usesGuards
@@ -56,13 +57,9 @@ usesComprehension = usesForComprehension
 
 -- | Inspection that tells whether an expression uses a lambda expression
 -- in its definition
-usesLambda :: Inspection
-usesLambda = unmatching usesLambdaMatching
-
-usesLambdaMatching :: Matcher -> Inspection
-usesLambdaMatching matcher = containsExpression f
-  where f (Lambda _ e) = matcher [e]
-        f _            = False
+(usesLambda, usesLambdaMatching, countLambdas) = deriveUses f :: InspectionFamily
+  where f matcher (Lambda _ e) = matcher [e]
+        f _       _            = False
 
 -- | Inspection that tells whether an expression uses guards
 -- in its definition

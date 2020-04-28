@@ -26,8 +26,8 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `DiscardsExceptions`              | are exceptions discarded within an empty catch block?
 | `DoesConsolePrint`                | is there any console-print-statement like `System.out.println`, `puts` or `console.log`?
 | `DoesTypeTest`                    |
-| `HasAssignmentReturn`             | is the code returning the result of an assignment?
 | `HasAssignmentCondition`          | is the code evaluating the result of an assignment where a boolean condition is expected?
+| `HasAssignmentReturn`             | is the code returning the result of an assignment?
 | `HasCodeDuplication`              | has the given code simple literal code duplication?
 | `HasDeclarationTypos`             | is an identifier *not* declared but a very similar one declared instead?
 | `HasEmptyIfBranches`              | has the given code an empty `if` branch?
@@ -104,7 +104,7 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `UsesForLoop`                     | is a c-style for loop used?
 | `UsesLoop`                        | are any of: repeat / for loop / foreach / while used?
 | `UsesRepeat`                      |
-| `UsesSwitch`                      |
+| `UsesSwitch`                      | is a `switch` control structure used?
 | `UsesWhile`                       | is a `while` control structure used?
 
 ## Object Oriented Inspections

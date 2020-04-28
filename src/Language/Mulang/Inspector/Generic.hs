@@ -7,8 +7,10 @@ module Language.Mulang.Inspector.Generic (
   countFors,
   countFunctions,
   countIfs,
+  countPrints,
   countReturns,
   countVariables,
+  countYiels,
   declares,
   declaresComputation,
   declaresComputationWithArity,
@@ -34,6 +36,7 @@ module Language.Mulang.Inspector.Generic (
   usesExceptionHandling,
   usesExceptions,
   usesFor,
+  usesForMatching,
   usesIf,
   usesIfMatching,
   usesLogic,
@@ -48,13 +51,14 @@ import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Generator (Generator, declaredIdentifiers, expressions, declarations, referencedIdentifiers, equationsExpandedExpressions, declarators, boundDeclarators)
 import Language.Mulang.Identifier
-import Language.Mulang.Inspector.Bound (uncounting, containsBoundDeclaration, countBoundDeclarations, BoundInspection, BoundCounter)
+import Language.Mulang.Inspector.Bound (uncounting, containsBoundDeclaration, BoundInspection, BoundCounter)
 import Language.Mulang.Inspector.Contextualized (decontextualize, ContextualizedBoundInspection)
 import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Inspector.Matcher (unmatching, matches, Matcher)
 import Language.Mulang.Inspector.Query (inspect, select)
 import Language.Mulang.Inspector.Literal (isMath, isLogic)
 import Language.Mulang.Inspector.Combiner (transitive)
+import Language.Mulang.Inspector.Family (deriveUses, deriveDeclares, InspectionFamily, BoundInspectionFamily)
 
 import Data.Maybe (listToMaybe)
 import Data.List.Extra (has)
@@ -109,51 +113,30 @@ delegates' p context expression = inspect $ do
 
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
-usesIf :: Inspection
-usesIf = unmatching usesIfMatching
+(usesIf, usesIfMatching, countIfs) = deriveUses f :: InspectionFamily
+  where f matcher (If c t e) = matcher [c, t, e]
+        f _       _          = False
 
-usesIfMatching :: Matcher -> Inspection
-usesIfMatching matcher = positive (countIfs matcher)
+(usesYield, usesYieldMatching, countYiels) = deriveUses f :: InspectionFamily
+  where f matcher (Yield e) = matcher [e]
+        f _       _         = False
 
-countIfs :: Matcher -> Counter
-countIfs matcher = countExpressions f
-  where f (If c t e) = matcher [c, t, e]
-        f _          = False
+(usesPrint, usesPrintMatching, countPrints) = deriveUses f :: InspectionFamily
+  where f matcher (Print e) = matcher [e]
+        f _       _         = False
 
-usesYield :: Inspection
-usesYield = unmatching usesYieldMatching
+(usesFor, usesForMatching, countFors) = deriveUses f :: InspectionFamily
+  where f matcher (For _ e) = matcher [e]
+        f _      _          = False
 
-usesYieldMatching ::  Matcher -> Inspection
-usesYieldMatching matcher = containsExpression f
-  where f (Yield e) = matcher [e]
-        f _         = False
+(returns, returnsMatching, countReturns) = deriveUses f :: InspectionFamily
+  where f matcher (Return body) = matcher [body]
+        f _       _             = False
 
-usesPrint :: Inspection
-usesPrint = unmatching usesPrintMatching
-
-usesPrintMatching :: Matcher -> Inspection
-usesPrintMatching matcher = containsExpression f
-  where f (Print e) = matcher [e]
-        f _         = False
-
-usesFor :: Inspection
-usesFor = positive countFors
-
-countFors :: Counter
-countFors = countExpressions f
-  where f (For _ _) = True
-        f _         = False
-
-returns :: Inspection
-returns = unmatching returnsMatching
-
-returnsMatching :: Matcher -> Inspection
-returnsMatching matcher = positive (countReturns matcher)
-
-countReturns :: Matcher -> Counter
-countReturns matcher = countExpressions f
-  where f (Return body) = matcher [body]
-        f _             = False
+usesExceptionHandling :: Inspection
+usesExceptionHandling  = containsExpression f
+  where f (Try _ _ _) = True
+        f _           = False
 
 -- | Inspection that tells whether a top level declaration exists
 declares :: BoundInspection
@@ -170,27 +153,13 @@ declaresRecursively = containsBoundDeclaration f
         nameOf :: Expression -> Maybe Identifier
         nameOf = listToMaybe . declaredIdentifiers
 
-declaresFunction :: BoundInspection
-declaresFunction = unmatching declaresFunctionMatching
+(declaresFunction, declaresFunctionMatching, countFunctions) = deriveDeclares f :: BoundInspectionFamily
+  where f matcher (Function _ equations) = matches matcher equationsExpandedExpressions $ equations
+        f _       _                      = False
 
-declaresFunctionMatching :: Matcher -> BoundInspection
-declaresFunctionMatching = uncounting countFunctions
-
-countFunctions :: Matcher -> BoundCounter
-countFunctions matcher = countBoundDeclarations f
-  where f (Function _ equations) = matches matcher equationsExpandedExpressions $ equations
-        f _                      = False
-
-declaresVariable :: BoundInspection
-declaresVariable = unmatching declaresVariableMatching
-
-declaresVariableMatching :: Matcher -> BoundInspection
-declaresVariableMatching = uncounting countVariables
-
-countVariables :: Matcher -> BoundCounter
-countVariables matcher = countBoundDeclarations f
-  where f (Variable _ body) = matches matcher id [body]
-        f _                 = False
+(declaresVariable, declaresVariableMatching, countVariables) = deriveDeclares f :: BoundInspectionFamily
+  where f matcher (Variable _ body) = matches matcher id [body]
+        f _       _                 = False
 
 declaresEntryPoint :: BoundInspection
 declaresEntryPoint = unmatching declaresEntryPointMatching
@@ -239,11 +208,6 @@ rescues :: BoundInspection
 rescues predicate = containsExpression f
   where f (Try _ rescues _) = any (matchesType predicate) . map fst  $ rescues
         f _                 = False
-
-usesExceptionHandling :: Inspection
-usesExceptionHandling  = containsExpression f
-  where f (Try _ _ _) = True
-        f _           = False
 
 usesAnonymousVariable :: Inspection
 usesAnonymousVariable = containsExpression f
