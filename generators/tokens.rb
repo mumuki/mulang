@@ -124,8 +124,8 @@ def generate_tokens_js(tokens, polyfills)
   Object.assign(DEFAULT_TOKENS, POLYFILLS.Common);
 
   ghcjsExports.Tokens = {
-    TOKENS = TOKENS,
-    DEFAULT_TOKENS = DEFAULT_TOKENS
+    TOKENS: TOKENS,
+    DEFAULT_TOKENS: DEFAULT_TOKENS
   };
 })();}
 end
