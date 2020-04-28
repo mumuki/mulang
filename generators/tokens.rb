@@ -1,7 +1,28 @@
 require 'yaml'
 
+## ======
+## Common
+## ======
+
+def generate_frontend_tokens_table(tokens)
+  tokens.map do |key, values|
+    tokens = generate_frontend_tokens_list(values, 'keyword') + generate_frontend_tokens_list(values, 'operator')
+    "  #{key}: {\n#{
+      tokens.map { |k, v| "        #{k}: '#{v}'" }.join(",\n")
+    }\n      }"
+  end.join(",\n    ")
+end
+
+def generate_frontend_tokens_list(values, kind)
+  (values["#{kind}s"] || []).map do |key, value|
+    token = value.is_a?(Array) ? value.first : value
+    ["#{kind}_#{key}", token]
+  end
+end
+
 
 $tokens = YAML.load(File.read('./tokens.yml'))
+$frontend_tokens_table = generate_frontend_tokens_table($tokens)
 
 ## =============================
 ## Haskell Operators Generation
@@ -57,12 +78,6 @@ end
 ## Ruby Tokens Table Generation
 ## ============================
 
-def generate_ruby_tokens_list(values, kind)
-  (values["#{kind}s"] || []).map do |key, value|
-    token = value.is_a?(Array) ? value.first : value
-    ["#{kind}_#{key}", token]
-  end
-end
 
 def generate_tokens_rb(ruby_tokens)
   %Q{module Mulang
@@ -77,15 +92,28 @@ end}
 end
 
 puts '[Mulang::Generator::Tokens] Generating Ruby Tokens Table...'
-File.write "./gem/lib/mulang/tokens.rb", generate_tokens_rb($tokens.map do |key, values|
-  tokens = generate_ruby_tokens_list(values, 'keyword') + generate_ruby_tokens_list(values, 'operator')
-  "  #{key}: {\n#{
-    tokens.map { |k, v| "        #{k}: '#{v}'" }.join(",\n")
-  }\n      }"
-end.join(",\n    "))
+File.write "./gem/lib/mulang/tokens.rb", generate_tokens_rb($frontend_tokens_table)
 
 ## ==================================
 ## JavaScript Tokens Table Generation
 ## ==================================
 
+def generate_tokens_js(javascript_tokens)
+  %Q{(() => {
+  const TOKENS = {
+  #{javascript_tokens}
+  }
+
+  const DEFAULT_TOKENS = {};
+  Object.assign(DEFAULT_TOKENS, TOKENS.Haskell);
+  Object.assign(DEFAULT_TOKENS, TOKENS.C);
+
+  ghcjsExports.Tokens = {
+    TOKENS = TOKENS,
+    DEFAULT_TOKENS = DEFAULT_TOKENS
+  };
+})();}
+end
+
 puts '[Mulang::Generator::Tokens] Generating JavaScript Tokens Table...'
+File.write "./ghcjslib/src/tokens.js", generate_tokens_js($frontend_tokens_table)
