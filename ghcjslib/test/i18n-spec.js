@@ -38,7 +38,8 @@ describe('es', () => {
   it('UsesAnonymousVariable', () => should(mulang.I18n.translate('foo', 'UsesAnonymousVariable')).eql('<code>foo</code> debe utilizar una variable anónima'));
   it('UsesStaticPolymorphism', () => should(mulang.I18n.translate('*', 'UsesStaticPolymorphism')).eql('la solución debe usar polimorfismo'));
 
-  it('HasRedundantIf', () => should(mulang.I18n.translate('foo', 'HasRedundantIf')).eql('<code>foo</code> tiene ifs innecesarios'));
+  it('HasRedundantIf', () => should(mulang.I18n.translate('foo', 'HasRedundantIf')).eql('<code>foo</code> tiene <code>if</code>s innecesarios que pueden ser reemplazados por expresiones booleanas'));
+  it('HasEqualIfBranches', () => should(mulang.I18n.translate('foo', 'HasEqualIfBranches')).eql('<code>foo</code> tiene <code>if</code>s innecesarios porque sus dos ramas son iguales'));
   it('HasRedundantBooleanComparison', () => should(mulang.I18n.translate('foo', 'HasRedundantBooleanComparison')).eql('<code>foo</code> hace comparaciones booleanas innecesarias'));
   it('UsesFail', () => should(mulang.I18n.translate('bar', 'UsesFail', 'Prolog')).eql('<code>bar</code> usa <code>fail</li>, lo cual es una mala práctica'));
   it('HasEmptyIfBranches', () => should(mulang.I18n.translate('foo', 'HasEmptyIfBranches')).eql('<code>foo</code> tiene ramas de <code>if</code> vacías'));

@@ -138,6 +138,7 @@ detectionFor ("HasCodeDuplication", Nothing)              = unsupported
 detectionFor ("HasDeclarationTypos", Just target)         = raw (detectDeclarationTypos target)
 detectionFor ("HasEmptyIfBranches", Nothing)              = simple hasEmptyIfBranches
 detectionFor ("HasEmptyRepeat", Nothing)                  = simple hasEmptyRepeat
+detectionFor ("HasEqualIfBranches", Nothing)              = simple hasEqualIfBranches
 detectionFor ("HasLongParameterList", Nothing)            = simple hasLongParameterList
 detectionFor ("HasMisspelledBindings", Nothing)           = withLanguage hasMisspelledIdentifiers
 detectionFor ("HasMisspelledIdentifiers", Nothing)        = withLanguage hasMisspelledIdentifiers

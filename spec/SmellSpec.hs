@@ -22,16 +22,15 @@ runHaskell = hs . unpack
 
 spec :: Spec
 spec = do
-  describe "hasUselessIf" $ do
+  describe "hasEqualIfBranches" $ do
     it "is True when both branches contain the same expression" $ do
-      hasUselessIf (js "if(m) { console.log('ok') } else { console.log('ok') }") `shouldBe` True
+      hasEqualIfBranches (js "if(m) { console.log('ok') } else { console.log('ok') }") `shouldBe` True
 
     it "is False when branches contain different expressions" $ do
-      hasUselessIf (js "if(m) { console.log('ok') } else { console.log('ups') }") `shouldBe` False
+      hasEqualIfBranches (js "if(m) { console.log('ok') } else { console.log('ups') }") `shouldBe` False
 
     it "is False when branches are empty" $ do
-      hasUselessIf (js "if(m) {  } else { }") `shouldBe` False
-
+      hasEqualIfBranches (js "if(m) {  } else { }") `shouldBe` False
 
   describe "hasRedundantIf" $ do
     it "is True when both branches are boolean literal returns" $ do

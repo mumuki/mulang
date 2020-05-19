@@ -32,6 +32,7 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `HasDeclarationTypos`             | is an identifier *not* declared but a very similar one declared instead?
 | `HasEmptyIfBranches`              | has the given code an empty `if` branch?
 | `HasEmptyRepeat`                  | has the given code a `repeat` with empty body?
+| `HasEqualIfBranches`              | are both branches of an `if` equal?
 | `HasLongParameterList`            | does a given method/function/predicate take too many parameters?
 | `HasMisspelledIdentifiers`        | an identifier is not a domain language dictionary's word and not part of its jargon
 | `HasRedundantBooleanComparison`   |

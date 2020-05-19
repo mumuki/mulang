@@ -18,7 +18,7 @@ module Language.Mulang.Inspector.Generic.Smell (
   hasRedundantParameter,
   hasRedundantRepeat,
   hasTooManyMethods,
-  hasUselessIf,
+  hasEqualIfBranches,
   detectDeclarationTypos,
   detectUsageTypos,
   hasUnreachableCode,
@@ -74,8 +74,8 @@ returnsNil = containsExpression f
   where f (Return MuNil) = True
         f _              = False
 
-hasUselessIf :: Inspection
-hasUselessIf = containsExpression f
+hasEqualIfBranches :: Inspection
+hasEqualIfBranches = containsExpression f
   where f (If _ None None) = False
         f (If _ t e)       = t == e
         f _                = False
