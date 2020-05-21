@@ -1,9 +1,10 @@
 {-# LANGUAGE DeriveGeneric, PatternSynonyms, ViewPatterns #-}
 
 module Language.Mulang.Ast.Operator (
+  opposite,
   Operator(..),
-  pattern Equalish,
-  pattern NotEqualish) where
+  pattern Like,
+  pattern NotLike) where
 
 import           GHC.Generics
 
@@ -11,15 +12,15 @@ data Operator
     = Equal
     -- ^ `===`-like equal operator
     | NotEqual
-    -- ^ `!==`-like distinct operator
-    | Like
-    -- ^ equal-ignoring-type operator
-    | NotLike
+    --    ^ `!==`-like distinct operator
+    | Similar
+    -- ^ equ   al-ignoring-type operator
+    | NotSimilar
     -- ^ not equal-ignoring-type operator
     | Same
-    -- ^ reference-identical operator
+      -- ^ reference-identical operator
     | NotSame
-    -- ^ not reference-identical operator
+     -- ^ not reference-identical operator
     | Negation
     -- ^ `!`-like not operator
     | And
@@ -101,15 +102,25 @@ data Operator
   deriving (Eq, Show, Read, Generic, Ord, Enum)
 
 
-pattern Equalish <- (isEqualish -> True)
-pattern NotEqualish <- (isNotEqualish -> True)
+pattern Like <- (isLike -> True)
+pattern NotLike <- (isNotLike -> True)
 
-isEqualish :: Operator -> Bool
-isEqualish Equal = True
-isEqualish Like  = True
-isEqualish _     = False
+isLike :: Operator -> Bool
+isLike Equal    = True
+isLike Similar  = True
+isLike Same     = True
+isLike _        = False
 
-isNotEqualish :: Operator -> Bool
-isNotEqualish NotEqual = True
-isNotEqualish NotLike = True
-isNotEqualish _       = False
+isNotLike :: Operator -> Bool
+isNotLike NotEqual   = True
+isNotLike NotSimilar = True
+isNotLike NotSame    = True
+isNotLike _          = False
+
+opposite :: Operator -> Operator
+opposite Equal       = NotEqual
+opposite NotEqual    = Equal
+opposite Similar     = NotSimilar
+opposite NotSimilar  = Similar
+opposite Same        = NotSame
+opposite NotSame     = Same
