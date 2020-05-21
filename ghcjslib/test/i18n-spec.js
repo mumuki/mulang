@@ -17,12 +17,12 @@ describe('es', () => {
   it('UsesIf', () => should(mulang.I18n.translate('foo.bar', 'UsesIf')).eql('<code>foo.bar</code> debe usar <code>if</code>'));
 
   it('Not', () => should(mulang.I18n.translate('Intransitive:foo', 'Not:UsesLambda')).eql('<code>foo</code> no debe emplear expresiones lambda'));
-  
+
   it('Uses', () => should(mulang.I18n.translate('foo', 'Uses:*')).eql('<code>foo</code> debe delegar'));
   it('DeclaresMethod', () => should(mulang.I18n.translate('foo', 'DeclaresMethod:*')).eql('<code>foo</code> debe declarar métodos'));
   it('Uses', () => should(mulang.I18n.translate('foo', 'Uses:baz')).eql('<code>foo</code> debe utilizar <code>baz</code>'));
   it('Uses', () => should(mulang.I18n.translate('foo', 'Uses')).eql('<code>foo</code> debe delegar'));
-  it('UsesForall', () => should(mulang.I18n.translate('foo', 'UsesForall')).eql('<code>foo</code> debe utilizar <code>forall</code>'));
+  it('UsesForall', () => should(mulang.I18n.translate('foo', 'UsesForall', 'Prolog')).eql('<code>foo</code> debe utilizar <code>forall</code>'));
 
   it('Not', () => should(mulang.I18n.translate('foo', 'Not:Uses:*')).eql('<code>foo</code> no debe delegar'));
   it('Not', () => should(mulang.I18n.translate('foo', 'Not:Uses')).eql('<code>foo</code> no debe delegar'));
@@ -40,7 +40,7 @@ describe('es', () => {
 
   it('HasRedundantIf', () => should(mulang.I18n.translate('foo', 'HasRedundantIf')).eql('<code>foo</code> tiene ifs innecesarios'));
   it('HasRedundantBooleanComparison', () => should(mulang.I18n.translate('foo', 'HasRedundantBooleanComparison')).eql('<code>foo</code> hace comparaciones booleanas innecesarias'));
-  it('UsesFail', () => should(mulang.I18n.translate('bar', 'UsesFail')).eql('<code>bar</code> usa <code>fail</li>, lo cual es una mala práctica'));
+  it('UsesFail', () => should(mulang.I18n.translate('bar', 'UsesFail', 'Prolog')).eql('<code>bar</code> usa <code>fail</li>, lo cual es una mala práctica'));
   it('HasEmptyIfBranches', () => should(mulang.I18n.translate('foo', 'HasEmptyIfBranches')).eql('<code>foo</code> tiene ramas de <code>if</code> vacías'));
   it('HasEmptyRepeat', () => should(mulang.I18n.translate('foo', 'HasEmptyRepeat')).eql('<code>foo</code> tiene un <code>repeat</code> vacío'));
   it('ShouldInvertIfCondition', () => should(mulang.I18n.translate('foo', 'ShouldInvertIfCondition')).eql('<code>foo</code> debería invertir la condición del <code>if</code> e intercambiar las ramas'));
