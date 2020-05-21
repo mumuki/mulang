@@ -26,6 +26,9 @@ sed -i -r "s/VERSION = \"${VERSION_REGEXP}/VERSION = \"${NEW_VERSION}/"         
 sed -i -r "s/MULANG_VERSION = \"${VERSION_REGEXP}/MULANG_VERSION = \"${NEW_VERSION}/"     ghcjslib/gem/lib/mulangjs/version.rb
 sed -i -r "s/MULANG_VERSION=${VERSION_REGEXP}/MULANG_VERSION=${NEW_VERSION}/"             docs/devinit
 
+echo "[Mulang] Running generators...."
+./generators/run
+
 echo "[Mulang] Running tests..."
 stack test
 
