@@ -148,12 +148,12 @@ $ mulangjs '{
 }
 ```
 
-## Deploying
+## Releasing
 
 Build and publish the package to NPM with:
 
 ```bash
-$ ./ghcjslib/deploy.sh
+$ ./ghcjslib/release.sh
 ```
 
 ## Try it out!
