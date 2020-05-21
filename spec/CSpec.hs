@@ -164,16 +164,42 @@ spec = do
           }
           |] `shouldBe` cContext (Switch (Reference "a") [(MuNumber 1, Break None), (MuNumber 2, Continue None)] (MuNumber 1))
 
-      it "does not parse structs access" $ do
+      it "does parse structs access" $ do
         run [text|
           int main () {
             person.age;
           }
-          |] `shouldBe` cContext (Other (Just ("CMember (CVar (Ident \"person\" 243067487 (NodeInfo <no file> (<no file>,6) (Name {nameId = 4}))) " ++
-                                                "(NodeInfo <no file> (<no file>,6) (Name {nameId = 5}))) (Ident \"age\" 1668065 (NodeInfo <no file> (<no file>,3) " ++
-                                                "(Name {nameId = 6}))) False (NodeInfo <no file> (<no file>,3) (Name {nameId = 7}))")) Nothing)
+          |] `shouldBe` cContext (FieldReference (Reference "person") "age")
 
-      it "parses simple assignment" $ do
+      it "does parse expression struct access" $ do
+        run [text|
+          int main () {
+            f_person().age;
+          }
+          |] `shouldBe` cContext (FieldReference (Application (Reference "f_person") []) "age")
+
+      it "does parse struct field assignment" $ do
+        run [text|
+          int main () {
+            person.age = 10;
+          }
+          |] `shouldBe` cContext (FieldAssignment (Reference "person") "age" (MuNumber 10))
+
+      it "does parse struct pointer field assignment" $ do
+        run [text|
+          int main () {
+            person->age = 10;
+          }
+          |] `shouldBe` cContext (Other (Just "CMember (CVar (Ident \"person\" 243067487 (NodeInfo <no file> (<no file>,6) (Name {nameId = 4}))) (NodeInfo <no file> (<no file>,6) (Name {nameId = 5}))) (Ident \"age\" 1668065 (NodeInfo <no file> (<no file>,3) (Name {nameId = 6}))) True (NodeInfo <no file> (<no file>,3) (Name {nameId = 7}))") Nothing)
+
+      it "does parse struct pointer field assignment operation" $ do
+        run [text|
+          int main () {
+            person.age += 10;
+          }
+          |] `shouldBe` cContext (FieldAssignment (Reference "person") "age" (Application (Primitive Plus) [Reference "age", MuNumber 10]))
+
+      it "parses complex c example" $ do
         run [text|
           int cantidadDeNumerosImpares(int unosNumeros[]) {
             int cantidadDeImpares;

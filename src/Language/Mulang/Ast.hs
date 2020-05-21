@@ -111,6 +111,8 @@ data Expression
     | PrimitiveMethod Operator SubroutineBody
     | Variable Identifier Expression
     | Assignment Identifier Expression
+    | FieldAssignment Expression Identifier Expression
+    -- ^ Generic nested field assignment
     | Attribute Identifier Expression
     -- ^ Object oriented programming attribute declaration, composed by an identifier and an initializer
     | Object Identifier Expression
@@ -138,6 +140,8 @@ data Expression
     -- ^ Logic programming universal cuantification
     | Reference Identifier
     -- ^ Generic variable
+    | FieldReference Expression Identifier
+    -- ^ Generic nested field access
     | Primitive Operator
     -- ^ Reference to special, low level, universal operations like logical operaions and math, that may or may not be primitives
     -- in the original language
@@ -304,10 +308,11 @@ equationPatterns :: Equation -> [Pattern]
 equationPatterns (Equation p _) = p
 
 extractUnification :: Expression -> Maybe (Identifier, Expression)
-extractUnification (Assignment name value)  = Just (name, value)
-extractUnification (Variable name value)    = Just (name, value)
-extractUnification (Attribute name value)   = Just (name, value)
-extractUnification _                        = Nothing
+extractUnification (Assignment name value)        = Just (name, value)
+extractUnification (FieldAssignment _ name value) = Just (name, value)
+extractUnification (Variable name value)          = Just (name, value)
+extractUnification (Attribute name value)         = Just (name, value)
+extractUnification _                              = Nothing
 
 extractSubroutine :: Expression -> Maybe (Identifier, SubroutineBody)
 extractSubroutine (Function name body)        = Just (name, body)

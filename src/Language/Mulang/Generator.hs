@@ -74,6 +74,8 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Class _ _ v)           = [v]
     subExpressions (Clause _ _ es)         = es
     subExpressions (EntryPoint _ e)        = [e]
+    subExpressions (FieldAssignment r _ e) = [r, e]
+    subExpressions (FieldReference r _)    = [r]
     subExpressions (For stmts a)           = statementsExpressions stmts ++ [a]
     subExpressions (Forall e1 e2)          = [e1, e2]
     subExpressions (ForLoop i c p s)       = [i, c, p, s]
@@ -159,6 +161,7 @@ declarationsOf b = boundDeclarations (named b)
 
 extractReference :: Expression -> Maybe Identifier
 extractReference (Reference n)        = Just n
+extractReference (FieldReference _ n) = Just n
 extractReference (Exist n _)          = Just n
 extractReference _                    = Nothing
 

@@ -50,8 +50,8 @@ muStatement (For targets generator body _ _)  = M.For [M.Generator (M.TuplePatte
 muStatement (Fun name args _ body _)          = muComputation (muIdent name) (map muParameter args) (muSuite body)
 muStatement (Class name parents body _)       = muClass (listToMaybe . map muParent $ parents) (muIdent name) (muSuite body)
 muStatement (Conditional guards els _ )       = foldr muIf (muSuite els) guards
-muStatement (Assign [to] from _)              = M.Assignment (muVariable to) (muExpr from)
-muStatement (AugmentedAssign to op from _)    = M.Assignment (muVariable to) (M.Application (muAssignOp $ op) [M.Reference . muVariable $ to, muExpr from])
+muStatement (Assign [to] from _)              = muAssignment to (muExpr from)
+muStatement (AugmentedAssign to op from _)    = muAssignment to (M.Application (muAssignOp $ op) [muExpr to, muExpr from])
 --muStatement (Decorated
 --     { decorated_decorators :: [Decorator annot] -- ^ Decorators.
 --     , decorated_def :: Statement annot -- ^ Function or class definition to be decorated.
@@ -129,6 +129,7 @@ muExpr :: ExprSpan -> M.Expression
 muExpr (Var (Ident "True" _) _)   = M.MuTrue
 muExpr (Var (Ident "False" _) _)  = M.MuFalse
 muExpr (Var ident _)              = M.Reference (muIdent ident)
+muExpr (Dot expr ident _)          = M.FieldReference (muExpr expr) (muIdent ident)
 muExpr (Int value _ _)            = muNumberFromInt value
 muExpr (LongInt value _ _)        = muNumberFromInt value
 muExpr (Float value _ _)          = M.MuNumber value
@@ -195,6 +196,11 @@ muNumberFromInt = M.MuNumber . fromInteger
 
 muVariable :: ExprSpan -> M.Identifier
 muVariable (Var ident _) = muIdent ident
+muVariable other         = error (show other)
+
+muAssignment :: ExprSpan -> M.Expression -> M.Expression
+muAssignment (Var ident _)      = M.Assignment (muIdent ident)
+muAssignment (Dot expr ident _) = M.FieldAssignment (muExpr expr) (muIdent ident)
 
 muArgument (ArgExpr expr _)             = muExpr expr
 muArgument (ArgVarArgsPos expr _ )      = muExpr expr

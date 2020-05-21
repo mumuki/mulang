@@ -93,6 +93,12 @@ spec = do
     it "handles this" $ do
       js "this" `shouldBe` Self
 
+    it "handles field access" $ do
+      js "x.y" `shouldBe` (FieldReference (Reference "x") "y")
+
+    it "handles field assignment" $ do
+      js "x.y = 4" `shouldBe` (FieldAssignment (Reference "x") "y" (MuNumber (4.0)))
+
     it "handles booleans" $ do
       js "true" `shouldBe` MuTrue
 
