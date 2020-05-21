@@ -1,8 +1,6 @@
 # with this file the following files will be generated:
 # - Operators/*.hs: Haskell Operator Tables
 # - Keywords/*.hs: Haskell Operator Tables
-# - operators.yml and keywords.yml: Translations for Ruby
-# - operators.js and keywords.js: Translations for JavaScript
 # - tokens.js: Ruby Tokens Tables
 # - tokens.rb: JavaScript Tokens Tables
 #

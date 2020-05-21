@@ -8,6 +8,8 @@ import           Language.Mulang.Operators.C (cTokensTable)
 import           Language.Mulang.Operators.Haskell (haskellTokensTable)
 import           Language.Mulang.Operators.Java (javaTokensTable)
 import           Language.Mulang.Operators.JavaScript (javaScriptTokensTable)
+import           Language.Mulang.Operators.Php (phpTokensTable)
+import           Language.Mulang.Operators.Prolog (prologTokensTable)
 import           Language.Mulang.Operators.Python (pythonTokensTable)
 import           Language.Mulang.Operators.Ruby (rubyTokensTable)
 
@@ -83,11 +85,13 @@ inferOperatorsTable = buildOperatorsTable . table
     table C          = cTokensTable
     table Haskell    = haskellTokensTable
     table Java       = javaTokensTable
-    table Ruby       = rubyTokensTable
     table JavaScript = javaScriptTokensTable
+    table Php        = phpTokensTable
+    table Prolog     = prologTokensTable
     table Python     = pythonTokensTable
     table Python2    = pythonTokensTable
     table Python3    = pythonTokensTable
+    table Ruby       = rubyTokensTable
     table _          = Map.empty
 
 inferCaseStyle :: Inference CaseStyle
