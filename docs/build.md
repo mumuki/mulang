@@ -12,15 +12,16 @@ To generate `mulang` executable, you have to build the project using [stack](htt
 
 
 ```bash
+# This will generate a `mulang` executable in the folder `~/.local/bin`.
 $ stack install
+# Run mulang
 $ mulang
 ```
-
-That will generate a `mulang` executable in the folder `~/.local/bin`.
 
 ## Running tests
 
 ```bash
+# This will build the project and run rspec and hspec tests
 $ ./test.sh
 ```
 
@@ -28,41 +29,37 @@ $ ./test.sh
 
 
 ```bash
+# This will build the project and run rspec and hspec tests, and wait for changes in hspec tests
 $ ./test.sh --file-watch
 ```
 
-## Loading mulang in the REPL
-
-```bash
-stack ghci
-```
-
-# Ruby wrapper
+## Ruby wrapper
 
 > See [`gem/README`](https://github.com/mumuki/mulang/blob/master/gem/README.md) for more details.
 
-This module can also be deployed a ruby gem. `mulang` works with Ruby 2.3+
+### Building
 
-## Building
+> :warning: You will need Ruby 2.3+.
 
 ```bash
 cd gem
-rake wrapper:wrap
+# install ruby
 bundle install
-bundle exec rspec
+# wrap gem and run rspec tests
+rake
 ```
 
-## Loading
+### Loading
 
 Run `bin/console` in the `gem` directory.
 
-# JavaScript library
+## JavaScript library
 
 > See [`ghcjslib/README`](https://github.com/mumuki/mulang/blob/master/ghcjslib/README.md) and [https://www.npmjs.com/package/mulang](https://www.npmjs.com/package/mulang) for more details.
 
 `mulang` can also be compiled to JavaScript library using [ghcjs](https://github.com/ghcjs/ghcjs) and [ghcjslib](https://github.com/flbulgarelli/ghcjslib), which allows you to use it from `node` or the browser.
 
-## Building
+### Building
 
 > :warning: you will need `node >= 7` installed on your system. If you have `nvm`, before starting run the following:
 >
@@ -81,16 +78,10 @@ ghcjslib/test.sh
 ghcjslib/swap.sh
 ```
 
-## Loading
+### Loading
 
 1. in the browser: `google-chrome ghcjslib/index.html`
 2. in `node`: run `node`, and then, within the interpreter, run: `let mulang = require('./ghcjslib/build/mulang.js');`
-
-# Releasing
-
-```bash
-./release.sh
-```
 
 # Updating docs
 
