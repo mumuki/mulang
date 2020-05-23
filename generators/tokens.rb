@@ -27,7 +27,6 @@ def generate_frontend_tokens_list(values, kind)
   end
 end
 
-
 $tokens = YAML.load(File.read('./tokens.yml'))
 $operators = $tokens.flat_map { |_, values| values['operators'].map { |operator, _| operator } }.uniq.sort
 $frontend_tokens_table = generate_frontend_tokens_table($tokens)
@@ -71,10 +70,6 @@ $tokens.each do |language_module, values|
   File.write destination, generate_operators_hs(language, language_module, (values['operators'] || {}))
 end
 
-## ===========================
-## Haskell Keywords Generation
-## ===========================
-
 ## =============================
 ## Ruby Oprators I18n Generation
 ## =============================
@@ -117,11 +112,9 @@ File.write './ghcjslib/src/operators-i18n.js', %Q{(() => {
 })();
 }
 
-
 ## ============================
 ## Ruby Tokens Table Generation
 ## ============================
-
 
 def generate_tokens_rb(tokens, polyfills)
   %Q{module Mulang
