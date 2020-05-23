@@ -495,4 +495,4 @@
   I18n.DEFAULT_KEYWORDS = DEFAULT_KEYWORDS;
 
   ghcjsExports.I18n = I18n;
-})()
+})();

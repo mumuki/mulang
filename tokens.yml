@@ -3,6 +3,8 @@
 # - Keywords/*.hs: Haskell Operator Tables
 # - tokens.js: Ruby Tokens Tables
 # - tokens.rb: JavaScript Tokens Tables
+# - operators-i18n.js: JavaScript Operators Translations
+# - locales/operators.yml: Ruby Operators Translations
 #
 # Notice: if there are more than one variants of the same token, put the preferred first
 Common:

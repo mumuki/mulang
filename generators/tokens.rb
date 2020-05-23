@@ -1,4 +1,5 @@
 require 'yaml'
+require 'cgi'
 
 ## ======
 ## Common
@@ -13,7 +14,7 @@ def generate_frontend_tokens_table(tokens, polyfills: false)
     .map do |key, values|
       tokens = generate_frontend_tokens_list(values, 'keyword') + generate_frontend_tokens_list(values, 'operator')
       "  #{key}: {\n#{
-        tokens.map { |k, v| "        #{k}: '#{v}'" }.join(",\n")
+        tokens.map { |k, v| "        #{k}: '#{CGI::escapeHTML(v)}'" }.join(",\n")
       }\n      }"
     end
     .join(",\n    ")
@@ -83,11 +84,11 @@ def generate_tokens_rb(tokens, polyfills)
   module Tokens
     TOKENS = {
     #{tokens}
-    }.transform_values { |v| v.transform_values { |v| CGI::escapeHTML(v) } }.freeze
+    }.freeze
 
     POLYFILLS = {
     #{polyfills}
-    }.transform_values { |v| v.transform_values { |v| CGI::escapeHTML(v) } }.freeze
+    }.freeze
 
     DEFAULT_TOKENS = TOKENS[:Common].merge(POLYFILLS[:Common]).freeze
   end
