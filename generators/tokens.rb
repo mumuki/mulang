@@ -29,6 +29,7 @@ end
 
 
 $tokens = YAML.load(File.read('./tokens.yml'))
+$operators = $tokens.flat_map { |_, values| values['operators'].map { |operator, _| operator } }.uniq.sort
 $frontend_tokens_table = generate_frontend_tokens_table($tokens)
 $frontend_polyfills_table = generate_frontend_tokens_table($tokens, polyfills: true)
 
@@ -73,6 +74,49 @@ end
 ## ===========================
 ## Haskell Keywords Generation
 ## ===========================
+
+## =============================
+## Ruby Oprators I18n Generation
+## =============================
+
+def operators_translations_yml(operators, use)
+%Q{
+  mulang:
+    inspection:
+#{operators.map do |it|
+"      Uses#{it}: '%{binding} %{must} #{use} <code>%{operator_#{it}}</code>'"
+end.join("\n")}}
+end
+
+File.write './gem/lib/locales/operators.yml', %Q{en:#{operators_translations_yml $operators, 'use'}
+es:#{operators_translations_yml $operators, 'usar'}
+pt:#{operators_translations_yml $operators, 'utilizar'}
+}
+
+## =============================
+## JavaScript Oprators I18n Generation
+## =============================
+
+def operators_translations_js(operators, use)
+%Q{{
+#{operators.map do |it|
+  "      Uses#{it}: (binding, must, target, tokens) => `${binding} ${must} #{use} <code>${tokens['operator_#{it}']}</code>`,"
+end.join("\n")}
+    }}
+end
+
+File.write './ghcjslib/src/operators-i18n.js', %Q{(() => {
+  const OPERATORS_LOCALES = {
+    en: #{operators_translations_js $operators, 'use'},
+    es: #{operators_translations_js $operators, 'usar'},
+    pt: #{operators_translations_js $operators, 'utilizar'}
+  }
+  for (let key in OPERATORS_LOCALES) {
+    Object.assign(ghcjsExports.I18n.LOCALES[key], OPERATORS_LOCALES[key]);
+  }
+})();
+}
+
 
 ## ============================
 ## Ruby Tokens Table Generation

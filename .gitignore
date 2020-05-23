@@ -12,6 +12,8 @@ docs/themes/cinder/**
 *.gem
 
 # Auto-generated tokens
-gem/lib/mulang/tokens.rb
-ghcjslib/src/tokens.js
 src/Language/Mulang/Operators/*.hs
+gem/lib/mulang/tokens.rb
+gem/lib/locales/operators.yml
+ghcjslib/src/tokens.js
+ghcjslib/src/operators-i18n.js
