@@ -4,16 +4,19 @@ module Language.Mulang.Interpreter.Internals (
   Value (..),
   Callback,
   ExecutionContext (..),
-  defaultContext,
-  debug,
   createReference,
+  debug,
+  debugType,
+  debugValue,
+  defaultContext,
   dereference,
   dereference',
-  updateRef,
-  updateGlobalObjects) where
+  updateGlobalObjects,
+  updateRef) where
 
 import           Language.Mulang.Ast (SubroutineBody)
 
+import           Data.List (intercalate)
 import           Data.Maybe (fromMaybe, fromJust)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
@@ -79,13 +82,19 @@ defaultReturnCallback = \_r -> error "Called return from outside a function"
 
 asString :: Value -> String
 asString (MuString v) = v
-asString other        = debug other
+asString other        = debugValue other
 
-debug :: Value -> String
-debug (MuString v)   = "(string) " ++ v
-debug (MuBool True)  = "(boolean) true"
-debug (MuBool False) = "(boolean) false"
-debug (MuNumber v)   = "(number) " ++ show v
+debugValue :: Value -> String
+debugValue (MuString v)   = debug ["Value", "String", v]
+debugValue (MuBool True)  = debug ["Value", "Boolean", "True"]
+debugValue (MuBool False) = debug ["Value", "Boolean", "False"]
+debugValue (MuNumber v)   = debug ["Value", "Number", show v]
+
+debugType :: String -> String
+debugType t = debug ["Type", t]
+
+debug :: [String] -> String
+debug strings = "{" ++ (intercalate "::" strings) ++ "}"
 
 -- ==================
 -- Reference Creation

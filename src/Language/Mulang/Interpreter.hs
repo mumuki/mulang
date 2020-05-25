@@ -78,19 +78,10 @@ evalExpr (M.Assert negated (M.Equality expected actual)) =
           | muEquals v1 v2 /= negated = return nullRef
           | otherwise                 = raiseString $ "Expected " ++ show v1 ++ " but got: " ++ show v2
 
-evalExpr (M.Application (M.Primitive O.GreatherOrEqualThan) expressions) = evalBinaryNumeric expressions (>=) createBool
-evalExpr (M.Application (M.Primitive O.Modulo) expressions) = evalBinaryNumeric expressions (mod') createNumber
-evalExpr (M.Application (M.Primitive O.GreatherThan) expressions) = evalBinaryNumeric expressions (>) createBool
-
-evalExpr (M.Application (M.Primitive O.Or) expressions) = evalBinaryBoolean expressions (||)
-evalExpr (M.Application (M.Primitive O.And) expressions) = evalBinaryBoolean expressions (&&)
-
 evalExpr (M.Application (M.Primitive O.Negation) expressions) =
   evalExpressionsWith expressions f
   where f [MuBool b] = createBool $ not b
         f params     = raiseTypeError "expected one boolean" params
-
-evalExpr (M.Application (M.Primitive O.Multiply) expressions) = evalBinaryNumeric expressions (*) createNumber
 
 evalExpr (M.Application (M.Primitive O.Equal) expressions) = do
   params <- mapM evalExpr expressions
@@ -100,10 +91,7 @@ evalExpr (M.Application (M.Primitive O.Equal) expressions) = do
 evalExpr (M.Application (M.Primitive O.NotEqual) expressions) = do
   evalExpr $ M.Application (M.Primitive O.Negation) [M.Application (M.Primitive O.Equal) expressions]
 
-evalExpr (M.Application (M.Primitive O.LessOrEqualThan) expressions) = evalBinaryNumeric expressions (<=) createBool
-evalExpr (M.Application (M.Primitive O.LessThan) expressions) = evalBinaryNumeric expressions (<) createBool
-evalExpr (M.Application (M.Primitive O.Plus) expressions) = evalBinaryNumeric expressions (+) createNumber
-evalExpr (M.Application (M.Primitive O.Minus) expressions) = evalBinaryNumeric expressions (-) createNumber
+evalExpr (M.Application (M.Primitive op) expressions) | Just op' <- reifyOperator op = evalOperator op' expressions
 
 evalExpr (M.MuList expressions) = do
   refs <- forM expressions evalExpr
@@ -182,22 +170,11 @@ evalExpr (M.Reference name) = findReferenceForName name
 evalExpr (M.None) = return nullRef
 evalExpr e = raiseString $ "Unkown expression: " ++ show e
 
--- TODO make this evaluation non strict on both parameters
-evalBinaryBoolean :: [M.Expression] -> (Bool -> Bool -> Bool) -> Executable Reference
-evalBinaryBoolean expressions op = evalExpressionsWith expressions f
-  where f [MuBool b1, MuBool b2] = createBool $ op b1 b2
-        f params                 = raiseTypeError "expected two booleans" params
-
-evalBinaryNumeric :: [M.Expression] -> (Double -> Double -> a) -> (a -> Executable Reference) -> Executable Reference
-evalBinaryNumeric expressions op pack = evalExpressionsWith expressions f
-  where f [MuNumber n1, MuNumber n2] = pack $ op n1 n2
-        f params                     = raiseTypeError "expected two numbers" params
-
 evalCondition :: M.Expression -> Executable Bool
 evalCondition cond = evalExpr cond >>= dereference >>= muBool
   where
     muBool (MuBool value) = return value
-    muBool v              = raiseTypeError "expected boolean" [v]
+    muBool v              = raiseTypeError ("expected " ++ debugType "Boolean") [v]
 
 evalParams :: [M.Pattern] -> [M.Expression] -> Executable Reference
 evalParams params arguments = do
@@ -217,7 +194,7 @@ raiseString s = do
   raiseInternal =<< (createReference $ MuString s)
 
 raiseTypeError :: String -> [Value] ->Executable a
-raiseTypeError message values = raiseString $ "Type error: " ++ message ++ " but got " ++ (intercalate ", " . map debug $ values)
+raiseTypeError message values = raiseString $ "Type error: " ++ message ++ " but got " ++ (intercalate ", " . map debugValue $ values)
 
 muValuesEqual r1 r2
   | r1 == r2 = createReference $ MuBool True
@@ -287,3 +264,42 @@ setLocalVariable name ref = do
 addAttrToObject :: String -> Reference -> Value -> Value
 addAttrToObject k r (MuObject map) = MuObject $ Map.insert k r map
 addAttrToObject k _r v = error $ "Tried adding " ++ k ++ " to a non object: " ++ show v
+
+-- TODO make this evaluation non strict on both parameters
+evalBinaryBoolean :: String -> (Bool -> Bool -> Bool) -> [M.Expression] -> Executable Reference
+evalBinaryBoolean name op expressions = evalExpressionsWith expressions f
+  where f [MuBool b1, MuBool b2]      = createBool $ op b1 b2
+        f params                      = raiseTypeError (name ++ " expected two " ++ debugType "Boolean") params
+
+evalBinaryNumeric :: String -> (Double -> Double -> a) -> (a -> Executable Reference) -> [M.Expression] -> Executable Reference
+evalBinaryNumeric name op pack expressions = evalExpressionsWith expressions f
+  where f [MuNumber n1, MuNumber n2]       = pack $ op n1 n2
+        f params                           = raiseTypeError (name ++ " expected two " ++ debugType "Number") params
+
+
+-- ==================
+-- Operators handling
+-- ==================
+
+data Operator
+  = NumericBinaryFunction String (Double -> Double -> Double)
+  | NumericBinaryPredicate String  (Double -> Double -> Bool)
+  | BinaryPredicate String (Bool -> Bool -> Bool)
+
+reifyOperator :: O.Operator -> Maybe Operator
+reifyOperator O.And                  = Just $ BinaryPredicate  "And" (&&)
+reifyOperator O.GreatherOrEqualThan  = Just $ NumericBinaryPredicate "GreatherOrEqualThan" (>=)
+reifyOperator O.GreatherThan         = Just $ NumericBinaryPredicate "GreatherThan" (>)
+reifyOperator O.LessOrEqualThan      = Just $ NumericBinaryPredicate "LessOrEqualThan" (<=)
+reifyOperator O.LessThan             = Just $ NumericBinaryPredicate "LessThan" (<)
+reifyOperator O.Minus                = Just $ NumericBinaryFunction "Minus" (-)
+reifyOperator O.Modulo               = Just $ NumericBinaryFunction  "Modulo" (mod')
+reifyOperator O.Multiply             = Just $ NumericBinaryFunction "Multiply" (*)
+reifyOperator O.Or                   = Just $ BinaryPredicate  "Or" (||)
+reifyOperator O.Plus                 = Just $ NumericBinaryFunction "Plus" (+)
+reifyOperator _                      = Nothing
+
+evalOperator :: Operator -> [M.Expression] -> Executable Reference
+evalOperator (NumericBinaryFunction name op)    = evalBinaryNumeric (debug ["Operator", name]) op createNumber
+evalOperator (NumericBinaryPredicate name op)   = evalBinaryNumeric (debug ["Operator", name]) op createBool
+evalOperator (BinaryPredicate name op)          = evalBinaryBoolean (debug ["Operator", name]) op
