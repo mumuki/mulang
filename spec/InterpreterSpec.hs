@@ -162,6 +162,13 @@ spec = do
       it "evals or" $ do
         (runpy "False or False") `shouldReturn` MuBool False
 
+      it "evals string concatenation" $ do
+        (runpy "'hello' + 'world'") `shouldReturn` MuString "helloworld"
+        (runpy "'hello ' + 'world'") `shouldReturn` MuString "hello world"
+
+      it "evals string length" $ do
+        (runpy "len('hello')") `shouldReturn` MuNumber 5
+        (runpy "len('')") `shouldReturn` MuNumber 0
 
       it "evals booleans within a function" $ do
         (runpy [text|
