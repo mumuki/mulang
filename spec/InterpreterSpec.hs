@@ -120,6 +120,22 @@ spec = do
 
       it "evals multiplication" $ do
         lastRef (runpy "2 * 3") `shouldReturn` MuNumber 6
+        lastRef (runpy "0 * 3") `shouldReturn` MuNumber 0
+        lastRef (runpy "0.5 * 6") `shouldReturn` MuNumber 3
+
+      it "evals multiplication with negative numbers" $ do
+        lastRef (runpy "-1 * 5") `shouldReturn` MuNumber (-5)
+        lastRef (runpy "(-1) * 5") `shouldReturn` MuNumber (-5)
+        lastRef (runpy "(-1) * (-8)") `shouldReturn` MuNumber 8
+
+      it "evals division" $ do
+        lastRef (runpy "4 / 2") `shouldReturn` MuNumber 2
+        lastRef (runpy "4 / 0.5") `shouldReturn` MuNumber 8
+
+      it "evals multiple multiplications" $ do
+        lastRef (runpy "2 * 3 * 10") `shouldReturn` MuNumber 60
+        lastRef (runpy "(2 * 3) * 10") `shouldReturn` MuNumber 60
+        lastRef (runpy "2 * (3 * 10)") `shouldReturn` MuNumber 60
 
       it "evals mod" $ do
         lastRef (runpy "7 % 4") `shouldReturn` MuNumber 3
@@ -164,6 +180,29 @@ spec = do
           def a():
             return 123
           a()|]) `shouldReturn` MuNumber 123
+
+      it "evals functions with arguments" $ do
+        lastRef (runpy [text|
+          def double(num):
+            return 2 * num
+
+          double(5)
+        |]) `shouldReturn` MuNumber 10
+
+
+      it "evals functions that call other functions" $ do
+          lastRef (runpy [text|
+            def double(num):
+              return 2 * num
+
+            def succ(num):
+              return num + 1
+
+            def double_succ(num):
+              return double(succ(num))
+
+            double_succ(5)
+          |]) `shouldReturn` MuNumber 12
 
       it "handles whiles" $ do
         lastRef (runpy [text|
