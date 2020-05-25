@@ -137,6 +137,22 @@ spec = do
         (runpy "(2 * 3) * 10") `shouldReturn` MuNumber 60
         (runpy "2 * (3 * 10)") `shouldReturn` MuNumber 60
 
+      it "evals abs" $ do
+        (runpy "abs(7)") `shouldReturn` MuNumber 7
+        (runpy "abs(-7)") `shouldReturn` MuNumber (-7)
+
+      it "evals max" $ do
+        (runpy "max(4, 7)") `shouldReturn` MuNumber 7
+        (runpy "max(10, 3)") `shouldReturn` MuNumber 10
+
+      it "evals min" $ do
+        (runpy "min(4, 7)") `shouldReturn` MuNumber 4
+        (runpy "min(10, 3)") `shouldReturn` MuNumber 3
+
+      it "evals round" $ do
+        (runpy "round(4.7)") `shouldReturn` MuNumber 5
+        (runpy "round(10.3)") `shouldReturn` MuNumber 10
+
       it "evals mod" $ do
         (runpy "7 % 4") `shouldReturn` MuNumber 3
 
@@ -145,6 +161,22 @@ spec = do
 
       it "evals or" $ do
         (runpy "False or False") `shouldReturn` MuBool False
+
+
+      it "evals booleans within a function" $ do
+        (runpy [text|
+          def is_between(x, y, z):
+            return x > y and x < z
+
+          is_between(16, 14, 20)
+        |]) `shouldReturn` MuBool True
+
+        (runpy [text|
+          def is_between(x, y, z):
+            return x > y and x < z
+
+          is_between(100, 14, 20)
+        |]) `shouldReturn` MuBool False
 
       it "evals comparison" $ do
         (runpy "7 > 4") `shouldReturn` MuBool True
@@ -158,6 +190,21 @@ spec = do
 
         it "is false when values are of different types" $ do
           (runpy "'123' == 123") `shouldReturn` MuBool False
+
+        it "works with non-ascii strings" $ do
+          (runpy [text|
+            def es_fin_de_semana(dia):
+              return dia == "sábado" or dia == "domingo"
+
+            es_fin_de_semana("sábado")
+          |]) `shouldReturn`  MuBool True
+
+          (runpy [text|
+            def es_fin_de_semana(dia):
+              return dia == "sábado" or dia == "domingo"
+
+            es_fin_de_semana("sabado")
+          |]) `shouldReturn`  MuBool False
 
       context "evals if" $ do
         it "condition is true then evals first branch" $ do
@@ -174,6 +221,17 @@ spec = do
           (runpy [text|
             if 6: 123
             else: 456|]) `shouldThrow` (errorCall "Exception thrown outside try: Type error: expected {Type::Boolean} but got {Value::Number::6.0}")
+
+        it "condition is a non literal expression inside a function" $ do
+          (runpy [text|
+            def loves_reading(num):
+              if num <= 20:
+                return False
+              else:
+                return True
+
+            loves_reading(40)
+          |]) `shouldReturn` MuBool True
 
       it "evals functions" $ do
         (runpy [text|
