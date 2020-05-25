@@ -276,6 +276,10 @@ evalBinaryNumeric name op pack expressions = evalExpressionsWith expressions f
   where f [MuNumber n1, MuNumber n2]       = pack $ op n1 n2
         f params                           = raiseTypeError (name ++ " expected two " ++ debugType "Number") params
 
+evalUnaryNumeric :: String -> (Double -> Double) -> [M.Expression] -> Executable Reference
+evalUnaryNumeric name op expressions = evalExpressionsWith expressions f
+  where f [MuNumber n] = createNumber $ op n
+        f params       = raiseTypeError (name ++ " expected one " ++ debugType "Number") params
 
 -- ==================
 -- Operators handling
@@ -284,22 +288,29 @@ evalBinaryNumeric name op pack expressions = evalExpressionsWith expressions f
 data Operator
   = NumericBinaryFunction String (Double -> Double -> Double)
   | NumericBinaryPredicate String  (Double -> Double -> Bool)
+  | NumericUnaryFuncion String  (Double -> Double)
   | BinaryPredicate String (Bool -> Bool -> Bool)
 
 reifyOperator :: O.Operator -> Maybe Operator
+reifyOperator O.Absolute             = Just $ NumericUnaryFuncion "Absolute" abs
 reifyOperator O.And                  = Just $ BinaryPredicate  "And" (&&)
 reifyOperator O.GreatherOrEqualThan  = Just $ NumericBinaryPredicate "GreatherOrEqualThan" (>=)
 reifyOperator O.GreatherThan         = Just $ NumericBinaryPredicate "GreatherThan" (>)
 reifyOperator O.LessOrEqualThan      = Just $ NumericBinaryPredicate "LessOrEqualThan" (<=)
 reifyOperator O.LessThan             = Just $ NumericBinaryPredicate "LessThan" (<)
+reifyOperator O.Max                  = Just $ NumericBinaryFunction "Max" max
+reifyOperator O.Min                  = Just $ NumericBinaryFunction "Min" min
 reifyOperator O.Minus                = Just $ NumericBinaryFunction "Minus" (-)
 reifyOperator O.Modulo               = Just $ NumericBinaryFunction  "Modulo" (mod')
 reifyOperator O.Multiply             = Just $ NumericBinaryFunction "Multiply" (*)
 reifyOperator O.Or                   = Just $ BinaryPredicate  "Or" (||)
 reifyOperator O.Plus                 = Just $ NumericBinaryFunction "Plus" (+)
+reifyOperator O.Divide               = Just $ NumericBinaryFunction "Divide" (/)
+reifyOperator O.Round                = Just $ NumericUnaryFuncion "Round" (fromInteger . round)
 reifyOperator _                      = Nothing
 
 evalOperator :: Operator -> [M.Expression] -> Executable Reference
 evalOperator (NumericBinaryFunction name op)    = evalBinaryNumeric (debug ["Operator", name]) op createNumber
 evalOperator (NumericBinaryPredicate name op)   = evalBinaryNumeric (debug ["Operator", name]) op createBool
 evalOperator (BinaryPredicate name op)          = evalBinaryBoolean (debug ["Operator", name]) op
+evalOperator (NumericUnaryFuncion name op)      = evalUnaryNumeric  (debug ["Operator", name]) op
