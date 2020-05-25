@@ -15,6 +15,7 @@ import qualified Language.Python.Version3.Parser as Python3
 import qualified Language.Python.Version2.Parser as Python2
 import           Language.Python.Common.Token (Token)
 import           Language.Python.Common.AST
+import           Language.Python.Common.SrcLocation (SrcSpan)
 
 import           Data.List (isPrefixOf)
 import           Data.List.Extra (dropLast)
@@ -180,9 +181,10 @@ muCallType (Dot receiver ident _)            x      = muCall (M.Send $ muExpr re
 muCallType (Var (Ident "print" _) _)         [x]    = M.Print x -- FIXME python print can have multiple arguments
 muCallType (Var ident _)                     x      = muCall M.Application ident x
 
-muCall callType ident = callType (M.Reference $ muIdent ident)
+muCall :: (M.Expression -> [M.Expression] -> M.Expression) -> Ident SrcSpan -> [M.Expression] -> M.Expression
+muCall callType ident = callType (muResolveIdent ident)
 
-
+muApplication :: Op a -> [Expr SrcSpan] -> M.Expression
 muApplication op args = M.Application (muOp op) (map muExpr args)
 
 muString = M.MuString . concat . map removeQuotes
@@ -215,35 +217,42 @@ muArgument e                            = M.debug e
 --muYieldArg (YieldFrom expr _)(Expr annot) annot -- ^ Yield from a generator (Version 3 only)
 muYieldArg (YieldExpr expr) = muExpr expr
 
-muOp (Equality _)           = M.Primitive O.Equal
-muOp (NotEquals _)          = M.Primitive O.NotEqual
-muOp op                     = muOpReference op
+muResolveIdent :: Ident SrcSpan -> M.Expression
+muResolveIdent (Ident "abs" _)   = M.Primitive O.Absolute
+muResolveIdent (Ident "max" _)   = M.Primitive O.Max
+muResolveIdent (Ident "min" _)   = M.Primitive O.Min
+muResolveIdent (Ident "len" _)   = M.Primitive O.Size
+muResolveIdent (Ident "round" _) = M.Primitive O.Round
+muResolveIdent ident             = M.Reference $ muIdent ident
 
-muOpReference (And _)                = M.Primitive O.And
-muOpReference (Or _)                 = M.Primitive O.Or
-muOpReference (Not _)                = M.Primitive O.Negation
-muOpReference (Exponent _)           = M.Reference "**"
-muOpReference (LessThan _)           = M.Primitive O.LessThan
-muOpReference (GreaterThan _)        = M.Primitive O.GreatherThan
-muOpReference (GreaterThanEquals _)  = M.Primitive O.GreatherOrEqualThan
-muOpReference (LessThanEquals _)     = M.Primitive O.LessOrEqualThan
-muOpReference (NotEqualsV2 _)        = M.Primitive O.NotEqual -- Version 2 only.
-muOpReference (In _)                 = M.Reference "in"
-muOpReference (Is _)                 = M.Reference "is"
-muOpReference (IsNot _)              = M.Reference "is not"
-muOpReference (NotIn _)              = M.Reference "not in"
-muOpReference (BinaryOr _)           = M.Primitive O.BitwiseOr
-muOpReference (Xor _)                = M.Primitive O.BitwiseXor
-muOpReference (BinaryAnd _)          = M.Primitive O.BitwiseAnd
-muOpReference (ShiftLeft _)          = M.Primitive O.BitwiseLeftShift
-muOpReference (ShiftRight _)         = M.Primitive O.BitwiseRightShift
-muOpReference (Multiply _)           = M.Primitive O.Multiply
-muOpReference (Plus _)               = M.Primitive O.Plus
-muOpReference (Minus _)              = M.Primitive O.Minus
-muOpReference (Divide _)             = M.Primitive O.Divide
-muOpReference (FloorDivide _)        = M.Reference "//"
-muOpReference (Invert _)             = M.Reference "~"
-muOpReference (Modulo _)             = M.Primitive O.Modulo
+muOp :: Op a -> M.Expression
+muOp (And _)                = M.Primitive O.And
+muOp (BinaryAnd _)          = M.Primitive O.BitwiseAnd
+muOp (BinaryOr _)           = M.Primitive O.BitwiseOr
+muOp (Divide _)             = M.Primitive O.Divide
+muOp (Equality _)           = M.Primitive O.Equal
+muOp (Exponent _)           = M.Reference "**"
+muOp (FloorDivide _)        = M.Reference "//"
+muOp (GreaterThan _)        = M.Primitive O.GreatherThan
+muOp (GreaterThanEquals _)  = M.Primitive O.GreatherOrEqualThan
+muOp (In _)                 = M.Reference "in"
+muOp (Invert _)             = M.Reference "~"
+muOp (Is _)                 = M.Reference "is"
+muOp (IsNot _)              = M.Reference "is not"
+muOp (LessThan _)           = M.Primitive O.LessThan
+muOp (LessThanEquals _)     = M.Primitive O.LessOrEqualThan
+muOp (Minus _)              = M.Primitive O.Minus
+muOp (Modulo _)             = M.Primitive O.Modulo
+muOp (Multiply _)           = M.Primitive O.Multiply
+muOp (Not _)                = M.Primitive O.Negation
+muOp (NotEquals _)          = M.Primitive O.NotEqual
+muOp (NotEqualsV2 _)        = M.Primitive O.NotEqual -- Version 2 only.
+muOp (NotIn _)              = M.Reference "not in"
+muOp (Or _)                 = M.Primitive O.Or
+muOp (Plus _)               = M.Primitive O.Plus
+muOp (ShiftLeft _)          = M.Primitive O.BitwiseLeftShift
+muOp (ShiftRight _)         = M.Primitive O.BitwiseRightShift
+muOp (Xor _)                = M.Primitive O.BitwiseXor
 
 muAssignOp (PlusAssign _)       = M.Primitive O.Plus
 muAssignOp (MinusAssign _)      = M.Primitive O.Minus
