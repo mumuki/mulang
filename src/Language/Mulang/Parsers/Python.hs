@@ -184,8 +184,11 @@ muCallType (Var ident _)                     x      = muCall M.Application ident
 muCall :: (M.Expression -> [M.Expression] -> M.Expression) -> Ident SrcSpan -> [M.Expression] -> M.Expression
 muCall callType ident = callType (muResolveIdent ident)
 
-muApplication :: Op a -> [Expr SrcSpan] -> M.Expression
-muApplication op args = M.Application (muOp op) (map muExpr args)
+muApplication :: Op SrcSpan -> [Expr SrcSpan] -> M.Expression
+muApplication op args | binary = M.Application (muBinaryOp op) argExprs
+                      | otherwise = M.Application (muUnaryOp op) argExprs
+  where argExprs = (map muExpr args)
+        binary = length argExprs == 2
 
 muString = M.MuString . concat . map removeQuotes
   where removeQuotes ('"':'"':'"':rest)    = dropLast 3 rest
@@ -225,34 +228,38 @@ muResolveIdent (Ident "len" _)   = M.Primitive O.Size
 muResolveIdent (Ident "round" _) = M.Primitive O.Round
 muResolveIdent ident             = M.Reference $ muIdent ident
 
-muOp :: Op a -> M.Expression
-muOp (And _)                = M.Primitive O.And
-muOp (BinaryAnd _)          = M.Primitive O.BitwiseAnd
-muOp (BinaryOr _)           = M.Primitive O.BitwiseOr
-muOp (Divide _)             = M.Primitive O.Divide
-muOp (Equality _)           = M.Primitive O.Equal
-muOp (Exponent _)           = M.Reference "**"
-muOp (FloorDivide _)        = M.Reference "//"
-muOp (GreaterThan _)        = M.Primitive O.GreatherThan
-muOp (GreaterThanEquals _)  = M.Primitive O.GreatherOrEqualThan
-muOp (In _)                 = M.Reference "in"
-muOp (Invert _)             = M.Reference "~"
-muOp (Is _)                 = M.Reference "is"
-muOp (IsNot _)              = M.Reference "is not"
-muOp (LessThan _)           = M.Primitive O.LessThan
-muOp (LessThanEquals _)     = M.Primitive O.LessOrEqualThan
-muOp (Minus _)              = M.Primitive O.Minus
-muOp (Modulo _)             = M.Primitive O.Modulo
-muOp (Multiply _)           = M.Primitive O.Multiply
-muOp (Not _)                = M.Primitive O.Negation
-muOp (NotEquals _)          = M.Primitive O.NotEqual
-muOp (NotEqualsV2 _)        = M.Primitive O.NotEqual -- Version 2 only.
-muOp (NotIn _)              = M.Reference "not in"
-muOp (Or _)                 = M.Primitive O.Or
-muOp (Plus _)               = M.Primitive O.Plus
-muOp (ShiftLeft _)          = M.Primitive O.BitwiseLeftShift
-muOp (ShiftRight _)         = M.Primitive O.BitwiseRightShift
-muOp (Xor _)                = M.Primitive O.BitwiseXor
+muUnaryOp :: Op SrcSpan -> M.Expression
+muUnaryOp (Not _) = M.Primitive O.Negation
+muUnaryOp op      = M.debug op
+
+muBinaryOp :: Op SrcSpan -> M.Expression
+muBinaryOp (And _)                = M.Primitive O.And
+muBinaryOp (BinaryAnd _)          = M.Primitive O.BitwiseAnd
+muBinaryOp (BinaryOr _)           = M.Primitive O.BitwiseOr
+muBinaryOp (Divide _)             = M.Primitive O.Divide
+muBinaryOp (Equality _)           = M.Primitive O.Equal
+muBinaryOp (Exponent _)           = M.Reference "**"
+muBinaryOp (FloorDivide _)        = M.Reference "//"
+muBinaryOp (GreaterThan _)        = M.Primitive O.GreatherThan
+muBinaryOp (GreaterThanEquals _)  = M.Primitive O.GreatherOrEqualThan
+muBinaryOp (In _)                 = M.Reference "in"
+muBinaryOp (Invert _)             = M.Reference "~"
+muBinaryOp (Is _)                 = M.Reference "is"
+muBinaryOp (IsNot _)              = M.Reference "is not"
+muBinaryOp (LessThan _)           = M.Primitive O.LessThan
+muBinaryOp (LessThanEquals _)     = M.Primitive O.LessOrEqualThan
+muBinaryOp (Minus _)              = M.Primitive O.Minus
+muBinaryOp (Modulo _)             = M.Primitive O.Modulo
+muBinaryOp (Multiply _)           = M.Primitive O.Multiply
+muBinaryOp (NotEquals _)          = M.Primitive O.NotEqual
+muBinaryOp (NotEqualsV2 _)        = M.Primitive O.NotEqual -- Version 2 only.
+muBinaryOp (NotIn _)              = M.Reference "not in"
+muBinaryOp (Or _)                 = M.Primitive O.Or
+muBinaryOp (Plus _)               = M.Primitive O.Plus
+muBinaryOp (ShiftLeft _)          = M.Primitive O.BitwiseLeftShift
+muBinaryOp (ShiftRight _)         = M.Primitive O.BitwiseRightShift
+muBinaryOp (Xor _)                = M.Primitive O.BitwiseXor
+muBinaryOp op                     = M.debug op
 
 muAssignOp (PlusAssign _)       = M.Primitive O.Plus
 muAssignOp (MinusAssign _)      = M.Primitive O.Minus
