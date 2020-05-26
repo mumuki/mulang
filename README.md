@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/mumuki/mulang.svg?branch=master)](https://travis-ci.org/mumuki/mulang)
 
-# Mulang
+# :bamboo: Mulang
 
 > A universal, multi-language, multi-paradigm code analyzer
 
