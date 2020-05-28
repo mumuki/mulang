@@ -183,3 +183,4 @@ The complete list of supported matchers is the following:
  * Julian Berbel Alt @julian-berbel @ [Mumuki](@mumuki)
  * Federico Lochbaum @FedeLochbaum @ [UNQ](http://www.unq.edu.ar/)
  * Lucas Traverso @ludat @ [10Pines](@10pines)
+ * Federico Scarpa @fedescarpa @ [Mumuki](@mumuki)
