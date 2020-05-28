@@ -1,0 +1,177 @@
+# with this file the following files will be generated:
+# - Operators/*.hs: Haskell Operator Tables
+# - tokens.js: Ruby Tokens Tables
+# - tokens.rb: JavaScript Tokens Tables
+# - operators-i18n.js: JavaScript Operators Translations
+# - locales/operators.yml: Ruby Operators Translations
+#
+# Notice: if there are more than one variants of the same token, put the preferred first
+Common:
+  keywords: &common_keywords
+    'False': 'false'
+    'Null': 'null'
+    'True': 'true'
+    For: 'for'
+    If: 'if'
+    Return: 'return'
+    While: 'while'
+  operators: &common_operators
+    And: '&&'
+    Divide: '/'
+    Equal: '=='
+    GreatherOrEqualThan: '>='
+    GreatherThan: '>'
+    LessOrEqualThan: '<='
+    LessThan: '<'
+    Minus: '-'
+    Multiply: '*'
+    Negation: '!'
+    NotEqual: '!='
+    Or: '||'
+    Plus: '+'
+    Modulo: '%'
+    BitwiseOr: '|'
+    BitwiseAnd: '&'
+    BitwiseXor: '^'
+    BitwiseLeftShift: '<<'
+    BitwiseRightShift: '>>'
+  polyfills: # not common, but kept for backward compatibilty
+    keywords:
+      EntryPoint: 'program'
+      ForEach: 'foreach'
+      Repeat: 'repeat'
+      Switch: 'switch'
+      Yield: 'yield'
+    operators:
+      Hash: 'hash'
+      BackwardComposition: '.'
+      ForwardComposition:  '>>'
+C:
+  keywords:
+    <<: *common_keywords
+    'False': 'FALSE'
+    'Null': 'NULL'
+    'True': 'TRUE'
+    Switch: 'switch'
+    While: 'while'
+  operators:
+    And: '&&'
+    Divide: '/'
+    Equal: '=='
+    GreatherOrEqualThan: '>='
+    GreatherThan: '>'
+    LessOrEqualThan: '<='
+    LessThan: '<'
+    Minus: '-'
+    Multiply: '*'
+    Negation: '!'
+    NotEqual: '!='
+    Or: '||'
+    Plus: '+'
+    Modulo: '%'
+    BitwiseOr: '|'
+    BitwiseAnd: '&'
+    BitwiseXor: '^'
+    BitwiseLeftShift: '<<'
+    BitwiseRightShift: '>>'
+Haskell:
+  keywords:
+    'False': 'False'
+    'True': 'True'
+    If: 'if'
+    TypeAlias: 'type'
+  operators:
+    And: '&&'
+    Divide:
+      - '/'
+      - 'div'
+    Equal: '=='
+    GreatherOrEqualThan: '>='
+    GreatherThan: '>'
+    LessOrEqualThan: '<='
+    LessThan: '<'
+    Minus: '-'
+    Multiply: '*'
+    Negation: 'not'
+    NotEqual: '/='
+    Or: '||'
+    Plus: '+'
+    Modulo: 'mod'
+    Otherwise: 'otherwise'
+    BackwardComposition: '.'
+Java:
+  keywords:
+    <<: *common_keywords
+    Class: 'class'
+    ForEach: 'for'
+    Interface: 'interface'
+    Switch: 'switch'
+  operators:
+    <<: *common_operators
+    Hash: 'hashCode'
+JavaScript:
+  keywords:
+    <<: *common_keywords
+  operators:
+    <<: *common_operators
+    Equal:
+      - "==="
+      - "=="
+    NotEqual:
+      - "!=="
+      - "!="
+Python:
+  keywords:
+    <<: *common_keywords
+    'False': 'False'
+    'Null': 'None'
+    'True': 'True'
+  operators:
+    <<: *common_operators
+    NotEqual:
+      - "!="
+      - "<>"
+    Negation: "not"
+    And: "and"
+    Or: "or"
+    Hash: "hash"
+Ruby:
+  keywords:
+    <<: *common_keywords
+    Class: 'class'
+    ForEach: 'for'
+    Include: 'include'
+    Switch: 'case'
+  operators:
+    <<: *common_operators
+    And:
+      - "&&"
+      - "and"
+    Or:
+      - "||"
+      - "or"
+    Hash: "hash"
+    ForwardComposition: ">>"
+    BackwardComposition: "<<"
+Php:
+  keywords:
+    <<: *common_keywords
+  operators:
+    <<: *common_operators
+Prolog:
+  keywords:
+    Fail: 'fail'
+    Findall: 'findall'
+    Forall: 'forall'
+    Not: 'not'
+    Is: 'is'
+  operators:
+    Divide: '/'
+    GreatherOrEqualThan: '>='
+    GreatherThan: '>'
+    LessOrEqualThan: '=<'
+    LessThan: '<'
+    Minus: '-'
+    Multiply: '*'
+    NotEqual: '/='
+    Plus: '+'

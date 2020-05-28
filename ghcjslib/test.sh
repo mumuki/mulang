@@ -1,15 +1,18 @@
 #!/bin/bash
 set -e
 
+echo '[Mulang:Ghcjslib] Building...'
+./ghcjslib/build.sh
+
 pushd ghcjslib
 
-echo 'Installing npm dependencies...'
+echo '[Mulang:Ghcjslib] Installing npm dependencies...'
 npm install
 
-echo 'Running mocha tests...'
+echo '[Mulang:Ghcjslib] Running mocha tests...'
 npm test
 
-echo 'Generating hspec tests...'
+echo '[Mulang:Ghcjslib] Generating hspec tests...'
 node -e '
 let fs = require("fs");
 let specs = fs.readdirSync("../spec")
@@ -36,10 +39,10 @@ ${descriptions}
 `);'
 
 popd
-echo 'Running hspec tests...'
+echo '[Mulang:Ghcjslib] Running hspec tests...'
 stack test
 
-echo 'Cleaning hspec tests...'
+echo '[Mulang:Ghcjslib] Cleaning hspec tests...'
 cat > spec/Spec.hs <<EOF
 module Main where
 
@@ -52,5 +55,5 @@ spec :: Spec
 spec = error "Don't run ghcjslib specs directly. Use ./ghcjslib/test.sh instead"
 EOF
 
-echo 'Done'
+echo '[Mulang:Ghcjslib] Done'
 

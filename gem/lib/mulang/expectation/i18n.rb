@@ -1,47 +1,5 @@
 module Mulang::Expectation::I18n
   class << self
-    DEFAULT_TOKENS = {
-      keyword_EntryPoint: 'program',
-      keyword_Fail: 'fail',
-      keyword_False: 'false',
-      keyword_findall: 'findall',
-      keyword_For: 'for',
-      keyword_Forall: 'forall',
-      keyword_Foreach: 'foreach',
-      keyword_If: 'if',
-      keyword_Is: 'is',
-      keyword_Not: 'not',
-      keyword_Null: 'null',
-      keyword_Repeat: 'repeat',
-      keyword_Switch: 'switch',
-      keyword_True: 'true',
-      keyword_While: 'while',
-      keyword_Yield: 'yield',
-      operator_And: '&&',
-      operator_BackwardComposition: '.',
-      operator_Divide: '/',
-      operator_Equal: '==',
-      operator_ForwardComposition: '>>',
-      operator_GreatherOrEqualThan: '>=',
-      operator_GreatherThan: '>',
-      operator_Hash: 'hash',
-      operator_LessOrEqualThan: '<=',
-      operator_LessThan: '<',
-      operator_Minus: '-',
-      operator_Multiply: '*',
-      operator_Negation: '!',
-      operator_NotEqual: '!=',
-      operator_Or: '||',
-      operator_Otherwise: 'otherwise',
-      operator_Plus: '+',
-      operator_Modulo: '%',
-      operator_BitwiseOr: '|',
-      operator_BitwiseAnd: '&',
-      operator_BitwiseXor: '^',
-      operator_BitwiseLeftShift: '<<',
-      operator_BitwiseRightShift: '>>'
-    }.transform_values { |v| CGI::escapeHTML(v) }.freeze
-
     def translate(e, tokens = nil)
       translate!(e, tokens)
     rescue
@@ -87,7 +45,15 @@ module Mulang::Expectation::I18n
     end
 
     def with_tokens(tokens, params)
-      params.merge(DEFAULT_TOKENS).merge(tokens || {})
+      hash = if tokens.nil?
+        {}
+      elsif tokens.is_a?(Hash)
+        tokens
+      else
+        params.merge(Mulang::Tokens::TOKENS.indifferent_get(tokens))
+      end
+
+      params.merge(Mulang::Tokens::DEFAULT_TOKENS.merge(hash))
     end
   end
 end

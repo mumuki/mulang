@@ -10,3 +10,10 @@ docs/js/mumuki-styles.js
 docs/themes/cinder/**
 .deploy/**
 *.gem
+
+# Auto-generated tokens
+src/Language/Mulang/Operators/*.hs
+gem/lib/mulang/tokens.rb
+gem/lib/locales/operators.yml
+ghcjslib/src/tokens.js
+ghcjslib/src/operators-i18n.js

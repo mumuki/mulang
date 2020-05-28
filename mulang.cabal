@@ -63,9 +63,12 @@ library
     Language.Mulang.Inspector.Typed
     Language.Mulang.Operators
     Language.Mulang.Operators.C
+    Language.Mulang.Operators.Common
     Language.Mulang.Operators.Haskell
     Language.Mulang.Operators.Java
     Language.Mulang.Operators.JavaScript
+    Language.Mulang.Operators.Php
+    Language.Mulang.Operators.Prolog
     Language.Mulang.Operators.Python
     Language.Mulang.Operators.Ruby
     Language.Mulang.Parsers

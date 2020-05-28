@@ -269,7 +269,7 @@ spec = do
       usesMath (hs "f x y = x + y")    `shouldBe` True
       usesMath (hs "f x y = x * y")    `shouldBe` True
       usesMath (hs "f x y = x / x")    `shouldBe` True
-      usesMath (hs "f x y = div x z")  `shouldBe` False -- TODO support mod/div operators in the future
+      usesMath (hs "f x y = div x z")  `shouldBe` True
       usesMath (hs "f x y = x - y")    `shouldBe` True
 
     it "is when it is used in composite literals" $ do

@@ -27,14 +27,14 @@ sed -i -r "s/MULANG_VERSION = \"${VERSION_REGEXP}/MULANG_VERSION = \"${NEW_VERSI
 sed -i -r "s/MULANG_VERSION=${VERSION_REGEXP}/MULANG_VERSION=${NEW_VERSION}/"             docs/devinit
 
 echo "[Mulang] Running tests..."
-stack test
+./test.sh
 
 echo "[Mulang] Running ghcjslib tests..."
 ./ghcjslib/swap.sh
 ./ghcjslib/test.sh
 
-echo "[Mulang] Deploying to NPM..."
-./ghcjslib/deploy.sh
+echo "[Mulang] Releasing to NPM..."
+./ghcjslib/release.sh
 ./ghcjslib/swap.sh
 
 echo "[Mulang] Commiting files..."

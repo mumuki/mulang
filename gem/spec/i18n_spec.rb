@@ -36,29 +36,35 @@ describe Mulang::Expectation::I18n do
     it { expect(expectation('Foo', 'HasDeclarationTypos:foo').translate).to eq('Solution must declare <code>foo</code>, but declares <code>Foo</code>. Perhaps you meant <code>foo</code>?') }
     it { expect(expectation('Foo', 'HasUsageTypos:foo').translate).to eq('Solution must use <code>foo</code>, but it uses <code>Foo</code>. Perhaps you meant <code>foo</code>?') }
 
-    it { expect(expectation('*', 'UsesEqual').translate).to eq('solution must use <code>==</code>') }
-    it { expect(expectation('*', 'UsesNotEqual').translate).to eq('solution must use <code>!=</code>') }
-    it { expect(expectation('*', 'UsesNegation').translate).to eq('solution must use <code>!</code>') }
-    it { expect(expectation('*', 'UsesAnd').translate).to eq('solution must use <code>&amp;&amp;</code>') }
-    it { expect(expectation('*', 'UsesOr').translate).to eq('solution must use <code>||</code>') }
-    it { expect(expectation('*', 'UsesHash').translate).to eq('solution must use <code>hash</code>') }
-    it { expect(expectation('*', 'UsesGreatherOrEqualThan').translate).to eq('solution must use <code>&gt;=</code>') }
-    it { expect(expectation('*', 'UsesGreatherThan').translate).to eq('solution must use <code>&gt;</code>') }
-    it { expect(expectation('*', 'UsesLessOrEqualThan').translate).to eq('solution must use <code>&lt;=</code>') }
-    it { expect(expectation('*', 'UsesLessThan').translate).to eq('solution must use <code>&lt;</code>') }
-    it { expect(expectation('*', 'UsesOtherwise').translate).to eq('solution must use <code>otherwise</code>') }
-    it { expect(expectation('*', 'UsesPlus').translate).to eq('solution must use <code>+</code>') }
-    it { expect(expectation('*', 'UsesMinus').translate).to eq('solution must use <code>-</code>') }
-    it { expect(expectation('*', 'UsesMultiply').translate).to eq('solution must use <code>*</code>') }
-    it { expect(expectation('*', 'UsesDivide').translate).to eq('solution must use <code>/</code>') }
-    it { expect(expectation('*', 'UsesForwardComposition').translate).to eq('solution must use <code>&gt;&gt;</code>') }
-    it { expect(expectation('*', 'UsesBackwardComposition').translate).to eq('solution must use <code>.</code>') }
-    it { expect(expectation('*', 'UsesModulo').translate).to eq('solution must use <code>%</code>') }
-    it { expect(expectation('*', 'UsesBitwiseOr').translate).to eq('solution must use <code>|</code>') }
-    it { expect(expectation('*', 'UsesBitwiseAnd').translate).to eq('solution must use <code>&amp;</code>') }
-    it { expect(expectation('*', 'UsesBitwiseXor').translate).to eq('solution must use <code>^</code>') }
-    it { expect(expectation('*', 'UsesBitwiseLeftShift').translate).to eq('solution must use <code>&lt;&lt;</code>') }
-    it { expect(expectation('*', 'UsesBitwiseRightShift').translate).to eq('solution must use <code>&gt;&gt;</code>') }
+    describe 'operators' do
+      it { expect(expectation('*', 'UsesNegation').translate :Python).to eq('solution must use <code>not</code>') }
+      it { expect(expectation('*', 'UsesNegation').translate :Haskell).to eq('solution must use <code>not</code>') }
+      it { expect(expectation('*', 'UsesNegation').translate :Ruby).to eq('solution must use <code>!</code>') }
+
+      it { expect(expectation('*', 'UsesEqual').translate).to eq('solution must use <code>==</code>') }
+      it { expect(expectation('*', 'UsesNotEqual').translate).to eq('solution must use <code>!=</code>') }
+      it { expect(expectation('*', 'UsesNegation').translate).to eq('solution must use <code>!</code>') }
+      it { expect(expectation('*', 'UsesAnd').translate).to eq('solution must use <code>&amp;&amp;</code>') }
+      it { expect(expectation('*', 'UsesOr').translate).to eq('solution must use <code>||</code>') }
+      it { expect(expectation('*', 'UsesHash').translate).to eq('solution must use <code>hash</code>') }
+      it { expect(expectation('*', 'UsesGreatherOrEqualThan').translate).to eq('solution must use <code>&gt;=</code>') }
+      it { expect(expectation('*', 'UsesGreatherThan').translate).to eq('solution must use <code>&gt;</code>') }
+      it { expect(expectation('*', 'UsesLessOrEqualThan').translate).to eq('solution must use <code>&lt;=</code>') }
+      it { expect(expectation('*', 'UsesLessThan').translate).to eq('solution must use <code>&lt;</code>') }
+      it { expect(expectation('*', 'UsesOtherwise').translate :Haskell).to eq('solution must use <code>otherwise</code>') }
+      it { expect(expectation('*', 'UsesPlus').translate).to eq('solution must use <code>+</code>') }
+      it { expect(expectation('*', 'UsesMinus').translate).to eq('solution must use <code>-</code>') }
+      it { expect(expectation('*', 'UsesMultiply').translate).to eq('solution must use <code>*</code>') }
+      it { expect(expectation('*', 'UsesDivide').translate).to eq('solution must use <code>/</code>') }
+      it { expect(expectation('*', 'UsesForwardComposition').translate).to eq('solution must use <code>&gt;&gt;</code>') }
+      it { expect(expectation('*', 'UsesBackwardComposition').translate).to eq('solution must use <code>.</code>') }
+      it { expect(expectation('*', 'UsesModulo').translate).to eq('solution must use <code>%</code>') }
+      it { expect(expectation('*', 'UsesBitwiseOr').translate).to eq('solution must use <code>|</code>') }
+      it { expect(expectation('*', 'UsesBitwiseAnd').translate).to eq('solution must use <code>&amp;</code>') }
+      it { expect(expectation('*', 'UsesBitwiseXor').translate).to eq('solution must use <code>^</code>') }
+      it { expect(expectation('*', 'UsesBitwiseLeftShift').translate).to eq('solution must use <code>&lt;&lt;</code>') }
+      it { expect(expectation('*', 'UsesBitwiseRightShift').translate).to eq('solution must use <code>&gt;&gt;</code>') }
+    end
   end
 
   context 'pt locale' do
@@ -86,11 +92,11 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'HasTypeDeclaration').translate).to eq('la solución debe declarar un sinónimo de tipo <code>foo</code>') }
       it { expect(expectation('foo', 'HasTypeSignature').translate).to eq('la solución debe declarar una firma <code>foo</code>') }
       it { expect(expectation('foo', 'HasRepeat').translate).to eq('<code>foo</code> debe usar <code>repeat</code>') }
-      it { expect(expectation('foo', 'HasNot').translate).to eq('<code>foo</code> debe utilizar <code>not</code>') }
+      it { expect(expectation('foo', 'HasNot').translate :Prolog).to eq('<code>foo</code> debe utilizar <code>not</code>') }
       it { expect(expectation('foo', 'HasLambda').translate).to eq('<code>foo</code> debe emplear expresiones lambda') }
       it { expect(expectation('foo', 'HasIf').translate).to eq('<code>foo</code> debe usar <code>if</code>') }
-      it { expect(expectation('foo', 'HasForall').translate).to eq('<code>foo</code> debe utilizar <code>forall</code>') }
-      it { expect(expectation('foo', 'HasFindall').translate).to eq('<code>foo</code> debe utilizar <code>findall</code>') }
+      it { expect(expectation('foo', 'HasForall').translate :Prolog).to eq('<code>foo</code> debe utilizar <code>forall</code>') }
+      it { expect(expectation('foo', 'HasFindall').translate :Prolog).to eq('<code>foo</code> debe utilizar <code>findall</code>') }
       it { expect(expectation('foo', 'HasComprehension').translate).to eq('<code>foo</code> debe emplear listas por comprensión') }
       it { expect(expectation('foo', 'HasDirectRecursion').translate).to eq('<code>foo</code> debe estar declarado recursivamente') }
       it { expect(expectation('foo', 'HasComposition').translate).to eq('<code>foo</code> debe usar composición') }
@@ -128,7 +134,7 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'Uses:baz').translate).to eq('<code>foo</code> debe utilizar <code>baz</code>') }
       it { expect(expectation('foo', 'Uses').translate).to eq('<code>foo</code> debe delegar') }
       it { expect(expectation('foo', 'Delegates').translate).to eq('<code>foo</code> debe delegar') }
-      it { expect(expectation('foo', 'UsesForall').translate).to eq('<code>foo</code> debe utilizar <code>forall</code>') }
+      it { expect(expectation('foo', 'UsesForall').translate :Prolog).to eq('<code>foo</code> debe utilizar <code>forall</code>') }
 
       it { expect(expectation('foo', 'Not:Uses:=baz').translate).to eq('<code>foo</code> no debe utilizar <code>baz</code>') }
       it { expect(expectation('foo', 'Not:Uses:~baz').translate).to eq('<code>foo</code> no debe delegar en algo parecido a <code>baz</code>') }
@@ -171,7 +177,7 @@ describe Mulang::Expectation::I18n do
     describe 'smells' do
       it { expect(expectation('foo', 'HasRedundantIf').translate).to eq('<code>foo</code> tiene ifs innecesarios') }
       it { expect(expectation('foo', 'HasRedundantBooleanComparison').translate).to eq('<code>foo</code> hace comparaciones booleanas innecesarias') }
-      it { expect(expectation('bar', 'UsesFail').translate).to eq('<code>bar</code> usa <code>fail</li>, lo cual es una mala práctica') }
+      it { expect(expectation('bar', 'UsesFail').translate :Prolog).to eq('<code>bar</code> usa <code>fail</li>, lo cual es una mala práctica') }
       it { expect(expectation('foo', 'HasEmptyIfBranches').translate).to eq('<code>foo</code> tiene ramas de <code>if</code> vacías') }
       it { expect(expectation('foo', 'HasEmptyRepeat').translate).to eq('<code>foo</code> tiene un <code>repeat</code> vacío') }
       it { expect(expectation('foo', 'ShouldInvertIfCondition').translate).to eq('<code>foo</code> debería invertir la condición del <code>if</code> e intercambiar las ramas') }
