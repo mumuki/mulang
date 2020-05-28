@@ -1,4 +1,4 @@
-# Mulang
+# 🎍 Mulang
 
 > A universal, multi-language, multi-paradigm code analyzer
 
