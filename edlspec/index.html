@@ -476,6 +476,9 @@ expectation &quot;must declare three subclasses of `Tax` and two subclasses of `
 
 expectation &quot;must declare no more than 4 methods in class `Queue`&quot;:
   within `Queue` count(declares method) &lt;= 4;
+
+expectation &quot;`max` must have 2 returns&quot;:
+  within `max` count(returns) = 2;
 </code></pre>
 
 <p>Finally, counters may be added, using the <code>+</code> opertor:</p>
@@ -487,6 +490,7 @@ expectation &quot;must declare no more than 4 methods in class `Queue`&quot;:
 <h3 id="supported-counters">Supported counters</h3>
 <p>Not all inspections can be counted. Currently, only the following are supported:</p>
 <ul>
+<li><code>calls</code></li>
 <li><code>declares attribute</code></li>
 <li><code>declares class</code></li>
 <li><code>declares function</code></li>
@@ -495,12 +499,18 @@ expectation &quot;must declare no more than 4 methods in class `Queue`&quot;:
 <li><code>declares object</code></li>
 <li><code>declares procedure</code></li>
 <li><code>declares variable</code></li>
+<li><code>returns</code></li>
+<li><code>uses for each</code></li>
 <li><code>uses for loop</code></li>
 <li><code>uses for</code></li>
 <li><code>uses if</code></li>
+<li><code>uses lambda</code></li>
+<li><code>uses print</code></li>
 <li><code>uses repeat</code></li>
+<li><code>uses switch</code></li>
+<li><code>uses try</code></li>
 <li><code>uses while</code></li>
-<li><code>calls</code></li>
+<li><code>uses yield</code></li>
 </ul>
 <h2 id="boolean-operators-on-scoped-queries">Boolean operators on scoped queries</h2>
 <p>Finally, EDL allows to use logical operations with scoped queries:</p>
@@ -532,7 +542,7 @@ expectation &quot;`Pet` must declare `eat` and `Owner` must send it&quot;:
         
         <hr>
         <p>
-        <small>© Copyright 2015-2019 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a><br></small>
+        <small>© Copyright 2015 - 2020 Franco Leonardo Bulgarelli<br></small>
         
         <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
 
