@@ -20,7 +20,7 @@ extra_javascript:
   - "js/jquery.json-viewer.js"
   - "js/jsoneditor.min.js"
 repo_url: "https://github.com/mumuki/mulang"
-copyright: '© Copyright 2015-2019 <a href="http://mumuki.org/" class="mu-org-link">Mumuki Project</a>'
+copyright: '© Copyright 2015 - 2020 Franco Leonardo Bulgarelli'
 theme:
   name: null
   custom_dir: 'docs/themes/cinder'
