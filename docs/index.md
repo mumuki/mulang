@@ -18,7 +18,7 @@ Mulang can work with many different programming languages. it natively supports:
   * Haskell
   * Java
   * JavaScript (ES6)
-  * Python (3 and 4)
+  * Python (2 and 3)
   * Prolog
 
 In addition, through external tools, it offers support for the following languages:
