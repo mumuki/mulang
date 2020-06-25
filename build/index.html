@@ -155,19 +155,14 @@
                 
             <li class="second-level"><a href="#watching-changes">Watching changes</a></li>
                 
-            <li class="second-level"><a href="#loading-mulang-in-the-repl">Loading mulang in the REPL</a></li>
+            <li class="second-level"><a href="#ruby-wrapper">Ruby wrapper</a></li>
                 
-        <li class="first-level "><a href="#ruby-wrapper">Ruby wrapper</a></li>
-            <li class="second-level"><a href="#building">Building</a></li>
+                <li class="third-level"><a href="#building">Building</a></li>
+                <li class="third-level"><a href="#loading">Loading</a></li>
+            <li class="second-level"><a href="#javascript-library">JavaScript library</a></li>
                 
-            <li class="second-level"><a href="#loading">Loading</a></li>
-                
-        <li class="first-level "><a href="#javascript-library">JavaScript library</a></li>
-            <li class="second-level"><a href="#building_1">Building</a></li>
-                
-            <li class="second-level"><a href="#loading_1">Loading</a></li>
-                
-        <li class="first-level "><a href="#releasing">Releasing</a></li>
+                <li class="third-level"><a href="#building_1">Building</a></li>
+                <li class="third-level"><a href="#loading_1">Loading</a></li>
         <li class="first-level "><a href="#updating-docs">Updating docs</a></li>
     </ul>
 </div></div>
@@ -179,46 +174,48 @@
 <ol>
 <li>Install stack: <code>wget -qO- https://get.haskellstack.org/ | sh</code></li>
 <li>Go to the mulang project directory and setup it: <code>stack setup</code></li>
-<li>Build the project: <code>stack build</code></li>
+<li>Build the project: <code>./build.sh</code></li>
 </ol>
 <h2 id="installing-and-creating-an-executable">Installing and creating an executable</h2>
-<pre><code class="bash">$ stack install
+<pre><code class="bash"># This will generate a `mulang` executable in the folder `~/.local/bin`.
+$ stack install
+# Run mulang
 $ mulang
 </code></pre>
 
-<p>That will generate a <code>mulang</code> executable in the folder <code>~/.local/bin</code>.</p>
 <h2 id="running-tests">Running tests</h2>
-<pre><code class="bash">$ stack test --fast
+<pre><code class="bash"># This will build the project and run rspec and hspec tests
+$ ./test.sh
 </code></pre>
 
 <h2 id="watching-changes">Watching changes</h2>
-<pre><code class="bash">$ stack test --fast --file-watch
+<pre><code class="bash"># This will build the project and run rspec and hspec tests, and wait for changes in hspec tests
+$ ./test.sh --file-watch
 </code></pre>
 
-<h2 id="loading-mulang-in-the-repl">Loading mulang in the REPL</h2>
-<pre><code class="bash">stack ghci
-</code></pre>
-
-<h1 id="ruby-wrapper">Ruby wrapper</h1>
+<h2 id="ruby-wrapper">Ruby wrapper</h2>
 <blockquote>
 <p>See <a href="https://github.com/mumuki/mulang/blob/master/gem/README.md"><code>gem/README</code></a> for more details.</p>
 </blockquote>
-<p>This module can also be deployed a ruby gem. <code>mulang</code> works with Ruby 2.3+</p>
-<h2 id="building">Building</h2>
+<h3 id="building">Building</h3>
+<blockquote>
+<p>:warning: You will need Ruby 2.3+.</p>
+</blockquote>
 <pre><code class="bash">cd gem
-rake wrapper:wrap
+# install ruby
 bundle install
-bundle exec rspec
+# wrap gem and run rspec tests
+rake
 </code></pre>
 
-<h2 id="loading">Loading</h2>
+<h3 id="loading">Loading</h3>
 <p>Run <code>bin/console</code> in the <code>gem</code> directory.</p>
-<h1 id="javascript-library">JavaScript library</h1>
+<h2 id="javascript-library">JavaScript library</h2>
 <blockquote>
 <p>See <a href="https://github.com/mumuki/mulang/blob/master/ghcjslib/README.md"><code>ghcjslib/README</code></a> and <a href="https://www.npmjs.com/package/mulang">https://www.npmjs.com/package/mulang</a> for more details.</p>
 </blockquote>
 <p><code>mulang</code> can also be compiled to JavaScript library using <a href="https://github.com/ghcjs/ghcjs">ghcjs</a> and <a href="https://github.com/flbulgarelli/ghcjslib">ghcjslib</a>, which allows you to use it from <code>node</code> or the browser.</p>
-<h2 id="building_1">Building</h2>
+<h3 id="building_1">Building</h3>
 <blockquote>
 <p>:warning: you will need <code>node &gt;= 7</code> installed on your system. If you have <code>nvm</code>, before starting run the following:</p>
 <p><code>sh
@@ -234,15 +231,11 @@ ghcjslib/test.sh
 ghcjslib/swap.sh
 </code></pre>
 
-<h2 id="loading_1">Loading</h2>
+<h3 id="loading_1">Loading</h3>
 <ol>
 <li>in the browser: <code>google-chrome ghcjslib/index.html</code></li>
 <li>in <code>node</code>: run <code>node</code>, and then, within the interpreter, run: <code>let mulang = require('./ghcjslib/build/mulang.js');</code></li>
 </ol>
-<h1 id="releasing">Releasing</h1>
-<pre><code class="bash">./release.sh
-</code></pre>
-
 <h1 id="updating-docs">Updating docs</h1>
 <p>These site is build using <code>mkdocs &gt;= 0.17</code>. You can install it using  <code>pip</code>:</p>
 <pre><code class="bash">$ pip install mkdocs
