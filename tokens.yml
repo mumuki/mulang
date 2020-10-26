@@ -114,12 +114,14 @@ JavaScript:
     <<: *common_keywords
   operators:
     <<: *common_operators
+    Similar:
+      - "=="
+    NotSimilar:
+      - "!="
     Equal:
       - "==="
-      - "=="
     NotEqual:
       - "!=="
-      - "!="
 Python:
   keywords:
     <<: *common_keywords
