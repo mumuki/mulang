@@ -175,7 +175,8 @@ describe Mulang::Expectation::I18n do
     end
 
     describe 'smells' do
-      it { expect(expectation('foo', 'HasRedundantIf').translate).to eq('<code>foo</code> tiene ifs innecesarios') }
+      it { expect(expectation('foo', 'HasEqualIfBranches').translate).to eq('<code>foo</code> tiene <code>if</code>s innecesarios porque sus dos ramas son iguales') }
+      it { expect(expectation('foo', 'HasRedundantIf').translate).to eq('<code>foo</code> tiene <code>if</code>s innecesarios que pueden ser reemplazados por expresiones booleanas') }
       it { expect(expectation('foo', 'HasRedundantBooleanComparison').translate).to eq('<code>foo</code> hace comparaciones booleanas innecesarias') }
       it { expect(expectation('bar', 'UsesFail').translate :Prolog).to eq('<code>bar</code> usa <code>fail</li>, lo cual es una mala práctica') }
       it { expect(expectation('foo', 'HasEmptyIfBranches').translate).to eq('<code>foo</code> tiene ramas de <code>if</code> vacías') }

@@ -18,6 +18,7 @@ module Language.Mulang.Inspector.Generic.Smell (
   hasRedundantParameter,
   hasRedundantRepeat,
   hasTooManyMethods,
+  hasEqualIfBranches,
   detectDeclarationTypos,
   detectUsageTypos,
   hasUnreachableCode,
@@ -72,6 +73,12 @@ returnsNil :: Inspection
 returnsNil = containsExpression f
   where f (Return MuNil) = True
         f _              = False
+
+hasEqualIfBranches :: Inspection
+hasEqualIfBranches = containsExpression f
+  where f (If _ None None) = False
+        f (If _ t e)       = t == e
+        f _                = False
 
 -- | Inspection that tells whether an expression has an if expression where both branches return
 -- boolean literals

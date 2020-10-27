@@ -22,6 +22,16 @@ runHaskell = hs . unpack
 
 spec :: Spec
 spec = do
+  describe "hasEqualIfBranches" $ do
+    it "is True when both branches contain the same expression" $ do
+      hasEqualIfBranches (js "if(m) { console.log('ok') } else { console.log('ok') }") `shouldBe` True
+
+    it "is False when branches contain different expressions" $ do
+      hasEqualIfBranches (js "if(m) { console.log('ok') } else { console.log('ups') }") `shouldBe` False
+
+    it "is False when branches are empty" $ do
+      hasEqualIfBranches (js "if(m) {  } else { }") `shouldBe` False
+
   describe "hasRedundantIf" $ do
     it "is True when both branches are boolean literal returns" $ do
       hasRedundantIf (js "function x() { if(m) return true else return false }") `shouldBe` True

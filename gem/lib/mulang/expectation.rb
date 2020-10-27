@@ -5,12 +5,13 @@ module Mulang::Expectation
     DoesNilTest
     DoesNullTest
     DoesTypeTest
-    HasAssignmentReturn
     HasAssignmentCondition
+    HasAssignmentReturn
     HasCodeDuplication
     HasDeclarationTypos
     HasEmptyIfBranches
     HasEmptyRepeat
+    HasEqualIfBranches
     HasLongParameterList
     HasMisspelledBindings
     HasMisspelledIdentifiers
