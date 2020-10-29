@@ -5,7 +5,6 @@ module ObjectOrientedSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Java (java)
-import           Language.Mulang.Parsers.Python (py2, py3)
 import           Language.Mulang.Ast
 import           Language.Mulang.Identifier
 import           Language.Mulang.Inspector.ObjectOriented

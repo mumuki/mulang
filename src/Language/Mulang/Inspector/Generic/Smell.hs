@@ -25,13 +25,15 @@ module Language.Mulang.Inspector.Generic.Smell (
   isLongCode,
   overridesEqualOrHashButNotBoth,
   returnsNil,
+  usesNamedSelfReference,
   shouldInvertIfCondition,
   shouldUseOtherwise) where
 
 import           Language.Mulang.Ast
 import qualified Language.Mulang.Ast.Operator as O
-import           Language.Mulang.Generator (Generator, identifierReferences, declaredIdentifiers, referencedIdentifiers)
+import           Language.Mulang.Generator (Generator, identifierReferences, declaredIdentifiers, referencedIdentifiers, declarations)
 import           Language.Mulang.Inspector.Primitive
+import           Language.Mulang.Inspector.Query (inspect, select)
 
 import           Data.Text.Metrics (damerauLevenshtein)
 import           Data.Text (pack)
@@ -242,3 +244,12 @@ detectTypos generator name expression | elem name identifiers = []
   where
     identifiers  = generator expression
     similar one other = damerauLevenshtein (pack one) (pack other) == 1
+
+
+usesNamedSelfReference :: Inspection
+usesNamedSelfReference expression = inspect $ do
+  Object name      objectBody <- declarations expression
+  SimpleMethod _ _ methodBody <- topLevelExpressions objectBody
+  select (elem name $ referencedIdentifiers methodBody)
+    where topLevelExpressions (Sequence es) = es
+          topLevelExpressions e             = [e]

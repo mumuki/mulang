@@ -334,6 +334,16 @@ spec = do
       shouldInvertIfCondition (javaStatement "if(true) { j++; } else { i++; }") `shouldBe` False
       shouldInvertIfCondition (js "if(true) { j++; } else { i++; }") `shouldBe` False
 
+  describe "UsesNamedSelfReference" $ do
+    it "is True when an object references itself by its name instead of using self" $ do
+      usesNamedSelfReference (js "var x = { foo: function () { return x.bar(); } }") `shouldBe` True
+
+    it "is False when an object references itself by using self" $ do
+      usesNamedSelfReference (js "var x = { foo: function () { return self.bar(); } }") `shouldBe` False
+
+    it "is False when reference is nested in another object" $ do
+      usesNamedSelfReference (Object "Aves" (Object "Pepita" (SimpleMethod "foo" [] (Reference "Aves")))) `shouldBe` False
+
   describe "hasEmptyIfBranches" $ do
     it "is True when if branch is empty but else isn't" $ do
       hasEmptyIfBranches (javaStatement "if(true) { } else { i++; }") `shouldBe` False
