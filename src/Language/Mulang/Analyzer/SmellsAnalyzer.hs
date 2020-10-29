@@ -83,6 +83,7 @@ allSmells = [
   "ShouldUseOtherwise",
   "UsesCut",
   "UsesFail",
+  "UsesNamedSelfReference",
   "UsesUnificationOperator" ]
 
 ---
@@ -164,8 +165,9 @@ detectionFor ("ShouldInvertIfCondition", Nothing)         = simple shouldInvertI
 detectionFor ("ShouldUseOtherwise", Nothing)              = simple shouldUseOtherwise
 detectionFor ("UsesCut", Nothing)                         = simple usesCut
 detectionFor ("UsesFail", Nothing)                        = simple usesFail
+detectionFor ("UsesNamedSelfReference", Nothing)          = simple usesNamedSelfReference
 detectionFor ("UsesUnificationOperator", Nothing)         = simple usesUnificationOperator
-detectionFor _                                      = unsupported
+detectionFor _                                            = unsupported
 
 unsupported :: Detection
 unsupported _ _ = []
