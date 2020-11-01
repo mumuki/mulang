@@ -14,8 +14,10 @@ module Language.Mulang.Builder (
 import           GHC.Generics
 
 import Data.List (sort, nub)
+
 import Language.Mulang.Ast
 import Language.Mulang.Generator (declarators, declaredIdentifiers)
+import Language.Mulang.Inspector.Literal (isLiteral)
 
 data NormalizationOptions = NormalizationOptions {
   convertObjectVariableIntoObject :: Bool,
@@ -23,7 +25,8 @@ data NormalizationOptions = NormalizationOptions {
   convertObjectLevelFunctionIntoMethod :: Bool,
   convertObjectLevelLambdaVariableIntoMethod :: Bool,
   convertObjectLevelVariableIntoAttribute :: Bool,
-  sortSequenceDeclarations :: SequenceSortMode
+  sortSequenceDeclarations :: SequenceSortMode,
+  insertImplicitReturn :: Bool
 } deriving (Eq, Show, Read, Generic)
 
 data SequenceSortMode
@@ -58,7 +61,8 @@ defaultNormalizationOptions = NormalizationOptions {
   convertObjectLevelFunctionIntoMethod = True,
   convertObjectLevelLambdaVariableIntoMethod = True,
   convertObjectLevelVariableIntoAttribute = True,
-  sortSequenceDeclarations = SortAllNonVarables
+  sortSequenceDeclarations = SortAllNonVarables,
+  insertImplicitReturn = False
 }
 
 normalize :: Expression -> Expression
@@ -106,8 +110,27 @@ normalizeObjectLevelWith ops (Sequence es)                = Sequence (map (norma
 normalizeObjectLevelWith ops e                            = normalizeWith ops e
 
 normalizeEquationWith :: NormalizationOptions -> Equation -> Equation
-normalizeEquationWith ops (Equation ps (UnguardedBody e))   = Equation ps (UnguardedBody (normalizeWith ops e))
-normalizeEquationWith ops (Equation ps (GuardedBody b))     = Equation ps (GuardedBody (map (\(c, e) -> (normalizeWith ops c, normalizeWith ops e)) b))
+normalizeEquationWith ops (Equation ps (UnguardedBody e))   = Equation ps (UnguardedBody (normalizeBodyWith ops e))
+normalizeEquationWith ops (Equation ps (GuardedBody b))     = Equation ps (GuardedBody (map (\(c, e) -> (normalizeWith ops c, normalizeBodyWith ops e)) b))
+
+normalizeBodyWith :: NormalizationOptions -> Expression -> Expression
+normalizeBodyWith ops = normalizeReturnWith ops . normalizeWith ops
+
+normalizeReturnWith :: NormalizationOptions -> Expression -> Expression
+normalizeReturnWith ops e | not . insertImplicitReturn $ ops = e
+normalizeReturnWith _   e | isImplicitReturn e = Return e
+normalizeReturnWith _   e = e
+
+isImplicitReturn :: Expression -> Bool
+isImplicitReturn (Reference _)         = True
+isImplicitReturn (TypeCast _ _)        = True
+isImplicitReturn (FieldReference _ _ ) = True
+isImplicitReturn (Application _ _ )    = True
+isImplicitReturn (Send _ _ _ )         = True
+isImplicitReturn (New _ _ )            = True
+isImplicitReturn (If _ _ _)            = True
+isImplicitReturn e                     = isLiteral e
+
 
 isSafeDeclaration :: Expression -> Bool
 isSafeDeclaration (Attribute _ _) = False
