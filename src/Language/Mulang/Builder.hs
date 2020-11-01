@@ -14,6 +14,7 @@ module Language.Mulang.Builder (
 import           GHC.Generics
 
 import Data.List (sort, nub)
+import Data.List.Extra (unwind)
 
 import Language.Mulang.Ast
 import Language.Mulang.Generator (declarators, declaredIdentifiers)
@@ -117,9 +118,10 @@ normalizeBodyWith :: NormalizationOptions -> Expression -> Expression
 normalizeBodyWith ops = normalizeReturnWith ops . normalizeWith ops
 
 normalizeReturnWith :: NormalizationOptions -> Expression -> Expression
-normalizeReturnWith ops e | not . insertImplicitReturn $ ops = e
-normalizeReturnWith _   e | isImplicitReturn e = Return e
-normalizeReturnWith _   e = e
+normalizeReturnWith ops e             | not $ insertImplicitReturn ops = e
+normalizeReturnWith _   e             | isImplicitReturn e = Return e
+normalizeReturnWith _   (Sequence es) | Just (i, l) <- unwind es, isImplicitReturn l = Sequence $ i ++ [Return l]
+normalizeReturnWith _   e             = e
 
 isImplicitReturn :: Expression -> Bool
 isImplicitReturn (Reference _)         = True

@@ -1,6 +1,9 @@
 module NormalizationSpec (spec) where
 
   import           Test.Hspec
+  import           Language.Mulang.Ast
+  import           Language.Mulang.Ast.Operator
+  import           Language.Mulang.Builder
   import           Language.Mulang.Parsers.Java (java)
   import           Language.Mulang.Parsers.Python (py)
   import           Language.Mulang.Parsers.Haskell (hs)
@@ -8,6 +11,21 @@ module NormalizationSpec (spec) where
 
   spec :: Spec
   spec = do
+    describe "can insert implicit retuns" $ do
+      let options = defaultNormalizationOptions { insertImplicitReturn = True}
+
+      it "does not insert return in single literal statement" $ do
+        normalizeWith options (py "def x(): x = 1") `shouldBe`  SimpleProcedure "x" [] (Assignment "x" (MuNumber 1.0))
+
+      it "inserts return in single literal expression" $ do
+        normalizeWith options (py "def x(): 3") `shouldBe`  SimpleProcedure "x" [] (Return (MuNumber 3.0))
+
+      it "inserts return in last literal expression" $ do
+        normalizeWith options (js "function x() { let x = 1; x += 1; x }") `shouldBe`  SimpleProcedure "x" [] (Sequence [
+                                                                                          Variable "x" (MuNumber 1.0),
+                                                                                          Assignment "x" (Application (Primitive Plus) [Reference "x",MuNumber 1.0]),
+                                                                                          Return (Reference "x")])
+
     describe "sorts declarations by default" $ do
       it "sorts functions on Python" $ do
         py "def foo():\n  return 2\n\ndef bar():\n  return 1\n\n" `shouldBe` py "def bar():\n  return 1\n\ndef foo():\n  return 2\n\n"
