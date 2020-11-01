@@ -14,8 +14,12 @@
   }
 
   class MulangExternalLanguage {
+    constructor(normalizationOptions = {}) {
+      this.normalizationOptions = normalizationOptions;
+    }
+
     sample(content) {
-      return { tag: 'MulangSample', ast: content };
+      return { tag: 'MulangSample', ast: content, normalizationOptions: this.normalizationOptions };
     }
 
     ast(code) {

@@ -25,7 +25,8 @@ module Mulang::Language
   end
 
   class External
-    def initialize(&tool)
+    def initialize(normalization_options = {}, &tool)
+      @normalization_options = normalization_options
       @tool = block_given? ? tool : proc { |it| it }
     end
 
@@ -36,6 +37,7 @@ module Mulang::Language
     def sample(content)
       {
         tag: 'MulangSample',
+        normalizationOptions: @normalization_options,
         ast: ast(content)
       }
     end

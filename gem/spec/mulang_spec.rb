@@ -84,4 +84,25 @@ describe Mulang::Code do
 
     it { expect { code.analyse(spec) }.not_to raise_error }
   end
+
+  context 'when language is external with normalization options' do
+    let(:input) { { tag: :MuNumber, contents: 1 } }
+    let(:code) { Mulang::Code.external(input, insertImplicitReturn: true) }
+
+    it do
+      expect(code.sample).to eq tag: 'MulangSample',
+                                ast: {tag: :MuNumber, contents: 1},
+                                normalizationOptions: {insertImplicitReturn: true}
+    end
+
+    it do
+      expect(code.analyse(includeIntermediateLanguage: true)).to eq 'expectationResults' => [],
+                                                                    'intermediateLanguage' => {'tag'=>'MuNumber', 'contents'=>1},
+                                                                    'signatures' => [],
+                                                                    'smells' => [],
+                                                                    'tag' => 'AnalysisCompleted',
+                                                                    'testResults' => []
+
+    end
+  end
 end
