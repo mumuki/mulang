@@ -486,11 +486,113 @@ $ mulang '
       ]
    }
 }
-
 ```
 
+### With normalization options
 
-## With test running
+```bash
+$ mulang '
+{
+  "sample": {
+    "tag": "MulangSample",
+    "normalizationOptions": {
+      "insertImplicitReturn": true
+    },
+    "ast": {
+      "tag": "Procedure",
+      "contents": [
+        "foo",
+        [
+          [
+            [
+              {
+                "tag": "VariablePattern",
+                "contents": "x"
+              }
+            ],
+            {
+              "tag": "UnguardedBody",
+              "contents": {
+                "tag": "Application",
+                "contents": [
+                  {
+                    "tag": "Primitive",
+                    "contents": "Multiply"
+                  },
+                  [
+                    {
+                      "tag": "MuNumber",
+                      "contents": 2
+                    },
+                    {
+                      "tag": "Reference",
+                      "contents": "x"
+                    }
+                  ]
+                ]
+              }
+            }
+          ]
+        ]
+      ]
+    }
+  },
+  "spec": {
+    "includeIntermediateLanguage": true
+  }
+}
+' | json_pp
+{
+   "tag" : "AnalysisCompleted",
+   "signatures" : [],
+   "smells" : [],
+   "expectationResults" : [],
+   "testResults" : [],
+   "intermediateLanguage" : {
+      "tag" : "Procedure",
+      "contents" : [
+         "foo",
+         [
+            [
+               [
+                  {
+                     "contents" : "x",
+                     "tag" : "VariablePattern"
+                  }
+               ],
+               {
+                  "contents" : {
+                     "tag" : "Return",
+                     "contents" : {
+                        "contents" : [
+                           {
+                              "tag" : "Primitive",
+                              "contents" : "Multiply"
+                           },
+                           [
+                              {
+                                 "tag" : "MuNumber",
+                                 "contents" : 2
+                              },
+                              {
+                                 "contents" : "x",
+                                 "tag" : "Reference"
+                              }
+                           ]
+                        ],
+                        "tag" : "Application"
+                     }
+                  },
+                  "tag" : "UnguardedBody"
+               }
+            ]
+         ]
+      ]
+   }
+}
+```
+
+### With test running
 
 ```bash
 mulang '{

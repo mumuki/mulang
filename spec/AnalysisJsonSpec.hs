@@ -10,6 +10,8 @@ import           Data.ByteString.Lazy.Char8 (pack, ByteString)
 import           Language.Mulang.Analyzer.Analysis.Json ()
 import           Language.Mulang.Analyzer hiding (spec)
 import           Language.Mulang.Ast
+import           Language.Mulang.Ast.Operator (Operator(..))
+import           Language.Mulang.Builder (NormalizationOptions (..), defaultNormalizationOptions)
 
 import           Data.Maybe (fromJust)
 import           Data.Aeson (decode)
@@ -243,3 +245,62 @@ spec = describe "AnalysisJson" $ do
                               domainLanguage = Just emptyDomainLanguage { dictionaryFilePath = Just "/usr/share/dict/words" } })
 
     run json `shouldBe` analysis
+
+  it "works with normalization and ast generation" $ do
+    let json = [text|
+{
+  "sample": {
+    "tag": "MulangSample",
+    "normalizationOptions": {
+      "insertImplicitReturn": true
+    },
+    "ast": {
+      "tag": "Procedure",
+      "contents": [
+        "foo",
+        [
+          [
+            [
+              {
+                "tag": "VariablePattern",
+                "contents": "x"
+              }
+            ],
+            {
+              "tag": "UnguardedBody",
+              "contents": {
+                "tag": "Application",
+                "contents": [
+                  {
+                    "tag": "Primitive",
+                    "contents": "Multiply"
+                  },
+                  [
+                    {
+                      "tag": "MuNumber",
+                      "contents": 2
+                    },
+                    {
+                      "tag": "Reference",
+                      "contents": "x"
+                    }
+                  ]
+                ]
+              }
+            }
+          ]
+        ]
+      ]
+    }
+  },
+  "spec": {
+    "includeIntermediateLanguage": true
+  }
+} |]
+    let analysis = Analysis (MulangSample (SimpleProcedure "foo" [VariablePattern "x"]
+                                              (Application (Primitive Multiply) [MuNumber 2.0,Reference "x"]))
+                                          (Just (defaultNormalizationOptions { insertImplicitReturn = True })))
+                            (emptyAnalysisSpec { includeIntermediateLanguage = Just True })
+
+    run json `shouldBe` analysis
+
