@@ -41,6 +41,39 @@ module Mulang::Expectation
     UsesFail
     UsesUnificationOperator)
 
+  LOGIC_SMELLS = %w(
+    UsesCut
+    UsesFail
+    UsesUnificationOperator
+    HasRedundantReduction)
+
+  FUNCTIONAL_SMELLS = %w(
+    HasRedundantParameter
+    HasRedundantGuards)
+
+  OBJECT_ORIENTED_SMELLS = %w(
+    DoesNullTest
+    ReturnsNull)
+
+  IMPERATIVE_SMELLS = %w(
+    HasRedundantLocalVariableReturn
+    HasAssignmentReturn)
+
+  EXPRESSIVENESS_SMELLS = %w(
+    HasTooShortIdentifiers
+    HasWrongCaseIdentifiers
+    HasMisspelledIdentifiers)
+
+  GENERIC_SMELLS = %w(
+    IsLongCode
+    HasCodeDuplication
+    HasRedundantLambda
+    HasRedundantIf
+    DoesTypeTest
+    HasRedundantBooleanComparison
+    HasEmptyIfBranches)
+
+
   def self.guess_type(expectation)
     if expectation[:binding] == '<<custom>>'
       Custom
