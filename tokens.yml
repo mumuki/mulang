@@ -109,6 +109,12 @@ Java:
   operators:
     <<: *common_operators
     Hash: 'hashCode'
+    Same:
+      - "=="
+    NotSame:
+      - "!="
+    Equal:
+      - "equal"
 JavaScript:
   keywords:
     <<: *common_keywords
