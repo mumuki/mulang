@@ -150,6 +150,7 @@ en:
       ReturnsNil: '%{binding} retuns <code>%{keyword_Nil}</code>, which is a bad practice'
       ReturnsNull: '%{binding} retuns <code>%{keyword_Nil}</code>, which is a bad practice'
       ShouldInvertIfCondition: '%{binding} should invert <code>%{keyword_If}</code> condition and swap branches'
+      ShouldUseStrictComparators: '%{binding} should use strict operators <code>%{operator_Equal}</code> and <code>%{operator_NotEqual}</code> instead of <code>%{operator_Similar}</code> and <code>%{operator_NotSimilar}</code>'
       SubordinatesDeclarationsTo: 'All declarations in %{binding} %{must} be used from %{target}'
       SubordinatesDeclarationsToEntryPoint: 'All declarations in %{binding} %{must} be used from <code>%{keyword_EntryPoint}</code> '
       TypesAs_named: '%{binding} %{must} type as %{target}'
