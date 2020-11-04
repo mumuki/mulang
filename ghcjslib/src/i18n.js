@@ -1,24 +1,4 @@
 (() => {
-  const DEFAULT_KEYWORDS = {
-    'entryPoint': 'program',
-    'equal': '==',
-    'fail': 'fail',
-    'false': 'false',
-    'findall': 'findall',
-    'for': 'for',
-    'forall': 'forall',
-    'foreach': 'foreach',
-    'if': 'if',
-    'is': 'is',
-    'not': 'not',
-    'null': 'null',
-    'repeat': 'repeat',
-    'switch': 'switch',
-    'true': 'true',
-    'while': 'while',
-    'yield': 'yield'
-  }
-
   const LOCALES = {
     es: {
       must_not: 'no debe',
@@ -495,7 +475,6 @@
   }
 
   I18n.LOCALES = LOCALES;
-  I18n.DEFAULT_KEYWORDS = DEFAULT_KEYWORDS;
 
   ghcjsExports.I18n = I18n;
 })();
