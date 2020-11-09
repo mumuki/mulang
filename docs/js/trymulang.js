@@ -208,6 +208,55 @@ const examples = {
        "includeIntermediateLanguage" : true
     }
   },
+  "normalization": {
+    "sample": {
+      "tag": "MulangSample",
+      "normalizationOptions": {
+        "insertImplicitReturn": true
+      },
+      "ast": {
+        "tag": "Procedure",
+        "contents": [
+          "foo",
+          [
+            [
+              [
+                {
+                  "tag": "VariablePattern",
+                  "contents": "x"
+                }
+              ],
+              {
+                "tag": "UnguardedBody",
+                "contents": {
+                  "tag": "Application",
+                  "contents": [
+                    {
+                      "tag": "Primitive",
+                      "contents": "Multiply"
+                    },
+                    [
+                      {
+                        "tag": "MuNumber",
+                        "contents": 2
+                      },
+                      {
+                        "tag": "Reference",
+                        "contents": "x"
+                      }
+                    ]
+                  ]
+                }
+              }
+            ]
+          ]
+        ]
+      }
+    },
+    "spec": {
+      "includeIntermediateLanguage": true
+    }
+  },
   "testRunning" : {
     "sample" : {
        "tag" : "CodeSample",

@@ -1,9 +1,11 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Language.Mulang.Analyzer.Analysis.Json () where
 
 import           Data.Aeson
 import           Language.Mulang
 import           Language.Mulang.Analyzer.Analysis
-import           Language.Mulang.Builder (NormalizationOptions, SequenceSortMode)
+import           Language.Mulang.Builder (NormalizationOptions (..), SequenceSortMode, defaultNormalizationOptions)
 import           Language.Mulang.Interpreter.Runner (TestResult, TestStatus)
 
 instance FromJSON Analysis
@@ -18,7 +20,16 @@ instance FromJSON CaseStyle
 instance FromJSON SignatureAnalysisType
 instance FromJSON SignatureStyle
 
-instance FromJSON NormalizationOptions
+instance FromJSON NormalizationOptions where
+    parseJSON = withObject "NormalizationOptions" $ \v -> NormalizationOptions
+        <$> v .:?  "convertObjectVariableIntoObject"              .!= convertObjectVariableIntoObject d
+        <*> v .:? "convertLambdaVariableIntoFunction"             .!= convertLambdaVariableIntoFunction d
+        <*> v .:? "convertObjectLevelFunctionIntoMethod"          .!= convertObjectLevelFunctionIntoMethod d
+        <*> v .:? "convertObjectLevelLambdaVariableIntoMethod"    .!= convertObjectLevelLambdaVariableIntoMethod d
+        <*> v .:? "convertObjectLevelVariableIntoAttribute"       .!= convertObjectLevelVariableIntoAttribute d
+        <*> v .:? "sortSequenceDeclarations"                      .!= sortSequenceDeclarations d
+        <*> v .:? "insertImplicitReturn"                          .!= insertImplicitReturn d
+          where d = defaultNormalizationOptions
 instance FromJSON SequenceSortMode
 
 instance FromJSON Fragment

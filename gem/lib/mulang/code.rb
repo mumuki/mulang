@@ -43,8 +43,8 @@ module Mulang
       native(*args).tap { |it| it.expect('Parses') }
     end
 
-    def self.external(content, &tool)
-      new Mulang::Language::External.new(&tool), content
+    def self.external(content, normalization_options = {},  &tool)
+      new Mulang::Language::External.new(normalization_options, &tool), content
     end
 
     def self.ast(ast)

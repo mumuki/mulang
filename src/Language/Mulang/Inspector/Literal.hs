@@ -10,7 +10,11 @@ module Language.Mulang.Inspector.Literal (
   isLogic,
   isMath,
   isLiteral,
+  isSimple,
+  isCompound,
   isNonliteral) where
+
+import Data.Function.Extra (orElse)
 
 import Language.Mulang.Ast
 import Language.Mulang.Ast.Operator (Operator (..))
@@ -54,14 +58,24 @@ isLogic (Primitive Or)       = True
 isLogic _                    = False
 
 isLiteral :: Inspection
-isLiteral (MuBool _)   = True
-isLiteral (MuChar _)   = True
-isLiteral (MuNumber _) = True
-isLiteral (MuString _) = True
-isLiteral (MuSymbol _) = True
-isLiteral MuNil        = True
-isLiteral Self         = True
-isLiteral _            = False
+isLiteral = isSimple `orElse` isCompound
+
+isSimple :: Inspection
+isSimple (MuBool _)   = True
+isSimple (MuChar _)   = True
+isSimple (MuNumber _) = True
+isSimple (MuString _) = True
+isSimple (MuSymbol _) = True
+isSimple MuNil        = True
+isSimple Self         = True
+isSimple _            = False
+
+isCompound :: Inspection
+isCompound (MuDict   _) = True
+isCompound (MuList   _) = True
+isCompound (MuObject _) = True
+isCompound (MuTuple  _) = True
+isCompound _            = False
 
 isNonliteral :: Inspection
 isNonliteral = not . isLiteral
