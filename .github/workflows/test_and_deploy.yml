@@ -17,7 +17,7 @@ jobs:
       run: ./generators/run
     - name: Haskell - prep, build, test, and install binaries
       run: |
-        docker run -v $PWD:/root/mulang -v $HOME/.local/bin:/root/.local/bin haskell:8.0.1 bash -c '
+        docker run -v $PWD:/root/mulang haskell:8.0.1 bash -c '
           set -e
 
           stack upgrade --binary-version 1.9.3
@@ -46,3 +46,22 @@ jobs:
       env:
         GEM_HOST_API_KEY: "${{secrets.RUBYGEMS_AUTH_TOKEN}}"
       working-directory: gem
+    - name: Create release
+      id: create_release
+      if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      uses: actions/create-release@v1
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload binary to release
+      if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/gem/bin/mulang
+        asset_name: mulang
+        asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
