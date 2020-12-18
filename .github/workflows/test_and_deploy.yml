@@ -15,7 +15,7 @@ jobs:
         ruby-version: 2.6.3
     - name: Generate template files
       run: ./generators/run
-    - name: Haskell - prep, build, test, and install binaries
+    - name: Haskell - prep, build, test
       run: |
         docker run -v $PWD:/root/mulang haskell:8.0.1 bash -c '
           set -e
@@ -26,7 +26,6 @@ jobs:
           cd /root/mulang
 
           stack --no-terminal --skip-ghc-check --allow-different-user test
-          stack --no-terminal --skip-ghc-check --allow-different-user install
         '
     - name: Wrap gem
       run: ./bin/setup
