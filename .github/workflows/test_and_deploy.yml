@@ -1,0 +1,66 @@
+name: Test and deploy
+
+on:
+- push
+- workflow_dispatch
+
+jobs:
+  test_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@21351ecc0a7c196081abca5dc55b08f085efe09a
+      with:
+        ruby-version: 2.6.3
+    - name: Generate template files
+      run: ./generators/run
+    - name: Haskell - prep, build, test
+      run: |
+        docker run -v $PWD:/root/mulang haskell:8.0.1 bash -c '
+          set -e
+
+          stack upgrade --binary-version 1.9.3
+          export PATH=/root/.local/bin:$PATH
+
+          cd /root/mulang
+
+          stack --no-terminal --skip-ghc-check --allow-different-user test
+        '
+    - name: Wrap gem
+      run: ./bin/setup
+      working-directory: gem
+    - name: Run ruby tests
+      run: bundle exec rake
+      working-directory: gem
+    - name: Deploy to RubyGems
+      if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      run: |
+        mkdir -p $HOME/.gem
+        touch $HOME/.gem/credentials
+        chmod 0600 $HOME/.gem/credentials
+        printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
+        gem build *.gemspec
+        gem push *.gem
+      env:
+        GEM_HOST_API_KEY: "${{secrets.RUBYGEMS_AUTH_TOKEN}}"
+      working-directory: gem
+    - name: Create release
+      id: create_release
+      if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      uses: actions/create-release@v1
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload binary to release
+      if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/gem/bin/mulang
+        asset_name: mulang
+        asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
