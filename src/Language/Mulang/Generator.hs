@@ -45,7 +45,7 @@ declarators e@(Clause n _ _)       = [(n, e)]
 declarators e@(Record n)           = [(n, e)]
 declarators e@(TypeAlias n _)      = [(n, e)]
 declarators e@(TypeSignature n _)  = [(n, e)]
-declarators e@(Variable n _)       = [(n, e)]
+declarators e@(LValue n _)         = [(n, e)]
 declarators _                      = []
 
 declarations :: Generator Expression
@@ -102,6 +102,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Try t cs f)            = t : map snd cs ++ [f]
     subExpressions (TypeCast e _)          = [e]
     subExpressions (Variable _ v)          = [v]
+    subExpressions (Constant _ v)          = [v]
     subExpressions (While e1 e2)           = [e1, e2]
     subExpressions (Yield v)               = [v]
     subExpressions (Break e)               = [e]

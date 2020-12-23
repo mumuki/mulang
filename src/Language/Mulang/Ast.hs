@@ -36,6 +36,7 @@ module Language.Mulang.Ast (
     pattern SubroutineSignature,
     pattern VariableSignature,
     pattern ModuleSignature,
+    pattern LValue,
     pattern Unification,
     pattern MuTrue,
     pattern MuFalse,
@@ -110,6 +111,7 @@ data Expression
     | HashMethod SubroutineBody -- deprecated
     | PrimitiveMethod Operator SubroutineBody
     | Variable Identifier Expression
+    | Constant Identifier Expression
     | Assignment Identifier Expression
     | FieldAssignment Expression Identifier Expression
     -- ^ Generic nested field assignment
@@ -286,6 +288,8 @@ pattern SimpleFunction name params body  = Function  name [SimpleEquation params
 pattern SimpleProcedure name params body = Procedure name [SimpleEquation params body]
 pattern SimpleMethod name params body    = Method    name [SimpleEquation params body]
 
+pattern LValue name value <- (extractLValue -> Just (name, value))
+
 pattern Unification name value <- (extractUnification -> Just (name, value))
 
 pattern MuTrue  = MuBool True
@@ -307,10 +311,16 @@ subroutineBodyPatterns = concatMap equationPatterns
 equationPatterns :: Equation -> [Pattern]
 equationPatterns (Equation p _) = p
 
+extractLValue :: Expression -> Maybe (Identifier, Expression)
+extractLValue (Variable name value) = Just (name, value)
+extractLValue (Constant name value) = Just (name, value)
+extractLValue _                     = Nothing
+
+
 extractUnification :: Expression -> Maybe (Identifier, Expression)
 extractUnification (Assignment name value)        = Just (name, value)
 extractUnification (FieldAssignment _ name value) = Just (name, value)
-extractUnification (Variable name value)          = Just (name, value)
+extractUnification (LValue name value)            = Just (name, value)
 extractUnification (Attribute name value)         = Just (name, value)
 extractUnification _                              = Nothing
 

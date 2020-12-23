@@ -89,9 +89,10 @@ normalizeWith ops (Return e)                       = Return (normalizeWith ops e
 normalizeWith ops (Rule n args es)                 = Rule n args (mapNormalizeWith ops es)
 normalizeWith ops (Send r e es)                    = Send (normalizeWith ops r) (normalizeWith ops e) (mapNormalizeWith ops es)
 normalizeWith ops (Sequence es)                    = Sequence . sortDeclarationsWith ops .  mapNormalizeWith ops $ es
-normalizeWith ops (Variable n (Lambda vars e))     | convertLambdaVariableIntoFunction ops = SimpleFunction n vars (normalizeWith ops e)
-normalizeWith ops (Variable n (MuObject e))        | convertObjectVariableIntoObject ops = Object n (normalizeObjectLevelWith ops e)
+normalizeWith ops (LValue n (Lambda vars e))       | convertLambdaVariableIntoFunction ops = SimpleFunction n vars (normalizeWith ops e)
+normalizeWith ops (LValue n (MuObject e))          | convertObjectVariableIntoObject ops = Object n (normalizeObjectLevelWith ops e)
 normalizeWith ops (Variable n e)                   = Variable n (normalizeWith ops e)
+normalizeWith ops (Constant n e)                   = Constant n (normalizeWith ops e)
 normalizeWith ops (While e1 e2)                    = While (normalizeWith ops e1) (normalizeWith ops e2)
 normalizeWith _ e = e
 
@@ -100,8 +101,8 @@ mapNormalizeEquationWith ops = map (normalizeEquationWith ops)
 
 normalizeObjectLevelWith :: NormalizationOptions -> Expression -> Expression
 normalizeObjectLevelWith ops (Function n eqs)             | convertObjectLevelFunctionIntoMethod ops       = Method n (mapNormalizeEquationWith ops eqs)
-normalizeObjectLevelWith ops (Variable n (Lambda vars e)) | convertObjectLevelLambdaVariableIntoMethod ops = SimpleMethod n vars (normalizeWith ops e)
-normalizeObjectLevelWith ops (Variable n e)               | convertObjectLevelVariableIntoAttribute ops    = Attribute n (normalizeWith ops e)
+normalizeObjectLevelWith ops (LValue n (Lambda vars e))   | convertObjectLevelLambdaVariableIntoMethod ops = SimpleMethod n vars (normalizeWith ops e)
+normalizeObjectLevelWith ops (LValue n e)                 | convertObjectLevelVariableIntoAttribute ops    = Attribute n (normalizeWith ops e)
 normalizeObjectLevelWith ops (Sequence es)                = Sequence (map (normalizeObjectLevelWith ops) es)
 normalizeObjectLevelWith ops e                            = normalizeWith ops e
 
@@ -111,7 +112,7 @@ normalizeEquationWith ops (Equation ps (GuardedBody b))     = Equation ps (Guard
 
 isSafeDeclaration :: Expression -> Bool
 isSafeDeclaration (Attribute _ _) = False
-isSafeDeclaration (Variable _ _)  = False
+isSafeDeclaration (LValue _ _)    = False
 isSafeDeclaration e = isDeclaration e
 
 isDeclaration :: Expression -> Bool

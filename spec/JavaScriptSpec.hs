@@ -18,10 +18,13 @@ spec :: Spec
 spec = do
   describe "foo" $ do
     it "simple assignation" $ do
-      js "var x = 1" `shouldBe` hs "x = 1"
+      js "var x = 1" `shouldBe` (Variable "x" (MuNumber 1))
 
     it "simple assignation, with let" $ do
-      js "let x = 1" `shouldBe` hs "x = 1"
+      js "let x = 1" `shouldBe` (Variable "x" (MuNumber 1))
+
+    it "simple declaration, with const" $ do
+      js "const x = 1" `shouldBe` (Constant "x" (MuNumber 1))
 
     it "simple string assignment" $ do
       js "var x = 'hello'" `shouldBe` hs "x = \"hello\""
@@ -192,6 +195,9 @@ spec = do
     it "handles c-style for with var" $ do
       run "for(var i = 0; i < 3; i++) i;" `shouldBe` ForLoop (Variable "i" (MuNumber 0)) (js "i < 3") (js "i++") (Reference "i")
 
+    it "handles c-style for with let" $ do
+      run "for(let i = 0; i < 3; i++) i;" `shouldBe` ForLoop (Variable "i" (MuNumber 0)) (js "i < 3") (js "i++") (Reference "i")
+
     describe "for generator" $ do
       let generatorAst = For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
 
@@ -203,6 +209,9 @@ spec = do
 
       it "handles for let of" $ do
         run "for(let i of [1,2]) i;" `shouldBe` generatorAst
+
+      it "handles for let of" $ do
+        run "for(const i of [1,2]) i;" `shouldBe` generatorAst
 
       it "handles for var of" $ do
         run "for(var i of [1,2]) i;" `shouldBe` generatorAst
