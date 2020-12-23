@@ -42,6 +42,7 @@ muJSStatement (JSForVarIn _ _ _ (JSVarInitExpression id _) _ gen _ body)    = mu
 muJSStatement (JSForLet _ _ _ inits _ conds _ progs _ body)                 = muFor inits conds progs body
 muJSStatement (JSForLetIn _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForIn id gen body
 muJSStatement (JSForLetOf _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForIn id gen body
+muJSStatement (JSForConstOf _ _ _ (JSVarInitExpression id _) _ gen _ body)  = muForIn id gen body
 muJSStatement (JSForOf _ _ id _ gen _ body)                                 = muForIn id gen body
 muJSStatement (JSForVarOf _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForIn id gen body
 muJSStatement (JSFunction _ ident _ params _ body _)                        = muComputation ident params body
@@ -58,8 +59,9 @@ muJSStatement (JSReturn _ maybeExpression _)                                = Re
 muJSStatement (JSSwitch _ _ expression _ _ cases _ _)                       = muSwitch expression . partition isDefault $ cases
 muJSStatement (JSThrow _ expression _)                                      = Raise (muJSExpression expression)
 muJSStatement (JSTry _ block catches finally)                               = Try (muJSBlock block) (map muJSTryCatch catches) (muJSTryFinally finally)
-muJSStatement (JSVariable _ list _)                                         = muJSExpressionFromList list
-muJSStatement (JSLet _ list _)                                              = muJSExpressionFromList list
+muJSStatement (JSVariable _ list _)                                         = muLValue Variable list
+muJSStatement (JSLet _ list _)                                              = muLValue Variable list
+muJSStatement (JSConstant _ list _)                                         = muLValue Constant list
 muJSStatement (JSWhile _ _ expression _ statement)                          = While (muJSExpression expression) (muJSStatement statement)
 muJSStatement e                                                             = debug e
 
@@ -77,6 +79,10 @@ muAssignment (JSIdentifier _ name) op value                       = Assignment n
 muAssignment (JSMemberDot expr1 _ (JSIdentifier _ name)) op value = FieldAssignment (muJSExpression expr1) name (muJSAssignOp op name value)
 muAssignment other op value                                       = MuTuple [debug other, debug op, debug value]
 
+muLValue :: (Identifier -> Expression -> Expression) -> JSCommaList JSExpression -> Expression
+muLValue kind = compact . mapJSList f
+  where f (JSVarInitExpression (JSIdentifier _ name) initial)  = kind name (muJSVarInitializer initial)
+
 mapJSList :: (a -> b) -> JSCommaList a -> [b]
 mapJSList f = map f . muJSCommaList
 
@@ -88,7 +94,11 @@ muJSPatternList = mapJSList muExpressionPattern
 
 muJSExpressionFromList = compact . muJSExpressionList
 
-muFor inits conds progs body = ForLoop (muJSExpressionFromList inits) (muJSExpressionFromList conds) (muJSExpressionFromList progs) (muJSStatement body)
+muFor inits conds progs body = (ForLoop
+                                  (muJSExpressionFromList inits)
+                                  (muJSExpressionFromList conds)
+                                  (muJSExpressionFromList progs)
+                                  (muJSStatement body))
 
 muForIn (JSIdentifier _ id) generator body = For [Generator (VariablePattern id) (muJSExpression generator)] (muJSStatement body)
 
