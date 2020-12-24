@@ -27,6 +27,9 @@ module Language.Mulang.Ast (
     debug,
     debugType,
     debugPattern,
+    mostly,
+    mostlyType,
+    mostlyPattern,
     pattern SimpleEquation,
     pattern SimpleFunction,
     pattern SimpleProcedure,
@@ -77,6 +80,9 @@ data Type
         -- Usefull for modelling classes and interfaces types
         | OtherType (Maybe Code) (Maybe Type)
         -- ^ unrecognized type, with optional code and nested type
+        | MostlyType Code Type
+        -- ^ Recognized type that closely maps to the given type but with
+        --  slightly different semantics
         deriving (Eq, Show, Read, Generic, Ord)
 
 -- | Expression is the root element of a Mulang program.
@@ -188,7 +194,7 @@ data Expression
     -- ^ Unrecognized expression, with optional description and body
     | Mostly Code Expression
     -- ^ Recognized expression that closely maps to the given expression but with
-    --  sliglth different semantics
+    --  slightly different semantics
     | Equal -- ^ deprecated
     | NotEqual -- ^ deprecated
     | Arrow Expression Expression
@@ -262,12 +268,24 @@ data Pattern
     | UnionPattern [Pattern]
     | OtherPattern (Maybe Code) (Maybe Pattern)
     -- ^ Other unrecognized pattern with optional code and nested pattern
+    | MostlyPattern Code Pattern
+    -- ^ Recognized pattern that closely maps to the given pattern but with
+    --  slightly different semantics
   deriving (Eq, Show, Read, Generic, Ord)
 
 data Statement
   = Generator Pattern Expression
   | Guard Expression
   deriving (Eq, Show, Read, Generic, Ord)
+
+mostly :: Show a => a -> Expression -> Expression
+mostly a = Mostly (show a)
+
+mostlyType :: Show a => a -> Type -> Type
+mostlyType a = MostlyType (show a)
+
+mostlyPattern :: Show a => a -> Pattern -> Pattern
+mostlyPattern a = MostlyPattern (show a)
 
 debug :: Show a => a -> Expression
 debug a = Other (Just (show a)) Nothing
