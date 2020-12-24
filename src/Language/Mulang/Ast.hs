@@ -186,6 +186,9 @@ data Expression
     -- ^ Generic sequence of statements
     | Other (Maybe Code) (Maybe Expression)
     -- ^ Unrecognized expression, with optional description and body
+    | Mostly Code Expression
+    -- ^ Recognized expression that closely maps to the given expression but with
+    --  sliglth different semantics
     | Equal -- ^ deprecated
     | NotEqual -- ^ deprecated
     | Arrow Expression Expression

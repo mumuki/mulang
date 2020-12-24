@@ -93,6 +93,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Not e)                 = [e]
     subExpressions (Object _ v)            = [v]
     subExpressions (Other _ (Just e))      = [e]
+    subExpressions (Mostly _ e)            = [e]
     subExpressions (Print v)               = [v]
     subExpressions (Repeat e1 e2)          = [e1, e2]
     subExpressions (Return v)              = [v]
