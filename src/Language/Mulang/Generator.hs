@@ -46,6 +46,7 @@ declarators e@(Record n)           = [(n, e)]
 declarators e@(TypeAlias n _)      = [(n, e)]
 declarators e@(TypeSignature n _)  = [(n, e)]
 declarators e@(LValue n _)         = [(n, e)]
+declarators (Mostly _ e)           = declarators e
 declarators _                      = []
 
 declarations :: Generator Expression
