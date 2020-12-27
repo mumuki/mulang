@@ -33,12 +33,12 @@ spec = do
 
   describe "declaresVariable" $ do
     it "is True when declare a variable" $ do
-      let code = js "function f(){ var x = 2}"
+      let code = js "function f(){ let x = 2}"
 
       declaresVariable (named "x") code `shouldBe` True
 
     it "is False when variable is not declared" $ do
-      let code = js "function f(){ var x = 2}"
+      let code = js "function f(){ let x = 2}"
 
       declaresVariable (named "y") code `shouldBe` False
 
@@ -93,19 +93,19 @@ spec = do
 
     describe "with variables, js" $ do
       it "is False when constant is declared with a non lambda literal" $ do
-        declaresFunction (named "f") (js "var f = 2") `shouldBe` False
+        declaresFunction (named "f") (js "let f = 2") `shouldBe` False
 
       it "is True when constant is declared with a lambda literal" $ do
-        declaresFunction (named "f") (js "var f = function(x) {}") `shouldBe` True
+        declaresFunction (named "f") (js "let f = function(x) {}") `shouldBe` True
 
       it "is False when constant is declared with a number literal" $ do
-        declaresFunction  (named "f") (js "var f = 3") `shouldBe` False
+        declaresFunction  (named "f") (js "let f = 3") `shouldBe` False
 
       it "is False when constant is declared with a list literal" $ do
-        declaresFunction (named "f") (js "var f = []") `shouldBe` False
+        declaresFunction (named "f") (js "let f = []") `shouldBe` False
 
       it "is False when is a method" $ do
-        declaresFunction (named "f") (js "var o = {f: function(){}}") `shouldBe` False
+        declaresFunction (named "f") (js "let o = {f: function(){}}") `shouldBe` False
 
     describe "with matcher" $ do
       it "is True when using a matcher that matches" $ do
@@ -150,7 +150,7 @@ spec = do
 
     describe "with constant declaration, js" $ do
       it "is True when constant is declared with lambda of given arity" $ do
-        (declaresComputationWithArity 2) (named "f") (js "var f = function(x, y) { return x + y }") `shouldBe` True
+        (declaresComputationWithArity 2) (named "f") (js "let f = function(x, y) { return x + y }") `shouldBe` True
 
   describe "isLongCode" $ do
     it "is False when the program has less than 16 nodes" $ do
@@ -408,31 +408,31 @@ spec = do
       uses (like "m") (js "function f(x) { m2 }") `shouldBe` True
 
     it "is True on direct usage in method" $ do
-      uses (named "m") (js "var o = {z: function(x) { m }}") `shouldBe` True
+      uses (named "m") (js "let o = {z: function(x) { m }}") `shouldBe` True
 
     it "is True on direct usage in method, scoped" $ do
-      scoped "o" (uses (named "m")) (js "var o = {z: function(x) { m }}") `shouldBe` True
+      scoped "o" (uses (named "m")) (js "let o = {z: function(x) { m }}") `shouldBe` True
 
     it "is False on missing usage in method, scoped" $ do
-      scoped "o" (uses (named "p")) (js "var o = {z: function(x) { m }}") `shouldBe` False
+      scoped "o" (uses (named "p")) (js "let o = {z: function(x) { m }}") `shouldBe` False
 
     it "is True on usage in method, scoped twice" $ do
-      scopedList ["o", "z"] (uses (named "m")) (js "var o = {z: function(x) { m }}") `shouldBe` True
+      scopedList ["o", "z"] (uses (named "m")) (js "let o = {z: function(x) { m }}") `shouldBe` True
 
     it "is False on missing usage in method, scoped twice" $ do
-      scopedList ["o", "z"] (uses (named "p")) (js "var o = {z: function(x) { m }}") `shouldBe` False
+      scopedList ["o", "z"] (uses (named "p")) (js "let o = {z: function(x) { m }}") `shouldBe` False
 
     it "is False on usage in wrong method, scoped twice" $ do
-      scopedList ["o", "z"] (uses (named "m")) (js "var o = {p: function(x) { m }}") `shouldBe` False
+      scopedList ["o", "z"] (uses (named "m")) (js "let o = {p: function(x) { m }}") `shouldBe` False
 
     it "is True on usage in method, scoped twice" $ do
-      transitiveList ["o", "z"] (uses (named "m")) (js "var o = {z: function(x) { m }}") `shouldBe` True
+      transitiveList ["o", "z"] (uses (named "m")) (js "let o = {z: function(x) { m }}") `shouldBe` True
 
     it "is False on missing usage in method, scoped twice" $ do
-      transitiveList ["o", "z"] (uses (named "p")) (js "var o = {z: function(x) { m }}") `shouldBe` False
+      transitiveList ["o", "z"] (uses (named "p")) (js "let o = {z: function(x) { m }}") `shouldBe` False
 
     it "is False on usage in wrong method, scoped twice" $ do
-      transitiveList ["o", "z"] (uses (named "m")) (js "var o = {p: function(x) { m }}") `shouldBe` False
+      transitiveList ["o", "z"] (uses (named "m")) (js "let o = {p: function(x) { m }}") `shouldBe` False
 
     it "is True through function application in function" $ do
       transitive "f" (uses (named "m")) (js "function g() { m }; function f(x) { g() }") `shouldBe` True
@@ -444,11 +444,11 @@ spec = do
       transitive "f" (uses (named "m")) (js "function g() { m }; function f(x) { k() }") `shouldBe` False
 
     it "is True through message send in function" $ do
-      transitive "f" (uses (named "m")) (js "var o = {g: function(){ m }}; function f(x) { o.g() }") `shouldBe` True
+      transitive "f" (uses (named "m")) (js "let o = {g: function(){ m }}; function f(x) { o.g() }") `shouldBe` True
 
     it "is True through message send in objects" $ do
-      transitive "p" (uses (named "m")) (js "var o = {g: function(){ m }}\n\
-                                        \var p = {n: function() { o.g() }}") `shouldBe` True
+      transitive "p" (uses (named "m")) (js "let o = {g: function(){ m }}\n\
+                                        \let p = {n: function() { o.g() }}") `shouldBe` True
 
   describe "usesPrimitive, hs" $ do
     it "is True when required primitive is used on application" $ do

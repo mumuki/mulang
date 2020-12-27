@@ -17,13 +17,13 @@ spec = do
       usesForLoop (js "function f() { for(;;) { console.log('foo') }  }")  `shouldBe` True
 
     it "is True when present in lambda" $ do
-      usesForLoop (js "var f = function() { for(;;) { console.log('foo') }  }")  `shouldBe` True
+      usesForLoop (js "let f = function() { for(;;) { console.log('foo') }  }")  `shouldBe` True
 
     it "is True when present in object" $ do
-      usesForLoop (js "var x = {f: function() { for(;;) { console.log('foo') } }}")  `shouldBe` True
+      usesForLoop (js "let x = {f: function() { for(;;) { console.log('foo') } }}")  `shouldBe` True
 
     it "is True when present in method" $ do
-      usesForLoop (js "var o = {f: function() { for(;;) { console.log('foo') }  }}")  `shouldBe` True
+      usesForLoop (js "let o = {f: function() { for(;;) { console.log('foo') }  }}")  `shouldBe` True
 
     it "is False when not present in function" $ do
       usesForLoop (js "function f() {}")  `shouldBe` False
@@ -106,13 +106,13 @@ spec = do
       usesWhile (js "function f() { while(true) { console.log('foo') }  }")  `shouldBe` True
 
     it "is True when present in lambda" $ do
-      usesWhile (js "var f = function() { while(true) { console.log('foo') }  }")  `shouldBe` True
+      usesWhile (js "let f = function() { while(true) { console.log('foo') }  }")  `shouldBe` True
 
     it "is True when present in object" $ do
-      usesWhile (js "var x = {f: function() { while(true) { console.log('foo') } }}")  `shouldBe` True
+      usesWhile (js "let x = {f: function() { while(true) { console.log('foo') } }}")  `shouldBe` True
 
     it "is True when present in method" $ do
-      usesWhile (js "var o = {f: function() { while(true) { console.log('foo') }  }}")  `shouldBe` True
+      usesWhile (js "let o = {f: function() { while(true) { console.log('foo') }  }}")  `shouldBe` True
 
     it "is False when not present in function" $ do
       usesWhile (js "function f() {}")  `shouldBe` False

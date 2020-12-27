@@ -58,28 +58,28 @@ spec = do
 
   describe "declaresMethod" $ do
     it "is True when present" $ do
-      declaresMethod (named "x") (js "var f = {x: function(){}}")  `shouldBe` True
+      declaresMethod (named "x") (js "let f = {x: function(){}}")  `shouldBe` True
 
     it "is works with except" $ do
-      declaresMethod (except "x") (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (except "a") (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (except "y") (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (except "b") (js "var obj = {b: function(){}}")  `shouldBe` False
+      declaresMethod (except "x") (js "let obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (except "a") (js "let obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (except "y") (js "let obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (except "b") (js "let obj = {b: function(){}}")  `shouldBe` False
 
     it "is works with anyOf" $ do
-      declaresMethod (anyOf ["x", "y"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` False
-      declaresMethod (anyOf ["a", "y"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (anyOf ["x", "b"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (anyOf ["a", "b"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (anyOf ["x", "y"]) (js "let obj = {a: function(){}, b: function(){}}")  `shouldBe` False
+      declaresMethod (anyOf ["a", "y"]) (js "let obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (anyOf ["x", "b"]) (js "let obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (anyOf ["a", "b"]) (js "let obj = {a: function(){}, b: function(){}}")  `shouldBe` True
 
     it "is works with noneOf" $ do
-      declaresMethod (noneOf ["x", "y"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (noneOf ["x", "b"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (noneOf ["a", "y"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` True
-      declaresMethod (noneOf ["a", "b"]) (js "var obj = {a: function(){}, b: function(){}}")  `shouldBe` False
+      declaresMethod (noneOf ["x", "y"]) (js "let obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (noneOf ["x", "b"]) (js "let obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (noneOf ["a", "y"]) (js "let obj = {a: function(){}, b: function(){}}")  `shouldBe` True
+      declaresMethod (noneOf ["a", "b"]) (js "let obj = {a: function(){}, b: function(){}}")  `shouldBe` False
 
     it "is True when any present" $ do
-      declaresMethod anyone (js "var f = {x: function(){}}")  `shouldBe` True
+      declaresMethod anyone (js "let f = {x: function(){}}")  `shouldBe` True
 
     it "is True when scoped in a class" $ do
       scoped "A" (declaresMethod (named "foo")) (java "class A { void foo() {} }")  `shouldBe` True
@@ -88,51 +88,51 @@ spec = do
       scoped "A" (declaresMethod (named "foo")) (java "class A { void foobar() {} }") `shouldBe` False
 
     it "is False when not present" $ do
-      declaresMethod (named "m") (js "var f = {x: function(){}}")  `shouldBe` False
+      declaresMethod (named "m") (js "let f = {x: function(){}}")  `shouldBe` False
 
     it "is False when not a method" $ do
-      declaresMethod (named "m") (js "var f = {x: 6}")  `shouldBe` False
+      declaresMethod (named "m") (js "let f = {x: 6}")  `shouldBe` False
 
     it "is True when object present, scoped" $ do
-      scoped "f" (declaresMethod (named "x")) (js "var f = {x: function(){}}")  `shouldBe` True
+      scoped "f" (declaresMethod (named "x")) (js "let f = {x: function(){}}")  `shouldBe` True
 
     it "is False when object not present, scoped" $ do
-      scoped "p" (declaresMethod (named "x")) (js "var f = {x: function(){}}")  `shouldBe` False
+      scoped "p" (declaresMethod (named "x")) (js "let f = {x: function(){}}")  `shouldBe` False
 
   describe "declaresAttribute" $ do
     it "is True when present" $ do
-      declaresAttribute (named "x") (js "var f = {x: 6}")  `shouldBe` True
+      declaresAttribute (named "x") (js "let f = {x: 6}")  `shouldBe` True
 
     it "is True when present and there are many" $ do
-      declaresAttribute (named "x") (js "var f = {j: 20, x: 6}")  `shouldBe` True
+      declaresAttribute (named "x") (js "let f = {j: 20, x: 6}")  `shouldBe` True
 
     it "is False when not present" $ do
-      declaresAttribute (named "m") (js "var f = {x: 6}")  `shouldBe` False
+      declaresAttribute (named "m") (js "let f = {x: 6}")  `shouldBe` False
 
     it "is True when attribute present, scoped" $ do
-      scoped "f" (declaresAttribute (named "x"))  (js "var f = {x: 6}")  `shouldBe` True
+      scoped "f" (declaresAttribute (named "x"))  (js "let f = {x: 6}")  `shouldBe` True
 
     it "is True when any attribute present, scoped" $ do
-      scoped "f" (declaresAttribute anyone) (js "var f = {x: 6}")  `shouldBe` True
+      scoped "f" (declaresAttribute anyone) (js "let f = {x: 6}")  `shouldBe` True
 
     it "is False when attribute not present, scoped" $ do
-      scoped "g" (declaresAttribute (named "x")) (js "var f = {x: 6}")  `shouldBe` False
+      scoped "g" (declaresAttribute (named "x")) (js "let f = {x: 6}")  `shouldBe` False
 
   describe "declaresObject" $ do
     it "is True when present" $ do
-      declaresObject (named "f")  (js "var f = {x: 6}")  `shouldBe` True
+      declaresObject (named "f")  (js "let f = {x: 6}")  `shouldBe` True
 
     it "is False when not present" $ do
-      declaresObject (named "f") (js "var f = 6")  `shouldBe` False
+      declaresObject (named "f") (js "let f = 6")  `shouldBe` False
 
     it "is False when not present, scoped" $ do
-      declaresObject (named "f") (js "var g = {}")  `shouldBe` False
+      declaresObject (named "f") (js "let g = {}")  `shouldBe` False
 
     it "is True when present, scoped" $ do
-      declaresObject (named "g") (js "var g = {}")  `shouldBe` True
+      declaresObject (named "g") (js "let g = {}")  `shouldBe` True
 
     it "is True when anyone present, scoped" $ do
-      declaresObject anyone (js "var g = {}")  `shouldBe` True
+      declaresObject anyone (js "let g = {}")  `shouldBe` True
 
   describe "declaresEnumeration" $ do
     it "is True when present" $ do

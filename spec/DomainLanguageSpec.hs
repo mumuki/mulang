@@ -35,7 +35,7 @@ spec = do
       run (hs "aFunction a = a") `shouldBe` False
 
     it "is False when it contains a short local variable name, but it is detected" $ do
-      let sample = js "function foo() { var x = 1; return x }"
+      let sample = js "function foo() { let x = 1; return x }"
 
       run sample `shouldBe` False
       runDetection sample `shouldBe` ["x"]
@@ -44,28 +44,28 @@ spec = do
       run (hs "aFunction aNumber = f aNumber") `shouldBe` False
 
     it "is False when it contains a short local variable name in a method, but it is detected" $ do
-      let sample = js "var pepita = {come:function(){var x = 1; }, vola:function(){}};"
+      let sample = js "let pepita = {come:function(){let x = 1; }, vola:function(){}};"
 
       runDetection sample `shouldBe` ["x"]
       run sample `shouldBe` False
 
     it "is False when it contains a short local parameter name in a method" $ do
-      run (js "var pepita = {come:function(x){ }, vola:function(){}};") `shouldBe` False
+      run (js "let pepita = {come:function(x){ }, vola:function(){}};") `shouldBe` False
 
     it "is False when it contains a short named method, but it is detected" $ do
-      let sample = js "var pepita = {x:function(){}, vola:function(){}};"
+      let sample = js "let pepita = {x:function(){}, vola:function(){}};"
 
       runDetection sample `shouldBe` ["x"]
       run sample `shouldBe` False
 
     it "is True when it contains a short named attribute" $ do
-      let sample = js "var pepita = {x: 2, vola:function(){}};"
+      let sample = js "let pepita = {x: 2, vola:function(){}};"
 
       runDetection sample `shouldBe` ["x"]
       run sample `shouldBe` False
 
     it "is True when it contains a short variable name" $ do
-      run (js "var x = 3;") `shouldBe` True
+      run (js "let x = 3;") `shouldBe` True
 
     it "is False when it is jargon" $ do
       run (hs "ui = False") `shouldBe` False
@@ -75,13 +75,13 @@ spec = do
       let run = hasWrongCaseIdentifiers language
 
       it "is True when there are snake case identifier on a camel case language" $ do
-        run (js "var a_day = 'monday'") `shouldBe` True
+        run (js "let a_day = 'monday'") `shouldBe` True
 
       it "is False when there are only camel case identifier on a camel case language" $ do
-        run (js "var aDay = 'monday'") `shouldBe` False
+        run (js "let aDay = 'monday'") `shouldBe` False
 
       it "is False when it has numbers but proper casing" $ do
-        run (js "var aFoo2 = 'monday'") `shouldBe` False
+        run (js "let aFoo2 = 'monday'") `shouldBe` False
 
     context "rubyCase language" $ do
       let run = hasWrongCaseIdentifiers (DomainLanguage english rubyCase 3 jargon)

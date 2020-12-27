@@ -66,7 +66,7 @@ spec = do
       js "function f(x, y) { return 1 }" `shouldBe` hs "f x y = 1"
 
     it "constant function declaration" $ do
-      js "var f = function(x) { return x + 1 }" `shouldBe` hs "f = \\x -> x + 1"
+      js "let f = function(x) { return x + 1 }" `shouldBe` hs "f = \\x -> x + 1"
 
     it "numeric top level expression" $ do
       js "8" `shouldBe` MuNumber 8

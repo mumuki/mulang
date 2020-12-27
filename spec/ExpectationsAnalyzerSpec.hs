@@ -96,7 +96,7 @@ spec = describe "ExpectationsAnalyzer" $ do
 
   it "works with UsesForLoop" $ do
     let hasForLoop = Expectation "f" "UsesForLoop"
-    (run JavaScript "function f() { var x; for (x = 0; x < 10; x++) { x; } }" [hasForLoop]) `shouldReturn` (result [passed hasForLoop] [])
+    (run JavaScript "function f() { let x; for (x = 0; x < 10; x++) { x; } }" [hasForLoop]) `shouldReturn` (result [passed hasForLoop] [])
 
   it "works with UsesConditional" $ do
     let hasConditional = Expectation "min" "UsesConditional"
@@ -105,7 +105,7 @@ spec = describe "ExpectationsAnalyzer" $ do
 
   it "works with UsesWhile" $ do
     let hasWhile = Expectation "f" "UsesWhile"
-    (run JavaScript "function f() { var x = 5; while (x < 10) { x++ } }" [hasWhile]) `shouldReturn` (result [passed hasWhile] [])
+    (run JavaScript "function f() { let x = 5; while (x < 10) { x++ } }" [hasWhile]) `shouldReturn` (result [passed hasWhile] [])
 
   it "works with UsesForall" $ do
     let hasForall = Expectation "f" "UsesForall"
@@ -163,7 +163,7 @@ spec = describe "ExpectationsAnalyzer" $ do
   it "works with scoped bindings" $ do
     let birdWeightUsesPlace = Expectation "bird.weight" "Uses:place"
     let birdPositionUsesPlace = Expectation "bird.position" "Uses:place"
-    let code = "var place = buenosAires; var bird = {position: place, weight: 20};";
+    let code = "let place = buenosAires; let bird = {position: place, weight: 20};";
 
     run JavaScript code [birdWeightUsesPlace] `shouldReturn` (result [failed birdWeightUsesPlace] [])
     run JavaScript code [birdPositionUsesPlace] `shouldReturn` (result [passed birdPositionUsesPlace] [])
@@ -171,7 +171,7 @@ spec = describe "ExpectationsAnalyzer" $ do
   it "works with scoped intransitive bindings" $ do
     let birdWeightUsesPlace = Expectation "Intransitive:bird.weight" "Uses:place"
     let birdPositionUsesPlace = Expectation "Intransitive:bird.position" "Uses:place"
-    let code = "var place = buenosAires; var bird = {position: place, weight: 20};";
+    let code = "let place = buenosAires; let bird = {position: place, weight: 20};";
 
     run JavaScript code [birdWeightUsesPlace] `shouldReturn` (result [failed birdWeightUsesPlace] [])
     run JavaScript code [birdPositionUsesPlace] `shouldReturn` (result [passed birdPositionUsesPlace] [])

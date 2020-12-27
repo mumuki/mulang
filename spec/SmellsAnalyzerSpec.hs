@@ -107,12 +107,12 @@ spec = describe "SmellsAnalyzer" $ do
     describe "works with non-empty set" $ do
       it "dont reports smell when excluded" $ do
         (runExcept JavaScript
-                  "function f() { var x = 1; return x }"
+                  "function f() { let x = 1; return x }"
                   ["HasRedundantLocalVariableReturn", "HasTooShortIdentifiers"]) `shouldReturn` (result [])
 
       it "reports smell when not excluded and present" $ do
         (runExcept JavaScript
-                  "function foo() { var aVariable = 1; return aVariable }"
+                  "function foo() { let aVariable = 1; return aVariable }"
                   []) `shouldReturn` (result [Expectation "foo" "HasRedundantLocalVariableReturn"])
 
       it "dont reports smell when not excluded and not present" $ do
