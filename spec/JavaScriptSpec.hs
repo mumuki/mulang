@@ -18,7 +18,7 @@ spec :: Spec
 spec = do
   describe "foo" $ do
     it "simple assignation" $ do
-      js "var x = 1" `shouldBe` (Mostly "var" (Variable "x" (MuNumber 1)))
+      js "var x = 1" `shouldBe` (Other (Just "var") (Just (Variable "x" (MuNumber 1))))
 
     it "simple assignation, with let" $ do
       js "let x = 1" `shouldBe` (Variable "x" (MuNumber 1))
@@ -44,7 +44,7 @@ spec = do
 
     it "handles lambdas likes haskell does" $ do
       js "let m = function(x) { return 1 }" `shouldBe` hs "m = \\x -> 1"
-      js "var m = function(x) { return 1 }" `shouldBe` (Mostly "var" (hs "m = \\x -> 1"))
+      js "var m = function(x) { return 1 }" `shouldBe` (Other (Just "var") (Just (hs "m = \\x -> 1")))
 
     it "handles arrow functions with explicit returns" $ do
       js "var m = (x) => { return 1 }" `shouldBe` js "var m = function(x) { return 1 }"
@@ -156,11 +156,10 @@ spec = do
 
     it "handles object declarations" $ do
       js "let x = {}" `shouldBe` (Object "x" None)
-      js "var x = {}" `shouldBe` (Mostly "var" (Object "x" None))
+      js "var x = {}" `shouldBe` (Other (Just "var") (Just (Object "x" None)))
 
     it "handles function declarations as vars" $ do
       js "let x = function(){}" `shouldBe` (SimpleFunction "x" [] None)
-      js "var x = function(){}" `shouldBe` (Mostly "var" (SimpleFunction "x" [] None))
 
     it "handles attribute and method declarations" $ do
       js "let x = {y: 2, z: function(){}}" `shouldBe` Object "x" (Sequence [

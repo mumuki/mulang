@@ -27,9 +27,6 @@ module Language.Mulang.Ast (
     debug,
     debugType,
     debugPattern,
-    mostly,
-    mostlyType,
-    mostlyPattern,
     pattern SimpleEquation,
     pattern SimpleFunction,
     pattern SimpleProcedure,
@@ -192,9 +189,6 @@ data Expression
     -- ^ Generic sequence of statements
     | Other (Maybe Code) (Maybe Expression)
     -- ^ Unrecognized expression, with optional description and body
-    | Mostly Code Expression
-    -- ^ Recognized expression that closely maps to the given expression but with
-    --  slightly different semantics
     | Equal -- ^ deprecated
     | NotEqual -- ^ deprecated
     | Arrow Expression Expression
@@ -279,15 +273,6 @@ data Statement
   = Generator Pattern Expression
   | Guard Expression
   deriving (Eq, Show, Read, Generic, Ord)
-
-mostly :: Show a => a -> Expression -> Expression
-mostly a = Mostly (show a)
-
-mostlyType :: Show a => a -> Type -> Type
-mostlyType a = MostlyType (show a)
-
-mostlyPattern :: Show a => a -> Pattern -> Pattern
-mostlyPattern a = MostlyPattern (show a)
 
 debug :: Show a => a -> Expression
 debug a = Other (Just (show a)) Nothing

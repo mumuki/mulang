@@ -181,7 +181,6 @@ evalExpr (M.Raise expr) = raiseInternal =<< evalExpr expr
 
 evalExpr (M.Reference name) = findReferenceForName name
 evalExpr (M.None) = return nullRef
-evalExpr (M.Mostly _ e) = evalExpr e
 evalExpr e = raiseString $ "Unkown expression: " ++ show e
 
 -- TODO make this evaluation non strict on both parameters

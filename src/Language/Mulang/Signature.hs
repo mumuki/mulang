@@ -56,7 +56,6 @@ signatureOf (Subroutine name es)                  = Just $ NamedSignature name (
 signatureOf (Clause name args _)                  = Just $ AritySignature name (length args)
 signatureOf (TypeSignature name t)                = typedSignatureOf name t
 signatureOf (LValue name _)                       = Just $ AritySignature name 0
-signatureOf (Mostly _ e)                          = signatureOf e
 signatureOf _                                     = Nothing
 
 typedSignatureOf :: Identifier -> Type -> Maybe Signature

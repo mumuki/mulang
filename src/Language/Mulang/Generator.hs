@@ -46,7 +46,7 @@ declarators e@(Record n)           = [(n, e)]
 declarators e@(TypeAlias n _)      = [(n, e)]
 declarators e@(TypeSignature n _)  = [(n, e)]
 declarators e@(LValue n _)         = [(n, e)]
-declarators (Mostly _ e)           = declarators e
+declarators (Other _ (Just e))     = declarators e
 declarators _                      = []
 
 declarations :: Generator Expression
@@ -94,7 +94,6 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Not e)                 = [e]
     subExpressions (Object _ v)            = [v]
     subExpressions (Other _ (Just e))      = [e]
-    subExpressions (Mostly _ e)            = [e]
     subExpressions (Print v)               = [v]
     subExpressions (Repeat e1 e2)          = [e1, e2]
     subExpressions (Return v)              = [v]

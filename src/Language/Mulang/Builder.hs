@@ -99,7 +99,6 @@ normalizeWith ops (LValue n (MuObject e))          | convertObjectVariableIntoOb
 normalizeWith ops (Variable n e)                   = Variable n (normalizeWith ops e)
 normalizeWith ops (Constant n e)                   = Constant n (normalizeWith ops e)
 normalizeWith ops (Other c (Just e))               = Other c (Just (normalizeWith ops e))
-normalizeWith ops (Mostly c e)                     = Mostly c (normalizeWith ops e)
 normalizeWith ops (While e1 e2)                    = While (normalizeWith ops e1) (normalizeWith ops e2)
 normalizeWith _ e = e
 
@@ -111,7 +110,6 @@ normalizeObjectLevelWith ops (Function n eqs)             | convertObjectLevelFu
 normalizeObjectLevelWith ops (LValue n (Lambda vars e))   | convertObjectLevelLambdaVariableIntoMethod ops = SimpleMethod n vars (normalizeWith ops e)
 normalizeObjectLevelWith ops (LValue n e)                 | convertObjectLevelVariableIntoAttribute ops    = Attribute n (normalizeWith ops e)
 normalizeObjectLevelWith ops (Sequence es)                = Sequence (map (normalizeObjectLevelWith ops) es)
-normalizeObjectLevelWith ops (Mostly c e)                 = Mostly c (normalizeWith ops e)
 normalizeObjectLevelWith ops e                            = normalizeWith ops e
 
 normalizeEquationWith :: NormalizationOptions -> Equation -> Equation
@@ -141,8 +139,7 @@ isImplicitReturn e                     = isLiteral e
 isSafeDeclaration :: Expression -> Bool
 isSafeDeclaration (Attribute _ _) = False
 isSafeDeclaration (LValue _ _)    = False
-isSafeDeclaration (Other _ e)     = False
-isSafeDeclaration (Mostly _ e)    = isSafeDeclaration e
+isSafeDeclaration (Other _ _)     = False
 isSafeDeclaration e               = isDeclaration e
 
 isDeclaration :: Expression -> Bool
