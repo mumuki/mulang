@@ -248,6 +248,8 @@ data Assertion
 data Pattern
     = VariablePattern Identifier
     -- ^ variable pattern like @X@
+    | ConstantPattern Identifier
+    -- ^ constant pattern like @X@
     | LiteralPattern Code
     -- ^ literal constant pattern like @4@
     | InfixApplicationPattern Pattern Identifier Pattern

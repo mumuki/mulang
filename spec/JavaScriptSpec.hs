@@ -203,25 +203,27 @@ spec = do
       run "for(let i = 0; i < 3; i++) i;" `shouldBe` ForLoop (Variable "i" (MuNumber 0)) (js "i < 3") (js "i++") (Reference "i")
 
     describe "for generator" $ do
-      let generatorAst = For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
+      let generatorWithVarAst = For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
+      let generatorWithLetAst = For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
+      let generatorWithConstAst = For [Generator (ConstantPattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
 
       it "handles for in" $ do
-        run "for(i in [1,2]) i;" `shouldBe` generatorAst
+        run "for(i in [1,2]) i;" `shouldBe` generatorWithVarAst
 
       it "handles for var in" $ do
-        run "for(var i in [1,2]) i;" `shouldBe` generatorAst
+        run "for(var i in [1,2]) i;" `shouldBe` generatorWithVarAst
 
       it "handles for let of" $ do
-        run "for(let i of [1,2]) i;" `shouldBe` generatorAst
+        run "for(let i of [1,2]) i;" `shouldBe` generatorWithLetAst
 
-      it "handles for let of" $ do
-        run "for(const i of [1,2]) i;" `shouldBe` generatorAst
+      it "handles for const of" $ do
+        run "for(const i of [1,2]) i;" `shouldBe` generatorWithConstAst
 
       it "handles for var of" $ do
-        run "for(var i of [1,2]) i;" `shouldBe` generatorAst
+        run "for(var i of [1,2]) i;" `shouldBe` generatorWithVarAst
 
       it "handles for let in" $ do
-        run "for(let i in [1,2]) i;" `shouldBe` generatorAst
+        run "for(let i in [1,2]) i;" `shouldBe` generatorWithLetAst
 
     context "handles assertions" $ do
       it "handles truth assertions" $ do
