@@ -80,9 +80,6 @@ data Type
         -- Usefull for modelling classes and interfaces types
         | OtherType (Maybe Code) (Maybe Type)
         -- ^ unrecognized type, with optional code and nested type
-        | MostlyType Code Type
-        -- ^ Recognized type that closely maps to the given type but with
-        --  slightly different semantics
         deriving (Eq, Show, Read, Generic, Ord)
 
 -- | Expression is the root element of a Mulang program.
@@ -267,9 +264,6 @@ data Pattern
     | UnionPattern [Pattern]
     | OtherPattern (Maybe Code) (Maybe Pattern)
     -- ^ Other unrecognized pattern with optional code and nested pattern
-    | MostlyPattern Code Pattern
-    -- ^ Recognized pattern that closely maps to the given pattern but with
-    --  slightly different semantics
   deriving (Eq, Show, Read, Generic, Ord)
 
 data Statement
