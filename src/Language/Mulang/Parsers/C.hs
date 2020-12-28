@@ -155,7 +155,7 @@ muUnaryOp CMinOp     argument                 = Application (Primitive O.Minus) 
 muUnaryOp CAdrOp     argument                 = Application (Reference "&")        [argument]
 muUnaryOp CIndOp     argument                 = Application (Reference "*")        [argument]
 muUnaryOp CCompOp    argument                 = Application (Reference "~")        [argument]
-muUnaryOp a b                                 = Other (Just $ show a) $ Just b
+muUnaryOp a b                                 = other (show a) b
 
 muAssignOp :: CAssignOp -> Expression
 muAssignOp CMulAssOp = Primitive O.Multiply

@@ -26,13 +26,13 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function esNumeroDeLaSuerte(x) {\r\n  return x > 0 && (esMultiploDe(2, x) || esMultiploDe(3, x)) && x != 15 ; \r\n} " test) `shouldReturn`  ok;
 
   it "evaluates count (uses for)" $ do
-    (run JavaScript "for (let x in []) {}" "expectation: count (uses for) = 0") `shouldReturn` nok
-    (run JavaScript "for (let x in []) {}" "expectation: count (uses for) = 1") `shouldReturn` ok
-    (run JavaScript "for (let x in []) {}" "expectation: count (uses for) = 2") `shouldReturn` nok
+    (run JavaScript "for (let x of []) {}" "expectation: count (uses for) = 0") `shouldReturn` nok
+    (run JavaScript "for (let x of []) {}" "expectation: count (uses for) = 1") `shouldReturn` ok
+    (run JavaScript "for (let x of []) {}" "expectation: count (uses for) = 2") `shouldReturn` nok
 
   it "evaluates count (uses for each)" $ do
-    (run JavaScript "for (let x in []) {}" "expectation: count (uses for each) = 0") `shouldReturn` nok
-    (run JavaScript "for (let x in []) {}" "expectation: count (uses for each) = 1") `shouldReturn` ok
+    (run JavaScript "for (let x of []) {}" "expectation: count (uses for each) = 0") `shouldReturn` nok
+    (run JavaScript "for (let x of []) {}" "expectation: count (uses for each) = 1") `shouldReturn` ok
 
   it "evaluates count (uses print)" $ do
     (run JavaScript "console.log('hello')" "expectation: count (uses print) = 1") `shouldReturn` ok

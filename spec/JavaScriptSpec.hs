@@ -7,6 +7,7 @@ import           Language.Mulang.Ast hiding (Equal, NotEqual)
 import           Language.Mulang.Ast.Operator
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
+import           Language.Mulang.Inspector.Literal (isOther)
 
 import           Data.Text (Text, unpack)
 import           NeatInterpolation (text)
@@ -18,7 +19,7 @@ spec :: Spec
 spec = do
   describe "foo" $ do
     it "simple assignation" $ do
-      js "var x = 1" `shouldBe` (Other (Just "var") (Just (Variable "x" (MuNumber 1))))
+      js "var x = 1" `shouldBe` (other "var" (Variable "x" (MuNumber 1)))
 
     it "simple assignation, with let" $ do
       js "let x = 1" `shouldBe` (Variable "x" (MuNumber 1))
@@ -44,7 +45,7 @@ spec = do
 
     it "handles lambdas likes haskell does" $ do
       js "let m = function(x) { return 1 }" `shouldBe` hs "m = \\x -> 1"
-      js "var m = function(x) { return 1 }" `shouldBe` (Other (Just "var") (Just (hs "m = \\x -> 1")))
+      js "var m = function(x) { return 1 }" `shouldBe` (other "var" (hs "m = \\x -> 1"))
 
     it "handles arrow functions with explicit returns" $ do
       js "var m = (x) => { return 1 }" `shouldBe` js "var m = function(x) { return 1 }"
@@ -156,7 +157,7 @@ spec = do
 
     it "handles object declarations" $ do
       js "let x = {}" `shouldBe` (Object "x" None)
-      js "var x = {}" `shouldBe` (Other (Just "var") (Just (Object "x" None)))
+      js "var x = {}" `shouldBe` (other "var" (Object "x" None))
 
     it "handles function declarations as vars" $ do
       js "let x = function(){}" `shouldBe` (SimpleFunction "x" [] None)
@@ -202,15 +203,26 @@ spec = do
       run "for(let i = 0; i < 3; i++) i;" `shouldBe` ForLoop (Variable "i" (MuNumber 0)) (js "i < 3") (js "i++") (Reference "i")
 
     describe "for generator" $ do
-      let generatorWithVarAst = For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
-      let generatorWithLetAst = For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
-      let generatorWithConstAst = For [Generator (ConstantPattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
+      let generatorWithLetAst = (For
+                                  [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])]
+                                  (Reference "i"))
 
-      it "handles for in" $ do
-        run "for(i in [1,2]) i;" `shouldBe` generatorWithVarAst
+      let generatorWithVarAst = (For
+                                  [Generator (otherPattern "var" (VariablePattern "i")) (MuList [MuNumber 1, MuNumber 2])]
+                                  (Reference "i"))
 
-      it "handles for var in" $ do
-        run "for(var i in [1,2]) i;" `shouldBe` generatorWithVarAst
+      let generatorWithConstAst = (For
+                                    [Generator (ConstantPattern "i") (MuList [MuNumber 1, MuNumber 2])]
+                                    (Reference "i"))
+
+      it "NOT handles for in" $ do
+        isOther (run "for(i in [1,2]) i;") `shouldBe` True
+
+      it "NOT handles for var in" $ do
+        isOther (run "for(var i in [1,2]) i;") `shouldBe` True
+
+      it "NOT handles for let in" $ do
+        isOther (run "for(let i in [1,2]) i;") `shouldBe` True
 
       it "handles for let of" $ do
         run "for(let i of [1,2]) i;" `shouldBe` generatorWithLetAst
@@ -221,8 +233,9 @@ spec = do
       it "handles for var of" $ do
         run "for(var i of [1,2]) i;" `shouldBe` generatorWithVarAst
 
-      it "handles for let in" $ do
-        run "for(let i in [1,2]) i;" `shouldBe` generatorWithLetAst
+      it "handles for var of" $ do
+        run "for(i of [1,2]) i;" `shouldBe` generatorWithVarAst
+
 
     context "handles assertions" $ do
       it "handles truth assertions" $ do

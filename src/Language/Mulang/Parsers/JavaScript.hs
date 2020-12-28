@@ -11,6 +11,7 @@ import Language.JavaScript.Parser.AST
 import Data.Either ()
 import Data.List (partition)
 import Data.List.Extra (headOrElse)
+import Data.Function.Extra ((<==))
 
 import Control.Fallible
 
@@ -36,15 +37,12 @@ muJSStatement (JSStatementBlock _ statements _ _)                           = co
 --muJSStatement (JSConstant _ (JSCommaList JSExpression) _) -- ^const, decl, autosemi
 muJSStatement (JSDoWhile _ statement _ _ expression _ _)                    = While (muJSExpression expression) (muJSStatement statement)
 muJSStatement (JSFor _ _ inits _ conds _ progs _ body)                      = muFor inits conds progs body
-muJSStatement (JSForIn _ _ id _ gen _ body)                                 = muForIn VariablePattern id gen body
 muJSStatement (JSForVar _ _ _ inits _ conds _ progs _ body)                 = muFor inits conds progs body
-muJSStatement (JSForVarIn _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForIn VariablePattern id gen body
 muJSStatement (JSForLet _ _ _ inits _ conds _ progs _ body)                 = muFor inits conds progs body
-muJSStatement (JSForLetIn _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForIn VariablePattern id gen body
-muJSStatement (JSForLetOf _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForIn VariablePattern id gen body
-muJSStatement (JSForConstOf _ _ _ (JSVarInitExpression id _) _ gen _ body)  = muForIn ConstantPattern id gen body
-muJSStatement (JSForOf _ _ id _ gen _ body)                                 = muForIn VariablePattern id gen body
-muJSStatement (JSForVarOf _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForIn VariablePattern id gen body
+muJSStatement (JSForConstOf _ _ _ (JSVarInitExpression id _) _ gen _ body)  = muForOf ConstantPattern id gen body
+muJSStatement (JSForLetOf _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForOf VariablePattern id gen body
+muJSStatement (JSForOf _ _ id _ gen _ body)                                 = muForOf (otherPattern "var" . VariablePattern) id gen body
+muJSStatement (JSForVarOf _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForOf (otherPattern "var" . VariablePattern) id gen body
 muJSStatement (JSFunction _ ident _ params _ body _)                        = muComputation ident params body
 muJSStatement (JSIf _ _ expression _ statement)                             = If (muJSExpression expression) (muJSStatement statement) None
 muJSStatement (JSIfElse _ _ expression _ ifStatement _ elseStatement)       = If (muJSExpression expression) (muJSStatement ifStatement) (muJSStatement elseStatement)
@@ -59,7 +57,7 @@ muJSStatement (JSReturn _ maybeExpression _)                                = Re
 muJSStatement (JSSwitch _ _ expression _ _ cases _ _)                       = muSwitch expression . partition isDefault $ cases
 muJSStatement (JSThrow _ expression _)                                      = Raise (muJSExpression expression)
 muJSStatement (JSTry _ block catches finally)                               = Try (muJSBlock block) (map muJSTryCatch catches) (muJSTryFinally finally)
-muJSStatement (JSVariable _ list _)                                         = Other (Just "var") (Just (muLValue Variable list))
+muJSStatement (JSVariable _ list _)                                         = muLValue (other "var" <== Variable) list
 muJSStatement (JSLet _ list _)                                              = muLValue Variable list
 muJSStatement (JSConstant _ list _)                                         = muLValue Constant list
 muJSStatement (JSWhile _ _ expression _ statement)                          = While (muJSExpression expression) (muJSStatement statement)
@@ -100,7 +98,7 @@ muFor inits conds progs body = (ForLoop
                                   (muJSExpressionFromList progs)
                                   (muJSStatement body))
 
-muForIn kind (JSIdentifier _ id) generator body = (For
+muForOf kind (JSIdentifier _ id) generator body = (For
                                                 [Generator (kind id) (muJSExpression generator)]
                                                 (muJSStatement body))
 

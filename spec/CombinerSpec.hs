@@ -33,7 +33,7 @@ spec = do
     it "fails when inspection is not present" $ do
       locate usesWhile (js "hello") `shouldBe` Nowhere
 
-  describe "negate" $ do
+  describe "never" $ do
     it "is False when inspection is true" $ do
       never usesIf (hs "f x = g x") `shouldBe` True
 

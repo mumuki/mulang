@@ -27,6 +27,9 @@ module Language.Mulang.Ast (
     debug,
     debugType,
     debugPattern,
+    other,
+    otherType,
+    otherPattern,
     pattern SimpleEquation,
     pattern SimpleFunction,
     pattern SimpleProcedure,
@@ -282,6 +285,15 @@ debugType a = OtherType (Just (show a)) Nothing
 
 debugPattern :: Show a => a -> Pattern
 debugPattern a = OtherPattern (Just (show a)) Nothing
+
+other :: String -> Expression -> Expression
+other s e = Other (Just s) (Just e)
+
+otherType :: String -> Type -> Type
+otherType s e = OtherType (Just s) (Just e)
+
+otherPattern :: String -> Pattern -> Pattern
+otherPattern s e = OtherPattern (Just s) (Just e)
 
 pattern VariableSignature name t cs        = TypeSignature name (SimpleType t cs)
 pattern SubroutineSignature name args t cs = TypeSignature name (ParameterizedType args t cs)
