@@ -15,7 +15,7 @@ import           Language.Mulang.Inspector.Matcher
 import           Language.Mulang.Inspector.Combiner
 import           Language.Mulang.Inspector.Contextualized
 import           Language.Mulang.Inspector.Generic
-import           Language.Mulang.Inspector.Generic.Smell
+import           Language.Mulang.Inspector.Smell
 
 spec :: Spec
 spec = do

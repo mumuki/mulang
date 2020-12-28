@@ -1,4 +1,4 @@
-module Language.Mulang.Inspector.Generic.Smell.JavaScript (
+module Language.Mulang.Inspector.Smell.JavaScript (
   usesVarInsteadOfLet) where
 
 import           Language.Mulang.Ast

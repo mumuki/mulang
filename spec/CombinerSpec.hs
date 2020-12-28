@@ -4,7 +4,7 @@ import           Data.Function.Extra (never)
 
 import           Test.Hspec
 import           Language.Mulang
-import           Language.Mulang.Inspector.Generic.Smell
+import           Language.Mulang.Inspector.Smell
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 

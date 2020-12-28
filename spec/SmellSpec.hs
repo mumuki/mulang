@@ -5,7 +5,7 @@ module SmellSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Ast hiding (Equal, NotEqual)
 import           Language.Mulang.Ast.Operator
-import           Language.Mulang.Inspector.Generic.Smell
+import           Language.Mulang.Inspector.Smell
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)
 import           Language.Mulang.Parsers.Python (py)

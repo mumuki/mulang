@@ -7,7 +7,7 @@ import Language.Mulang.Ast (Expression, Identifier)
 import Language.Mulang.DomainLanguage
 import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Inspector.Logic
-import Language.Mulang.Inspector.Generic.Smell
+import Language.Mulang.Inspector.Smell
 import Language.Mulang.Inspector.Combiner (Location(..), locate)
 import Language.Mulang.Edl.Expectation (cQuery, Query(..), CQuery (..), Matcher(..), Predicate(..))
 
