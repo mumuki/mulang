@@ -6,6 +6,7 @@ import           Test.Hspec
 import           Language.Mulang.Ast hiding (Equal, NotEqual)
 import           Language.Mulang.Ast.Operator
 import           Language.Mulang.Inspector.Smell
+import           Language.Mulang.Inspector.Smell.JavaScript
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)
 import           Language.Mulang.Parsers.Python (py)
@@ -497,3 +498,10 @@ spec = do
       detectUsageTypos "bar"  (js "Foo()\nbaar()") `shouldBe` ["baar"]
       detectUsageTypos "br"   (js "Foo()\nbar()") `shouldBe` ["bar"]
       detectUsageTypos "baz"  (js "Foo()\nbar()\nbaaz()") `shouldBe` ["bar", "baaz"]
+
+
+  describe "usesVarInsteadOfLet" $ do
+    it "is True when there is a var" $ do
+      usesVarInsteadOfLet (js "var x = 1; x++") `shouldBe` True
+      usesVarInsteadOfLet (js "let x = 1; x++") `shouldBe` False
+      usesVarInsteadOfLet (js "const x = 1; x++") `shouldBe` False

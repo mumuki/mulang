@@ -16,6 +16,11 @@ runWithTypos language content expectations = do
   return $ smells result
 
 spec = describe "SmellsAnalyzer" $ do
+  describe "Using language specific smells" $ do
+    it "works with JavaScript smells" $ do
+      (runOnly JavaScript "function f() { var x = 1 }" ["JavaScript#UsesVarInsteadOfLet"]) `shouldReturn` (result [Expectation "f" "JavaScript#UsesVarInsteadOfLet"])
+      (runOnly JavaScript "function f() { let x = 1 }" ["JavaScript#UsesVarInsteadOfLet"]) `shouldReturn` (result [])
+
   describe "using usage typos" $ do
     it "works when there are missing usages and typos" $ do
       runWithTypos JavaScript "baz()" [Expectation "*" "Uses:bar"] `shouldReturn` [Expectation "baz" "HasUsageTypos:bar"]

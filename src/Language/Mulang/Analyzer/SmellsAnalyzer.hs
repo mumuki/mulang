@@ -8,6 +8,7 @@ import Language.Mulang.DomainLanguage
 import Language.Mulang.Inspector.Primitive
 import Language.Mulang.Inspector.Logic
 import Language.Mulang.Inspector.Smell
+import Language.Mulang.Inspector.Smell.JavaScript
 import Language.Mulang.Inspector.Combiner (Location(..), locate)
 import Language.Mulang.Edl.Expectation (cQuery, Query(..), CQuery (..), Matcher(..), Predicate(..))
 
@@ -85,7 +86,8 @@ allSmells = [
   "UsesCut",
   "UsesFail",
   "UsesNamedSelfReference",
-  "UsesUnificationOperator" ]
+  "UsesUnificationOperator",
+  "JavaScript#UsesVarInsteadOfLet" ]
 
 ---
 --- Instantiation
@@ -170,6 +172,7 @@ detectionFor ("UsesCut", Nothing)                         = simple usesCut
 detectionFor ("UsesFail", Nothing)                        = simple usesFail
 detectionFor ("UsesNamedSelfReference", Nothing)          = simple usesNamedSelfReference
 detectionFor ("UsesUnificationOperator", Nothing)         = simple usesUnificationOperator
+detectionFor ("JavaScript#UsesVarInsteadOfLet", Nothing)  = simple usesVarInsteadOfLet
 detectionFor _                                            = unsupported
 
 unsupported :: Detection
