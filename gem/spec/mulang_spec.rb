@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mulang::Code do
   context 'when language is javascript' do
-    let(:code) { Mulang::Code.native('JavaScript', 'var x = 1') }
+    let(:code) { Mulang::Code.native('JavaScript', 'let x = 1') }
 
     it { expect(code.ast).to eq "tag"=>"Variable", "contents"=>["x", {"tag"=>"MuNumber", "contents"=>1}] }
     it { expect(code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }). to eq 'tag'=>'AnalysisCompleted',
