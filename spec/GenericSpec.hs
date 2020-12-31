@@ -5,17 +5,21 @@ module GenericSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Ast
 import           Language.Mulang.Ast.Operator
-import           Language.Mulang.Parsers.Haskell
-import           Language.Mulang.Parsers.JavaScript
-import           Language.Mulang.Parsers.Java (java)
-import           Language.Mulang.Parsers.Python (py2, py3)
 import           Language.Mulang.Identifier
-import           Language.Mulang.Inspector.Literal
-import           Language.Mulang.Inspector.Matcher
 import           Language.Mulang.Inspector.Combiner
 import           Language.Mulang.Inspector.Contextualized
 import           Language.Mulang.Inspector.Generic
+import           Language.Mulang.Inspector.Literal
+import           Language.Mulang.Inspector.Matcher
 import           Language.Mulang.Inspector.Smell
+import           Language.Mulang.Normalizers.Haskell (haskellNormalizationOptions)
+import           Language.Mulang.Parsers.Haskell
+import           Language.Mulang.Parsers.Java (java)
+import           Language.Mulang.Parsers.JavaScript
+import           Language.Mulang.Parsers.Python (py2, py3)
+import           Language.Mulang.Transform.Normalizer
+
+nhs = normalize haskellNormalizationOptions . hs
 
 spec :: Spec
 spec = do
@@ -67,7 +71,7 @@ spec = do
         declaresFunction (named "f") (hs "f = 2") `shouldBe` False
 
       it "is True when constant is declared with a lambda literal" $ do
-        declaresFunction (named "f") (hs "f = \\x -> x + 1") `shouldBe` True
+        declaresFunction (named "f") (nhs "f = \\x -> x + 1") `shouldBe` True
 
       it "is False when constant is declared with a number literal" $ do
         declaresFunction (named "f") (hs "f = 3") `shouldBe` False
@@ -133,10 +137,10 @@ spec = do
 
     describe "with constant declaration, hs" $ do
       it "is True when constant is declared with lambda of given arity" $ do
-        (declaresComputationWithArity 2) (named "f") (hs "f = \\x y -> x + y") `shouldBe` True
+        (declaresComputationWithArity 2) (named "f") (nhs "f = \\x y -> x + y") `shouldBe` True
 
       it "is False when constant is declared with lambda of given arity" $ do
-        (declaresComputationWithArity 3) (named "f") (hs "f = \\x y -> x + y") `shouldBe` False
+        (declaresComputationWithArity 3) (named "f") (nhs "f = \\x y -> x + y") `shouldBe` False
 
       it "is False if it is a variable" $ do
         (declaresComputationWithArity 1) (named "f") (hs "f = snd") `shouldBe` False

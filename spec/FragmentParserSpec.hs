@@ -21,7 +21,7 @@ spec = do
 
     parseFragment convert fragment `shouldBe` (Right (Object "x" None))
     parseFragment keep fragment `shouldBe` (Right (Variable "x" (MuObject None)))
-    parseFragment Nothing fragment `shouldBe` (Right (Variable "x" (MuDict None)))
+    parseFragment Nothing fragment `shouldBe` (Right (Variable "x" (MuObject None)))
 
   it "parses malformed Haskell expressions" $ do
     let fragment = CodeSample Haskell "x 1"

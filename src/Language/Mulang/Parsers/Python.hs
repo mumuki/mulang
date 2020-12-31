@@ -9,7 +9,6 @@ module Language.Mulang.Parsers.Python (
 import qualified Language.Mulang.Ast as M
 import qualified Language.Mulang.Ast.Operator as O
 import           Language.Mulang.Builder (compactMap)
-import           Language.Mulang.Transform.Normalizer (normalize)
 import           Language.Mulang.Parsers
 
 import qualified Language.Python.Version3.Parser as Python3
@@ -23,7 +22,6 @@ import           Data.Maybe (fromMaybe, listToMaybe)
 
 import           Control.Fallible
 
-
 py, py2, py3 :: Parser
 py = py3
 py2 = parsePythonOrFail Python2.parseModule
@@ -36,7 +34,7 @@ parsePython3 = parsePythonOrLeft Python3.parseModule
 
 parsePythonOrFail p = orFail . parsePython' p
 parsePythonOrLeft p = orLeft . parsePython' p
-parsePython' parseModule = fmap (normalize . muPyAST) . (`parseModule` "")
+parsePython' parseModule = fmap muPyAST . (`parseModule` "")
 
 muPyAST :: (ModuleSpan, [Token]) -> M.Expression
 muPyAST (modul, _) = muModule modul

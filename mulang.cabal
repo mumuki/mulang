@@ -63,6 +63,12 @@ library
     Language.Mulang.Inspector.Procedural
     Language.Mulang.Inspector.Query
     Language.Mulang.Inspector.Typed
+    Language.Mulang.Normalizers.C
+    Language.Mulang.Normalizers.Haskell
+    Language.Mulang.Normalizers.Java
+    Language.Mulang.Normalizers.JavaScript
+    Language.Mulang.Normalizers.Python
+    Language.Mulang.Normalizers.Ruby
     Language.Mulang.Operators
     Language.Mulang.Operators.C
     Language.Mulang.Operators.Common

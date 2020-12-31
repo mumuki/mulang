@@ -7,7 +7,6 @@ import Language.Mulang.Ast
 import qualified Language.Mulang.Ast.Operator as O
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compactMap, compactConcatMap)
-import Language.Mulang.Transform.Normalizer (normalize)
 
 import qualified Language.C.Parser as C
 import Language.C.Syntax
@@ -27,7 +26,7 @@ parseC :: EitherParser
 parseC = parseC'
 
 parseC' :: EitherParser
-parseC' = fmap (normalize . muTranslationUnit) . toEitherParser . flip (C.parseC) nopos . inputStreamFromString
+parseC' = fmap muTranslationUnit . toEitherParser . flip (C.parseC) nopos . inputStreamFromString
 
 toEitherParser :: Either C.ParseError CTranslUnit -> Either String CTranslUnit
 toEitherParser (Left (C.ParseError (msgs, _))) = Left $ concat msgs

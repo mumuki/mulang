@@ -8,7 +8,6 @@ import qualified Language.Mulang.Ast as M
 import qualified Language.Mulang.Ast.Operator as O
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compact, compactMap, compactConcatMap)
-import Language.Mulang.Transform.Normalizer (normalize)
 
 import Language.Java.Parser
 import Language.Java.Syntax
@@ -27,7 +26,7 @@ java = orFail . parseJava'
 parseJava :: EitherParser
 parseJava = orLeft . parseJava'
 
-parseJava' = fmap (normalize . m) . j
+parseJava' = fmap m . j
 
 m (CompilationUnit _ _ typeDecls) = compactMap muTypeDecl $ typeDecls
 
