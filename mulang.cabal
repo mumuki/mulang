@@ -38,6 +38,7 @@ library
     Language.Mulang.Ast
     Language.Mulang.Ast.Operator
     Language.Mulang.Builder
+    Language.Mulang.Renamer
     Language.Mulang.Consult
     Language.Mulang.Counter
     Language.Mulang.DomainLanguage
