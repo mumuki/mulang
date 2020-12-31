@@ -81,7 +81,8 @@ data AnalysisSpec = AnalysisSpec {
   domainLanguage :: Maybe DomainLanguage,
   includeIntermediateLanguage :: Maybe Bool,
   originalLanguage :: Maybe Language,
-  autocorrectionRules :: Maybe AutocorrectionRules
+  autocorrectionRules :: Maybe AutocorrectionRules,
+  normalizationOptions :: Maybe NormalizationOptions
 } deriving (Show, Eq, Generic)
 
 data DomainLanguage = DomainLanguage {
@@ -112,7 +113,7 @@ data SignatureStyle
   | PrologStyle deriving (Show, Eq, Generic)
 
 data Fragment
-  = MulangSample { ast :: Expression, normalizationOptions :: Maybe NormalizationOptions }
+  = MulangSample { ast :: Expression }
   | CodeSample { language :: Language, content :: Code } deriving (Show, Eq, Generic)
 
 data InterpreterOptions = InterpreterOptions {
@@ -185,7 +186,18 @@ allSmellsBut :: [Smell] -> Maybe SmellsSet
 allSmellsBut = Just . AllSmells . Just
 
 emptyAnalysisSpec :: AnalysisSpec
-emptyAnalysisSpec = AnalysisSpec Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+emptyAnalysisSpec = AnalysisSpec {
+    expectations = Nothing,
+    customExpectations = Nothing,
+    smellsSet = Nothing,
+    signatureAnalysisType = Nothing,
+    testAnalysisType = Nothing,
+    domainLanguage = Nothing,
+    includeIntermediateLanguage = Nothing,
+    originalLanguage = Nothing,
+    autocorrectionRules = Nothing,
+    normalizationOptions = Nothing
+  }
 
 emptyAnalysis :: Fragment -> Analysis
 emptyAnalysis code = Analysis code emptyAnalysisSpec
