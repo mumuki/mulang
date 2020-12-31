@@ -37,6 +37,7 @@ library
     Language.Mulang
     Language.Mulang.Ast
     Language.Mulang.Ast.Operator
+    Language.Mulang.Ast.Visitor
     Language.Mulang.Builder
     Language.Mulang.Renamer
     Language.Mulang.Consult

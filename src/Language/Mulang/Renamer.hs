@@ -3,6 +3,7 @@ module Language.Mulang.Renamer (rename) where
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import           Language.Mulang.Ast
+import           Language.Mulang.Ast.Visitor
 import           Data.Maybe (catMaybes)
 import           Control.Monad.State
 
@@ -19,162 +20,36 @@ emptyReferencesMap = ReferencesMap (Map.empty) (Map.empty)
 rename :: Expression -> Expression
 rename e = evalState (renameState e) emptyReferencesMap
 
-
 renameState :: Expression -> RenameState Expression
-renameState (Application e es)               = do
-  e' <- renameState e
-  es' <- mapM (renameState) es
-  return $ Application e' es'
-renameState (Arrow e1 e2)                    = do
-  e1' <- renameState e1
-  e2' <- renameState e2
-  return $ Arrow e1' e2'
-renameState (Attribute n e)                  = do
-  e' <- renameState e
-  return $ Attribute n e'
-renameState (Fact n args)                    = do
-  return $ Fact n args
-renameState (For stms e1)                    = do
-  e1' <- renameState e1
-  return $ For stms e1'
-renameState (Forall e1 e2)                   = do
-  e1' <- renameState e1
-  e2' <- renameState e2
-  return $ Forall e1' e2'
-renameState (ForLoop init cond prog stmt)    = do
-  init' <- renameState init
-  cond' <- renameState cond
-  prog' <- renameState prog
-  stmt' <- renameState stmt
-  return $ ForLoop init' cond' prog' stmt'
-renameState (Function n equations)           = do
-  equations' <- renameEquations equations
-  return $ Function n equations'
-renameState (If e1 e2 e3)                    = do
-  e1' <- renameState e1
-  e2' <- renameState e2
-  e3' <- renameState e3
-  return $ If e1' e2' e3'
-renameState (Lambda ps e2)                   = do
-  e2' <- renameState e2
-  return $ Lambda ps e2'
-renameState (Match e1 equations)             = do
-  e1' <- renameState e1
-  equations' <- renameEquations equations
-  return $ Match e1' equations'
-renameState (Method n equations)             = do
-  equations' <- renameEquations equations
-  return $ Method n equations'
-renameState (MuDict e)                       = do
-  e' <- renameState e
-  return $ MuDict e'
-renameState (MuList es)                      = do
-  es' <- mapM (renameState) es
-  return $ MuList es'
-renameState (MuObject e)                     = do
-  e' <- renameState e
-  return $ MuObject e'
-renameState (MuTuple es)                     = do
-  es' <- mapM (renameState) es
-  return $ MuTuple es'
-renameState (Not e)                          = do
-  e' <- renameState e
-  return $ Not e'
-renameState (Object n e)                     = do
-  e' <- renameState e
-  return $ Object n e'
-renameState (Procedure n equations)          = do
-  equations' <- renameEquations equations
-  return $ Procedure n equations'
-renameState (Return e)                       = do
-  e' <- renameState e
-  return $ Return e'
-renameState (Rule n args es)                 = do
-  es' <- mapM (renameState) es
-  return $ Rule n args es'
-renameState (Send r e es)                    = do
-  r' <- renameState r
-  e' <- renameState e
-  es' <- mapM (renameState) es
-  return $ Send r' e' es'
-renameState (Sequence es)                    = do
-  es' <- mapM renameState es
-  return $ Sequence es'
-renameState (Other n (Just e))               = do
-  e' <- renameState e
-  return $ Other n (Just e')
-renameState (While e1 e2)                    = do
-  e1' <- renameState e1
-  e2' <- renameState e2
-  return $ While e1' e2'
-renameState (Yield e)                        = do
-  e' <- renameState e
-  return $ Yield e'
-renameState (TypeCast e t)                   = do
-  e' <- renameState e
-  return $ TypeCast e' t
-renameState (Assignment i e)                 = do
-  e' <- renameState e
-  return $ Assignment i e'
-renameState (Break e)                        = do
-  e' <- renameState e
-  return $ Break e'
-renameState (Class i pi e)                   = do
-  e' <- renameState e
-  return $ Class i pi e'
-renameState (Continue e)                     = do
-  e' <- renameState e
-  return $ Continue e'
-renameState (EntryPoint i e)                 = do
-  e' <- renameState e
-  return $ EntryPoint i e'
-renameState (EqualMethod equations)          = do
-  equations' <- renameEquations equations
-  return $ EqualMethod equations'
-renameState (FieldAssignment e1 i e2)        = do
-  e1' <- renameState e1
-  e2' <- renameState e2
-  return $ FieldAssignment e1' i e2'
-renameState (FieldReference e i)             = do
-  e' <- renameState e
-  return $ FieldReference e' i
-renameState (Findall e1 e2 e3)               = do
-  e1' <- renameState e1
-  e2' <- renameState e2
-  e3' <- renameState e3
-  return $ Findall e1' e2' e3'
-renameState (HashMethod equations)           = do
-  equations' <- renameEquations equations
-  return $ HashMethod equations'
-renameState (Implement e)                    = do
-  e' <- renameState e
-  return $ Implement e'
-renameState (Include e)                      = do
-  e' <- renameState e
-  return $ Include e'
-renameState (Interface i is e)               = do
-  e' <- renameState e
-  return $ Interface i is e'
-renameState (New e es)                       = do
-  e' <- renameState e
-  es' <- mapM renameState es
-  return $ New e' es'
-renameState (PrimitiveMethod op equations)   = do
-  equations' <- renameEquations equations
-  return $ PrimitiveMethod op equations'
-renameState (Print e)                        = do
-  e' <- renameState e
-  return $ Print e'
-renameState (Raise e)                        = do
-  e' <- renameState e
-  return $ Raise e'
-renameState (Repeat e1 e2)                   = do
-  e1' <- renameState e1
-  e2' <- renameState e2
-  return $ Repeat e1' e2'
-renameState (Variable n e)                   = renameVariable n e
-renameState (Reference r)                    = renameReference r
-renameState e                                = return e
+renameState (Reference r)       = renameReference r
+renameState (Variable n e)      = renameVariable n e
+renameState e@(Exist _ _)       = return e
+renameState f@(Fact _ _)        = return f
+renameState f@(Findall _ _ _)   = return f
+renameState f@(Forall _ _)      = return f
+renameState n@(Not _)           = return n
+--
+renameState (For stms e1)       = do { e1' <- renameState e1; return $ For stms e1' }
+renameState (ForLoop i c a b)   = do { [i', c', a', b'] <- mapM renameState [i, c, a, b]; return $ ForLoop i' c' a' b' }
+renameState (Lambda ps e2)      = do { e2' <- renameState e2; return $ Lambda ps e2' }
+renameState (Match e1 eqs)      = do { e1' <- renameState e1; eqs' <- renameEquations eqs; return $ Match e1' eqs' }
+renameState (Send r e es)       = do { (r':e':es') <- mapM renameState (r:e:es); return $ Send r' e' es' }
+renameState (Switch v cs d)     = do { v' <- renameState v; cs' <- renameSwitchCases cs; d' <- renameState d; return $ Switch v' cs' d' }
+renameState (Try t cs f)        = do { t' <- renameState t; cs' <- renameTryCases cs; f' <- renameState f; return $ Try t' cs' f' }
+renameState a@(Assert _ _)      = return a
+renameState r@(Rule _ _ _)      = return r
+--
+renameState (ExpressionAndExpressionsList e es c)  = do { (e':es') <- mapM renameState (e:es); return $ c e' es' }
+renameState (SingleEquationsList eqs c)            = do { eqs' <- renameEquations eqs; return $ c eqs' }
+renameState (SingleExpression e c)                 = do { e' <- renameState e; return $ c e' }
+renameState (SingleExpressionsList es c)           = do { es' <- mapM renameState es; return $ c es' }
+renameState (ThreeExpressions e1 e2 e3 c)          = do { [e1', e2', e3'] <- mapM renameState [e1, e2, e3]; return $ c e1' e2' e3' }
+renameState (TwoExpressions e1 e2 c)               = do { e1' <- renameState e1; e2' <- renameState e2; return $ c e1' e2' }
+renameState e@(SinglePatternsList _ _)             = return e
+renameState e@Terminal                             = return e
+
+renameTryCases    = mapM (\(p, e) -> do { e' <- renameState e; return (p, e') })
+renameSwitchCases = mapM (\(e1, e2) -> do { e1' <- renameState e1; e2' <- renameState e2; return (e1', e2') })
 
 renameEquations :: [Equation] -> RenameState [Equation]
 renameEquations equations = do

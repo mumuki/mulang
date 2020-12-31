@@ -19,6 +19,7 @@ module Language.Mulang.Generator (
   Expression(..)) where
 
 import Language.Mulang.Ast
+import Language.Mulang.Ast.Visitor
 import Language.Mulang.Identifier
 
 import Data.Maybe (mapMaybe)
@@ -68,47 +69,25 @@ expressions :: Generator Expression
 expressions expr = expr : concatMap expressions (subExpressions expr)
   where
     subExpressions :: Generator Expression
-    subExpressions (Arrow e1 e2)           = [e1, e2]
-    subExpressions (Assignment _ e)        = [e]
-    subExpressions (Attribute _ v)         = [v]
-    subExpressions (Call op args)          = op:args
-    subExpressions (Class _ _ v)           = [v]
-    subExpressions (Clause _ _ es)         = es
-    subExpressions (EntryPoint _ e)        = [e]
-    subExpressions (FieldAssignment r _ e) = [r, e]
-    subExpressions (FieldReference r _)    = [r]
-    subExpressions (For stmts a)           = statementsExpressions stmts ++ [a]
-    subExpressions (Forall e1 e2)          = [e1, e2]
-    subExpressions (ForLoop i c p s)       = [i, c, p, s]
-    subExpressions (If a b c)              = [a, b, c]
-    subExpressions (Implement e)           = [e]
-    subExpressions (Include e)             = [e]
-    subExpressions (Interface _ _ v)       = [v]
-    subExpressions (Lambda _ a)            = [a]
-    subExpressions (Match e1 equations)    = e1:equationsExpressions equations
-    subExpressions (MuDict es)             = [es]
-    subExpressions (MuList as)             = as
-    subExpressions (MuObject es)           = [es]
-    subExpressions (MuTuple as)            = as
-    subExpressions (New e es)              = e:es
-    subExpressions (Not e)                 = [e]
-    subExpressions (Object _ v)            = [v]
-    subExpressions (Other _ (Just e))      = [e]
-    subExpressions (Print v)               = [v]
-    subExpressions (Repeat e1 e2)          = [e1, e2]
-    subExpressions (Return v)              = [v]
-    subExpressions (Sequence es)           = es
-    subExpressions (Subroutine _ es)       = equationsExpressions es
-    subExpressions (Switch e1 list _)      = e1 : concatMap (\(x,y) -> [x,y]) list
-    subExpressions (Try t cs f)            = t : map snd cs ++ [f]
-    subExpressions (TypeCast e _)          = [e]
-    subExpressions (Variable _ v)          = [v]
-    subExpressions (Constant _ v)          = [v]
-    subExpressions (While e1 e2)           = [e1, e2]
-    subExpressions (Yield v)               = [v]
-    subExpressions (Break e)               = [e]
-    subExpressions (Continue e)            = [e]
-    subExpressions _                       = []
+    --
+    subExpressions (Assert _ a)                           = [] -- FIXME
+    subExpressions (For stmts a)                          = statementsExpressions stmts ++ [a]
+    subExpressions (ForLoop i c p s)                      = [i, c, p, s]
+    subExpressions (Lambda _ e)                           = [e]
+    subExpressions (Match e eqs)                          = e : equationsExpressions eqs
+    subExpressions (Rule _ _ es)                          = es
+    subExpressions (Send e1 e2 es)                        = e1 : e2 : es
+    subExpressions (Switch e1 list e2)                     = e1 : concatMap (\(x,y) -> [x,y]) list ++ [e2]
+    subExpressions (Try t cs f)                           = t : map snd cs ++ [f]
+    --
+    subExpressions (ExpressionAndExpressionsList e es _)  = e : es
+    subExpressions (SingleEquationsList eqs _)            = equationsExpressions eqs
+    subExpressions (SingleExpression e _)                 = [e]
+    subExpressions (SingleExpressionsList es _)           = es
+    subExpressions (SinglePatternsList _ _)               = []
+    subExpressions (Terminal)                             = []
+    subExpressions (ThreeExpressions e1 e2 e3 _)          = [e1, e2, e3]
+    subExpressions (TwoExpressions e1 e2 _)               = [e1, e2]
 
 
 -- | Returns all the referenced identifiers
