@@ -1,13 +1,13 @@
-module NormalizationSpec (spec) where
+module NormalizerSpec (spec) where
 
   import           Test.Hspec
   import           Language.Mulang.Ast
   import           Language.Mulang.Ast.Operator
-  import           Language.Mulang.Builder
-  import           Language.Mulang.Parsers.Java (java)
-  import           Language.Mulang.Parsers.Python (py)
   import           Language.Mulang.Parsers.Haskell (hs)
+  import           Language.Mulang.Parsers.Java (java)
   import           Language.Mulang.Parsers.JavaScript (js)
+  import           Language.Mulang.Parsers.Python (py)
+  import           Language.Mulang.Transform.Normalizer
 
   spec :: Spec
   spec = do

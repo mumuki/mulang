@@ -6,7 +6,8 @@ module Language.Mulang.Parsers.C (c, parseC) where
 import Language.Mulang.Ast
 import qualified Language.Mulang.Ast.Operator as O
 import Language.Mulang.Parsers
-import Language.Mulang.Builder (compactMap, compactConcatMap, normalize)
+import Language.Mulang.Builder (compactMap, compactConcatMap)
+import Language.Mulang.Transform.Normalizer (normalize)
 
 import qualified Language.C.Parser as C
 import Language.C.Syntax

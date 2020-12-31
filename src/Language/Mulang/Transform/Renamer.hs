@@ -1,4 +1,4 @@
-module Language.Mulang.Renamer (rename) where
+module Language.Mulang.Transform.Renamer (rename) where
 
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map

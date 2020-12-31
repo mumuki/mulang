@@ -39,7 +39,6 @@ library
     Language.Mulang.Ast.Operator
     Language.Mulang.Ast.Visitor
     Language.Mulang.Builder
-    Language.Mulang.Renamer
     Language.Mulang.Consult
     Language.Mulang.Counter
     Language.Mulang.DomainLanguage
@@ -104,6 +103,8 @@ library
     Language.Mulang.Interpreter
     Language.Mulang.Interpreter.Internals
     Language.Mulang.Interpreter.Runner
+    Language.Mulang.Transform.Normalizer
+    Language.Mulang.Transform.Renamer
 
   build-depends:
     base                      <= 5,

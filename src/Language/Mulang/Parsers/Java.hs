@@ -7,7 +7,8 @@ import Language.Mulang.Ast hiding (Primitive, While, Return, Equal, Lambda, Try,
 import qualified Language.Mulang.Ast as M
 import qualified Language.Mulang.Ast.Operator as O
 import Language.Mulang.Parsers
-import Language.Mulang.Builder (compact, compactMap, compactConcatMap, normalize)
+import Language.Mulang.Builder (compact, compactMap, compactConcatMap)
+import Language.Mulang.Transform.Normalizer (normalize)
 
 import Language.Java.Parser
 import Language.Java.Syntax

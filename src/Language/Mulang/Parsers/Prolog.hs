@@ -7,7 +7,7 @@ import Text.Parsec.Expr
 import Text.Parsec.Numbers
 
 import Language.Mulang.Ast
-import Language.Mulang.Builder
+import Language.Mulang.Builder (compact)
 import Language.Mulang.Parsers
 
 import Data.Maybe (fromMaybe)

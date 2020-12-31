@@ -2,7 +2,7 @@ module RenamerSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang.Ast
-import           Language.Mulang.Renamer (rename)
+import           Language.Mulang.Transform.Renamer (rename)
 import           Language.Mulang.Parsers.JavaScript (js)
 
 spec :: Spec

@@ -13,7 +13,7 @@ import        Language.Mulang.Parsers.Prolog (parseProlog)
 import        Language.Mulang.Parsers.Java (parseJava)
 import        Language.Mulang.Parsers.Python (parsePython, parsePython2, parsePython3)
 import        Language.Mulang.Analyzer.Analysis (Fragment(..), Language(..))
-import        Language.Mulang.Builder (normalize, normalizeWith, NormalizationOptions)
+import        Language.Mulang.Transform.Normalizer (normalize, normalizeWith, NormalizationOptions)
 
 parseFragment' :: Fragment -> Expression
 parseFragment' = orFail . parseFragment

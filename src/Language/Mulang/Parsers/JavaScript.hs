@@ -2,7 +2,8 @@ module Language.Mulang.Parsers.JavaScript (js, parseJavaScript) where
 
 import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
-import Language.Mulang.Builder (compact, compactMap, normalizeWith, defaultNormalizationOptions, NormalizationOptions(..), SequenceSortMode(..))
+import Language.Mulang.Builder (compact, compactMap)
+import Language.Mulang.Transform.Normalizer (normalizeWith, defaultNormalizationOptions, NormalizationOptions(..), SequenceSortMode(..))
 import Language.Mulang.Parsers
 
 import Language.JavaScript.Parser.Parser (parse)
