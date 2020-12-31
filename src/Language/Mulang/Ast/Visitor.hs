@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, PatternSynonyms, ViewPatterns #-}
+{-# LANGUAGE PatternSynonyms, ViewPatterns #-}
 
 module Language.Mulang.Ast.Visitor (
     pattern Terminal,
@@ -12,6 +12,30 @@ module Language.Mulang.Ast.Visitor (
   ) where
 
 import Language.Mulang.Ast
+
+-- By using this module, AST can be visited with less effort using the following strategy:
+--
+-- --
+-- (ProblemSpecificPatterns)
+-- --
+-- (Assert b a)
+-- (For stmts e)
+-- (ForLoop e1 e2 e3 e4)
+-- (Lambda ps e)
+-- (Match e eqs)
+-- (Rule i ps es)
+-- (Send e1 e2 es)
+-- (Switch e1 ps e2)
+-- (Try t cs f)
+-- --
+-- (ExpressionAndExpressionsList e1 es _)
+-- (SingleEquationsList es _)
+-- (SingleExpression e1 _)
+-- (SingleExpressionsList es _)
+-- (SinglePatternsList es _)
+-- (ThreeExpressions e1 e2 e3 _)
+-- (TwoExpressions e1 e2 _)
+-- Terminal
 
 pattern Terminal <- (extractTerminal -> Just _)
 
@@ -119,26 +143,3 @@ extractExpressionAndExpressionsList :: Expression -> Maybe (Expression, [Express
 extractExpressionAndExpressionsList (Application e1 es) = Just (e1, es, Application)
 extractExpressionAndExpressionsList (New e1 es)         = Just (e1, es, New)
 extractExpressionAndExpressionsList _                   = Nothing
-
--- --
--- ProblemSpecific
--- --
--- (Assert b a)
--- (For stmts e)
--- (ForLoop e1 e2 e3 e4)
--- (Lambda ps e)
--- (Match e eqs)
--- (Rule i ps es)
--- (Send e1 e2 es)
--- (Switch e1 ps e2)
--- (Try t cs f)
--- --
--- (ExpressionAndExpressionsList e1 es _)
--- (SingleEquationsList es _)
--- (SingleExpression e1 _)
--- (SingleExpressionsList es _)
--- (SinglePatternsList es _)
--- (Terminal)
--- (ThreeExpressions e1 e2 e3 _)
--- (TwoExpressions e1 e2 _)
-
