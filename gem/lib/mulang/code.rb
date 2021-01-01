@@ -1,5 +1,6 @@
 module Mulang
   class Code
+    attr_accessor :language, :content
     def initialize(language, content)
       @language = language
       @content  = content
