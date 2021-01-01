@@ -22,6 +22,7 @@ data NormalizationOptions = NormalizationOptions {
   convertObjectLevelFunctionIntoMethod :: Bool,
   convertObjectLevelLambdaVariableIntoMethod :: Bool,
   convertObjectLevelVariableIntoAttribute :: Bool,
+  convertObjectIntoDict :: Bool,
   sortSequenceDeclarations :: SequenceSortMode,
   insertImplicitReturn :: Bool
 } deriving (Eq, Show, Read, Generic)
@@ -39,6 +40,7 @@ defaultNormalizationOptions = NormalizationOptions {
   convertObjectLevelFunctionIntoMethod = False,
   convertObjectLevelLambdaVariableIntoMethod = False,
   convertObjectLevelVariableIntoAttribute = False,
+  convertObjectIntoDict = False,
   sortSequenceDeclarations = SortNothing,
   insertImplicitReturn = False
 }
@@ -48,6 +50,7 @@ normalize :: NormalizationOptions -> Expression -> Expression
 normalize ops (Application (Send r m []) args)      = Send (normalize ops r) (normalize ops m) (mapNormalize ops args)
 normalize ops (LValue n (Lambda vars e))            | convertLambdaVariableIntoFunction ops = SimpleFunction n vars (normalize ops e)
 normalize ops (LValue n (MuObject e))               | convertObjectVariableIntoObject ops = Object n (normalizeObjectLevel ops e)
+normalize ops (MuObject e)                          | convertObjectIntoDict ops = MuDict e
 normalize ops (Object n e)                          = Object n (normalizeObjectLevel ops e)
 normalize ops (Sequence es)                         = Sequence . sortDeclarationsWith ops .  mapNormalize ops $ es
 --

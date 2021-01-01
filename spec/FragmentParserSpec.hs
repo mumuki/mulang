@@ -17,10 +17,12 @@ spec = do
   it "parses well formed expressions with normalization options" $ do
     let convert = Just (defaultNormalizationOptions { convertObjectVariableIntoObject = True })
     let keep    = Just (defaultNormalizationOptions { convertObjectVariableIntoObject = False })
+    let asDict  = Just (defaultNormalizationOptions { convertObjectIntoDict = True })
     let fragment = CodeSample JavaScript "let x = {}"
 
     parseFragment convert fragment `shouldBe` (Right (Object "x" None))
     parseFragment keep fragment `shouldBe` (Right (Variable "x" (MuObject None)))
+    parseFragment asDict fragment `shouldBe` (Right (Variable "x" (MuDict None)))
     parseFragment Nothing fragment `shouldBe` (Right (Variable "x" (MuObject None)))
 
   it "parses malformed Haskell expressions" $ do
