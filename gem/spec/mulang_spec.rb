@@ -111,4 +111,31 @@ describe Mulang::Code do
 
     end
   end
+
+  context 'when language is native with normalization options' do
+    let(:input) do
+      'function x() { 1 }'
+    end
+    let(:code) { Mulang::Code.native('JavaScript', input) }
+
+    it do
+      expect(code.sample).to eq tag: 'CodeSample', language: 'JavaScript', content: input
+
+    end
+
+    it do
+      expect(code.analyse(includeIntermediateLanguage: true,
+                          normalizationOptions: {insertImplicitReturn: true})).to eq 'expectationResults' => [],
+                                                                                    'intermediateLanguage' => {
+                                                                                      'tag'=>'Procedure',
+                                                                                      'contents'=>['x', [[[], {
+                                                                                        'tag'=>'UnguardedBody',
+                                                                                        'contents'=>{'tag'=>'Return', 'contents'=>{'tag'=>'MuNumber', 'contents'=>1}}}]]]},
+                                                                                    'signatures' => [],
+                                                                                    'smells' => [],
+                                                                                    'tag' => 'AnalysisCompleted',
+                                                                                    'testResults' => []
+
+    end
+  end
 end
