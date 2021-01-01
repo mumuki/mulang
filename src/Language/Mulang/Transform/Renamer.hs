@@ -60,18 +60,9 @@ renameEquations equations = do
 
 renameEquation :: Equation -> RenameState Equation
 renameEquation (Equation ps b) = do
-  ps' <- renameParameters ps
+  ps' <- mapM renameParameter ps
   b' <- renameEquationBody b
   return $ Equation ps' b'
-
-renameParameters :: [Pattern] -> RenameState [Pattern]
-renameParameters [p] = do
-  p' <- renameParameter p
-  return [p']
-renameParameters (p:ps) = do
-  p'<- renameParameter p
-  ps' <- renameParameters ps
-  return (p':ps')
 
 renameParameter :: Pattern -> RenameState Pattern
 renameParameter (VariablePattern n) = fmap VariablePattern . createParameter $ n
