@@ -1,5 +1,6 @@
 module Language.Mulang.Analyzer (
   analyse,
+  analyseMany,
   module Language.Mulang.Analyzer.Analysis) where
 
 import Language.Mulang
@@ -18,6 +19,9 @@ import Data.Maybe (fromMaybe)
 --
 -- Analysis running
 --
+
+analyseMany :: [Analysis] -> IO [AnalysisResult]
+analyseMany = mapM analyse
 
 analyse, analyse' :: Analysis -> IO AnalysisResult
 analyse = analyse' . autocorrect

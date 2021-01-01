@@ -9,6 +9,10 @@ module Mulang
       @language.ast @content
     end
 
+    def ast_analysis
+      @language.ast_analysis @content
+    end
+
     def sample
       @language.sample @content
     end
@@ -49,6 +53,14 @@ module Mulang
 
     def self.ast(ast)
       new Mulang::Language::External.new, ast
+    end
+
+    def self.analyse_many(codes, spec)
+      Mulang.analyse codes.map { |it| it.analysis(spec)  }
+    end
+
+    def self.ast_many(codes)
+      Mulang.analyse codes.map { |it| it.ast_analysis  }
     end
 
     private
