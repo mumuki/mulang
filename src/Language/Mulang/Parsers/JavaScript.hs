@@ -139,7 +139,7 @@ containsReturn _             = False
 muJSExpression:: JSExpression -> Expression
 muJSExpression (JSIdentifier _ "undefined")                         = None
 muJSExpression (JSIdentifier _ name)                                = Reference name
-muJSExpression (JSDecimal _ val)                                    = MuNumber (read val)
+muJSExpression (JSDecimal _ val)                                    = muDecimal val
 muJSExpression (JSLiteral _ "null")                                 = MuNil
 muJSExpression (JSLiteral _ "true")                                 = MuTrue
 muJSExpression (JSLiteral _ "false")                                = MuFalse
@@ -276,3 +276,10 @@ muJSArrowParameterList :: JSArrowParameterList -> [Pattern]
 muJSArrowParameterList (JSUnparenthesizedArrowParameter ident)        = [muIdentPattern ident]
 muJSArrowParameterList (JSParenthesizedArrowParameterList _ params _) = muJSPatternList params
 
+muDecimal s@('.':_) = muDecimal ('0':s)
+muDecimal str       = decode (reads str)
+  where
+    decode [(n, "")]  = MuNumber n
+    decode [(n, ".")] = MuNumber n
+    decode [(n, s)]   = other ("JSDecimal:" ++ s) (MuNumber n)
+    decode _          = debug ("JSDecimal:" ++ str)
