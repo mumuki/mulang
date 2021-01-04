@@ -10,7 +10,7 @@ import Language.Mulang.Analyzer.Analysis (Expectation, TransformationSpec, Trans
 import Language.Mulang.Analyzer.ExpectationsCompiler (compileExpectation)
 
 transformMany' :: Expression -> Maybe [TransformationSpec] -> Maybe [Expression]
-transformMany' e = fmap (transformMany e)
+transformMany' e =  fmap (transformMany e)
 
 transformMany :: Expression -> [TransformationSpec] -> [Expression]
 transformMany e specs = map (transform e) specs

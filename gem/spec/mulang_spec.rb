@@ -7,6 +7,7 @@ describe Mulang::Code do
     it { expect(code.ast).to eq "tag"=>"Variable", "contents"=>["x", {"tag"=>"MuNumber", "contents"=>1}] }
     it { expect(code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }). to eq 'tag'=>'AnalysisCompleted',
                                                                                       'outputAst'=>nil,
+                                                                                      'transformedAsts' => nil,
                                                                                       'signatures'=>[],
                                                                                       'smells'=>[],
                                                                                       'expectationResults'=>[],
@@ -126,6 +127,7 @@ describe Mulang::Code do
     it do
       expect(code.analyse(includeOutputAst: true)).to eq 'expectationResults' => [],
                                                                     'outputAst' => {'tag'=>'MuNumber', 'contents'=>1},
+                                                                    'transformedAsts' => nil,
                                                                     'signatures' => [],
                                                                     'smells' => [],
                                                                     'tag' => 'AnalysisCompleted',
