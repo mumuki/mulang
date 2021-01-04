@@ -294,7 +294,7 @@ spec = describe "AnalysisJson" $ do
     "normalizationOptions": {
       "insertImplicitReturn": true
     },
-    "includeIntermediateLanguage": true
+    "includeOutputAst": true
   }
 } |]
     let analysis = Analysis (MulangSample (SimpleProcedure "foo" [VariablePattern "x"]
@@ -303,7 +303,7 @@ spec = describe "AnalysisJson" $ do
                               normalizationOptions = Just (defaultNormalizationOptions {
                                 insertImplicitReturn = True
                               }),
-                              includeIntermediateLanguage = Just True
+                              includeOutputAst = Just True
                             })
 
     run json `shouldBe` analysis

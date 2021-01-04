@@ -44,8 +44,9 @@ analyseAst ast spec = do
                              (analyseSignatures ast (signatureAnalysisType spec))
                              testResults
                              (analyzeIntermediateLanguage ast spec)
+                             Nothing
 
 analyzeIntermediateLanguage :: Expression -> AnalysisSpec -> Maybe Expression
 analyzeIntermediateLanguage ast spec
-  | fromMaybe False (includeIntermediateLanguage spec) = Just ast
+  | fromMaybe False (includeOutputAst spec) = Just ast
   | otherwise = Nothing

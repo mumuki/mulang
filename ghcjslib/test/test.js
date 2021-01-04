@@ -82,7 +82,7 @@ describe("mulang", () => {
           "result": true
         },
       ],
-      "intermediateLanguage": null,
+      "outputAst": null,
       "signatures": [],
       "smells": [],
       "tag": "AnalysisCompleted",
@@ -100,11 +100,11 @@ describe("mulang", () => {
       "spec": {
         "expectations": [],
         "smellsSet": { "tag": "NoSmells" },
-        "includeIntermediateLanguage": true
+        "includeOutputAst": true
       }
     })).be.eql({
       "expectationResults": [],
-      "intermediateLanguage": {
+      "outputAst": {
         "contents": [
           "foo",
           [

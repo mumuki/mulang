@@ -5,13 +5,13 @@ module Mulang::Language
     end
 
     def ast(content)
-      Mulang.analyse(ast_analysis(content))['intermediateLanguage'] rescue nil
+      Mulang.analyse(ast_analysis(content))['outputAst'] rescue nil
     end
 
     def ast_analysis(content)
       {
         sample: { tag: 'CodeSample', language: @language, content: content },
-        spec: { expectations: [], smellsSet: { tag: 'NoSmells' }, includeIntermediateLanguage: true }
+        spec: { expectations: [], smellsSet: { tag: 'NoSmells' }, includeOutputAst: true }
       }
     end
 

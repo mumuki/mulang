@@ -416,7 +416,7 @@ mulang '
 }
 ' | json_pp
 {
-   "intermediateLanguage" : null,
+   "outputAst" : null,
    "tag" : "AnalysisCompleted",
    "expectationResults" : [
       {
@@ -450,13 +450,13 @@ $ mulang '
       "content" : "function foo(x, y) { return null; }"
    },
    "spec" : {
-      "includeIntermediateLanguage" : true
+      "includeOutputAst" : true
    }
 }
 ' | json_pp
 {
    "tag" : "AnalysisCompleted",
-   "intermediateLanguage" : {
+   "outputAst" : {
       "tag" : "Function",
       "contents" : [
          "foo",
@@ -538,7 +538,7 @@ $ mulang '
     }
   },
   "spec": {
-    "includeIntermediateLanguage": true
+    "includeOutputAst": true
   }
 }
 ' | json_pp
@@ -548,7 +548,7 @@ $ mulang '
    "smells" : [],
    "expectationResults" : [],
    "testResults" : [],
-   "intermediateLanguage" : {
+   "outputAst" : {
       "tag" : "Procedure",
       "contents" : [
          "foo",

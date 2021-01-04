@@ -205,7 +205,7 @@ const examples = {
        "content" : "function foo(x, y) { return null; }"
     },
     "spec" : {
-       "includeIntermediateLanguage" : true
+       "includeOutputAst" : true
     }
   },
   "normalization": {
@@ -254,7 +254,7 @@ const examples = {
       }
     },
     "spec": {
-      "includeIntermediateLanguage": true
+      "includeOutputAst": true
     }
   },
   "testRunning" : {

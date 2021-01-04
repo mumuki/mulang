@@ -6,7 +6,7 @@ describe Mulang::Code do
 
     it { expect(code.ast).to eq "tag"=>"Variable", "contents"=>["x", {"tag"=>"MuNumber", "contents"=>1}] }
     it { expect(code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }). to eq 'tag'=>'AnalysisCompleted',
-                                                                                      'intermediateLanguage'=>nil,
+                                                                                      'outputAst'=>nil,
                                                                                       'signatures'=>[],
                                                                                       'smells'=>[],
                                                                                       'expectationResults'=>[],
@@ -124,18 +124,22 @@ describe Mulang::Code do
     end
 
     it do
-      expect(code.analyse(includeIntermediateLanguage: true,
-                          normalizationOptions: {insertImplicitReturn: true})).to eq 'expectationResults' => [],
-                                                                                    'intermediateLanguage' => {
-                                                                                      'tag'=>'Procedure',
-                                                                                      'contents'=>['x', [[[], {
-                                                                                        'tag'=>'UnguardedBody',
-                                                                                        'contents'=>{'tag'=>'Return', 'contents'=>{'tag'=>'MuNumber', 'contents'=>1}}}]]]},
-                                                                                    'signatures' => [],
-                                                                                    'smells' => [],
-                                                                                    'tag' => 'AnalysisCompleted',
-                                                                                    'testResults' => []
+      expect(code.analyse(includeOutputAst: true)).to eq 'expectationResults' => [],
+                                                                    'outputAst' => {'tag'=>'MuNumber', 'contents'=>1},
+                                                                    'signatures' => [],
+                                                                    'smells' => [],
+                                                                    'tag' => 'AnalysisCompleted',
+                                                                    'testResults' => []
 
+    end
+  end
+
+  context 'when batch mode is used' do
+    let(:codes) { 3.times.map { |it| Mulang::Code.native("JavaScript", "let x = #{it}") } }
+
+
+    it "results are functionally equivalent to standard mode" do
+      expect(Mulang::Code.ast_many codes).to eq codes.map(&:ast)
     end
   end
 

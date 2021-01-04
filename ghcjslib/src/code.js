@@ -46,7 +46,7 @@
     }
 
     get computedAst() {
-      return this.analyse({expectations: [], smellsSet: { tag: 'NoSmells'}, includeIntermediateLanguage: true}).intermediateLanguage;
+      return this.analyse({expectations: [], smellsSet: { tag: 'NoSmells'}, includeOutputAst: true}).outputAst;
     }
 
     expect(binding, inspection) {
