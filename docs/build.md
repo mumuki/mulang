@@ -6,7 +6,9 @@ To generate `mulang` executable, you have to build the project using [stack](htt
 
 1. Install stack: `wget -qO- https://get.haskellstack.org/ | sh`
 2. Go to the mulang project directory and setup it: `stack setup`
-4. Build the project: `./build.sh`
+4. Build the project:
+    1. If you need a production ready build, run `./build.sh`
+    2. If you just need a quick-to-compile development version, run `./build.sh --fast`
 
 ## Installing and creating an executable
 
