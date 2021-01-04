@@ -36,6 +36,7 @@ module Language.Mulang.Analyzer.Analysis (
   Smell,
   SmellsSet(..),
   TestAnalysisType(..),
+  TransformationSpec,
   TransformationOperation(..),
 
   QueryResult,
