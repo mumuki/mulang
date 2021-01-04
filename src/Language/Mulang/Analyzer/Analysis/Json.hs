@@ -44,6 +44,7 @@ instance FromJSON Statement
 instance FromJSON Type
 instance FromJSON Assertion
 instance FromJSON TestAnalysisType
+instance FromJSON TransformationOperation
 instance FromJSON InterpreterOptions
 instance FromJSON Operator
 

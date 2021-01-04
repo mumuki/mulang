@@ -36,6 +36,7 @@ module Language.Mulang.Analyzer.Analysis (
   Smell,
   SmellsSet(..),
   TestAnalysisType(..),
+  TransformationOperation(..),
 
   QueryResult,
 
@@ -78,8 +79,9 @@ data AnalysisSpec = AnalysisSpec {
   smellsSet :: Maybe SmellsSet,
   signatureAnalysisType :: Maybe SignatureAnalysisType,
   testAnalysisType :: Maybe TestAnalysisType,
+  transformationSpecs :: Maybe [TransformationSpec],
   domainLanguage :: Maybe DomainLanguage,
-  includeIntermediateLanguage :: Maybe Bool,
+  includeOutputAst :: Maybe Bool,
   originalLanguage :: Maybe Language,
   autocorrectionRules :: Maybe AutocorrectionRules,
   normalizationOptions :: Maybe NormalizationOptions
@@ -130,6 +132,13 @@ data TestAnalysisType
       interpreterOptions :: Maybe InterpreterOptions
     } deriving (Show, Eq, Generic)
 
+type TransformationSpec = [TransformationOperation]
+
+data TransformationOperation
+  = RenameVariables
+  | Normalize NormalizationOptions
+  | Crop Expectation deriving (Show, Eq, Generic)
+
 data Language
   =  Json
   |  Java
@@ -160,7 +169,8 @@ data AnalysisResult
       smells :: [Expectation],
       signatures :: [Code],
       testResults :: [TestResult],
-      intermediateLanguage :: Maybe Expression }
+      outputAst :: Maybe Expression,
+      transformedAsts :: Maybe [Expression] }
   | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
 data ExpectationResult = ExpectationResult {
@@ -192,8 +202,9 @@ emptyAnalysisSpec = AnalysisSpec {
     smellsSet = Nothing,
     signatureAnalysisType = Nothing,
     testAnalysisType = Nothing,
+    transformationSpecs = Nothing,
     domainLanguage = Nothing,
-    includeIntermediateLanguage = Nothing,
+    includeOutputAst = Nothing,
     originalLanguage = Nothing,
     autocorrectionRules = Nothing,
     normalizationOptions = Nothing
@@ -221,7 +232,7 @@ testsAnalysis :: Fragment -> TestAnalysisType -> Analysis
 testsAnalysis code testAnalysisType = Analysis code (emptyAnalysisSpec { testAnalysisType = Just testAnalysisType })
 
 emptyCompletedAnalysisResult :: AnalysisResult
-emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing
+emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing Nothing
 
 emptyDomainLanguage :: DomainLanguage
 emptyDomainLanguage = DomainLanguage Nothing Nothing Nothing Nothing
