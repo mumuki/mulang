@@ -50,9 +50,9 @@ hasRedundantRepeat = containsExpression f
 
 shouldUseStrictComparators :: Inspection
 shouldUseStrictComparators = containsExpression f
-  where f (Primitive O.Like)    = True
+  where f (Primitive O.Similar)    = True
         f (Primitive O.NotSimilar) = True
-        f _                     = False
+        f _                        = False
 
 doesNilTest :: Inspection
 doesNilTest = compares f
