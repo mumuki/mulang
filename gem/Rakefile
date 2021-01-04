@@ -8,7 +8,7 @@ task :default => :all
 namespace :wrapper do
   desc 'Wrap mulang into this gem'
   task wrap: :clean do
-    cp Dir['../.stack-work/install/x86_64-linux/**/8.0.1/bin/mulang'].first, 'bin/mulang'
+    cp Dir['../.stack-work/install/x86_64-linux*/**/8.0.1/bin/mulang'].first, 'bin/mulang'
   end
 
   task :clean do
