@@ -38,6 +38,9 @@ spec = do
     it "differentiates procedures and functions" $ do
       (js "function f() { return 1 }" /= js "function f() { 1 }") `shouldBe` True
 
+    it "differentiates procedures and functions with returns in if" $ do
+      (js "function f(){ if (x) { } else { return 4 } }") `shouldBe` (SimpleFunction "f" [] (If (Reference "x") None (Return (MuNumber 4.0))))
+
     it "handles lambdas likes haskell does" $ do
       js "var m = function(x) { return 1 }" `shouldBe` hs "m = \\x -> 1"
 

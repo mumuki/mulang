@@ -121,7 +121,9 @@ computationFor body | containsReturn body = Function
                     | otherwise           = Procedure
 
 containsReturn :: Expression -> Bool
+containsReturn (Return None) = False
 containsReturn (Return _)    = True
+containsReturn (If _ t e)    = containsReturn t || containsReturn e
 containsReturn (Sequence xs) = any containsReturn xs
 containsReturn _             = False
 
