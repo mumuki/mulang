@@ -2,7 +2,7 @@
 
 module Language.Mulang.Transform.Normalizer (
     normalize,
-    defaultNormalizationOptions,
+    unnormalized,
     NormalizationOptions (..),
     SequenceSortMode (..)) where
 
@@ -36,8 +36,8 @@ data SequenceSortMode
   | SortAllNonVariables
   | SortAll deriving (Eq, Show, Read, Generic)
 
-defaultNormalizationOptions :: NormalizationOptions
-defaultNormalizationOptions = NormalizationOptions {
+unnormalized :: NormalizationOptions
+unnormalized = NormalizationOptions {
   convertObjectVariableIntoObject = False,
   convertLambdaVariableIntoFunction = False,
   convertObjectLevelFunctionIntoMethod = False,

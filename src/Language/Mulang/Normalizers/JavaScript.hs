@@ -1,9 +1,9 @@
 module Language.Mulang.Normalizers.JavaScript (javaScriptNormalizationOptions) where
 
-import Language.Mulang.Transform.Normalizer (defaultNormalizationOptions, NormalizationOptions(..), SequenceSortMode(..))
+import Language.Mulang.Transform.Normalizer (unnormalized, NormalizationOptions(..), SequenceSortMode(..))
 
 javaScriptNormalizationOptions :: NormalizationOptions
-javaScriptNormalizationOptions = defaultNormalizationOptions {
+javaScriptNormalizationOptions = unnormalized {
   convertObjectVariableIntoObject = True,
   convertLambdaVariableIntoFunction = True,
   convertObjectLevelFunctionIntoMethod = True,

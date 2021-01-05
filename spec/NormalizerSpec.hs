@@ -19,7 +19,7 @@ module NormalizerSpec (spec) where
   spec :: Spec
   spec = do
     describe "can trim code" $ do
-      let options = defaultNormalizationOptions { trimSequences = True }
+      let options = unnormalized { trimSequences = True }
 
       it "removes nones from sequences" $ do
         normalize options (Object "X" (Sequence [None, None, MuNumber 5, None])) `shouldBe`  (Object "X" (Sequence [MuNumber 5]))
@@ -28,7 +28,7 @@ module NormalizerSpec (spec) where
         normalize options (MuList [None, None, MuNumber 5, None]) `shouldBe`  (MuList [None, None, MuNumber 5, None])
 
     describe "can compact code" $ do
-      let options = defaultNormalizationOptions { compactSequences = True }
+      let options = unnormalized { compactSequences = True }
 
       it "compacts sequences" $ do
         normalize options (Object "X" (Sequence [MuNumber 5])) `shouldBe`  (Object "X" (MuNumber 5))
@@ -40,7 +40,7 @@ module NormalizerSpec (spec) where
         normalize options (Object "X" (Sequence [None, None, MuNumber 5])) `shouldBe`  (Object "X" (Sequence [None, None, MuNumber 5]))
 
     describe "can trim and compact code" $ do
-      let options = defaultNormalizationOptions { trimSequences = True, compactSequences = True }
+      let options = unnormalized { trimSequences = True, compactSequences = True }
 
       it "trims first, compacts later" $ do
         normalize options (Object "X" (Sequence [MuNumber 5])) `shouldBe`  (Object "X" (MuNumber 5))
@@ -52,7 +52,7 @@ module NormalizerSpec (spec) where
         normalize options (Object "X" (Sequence [None, None, MuNumber 5])) `shouldBe`  (Object "X" (MuNumber 5))
 
     describe "can insert implicit retuns" $ do
-      let options = defaultNormalizationOptions { insertImplicitReturn = True }
+      let options = unnormalized { insertImplicitReturn = True }
 
       it "does not insert return in single literal statement" $ do
         normalize options (py "def x(): x = 1") `shouldBe`  SimpleProcedure "x" [] (Assignment "x" (MuNumber 1.0))

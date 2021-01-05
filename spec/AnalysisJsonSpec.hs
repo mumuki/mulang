@@ -11,7 +11,7 @@ import           Language.Mulang.Analyzer.Analysis.Json ()
 import           Language.Mulang.Analyzer hiding (spec)
 import           Language.Mulang.Ast
 import           Language.Mulang.Ast.Operator (Operator(..))
-import           Language.Mulang.Transform.Normalizer (NormalizationOptions (..), defaultNormalizationOptions)
+import           Language.Mulang.Transform.Normalizer (NormalizationOptions (..), unnormalized)
 
 import           Data.Maybe (fromJust)
 import           Data.Aeson (decode)
@@ -300,11 +300,10 @@ spec = describe "AnalysisJson" $ do
     let analysis = Analysis (MulangSample (SimpleProcedure "foo" [VariablePattern "x"]
                                               (Application (Primitive Multiply) [MuNumber 2.0,Reference "x"])))
                             (emptyAnalysisSpec {
-                              normalizationOptions = Just (defaultNormalizationOptions {
+                              normalizationOptions = Just (unnormalized {
                                 insertImplicitReturn = True
                               }),
                               includeOutputAst = Just True
                             })
 
     run json `shouldBe` analysis
-

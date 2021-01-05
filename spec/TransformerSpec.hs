@@ -12,7 +12,7 @@ spec = do
     it "transform with two paths" $ do
       transformMany (Variable "x" (MuObject None)) [
           [RenameVariables],
-          [Normalize (defaultNormalizationOptions { convertObjectVariableIntoObject = True })]
+          [Normalize (unnormalized { convertObjectVariableIntoObject = True })]
         ] `shouldBe` [Variable "mulang_var_n0" (MuObject None), Object "x" None]
 
   describe "transform" $ do
@@ -25,5 +25,5 @@ spec = do
     it "transform with normalization" $ do
       transform (Variable "x" (MuObject None)) [
         RenameVariables,
-        Normalize (defaultNormalizationOptions { convertObjectVariableIntoObject = True })] `shouldBe` (
+        Normalize (unnormalized { convertObjectVariableIntoObject = True })] `shouldBe` (
           Object "mulang_var_n0" None)
