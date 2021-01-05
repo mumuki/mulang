@@ -283,8 +283,12 @@ spec = do
     run (java "class Foo extends Bar {}") "Foo" "Inherits:Baz" `shouldBe` False
 
   it "works with primitive operators in js" $ do
-    run (js "x == 4") "*" "UsesEqual" `shouldBe` True
+    run (js "x == 4") "*" "UsesEqual" `shouldBe` False
     run (js "x != 4") "*" "UsesEqual" `shouldBe` False
+    run (js "x == 4") "*" "UsesSimilar" `shouldBe` True
+    run (js "x != 4") "*" "UsesSimilar" `shouldBe` False
+    run (js "x === 4") "*" "UsesEqual" `shouldBe` True
+    run (js "x !== 4") "*" "UsesEqual" `shouldBe` False
 
   it "works with primitive operators in hs" $ do
     run (hs "x = x . y") "*" "UsesForwardComposition" `shouldBe` False

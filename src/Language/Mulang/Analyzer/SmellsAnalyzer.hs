@@ -81,6 +81,7 @@ allSmells = [
   "ReturnsNil",
   "ShouldInvertIfCondition",
   "ShouldUseOtherwise",
+  "ShouldUseStrictComparators",
   "UsesCut",
   "UsesFail",
   "UsesNamedSelfReference",
@@ -164,6 +165,7 @@ detectionFor ("ReturnsNil", Nothing)                      = simple returnsNil
 detectionFor ("ReturnsNull", Nothing)                     = simple returnsNil
 detectionFor ("ShouldInvertIfCondition", Nothing)         = simple shouldInvertIfCondition
 detectionFor ("ShouldUseOtherwise", Nothing)              = simple shouldUseOtherwise
+detectionFor ("ShouldUseStrictComparators", Nothing)      = simple shouldUseStrictComparators
 detectionFor ("UsesCut", Nothing)                         = simple usesCut
 detectionFor ("UsesFail", Nothing)                        = simple usesFail
 detectionFor ("UsesNamedSelfReference", Nothing)          = simple usesNamedSelfReference

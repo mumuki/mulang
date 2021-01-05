@@ -245,6 +245,27 @@ spec = do
     it "is False when there no guards" $ do
       shouldUseOtherwise (hs "f x = True") `shouldBe` False
 
+  describe "shouldUseStrictComparators" $ do
+    it "is True when Similar operator is used" $ do
+      shouldUseStrictComparators (js "x == y") `shouldBe` True
+
+    it "is True when NotSimilar operator is used" $ do
+      shouldUseStrictComparators (js "x != y") `shouldBe` True
+
+    it "is False when Equal operator is used" $ do
+      shouldUseStrictComparators (js "x === y") `shouldBe` False
+      shouldUseStrictComparators (javaStatement "int m = x.equal(y);") `shouldBe` False
+
+    it "is False when NotEqual operator is used" $ do
+      shouldUseStrictComparators (js "x !== y") `shouldBe` False
+      shouldUseStrictComparators (javaStatement "int m = !x.equal(y);") `shouldBe` False
+
+    it "is False when Same operator is used" $ do
+      shouldUseStrictComparators (javaStatement "int m = x == y;") `shouldBe` False
+
+    it "is False when Same operator is used" $ do
+      shouldUseStrictComparators (javaStatement "int m = x != y;") `shouldBe` False
+
   describe "discardsExceptions" $ do
     it "is True when there is an empty catch" $ do
       discardsExceptions (javaStatement "try { new Bar().baz(); } catch (Exception e) { /*TODO handle exception*/ }") `shouldBe` True

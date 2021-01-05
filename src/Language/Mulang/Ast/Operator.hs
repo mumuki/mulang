@@ -1,14 +1,26 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric, PatternSynonyms, ViewPatterns #-}
 
-module Language.Mulang.Ast.Operator (Operator(..)) where
+module Language.Mulang.Ast.Operator (
+  opposite,
+  Operator(..),
+  pattern Like,
+  pattern NotLike) where
 
 import           GHC.Generics
 
 data Operator
     = Equal
-    -- ^ `==`-like equal operator
+    -- ^ `===`-like equal operator
     | NotEqual
-    -- ^ `!==`-like distinct operator
+    --    ^ `!==`-like distinct operator
+    | Similar
+    -- ^ equ   al-ignoring-type operator
+    | NotSimilar
+    -- ^ not equal-ignoring-type operator
+    | Same
+      -- ^ reference-identical operator
+    | NotSame
+     -- ^ not reference-identical operator
     | Negation
     -- ^ `!`-like not operator
     | And
@@ -90,3 +102,25 @@ data Operator
   deriving (Eq, Show, Read, Generic, Ord, Enum)
 
 
+pattern Like <- (isLike -> True)
+pattern NotLike <- (isNotLike -> True)
+
+isLike :: Operator -> Bool
+isLike Equal    = True
+isLike Similar  = True
+isLike Same     = True
+isLike _        = False
+
+isNotLike :: Operator -> Bool
+isNotLike NotEqual   = True
+isNotLike NotSimilar = True
+isNotLike NotSame    = True
+isNotLike _          = False
+
+opposite :: Operator -> Operator
+opposite Equal       = NotEqual
+opposite NotEqual    = Equal
+opposite Similar     = NotSimilar
+opposite NotSimilar  = Similar
+opposite Same        = NotSame
+opposite NotSame     = Same

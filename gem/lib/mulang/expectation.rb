@@ -1,44 +1,63 @@
 module Mulang::Expectation
-  SMELLS = %w(
-    DiscardsExceptions
-    DoesConsolePrint
+  LOGIC_SMELLS = %w(
+    HasRedundantReduction
+    UsesCut
+    UsesFail
+    UsesUnificationOperator
+  )
+
+  FUNCTIONAL_SMELLS = %w(
+    HasRedundantGuards
+    HasRedundantParameter
+    ShouldUseOtherwise
+  )
+
+  OBJECT_ORIENTED_SMELLS = %w(
     DoesNilTest
     DoesNullTest
-    DoesTypeTest
-    HasAssignmentCondition
-    HasAssignmentReturn
-    HasCodeDuplication
-    HasDeclarationTypos
-    HasEmptyIfBranches
-    HasEmptyRepeat
-    HasEqualIfBranches
-    HasLongParameterList
-    HasMisspelledBindings
-    HasMisspelledIdentifiers
-    HasRedundantBooleanComparison
-    HasRedundantGuards
-    HasRedundantIf
-    HasRedundantLambda
-    HasRedundantLocalVariableReturn
-    HasRedundantParameter
-    HasRedundantReduction
-    HasRedundantRepeat
     HasTooManyMethods
-    HasTooShortBindings
-    HasTooShortIdentifiers
-    HasUnreachableCode
-    HasUsageTypos
-    HasWrongCaseBinding
-    HasWrongCaseIdentifiers
-    IsLongCode
     OverridesEqualOrHashButNotBoth
     ReturnsNil
     ReturnsNull
+  )
+
+  IMPERATIVE_SMELLS = %w(
+    HasAssignmentCondition
+    HasAssignmentReturn
+    HasEmptyRepeat
+    HasRedundantLocalVariableReturn
+    HasRedundantRepeat
+  )
+
+  EXPRESSIVENESS_SMELLS = %w(
+    HasMisspelledBindings
+    HasMisspelledIdentifiers
+    HasTooShortIdentifiers
+    HasWrongCaseBinding
+    HasWrongCaseIdentifiers
+  )
+
+  GENERIC_SMELLS = %w(
+    DiscardsExceptions
+    DoesConsolePrint
+    DoesTypeTest
+    HasCodeDuplication
+    HasDeclarationTypos
+    HasEmptyIfBranches
+    HasEqualIfBranches
+    HasLongParameterList
+    HasRedundantBooleanComparison
+    HasRedundantIf
+    HasRedundantLambda
+    HasTooShortBindings
+    HasUnreachableCode
+    HasUsageTypos
+    IsLongCode
     ShouldInvertIfCondition
-    ShouldUseOtherwise
-    UsesCut
-    UsesFail
-    UsesUnificationOperator)
+    ShouldUseStrictComparators
+  )
+
+  SMELLS = GENERIC_SMELLS + EXPRESSIVENESS_SMELLS +  IMPERATIVE_SMELLS + OBJECT_ORIENTED_SMELLS + FUNCTIONAL_SMELLS + LOGIC_SMELLS
 
   def self.guess_type(expectation)
     if expectation[:binding] == '<<custom>>'

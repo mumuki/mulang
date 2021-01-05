@@ -158,6 +158,7 @@ pt:
       ReturnsNil: '%{binding}  retorna nulo, o que é uma prática ruim'
       ReturnsNull: '%{binding}  retorna nulo, o que é uma prática ruim'
       ShouldInvertIfCondition: '%{binding} deve inverter a condição da <code>%{keyword_If}</code> e trocar as ramos'
+      ShouldUseStrictComparators: '%{binding} deve usar os operadores de equivalência <code>%{operator_Equal}</code> e <code>%{operator_NotEqual}</code> em vez dos operadores de similaridade <code>%{operator_Similar}</code> e <code>%{operator_NotSimilar}</code> '
       SubordinatesDeclarationsTo: 'Todas as declarações em %{binding} %{must} ser usadas a partir de %{target}'
       SubordinatesDeclarationsToEntryPoint: 'Todas as declarações em %{binding} %{must} devem ser usadas a partir de <code>%{keyword_EntryPoint}</code>'
       TypesAs_named: '%{binding} %{must} é do tipo %{target}'

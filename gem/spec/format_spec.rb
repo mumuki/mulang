@@ -28,6 +28,9 @@ describe Mulang::Expectation do
   describe 'it can guess format' do
     it { expect(subject.guess_type binding: 'foo', inspection: 'HasBinding').to be Mulang::Expectation::V0 }
     it { expect(subject.guess_type binding: 'foo', inspection: 'Uses:*').to be Mulang::Expectation::V2 }
+
+    it { expect(subject.guess_type binding: 'foo', inspection: 'HasEmptyRepeat').to be Mulang::Expectation::V2 }
+    it { expect(subject.guess_type binding: 'foo', inspection: 'HasRedundantBooleanComparison').to be Mulang::Expectation::V2 }
   end
 
   describe 'it can convert back to hash' do

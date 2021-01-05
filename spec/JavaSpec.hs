@@ -142,6 +142,15 @@ spec = do
                           SubroutineSignature "main" [] "void" [],
                           (SimpleMethod "main" [] (Print (PrimitiveSend (MuNumber 5) Equal [MuNumber 6])))])
 
+    it "parses not equals constructs" $ do
+      run [text|public class Foo {
+            public static void main() {
+              System.out.println(! (5).equals(6) );
+            }
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                          SubroutineSignature "main" [] "void" [],
+                          (SimpleMethod "main" [] (Print (PrimitiveSend (MuNumber 5) NotEqual [MuNumber 6])))])
+
     it "parses Parameters" $ do
       run "public class Foo extends Bar { int succ(int y) {} }" `shouldBe` Class "Foo" (Just "Bar") (Sequence [
                                                                               SubroutineSignature "succ" ["int"] "int" [],
@@ -264,25 +273,25 @@ spec = do
                           SubroutineSignature "hello" [] "void" [],
                           (SimpleMethod "hello" [] (If MuTrue (Return MuTrue) (Return MuFalse)))])
 
-    it "parses Ifs with equal comparisons on conditions" $ do
+    it "parses Ifs with == comparisons on conditions" $ do
       run [text|
           class Foo {
              public void hello(String x) { if (x == "foo") { } }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                            SubroutineSignature "hello" ["String"] "void" [],
                            SimpleMethod "hello" [VariablePattern "x"] (
-                             If (Send (Reference "x") (Primitive Equal) [MuString "foo"])
+                             If (Send (Reference "x") (Primitive Same) [MuString "foo"])
                               None
                               None)])
 
-    it "parses Ifs with not-equal comparisons on conditions" $ do
+    it "parses Ifs with != comparisons on conditions" $ do
       run [text|
           class Foo {
              public void hello(String x) { if (x != "foo") { } }
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
                             SubroutineSignature "hello" ["String"] "void" [],
                             (SimpleMethod "hello" [VariablePattern "x"] (
-                            If (Send (Reference "x") (Primitive NotEqual) [MuString "foo"])
+                            If (Send (Reference "x") (Primitive NotSame) [MuString "foo"])
                               None
                               None))])
 

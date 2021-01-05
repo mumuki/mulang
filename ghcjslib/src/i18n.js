@@ -1,24 +1,4 @@
 (() => {
-  const DEFAULT_KEYWORDS = {
-    'entryPoint': 'program',
-    'equal': '==',
-    'fail': 'fail',
-    'false': 'false',
-    'findall': 'findall',
-    'for': 'for',
-    'forall': 'forall',
-    'foreach': 'foreach',
-    'if': 'if',
-    'is': 'is',
-    'not': 'not',
-    'null': 'null',
-    'repeat': 'repeat',
-    'switch': 'switch',
-    'true': 'true',
-    'while': 'while',
-    'yield': 'yield'
-  }
-
   const LOCALES = {
     es: {
       must_not: 'no debe',
@@ -119,6 +99,7 @@
       ReturnsNil: (binding, must, target, tokens) => `${binding} retorna null, lo cual es una mala práctica`,
       ReturnsNull: (binding, must, target, tokens) => `${binding} retorna null, lo cual es una mala práctica`,
       ShouldInvertIfCondition: (binding, must, target, tokens) => `${binding} debería invertir la condición del <code>${tokens['keyword_If']}</code> e intercambiar las ramas`,
+      ShouldUseStrictComparators: (binding, must, target, tokens) => `${binding} debería usar los operadores de equivalencia <code>${tokens['operator_Equal']}</code> y <code>${tokens['operator_NotEqual']}</code> en lugar de los operadores de similitud <code>${tokens['operator_Similar']}</code> y <code>${tokens['operator_NotSimilar']}</code>`,
       SubordinatesDeclarationsTo: (binding, must, target, tokens) => `Todas las declaraciones en ${binding} ${must} ser usadas desde ${target}`,
       SubordinatesDeclarationsToEntryPoint: (binding, must, target, tokens) => `Todas las declaraciones en ${binding} ${must} deben ser usadas desde un <code>${tokens['keyword_EntryPoint']}</code>`,
       TypesAs_named: (binding, must, target, tokens) => `${binding} ${must} ser de tipo ${target}`,
@@ -258,6 +239,7 @@
       ReturnsNil: (binding, must, target, tokens) => `${binding} retuns <code>${tokens['keyword_Nil']}</code>, which is a bad practice`,
       ReturnsNull: (binding, must, target, tokens) => `${binding} retuns <code>${tokens['keyword_Nil']}</code>, which is a bad practice`,
       ShouldInvertIfCondition: (binding, must, target, tokens) => `${binding} should invert <code>${tokens['keyword_If']}</code> condition and swap branches`,
+      ShouldUseStrictComparators: (binding, must, target, tokens) => `${binding} should use strict operators <code>${tokens['operator_Equal']}</code> and <code>${tokens['operator_NotEqual']}</code> instead of <code>${tokens['operator_Similar']}</code> and <code>${tokens['operator_NotSimilar']}</code>'`,
       SubordinatesDeclarationsTo: (binding, must, target, tokens) => `All declarations in ${binding} ${must} be used from ${target}`,
       SubordinatesDeclarationsToEntryPoint: (binding, must, target, tokens) => `All declarations in ${binding} ${must} be used from <code>${tokens['keyword_EntryPoint']}</code>`,
       TypesAs_named: (binding, must, target, tokens) => `${binding} ${must} type as ${target}`,
@@ -396,6 +378,7 @@
       ReturnsNil: (binding, must, target, tokens) => `${binding}  retorna nulo, o que é uma prática ruim`,
       ReturnsNull: (binding, must, target, tokens) => `${binding}  retorna nulo, o que é uma prática ruim`,
       ShouldInvertIfCondition: (binding, must, target, tokens) => `${binding} deve inverter a condição da <code>${tokens['keyword_If']}</code> e trocar as ramos`,
+      ShouldUseStrictComparators: (binding, must, target, tokens) => `${binding} deve usar os operadores de equivalência <code>${tokens['operator_Equal']}</code> e <code>${tokens['operator_NotEqual']}</code> em vez dos operadores de similaridade <code>${tokens['operator_Similar']}</code> e <code>${tokens['operator_NotSimilar']}</code>`,
       SubordinatesDeclarationsTo: (binding, must, target, tokens) => `Todas as declarações em ${binding} ${must} ser usadas a partir de ${target}`,
       SubordinatesDeclarationsToEntryPoint: (binding, must, target, tokens) => `Todas as declarações em ${binding} ${must} devem ser usadas a partir de <code>${tokens['keyword_EntryPoint']}</code>`,
       TypesAs_named: (binding, must, target, tokens) => `${binding} ${must} é do tipo ${target}`,
@@ -495,7 +478,6 @@
   }
 
   I18n.LOCALES = LOCALES;
-  I18n.DEFAULT_KEYWORDS = DEFAULT_KEYWORDS;
 
   ghcjsExports.I18n = I18n;
 })();

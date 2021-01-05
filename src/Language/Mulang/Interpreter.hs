@@ -25,6 +25,7 @@ import           Data.Fixed (mod')
 
 import qualified Language.Mulang.Ast as M
 import qualified Language.Mulang.Ast.Operator as O
+import           Language.Mulang.Ast.Operator (opposite)
 import           Language.Mulang.Interpreter.Internals
 
 eval' :: ExecutionContext -> Executable Reference -> IO (Reference, ExecutionContext)
@@ -92,13 +93,13 @@ evalExpr (M.Application (M.Primitive O.Negation) expressions) =
 
 evalExpr (M.Application (M.Primitive O.Multiply) expressions) = evalBinaryNumeric expressions (*) createNumber
 
-evalExpr (M.Application (M.Primitive O.Equal) expressions) = do
+evalExpr (M.Application (M.Primitive O.Like) expressions) = do
   params <- mapM evalExpr expressions
   let [r1, r2] = params
   muValuesEqual r1 r2
 
-evalExpr (M.Application (M.Primitive O.NotEqual) expressions) = do
-  evalExpr $ M.Application (M.Primitive O.Negation) [M.Application (M.Primitive O.Equal) expressions]
+evalExpr (M.Application (M.Primitive op@O.NotLike) expressions) = do
+  evalExpr $ M.Application (M.Primitive O.Negation) [M.Application (M.Primitive (opposite op)) expressions]
 
 evalExpr (M.Application (M.Primitive O.LessOrEqualThan) expressions) = evalBinaryNumeric expressions (<=) createBool
 evalExpr (M.Application (M.Primitive O.LessThan) expressions) = evalBinaryNumeric expressions (<) createBool

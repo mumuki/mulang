@@ -47,6 +47,7 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `Raises`                          | is the given _exception type_ raised?
 | `Rescues`                         | is the given _exception type_ rescued?
 | `ShouldInvertIfCondition`         | has the given code an `if` with an empty `then` but a non-empty `else`?
+| `ShouldUseStrictComparators`      | does the given use a non-strict comparator like `==` in JavaScript?
 | `SubordinatesDeclarationsTo`      | are all the declarations in the code called from the given declaration?
 | `SubordinatesDeclarationsToEntryPoint` | are all the declarations in the code called from an entry point?
 | `TypesAs`                         | is the given type used to type a variable?
