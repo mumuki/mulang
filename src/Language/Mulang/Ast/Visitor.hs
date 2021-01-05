@@ -37,27 +37,27 @@ import Language.Mulang.Ast
 -- (TwoExpressions e1 e2 _)
 -- Terminal
 
-pattern Terminal <- (extractTerminal -> Just _)
+pattern Terminal <- (extractTerminal -> True)
 
-extractTerminal :: Expression -> Maybe ()
-extractTerminal (Enumeration _ _)   = Just ()
-extractTerminal (MuBool _)          = Just ()
-extractTerminal (MuChar _)          = Just ()
-extractTerminal (MuNumber _)        = Just ()
-extractTerminal (MuString _)        = Just ()
-extractTerminal (MuSymbol _)        = Just ()
-extractTerminal (Other _ Nothing)   = Just ()
-extractTerminal (Primitive _)       = Just ()
-extractTerminal (Record _)          = Just ()
-extractTerminal (Reference _)       = Just ()
-extractTerminal (TypeAlias _ _)     = Just ()
-extractTerminal (TypeSignature _ _) = Just ()
-extractTerminal Equal               = Just ()
-extractTerminal MuNil               = Just ()
-extractTerminal None                = Just ()
-extractTerminal NotEqual            = Just ()
-extractTerminal Self                = Just ()
-extractTerminal _                   = Nothing
+extractTerminal :: Expression -> Bool
+extractTerminal (Enumeration _ _)   = True
+extractTerminal (MuBool _)          = True
+extractTerminal (MuChar _)          = True
+extractTerminal (MuNumber _)        = True
+extractTerminal (MuString _)        = True
+extractTerminal (MuSymbol _)        = True
+extractTerminal (Other _ Nothing)   = True
+extractTerminal (Primitive _)       = True
+extractTerminal (Record _)          = True
+extractTerminal (Reference _)       = True
+extractTerminal (TypeAlias _ _)     = True
+extractTerminal (TypeSignature _ _) = True
+extractTerminal Equal               = True
+extractTerminal MuNil               = True
+extractTerminal None                = True
+extractTerminal NotEqual            = True
+extractTerminal Self                = True
+extractTerminal _                   = False
 
 pattern SingleExpression e1 c <- (extractSingleExpression -> Just (e1, c))
 

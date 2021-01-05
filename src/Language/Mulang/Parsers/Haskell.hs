@@ -6,9 +6,6 @@ import Language.Mulang.Operators (parseOperator)
 import Language.Mulang.Builder (compact)
 import Language.Mulang.Parsers
 
-import Language.Mulang.Transform.Normalizer (normalize)
-import Language.Mulang.Normalizers.Haskell (haskellNormalizationOptions)
-
 import Language.Haskell.Syntax
 import Language.Haskell.Parser
 import Language.Haskell.Pretty (prettyPrint)
@@ -157,4 +154,3 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muTypeId (HsTyTuple ts)                             = "(" ++ (intercalate ", " . map muTypeId $ ts) ++ ")"
     muTypeId (HsTyApp (HsTyCon (Special HsListCon)) t2) = "[" ++ muTypeId t2 ++ "]"
     muTypeId (HsTyApp t1 t2)                            = muTypeId t1 ++ " " ++ muTypeId t2
-
