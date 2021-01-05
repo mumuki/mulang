@@ -13,6 +13,7 @@ import Data.List.Extra (unwind)
 
 import Language.Mulang.Ast
 import Language.Mulang.Ast.Visitor
+import Language.Mulang.Builder (compact, trim)
 import Language.Mulang.Generator (declarators, declaredIdentifiers)
 import Language.Mulang.Inspector.Literal (isLiteral)
 
@@ -24,7 +25,9 @@ data NormalizationOptions = NormalizationOptions {
   convertObjectLevelVariableIntoAttribute :: Bool,
   convertObjectIntoDict :: Bool,
   sortSequenceDeclarations :: SequenceSortMode,
-  insertImplicitReturn :: Bool
+  insertImplicitReturn :: Bool,
+  compactSequences :: Bool,
+  trimSequences :: Bool
 } deriving (Eq, Show, Read, Generic)
 
 data SequenceSortMode
@@ -42,7 +45,9 @@ defaultNormalizationOptions = NormalizationOptions {
   convertObjectLevelVariableIntoAttribute = False,
   convertObjectIntoDict = False,
   sortSequenceDeclarations = SortNothing,
-  insertImplicitReturn = False
+  insertImplicitReturn = False,
+  compactSequences = False,
+  trimSequences = False
 }
 
 
@@ -75,6 +80,12 @@ normalize ops (TwoExpressions e1 e2 c)              = c (normalize ops e1) (norm
 
 mapNormalize ops = map (normalize ops)
 mapNormalizeEquation ops = map (normalizeEquation ops)
+
+normalizeSequence :: NormalizationOptions -> [Expression] -> Expression
+normalizeSequence opts = compact' . trim'
+  where
+    compact' = if compactSequences opts then compact else Sequence
+    trim'    = if trimSequences opts then trim else id
 
 normalizeObjectLevel :: NormalizationOptions -> Expression -> Expression
 normalizeObjectLevel ops (Function n eqs)             | convertObjectLevelFunctionIntoMethod ops       = Method n (mapNormalizeEquation ops eqs)
@@ -118,8 +129,8 @@ isSafeDeclaration e               = isDeclaration e
 isDeclaration :: Expression -> Bool
 isDeclaration = not.null.declarators
 
-sortDeclarationsWith :: NormalizationOptions -> [Expression] -> [Expression]
-sortDeclarationsWith ops expressions | shouldSort (sortSequenceDeclarations ops) = sort expressions
+sortDeclarations :: NormalizationOptions -> [Expression] -> [Expression]
+sortDeclarations ops expressions | shouldSort (sortSequenceDeclarations ops) = sort expressions
                                      | otherwise                                 = expressions
   where
     shouldSort :: SequenceSortMode -> Bool

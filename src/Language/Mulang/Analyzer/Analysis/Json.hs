@@ -30,6 +30,8 @@ instance FromJSON NormalizationOptions where
         <*> v .:? "convertObjectIntoDict"                         .!= convertObjectIntoDict d
         <*> v .:? "sortSequenceDeclarations"                      .!= sortSequenceDeclarations d
         <*> v .:? "insertImplicitReturn"                          .!= insertImplicitReturn d
+        <*> v .:? "compactSequences"                              .!= compactSequences d
+        <*> v .:? "trimSequences"                                 .!= trimSequences d
           where d = defaultNormalizationOptions
 instance FromJSON SequenceSortMode
 

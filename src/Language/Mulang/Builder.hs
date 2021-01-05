@@ -1,5 +1,6 @@
 module Language.Mulang.Builder (
     merge,
+    trim,
     compact,
     compactMap,
     compactConcatMap) where
@@ -16,6 +17,9 @@ compact :: [Expression] -> Expression
 compact []  = None
 compact [e] = e
 compact es  = Sequence es
+
+trim :: [Expression] -> [Expression]
+trim = filter (/= None)
 
 merge :: Expression -> Expression -> Expression
 merge e1 None                      = e1
