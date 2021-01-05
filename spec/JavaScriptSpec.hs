@@ -30,6 +30,12 @@ spec = do
     it "simple string assignment" $ do
       js "let x = 'hello'" `shouldBe` hs "x = \"hello\""
 
+    it "number parsing" $ do
+      js "1" `shouldBe` (MuNumber 1)
+      js "1.0" `shouldBe` (MuNumber 1)
+      js "1." `shouldBe` (MuNumber 1.0)
+      js ".1" `shouldBe` (MuNumber 0.1)
+
     it "string parsing" $ do
       js "var x = \"hello\"" `shouldBe` js "var x = 'hello'"
       js "let x = \"hello\"" `shouldBe` js "let x = 'hello'"
