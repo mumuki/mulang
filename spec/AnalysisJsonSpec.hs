@@ -11,7 +11,7 @@ import           Language.Mulang.Analyzer.Analysis.Json ()
 import           Language.Mulang.Analyzer hiding (spec)
 import           Language.Mulang.Ast
 import           Language.Mulang.Ast.Operator (Operator(..))
-import           Language.Mulang.Builder (NormalizationOptions (..), defaultNormalizationOptions)
+import           Language.Mulang.Transform.Normalizer (NormalizationOptions (..), defaultNormalizationOptions)
 
 import           Data.Maybe (fromJust)
 import           Data.Aeson (decode)

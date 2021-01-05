@@ -8,7 +8,8 @@ module Language.Mulang.Parsers.Python (
 
 import qualified Language.Mulang.Ast as M
 import qualified Language.Mulang.Ast.Operator as O
-import           Language.Mulang.Builder
+import           Language.Mulang.Builder (compactMap)
+import           Language.Mulang.Transform.Normalizer (normalize)
 import           Language.Mulang.Parsers
 
 import qualified Language.Python.Version3.Parser as Python3

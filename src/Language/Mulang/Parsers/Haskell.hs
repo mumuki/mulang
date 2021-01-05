@@ -3,7 +3,8 @@ module Language.Mulang.Parsers.Haskell (hs, parseHaskell) where
 import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Operators.Haskell (haskellTokensTable)
 import Language.Mulang.Operators (parseOperator)
-import Language.Mulang.Builder (compact, normalizeWith, defaultNormalizationOptions, NormalizationOptions(..), SequenceSortMode(..))
+import Language.Mulang.Builder (compact)
+import Language.Mulang.Transform.Normalizer (normalizeWith, defaultNormalizationOptions, NormalizationOptions(..), SequenceSortMode(..))
 import Language.Mulang.Parsers
 
 import Language.Haskell.Syntax

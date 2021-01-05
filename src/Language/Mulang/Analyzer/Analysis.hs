@@ -46,7 +46,7 @@ import GHC.Generics
 
 import Language.Mulang.Ast
 import Language.Mulang.Edl.Expectation (Query)
-import Language.Mulang.Builder (NormalizationOptions)
+import Language.Mulang.Transform.Normalizer (NormalizationOptions)
 import Language.Mulang.Interpreter.Runner (TestResult)
 import Data.Map.Strict (Map)
 

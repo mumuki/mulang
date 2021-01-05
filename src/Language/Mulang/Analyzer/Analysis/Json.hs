@@ -5,7 +5,7 @@ module Language.Mulang.Analyzer.Analysis.Json () where
 import           Data.Aeson
 import           Language.Mulang
 import           Language.Mulang.Analyzer.Analysis
-import           Language.Mulang.Builder (NormalizationOptions (..), SequenceSortMode, defaultNormalizationOptions)
+import           Language.Mulang.Transform.Normalizer (NormalizationOptions (..), SequenceSortMode, defaultNormalizationOptions)
 import           Language.Mulang.Interpreter.Runner (TestResult, TestStatus)
 
 instance FromJSON Analysis
