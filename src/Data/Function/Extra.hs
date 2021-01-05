@@ -1,4 +1,4 @@
-module Data.Function.Extra (compose2, orElse, andAlso, never) where
+module Data.Function.Extra (compose2, orElse, andAlso, never, (<==)) where
 
 import Data.Function (on)
 
@@ -13,4 +13,7 @@ never f = not . f
 
 compose2 :: (a -> a -> b) -> (c -> a) -> (c -> a) -> c -> b
 compose2 op f1 f2 a = on op ($ a) f1 f2
+
+(<==) :: (b -> c) -> (a -> a1 -> b) -> a -> a1 -> c
+(<==) = ((.).(.))
 

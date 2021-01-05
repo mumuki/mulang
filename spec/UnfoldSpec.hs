@@ -20,11 +20,11 @@ spec = do
       (length $ declarations code) `shouldBe` 2
 
     it "answers objects and methods" $ do
-      let code = js "var pepita = {comer: function(x){ this.energia = this.energia + 1; }, volar: function(){console.log('volando')}}"
+      let code = js "let pepita = {comer: function(x){ this.energia = this.energia + 1; }, volar: function(){console.log('volando')}}"
       (length $ declarations code) `shouldBe` 3
 
     it "answers attributes" $ do
-      let code = js "var pepita = {energia: 4, posicion: 4,\n\
+      let code = js "let pepita = {energia: 4, posicion: 4,\n\
                     \              comer: function(x){ this.energia = this.energia + 1; },\n\
                     \              volar: function(){console.log('volando')}}"
       (length $ declarations code) `shouldBe` 5

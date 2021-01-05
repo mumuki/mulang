@@ -50,8 +50,9 @@ library
     Language.Mulang.Inspector.Family
     Language.Mulang.Inspector.Functional
     Language.Mulang.Inspector.Generic
-    Language.Mulang.Inspector.Generic.Duplication
-    Language.Mulang.Inspector.Generic.Smell
+    Language.Mulang.Inspector.Smell.Duplication
+    Language.Mulang.Inspector.Smell
+    Language.Mulang.Inspector.Smell.JavaScript
     Language.Mulang.Inspector.Literal
     Language.Mulang.Inspector.Logic
     Language.Mulang.Inspector.Matcher

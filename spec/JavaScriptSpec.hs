@@ -7,6 +7,7 @@ import           Language.Mulang.Ast hiding (Equal, NotEqual)
 import           Language.Mulang.Ast.Operator
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
+import           Language.Mulang.Inspector.Literal (isOther)
 
 import           Data.Text (Text, unpack)
 import           NeatInterpolation (text)
@@ -18,28 +19,33 @@ spec :: Spec
 spec = do
   describe "foo" $ do
     it "simple assignation" $ do
-      js "var x = 1" `shouldBe` hs "x = 1"
+      js "var x = 1" `shouldBe` (other "JSVar" (Variable "x" (MuNumber 1)))
 
     it "simple assignation, with let" $ do
-      js "let x = 1" `shouldBe` hs "x = 1"
+      js "let x = 1" `shouldBe` (Variable "x" (MuNumber 1))
+
+    it "simple declaration, with const" $ do
+      js "const x = 1" `shouldBe` (Constant "x" (MuNumber 1))
 
     it "simple string assignment" $ do
-      js "var x = 'hello'" `shouldBe` hs "x = \"hello\""
+      js "let x = 'hello'" `shouldBe` hs "x = \"hello\""
 
     it "string parsing" $ do
       js "var x = \"hello\"" `shouldBe` js "var x = 'hello'"
+      js "let x = \"hello\"" `shouldBe` js "let x = 'hello'"
 
     it "simple assignation 2" $ do
       js "x" `shouldBe` Reference "x"
 
     it "simple function application in var declaration" $ do
-      js "var x = m(1, 2)" `shouldBe` hs "x = m 1 2"
+      js "let x = m(1, 2)" `shouldBe` hs "x = m 1 2"
 
     it "differentiates procedures and functions" $ do
       (js "function f() { return 1 }" /= js "function f() { 1 }") `shouldBe` True
 
     it "handles lambdas likes haskell does" $ do
-      js "var m = function(x) { return 1 }" `shouldBe` hs "m = \\x -> 1"
+      js "let m = function(x) { return 1 }" `shouldBe` hs "m = \\x -> 1"
+      js "var m = function(x) { return 1 }" `shouldBe` (other "JSVar" (hs "m = \\x -> 1"))
 
     it "handles arrow functions with explicit returns" $ do
       js "var m = (x) => { return 1 }" `shouldBe` js "var m = function(x) { return 1 }"
@@ -61,7 +67,7 @@ spec = do
       js "function f(x, y) { return 1 }" `shouldBe` hs "f x y = 1"
 
     it "constant function declaration" $ do
-      js "var f = function(x) { return x + 1 }" `shouldBe` hs "f = \\x -> x + 1"
+      js "let f = function(x) { return x + 1 }" `shouldBe` hs "f = \\x -> x + 1"
 
     it "numeric top level expression" $ do
       js "8" `shouldBe` MuNumber 8
@@ -104,7 +110,7 @@ spec = do
 
     it "handles parenthesis around variables" $ do
       js "function f() { return (x) } " `shouldBe` (SimpleFunction "f" [] (Return (Reference "x")))
-      js "var y = (x)" `shouldBe` (Variable "y" (Reference "x"))
+      js "let y = (x)" `shouldBe` (Variable "y" (Reference "x"))
       js "(x)" `shouldBe` (Reference "x")
 
     it "handles negation" $ do
@@ -150,13 +156,14 @@ spec = do
       js "({})" `shouldBe` MuObject None
 
     it "handles object declarations" $ do
-      js "var x = {}" `shouldBe` (Object "x" None)
+      js "let x = {}" `shouldBe` (Object "x" None)
+      js "var x = {}" `shouldBe` (other "JSVar" (Object "x" None))
 
     it "handles function declarations as vars" $ do
-      js "var x = function(){}" `shouldBe` (SimpleFunction "x" [] None)
+      js "let x = function(){}" `shouldBe` (SimpleFunction "x" [] None)
 
     it "handles attribute and method declarations" $ do
-      js "var x = {y: 2, z: function(){}}" `shouldBe` Object "x" (Sequence [
+      js "let x = {y: 2, z: function(){}}" `shouldBe` Object "x" (Sequence [
                                                             Attribute "y" (MuNumber 2.0),
                                                             SimpleMethod "z" [] None])
 
@@ -190,25 +197,46 @@ spec = do
       run "for(i = 0; i < 3; i++) i;" `shouldBe` ForLoop (Assignment "i" (MuNumber 0)) (js "i < 3") (js "i++") (Reference "i")
 
     it "handles c-style for with var" $ do
-      run "for(var i = 0; i < 3; i++) i;" `shouldBe` ForLoop (Variable "i" (MuNumber 0)) (js "i < 3") (js "i++") (Reference "i")
+      -- run "for(var i = 0; i < 3; i++) i;" `shouldBe` ForLoop (other "JSVar" (Variable "i" (MuNumber 0))) (js "i < 3") (js "i++") (Reference "i")
+      pending
+
+    it "handles c-style for with let" $ do
+      run "for(let i = 0; i < 3; i++) i;" `shouldBe` ForLoop (Variable "i" (MuNumber 0)) (js "i < 3") (js "i++") (Reference "i")
 
     describe "for generator" $ do
-      let generatorAst = For [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])] (Reference "i")
+      let generatorWithLetAst = (For
+                                  [Generator (VariablePattern "i") (MuList [MuNumber 1, MuNumber 2])]
+                                  (Reference "i"))
 
-      it "handles for in" $ do
-        run "for(i in [1,2]) i;" `shouldBe` generatorAst
+      let generatorWithVarAst = (For
+                                  [Generator (otherPattern "JSVar" (VariablePattern "i")) (MuList [MuNumber 1, MuNumber 2])]
+                                  (Reference "i"))
 
-      it "handles for var in" $ do
-        run "for(var i in [1,2]) i;" `shouldBe` generatorAst
+      let generatorWithConstAst = (For
+                                    [Generator (ConstantPattern "i") (MuList [MuNumber 1, MuNumber 2])]
+                                    (Reference "i"))
+
+      it "NOT handles for in" $ do
+        isOther (run "for(i in [1,2]) i;") `shouldBe` True
+
+      it "NOT handles for var in" $ do
+        isOther (run "for(var i in [1,2]) i;") `shouldBe` True
+
+      it "NOT handles for let in" $ do
+        isOther (run "for(let i in [1,2]) i;") `shouldBe` True
 
       it "handles for let of" $ do
-        run "for(let i of [1,2]) i;" `shouldBe` generatorAst
+        run "for(let i of [1,2]) i;" `shouldBe` generatorWithLetAst
+
+      it "handles for const of" $ do
+        run "for(const i of [1,2]) i;" `shouldBe` generatorWithConstAst
 
       it "handles for var of" $ do
-        run "for(var i of [1,2]) i;" `shouldBe` generatorAst
+        run "for(var i of [1,2]) i;" `shouldBe` generatorWithVarAst
 
-      it "handles for let in" $ do
-        run "for(let i in [1,2]) i;" `shouldBe` generatorAst
+      it "handles for var of" $ do
+        run "for(i of [1,2]) i;" `shouldBe` generatorWithVarAst
+
 
     context "handles assertions" $ do
       it "handles truth assertions" $ do

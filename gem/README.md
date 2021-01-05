@@ -39,10 +39,10 @@ code.custom_expect %q{
 ### AST Generation
 
 ```ruby
-code = Mulang::Code.new(Mulang::Language::Native.new('JavaScript'),  'var x = 1')
+code = Mulang::Code.new(Mulang::Language::Native.new('JavaScript'),  'let x = 1')
 
 # shortcut
-code = Mulang::Code.native('JavaScript',  'var x = 1')
+code = Mulang::Code.native('JavaScript',  'let x = 1')
 
 # generate ast
 code.ast
@@ -52,10 +52,10 @@ code.ast
 ### Build and run analysis
 
 ```ruby
-code = Mulang::Code.native('JavaScript',  'var x = 1')
+code = Mulang::Code.native('JavaScript',  'let x = 1')
 
 code.analysis expectations: [], smellsSet: { tag: 'NoSmells' }
-# => {:sample=>{:tag=>"CodeSample", :language=>"JavaScript", :content=>"var x = 1"}, :spec=>{:expectations=>[], :smellsSet=>{:tag=>"NoSmells"}}}
+# => {:sample=>{:tag=>"CodeSample", :language=>"JavaScript", :content=>"let x = 1"}, :spec=>{:expectations=>[], :smellsSet=>{:tag=>"NoSmells"}}}
 
 code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }
 # => {"tag"=>"AnalysisCompleted", "intermediateLanguage"=>nil, "signatures"=>[], "smells"=>[], "expectationResults"=>[]}
@@ -64,10 +64,10 @@ code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }
 ### Build and run analysis
 
 ```ruby
-code = Mulang::Code.native('JavaScript',  'var x = 1')
+code = Mulang::Code.native('JavaScript',  'let x = 1')
 
 code.analysis expectations: [], smellsSet: { tag: 'NoSmells' }
-# => {:sample=>{:tag=>"CodeSample", :language=>"JavaScript", :content=>"var x = 1"}, :spec=>{:expectations=>[], :smellsSet=>{:tag=>"NoSmells"}}}
+# => {:sample=>{:tag=>"CodeSample", :language=>"JavaScript", :content=>"let x = 1"}, :spec=>{:expectations=>[], :smellsSet=>{:tag=>"NoSmells"}}}
 
 code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }
 # => {"tag"=>"AnalysisCompleted", "intermediateLanguage"=>nil, "signatures"=>[], "smells"=>[], "expectationResults"=>[]}
@@ -90,7 +90,7 @@ require 'mulang'
 Mulang.analyse sample: {
                   tag: 'CodeSample',
                   language: 'JavaScript',
-                  content: 'var x = 1'
+                  content: 'let x = 1'
                },
                spec: {
                 expectations: [],

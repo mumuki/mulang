@@ -46,4 +46,4 @@ module NormalizationSpec (spec) where
         js "function f() { return 1 } function g() {} function f() { return 2 }" `shouldNotBe` js "function g() {} function f() { return 2 } function f() { return 1 } "
 
       it "doesn't sort declarations on javascript if there are also statements" $ do
-        js "function f() {}; var x = 2; function g() {}" `shouldNotBe` js "function g() {}; var x = 2; function f() {}"
+        js "function f() {}; let x = 2; function g() {}" `shouldNotBe` js "function g() {}; let x = 2; function f() {}"

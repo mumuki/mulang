@@ -12,7 +12,8 @@ module Language.Mulang.Inspector.Literal (
   isLiteral,
   isSimple,
   isCompound,
-  isNonliteral) where
+  isNonliteral,
+  isOther) where
 
 import Data.Function.Extra (orElse)
 
@@ -79,3 +80,7 @@ isCompound _            = False
 
 isNonliteral :: Inspection
 isNonliteral = not . isLiteral
+
+isOther :: Inspection
+isOther (Other _ _) = True
+isOther _           = False

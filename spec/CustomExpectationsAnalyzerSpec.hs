@@ -26,23 +26,23 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function esNumeroDeLaSuerte(x) {\r\n  return x > 0 && (esMultiploDe(2, x) || esMultiploDe(3, x)) && x != 15 ; \r\n} " test) `shouldReturn`  ok;
 
   it "evaluates count (uses for)" $ do
-    (run JavaScript "for (let x in []) {}" "expectation: count (uses for) = 0") `shouldReturn` nok
-    (run JavaScript "for (let x in []) {}" "expectation: count (uses for) = 1") `shouldReturn` ok
-    (run JavaScript "for (let x in []) {}" "expectation: count (uses for) = 2") `shouldReturn` nok
+    (run JavaScript "for (let x of []) {}" "expectation: count (uses for) = 0") `shouldReturn` nok
+    (run JavaScript "for (let x of []) {}" "expectation: count (uses for) = 1") `shouldReturn` ok
+    (run JavaScript "for (let x of []) {}" "expectation: count (uses for) = 2") `shouldReturn` nok
 
   it "evaluates count (uses for each)" $ do
-    (run JavaScript "for (let x in []) {}" "expectation: count (uses for each) = 0") `shouldReturn` nok
-    (run JavaScript "for (let x in []) {}" "expectation: count (uses for each) = 1") `shouldReturn` ok
+    (run JavaScript "for (let x of []) {}" "expectation: count (uses for each) = 0") `shouldReturn` nok
+    (run JavaScript "for (let x of []) {}" "expectation: count (uses for each) = 1") `shouldReturn` ok
 
   it "evaluates count (uses print)" $ do
     (run JavaScript "console.log('hello')" "expectation: count (uses print) = 1") `shouldReturn` ok
     (run JavaScript "console.log('hello')" "expectation: count (uses print) = 2") `shouldReturn` nok
 
   it "evaluates count (declares variable)" $ do
-    (run JavaScript "var x = 1" "expectation: count (declares variable) = 0") `shouldReturn` nok
-    (run JavaScript "var x = 1" "expectation: count (declares variable) = 1") `shouldReturn` ok
-    (run JavaScript "var x = 1" "expectation: count (declares variable) = 2") `shouldReturn` nok
-    (run JavaScript "var x = 1;\n\
+    (run JavaScript "let x = 1" "expectation: count (declares variable) = 0") `shouldReturn` nok
+    (run JavaScript "let x = 1" "expectation: count (declares variable) = 1") `shouldReturn` ok
+    (run JavaScript "let x = 1" "expectation: count (declares variable) = 2") `shouldReturn` nok
+    (run JavaScript "let x = 1;\n\
                     \let y = 2" "expectation: count (declares variable) = 2") `shouldReturn` ok
 
   it "evaluates count (declares procedure)" $ do
@@ -105,7 +105,7 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function totalAmount() {}" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() { return 0 }" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() { return x + y }" test) `shouldReturn` ok
-    (run JavaScript "function totalAmount() { var z = x + y; return z }" test) `shouldReturn` nok
+    (run JavaScript "function totalAmount() { let z = x + y; return z }" test) `shouldReturn` nok
 
   it "evaluates declares function like `total` with math" $ do
     let test = "expectation: declares function like `total` with math"
@@ -114,7 +114,7 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function totalAmount() {}" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() { return 0 }" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() { return x + y }" test) `shouldReturn` ok
-    (run JavaScript "function totalAmount() { var z = x + y; return z }" test) `shouldReturn` ok
+    (run JavaScript "function totalAmount() { let z = x + y; return z }" test) `shouldReturn` ok
 
   it "evaluates declares function like `total` that (uses math)" $ do
     let test = "expectation: declares function like `total` that (uses math)"
@@ -123,9 +123,9 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function totalAmount() {}" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() { return 0 }" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() { return x + y }" test) `shouldReturn` ok
-    (run JavaScript "function totalAmount() { var z = x + y; return z }" test) `shouldReturn` ok
-    (run JavaScript "var magicNumber = 10 + 1; function totalAmount() { return magicNumber }" test) `shouldReturn` nok
-    (run JavaScript "var magicNumber = 10 + 1; function totalAmount() { var z = magicNumber; return 0 }" test) `shouldReturn` nok
+    (run JavaScript "function totalAmount() { let z = x + y; return z }" test) `shouldReturn` ok
+    (run JavaScript "let magicNumber = 10 + 1; function totalAmount() { return magicNumber }" test) `shouldReturn` nok
+    (run JavaScript "let magicNumber = 10 + 1; function totalAmount() { let z = magicNumber; return 0 }" test) `shouldReturn` nok
 
   it "evaluates declares function like `total` that (returns something that (uses math))" $ do
     let test = "expectation: declares function like `total` that (returns something that (uses math))"
@@ -134,26 +134,26 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function totalAmount() {}" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() { return 0 }" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() { return x + y }" test) `shouldReturn` ok
-    (run JavaScript "function totalAmount() { var z = x + y; return z }" test) `shouldReturn` nok
-    (run JavaScript "var magicNumber = 10 + 1; function totalAmount() { return magicNumber }" test) `shouldReturn` nok
-    (run JavaScript "var magicNumber = 10 + 1; function totalAmount() { var z = magicNumber; return 0 }" test) `shouldReturn` nok
+    (run JavaScript "function totalAmount() { let z = x + y; return z }" test) `shouldReturn` nok
+    (run JavaScript "let magicNumber = 10 + 1; function totalAmount() { return magicNumber }" test) `shouldReturn` nok
+    (run JavaScript "let magicNumber = 10 + 1; function totalAmount() { let z = magicNumber; return 0 }" test) `shouldReturn` nok
 
   it "evaluates count (declares variable like `client`)" $ do
-    (run JavaScript "var clientName = 'jon'" "expectation: count (declares variable like `client`) = 0") `shouldReturn` nok
-    (run JavaScript "var clientName = 'jon'" "expectation: count (declares variable like `client`) = 1") `shouldReturn` ok
-    (run JavaScript "var clientName = 'jon'" "expectation: count (declares variable like `client`) = 2") `shouldReturn` nok
-    (run JavaScript "var clientName = 'jon';\n\
+    (run JavaScript "let clientName = 'jon'" "expectation: count (declares variable like `client`) = 0") `shouldReturn` nok
+    (run JavaScript "let clientName = 'jon'" "expectation: count (declares variable like `client`) = 1") `shouldReturn` ok
+    (run JavaScript "let clientName = 'jon'" "expectation: count (declares variable like `client`) = 2") `shouldReturn` nok
+    (run JavaScript "let clientName = 'jon';\n\
                     \let clientSurname = 'doe'" "expectation: count (declares variable like `client`) = 2") `shouldReturn` ok
-    (run JavaScript "var clientName = 'jon';\n\
+    (run JavaScript "let clientName = 'jon';\n\
                     \let clientSurname = 'doe';\n\
                     \let username = 'jondoe4'" "expectation: count (declares variable like `client`) = 3") `shouldReturn` nok
 
   it "evaluates count (declares variable with \"jon\")" $ do
-      (run JavaScript "var clientName = 'jon'" "expectation: count (declares variable with \"jon\") = 0") `shouldReturn` nok
-      (run JavaScript "var clientName = 'jon'" "expectation: count (declares variable with \"jon\") = 1") `shouldReturn` ok
-      (run JavaScript "var username = 'jondoe'" "expectation: count (declares variable with \"jon\") = 1") `shouldReturn` nok
-      (run JavaScript "var clientName = 'jon'" "expectation: count (declares variable with \"jon\") = 2") `shouldReturn` nok
-      (run JavaScript "var clientName = 'jon';\n\
+      (run JavaScript "let clientName = 'jon'" "expectation: count (declares variable with \"jon\") = 0") `shouldReturn` nok
+      (run JavaScript "let clientName = 'jon'" "expectation: count (declares variable with \"jon\") = 1") `shouldReturn` ok
+      (run JavaScript "let username = 'jondoe'" "expectation: count (declares variable with \"jon\") = 1") `shouldReturn` nok
+      (run JavaScript "let clientName = 'jon'" "expectation: count (declares variable with \"jon\") = 2") `shouldReturn` nok
+      (run JavaScript "let clientName = 'jon';\n\
                       \let clientSurname = 'doe'" "expectation: count (declares variable with \"jon\") = 2") `shouldReturn` nok
 
   it "evaluates count (uses if)" $ do
@@ -216,7 +216,7 @@ spec = describe "ExpectationsAnalyzer" $ do
     pendingWith "autocorrector does not work with EDL"
 
   it "evaluates uses `!`" $ do
-    -- (run JavaScript "var x = ! y" "expectation: uses `!`") `shouldReturn` nok
+    -- (run JavaScript "let x = ! y" "expectation: uses `!`") `shouldReturn` nok
     pendingWith "autocorrector does not work with EDL"
 
   it "evaluates uses negation" $ do
@@ -262,7 +262,7 @@ spec = describe "ExpectationsAnalyzer" $ do
     let test = "expectation: uses for loop with (something that (declares variable `x`), anything, anything, anything);"
 
     (run JavaScript "" test) `shouldReturn` nok
-    (run JavaScript "for (var x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
+    (run JavaScript "for (let x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
     (run JavaScript "for (let x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
     (run JavaScript "for (let y = 0; y < 10; y++) { y; }" test) `shouldReturn` nok
     (run JavaScript "for (x = 0; x < 10; x++) { x; }" test) `shouldReturn` nok
@@ -271,7 +271,7 @@ spec = describe "ExpectationsAnalyzer" $ do
     let test = "expectation: uses for loop with (something that (declares variable `x`));"
 
     (run JavaScript "" test) `shouldReturn` nok
-    (run JavaScript "for (var x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
+    (run JavaScript "for (let x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
     (run JavaScript "for (let x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
     (run JavaScript "for (let y = 0; y < 10; y++) { y; }" test) `shouldReturn` nok
     (run JavaScript "for (x = 0; x < 10; x++) { x; }" test) `shouldReturn` nok
@@ -280,7 +280,7 @@ spec = describe "ExpectationsAnalyzer" $ do
     let test = "expectation: uses for loop that (declares variable `x`);"
 
     (run JavaScript "" test) `shouldReturn` nok
-    (run JavaScript "for (var x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
+    (run JavaScript "for (let x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
     (run JavaScript "for (let x = 0; x < 10; x++) { x; }" test) `shouldReturn` ok
     (run JavaScript "for (let y = 0; y < 10; y++) { y; }" test) `shouldReturn` nok
     (run JavaScript "for (x = 0; x < 10; x++) { x; }" test) `shouldReturn` nok

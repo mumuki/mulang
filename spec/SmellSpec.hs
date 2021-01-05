@@ -5,7 +5,8 @@ module SmellSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Ast hiding (Equal, NotEqual)
 import           Language.Mulang.Ast.Operator
-import           Language.Mulang.Inspector.Generic.Smell
+import           Language.Mulang.Inspector.Smell
+import           Language.Mulang.Inspector.Smell.JavaScript
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)
 import           Language.Mulang.Parsers.Python (py)
@@ -44,7 +45,7 @@ spec = do
       hasRedundantIf (js "m ? true : false") `shouldBe` True
 
     it "is True when return an if with boolean literals, in method" $ do
-      hasRedundantIf (js "var y = {x: function(m){ return m ? true : false }}") `shouldBe` True
+      hasRedundantIf (js "let y = {x: function(m){ return m ? true : false }}") `shouldBe` True
 
     it "is True when in incomplete if structures with return" $ do
       hasRedundantIf (js "function x() { if(m) { return true }; return false; }") `shouldBe` True
@@ -57,16 +58,16 @@ spec = do
       hasRedundantIf (js "function x() { if(m) { console.log('hello'); return false }; return true; }") `shouldBe` False
 
     it "is False when there is no if" $ do
-      hasRedundantIf (js "var x = false") `shouldBe` False
+      hasRedundantIf (js "let x = false") `shouldBe` False
 
     it "is False when there are no literals" $ do
       hasRedundantIf (js "function x() { if(m) 2 else 4 }") `shouldBe` False
 
     it "is True even if a variable is used" $ do
-      hasRedundantIf (js "function x(b) { var r = true; if(b) { r = true; } else { r = false; }; return r; }") `shouldBe` True
+      hasRedundantIf (js "function x(b) { let r = true; if(b) { r = true; } else { r = false; }; return r; }") `shouldBe` True
 
     it "is True even if there is no return" $ do
-      hasRedundantIf (js "function x(b) { var r = true; if(b) { r = true; } else { r = false; }; console.log(r) }") `shouldBe` True
+      hasRedundantIf (js "function x(b) { let r = true; if(b) { r = true; } else { r = false; }; console.log(r) }") `shouldBe` True
 
     it "is True even if there is variable declaration" $ do
       hasRedundantIf (js "function x(b) { if(b) { r = true; } else { r = false; } }") `shouldBe` True
@@ -76,7 +77,7 @@ spec = do
       hasRedundantIf (hs "x = if m then False else True") `shouldBe` True
 
     it "is True, no return" $ do
-      hasRedundantIf (js "function foo(x) { var y = x; if (x) { y = true  } else { y = false } }") `shouldBe` True
+      hasRedundantIf (js "function foo(x) { let y = x; if (x) { y = true  } else { y = false } }") `shouldBe` True
 
     it "is False when there is no if, hs" $ do
       hasRedundantIf (hs "x = False") `shouldBe` False
@@ -114,19 +115,19 @@ spec = do
 
   describe "hasRedundantLocalVariableReturn" $ do
     it "is True when local variable is not necessary" $ do
-      hasRedundantLocalVariableReturn (js "function x(m) { var x  = 5; return x; }") `shouldBe` True
+      hasRedundantLocalVariableReturn (js "function x(m) { let x  = 5; return x; }") `shouldBe` True
 
     it "is False when local variable is not necessary, but there are many variables" $ do
-      hasRedundantLocalVariableReturn (js "function x(m) { var x = 5; var y = 2; return x; }") `shouldBe` False
+      hasRedundantLocalVariableReturn (js "function x(m) { let x = 5; let y = 2; return x; }") `shouldBe` False
 
     it "is False when local variable is necessary in return" $ do
-      hasRedundantLocalVariableReturn (js "function x(m) { var x = 5; return x + x; }") `shouldBe` False
+      hasRedundantLocalVariableReturn (js "function x(m) { let x = 5; return x + x; }") `shouldBe` False
 
     it "is False when local variable is updated" $ do
-      hasRedundantLocalVariableReturn (js "function x(m) { var x = 5; x+= 1; return x; }") `shouldBe` False
+      hasRedundantLocalVariableReturn (js "function x(m) { let x = 5; x+= 1; return x; }") `shouldBe` False
 
     it "is False when local variable is used as a cache" $ do
-      hasRedundantLocalVariableReturn (js "function x(m) { var x = 5; var y = 1 + x; g(y); return x; }") `shouldBe` False
+      hasRedundantLocalVariableReturn (js "function x(m) { let x = 5; let y = 1 + x; g(y); return x; }") `shouldBe` False
 
 
   describe "hasAssignmentCondition" $ do
@@ -357,10 +358,10 @@ spec = do
 
   describe "UsesNamedSelfReference" $ do
     it "is True when an object references itself by its name instead of using self" $ do
-      usesNamedSelfReference (js "var x = { foo: function () { return x.bar(); } }") `shouldBe` True
+      usesNamedSelfReference (js "let x = { foo: function () { return x.bar(); } }") `shouldBe` True
 
     it "is False when an object references itself by using self" $ do
-      usesNamedSelfReference (js "var x = { foo: function () { return self.bar(); } }") `shouldBe` False
+      usesNamedSelfReference (js "let x = { foo: function () { return self.bar(); } }") `shouldBe` False
 
     it "is False when reference is nested in another object" $ do
       usesNamedSelfReference (Object "Aves" (Object "Pepita" (SimpleMethod "foo" [] (Reference "Aves")))) `shouldBe` False
@@ -497,3 +498,10 @@ spec = do
       detectUsageTypos "bar"  (js "Foo()\nbaar()") `shouldBe` ["baar"]
       detectUsageTypos "br"   (js "Foo()\nbar()") `shouldBe` ["bar"]
       detectUsageTypos "baz"  (js "Foo()\nbar()\nbaaz()") `shouldBe` ["bar", "baaz"]
+
+
+  describe "usesVarInsteadOfLet" $ do
+    it "is True when there is a var" $ do
+      usesVarInsteadOfLet (js "var x = 1; x++") `shouldBe` True
+      usesVarInsteadOfLet (js "let x = 1; x++") `shouldBe` False
+      usesVarInsteadOfLet (js "const x = 1; x++") `shouldBe` False

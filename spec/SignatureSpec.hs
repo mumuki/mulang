@@ -14,7 +14,7 @@ spec = do
       styledCodeSignaturesOf untypedCStyle (js "function x(y, z) {}") `shouldBe` ["// x(y, z)"]
 
     it "works with variable signatures in untyped-c" $ do
-      styledCodeSignaturesOf untypedCStyle (js "var x = 2") `shouldBe` ["// x"]
+      styledCodeSignaturesOf untypedCStyle (js "let x = 2") `shouldBe` ["// x"]
 
     it "works with no-args function signatures in untyped-c" $ do
       styledCodeSignaturesOf untypedCStyle (js "function x() { return 2 }") `shouldBe` ["// x()"]
@@ -41,7 +41,7 @@ spec = do
 
   describe "unhandled declaration" $ do
     it "object declaration" $ do
-      signaturesOf (js "var x = {}") `shouldBe` []
+      signaturesOf (js "let x = {}") `shouldBe` []
 
   describe "TypedSignature" $ do
     it "simple variable type declaration" $ do
@@ -58,7 +58,7 @@ spec = do
       signaturesOf (js "") `shouldBe` []
 
     it "variable" $ do
-      signaturesOf (js "var x = 3; var z = 2;") `shouldBe` [
+      signaturesOf (js "let x = 3; let z = 2;") `shouldBe` [
                                                     AritySignature "x" 0,
                                                     AritySignature "z" 0]
 

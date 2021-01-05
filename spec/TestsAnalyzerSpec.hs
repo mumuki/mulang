@@ -26,12 +26,12 @@ spec = describe "TestsAnalyzer" $ do
       JavaScript
       "function f(x) { return x + 1 }"
       "it('f increments by one', function() { assert.equals(f(1), m) })"
-      (Just "var m = 2")) `shouldReturn` result [TestResult ["f increments by one"] Success]
+      (Just "let m = 2")) `shouldReturn` result [TestResult ["f increments by one"] Success]
 
   it "works with extra, failing result" $ do
     (run
       JavaScript
       "function f(x) { return x + 1 }"
       "it('f increments by one', function() { assert.equals(f(1), m) })"
-      (Just "var m = 3")) `shouldReturn` result [TestResult ["f increments by one"] (Failure "MuString \"Expected MuNumber 2.0 but got: MuNumber 3.0\"")]
+      (Just "let m = 3")) `shouldReturn` result [TestResult ["f increments by one"] (Failure "MuString \"Expected MuNumber 2.0 but got: MuNumber 3.0\"")]
 

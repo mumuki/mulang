@@ -16,6 +16,11 @@ runWithTypos language content expectations = do
   return $ smells result
 
 spec = describe "SmellsAnalyzer" $ do
+  describe "Using language specific smells" $ do
+    it "works with JavaScript smells" $ do
+      (runOnly JavaScript "function f() { var x = 1 }" ["JavaScript#UsesVarInsteadOfLet"]) `shouldReturn` (result [Expectation "f" "JavaScript#UsesVarInsteadOfLet"])
+      (runOnly JavaScript "function f() { let x = 1 }" ["JavaScript#UsesVarInsteadOfLet"]) `shouldReturn` (result [])
+
   describe "using usage typos" $ do
     it "works when there are missing usages and typos" $ do
       runWithTypos JavaScript "baz()" [Expectation "*" "Uses:bar"] `shouldReturn` [Expectation "baz" "HasUsageTypos:bar"]
@@ -107,12 +112,12 @@ spec = describe "SmellsAnalyzer" $ do
     describe "works with non-empty set" $ do
       it "dont reports smell when excluded" $ do
         (runExcept JavaScript
-                  "function f() { var x = 1; return x }"
+                  "function f() { let x = 1; return x }"
                   ["HasRedundantLocalVariableReturn", "HasTooShortIdentifiers"]) `shouldReturn` (result [])
 
       it "reports smell when not excluded and present" $ do
         (runExcept JavaScript
-                  "function foo() { var aVariable = 1; return aVariable }"
+                  "function foo() { let aVariable = 1; return aVariable }"
                   []) `shouldReturn` (result [Expectation "foo" "HasRedundantLocalVariableReturn"])
 
       it "dont reports smell when not excluded and not present" $ do

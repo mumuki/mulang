@@ -4,7 +4,7 @@ import           Data.Function.Extra (never)
 
 import           Test.Hspec
 import           Language.Mulang
-import           Language.Mulang.Inspector.Generic.Smell
+import           Language.Mulang.Inspector.Smell
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 
@@ -33,7 +33,7 @@ spec = do
     it "fails when inspection is not present" $ do
       locate usesWhile (js "hello") `shouldBe` Nowhere
 
-  describe "negate" $ do
+  describe "never" $ do
     it "is False when inspection is true" $ do
       never usesIf (hs "f x = g x") `shouldBe` True
 

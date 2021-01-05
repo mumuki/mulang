@@ -27,6 +27,9 @@ module Language.Mulang.Ast (
     debug,
     debugType,
     debugPattern,
+    other,
+    otherType,
+    otherPattern,
     pattern SimpleEquation,
     pattern SimpleFunction,
     pattern SimpleProcedure,
@@ -36,6 +39,7 @@ module Language.Mulang.Ast (
     pattern SubroutineSignature,
     pattern VariableSignature,
     pattern ModuleSignature,
+    pattern LValue,
     pattern Unification,
     pattern MuTrue,
     pattern MuFalse,
@@ -110,6 +114,7 @@ data Expression
     | HashMethod SubroutineBody -- deprecated
     | PrimitiveMethod Operator SubroutineBody
     | Variable Identifier Expression
+    | Constant Identifier Expression
     | Assignment Identifier Expression
     | FieldAssignment Expression Identifier Expression
     -- ^ Generic nested field assignment
@@ -237,6 +242,8 @@ data Assertion
 data Pattern
     = VariablePattern Identifier
     -- ^ variable pattern like @X@
+    | ConstantPattern Identifier
+    -- ^ constant pattern like @X@
     | LiteralPattern Code
     -- ^ literal constant pattern like @4@
     | InfixApplicationPattern Pattern Identifier Pattern
@@ -273,6 +280,15 @@ debugType a = OtherType (Just (show a)) Nothing
 debugPattern :: Show a => a -> Pattern
 debugPattern a = OtherPattern (Just (show a)) Nothing
 
+other :: String -> Expression -> Expression
+other s e = Other (Just s) (Just e)
+
+otherType :: String -> Type -> Type
+otherType s e = OtherType (Just s) (Just e)
+
+otherPattern :: String -> Pattern -> Pattern
+otherPattern s e = OtherPattern (Just s) (Just e)
+
 pattern VariableSignature name t cs        = TypeSignature name (SimpleType t cs)
 pattern SubroutineSignature name args t cs = TypeSignature name (ParameterizedType args t cs)
 pattern ModuleSignature name cs            = TypeSignature name (ConstrainedType cs)
@@ -285,6 +301,8 @@ pattern PrimitiveSend receptor selector args = Send receptor (Primitive selector
 pattern SimpleFunction name params body  = Function  name [SimpleEquation params body]
 pattern SimpleProcedure name params body = Procedure name [SimpleEquation params body]
 pattern SimpleMethod name params body    = Method    name [SimpleEquation params body]
+
+pattern LValue name value <- (extractLValue -> Just (name, value))
 
 pattern Unification name value <- (extractUnification -> Just (name, value))
 
@@ -307,10 +325,16 @@ subroutineBodyPatterns = concatMap equationPatterns
 equationPatterns :: Equation -> [Pattern]
 equationPatterns (Equation p _) = p
 
+extractLValue :: Expression -> Maybe (Identifier, Expression)
+extractLValue (Variable name value) = Just (name, value)
+extractLValue (Constant name value) = Just (name, value)
+extractLValue _                     = Nothing
+
+
 extractUnification :: Expression -> Maybe (Identifier, Expression)
 extractUnification (Assignment name value)        = Just (name, value)
 extractUnification (FieldAssignment _ name value) = Just (name, value)
-extractUnification (Variable name value)          = Just (name, value)
+extractUnification (LValue name value)            = Just (name, value)
 extractUnification (Attribute name value)         = Just (name, value)
 extractUnification _                              = Nothing
 

@@ -24,8 +24,8 @@ spec = do
     run (java "class Person { String name; }") "Person" "DeclaresAttribute:name" `shouldBe` True
 
   it "works with DeclaresAttribute on an object" $ do
-    run (js "var Person = {}") "Person" "DeclaresAttribute:name" `shouldBe` False
-    run (js "var Person = {name: 'name'}") "Person" "DeclaresAttribute:name" `shouldBe` True
+    run (js "let Person = {}") "Person" "DeclaresAttribute:name" `shouldBe` False
+    run (js "let Person = {name: 'name'}") "Person" "DeclaresAttribute:name" `shouldBe` True
 
   it "works with DeclaresMethod on a class" $ do
     run (java "class Person { }") "Person" "DeclaresMethod:name" `shouldBe` False
@@ -35,17 +35,17 @@ spec = do
     run (js "") "pepita" "DeclaresMethod:*" `shouldBe` False
 
   it "works with DeclaresMethod and explicitly anyone object" $ do
-    run (js "var pepita = {volar:function(){}}") "pepita" "DeclaresMethod:*" `shouldBe` True
-    run (js "var pepita = {}") "pepita" "DeclaresMethod:*" `shouldBe` False
+    run (js "let pepita = {volar:function(){}}") "pepita" "DeclaresMethod:*" `shouldBe` True
+    run (js "let pepita = {}") "pepita" "DeclaresMethod:*" `shouldBe` False
 
   it "works with DeclaresMethod and named object" $ do
-    run (js "var pepita = {volar:function(){}}") "pepita" "DeclaresMethod:volar" `shouldBe` True
-    run (js "var pepita = {volar:function(){}}") "pepita" "DeclaresMethod:cantar" `shouldBe` False
+    run (js "let pepita = {volar:function(){}}") "pepita" "DeclaresMethod:volar" `shouldBe` True
+    run (js "let pepita = {volar:function(){}}") "pepita" "DeclaresMethod:cantar" `shouldBe` False
 
   it "works with DeclaresMethod with scope" $ do
-    run (js "var pepita = {volar:function(){}}") "pepita.volar" "DeclaresMethod" `shouldBe` False
-    run (js "var pepita = {volar:function(){}}") "Intransitive:pepita.volar" "DeclaresMethod:^volar" `shouldBe` False
-    run (js "var pepita = {volar:function(){}}") "pepita.cantar" "DeclaresMethod" `shouldBe` False
+    run (js "let pepita = {volar:function(){}}") "pepita.volar" "DeclaresMethod" `shouldBe` False
+    run (js "let pepita = {volar:function(){}}") "Intransitive:pepita.volar" "DeclaresMethod:^volar" `shouldBe` False
+    run (js "let pepita = {volar:function(){}}") "pepita.cantar" "DeclaresMethod" `shouldBe` False
 
   it "works with DeclaresFunction in any scope and empty predicate" $ do
     run (hs "f x = 2") "*" "DeclaresFunction" `shouldBe` True
@@ -109,10 +109,10 @@ spec = do
     run (hs "f [] = 2\nf _ = 3") "f" "UsesPatternMatching" `shouldBe` True
 
   it "works with DeclaresVariable" $ do
-    run (js "var f = 2") "g" "DeclaresVariable" `shouldBe` False
-    run (js "var f = 2") "f" "DeclaresVariable:^f" `shouldBe` False
-    run (js "function f() { var m = 2; }") "f" "DeclaresVariable" `shouldBe` True
-    run (js "function f() { var m = 2; }") "f" "DeclaresVariable:m" `shouldBe` True
+    run (js "let f = 2") "g" "DeclaresVariable" `shouldBe` False
+    run (js "let f = 2") "f" "DeclaresVariable:^f" `shouldBe` False
+    run (js "function f() { let m = 2; }") "f" "DeclaresVariable" `shouldBe` True
+    run (js "function f() { let m = 2; }") "f" "DeclaresVariable:m" `shouldBe` True
 
   it "works with DeclaresComputationWithArity1" $ do
     run (hs "f a b = 2") "*" "DeclaresComputationWithArity1:f" `shouldBe` False
@@ -136,8 +136,8 @@ spec = do
     run (hs "f a b = g") "f" "Uses:g" `shouldBe` True
     run (hs "x = (*y) 10") "x" "Uses:y" `shouldBe` True
     run (hs "x = (*z) 10") "x" "Uses:y" `shouldBe` False
-    run (java "class Foo{ void a(){ var = b(); } }") "a" "Uses:b" `shouldBe` True
-    run (java "class Foo{ void a(){ var = c(); } }") "a" "Uses:b" `shouldBe` False
+    run (java "class Foo{ void a(){ let = b(); } }") "a" "Uses:b" `shouldBe` True
+    run (java "class Foo{ void a(){ let = c(); } }") "a" "Uses:b" `shouldBe` False
     run (java "class Foo{ void a(){ try{ b(); } } }") "a" "Uses:b" `shouldBe` True
     run (java "class Foo{ void a(){ try{} catch(Exception e) { b(); } } }") "a" "Uses:b" `shouldBe` True
     run (java "class Foo{ void a(){ try{} catch(Exception e) {} finally { b(); } } }") "a" "Uses:b" `shouldBe` True

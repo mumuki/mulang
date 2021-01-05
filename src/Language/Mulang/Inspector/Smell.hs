@@ -1,6 +1,6 @@
 {-# LANGUAGE ViewPatterns #-}
 
-module Language.Mulang.Inspector.Generic.Smell (
+module Language.Mulang.Inspector.Smell (
   discardsExceptions,
   doesConsolePrint,
   doesNilTest,

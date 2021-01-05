@@ -97,15 +97,15 @@ spec = do
 
       it "handles whiles" $ do
         lastRef (runjs [text|
-          var a = 0;
+          let a = 0;
 
           while(a < 10) a = a + 1;
           a;|]) `shouldReturn` MuNumber 10
 
       it "handles fors" $ do
         lastRef (runjs [text|
-          var a = 0;
-          var i = 0;
+          let a = 0;
+          let i = 0;
 
           for(i = 0; i <= 10; i++) a = a + i;
           a;|]) `shouldReturn` MuNumber 55

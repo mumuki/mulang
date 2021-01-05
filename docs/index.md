@@ -47,15 +47,15 @@ Better than explaining what Mulang is, let's see what it can do for you.
 Let's suppose we have the following JS code...
 
 ```javascript
-var aPlace = buenosAires;
-var aBird = {position: aPlace, weight: 20};
+let aPlace = buenosAires;
+let aBird = {position: aPlace, weight: 20};
 ```
 
 ...and we want to recognize some code patterns on it. We will first load the expression into Mulang:
 
 ```ruby
 > require "mulang"
-> code = Mulang::Code.native "JavaScript", "var aPlace = buenosAires; var aBird = {position: aPlace, weight: 20};"
+> code = Mulang::Code.native "JavaScript", "let aPlace = buenosAires; let aBird = {position: aPlace, weight: 20};"
 ```
 
 Now we want to know if the code expression _uses_ - that is, contains any reference to - a given _identifier_. Such identifier could be a variable, function, or anything that has a name:
