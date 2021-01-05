@@ -113,6 +113,7 @@ library
     Language.Mulang.Transform.Normalizer
     Language.Mulang.Transform.Renamer
     Language.Mulang.Transform.Replacer
+    Language.Mulang.Transform.Cropper
 
   build-depends:
     base                      <= 5,

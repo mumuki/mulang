@@ -22,8 +22,12 @@ spec = do
     it "transform with rename" $ do
       transform (Variable "x" (MuNumber 1)) [RenameVariables] `shouldBe` (Variable "mulang_var_n0" (MuNumber 1))
 
+    it "transform with crop" $ do
+      transform (Sequence [
+                    Variable "x" (MuNumber 5),
+                    Variable "y" (MuNumber 5)]) [Crop "Declares:x"] `shouldBe` (Variable "mulang_var_n0" (MuNumber 1))
+
     it "transform with normalization" $ do
       transform (Variable "x" (MuObject None)) [
         RenameVariables,
-        Normalize (unnormalized { convertObjectVariableIntoObject = True })] `shouldBe` (
-          Object "mulang_var_n0" None)
+        Normalize (unnormalized { convertObjectVariableIntoObject = True })] `shouldBe` (Object "mulang_var_n0" None)

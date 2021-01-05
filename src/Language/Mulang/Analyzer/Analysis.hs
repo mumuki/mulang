@@ -137,9 +137,9 @@ type TransformationSpec = [TransformationOperation]
 
 data TransformationOperation
   = RenameVariables
-  | Normalize NormalizationOptions
-  | Replace Expectation Expression
-  | Crop Expectation deriving (Show, Eq, Generic)
+  | Crop Inspection
+  | Replace Inspection Expression
+  | Normalize NormalizationOptions deriving (Show, Eq, Generic)
 
 data Language
   =  Json
