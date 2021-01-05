@@ -112,6 +112,7 @@ library
     Language.Mulang.Interpreter.Runner
     Language.Mulang.Transform.Normalizer
     Language.Mulang.Transform.Renamer
+    Language.Mulang.Transform.Replacer
 
   build-depends:
     base                      <= 5,
