@@ -1,9 +1,6 @@
 module Language.Mulang.Transform.Replacer (
     replace) where
 
-import           GHC.Generics
-
-
 import Language.Mulang.Ast
 import Language.Mulang.Ast.Visitor
 import Language.Mulang.Inspector (Inspection)
@@ -21,8 +18,8 @@ replace i o (Send r e es)                         = Send (replace i o r) (replac
 replace i o (Switch v cs d)                       = Switch (replace i o v) (replaceSwitchCases i o cs) (replace i o d)
 replace i o (Try t cs f)                          = Try (replace i o t) (replaceTryCases i o cs) (replace i o f)
 --
-replace _ o (SinglePatternsList ps c)             = c ps
-replace _ o c@(Terminal)                          = c
+replace _ _ (SinglePatternsList ps c)             = c ps
+replace _ _ c@(Terminal)                          = c
 replace i o (ExpressionAndExpressionsList e es c) = c (replace i o e) (mapReplace i o es)
 replace i o (SingleEquationsList eqs c)           = c (mapReplaceEquation i o eqs)
 replace i o (SingleExpression e c)                = c (replace i o e)
@@ -34,8 +31,8 @@ mapReplace i o = map (replace i o)
 mapReplaceEquation i o = map (replaceEquation i o)
 
 replaceEquation :: Inspection -> Expression -> Equation -> Equation
-replaceEquation i o (Equation ps (UnguardedBody e))   = Equation ps (UnguardedBody (replace i o e))
-replaceEquation i o (Equation ps (GuardedBody b))     = Equation ps (GuardedBody (map (\(c, e) -> (replace i o c, replace i o e)) b))
+replaceEquation i o = mapEquation f f
+  where f = replace i o
 
 replaceTryCases    i o = map (\(p, e) -> (p, replace i o e))
 replaceSwitchCases i o = map (\(e1, e2) -> (replace i o e1, replace i o e2))

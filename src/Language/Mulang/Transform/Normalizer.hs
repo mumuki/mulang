@@ -84,8 +84,7 @@ normalizeObjectLevel ops (Sequence es)                = Sequence (map (normalize
 normalizeObjectLevel ops e                            = normalize ops e
 
 normalizeEquation :: NormalizationOptions -> Equation -> Equation
-normalizeEquation ops (Equation ps (UnguardedBody e))   = Equation ps (UnguardedBody (normalizeBody ops e))
-normalizeEquation ops (Equation ps (GuardedBody b))     = Equation ps (GuardedBody (map (\(c, e) -> (normalize ops c, normalizeBody ops e)) b))
+normalizeEquation ops = mapEquation (normalize ops) (normalizeBody ops)
 
 normalizeBody :: NormalizationOptions -> Expression -> Expression
 normalizeBody ops = normalizeReturn ops . normalize ops
