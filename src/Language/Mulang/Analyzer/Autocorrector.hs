@@ -4,6 +4,8 @@ import           Language.Mulang.Analyzer.Analysis
 import           Language.Mulang.Analyzer.Synthesizer (generateOperatorEncodingRules, generateInspectionEncodingRules)
 
 import           Language.Mulang.Operators (Token, OperatorsTable, buildOperatorsTable)
+import           Language.Mulang.Transform.Normalizer (NormalizationOptions)
+
 import           Language.Mulang.Operators.C (cTokensTable)
 import           Language.Mulang.Operators.Haskell (haskellTokensTable)
 import           Language.Mulang.Operators.Java (javaTokensTable)
@@ -12,6 +14,13 @@ import           Language.Mulang.Operators.Php (phpTokensTable)
 import           Language.Mulang.Operators.Prolog (prologTokensTable)
 import           Language.Mulang.Operators.Python (pythonTokensTable)
 import           Language.Mulang.Operators.Ruby (rubyTokensTable)
+
+import           Language.Mulang.Normalizers.C (cNormalizationOptions)
+import           Language.Mulang.Normalizers.Haskell (haskellNormalizationOptions)
+import           Language.Mulang.Normalizers.Java (javaNormalizationOptions)
+import           Language.Mulang.Normalizers.JavaScript (javaScriptNormalizationOptions)
+import           Language.Mulang.Normalizers.Python (pythonNormalizationOptions)
+import           Language.Mulang.Normalizers.Ruby (rubyNormalizationOptions)
 
 import           Data.Maybe (fromMaybe, fromJust)
 import qualified Data.Map.Strict as Map
@@ -27,13 +36,20 @@ import qualified Data.Map.Strict as Map
 --  4. corrects the expectations' inspections using the autocorrectionRules
 --  5. fills the domainLanguage rules when it is not present but can be inferred from the originalLanguage
 --  6. fills the domainLanguage's caseStyle when it is not present but can be inferred from the originalLanguage
+--  7. fills the normalizationOption when they are not present but can be inferred from the originalLanguage
 autocorrect :: Analysis -> Analysis
 autocorrect (Analysis f s@(AnalysisSpec { originalLanguage = Just _ })) = Analysis f (autocorrectSpec s)
 autocorrect (Analysis f@(CodeSample { language = l } ) s)               = autocorrect (Analysis f s { originalLanguage = Just l }) -- (1)
 autocorrect a                                                           = a
 
 autocorrectSpec :: AnalysisSpec -> AnalysisSpec
-autocorrectSpec s = runFixes [rulesFix, rulesAgumentationFix, expectationsFix, emptyDomainLanguageFix, domainLanguageCaseStyleFix]
+autocorrectSpec s = runFixes [
+    rulesFix,
+    rulesAgumentationFix,
+    expectationsFix,
+    emptyDomainLanguageFix,
+    domainLanguageCaseStyleFix,
+    normalizationOptionFix]
   where
     runFixes = foldl combine s . map ($ (justOriginalLanguage s))
     combine s f | Just s' <- f s = s'
@@ -74,6 +90,11 @@ domainLanguageCaseStyleFix l s = do
   AnalysisSpec { domainLanguage = Just dl } <- Just s
   DomainLanguage { caseStyle = Nothing } <- Just dl
   return s { domainLanguage = Just (dl { caseStyle = Just (inferCaseStyle l) }) }
+
+normalizationOptionFix :: Fix -- (7)
+normalizationOptionFix l s = do
+  AnalysisSpec { normalizationOptions = Nothing } <- Just s
+  return s { normalizationOptions = (inferNormalizationOptions l) }
 
 -- Inferences
 
@@ -136,6 +157,17 @@ inferAutocorrectionRules = buildRules . rules
     rules Python2 = rules Python
     rules Python3 = rules Python
     rules _ = []
+
+inferNormalizationOptions :: Inference (Maybe NormalizationOptions)
+inferNormalizationOptions C          = Just cNormalizationOptions
+inferNormalizationOptions Haskell    = Just haskellNormalizationOptions
+inferNormalizationOptions Java       = Just javaNormalizationOptions
+inferNormalizationOptions JavaScript = Just javaScriptNormalizationOptions
+inferNormalizationOptions Python     = Just pythonNormalizationOptions
+inferNormalizationOptions Python2    = Just pythonNormalizationOptions
+inferNormalizationOptions Python3    = Just pythonNormalizationOptions
+inferNormalizationOptions Ruby       = Just rubyNormalizationOptions
+inferNormalizationOptions _          = Nothing
 
 -- Misc
 

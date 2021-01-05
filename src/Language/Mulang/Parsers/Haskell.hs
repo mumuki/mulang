@@ -4,7 +4,6 @@ import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Operators.Haskell (haskellTokensTable)
 import Language.Mulang.Operators (parseOperator)
 import Language.Mulang.Builder (compact)
-import Language.Mulang.Transform.Normalizer (normalizeWith, defaultNormalizationOptions, NormalizationOptions(..), SequenceSortMode(..))
 import Language.Mulang.Parsers
 
 import Language.Haskell.Syntax
@@ -26,8 +25,7 @@ parseHaskell :: EitherParser
 parseHaskell = orLeft . parseHaskell'
 
 parseHaskell' :: String -> ParseResult Expression
-parseHaskell' = fmap (normalize . mu) . parseModule . (++"\n")
-    where normalize = normalizeWith (defaultNormalizationOptions { sortSequenceDeclarations = SortAll })
+parseHaskell' = fmap mu . parseModule . (++"\n")
 
 mu :: HsModule -> Expression
 mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
@@ -156,4 +154,3 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muTypeId (HsTyTuple ts)                             = "(" ++ (intercalate ", " . map muTypeId $ ts) ++ ")"
     muTypeId (HsTyApp (HsTyCon (Special HsListCon)) t2) = "[" ++ muTypeId t2 ++ "]"
     muTypeId (HsTyApp t1 t2)                            = muTypeId t1 ++ " " ++ muTypeId t2
-

@@ -49,9 +49,9 @@ spec = do
     it "differentiates procedures and functions" $ do
       (js "function f() { return 1 }" /= js "function f() { 1 }") `shouldBe` True
 
-    it "handles lambdas likes haskell does" $ do
-      js "let m = function(x) { return 1 }" `shouldBe` hs "m = \\x -> 1"
-      js "var m = function(x) { return 1 }" `shouldBe` (other "JSVar" (hs "m = \\x -> 1"))
+    it "handles lambdas as functions" $ do
+      js "let m = function(x) { return 1 }" `shouldBe` js "function m(x) { return 1 }"
+      js "var m = function(x) { return 1 }" `shouldBe` (other "JSVar" (js "function m(x) { return 1 }"))
 
     it "handles arrow functions with explicit returns" $ do
       js "var m = (x) => { return 1 }" `shouldBe` js "var m = function(x) { return 1 }"
@@ -71,9 +71,6 @@ spec = do
 
     it "multiple params function declaration" $ do
       js "function f(x, y) { return 1 }" `shouldBe` hs "f x y = 1"
-
-    it "constant function declaration" $ do
-      js "let f = function(x) { return x + 1 }" `shouldBe` hs "f = \\x -> x + 1"
 
     it "numeric top level expression" $ do
       js "8" `shouldBe` MuNumber 8

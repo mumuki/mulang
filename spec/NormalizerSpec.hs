@@ -7,7 +7,14 @@ module NormalizerSpec (spec) where
   import           Language.Mulang.Parsers.Java (java)
   import           Language.Mulang.Parsers.JavaScript (js)
   import           Language.Mulang.Parsers.Python (py)
+  import           Language.Mulang.Normalizers.Java (javaNormalizationOptions)
+  import           Language.Mulang.Normalizers.Python (pythonNormalizationOptions)
+  import           Language.Mulang.Normalizers.Haskell (haskellNormalizationOptions)
   import           Language.Mulang.Transform.Normalizer
+
+  njava = normalize javaNormalizationOptions . java
+  npy = normalize pythonNormalizationOptions . py
+  nhs = normalize haskellNormalizationOptions . hs
 
   spec :: Spec
   spec = do
@@ -15,29 +22,29 @@ module NormalizerSpec (spec) where
       let options = defaultNormalizationOptions { insertImplicitReturn = True}
 
       it "does not insert return in single literal statement" $ do
-        normalizeWith options (py "def x(): x = 1") `shouldBe`  SimpleProcedure "x" [] (Assignment "x" (MuNumber 1.0))
+        normalize options (py "def x(): x = 1") `shouldBe`  SimpleProcedure "x" [] (Assignment "x" (MuNumber 1.0))
 
       it "inserts return in single literal expression" $ do
-        normalizeWith options (py "def x(): 3") `shouldBe`  SimpleProcedure "x" [] (Return (MuNumber 3.0))
+        normalize options (py "def x(): 3") `shouldBe`  SimpleProcedure "x" [] (Return (MuNumber 3.0))
 
       it "inserts return in last literal expression" $ do
-        normalizeWith options (js "function x() { let x = 1; x += 1; x }") `shouldBe`  SimpleProcedure "x" [] (Sequence [
+        normalize options (js "function x() { let x = 1; x += 1; x }") `shouldBe`  SimpleProcedure "x" [] (Sequence [
                                                                                           Variable "x" (MuNumber 1.0),
                                                                                           Assignment "x" (Application (Primitive Plus) [Reference "x",MuNumber 1.0]),
                                                                                           Return (Reference "x")])
 
     describe "sorts declarations by default" $ do
       it "sorts functions on Python" $ do
-        py "def foo():\n  return 2\n\ndef bar():\n  return 1\n\n" `shouldBe` py "def bar():\n  return 1\n\ndef foo():\n  return 2\n\n"
+        npy "def foo():\n  return 2\n\ndef bar():\n  return 1\n\n" `shouldBe` py "def bar():\n  return 1\n\ndef foo():\n  return 2\n\n"
 
       it "sorts classes on Java" $ do
-        java "class Foo {} class Bar {}" `shouldBe` java "class Bar {} class Foo {}"
+        njava "class Foo {} class Bar {}" `shouldBe` java "class Bar {} class Foo {}"
 
       it "sorts functions on haskell" $ do
-        hs "f 1 = 1\ng 2 = 2" `shouldBe` hs "g 2 = 2\nf 1 = 1"
+        nhs "g 2 = 2\nf 1 = 1" `shouldBe` hs "f 1 = 1\ng 2 = 2"
 
       it "sorts declarations on haskell even when there are variables" $ do
-        hs "n = 1\nf 1 = 1\ng 2 = 2" `shouldBe` hs "g 2 = 2\nf 1 = 1\nn = 1"
+        nhs "g 2 = 2\nf 1 = 1\nn = 1" `shouldBe` hs "f 1 = 1\ng 2 = 2\nn = 1"
 
       it "sorts functions on javascript if there are only functions" $ do
         js "function f() {} function g() {}" `shouldBe` js "function g() {} function f() {}"

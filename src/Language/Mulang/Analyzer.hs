@@ -22,14 +22,14 @@ import Data.Maybe (fromMaybe)
 analyse, analyse' :: Analysis -> IO AnalysisResult
 analyse = analyse' . autocorrect
 
-analyse' (Analysis sample spec) = analyseSample . parseFragment $ sample
+analyse' (Analysis sample spec) = analyseSample . parseFragment (normalizationOptions spec) $ sample
   where analyseSample (Right ast)    = analyseAst ast spec
         analyseSample (Left message) = return $ AnalysisFailed message
 
 analyseAst :: Expression -> AnalysisSpec -> IO AnalysisResult
 analyseAst ast spec = do
   domainLang <- compileDomainLanguage (domainLanguage spec)
-  testResults <- analyseTests ast (testAnalysisType spec)
+  testResults <- analyseTests ast (testAnalysisType spec) (normalizationOptions spec)
 
   let queryResults = (analyseExpectations ast (expectations spec) ++ analyseCustomExpectations ast (customExpectations spec))
   let expectationResults = map snd queryResults

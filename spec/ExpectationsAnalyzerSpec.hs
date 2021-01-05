@@ -8,7 +8,7 @@ result expectationResults smells
   = emptyCompletedAnalysisResult { expectationResults = expectationResults, smells = smells }
 
 run language content expectations = analyse (expectationsAnalysis (CodeSample language content) expectations)
-runAst ast expectations = analyse (expectationsAnalysis (MulangSample ast Nothing) expectations)
+runAst ast expectations = analyse (expectationsAnalysis (MulangSample ast) expectations)
 
 passed e = ExpectationResult e True
 failed e = ExpectationResult e False

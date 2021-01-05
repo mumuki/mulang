@@ -86,22 +86,55 @@ describe Mulang::Code do
   end
 
   context 'when language is external with normalization options' do
-    let(:input) { { tag: :MuNumber, contents: 1 } }
-    let(:code) { Mulang::Code.external(input, insertImplicitReturn: true) }
+    let(:input) do
+      {tag: 'Procedure', contents: ['x', [[[], {tag: 'UnguardedBody', contents: {tag: 'MuNumber', contents: 1}}]]]}
+    end
+    let(:code) { Mulang::Code.external(input) }
 
     it do
-      expect(code.sample).to eq tag: 'MulangSample',
-                                ast: {tag: :MuNumber, contents: 1},
-                                normalizationOptions: {insertImplicitReturn: true}
+      expect(code.sample).to eq tag: 'MulangSample', ast: input
+
     end
 
     it do
-      expect(code.analyse(includeIntermediateLanguage: true)).to eq 'expectationResults' => [],
-                                                                    'intermediateLanguage' => {'tag'=>'MuNumber', 'contents'=>1},
-                                                                    'signatures' => [],
-                                                                    'smells' => [],
-                                                                    'tag' => 'AnalysisCompleted',
-                                                                    'testResults' => []
+      expect(code.analyse(includeIntermediateLanguage: true,
+                          normalizationOptions: {insertImplicitReturn: true})).to eq 'expectationResults' => [],
+                                                                                    'intermediateLanguage' => {
+                                                                                      'tag'=>'Procedure',
+                                                                                      'contents'=>['x', [[[], {
+                                                                                        'tag'=>'UnguardedBody',
+                                                                                        'contents'=>{'tag'=>'Return', 'contents'=>{'tag'=>'MuNumber', 'contents'=>1}}}]]]},
+                                                                                    'signatures' => [],
+                                                                                    'smells' => [],
+                                                                                    'tag' => 'AnalysisCompleted',
+                                                                                    'testResults' => []
+
+    end
+  end
+
+  context 'when language is native with normalization options' do
+    let(:input) do
+      'function x() { 1 }'
+    end
+    let(:code) { Mulang::Code.native('JavaScript', input) }
+
+    it do
+      expect(code.sample).to eq tag: 'CodeSample', language: 'JavaScript', content: input
+
+    end
+
+    it do
+      expect(code.analyse(includeIntermediateLanguage: true,
+                          normalizationOptions: {insertImplicitReturn: true})).to eq 'expectationResults' => [],
+                                                                                    'intermediateLanguage' => {
+                                                                                      'tag'=>'Procedure',
+                                                                                      'contents'=>['x', [[[], {
+                                                                                        'tag'=>'UnguardedBody',
+                                                                                        'contents'=>{'tag'=>'Return', 'contents'=>{'tag'=>'MuNumber', 'contents'=>1}}}]]]},
+                                                                                    'signatures' => [],
+                                                                                    'smells' => [],
+                                                                                    'tag' => 'AnalysisCompleted',
+                                                                                    'testResults' => []
 
     end
   end

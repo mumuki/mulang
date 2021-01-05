@@ -3,8 +3,9 @@ module Language.Mulang.Parsers.JavaScript (js, parseJavaScript) where
 import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Builder (compact, compactMap)
-import Language.Mulang.Transform.Normalizer (normalizeWith, defaultNormalizationOptions, NormalizationOptions(..), SequenceSortMode(..))
 import Language.Mulang.Parsers
+import Language.Mulang.Transform.Normalizer (normalize)
+import Language.Mulang.Normalizers.JavaScript (javaScriptNormalizationOptions )
 
 import Language.JavaScript.Parser.Parser (parse)
 import Language.JavaScript.Parser.AST
@@ -17,14 +18,13 @@ import Data.Function.Extra ((<==))
 import Control.Fallible
 
 js :: Parser
-js = orFail . parseJavaScript'
+js = normalize javaScriptNormalizationOptions . orFail . parseJavaScript'
 
 parseJavaScript :: MaybeParser
 parseJavaScript = orNothing . parseJavaScript'
 
 parseJavaScript' :: String -> Either String Expression
-parseJavaScript' = fmap (normalize . muJSAST) . (`parse` "src")
-  where normalize = normalizeWith (defaultNormalizationOptions { sortSequenceDeclarations = SortUniqueNonVariables })
+parseJavaScript' = fmap muJSAST . (`parse` "src")
 
 muJSAST:: JSAST -> Expression
 muJSAST (JSAstProgram statements _)     = compactMap muJSStatement statements

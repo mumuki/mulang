@@ -2,7 +2,6 @@
 
 module Language.Mulang.Transform.Normalizer (
     normalize,
-    normalizeWith,
     defaultNormalizationOptions,
     NormalizationOptions (..),
     SequenceSortMode (..)) where
@@ -23,6 +22,7 @@ data NormalizationOptions = NormalizationOptions {
   convertObjectLevelFunctionIntoMethod :: Bool,
   convertObjectLevelLambdaVariableIntoMethod :: Bool,
   convertObjectLevelVariableIntoAttribute :: Bool,
+  convertObjectIntoDict :: Bool,
   sortSequenceDeclarations :: SequenceSortMode,
   insertImplicitReturn :: Bool
 } deriving (Eq, Show, Read, Generic)
@@ -30,65 +30,65 @@ data NormalizationOptions = NormalizationOptions {
 data SequenceSortMode
   = SortNothing
   | SortUniqueNonVariables
-  | SortAllNonVarables
+  | SortAllNonVariables
   | SortAll deriving (Eq, Show, Read, Generic)
 
 defaultNormalizationOptions :: NormalizationOptions
 defaultNormalizationOptions = NormalizationOptions {
-  convertObjectVariableIntoObject = True,
-  convertLambdaVariableIntoFunction = True,
-  convertObjectLevelFunctionIntoMethod = True,
-  convertObjectLevelLambdaVariableIntoMethod = True,
-  convertObjectLevelVariableIntoAttribute = True,
-  sortSequenceDeclarations = SortAllNonVarables,
+  convertObjectVariableIntoObject = False,
+  convertLambdaVariableIntoFunction = False,
+  convertObjectLevelFunctionIntoMethod = False,
+  convertObjectLevelLambdaVariableIntoMethod = False,
+  convertObjectLevelVariableIntoAttribute = False,
+  convertObjectIntoDict = False,
+  sortSequenceDeclarations = SortNothing,
   insertImplicitReturn = False
 }
 
-normalize :: Expression -> Expression
-normalize = normalizeWith defaultNormalizationOptions
 
-normalizeWith :: NormalizationOptions -> Expression -> Expression
-normalizeWith ops (Application (Send r m []) args)      = Send (normalizeWith ops r) (normalizeWith ops m) (mapNormalize ops args)
-normalizeWith ops (LValue n (Lambda vars e))            | convertLambdaVariableIntoFunction ops = SimpleFunction n vars (normalizeWith ops e)
-normalizeWith ops (LValue n (MuObject e))               | convertObjectVariableIntoObject ops = Object n (normalizeObjectLevel ops e)
-normalizeWith ops (Object n e)                          = Object n (normalizeObjectLevel ops e)
-normalizeWith ops (Sequence es)                         = Sequence . sortDeclarationsWith ops .  mapNormalize ops $ es
+normalize :: NormalizationOptions -> Expression -> Expression
+normalize ops (Application (Send r m []) args)      = Send (normalize ops r) (normalize ops m) (mapNormalize ops args)
+normalize ops (LValue n (Lambda vars e))            | convertLambdaVariableIntoFunction ops = SimpleFunction n vars (normalize ops e)
+normalize ops (LValue n (MuObject e))               | convertObjectVariableIntoObject ops = Object n (normalizeObjectLevel ops e)
+normalize ops (MuObject e)                          | convertObjectIntoDict ops = MuDict e
+normalize ops (Object n e)                          = Object n (normalizeObjectLevel ops e)
+normalize ops (Sequence es)                         = Sequence . sortDeclarationsWith ops .  mapNormalize ops $ es
 --
-normalizeWith _    a@(Assert _ _)                       = a
-normalizeWith ops (For stms e1)                         = For stms (normalizeWith ops e1)
-normalizeWith ops (ForLoop e c i b)                     = ForLoop (normalizeWith ops e) (normalizeWith ops c) (normalizeWith ops i) (normalizeWith ops b)
-normalizeWith ops (Lambda ps e2)                        = Lambda ps (normalizeWith ops e2)
-normalizeWith ops (Match e1 equations)                  = Match (normalizeWith ops e1) (mapNormalizeEquation ops equations)
-normalizeWith ops (Rule n args es)                      = Rule n args (mapNormalize ops es)
-normalizeWith ops (Send r e es)                         = Send (normalizeWith ops r) (normalizeWith ops e) (mapNormalize ops es)
-normalizeWith ops (Switch v cs d)                       = Switch (normalizeWith ops v) (normalizeSwitchCases ops cs) (normalizeWith ops d)
-normalizeWith ops (Try t cs f)                          = Try (normalizeWith ops t) (normalizeTryCases ops cs) (normalizeWith ops f)
+normalize _    a@(Assert _ _)                       = a
+normalize ops (For stms e1)                         = For stms (normalize ops e1)
+normalize ops (ForLoop e c i b)                     = ForLoop (normalize ops e) (normalize ops c) (normalize ops i) (normalize ops b)
+normalize ops (Lambda ps e2)                        = Lambda ps (normalize ops e2)
+normalize ops (Match e1 equations)                  = Match (normalize ops e1) (mapNormalizeEquation ops equations)
+normalize ops (Rule n args es)                      = Rule n args (mapNormalize ops es)
+normalize ops (Send r e es)                         = Send (normalize ops r) (normalize ops e) (mapNormalize ops es)
+normalize ops (Switch v cs d)                       = Switch (normalize ops v) (normalizeSwitchCases ops cs) (normalize ops d)
+normalize ops (Try t cs f)                          = Try (normalize ops t) (normalizeTryCases ops cs) (normalize ops f)
 --
-normalizeWith _   (SinglePatternsList ps c)             = c ps
-normalizeWith _   c@(Terminal)                          = c
-normalizeWith ops (ExpressionAndExpressionsList e es c) = c (normalizeWith ops e) (mapNormalize ops es)
-normalizeWith ops (SingleEquationsList eqs c)           = c (mapNormalizeEquation ops eqs)
-normalizeWith ops (SingleExpression e c)                = c (normalizeWith ops e)
-normalizeWith ops (SingleExpressionsList es c)          = c (mapNormalize ops es)
-normalizeWith ops (ThreeExpressions e1 e2 e3 c)         = c (normalizeWith ops e1) (normalizeWith ops e2) (normalizeWith ops e3)
-normalizeWith ops (TwoExpressions e1 e2 c)              = c (normalizeWith ops e1) (normalizeWith ops e2)
+normalize _   (SinglePatternsList ps c)             = c ps
+normalize _   c@(Terminal)                          = c
+normalize ops (ExpressionAndExpressionsList e es c) = c (normalize ops e) (mapNormalize ops es)
+normalize ops (SingleEquationsList eqs c)           = c (mapNormalizeEquation ops eqs)
+normalize ops (SingleExpression e c)                = c (normalize ops e)
+normalize ops (SingleExpressionsList es c)          = c (mapNormalize ops es)
+normalize ops (ThreeExpressions e1 e2 e3 c)         = c (normalize ops e1) (normalize ops e2) (normalize ops e3)
+normalize ops (TwoExpressions e1 e2 c)              = c (normalize ops e1) (normalize ops e2)
 
-mapNormalize ops = map (normalizeWith ops)
+mapNormalize ops = map (normalize ops)
 mapNormalizeEquation ops = map (normalizeEquation ops)
 
 normalizeObjectLevel :: NormalizationOptions -> Expression -> Expression
 normalizeObjectLevel ops (Function n eqs)             | convertObjectLevelFunctionIntoMethod ops       = Method n (mapNormalizeEquation ops eqs)
-normalizeObjectLevel ops (LValue n (Lambda vars e))   | convertObjectLevelLambdaVariableIntoMethod ops = SimpleMethod n vars (normalizeWith ops e)
-normalizeObjectLevel ops (LValue n e)                 | convertObjectLevelVariableIntoAttribute ops    = Attribute n (normalizeWith ops e)
+normalizeObjectLevel ops (LValue n (Lambda vars e))   | convertObjectLevelLambdaVariableIntoMethod ops = SimpleMethod n vars (normalize ops e)
+normalizeObjectLevel ops (LValue n e)                 | convertObjectLevelVariableIntoAttribute ops    = Attribute n (normalize ops e)
 normalizeObjectLevel ops (Sequence es)                = Sequence (map (normalizeObjectLevel ops) es)
-normalizeObjectLevel ops e                            = normalizeWith ops e
+normalizeObjectLevel ops e                            = normalize ops e
 
 normalizeEquation :: NormalizationOptions -> Equation -> Equation
 normalizeEquation ops (Equation ps (UnguardedBody e))   = Equation ps (UnguardedBody (normalizeBody ops e))
-normalizeEquation ops (Equation ps (GuardedBody b))     = Equation ps (GuardedBody (map (\(c, e) -> (normalizeWith ops c, normalizeBody ops e)) b))
+normalizeEquation ops (Equation ps (GuardedBody b))     = Equation ps (GuardedBody (map (\(c, e) -> (normalize ops c, normalizeBody ops e)) b))
 
 normalizeBody :: NormalizationOptions -> Expression -> Expression
-normalizeBody ops = normalizeReturn ops . normalizeWith ops
+normalizeBody ops = normalizeReturn ops . normalize ops
 
 normalizeReturn :: NormalizationOptions -> Expression -> Expression
 normalizeReturn ops e             | not $ insertImplicitReturn ops = e
@@ -96,8 +96,8 @@ normalizeReturn _   e             | isImplicitReturn e = Return e
 normalizeReturn _   (Sequence es) | Just (i, l) <- unwind es, isImplicitReturn l = Sequence $ i ++ [Return l]
 normalizeReturn _   e             = e
 
-normalizeTryCases    ops = map (\(p, e) -> (p, normalizeWith ops e))
-normalizeSwitchCases ops = map (\(e1, e2) -> (normalizeWith ops e1, normalizeWith ops e2))
+normalizeTryCases    ops = map (\(p, e) -> (p, normalize ops e))
+normalizeSwitchCases ops = map (\(e1, e2) -> (normalize ops e1, normalize ops e2))
 
 isImplicitReturn :: Expression -> Bool
 isImplicitReturn (Reference _)         = True
@@ -126,7 +126,7 @@ sortDeclarationsWith ops expressions | shouldSort (sortSequenceDeclarations ops)
     shouldSort :: SequenceSortMode -> Bool
     shouldSort SortNothing             = False
     shouldSort SortUniqueNonVariables  = all isSafeDeclaration expressions && identifiersAreUnique expressions
-    shouldSort SortAllNonVarables      = all isSafeDeclaration expressions
+    shouldSort SortAllNonVariables      = all isSafeDeclaration expressions
     shouldSort SortAll                 = all isDeclaration expressions
 
     identifiersAreUnique = unique . map declaredIdentifiers
