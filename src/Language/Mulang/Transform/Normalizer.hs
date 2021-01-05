@@ -57,7 +57,7 @@ normalize ops (LValue n (Lambda vars e))            | convertLambdaVariableIntoF
 normalize ops (LValue n (MuObject e))               | convertObjectVariableIntoObject ops = Object n (normalizeObjectLevel ops e)
 normalize ops (MuObject e)                          | convertObjectIntoDict ops = MuDict e
 normalize ops (Object n e)                          = Object n (normalizeObjectLevel ops e)
-normalize ops (Sequence es)                         = Sequence . sortDeclarationsWith ops .  mapNormalize ops $ es
+normalize ops (Sequence es)                         = normalizeSequence ops . sortDeclarations ops .  mapNormalize ops $ es
 --
 normalize _    a@(Assert _ _)                       = a
 normalize ops (For stms e1)                         = For stms (normalize ops e1)
@@ -82,16 +82,16 @@ mapNormalize ops = map (normalize ops)
 mapNormalizeEquation ops = map (normalizeEquation ops)
 
 normalizeSequence :: NormalizationOptions -> [Expression] -> Expression
-normalizeSequence opts = compact' . trim'
+normalizeSequence ops = compact' . trim'
   where
-    compact' = if compactSequences opts then compact else Sequence
-    trim'    = if trimSequences opts then trim else id
+    compact' = if compactSequences ops then compact else Sequence
+    trim'    = if trimSequences ops then trim else id
 
 normalizeObjectLevel :: NormalizationOptions -> Expression -> Expression
 normalizeObjectLevel ops (Function n eqs)             | convertObjectLevelFunctionIntoMethod ops       = Method n (mapNormalizeEquation ops eqs)
 normalizeObjectLevel ops (LValue n (Lambda vars e))   | convertObjectLevelLambdaVariableIntoMethod ops = SimpleMethod n vars (normalize ops e)
 normalizeObjectLevel ops (LValue n e)                 | convertObjectLevelVariableIntoAttribute ops    = Attribute n (normalize ops e)
-normalizeObjectLevel ops (Sequence es)                = Sequence (map (normalizeObjectLevel ops) es)
+normalizeObjectLevel ops (Sequence es)                = normalizeSequence ops (map (normalizeObjectLevel ops) es)
 normalizeObjectLevel ops e                            = normalize ops e
 
 normalizeEquation :: NormalizationOptions -> Equation -> Equation
