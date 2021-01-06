@@ -22,10 +22,20 @@ spec = do
     it "transform with rename" $ do
       transform (Variable "x" (MuNumber 1)) [RenameVariables] `shouldBe` (Variable "mulang_var_n0" (MuNumber 1))
 
+    it "transform with replace" $ do
+      let ast = (Sequence [
+                    Variable "x" (MuNumber 5),
+                    Variable "y" (MuNumber 5)])
+
+      transform ast [Replace "IsVariable:x" None] `shouldBe` Sequence [None, Variable "y" (MuNumber 5)]
+      transform ast [Replace "IsDeclaration:x" None] `shouldBe` Sequence [None, Variable "y" (MuNumber 5)]
+
+      transform ast [Replace "IsVariable" None] `shouldBe` Sequence [None, None]
+
     it "transform with crop" $ do
       transform (Sequence [
                     Variable "x" (MuNumber 5),
-                    Variable "y" (MuNumber 5)]) [Crop "Declares:x"] `shouldBe` (Variable "mulang_var_n0" (MuNumber 1))
+                    Variable "y" (MuNumber 5)]) [Crop "IsVariable:x"] `shouldBe` (Variable "y" (MuNumber 5))
 
     it "transform with normalization" $ do
       transform (Variable "x" (MuObject None)) [

@@ -11,7 +11,7 @@ import Language.Mulang
 import Language.Mulang.Consult (Consult)
 import Language.Mulang.Counter (plus)
 import Language.Mulang.Inspector.Primitive (atLeast, atMost, exactly)
-import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol, isSelf)
+import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol, isSelf, isLiteral)
 import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
 
 import qualified Language.Mulang.Edl.Expectation as E
@@ -130,6 +130,14 @@ compileInspection = f
   f "Includes"                         E.Unmatching   = bound includes
   f "Inherits"                         E.Unmatching   = bound inherits
   f "Instantiates"                     E.Unmatching   = bound instantiates
+  f "IsClass"                          E.Unmatching   = bound isClass
+  f "IsDeclaration"                    E.Unmatching   = bound isDeclaration
+  f "IsFunction"                       E.Unmatching   = bound isFunction
+  f "IsLValue"                         E.Unmatching   = bound isLValue
+  f "IsVariable"                       E.Unmatching   = bound isVariable
+  f "IsNil"                            E.Unmatching   = plain isNil
+  f "IsSelf"                           E.Unmatching   = plain isSelf
+  f "IsLiteral"                        E.Unmatching   = plain isLiteral
   f "Raises"                           E.Unmatching   = bound raises
   f "Rescues"                          E.Unmatching   = bound rescues
   f "Returns"                          m              = plainMatching returnsMatching m

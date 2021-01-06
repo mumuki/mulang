@@ -59,6 +59,7 @@ library
     Language.Mulang.Inspector.Matcher
     Language.Mulang.Inspector.ObjectOriented
     Language.Mulang.Inspector.ObjectOriented.Polymorphism
+    Language.Mulang.Inspector.Plain
     Language.Mulang.Inspector.Primitive
     Language.Mulang.Inspector.Procedural
     Language.Mulang.Inspector.Query
