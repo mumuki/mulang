@@ -201,5 +201,9 @@ describe Mulang::Code do
     it "results are functionally equivalent to standard mode with normalization options are used" do
       expect(Mulang::Code.ast_many codes, convertObjectIntoDict: true).to eq codes.map { |it| it.ast convertObjectIntoDict: true }
     end
+
+    it "results are functionally equivalent to standard mode with transformations" do
+      expect(Mulang::Code.transformed_asts_many codes, [[{tag: :RenameVariables}]]).to eq codes.map { |it| it.transformed_asts [[{tag: :RenameVariables}]] }
+    end
   end
 end

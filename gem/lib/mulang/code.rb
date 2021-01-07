@@ -19,7 +19,7 @@ module Mulang
     end
 
     def transformed_asts_analysis(operations, **options)
-      @language.transformed_asts_analysis @content, options, **options
+      @language.transformed_asts_analysis @content, operations, **options
     end
 
     def sample
@@ -68,8 +68,8 @@ module Mulang
       run_many(codes, key: 'outputAst') { |it| it.ast_analysis(**options) }
     end
 
-    def self.transformed_ast_many(codes, operations, **options)
-      run_many(codes, key: 'transformedAsts') { |it| it.transformed_ast_analysis(operations, **options) }
+    def self.transformed_asts_many(codes, operations, **options)
+      run_many(codes, key: 'transformedAsts') { |it| it.transformed_asts_analysis(operations, **options) }
     end
 
     private
