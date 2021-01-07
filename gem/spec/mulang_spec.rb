@@ -98,13 +98,14 @@ describe Mulang::Code do
     end
 
     it do
-      expect(code.analyse(includeIntermediateLanguage: true,
+      expect(code.analyse(includeOutputAst: true,
                           normalizationOptions: {insertImplicitReturn: true})).to eq 'expectationResults' => [],
-                                                                                    'intermediateLanguage' => {
+                                                                                    'outputAst' => {
                                                                                       'tag'=>'Procedure',
                                                                                       'contents'=>['x', [[[], {
                                                                                         'tag'=>'UnguardedBody',
                                                                                         'contents'=>{'tag'=>'Return', 'contents'=>{'tag'=>'MuNumber', 'contents'=>1}}}]]]},
+                                                                                    'transformedAsts' => nil,
                                                                                     'signatures' => [],
                                                                                     'smells' => [],
                                                                                     'tag' => 'AnalysisCompleted',
@@ -125,13 +126,18 @@ describe Mulang::Code do
     end
 
     it do
-      expect(code.analyse(includeOutputAst: true)).to eq 'expectationResults' => [],
-                                                                    'outputAst' => {'tag'=>'MuNumber', 'contents'=>1},
-                                                                    'transformedAsts' => nil,
-                                                                    'signatures' => [],
-                                                                    'smells' => [],
-                                                                    'tag' => 'AnalysisCompleted',
-                                                                    'testResults' => []
+      expect(code.analyse(includeOutputAst: true,
+                          normalizationOptions: {insertImplicitReturn: true})).to eq 'expectationResults' => [],
+                                                                                      'outputAst' => {
+                                                                                        'tag'=>'Procedure',
+                                                                                        'contents'=>['x', [[[], {
+                                                                                          'tag'=>'UnguardedBody',
+                                                                                          'contents'=>{'tag'=>'Return', 'contents'=>{'tag'=>'MuNumber', 'contents'=>1}}}]]]},
+                                                                                      'transformedAsts' => nil,
+                                                                                      'signatures' => [],
+                                                                                      'smells' => [],
+                                                                                      'tag' => 'AnalysisCompleted',
+                                                                                      'testResults' => []
 
     end
   end

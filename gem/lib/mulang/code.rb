@@ -61,7 +61,7 @@ module Mulang
     end
 
     def self.ast_many(codes)
-      Mulang.analyse(codes.map { |it| it.ast_analysis  }).map { |it| it['intermediateLanguage'] }
+      Mulang.analyse(codes.map { |it| it.ast_analysis  }).map { |it| it['outputAst'] }
     end
 
     private
