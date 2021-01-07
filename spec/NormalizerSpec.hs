@@ -18,6 +18,16 @@ module NormalizerSpec (spec) where
 
   spec :: Spec
   spec = do
+    describe "can convert dicts" $ do
+      let options = unnormalized { convertObjectIntoDict = True }
+      let n = normalize options
+
+      it "converts dict and its var contents" $ do
+        n (MuObject (Variable "x" (MuNumber 5))) `shouldBe` (MuDict (Arrow (MuString "x") (MuNumber 5)))
+        n (MuObject (Sequence [Variable "x" (MuNumber 5), Variable "y" (MuNumber 6)])) `shouldBe` (MuDict (Sequence [
+                                                                                          Arrow (MuString "x") (MuNumber 5),
+                                                                                          Arrow (MuString "y") (MuNumber 6)]))
+
     describe "can trim code" $ do
       let options = unnormalized { trimSequences = True }
       let n = normalize options

@@ -58,7 +58,7 @@ normalize ops (Application (Send r m []) args)      = Send (normalize ops r) (no
 normalize ops (Application (Primitive op) [e1, e2]) | isCommutative op = Application (Primitive op) (normalizeCommutativeArguments ops [e1, e2])
 normalize ops (LValue n (Lambda vars e))            | convertLambdaVariableIntoFunction ops = SimpleFunction n vars (normalize ops e)
 normalize ops (LValue n (MuObject e))               | convertObjectVariableIntoObject ops = Object n (normalizeObjectLevel ops e)
-normalize ops (MuObject e)                          | convertObjectIntoDict ops = MuDict e
+normalize ops (MuObject e)                          | convertObjectIntoDict ops = MuDict . normalize ops . normalizeArrows $ e
 normalize ops (Object n e)                          = Object n (normalizeObjectLevel ops e)
 normalize ops (Sequence es)                         = normalizeSequence ops . sortDeclarations ops .  mapNormalize ops $ es
 --
@@ -83,6 +83,11 @@ normalize ops (TwoExpressions e1 e2 c)              = c (normalize ops e1) (norm
 
 mapNormalize ops = map (normalize ops)
 mapNormalizeEquation ops = map (normalizeEquation ops)
+
+normalizeArrows :: Expression -> Expression
+normalizeArrows (Sequence es) = Sequence . map normalizeArrows $ es
+normalizeArrows (LValue n v)  = Arrow (MuString n) v
+normalizeArrows e             = e
 
 normalizeSequence :: NormalizationOptions -> [Expression] -> Expression
 normalizeSequence ops = compact' . trim'
