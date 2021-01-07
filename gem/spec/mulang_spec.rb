@@ -138,4 +138,12 @@ describe Mulang::Code do
 
     end
   end
+
+  context 'when batch mode is used' do
+    let(:codes) { 3.times.map { |it| Mulang::Code.native("JavaScript", "let x = #{it}") } }
+
+    it "results are functionally equivalent to standard mode" do
+      expect(Mulang::Code.ast_many codes).to eq codes.map(&:ast)
+    end
+  end
 end

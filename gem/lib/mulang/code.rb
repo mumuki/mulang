@@ -1,5 +1,6 @@
 module Mulang
   class Code
+    attr_accessor :language, :content
     def initialize(language, content)
       @language = language
       @content  = content
@@ -7,6 +8,10 @@ module Mulang
 
     def ast
       @language.ast @content
+    end
+
+    def ast_analysis
+      @language.ast_analysis @content
     end
 
     def sample
@@ -49,6 +54,14 @@ module Mulang
 
     def self.ast(ast)
       new Mulang::Language::External.new, ast
+    end
+
+    def self.analyse_many(codes, spec)
+      Mulang.analyse codes.map { |it| it.analysis(spec)  }
+    end
+
+    def self.ast_many(codes)
+      Mulang.analyse(codes.map { |it| it.ast_analysis  }).map { |it| it['intermediateLanguage'] }
     end
 
     private

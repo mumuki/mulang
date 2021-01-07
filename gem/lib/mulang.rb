@@ -10,7 +10,9 @@ module Mulang
     File.join(__dir__, '..', 'bin', 'mulang')
   end
   def self.analyse(analysis)
-    Open3.popen2(bin_path, '-s') do |input, output, _thread|
+    mode = analysis.is_a?(Array) ? '-S' : '-s'
+
+    Open3.popen2(bin_path, mode) do |input, output, _thread|
       input.puts analysis.to_json
       input.close
       JSON.parse output.read

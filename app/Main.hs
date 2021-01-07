@@ -2,7 +2,7 @@
 
 module Main where
 
-import Language.Mulang.Analyzer (analyse)
+import Language.Mulang.Analyzer (analyse, analyseMany)
 import Language.Mulang.Analyzer.Analysis.Json ()
 import Data.Aeson (eitherDecode, encode)
 import System.Environment (getArgs)
@@ -32,24 +32,33 @@ analyseJson = fmap encode . analyse . decode . encodeUtf8 . T.pack
   where
     decode = orFail . eitherDecode
 
+analyseJsons :: String -> IO ByteString
+analyseJsons = fmap encode . analyseMany . decode . encodeUtf8 . T.pack
+   where
+      decode = orFail . eitherDecode
+
 main :: IO ()
 main = do
-  argsBody <- fmap parseArgs $ getArgs
   streamBody <- getContents
-  let body = if argsBody == "-s" then streamBody else argsBody
-  result <- analyseJson body
+  args <- getArgs
+  result <- run args streamBody
   LBS.putStrLn result
 
   where
-    parseArgs :: [String] -> String
-    parseArgs [jsonBody] = jsonBody
-    parseArgs _          = error (intercalate "\n" [prettyVersion, usage])
+    run :: [String] -> String ->  IO ByteString
+    run ["-s"] body = analyseJson body
+    run ["-S"] body = analyseJsons body
+    run [body] _    = analyseJson body
+    run  _     _    = error (intercalate "\n" [prettyVersion, usage])
 
     usage = unpack [text|
         Wrong usage.
 
          #read from STDIN
          $ mulang -s
+
+         #read from STDIN a list of analyses
+         $ mulang -S
 
          #read from argument
          $ mulang '{
