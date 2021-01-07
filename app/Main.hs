@@ -57,7 +57,7 @@ main = do
          #read from STDIN
          $ mulang -s
 
-         #read from STDIN a list of analysis
+         #read from STDIN a list of analyses
          $ mulang -S
 
          #read from argument
