@@ -31,6 +31,9 @@ spec = do
     it "does not rename unknown references" $ do
       (rename (js "console.log(x * 2)")) `shouldBe` (js "console.log(x * 2)")
 
+    it "renames generator param" $ do
+      (rename (js "for (let x of xs) { console.log(x) }")) `shouldBe` (js "for (let mulang_param_n0 of xs) { console.log(mulang_param_n0) }")
+
     it "renames single param" $ do
       (rename (js "function f(x) {}")) `shouldBe` (js "function f(mulang_param_n0) {}")
 
