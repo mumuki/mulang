@@ -4,14 +4,19 @@ module Mulang::Language
       @language = language
     end
 
-    def ast(content)
-      Mulang.analyse(ast_analysis(content))['outputAst'] rescue nil
+    def ast(content, **options)
+      Mulang.analyse(ast_analysis(content, **options))['outputAst'] rescue nil
     end
 
-    def ast_analysis(content)
+    def ast_analysis(content, **options)
       {
         sample: { tag: 'CodeSample', language: @language, content: content },
-        spec: { expectations: [], smellsSet: { tag: 'NoSmells' }, includeOutputAst: true }
+        spec: {
+          expectations: [],
+          smellsSet: { tag: 'NoSmells' },
+          includeOutputAst: true,
+          normalizationOptions: options
+        }.compact
       }
     end
 
@@ -29,7 +34,7 @@ module Mulang::Language
       @tool = block_given? ? tool : proc { |it| it }
     end
 
-    def ast(content)
+    def ast(content, **args)
       @tool.call(content) rescue nil
     end
 

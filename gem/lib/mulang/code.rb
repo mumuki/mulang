@@ -6,12 +6,12 @@ module Mulang
       @content  = content
     end
 
-    def ast
-      @language.ast @content
+    def ast(**options)
+      @language.ast @content, **options
     end
 
-    def ast_analysis
-      @language.ast_analysis @content
+    def ast_analysis(**options)
+      @language.ast_analysis @content, **options
     end
 
     def sample
@@ -52,16 +52,12 @@ module Mulang
       new Mulang::Language::External.new(&tool), content
     end
 
-    def self.ast(ast)
-      new Mulang::Language::External.new, ast
-    end
-
     def self.analyse_many(codes, spec)
       Mulang.analyse codes.map { |it| it.analysis(spec)  }
     end
 
-    def self.ast_many(codes)
-      Mulang.analyse(codes.map { |it| it.ast_analysis  }).map { |it| it['outputAst'] }
+    def self.ast_many(codes, **options)
+      Mulang.analyse(codes.map { |it| it.ast_analysis(**options)  }).map { |it| it['outputAst'] }
     end
 
     private

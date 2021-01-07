@@ -31,6 +31,13 @@ describe Mulang::Code do
                                            'assigns 2' => false }
 
     it { expect { code.expect ':foo' }.to raise_error 'Invalid inspection :foo' }
+
+    describe 'normalization' do
+      let(:code) { Mulang::Code.native('JavaScript', 'let x = {}') }
+
+      it { expect(code.ast convertObjectIntoDict: true).to eq "tag"=>"Variable", "contents"=>["x", {"tag"=>"MuDict", "contents"=>{"tag"=>"None"}}] }
+    end
+
     pending { expect { code.custom_expect 'dfsdfsdf dsfsd sdfsdf' }.to raise_error 'unexpected token dfsdfsdf' }
   end
 
@@ -48,7 +55,7 @@ describe Mulang::Code do
 
   context 'when code is expressed as an ast' do
     let(:ast) { {'tag'=>'Variable', 'contents'=>['x', {'tag'=>'MuNumber', 'contents'=>1}]} }
-    let(:code) { Mulang::Code.ast(ast) }
+    let(:code) { Mulang::Code.external(ast) }
 
     it { expect(code.ast).to eq ast }
   end
@@ -94,7 +101,6 @@ describe Mulang::Code do
 
     it do
       expect(code.sample).to eq tag: 'MulangSample', ast: input
-
     end
 
     it do
@@ -122,6 +128,13 @@ describe Mulang::Code do
 
     it do
       expect(code.sample).to eq tag: 'CodeSample', language: 'JavaScript', content: input
+    end
+
+    it do
+      expect(code.ast(insertImplicitReturn: true)).to eq 'tag'=>'Procedure',
+                                                          'contents'=>['x', [[[], {
+                                                            'tag'=>'UnguardedBody',
+                                                            'contents'=>{'tag'=>'Return', 'contents'=>{'tag'=>'MuNumber', 'contents'=>1}}}]]]
 
     end
 
@@ -143,19 +156,15 @@ describe Mulang::Code do
   end
 
   context 'when batch mode is used' do
-    let(:codes) { 3.times.map { |it| Mulang::Code.native("JavaScript", "let x = #{it}") } }
+    let(:codes) { 3.times.map { |it| Mulang::Code.native("JavaScript", "let x#{it} = {}") } }
 
 
     it "results are functionally equivalent to standard mode" do
       expect(Mulang::Code.ast_many codes).to eq codes.map(&:ast)
     end
-  end
 
-  context 'when batch mode is used' do
-    let(:codes) { 3.times.map { |it| Mulang::Code.native("JavaScript", "let x = #{it}") } }
-
-    it "results are functionally equivalent to standard mode" do
-      expect(Mulang::Code.ast_many codes).to eq codes.map(&:ast)
+    it "results are functionally equivalent to standard mode with normalization options are used" do
+      expect(Mulang::Code.ast_many codes, convertObjectIntoDict: true).to eq codes.map { |it| it.ast convertObjectIntoDict: true }
     end
   end
 end
