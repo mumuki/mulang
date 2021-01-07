@@ -1,5 +1,24 @@
 module Mulang::Language
-  class Native
+  class Base
+    def transformed_asts(content, operations, **options)
+      Mulang.analyse(transformed_asts_analysis(content, operations, **options))['transformedAsts'] rescue nil
+    end
+
+    def transformed_asts_analysis(content, operations, **options)
+      {
+        sample: sample(content),
+        spec: {
+          expectations: [],
+          smellsSet: { tag: 'NoSmells' },
+          includeOutputAst: false,
+          transformationSpecs: operations,
+          normalizationOptions: options.presence
+        }.compact
+      }
+    end
+  end
+
+  class Native < Base
     def initialize(language)
       @language = language
     end
@@ -10,12 +29,12 @@ module Mulang::Language
 
     def ast_analysis(content, **options)
       {
-        sample: { tag: 'CodeSample', language: @language, content: content },
+        sample: sample(content),
         spec: {
           expectations: [],
           smellsSet: { tag: 'NoSmells' },
           includeOutputAst: true,
-          normalizationOptions: options
+          normalizationOptions: options.presence
         }.compact
       }
     end
@@ -29,7 +48,7 @@ module Mulang::Language
     end
   end
 
-  class External
+  class External < Base
     def initialize(&tool)
       @tool = block_given? ? tool : proc { |it| it }
     end

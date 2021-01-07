@@ -32,6 +32,41 @@ describe Mulang::Code do
 
     it { expect { code.expect ':foo' }.to raise_error 'Invalid inspection :foo' }
 
+    describe "transformed_asts" do
+      let(:code) { Mulang::Code.native('JavaScript', 'let x = {}; let y = 2; console.log(x)') }
+
+      it "can produce one transformed asts" do
+        expect(code.transformed_asts [
+                      [{tag: :Replace, contents: ["IsLiteral", {tag: :None}]}]
+                    ]).to eq [
+                      {"contents"=>
+                       [{"contents"=>["x", {"tag"=>"None"}], "tag"=>"Object"},
+                        {"contents"=>["y", {"tag"=>"None"}], "tag"=>"Variable"},
+                        {"contents"=>{"contents"=>"x", "tag"=>"Reference"}, "tag"=>"Print"}],
+                      "tag"=>"Sequence"}]
+      end
+
+      it "can produce multiple transformeds with options" do
+        expect(code.transformed_asts [
+                      [{tag: :Normalize, contents: { convertObjectIntoDict: true }}],
+                      [{tag: :Crop, contents: "IsVariable:y"}, {tag: :RenameVariables}]
+                    ], convertObjectVariableIntoObject: false).to eq [
+                      {"contents"=>
+                       [{"contents"=>["x", {"contents"=>{"tag"=>"None"}, "tag"=>"MuDict"}],
+                         "tag"=>"Variable"},
+                        {"contents"=>["y", {"contents"=>2, "tag"=>"MuNumber"}], "tag"=>"Variable"},
+                        {"contents"=>{"contents"=>"x", "tag"=>"Reference"}, "tag"=>"Print"}],
+                      "tag"=>"Sequence"},
+                     {"contents"=>
+                       [{"contents"=>
+                          ["mulang_var_n0", {"contents"=>{"tag"=>"None"}, "tag"=>"MuObject"}],
+                         "tag"=>"Variable"},
+                        {"contents"=>{"contents"=>"mulang_var_n0", "tag"=>"Reference"},
+                         "tag"=>"Print"}],
+                      "tag"=>"Sequence"}]
+      end
+    end
+
     describe 'normalization' do
       let(:code) { Mulang::Code.native('JavaScript', 'let x = {}') }
 
