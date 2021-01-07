@@ -32,6 +32,7 @@ instance FromJSON NormalizationOptions where
         <*> v .:? "insertImplicitReturn"                          .!= insertImplicitReturn d
         <*> v .:? "compactSequences"                              .!= compactSequences d
         <*> v .:? "trimSequences"                                 .!= trimSequences d
+        <*> v .:? "sortCommutativeApplications"                   .!= sortCommutativeApplications d
           where d = unnormalized
 instance FromJSON SequenceSortMode
 

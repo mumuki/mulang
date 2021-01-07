@@ -2,6 +2,7 @@
 
 module Language.Mulang.Ast.Operator (
   opposite,
+  isCommutative,
   Operator(..),
   pattern Like,
   pattern NotLike) where
@@ -124,3 +125,13 @@ opposite Similar     = NotSimilar
 opposite NotSimilar  = Similar
 opposite Same        = NotSame
 opposite NotSame     = Same
+
+isCommutative :: Operator -> Bool
+isCommutative Like     = True
+isCommutative And      = True
+isCommutative Or       = True
+isCommutative Multiply = True
+isCommutative Plus     = True
+isCommutative Max      = True
+isCommutative Min      = True
+isCommutative _        = False

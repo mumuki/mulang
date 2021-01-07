@@ -12,7 +12,7 @@ import Language.Mulang.Consult (Consult)
 import Language.Mulang.Counter (plus)
 import Language.Mulang.Inspector.Primitive (atLeast, atMost, exactly)
 import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol, isSelf, isLiteral)
-import Language.Mulang.Analyzer.Synthesizer (decodeUsageInspection, decodeDeclarationInspection)
+import Language.Mulang.Analyzer.Synthesizer (decodeIsInspection, decodeUsageInspection, decodeDeclarationInspection)
 
 import qualified Language.Mulang.Edl.Expectation as E
 
@@ -183,8 +183,10 @@ compileInspection = f
   f "UsesYield"                        m              = plainMatching usesYieldMatching m
   f (primitiveDeclaration -> Just p)   E.Unmatching   = plain (declaresPrimitive p)
   f (primitiveUsage -> Just p)         E.Unmatching   = plain (usesPrimitive p)
+  f (primitiveEssence -> Just p)       E.Unmatching   = plain (isPrimitive p)
   f _                                  _              = Nothing
 
+  primitiveEssence = decodeIsInspection
   primitiveUsage = decodeUsageInspection
   primitiveDeclaration = decodeDeclarationInspection
 

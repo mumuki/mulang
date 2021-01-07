@@ -13,6 +13,7 @@ import Data.List.Extra (unwind)
 
 import Language.Mulang.Ast
 import Language.Mulang.Ast.Visitor
+import Language.Mulang.Ast.Operator (isCommutative)
 import Language.Mulang.Builder (compact, trim)
 import Language.Mulang.Generator (declarators, declaredIdentifiers)
 import Language.Mulang.Inspector.Literal (isLiteral)
@@ -27,7 +28,8 @@ data NormalizationOptions = NormalizationOptions {
   sortSequenceDeclarations :: SequenceSortMode,
   insertImplicitReturn :: Bool,
   compactSequences :: Bool,
-  trimSequences :: Bool
+  trimSequences :: Bool,
+  sortCommutativeApplications :: Bool
 } deriving (Eq, Show, Read, Generic)
 
 data SequenceSortMode
@@ -47,12 +49,13 @@ unnormalized = NormalizationOptions {
   sortSequenceDeclarations = SortNothing,
   insertImplicitReturn = False,
   compactSequences = False,
-  trimSequences = False
+  trimSequences = False,
+  sortCommutativeApplications = False
 }
-
 
 normalize :: NormalizationOptions -> Expression -> Expression
 normalize ops (Application (Send r m []) args)      = Send (normalize ops r) (normalize ops m) (mapNormalize ops args)
+normalize ops (Application (Primitive op) [e1, e2]) | isCommutative op = Application (Primitive op) (normalizeCommutativeArguments ops [e1, e2])
 normalize ops (LValue n (Lambda vars e))            | convertLambdaVariableIntoFunction ops = SimpleFunction n vars (normalize ops e)
 normalize ops (LValue n (MuObject e))               | convertObjectVariableIntoObject ops = Object n (normalizeObjectLevel ops e)
 normalize ops (MuObject e)                          | convertObjectIntoDict ops = MuDict e
@@ -86,6 +89,10 @@ normalizeSequence ops = compact' . trim'
   where
     compact' = if compactSequences ops then compact else Sequence
     trim'    = if trimSequences ops then trim else id
+
+normalizeCommutativeArguments :: NormalizationOptions -> [Expression] -> [Expression]
+normalizeCommutativeArguments ops args | sortCommutativeApplications ops = sort args
+normalizeCommutativeArguments _   args = args
 
 normalizeObjectLevel :: NormalizationOptions -> Expression -> Expression
 normalizeObjectLevel ops (Function n eqs)             | convertObjectLevelFunctionIntoMethod ops       = Method n (mapNormalizeEquation ops eqs)

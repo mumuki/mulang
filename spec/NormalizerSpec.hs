@@ -1,7 +1,7 @@
 module NormalizerSpec (spec) where
 
   import           Test.Hspec
-  import           Language.Mulang.Ast
+  import           Language.Mulang.Ast hiding (Equal)
   import           Language.Mulang.Ast.Operator
   import           Language.Mulang.Parsers.Haskell (hs)
   import           Language.Mulang.Parsers.Java (java)
@@ -20,48 +20,62 @@ module NormalizerSpec (spec) where
   spec = do
     describe "can trim code" $ do
       let options = unnormalized { trimSequences = True }
+      let n = normalize options
 
       it "removes nones from sequences" $ do
-        normalize options (Object "X" (Sequence [None, None, MuNumber 5, None])) `shouldBe`  (Object "X" (Sequence [MuNumber 5]))
+        n (Object "X" (Sequence [None, None, MuNumber 5, None])) `shouldBe`  (Object "X" (Sequence [MuNumber 5]))
 
       it "does not remove nones from literals" $ do
-        normalize options (MuList [None, None, MuNumber 5, None]) `shouldBe`  (MuList [None, None, MuNumber 5, None])
+        n (MuList [None, None, MuNumber 5, None]) `shouldBe`  (MuList [None, None, MuNumber 5, None])
+
+    describe "can sort commutative operations" $ do
+      let options = unnormalized { sortCommutativeApplications = True }
+      let n = normalize options
+
+      it "sorts references" $ do
+        n (Application (Primitive Equal) [Reference "a", Reference "b"])  `shouldBe` n (Application (Primitive Equal) [Reference "b", Reference "a"])
+        n (Application (Primitive Max) [Reference "a", Reference "b"])  `shouldBe` n (Application (Primitive Max) [Reference "b", Reference "a"])
+        n (Application (Primitive Similar) [Reference "a", Reference "b"])  `shouldBe` n (Application (Primitive Similar) [Reference "b", Reference "a"])
 
     describe "can compact code" $ do
       let options = unnormalized { compactSequences = True }
+      let n = normalize options
+
 
       it "compacts sequences" $ do
-        normalize options (Object "X" (Sequence [MuNumber 5])) `shouldBe`  (Object "X" (MuNumber 5))
-        normalize options (Object "X" (Sequence [])) `shouldBe`  (Object "X" None)
-        normalize options (Object "X" (Sequence [MuNumber 5, MuNumber 6])) `shouldBe`  (Object "X" (Sequence [MuNumber 5, MuNumber 6]))
+        n (Object "X" (Sequence [MuNumber 5])) `shouldBe`  (Object "X" (MuNumber 5))
+        n (Object "X" (Sequence [])) `shouldBe`  (Object "X" None)
+        n (Object "X" (Sequence [MuNumber 5, MuNumber 6])) `shouldBe`  (Object "X" (Sequence [MuNumber 5, MuNumber 6]))
 
-        normalize options (Object "X" (Sequence [None])) `shouldBe`  (Object "X" None)
-        normalize options (Object "X" (Sequence [None, None])) `shouldBe`  (Object "X" (Sequence [None, None]))
-        normalize options (Object "X" (Sequence [None, None, MuNumber 5])) `shouldBe`  (Object "X" (Sequence [None, None, MuNumber 5]))
+        n (Object "X" (Sequence [None])) `shouldBe`  (Object "X" None)
+        n (Object "X" (Sequence [None, None])) `shouldBe`  (Object "X" (Sequence [None, None]))
+        n (Object "X" (Sequence [None, None, MuNumber 5])) `shouldBe`  (Object "X" (Sequence [None, None, MuNumber 5]))
 
     describe "can trim and compact code" $ do
       let options = unnormalized { trimSequences = True, compactSequences = True }
+      let n = normalize options
 
       it "trims first, compacts later" $ do
-        normalize options (Object "X" (Sequence [MuNumber 5])) `shouldBe`  (Object "X" (MuNumber 5))
-        normalize options (Object "X" (Sequence [])) `shouldBe`  (Object "X" None)
-        normalize options (Object "X" (Sequence [MuNumber 5, MuNumber 6])) `shouldBe`  (Object "X" (Sequence [MuNumber 5, MuNumber 6]))
+        n (Object "X" (Sequence [MuNumber 5])) `shouldBe`  (Object "X" (MuNumber 5))
+        n (Object "X" (Sequence [])) `shouldBe`  (Object "X" None)
+        n (Object "X" (Sequence [MuNumber 5, MuNumber 6])) `shouldBe`  (Object "X" (Sequence [MuNumber 5, MuNumber 6]))
 
-        normalize options (Object "X" (Sequence [None])) `shouldBe`  (Object "X" None)
-        normalize options (Object "X" (Sequence [None, None])) `shouldBe`  (Object "X" None)
-        normalize options (Object "X" (Sequence [None, None, MuNumber 5])) `shouldBe`  (Object "X" (MuNumber 5))
+        n (Object "X" (Sequence [None])) `shouldBe`  (Object "X" None)
+        n (Object "X" (Sequence [None, None])) `shouldBe`  (Object "X" None)
+        n (Object "X" (Sequence [None, None, MuNumber 5])) `shouldBe`  (Object "X" (MuNumber 5))
 
     describe "can insert implicit retuns" $ do
       let options = unnormalized { insertImplicitReturn = True }
+      let n = normalize options
 
       it "does not insert return in single literal statement" $ do
-        normalize options (py "def x(): x = 1") `shouldBe`  SimpleProcedure "x" [] (Assignment "x" (MuNumber 1.0))
+        n (py "def x(): x = 1") `shouldBe`  SimpleProcedure "x" [] (Assignment "x" (MuNumber 1.0))
 
       it "inserts return in single literal expression" $ do
-        normalize options (py "def x(): 3") `shouldBe`  SimpleProcedure "x" [] (Return (MuNumber 3.0))
+        n (py "def x(): 3") `shouldBe`  SimpleProcedure "x" [] (Return (MuNumber 3.0))
 
       it "inserts return in last literal expression" $ do
-        normalize options (js "function x() { let x = 1; x += 1; x }") `shouldBe`  SimpleProcedure "x" [] (Sequence [
+        n (js "function x() { let x = 1; x += 1; x }") `shouldBe`  SimpleProcedure "x" [] (Sequence [
                                                                                           Variable "x" (MuNumber 1.0),
                                                                                           Assignment "x" (Application (Primitive Plus) [Reference "x",MuNumber 1.0]),
                                                                                           Return (Reference "x")])

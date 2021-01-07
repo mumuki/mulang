@@ -31,6 +31,7 @@ module Language.Mulang.Inspector.Generic (
   returnsMatching,
   subordinatesDeclarationsTo,
   subordinatesDeclarationsToEntryPoint,
+  isPrimitive,
   uses,
   usesAnonymousVariable,
   usesExceptionHandling,
@@ -82,9 +83,11 @@ uses p = containsExpression f
   where f = any p . referencedIdentifiers
 
 usesPrimitive :: Operator -> Inspection
-usesPrimitive operator = containsExpression f
-  where f (Primitive o) = operator == o
-        f _             = False
+usesPrimitive operator = containsExpression (isPrimitive operator)
+
+isPrimitive :: Operator -> Inspection
+isPrimitive operator (Primitive o) = operator == o
+isPrimitive _        _             = False
 
 calls :: BoundInspection
 calls = unmatching callsMatching
