@@ -162,6 +162,7 @@ muJSExpression (JSExpressionPostfix (JSIdentifier _ name) op)       = Assignment
 muJSExpression (JSExpressionTernary condition _ trueVal _ falseVal) = If (muJSExpression condition) (muJSExpression trueVal) (muJSExpression falseVal)
 muJSExpression (JSFunctionExpression _ ident _ params _ body)       = muComputation ident params body
 muJSExpression (JSArrowExpression  params _ body)                   = Lambda (muJSArrowParameterList params) (muJSStatement body)
+muJSExpression (JSMemberDot receptor _ (JSIdentifier _ "length"))   = Application (Primitive Size) [muJSExpression receptor]
 muJSExpression (JSMemberDot receptor _ (JSIdentifier _ message))    = FieldReference (muJSExpression receptor) message
 muJSExpression (JSMemberExpression id _ params _)                   = Application (muJSExpression id) (muJSExpressionList params)
 muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _)       = New (Reference name) (muJSExpressionList args)
