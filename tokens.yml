@@ -130,6 +130,8 @@ JavaScript:
       - "==="
     NotEqual:
       - "!=="
+    Push:
+      - "push"
 Python:
   keywords:
     <<: *common_keywords

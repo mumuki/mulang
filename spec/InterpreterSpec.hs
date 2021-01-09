@@ -4,6 +4,7 @@ module InterpreterSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang.Interpreter
+import           Language.Mulang.Interpreter.Internals (Reference (..))
 import           Language.Mulang.Transform.Normalizer
 import qualified Data.Map.Strict as Map
 import           Language.Mulang.Parsers.JavaScript
@@ -110,6 +111,27 @@ spec = do
             return 123;
           }
           a()|]) `shouldReturn` MuNumber 123
+
+      it "evals functions with for" $ do
+        lastRef (runjs [text|
+          function shortPubs(nick,thread){
+            let result=[];
+            for(let p of thread){
+              if((p.message.length)<20&&nick===p.nick){
+                result.push(p);
+              }
+            }
+            return result;
+          }
+          let aThread = [
+              { nick: "tommy", message: "hello" },
+              { nick: "tommy", message: "world" },
+              { nick: "danny", message: "we are running" },
+              { nick: "tommy", message: "another message" },
+              { nick: "tommy", message: "another looooooooooooooooooooooooong message" },
+          ]
+          shortPubs("tommy", aThread);
+        |]) `shouldReturn` (MuList [Reference 7, Reference 12, Reference 22])
 
       it "handles scopes" $ do
         lastRef (runjs [text|

@@ -71,6 +71,7 @@ normalizeReference (SimpleSend  (Reference "console") "log"      [value])       
 normalizeReference (SimpleSend  (Reference "assert") "equals"    [expected, actual])         = Assert False $ Equality expected actual
 normalizeReference (SimpleSend  (Reference "assert") "notEquals" [expected, actual])         = Assert True $ Equality expected actual
 normalizeReference (SimpleSend  (Reference "assert") "throws"    [block, error])             = Assert False $ Failure block error
+normalizeReference (SimpleSend  list       "push"                [value])                    = Application (Primitive Push) [list, value]
 normalizeReference (Application (Reference "assert")             [expression])               = Assert False $ Truth expression
 normalizeReference (Application (Reference "describe")           [description, Lambda [] e]) = TestGroup description e
 normalizeReference (Application (Reference "context")            [description, Lambda [] e]) = TestGroup description e

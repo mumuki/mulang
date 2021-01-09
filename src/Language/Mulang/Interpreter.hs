@@ -61,13 +61,13 @@ evalExpr :: M.Expression -> Executable Reference
 evalExpr (M.Sequence expressions) = last <$> forM expressions evalExpr
 evalExpr (M.Lambda params body) = do
   executionFrames <- gets scopes
-  createReference $
+  createRef $
     MuFunction executionFrames [M.Equation params (M.UnguardedBody body)]
 
 evalExpr (M.Subroutine name body) = do
   executionFrames <- gets scopes
   let function = MuFunction executionFrames body
-  ref <- createReference function
+  ref <- createRef function
   unless (null name) (setLocalVariable name ref) -- if function has no name we avoid registering it
   return ref
 
@@ -100,10 +100,16 @@ evalExpr (M.Application (M.Primitive O.Negation) expressions) =
   where f [MuBool b] = createBool $ not b
         f params     = raiseTypeError "expected one boolean" params
 
+evalExpr (M.Application (M.Primitive O.Push) expressions) =
+  evalExpressionsWith' expressions f
+  where f [(lr, MuList xs), (vr, _)]  = updateRef lr (MuList (xs ++ [vr])) >> return vr
+        f params                      = raiseTypeError "{Push} expected a list" (map snd params)
+
 evalExpr (M.Application (M.Primitive O.Size) expressions) =
   evalExpressionsWith expressions f
-  where f [MuList xs] = createNumber $ genericLength xs
-        f params      = raiseTypeError "expected a list" params
+  where f [MuList xs]  = createNumber $ genericLength xs
+        f [MuString s] = createNumber $ genericLength s
+        f params       = raiseTypeError "{Size} expected a list or string" params
 
 evalExpr (M.Application (M.Primitive O.GetAt) expressions) =
   evalExpressionsWith expressions f
@@ -113,7 +119,7 @@ evalExpr (M.Application (M.Primitive O.GetAt) expressions) =
 
 evalExpr (M.Application (M.Primitive O.SetAt) expressions) =
   evalExpressionsWith' expressions f
-  where f [(or, MuObject _), (_, MuString s), (vr, _)] = updateRef or (setObjectAt s vr) >> return vr
+  where f [(or, MuObject _), (_, MuString s), (vr, _)] = modifyRef or (setObjectAt s vr) >> return vr
         f params                                       = raiseTypeError "expected an object" (map snd params)
 
 
@@ -134,7 +140,7 @@ evalExpr (M.Application (M.Primitive O.Minus) expressions) = evalBinaryNumeric e
 
 evalExpr (M.MuList expressions) = do
   refs <- forM expressions evalExpr
-  createReference $ MuList refs
+  createRef $ MuList refs
 
 evalExpr (M.MuDict expression)   = evalObject expression
 evalExpr (M.MuObject expression) = evalObject expression
@@ -164,7 +170,7 @@ evalExpr (M.If cond thenBranch elseBranch) = do
 evalExpr (M.MuNumber n) = createNumber n
 evalExpr (M.MuNil) = return nullRef
 evalExpr (M.MuBool b) = createBool b
-evalExpr (M.MuString s) = createReference $ MuString s
+evalExpr (M.MuString s) = createRef $ MuString s
 evalExpr (M.Return e) = do
   ref <- evalExpr e
   currentReturn <- gets (currentReturnCallback)
@@ -179,6 +185,13 @@ evalExpr (M.While cond expr) = do
   whileM (evalCondition cond) (evalExpr expr)
   return nullRef
 
+evalExpr (M.For [M.Generator (M.LValuePattern name) iterable] body) = do
+  (MuList elementRefs) <- evalExprValue iterable
+  forM elementRefs (\r -> do
+    setLocalVariable name r
+    evalExpr body)
+  return nullRef
+
 evalExpr (M.ForLoop beforeExpr cond afterExpr expr) = do
   evalExpr beforeExpr
   whileM (evalCondition cond) $ do
@@ -190,7 +203,7 @@ evalExpr (M.Assignment name expr) = do
   valueRef <- evalExpr expr
   frameRef <- findFrameForName' name
   case frameRef of
-    Just ref -> updateRef ref (setObjectAt name valueRef)
+    Just ref -> modifyRef ref (setObjectAt name valueRef)
     Nothing -> setLocalVariable name valueRef
   return valueRef
 
@@ -265,13 +278,13 @@ raiseInternal exceptionRef = do
 
 raiseString :: String -> Executable a
 raiseString s = do
-  raiseInternal =<< (createReference $ MuString s)
+  raiseInternal =<< (createRef $ MuString s)
 
 raiseTypeError :: String -> [Value] ->Executable a
 raiseTypeError message values = raiseString $ "Type error: " ++ message ++ " but got " ++ (intercalate ", " . map debug $ values)
 
 muValuesEqual r1 r2
-  | r1 == r2 = createReference $ MuBool True
+  | r1 == r2 = createRef $ MuBool True
   | otherwise = do
       v1 <- dereference r1
       v2 <- dereference r2
@@ -323,14 +336,14 @@ findReferenceForName name = do
 
 nullRef = Reference 0
 
-createBool = createReference . MuBool
-createNumber = createReference . MuNumber
-createObject = createReference . MuObject
+createBool = createRef . MuBool
+createNumber = createRef . MuNumber
+createObject = createRef . MuObject
 
 setLocalVariable :: String -> Reference -> Executable ()
 setLocalVariable name ref = do
   frame <- currentFrame
-  updateRef frame (setObjectAt name ref)
+  modifyRef frame (setObjectAt name ref)
 
   where
       currentFrame :: Executable Reference

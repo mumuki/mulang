@@ -6,9 +6,10 @@ module Language.Mulang.Interpreter.Internals (
   ExecutionContext (..),
   defaultContext,
   debug,
-  createReference,
+  createRef,
   dereference,
   dereference',
+  modifyRef,
   updateRef,
   updateGlobalObjects) where
 
@@ -91,8 +92,8 @@ debug (MuNumber v)   = "(number) " ++ show v
 -- Reference Creation
 -- ==================
 
-createReference :: Value -> Executable Reference
-createReference value = do
+createRef :: Value -> Executable Reference
+createRef value = do
   nextReferenceId  <- gets (fromJust . fmap incrementRef . getMaxKey . globalObjects)
   modify (updateGlobalObjects $ Map.insert nextReferenceId value)
   return nextReferenceId
@@ -127,16 +128,14 @@ dereference ref = do
 -- Reference Update
 -- ================
 
-updateRef :: Reference -> (Value -> Value) -> Executable ()
-updateRef ref f = do
-  val <- dereference ref
-  putRef ref (f val)
+updateRef :: Reference -> Value -> Executable ()
+updateRef ref = modify . updateGlobalObjects . Map.insert ref
 
-  where
-    putRef :: Reference -> Value -> Executable ()
-    putRef ref = modify . updateGlobalObjects . Map.insert ref
+modifyRef :: Reference -> (Value -> Value) -> Executable ()
+modifyRef ref f = do
+  val <- dereference ref
+  updateRef ref (f val)
 
 updateGlobalObjects :: (ObjectSpace -> ObjectSpace) -> ExecutionContext -> ExecutionContext
 updateGlobalObjects f context =
   context { globalObjects = f $ globalObjects context }
-
