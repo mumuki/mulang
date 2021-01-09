@@ -1,4 +1,4 @@
-module Language.Mulang.Parsers.JavaScript (js, parseJavaScript) where
+module Language.Mulang.Parsers.JavaScript (js, js', parseJavaScript) where
 
 import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
@@ -18,7 +18,10 @@ import Data.Function.Extra ((<==))
 import Control.Fallible
 
 js :: Parser
-js = normalize javaScriptNormalizationOptions . orFail . parseJavaScript'
+js = normalize javaScriptNormalizationOptions . js'
+
+js' :: Parser
+js' = orFail . parseJavaScript'
 
 parseJavaScript :: MaybeParser
 parseJavaScript = orNothing . parseJavaScript'

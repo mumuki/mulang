@@ -4,6 +4,7 @@ module InterpreterSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang.Interpreter
+import           Language.Mulang.Transform.Normalizer
 import qualified Data.Map.Strict as Map
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Python
@@ -14,7 +15,7 @@ import           NeatInterpolation (text)
 lastRef result = (\(ref, ctx) -> (Map.! ref) . globalObjects $ ctx) <$> result
 
 run language code = eval defaultContext  . language . unpack $ code
-runjs = run js
+runjs = run (normalize (unnormalized { convertObjectIntoDict = True }) . js')
 runpy = run py
 
 spec :: Spec
@@ -50,6 +51,28 @@ spec = do
 
       it "evals comparison" $ do
         lastRef (runjs "7 > 4") `shouldReturn` MuBool True
+
+      it "evals list length" $ do
+        lastRef (runjs "[1, 2, 3].length") `shouldReturn` MuNumber 3
+
+      it "evals dict get" $ do
+        lastRef (runjs "({x: 3})['x']") `shouldReturn` MuNumber 3
+        lastRef (runjs "({x: 3, y: 4})['x']") `shouldReturn` MuNumber 3
+
+      it "evals dict get with field access" $ do
+        lastRef (runjs "({x: 3}).x") `shouldReturn` MuNumber 3
+        lastRef (runjs "({x: 3, y: 4}).x") `shouldReturn` MuNumber 3
+
+      it "evals dict set" $ do
+        -- lastRef (runjs "let dict = {x: 3}; dict['x'] = 4") `shouldReturn` MuNumber 4
+        -- lastRef (runjs "let dict = {x: 3}; dict['x'] = 4; dict['x']") `shouldReturn` MuNumber 4
+        -- lastRef (runjs "let dict = {x: 3}; dict['y'] = 4; dict['x']") `shouldReturn` MuNumber 3
+        pending
+
+      it "evals dict set with field access" $ do
+        lastRef (runjs "let dict = {x: 3}; dict.x = 4") `shouldReturn` MuNumber 4
+        lastRef (runjs "let dict = {x: 3}; dict.x = 4; dict.x") `shouldReturn` MuNumber 4
+        lastRef (runjs "let dict = {x: 3}; dict.y = 4; dict.x") `shouldReturn` MuNumber 3
 
       context "evals equal" $ do
         it "is false when values are different" $ do
