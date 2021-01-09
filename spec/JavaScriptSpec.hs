@@ -111,6 +111,9 @@ spec = do
     it "handles booleans" $ do
       js "true" `shouldBe` MuTrue
 
+    it "handles length" $ do
+      js "[1, 2].length" `shouldBe` (Application (Primitive Size) [MuList [MuNumber 1, MuNumber 2]])
+
     it "handles parenthesis around variables" $ do
       js "function f() { return (x) } " `shouldBe` (SimpleFunction "f" [] (Return (Reference "x")))
       js "let y = (x)" `shouldBe` (Variable "y" (Reference "x"))

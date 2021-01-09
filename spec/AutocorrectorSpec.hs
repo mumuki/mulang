@@ -55,6 +55,7 @@ spec = do
       run JavaScript (Expectation "*" "Uses:|") `shouldBe` (Expectation "*" "UsesBitwiseOr")
       run JavaScript (Expectation "*" "Uses:>>") `shouldBe` (Expectation "*" "UsesBitwiseRightShift")
       run JavaScript (Expectation "*" "Uses:<<") `shouldBe` (Expectation "*" "UsesBitwiseLeftShift")
+      run JavaScript (Expectation "*" "Uses:length") `shouldBe` (Expectation "*" "UsesSize")
 
     it "corrects C operators" $ do
       run C (Expectation "*" "Uses:+") `shouldBe` (Expectation "*" "UsesPlus")

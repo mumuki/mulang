@@ -120,6 +120,8 @@ JavaScript:
     <<: *common_keywords
   operators:
     <<: *common_operators
+    Size:
+      - "length"
     Similar:
       - "=="
     NotSimilar:
