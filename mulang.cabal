@@ -108,6 +108,7 @@ library
     Language.Mulang.Edl.Expectation
     Language.Mulang.Edl.Lexer
     Language.Mulang.Edl.Parser
+    Language.Mulang.Serializer
     Language.Mulang.Interpreter
     Language.Mulang.Interpreter.Internals
     Language.Mulang.Interpreter.Runner
