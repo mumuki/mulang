@@ -40,6 +40,7 @@ module Language.Mulang.Ast (
     pattern VariableSignature,
     pattern ModuleSignature,
     pattern LValue,
+    pattern LValuePattern,
     pattern Unification,
     pattern MuTrue,
     pattern MuFalse,
@@ -304,6 +305,8 @@ pattern SimpleMethod name params body    = Method    name [SimpleEquation params
 
 pattern LValue name value <- (extractLValue -> Just (name, value))
 
+pattern LValuePattern name <- (extractLValuePattern -> Just name)
+
 pattern Unification name value <- (extractUnification -> Just (name, value))
 
 pattern MuTrue  = MuBool True
@@ -330,6 +333,10 @@ extractLValue (Variable name value) = Just (name, value)
 extractLValue (Constant name value) = Just (name, value)
 extractLValue _                     = Nothing
 
+extractLValuePattern :: Pattern -> Maybe Identifier
+extractLValuePattern (VariablePattern name) = Just name
+extractLValuePattern (ConstantPattern name) = Just name
+extractLValuePattern _                      = Nothing
 
 extractUnification :: Expression -> Maybe (Identifier, Expression)
 extractUnification (Assignment name value)        = Just (name, value)
