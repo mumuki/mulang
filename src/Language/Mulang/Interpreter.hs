@@ -297,8 +297,10 @@ muEquals MuNull        MuNull        = True
 muEquals _             _             = False
 
 getParamNames :: [M.Pattern] -> [String]
-getParamNames = fmap (\(M.VariablePattern n) -> n)
-
+getParamNames = fmap getParamName
+  where
+    getParamName (M.LValuePattern n) = n
+    getParamName other               = error $ "Unsupported pattern " ++ (show other)
 runFunction :: [Reference] -> M.Expression -> Executable Reference
 runFunction functionEnv body = do
   context <- get

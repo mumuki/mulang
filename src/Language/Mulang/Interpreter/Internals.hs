@@ -87,6 +87,7 @@ debug (MuString v)   = "(string) " ++ v
 debug (MuBool True)  = "(boolean) true"
 debug (MuBool False) = "(boolean) false"
 debug (MuNumber v)   = "(number) " ++ show v
+debug other          = "(other)"
 
 -- ==================
 -- Reference Creation

@@ -9,6 +9,7 @@ module Language.Mulang.Interpreter.Runner (
 import GHC.Generics
 
 import           Control.Monad (forM)
+import           Control.Exception (ErrorCall, catch)
 import           Control.Monad.State.Strict
 import           Data.Maybe (fromMaybe, fromJust)
 import           Data.List (intercalate)
@@ -40,8 +41,10 @@ runTestsForDir solutionPath testPath parse = do
       putStrLn $ "       " ++ show reason
 
 runTests :: Mu.Expression -> Mu.Expression -> IO [TestResult]
-runTests code = runTests' code . getTests
-
+runTests code = (`catch` handler) . runTests' code . getTests
+  where
+    handler :: ErrorCall -> IO [TestResult]
+    handler _ = return [TestResult ["init"] (Failure "Can not load code")]
 runTests' :: Mu.Expression -> [MuTest] -> IO [TestResult]
 runTests' expr tests = do
   (_ref, context) <- eval defaultContext expr
