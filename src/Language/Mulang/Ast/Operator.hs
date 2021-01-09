@@ -100,6 +100,10 @@ data Operator
     -- ^ collection `flatten`-like operator
     | Gather
     -- ^ collection `flatmap`-like operator
+    | GetAt
+    -- ^ collection `[]`-like operator
+    | SetAt
+    -- ^ collection `[]=`-like operator
   deriving (Eq, Show, Read, Generic, Ord, Enum)
 
 
