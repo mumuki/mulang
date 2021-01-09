@@ -105,8 +105,15 @@ spec = do
     it "handles field access" $ do
       js "x.y" `shouldBe` (FieldReference (Reference "x") "y")
 
+    it "handles dict access" $ do
+      js "x['y']" `shouldBe` (Application (Primitive GetAt) [Reference "x", MuString "y"])
+
     it "handles field assignment" $ do
-      js "x.y = 4" `shouldBe` (FieldAssignment (Reference "x") "y" (MuNumber (4.0)))
+      js "x.y = 4;" `shouldBe` (FieldAssignment (Reference "x") "y" (MuNumber (4.0)))
+
+    it "handles dict assignment" $ do
+      -- js "x['y'] = 4;" `shouldBe` (Application  (Primitive SetAt) [Reference "x", MuString "y", MuNumber (4.0)])
+      pending
 
     it "handles booleans" $ do
       js "true" `shouldBe` MuTrue
