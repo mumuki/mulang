@@ -47,6 +47,7 @@ module Language.Mulang.Analyzer.Analysis (
 import GHC.Generics
 
 import Language.Mulang.Ast
+import Language.Mulang.Ast.Operator (Operator)
 import Language.Mulang.Edl.Expectation (Query)
 import Language.Mulang.Transform.Normalizer (NormalizationOptions)
 import Language.Mulang.Interpreter.Runner (TestResult)
@@ -136,10 +137,11 @@ data TestAnalysisType
 type TransformationSpec = [TransformationOperation]
 
 data TransformationOperation
-  = RenameVariables
+  =  Aliase (Map String Operator)
   | Crop Inspection
-  | Replace Inspection Expression
-  | Normalize NormalizationOptions deriving (Show, Eq, Generic)
+  | Normalize NormalizationOptions
+  | RenameVariables
+  | Replace Inspection Expression deriving (Show, Eq, Generic)
 
 data Language
   =  Json
