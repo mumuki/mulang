@@ -4,6 +4,7 @@ module AnalysisJsonSpec(spec) where
 
 import           Test.Hspec
 
+import qualified Data.Map.Strict as Map
 import           Data.Text (unpack, Text)
 import           Data.ByteString.Lazy.Char8 (pack, ByteString)
 
@@ -102,6 +103,35 @@ spec = describe "AnalysisJson" $ do
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return x + y; }")
                             (emptyAnalysisSpec { signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
+
+    run json `shouldBe` analysis
+
+  it "works with trasnform analysis" $ do
+    let json = [text|
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "JavaScript",
+      "content" : "plus(count([]), 1)"
+   },
+   "spec" : {
+      "transformationSpecs" : [
+        [
+          {"tag" : "Crop", "contents": "IsVariable:y"},
+          {"tag" : "RenameVariables"},
+          {"tag" : "Aliase", "contents": { "count": "Size", "plus": "Plus" }}
+        ]
+      ]
+   }
+} |]
+    let analysis = Analysis (CodeSample JavaScript "plus(count([]), 1)")
+                            (emptyAnalysisSpec { transformationSpecs = Just [
+                              [
+                                Crop "IsVariable:y",
+                                RenameVariables,
+                                Aliase (Map.fromList [("count",Size),("plus",Plus)])
+                              ]
+                            ]})
 
     run json `shouldBe` analysis
 

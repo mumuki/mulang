@@ -2,9 +2,13 @@ module TransformerSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang
+import           Language.Mulang.Ast.Operator
+import           Language.Mulang.Parsers.JavaScript (js)
 import           Language.Mulang.Analyzer.Analysis hiding (spec)
 import           Language.Mulang.Analyzer.Transformer
 import           Language.Mulang.Transform.Normalizer
+
+import qualified Data.Map.Strict as Map
 
 spec :: Spec
 spec = do
@@ -41,3 +45,7 @@ spec = do
       transform (Variable "x" (MuObject None)) [
         RenameVariables,
         Normalize (unnormalized { convertObjectVariableIntoObject = True })] `shouldBe` (Object "mulang_var_n0" None)
+
+    it "transform with aliasing" $ do
+      transform (js "foo(a, b)") [Aliase (Map.singleton "foo" Similar)] `shouldBe` (js "a == b")
+      transform (js "a.foo(b)") [Aliase (Map.singleton "foo" Similar)] `shouldBe` (js "a == b")

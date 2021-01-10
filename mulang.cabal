@@ -111,10 +111,11 @@ library
     Language.Mulang.Interpreter
     Language.Mulang.Interpreter.Internals
     Language.Mulang.Interpreter.Runner
+    Language.Mulang.Transform.Aliaser
+    Language.Mulang.Transform.Cropper
     Language.Mulang.Transform.Normalizer
     Language.Mulang.Transform.Renamer
     Language.Mulang.Transform.Replacer
-    Language.Mulang.Transform.Cropper
 
   build-depends:
     base                      <= 5,
