@@ -10,26 +10,57 @@ module Mulang
     File.join(__dir__, '..', 'bin', 'mulang')
   end
   def self.analyse(analysis, **options)
-    serialization = options[:serialization]
-    many = analysis.is_a?(Array)
-    mode = many || serialization ? encode_serialization(serialization) : '-s'
-
-    Open3.popen2(bin_path, mode) do |input, output, _thread|
-      input.puts (!many && serialization ? [analysis] : analysis).to_json
+    arg, mode = Mulang::RunMode.for analysis, options
+    Open3.popen2(bin_path, arg) do |input, output, _thread|
+      input.puts mode.input(analysis).to_json
       input.close
       result = JSON.parse output.read
-      !many && serialization ? result[0] : result
+      mode.output result
     end
   end
 
   private
 
-  def self.encode_serialization(option)
-    case option
-    when nil then '-S'
-    when :bracket then '-B'
-    when :brace then '-C'
-    else raise "Unsupported serialization #{option}"
+  module RunMode
+    def self.for(analysis, options)
+      serialization = options[:serialization]
+      many = analysis.is_a?(Array)
+      if many
+        [encode_serialization(serialization), Mulang::RunMode::Natural]
+      elsif serialization
+        [encode_serialization(serialization), Mulang::RunMode::ForcedMany]
+      else
+        ["-s", Mulang::RunMode::Natural]
+      end
+    end
+
+    def self.encode_serialization(option)
+      case option
+      when nil then '-S'
+      when :bracket then '-B'
+      when :brace then '-C'
+      else raise "Unsupported serialization #{option}"
+      end
+    end
+
+    module Natural
+      def self.input(analysis)
+        analysis
+      end
+
+      def self.output(result)
+        result
+      end
+    end
+
+    module ForcedMany
+      def self.input(analysis)
+        [analysis]
+      end
+
+      def self.output(result)
+        result[0]
+      end
     end
   end
 end
