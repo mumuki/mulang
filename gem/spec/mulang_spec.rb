@@ -5,6 +5,7 @@ describe Mulang::Code do
     let(:code) { Mulang::Code.native('JavaScript', 'let x = 1') }
 
     it { expect(code.ast).to eq "tag"=>"Variable", "contents"=>["x", {"tag"=>"MuNumber", "contents"=>1}] }
+    it { expect(code.ast serialization: :bracket).to eq "[Variable[x][MuNumber[1.0]]]" }
     it { expect(code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }). to eq 'tag'=>'AnalysisCompleted',
                                                                                       'outputAst'=>nil,
                                                                                       'transformedAsts' => nil,
@@ -64,6 +65,16 @@ describe Mulang::Code do
                         {"contents"=>{"contents"=>"mulang_var_n0", "tag"=>"Reference"},
                          "tag"=>"Print"}],
                       "tag"=>"Sequence"}]
+      end
+
+      it "can produce multiple transformed asts with serialization options" do
+        expect(code.transformed_asts [
+                      [{tag: :Normalize, contents: { convertObjectIntoDict: true }}],
+                      [{tag: :Crop, contents: "IsVariable:y"}, {tag: :RenameVariables}]
+                    ], convertObjectVariableIntoObject: false, serialization: :brace).to eq [
+                      "{Sequence{Variable{x}{MuDict{None}}}{Variable{y}{MuNumber{2.0}}}{Print{Reference{x}}}}",
+                      "{Sequence{Variable{mulang_var_n0}{MuObject{None}}}{Print{Reference{mulang_var_n0}}}}"
+                    ]
       end
     end
 

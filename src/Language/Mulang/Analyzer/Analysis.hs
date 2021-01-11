@@ -42,6 +42,7 @@ module Language.Mulang.Analyzer.Analysis (
   QueryResult,
 
   AnalysisResult(..),
+  GenericAnalysisResult(..),
   ExpectationResult(..)) where
 
 import GHC.Generics
@@ -163,18 +164,18 @@ data Language
 
 type QueryResult = (Query, ExpectationResult)
 
+type AnalysisResult = GenericAnalysisResult Expression
 --
 -- Analysis Output structures
 --
-
-data AnalysisResult
+data GenericAnalysisResult a
   = AnalysisCompleted {
       expectationResults :: [ExpectationResult],
       smells :: [Expectation],
       signatures :: [Code],
       testResults :: [TestResult],
-      outputAst :: Maybe Expression,
-      transformedAsts :: Maybe [Expression] }
+      outputAst :: Maybe a,
+      transformedAsts :: Maybe [a] }
   | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
 data ExpectationResult = ExpectationResult {

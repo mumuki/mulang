@@ -30,8 +30,8 @@ module Mulang
       { sample: sample, spec: spec }
     end
 
-    def analyse(spec)
-      Mulang.analyse analysis(spec)
+    def analyse(spec, **options)
+      Mulang.analyse analysis(spec), **options
     end
 
     def expect(binding='*', inspection)
@@ -60,22 +60,22 @@ module Mulang
       new Mulang::Language::External.new(&tool), content
     end
 
-    def self.analyse_many(codes, spec)
-      run_many(codes) { |it| it.analysis(spec)  }
+    def self.analyse_many(codes, spec, **options)
+      run_many(codes, **options) { |it| it.analysis(spec)  }
     end
 
     def self.ast_many(codes, **options)
-      run_many(codes, key: 'outputAst') { |it| it.ast_analysis(**options) }
+      run_many(codes, key: 'outputAst', **options) { |it| it.ast_analysis(**options) }
     end
 
     def self.transformed_asts_many(codes, operations, **options)
-      run_many(codes, key: 'transformedAsts') { |it| it.transformed_asts_analysis(operations, **options) }
+      run_many(codes, key: 'transformedAsts', **options) { |it| it.transformed_asts_analysis(operations, **options) }
     end
 
     private
 
-    def self.run_many(codes, key: nil)
-      result = Mulang.analyse(codes.map { |it| yield it })
+    def self.run_many(codes, key: nil, **options)
+      result = Mulang.analyse(codes.map { |it| yield it }, **options)
       key ? result.map { |it| it[key] } : result
     end
 

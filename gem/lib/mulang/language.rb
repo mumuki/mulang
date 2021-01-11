@@ -1,7 +1,7 @@
 module Mulang::Language
   class Base
     def transformed_asts(content, operations, **options)
-      Mulang.analyse(transformed_asts_analysis(content, operations, **options))['transformedAsts'] rescue nil
+      Mulang.analyse(transformed_asts_analysis(content, operations, **options), **options)['transformedAsts'] rescue nil
     end
 
     def transformed_asts_analysis(content, operations, **options)
@@ -12,9 +12,13 @@ module Mulang::Language
           smellsSet: { tag: 'NoSmells' },
           includeOutputAst: false,
           transformationSpecs: operations,
-          normalizationOptions: options.presence
+          normalizationOptions: normalization_options(options)
         }.compact
       }
+    end
+
+    def normalization_options(**options)
+      options.except(:serialization).presence
     end
   end
 
@@ -24,7 +28,7 @@ module Mulang::Language
     end
 
     def ast(content, **options)
-      Mulang.analyse(ast_analysis(content, **options))['outputAst'] rescue nil
+      Mulang.analyse(ast_analysis(content, **options), **options)['outputAst'] rescue nil
     end
 
     def ast_analysis(content, **options)
@@ -34,7 +38,7 @@ module Mulang::Language
           expectations: [],
           smellsSet: { tag: 'NoSmells' },
           includeOutputAst: true,
-          normalizationOptions: options.presence
+          normalizationOptions: normalization_options(options)
         }.compact
       }
     end
