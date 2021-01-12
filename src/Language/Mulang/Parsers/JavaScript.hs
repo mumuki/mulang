@@ -1,4 +1,4 @@
-module Language.Mulang.Parsers.JavaScript (js, parseJavaScript) where
+module Language.Mulang.Parsers.JavaScript (js, js', parseJavaScript) where
 
 import Language.Mulang.Ast hiding (Equal, NotEqual)
 import Language.Mulang.Ast.Operator (Operator (..))
@@ -18,7 +18,10 @@ import Data.Function.Extra ((<==))
 import Control.Fallible
 
 js :: Parser
-js = normalize javaScriptNormalizationOptions . orFail . parseJavaScript'
+js = normalize javaScriptNormalizationOptions . js'
+
+js' :: Parser
+js' = orFail . parseJavaScript'
 
 parseJavaScript :: MaybeParser
 parseJavaScript = orNothing . parseJavaScript'
@@ -68,6 +71,7 @@ normalizeReference (SimpleSend  (Reference "console") "log"      [value])       
 normalizeReference (SimpleSend  (Reference "assert") "equals"    [expected, actual])         = Assert False $ Equality expected actual
 normalizeReference (SimpleSend  (Reference "assert") "notEquals" [expected, actual])         = Assert True $ Equality expected actual
 normalizeReference (SimpleSend  (Reference "assert") "throws"    [block, error])             = Assert False $ Failure block error
+normalizeReference (SimpleSend  list       "push"                [value])                    = Application (Primitive Push) [list, value]
 normalizeReference (Application (Reference "assert")             [expression])               = Assert False $ Truth expression
 normalizeReference (Application (Reference "describe")           [description, Lambda [] e]) = TestGroup description e
 normalizeReference (Application (Reference "context")            [description, Lambda [] e]) = TestGroup description e
@@ -162,10 +166,11 @@ muJSExpression (JSExpressionPostfix (JSIdentifier _ name) op)       = Assignment
 muJSExpression (JSExpressionTernary condition _ trueVal _ falseVal) = If (muJSExpression condition) (muJSExpression trueVal) (muJSExpression falseVal)
 muJSExpression (JSFunctionExpression _ ident _ params _ body)       = muComputation ident params body
 muJSExpression (JSArrowExpression  params _ body)                   = Lambda (muJSArrowParameterList params) (muJSStatement body)
+muJSExpression (JSMemberDot receptor _ (JSIdentifier _ "length"))   = Application (Primitive Size) [muJSExpression receptor]
 muJSExpression (JSMemberDot receptor _ (JSIdentifier _ message))    = FieldReference (muJSExpression receptor) message
 muJSExpression (JSMemberExpression id _ params _)                   = Application (muJSExpression id) (muJSExpressionList params)
 muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _)       = New (Reference name) (muJSExpressionList args)
-muJSExpression (JSMemberSquare receptor _ index _)                  = Send (muJSExpression receptor) (Reference "[]") [muJSExpression index]
+muJSExpression (JSMemberSquare receptor _ index _)                  = Application (Primitive GetAt) [muJSExpression receptor, muJSExpression index]
 muJSExpression (JSNewExpression _ (JSIdentifier _ name))            = New (Reference name) []
 muJSExpression (JSObjectLiteral _ propertyList _)                   = MuObject (compactMap muJSObjectProperty . muJSCommaTrailingList $ propertyList)
 muJSExpression (JSUnaryExpression (JSUnaryOpNot _) e)               = Application (Primitive Negation) [muJSExpression e]

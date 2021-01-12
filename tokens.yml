@@ -120,6 +120,8 @@ JavaScript:
     <<: *common_keywords
   operators:
     <<: *common_operators
+    Size:
+      - "length"
     Similar:
       - "=="
     NotSimilar:
@@ -128,6 +130,8 @@ JavaScript:
       - "==="
     NotEqual:
       - "!=="
+    Push:
+      - "push"
 Python:
   keywords:
     <<: *common_keywords

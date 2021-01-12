@@ -15,8 +15,8 @@ module Language.Mulang.Interpreter (
 
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import           Data.List (find, intercalate)
-import           Control.Monad (forM)
+import           Data.List (find, intercalate, genericLength)
+import           Control.Monad (forM, (>=>))
 import           Control.Monad.State.Class
 import           Control.Monad.Loops
 import           Control.Monad.State.Strict
@@ -45,25 +45,34 @@ evalRaising context expr = do
 
 evalExpressionsWith :: [M.Expression] -> ([Value] -> Executable Reference) -> Executable Reference
 evalExpressionsWith expressions f = do
-  params <- mapM (\e -> evalExpr e >>= dereference) expressions
+  params <- forM expressions evalExprValue
   f params
+
+evalExpressionsWith' :: [M.Expression] -> ([(Reference, Value)] -> Executable Reference) -> Executable Reference
+evalExpressionsWith' expressions f = do
+  refs <- forM expressions evalExpr
+  values <- forM refs dereference
+  f $ zip refs values
+
+evalExprValue :: M.Expression -> Executable Value
+evalExprValue = evalExpr >=> dereference
 
 evalExpr :: M.Expression -> Executable Reference
 evalExpr (M.Sequence expressions) = last <$> forM expressions evalExpr
 evalExpr (M.Lambda params body) = do
   executionFrames <- gets scopes
-  createReference $
+  createRef $
     MuFunction executionFrames [M.Equation params (M.UnguardedBody body)]
 
 evalExpr (M.Subroutine name body) = do
   executionFrames <- gets scopes
   let function = MuFunction executionFrames body
-  ref <- createReference function
+  ref <- createRef function
   unless (null name) (setLocalVariable name ref) -- if function has no name we avoid registering it
   return ref
 
 evalExpr (M.Print expression) = do
-  parameter :: Value <- evalExpr expression >>= dereference
+  parameter <- evalExprValue expression
   liftIO $ print parameter
   return nullRef
 
@@ -91,10 +100,33 @@ evalExpr (M.Application (M.Primitive O.Negation) expressions) =
   where f [MuBool b] = createBool $ not b
         f params     = raiseTypeError "expected one boolean" params
 
+evalExpr (M.Application (M.Primitive O.Push) expressions) =
+  evalExpressionsWith' expressions f
+  where f [(lr, MuList xs), (vr, _)]  = updateRef lr (MuList (xs ++ [vr])) >> return vr
+        f params                      = raiseTypeError "{Push} expected a list" (map snd params)
+
+evalExpr (M.Application (M.Primitive O.Size) expressions) =
+  evalExpressionsWith expressions f
+  where f [MuList xs]  = createNumber $ genericLength xs
+        f [MuString s] = createNumber $ genericLength s
+        f params       = raiseTypeError "{Size} expected a list or string" params
+
+evalExpr (M.Application (M.Primitive O.GetAt) expressions) =
+  evalExpressionsWith expressions f
+  where f [MuObject m, MuString s] | Just ref <- Map.lookup s m = return ref
+                                   | otherwise = raiseString ("key error: " ++ s)
+        f params        = raiseTypeError "expected an object" params
+
+evalExpr (M.Application (M.Primitive O.SetAt) expressions) =
+  evalExpressionsWith' expressions f
+  where f [(or, MuObject _), (_, MuString s), (vr, _)] = modifyRef or (setObjectAt s vr) >> return vr
+        f params                                       = raiseTypeError "expected an object" (map snd params)
+
+
 evalExpr (M.Application (M.Primitive O.Multiply) expressions) = evalBinaryNumeric expressions (*) createNumber
 
 evalExpr (M.Application (M.Primitive O.Like) expressions) = do
-  params <- mapM evalExpr expressions
+  params <- forM expressions evalExpr
   let [r1, r2] = params
   muValuesEqual r1 r2
 
@@ -108,18 +140,25 @@ evalExpr (M.Application (M.Primitive O.Minus) expressions) = evalBinaryNumeric e
 
 evalExpr (M.MuList expressions) = do
   refs <- forM expressions evalExpr
-  createReference $ MuList refs
+  createRef $ MuList refs
+
+evalExpr (M.MuDict expression)   = evalObject expression
+evalExpr (M.MuObject expression) = evalObject expression
+evalExpr (M.Object name expression) = evalExpr (M.Variable name (M.MuObject expression))
+
+evalExpr (M.FieldAssignment e1 k e2) = evalExpr (M.Application (M.Primitive O.SetAt) [e1, M.MuString k, e2])
+evalExpr (M.FieldReference expression k) = evalExpr (M.Application (M.Primitive O.GetAt) [expression, M.MuString k])
 
 evalExpr (M.New klass expressions) = do
-  (MuFunction locals ([M.SimpleEquation params body])) <- evalExpr klass >>= dereference
-  objReference <- createReference $ MuObject Map.empty
-  thisContext <- createReference $ MuObject $ Map.singleton "this" objReference
+  (MuFunction locals ([M.SimpleEquation params body])) <- evalExprValue klass
+  objReference <- createObject Map.empty
+  thisContext <- createObject $ Map.singleton "this" objReference
   paramsContext <- evalParams params expressions
   runFunction (thisContext:paramsContext:locals) body
   return objReference
 
 evalExpr (M.Application function expressions) = do
-  (MuFunction locals ([M.SimpleEquation params body])) <- evalExpr function >>= dereference
+  (MuFunction locals ([M.SimpleEquation params body])) <- evalExprValue function
   paramsContext <- evalParams params expressions
   returnValue <- runFunction (paramsContext:locals) (body)
   return returnValue
@@ -131,7 +170,7 @@ evalExpr (M.If cond thenBranch elseBranch) = do
 evalExpr (M.MuNumber n) = createNumber n
 evalExpr (M.MuNil) = return nullRef
 evalExpr (M.MuBool b) = createBool b
-evalExpr (M.MuString s) = createReference $ MuString s
+evalExpr (M.MuString s) = createRef $ MuString s
 evalExpr (M.Return e) = do
   ref <- evalExpr e
   currentReturn <- gets (currentReturnCallback)
@@ -146,6 +185,13 @@ evalExpr (M.While cond expr) = do
   whileM (evalCondition cond) (evalExpr expr)
   return nullRef
 
+evalExpr (M.For [M.Generator (M.LValuePattern name) iterable] body) = do
+  (MuList elementRefs) <- evalExprValue iterable
+  forM elementRefs (\r -> do
+    setLocalVariable name r
+    evalExpr body)
+  return nullRef
+
 evalExpr (M.ForLoop beforeExpr cond afterExpr expr) = do
   evalExpr beforeExpr
   whileM (evalCondition cond) $ do
@@ -157,7 +203,7 @@ evalExpr (M.Assignment name expr) = do
   valueRef <- evalExpr expr
   frameRef <- findFrameForName' name
   case frameRef of
-    Just ref -> updateRef ref (addAttrToObject name valueRef)
+    Just ref -> modifyRef ref (setObjectAt name valueRef)
     Nothing -> setLocalVariable name valueRef
   return valueRef
 
@@ -183,6 +229,23 @@ evalExpr (M.Reference name) = findReferenceForName name
 evalExpr (M.None) = return nullRef
 evalExpr e = raiseString $ "Unkown expression: " ++ show e
 
+evalObject :: M.Expression -> Executable Reference
+evalObject M.None          = createObject (Map.empty)
+evalObject (M.Sequence es) = do
+  arrowRefs <- forM es evalArrow
+  createObject $ Map.fromList arrowRefs
+evalObject e             = do
+  (s, vRef) <- evalArrow e
+  createObject $ Map.singleton s vRef
+
+evalArrow :: M.Expression -> Executable (String, Reference)
+evalArrow (M.LValue n v)  = evalArrow (M.Arrow (M.MuString n) v)
+evalArrow (M.Arrow k v)   = do
+  (MuString s) <- evalExprValue k
+  vRef <- evalExpr v
+  return (s, vRef)
+evalArrow e               = raiseString ("malformed object arrow: " ++ show e)
+
 -- TODO make this evaluation non strict on both parameters
 evalBinaryBoolean :: [M.Expression] -> (Bool -> Bool -> Bool) -> Executable Reference
 evalBinaryBoolean expressions op = evalExpressionsWith expressions f
@@ -195,7 +258,7 @@ evalBinaryNumeric expressions op pack = evalExpressionsWith expressions f
         f params                     = raiseTypeError "expected two numbers" params
 
 evalCondition :: M.Expression -> Executable Bool
-evalCondition cond = evalExpr cond >>= dereference >>= muBool
+evalCondition cond = evalExprValue cond >>= muBool
   where
     muBool (MuBool value) = return value
     muBool v              = raiseTypeError "expected boolean" [v]
@@ -204,7 +267,7 @@ evalParams :: [M.Pattern] -> [M.Expression] -> Executable Reference
 evalParams params arguments = do
   evaluatedParams <- forM arguments evalExpr
   let localsAfterParameters = Map.fromList $ zip (getParamNames params) (evaluatedParams ++ repeat nullRef)
-  createReference $ MuObject localsAfterParameters
+  createObject localsAfterParameters
 
 raiseInternal :: Reference -> Executable b
 raiseInternal exceptionRef = do
@@ -215,13 +278,13 @@ raiseInternal exceptionRef = do
 
 raiseString :: String -> Executable a
 raiseString s = do
-  raiseInternal =<< (createReference $ MuString s)
+  raiseInternal =<< (createRef $ MuString s)
 
 raiseTypeError :: String -> [Value] ->Executable a
 raiseTypeError message values = raiseString $ "Type error: " ++ message ++ " but got " ++ (intercalate ", " . map debug $ values)
 
 muValuesEqual r1 r2
-  | r1 == r2 = createReference $ MuBool True
+  | r1 == r2 = createRef $ MuBool True
   | otherwise = do
       v1 <- dereference r1
       v2 <- dereference r2
@@ -234,8 +297,10 @@ muEquals MuNull        MuNull        = True
 muEquals _             _             = False
 
 getParamNames :: [M.Pattern] -> [String]
-getParamNames = fmap (\(M.VariablePattern n) -> n)
-
+getParamNames = fmap getParamName
+  where
+    getParamName (M.LValuePattern n) = n
+    getParamName other               = error $ "Unsupported pattern " ++ (show other)
 runFunction :: [Reference] -> M.Expression -> Executable Reference
 runFunction functionEnv body = do
   context <- get
@@ -273,18 +338,19 @@ findReferenceForName name = do
 
 nullRef = Reference 0
 
-createBool = createReference . MuBool
-createNumber = createReference . MuNumber
+createBool = createRef . MuBool
+createNumber = createRef . MuNumber
+createObject = createRef . MuObject
 
 setLocalVariable :: String -> Reference -> Executable ()
 setLocalVariable name ref = do
   frame <- currentFrame
-  updateRef frame (addAttrToObject name ref)
+  modifyRef frame (setObjectAt name ref)
 
   where
       currentFrame :: Executable Reference
       currentFrame = gets (head . scopes)
 
-addAttrToObject :: String -> Reference -> Value -> Value
-addAttrToObject k r (MuObject map) = MuObject $ Map.insert k r map
-addAttrToObject k _r v = error $ "Tried adding " ++ k ++ " to a non object: " ++ show v
+setObjectAt :: String -> Reference -> Value -> Value
+setObjectAt k r (MuObject map) = MuObject $ Map.insert k r map
+setObjectAt k _r v = error $ "Tried adding " ++ k ++ " to a non object: " ++ show v
