@@ -38,10 +38,11 @@ module Language.Mulang.Analyzer.Analysis (
   TestAnalysisType(..),
   TransformationSpec,
   TransformationOperation(..),
+  TransformationScope(..),
 
   QueryResult,
 
-  AnalysisResult(..),
+  AnalysisResult,
   GenericAnalysisResult(..),
   ExpectationResult(..)) where
 
@@ -138,11 +139,15 @@ data TestAnalysisType
 type TransformationSpec = [TransformationOperation]
 
 data TransformationOperation
-  =  Alias (Map String Operator)
+  = Alias (Map String Operator)
   | Crop Inspection
+  | CropAt TransformationScope Inspection
   | Normalize NormalizationOptions
   | RenameVariables
-  | Replace Inspection Expression deriving (Show, Eq, Generic)
+  | Replace Inspection Expression
+  | ReplaceAt TransformationScope Inspection Expression deriving (Show, Eq, Generic)
+
+data TransformationScope = GlobalScope | LocalScope deriving (Show, Eq, Generic)
 
 data Language
   =  Json
