@@ -47,5 +47,5 @@ spec = do
         Normalize (unnormalized { convertObjectVariableIntoObject = True })] `shouldBe` (Object "mulang_var_n0" None)
 
     it "transform with aliasing" $ do
-      transform (js "foo(a, b)") [Aliase (Map.singleton "foo" Similar)] `shouldBe` (js "a == b")
-      transform (js "a.foo(b)") [Aliase (Map.singleton "foo" Similar)] `shouldBe` (js "a == b")
+      transform (js "foo(a, b)") [Alias (Map.singleton "foo" Similar)] `shouldBe` (js "a == b")
+      transform (js "a.foo(b)") [Alias (Map.singleton "foo" Similar)] `shouldBe` (js "a == b")

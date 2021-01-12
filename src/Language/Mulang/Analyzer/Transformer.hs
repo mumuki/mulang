@@ -21,7 +21,7 @@ transformMany e specs = map (transform e) specs
 transform :: Expression -> TransformationSpec -> Expression
 transform e ops = foldl f e ops
   where
-    f e (Aliase m)          = alias m e
+    f e (Alias m)          = alias m e
     f e (Crop i)            = crop (compileInspection i) e
     f e (Normalize options) = normalize options e
     f e (Replace i o)       = replace (compileInspection i) o e

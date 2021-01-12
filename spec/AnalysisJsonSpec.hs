@@ -119,7 +119,7 @@ spec = describe "AnalysisJson" $ do
         [
           {"tag" : "Crop", "contents": "IsVariable:y"},
           {"tag" : "RenameVariables"},
-          {"tag" : "Aliase", "contents": { "count": "Size", "plus": "Plus" }}
+          {"tag" : "Alias", "contents": { "count": "Size", "plus": "Plus" }}
         ]
       ]
    }
@@ -129,7 +129,7 @@ spec = describe "AnalysisJson" $ do
                               [
                                 Crop "IsVariable:y",
                                 RenameVariables,
-                                Aliase (Map.fromList [("count",Size),("plus",Plus)])
+                                Alias (Map.fromList [("count",Size),("plus",Plus)])
                               ]
                             ]})
 

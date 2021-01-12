@@ -46,7 +46,7 @@ describe Mulang::Code do
                       "tag"=>"Sequence"}]
       end
 
-      it "can produce multiple transformeds with options" do
+      it "can produce multiple transformed asts with options" do
         expect(code.transformed_asts [
                       [{tag: :Normalize, contents: { convertObjectIntoDict: true }}],
                       [{tag: :Crop, contents: "IsVariable:y"}, {tag: :RenameVariables}]

@@ -137,7 +137,7 @@ data TestAnalysisType
 type TransformationSpec = [TransformationOperation]
 
 data TransformationOperation
-  =  Aliase (Map String Operator)
+  =  Alias (Map String Operator)
   | Crop Inspection
   | Normalize NormalizationOptions
   | RenameVariables
