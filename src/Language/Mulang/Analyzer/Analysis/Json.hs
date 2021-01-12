@@ -5,7 +5,7 @@ module Language.Mulang.Analyzer.Analysis.Json () where
 import           Data.Aeson
 import           Language.Mulang
 import           Language.Mulang.Analyzer.Analysis
-import           Language.Mulang.Transform.Normalizer (NormalizationOptions (..), SequenceSortMode, defaultNormalizationOptions)
+import           Language.Mulang.Transform.Normalizer (NormalizationOptions (..), SequenceSortMode, unnormalized)
 import           Language.Mulang.Interpreter.Runner (TestResult, TestStatus)
 
 instance FromJSON Analysis
@@ -30,7 +30,10 @@ instance FromJSON NormalizationOptions where
         <*> v .:? "convertObjectIntoDict"                         .!= convertObjectIntoDict d
         <*> v .:? "sortSequenceDeclarations"                      .!= sortSequenceDeclarations d
         <*> v .:? "insertImplicitReturn"                          .!= insertImplicitReturn d
-          where d = defaultNormalizationOptions
+        <*> v .:? "compactSequences"                              .!= compactSequences d
+        <*> v .:? "trimSequences"                                 .!= trimSequences d
+        <*> v .:? "sortCommutativeApplications"                   .!= sortCommutativeApplications d
+          where d = unnormalized
 instance FromJSON SequenceSortMode
 
 instance FromJSON Fragment
@@ -44,6 +47,7 @@ instance FromJSON Statement
 instance FromJSON Type
 instance FromJSON Assertion
 instance FromJSON TestAnalysisType
+instance FromJSON TransformationOperation
 instance FromJSON InterpreterOptions
 instance FromJSON Operator
 

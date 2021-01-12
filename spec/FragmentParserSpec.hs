@@ -15,9 +15,9 @@ spec = do
     parseFragment Nothing fragment `shouldBe` Right (Variable "x" (MuNumber 1.0))
 
   it "parses well formed expressions with normalization options" $ do
-    let convert = Just (defaultNormalizationOptions { convertObjectVariableIntoObject = True })
-    let keep    = Just (defaultNormalizationOptions { convertObjectVariableIntoObject = False })
-    let asDict  = Just (defaultNormalizationOptions { convertObjectIntoDict = True })
+    let convert = Just (unnormalized { convertObjectVariableIntoObject = True })
+    let keep    = Just (unnormalized { convertObjectVariableIntoObject = False })
+    let asDict  = Just (unnormalized { convertObjectIntoDict = True })
     let fragment = CodeSample JavaScript "let x = {}"
 
     parseFragment convert fragment `shouldBe` (Right (Object "x" None))

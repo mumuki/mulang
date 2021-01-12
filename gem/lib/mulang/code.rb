@@ -6,12 +6,20 @@ module Mulang
       @content  = content
     end
 
-    def ast
-      @language.ast @content
+    def ast(**options)
+      @language.ast @content, **options
     end
 
-    def ast_analysis
-      @language.ast_analysis @content
+    def ast_analysis(**options)
+      @language.ast_analysis @content, **options
+    end
+
+    def transformed_asts(operations, **options)
+      @language.transformed_asts @content, operations, **options
+    end
+
+    def transformed_asts_analysis(operations, **options)
+      @language.transformed_asts_analysis @content, operations, **options
     end
 
     def sample
@@ -52,19 +60,24 @@ module Mulang
       new Mulang::Language::External.new(&tool), content
     end
 
-    def self.ast(ast)
-      new Mulang::Language::External.new, ast
-    end
-
     def self.analyse_many(codes, spec)
-      Mulang.analyse codes.map { |it| it.analysis(spec)  }
+      run_many(codes) { |it| it.analysis(spec)  }
     end
 
-    def self.ast_many(codes)
-      Mulang.analyse(codes.map { |it| it.ast_analysis  }).map { |it| it['intermediateLanguage'] }
+    def self.ast_many(codes, **options)
+      run_many(codes, key: 'outputAst') { |it| it.ast_analysis(**options) }
+    end
+
+    def self.transformed_asts_many(codes, operations, **options)
+      run_many(codes, key: 'transformedAsts') { |it| it.transformed_asts_analysis(operations, **options) }
     end
 
     private
+
+    def self.run_many(codes, key: nil)
+      result = Mulang.analyse(codes.map { |it| yield it })
+      key ? result.map { |it| it[key] } : result
+    end
 
     def expectation_results_for(result)
       raise result['reason'] if result['tag'] == 'AnalysisFailed'

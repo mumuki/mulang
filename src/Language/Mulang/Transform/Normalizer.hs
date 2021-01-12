@@ -2,7 +2,7 @@
 
 module Language.Mulang.Transform.Normalizer (
     normalize,
-    defaultNormalizationOptions,
+    unnormalized,
     NormalizationOptions (..),
     SequenceSortMode (..)) where
 
@@ -13,6 +13,8 @@ import Data.List.Extra (unwind)
 
 import Language.Mulang.Ast
 import Language.Mulang.Ast.Visitor
+import Language.Mulang.Ast.Operator (isCommutative)
+import Language.Mulang.Builder (compact, trim)
 import Language.Mulang.Generator (declarators, declaredIdentifiers)
 import Language.Mulang.Inspector.Literal (isLiteral)
 
@@ -24,7 +26,10 @@ data NormalizationOptions = NormalizationOptions {
   convertObjectLevelVariableIntoAttribute :: Bool,
   convertObjectIntoDict :: Bool,
   sortSequenceDeclarations :: SequenceSortMode,
-  insertImplicitReturn :: Bool
+  insertImplicitReturn :: Bool,
+  compactSequences :: Bool,
+  trimSequences :: Bool,
+  sortCommutativeApplications :: Bool
 } deriving (Eq, Show, Read, Generic)
 
 data SequenceSortMode
@@ -33,8 +38,8 @@ data SequenceSortMode
   | SortAllNonVariables
   | SortAll deriving (Eq, Show, Read, Generic)
 
-defaultNormalizationOptions :: NormalizationOptions
-defaultNormalizationOptions = NormalizationOptions {
+unnormalized :: NormalizationOptions
+unnormalized = NormalizationOptions {
   convertObjectVariableIntoObject = False,
   convertLambdaVariableIntoFunction = False,
   convertObjectLevelFunctionIntoMethod = False,
@@ -42,17 +47,20 @@ defaultNormalizationOptions = NormalizationOptions {
   convertObjectLevelVariableIntoAttribute = False,
   convertObjectIntoDict = False,
   sortSequenceDeclarations = SortNothing,
-  insertImplicitReturn = False
+  insertImplicitReturn = False,
+  compactSequences = False,
+  trimSequences = False,
+  sortCommutativeApplications = False
 }
-
 
 normalize :: NormalizationOptions -> Expression -> Expression
 normalize ops (Application (Send r m []) args)      = Send (normalize ops r) (normalize ops m) (mapNormalize ops args)
+normalize ops (Application (Primitive op) [e1, e2]) | isCommutative op = Application (Primitive op) (normalizeCommutativeArguments ops [e1, e2])
 normalize ops (LValue n (Lambda vars e))            | convertLambdaVariableIntoFunction ops = SimpleFunction n vars (normalize ops e)
 normalize ops (LValue n (MuObject e))               | convertObjectVariableIntoObject ops = Object n (normalizeObjectLevel ops e)
-normalize ops (MuObject e)                          | convertObjectIntoDict ops = MuDict e
+normalize ops (MuObject e)                          | convertObjectIntoDict ops = MuDict . normalize ops . normalizeArrows $ e
 normalize ops (Object n e)                          = Object n (normalizeObjectLevel ops e)
-normalize ops (Sequence es)                         = Sequence . sortDeclarationsWith ops .  mapNormalize ops $ es
+normalize ops (Sequence es)                         = normalizeSequence ops . sortDeclarations ops .  mapNormalize ops $ es
 --
 normalize _    a@(Assert _ _)                       = a
 normalize ops (For stms e1)                         = For stms (normalize ops e1)
@@ -76,16 +84,30 @@ normalize ops (TwoExpressions e1 e2 c)              = c (normalize ops e1) (norm
 mapNormalize ops = map (normalize ops)
 mapNormalizeEquation ops = map (normalizeEquation ops)
 
+normalizeArrows :: Expression -> Expression
+normalizeArrows (Sequence es) = Sequence . map normalizeArrows $ es
+normalizeArrows (LValue n v)  = Arrow (MuString n) v
+normalizeArrows e             = e
+
+normalizeSequence :: NormalizationOptions -> [Expression] -> Expression
+normalizeSequence ops = compact' . trim'
+  where
+    compact' = if compactSequences ops then compact else Sequence
+    trim'    = if trimSequences ops then trim else id
+
+normalizeCommutativeArguments :: NormalizationOptions -> [Expression] -> [Expression]
+normalizeCommutativeArguments ops args | sortCommutativeApplications ops = sort args
+normalizeCommutativeArguments _   args = args
+
 normalizeObjectLevel :: NormalizationOptions -> Expression -> Expression
 normalizeObjectLevel ops (Function n eqs)             | convertObjectLevelFunctionIntoMethod ops       = Method n (mapNormalizeEquation ops eqs)
 normalizeObjectLevel ops (LValue n (Lambda vars e))   | convertObjectLevelLambdaVariableIntoMethod ops = SimpleMethod n vars (normalize ops e)
 normalizeObjectLevel ops (LValue n e)                 | convertObjectLevelVariableIntoAttribute ops    = Attribute n (normalize ops e)
-normalizeObjectLevel ops (Sequence es)                = Sequence (map (normalizeObjectLevel ops) es)
+normalizeObjectLevel ops (Sequence es)                = normalizeSequence ops (map (normalizeObjectLevel ops) es)
 normalizeObjectLevel ops e                            = normalize ops e
 
 normalizeEquation :: NormalizationOptions -> Equation -> Equation
-normalizeEquation ops (Equation ps (UnguardedBody e))   = Equation ps (UnguardedBody (normalizeBody ops e))
-normalizeEquation ops (Equation ps (GuardedBody b))     = Equation ps (GuardedBody (map (\(c, e) -> (normalize ops c, normalizeBody ops e)) b))
+normalizeEquation ops = mapEquation (normalize ops) (normalizeBody ops)
 
 normalizeBody :: NormalizationOptions -> Expression -> Expression
 normalizeBody ops = normalizeReturn ops . normalize ops
@@ -119,8 +141,8 @@ isSafeDeclaration e               = isDeclaration e
 isDeclaration :: Expression -> Bool
 isDeclaration = not.null.declarators
 
-sortDeclarationsWith :: NormalizationOptions -> [Expression] -> [Expression]
-sortDeclarationsWith ops expressions | shouldSort (sortSequenceDeclarations ops) = sort expressions
+sortDeclarations :: NormalizationOptions -> [Expression] -> [Expression]
+sortDeclarations ops expressions | shouldSort (sortSequenceDeclarations ops) = sort expressions
                                      | otherwise                                 = expressions
   where
     shouldSort :: SequenceSortMode -> Bool

@@ -1,8 +1,8 @@
 module Language.Mulang.Normalizers.C (cNormalizationOptions) where
 
-import Language.Mulang.Transform.Normalizer (defaultNormalizationOptions, NormalizationOptions(..), SequenceSortMode(..))
+import Language.Mulang.Transform.Normalizer (unnormalized, NormalizationOptions(..), SequenceSortMode(..))
 
 cNormalizationOptions :: NormalizationOptions
-cNormalizationOptions = defaultNormalizationOptions {
+cNormalizationOptions = unnormalized {
   sortSequenceDeclarations = SortAllNonVariables
 }

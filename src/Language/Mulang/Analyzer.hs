@@ -13,6 +13,7 @@ import Language.Mulang.Analyzer.SignaturesAnalyzer  (analyseSignatures)
 import Language.Mulang.Analyzer.SmellsAnalyzer (analyseSmells)
 import Language.Mulang.Analyzer.TestsAnalyzer  (analyseTests)
 import Language.Mulang.Analyzer.Autocorrector  (autocorrect)
+import Language.Mulang.Analyzer.Transformer  (transformMany')
 import Data.Maybe (fromMaybe)
 
 
@@ -44,8 +45,9 @@ analyseAst ast spec = do
                              (analyseSignatures ast (signatureAnalysisType spec))
                              testResults
                              (analyzeIntermediateLanguage ast spec)
+                             (transformMany' ast (transformationSpecs spec))
 
 analyzeIntermediateLanguage :: Expression -> AnalysisSpec -> Maybe Expression
 analyzeIntermediateLanguage ast spec
-  | fromMaybe False (includeIntermediateLanguage spec) = Just ast
+  | fromMaybe False (includeOutputAst spec) = Just ast
   | otherwise = Nothing

@@ -36,6 +36,8 @@ module Language.Mulang.Analyzer.Analysis (
   Smell,
   SmellsSet(..),
   TestAnalysisType(..),
+  TransformationSpec,
+  TransformationOperation(..),
 
   QueryResult,
 
@@ -45,6 +47,7 @@ module Language.Mulang.Analyzer.Analysis (
 import GHC.Generics
 
 import Language.Mulang.Ast
+import Language.Mulang.Ast.Operator (Operator)
 import Language.Mulang.Edl.Expectation (Query)
 import Language.Mulang.Transform.Normalizer (NormalizationOptions)
 import Language.Mulang.Interpreter.Runner (TestResult)
@@ -78,8 +81,9 @@ data AnalysisSpec = AnalysisSpec {
   smellsSet :: Maybe SmellsSet,
   signatureAnalysisType :: Maybe SignatureAnalysisType,
   testAnalysisType :: Maybe TestAnalysisType,
+  transformationSpecs :: Maybe [TransformationSpec],
   domainLanguage :: Maybe DomainLanguage,
-  includeIntermediateLanguage :: Maybe Bool,
+  includeOutputAst :: Maybe Bool,
   originalLanguage :: Maybe Language,
   autocorrectionRules :: Maybe AutocorrectionRules,
   normalizationOptions :: Maybe NormalizationOptions
@@ -130,6 +134,15 @@ data TestAnalysisType
       interpreterOptions :: Maybe InterpreterOptions
     } deriving (Show, Eq, Generic)
 
+type TransformationSpec = [TransformationOperation]
+
+data TransformationOperation
+  =  Alias (Map String Operator)
+  | Crop Inspection
+  | Normalize NormalizationOptions
+  | RenameVariables
+  | Replace Inspection Expression deriving (Show, Eq, Generic)
+
 data Language
   =  Json
   |  Java
@@ -160,7 +173,8 @@ data AnalysisResult
       smells :: [Expectation],
       signatures :: [Code],
       testResults :: [TestResult],
-      intermediateLanguage :: Maybe Expression }
+      outputAst :: Maybe Expression,
+      transformedAsts :: Maybe [Expression] }
   | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
 data ExpectationResult = ExpectationResult {
@@ -192,8 +206,9 @@ emptyAnalysisSpec = AnalysisSpec {
     smellsSet = Nothing,
     signatureAnalysisType = Nothing,
     testAnalysisType = Nothing,
+    transformationSpecs = Nothing,
     domainLanguage = Nothing,
-    includeIntermediateLanguage = Nothing,
+    includeOutputAst = Nothing,
     originalLanguage = Nothing,
     autocorrectionRules = Nothing,
     normalizationOptions = Nothing
@@ -221,7 +236,7 @@ testsAnalysis :: Fragment -> TestAnalysisType -> Analysis
 testsAnalysis code testAnalysisType = Analysis code (emptyAnalysisSpec { testAnalysisType = Just testAnalysisType })
 
 emptyCompletedAnalysisResult :: AnalysisResult
-emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing
+emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing Nothing
 
 emptyDomainLanguage :: DomainLanguage
 emptyDomainLanguage = DomainLanguage Nothing Nothing Nothing Nothing

@@ -143,7 +143,7 @@ $ mulangjs '{
       }
    ],
    "smells" : [],
-   "intermediateLanguage" : null,
+   "outputAst" : null,
    "signatures" : []
 }
 ```

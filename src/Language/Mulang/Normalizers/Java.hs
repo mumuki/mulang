@@ -1,8 +1,8 @@
 module Language.Mulang.Normalizers.Java (javaNormalizationOptions) where
 
-import Language.Mulang.Transform.Normalizer (defaultNormalizationOptions, NormalizationOptions(..), SequenceSortMode(..))
+import Language.Mulang.Transform.Normalizer (unnormalized, NormalizationOptions(..), SequenceSortMode(..))
 
 javaNormalizationOptions :: NormalizationOptions
-javaNormalizationOptions = defaultNormalizationOptions {
+javaNormalizationOptions = unnormalized {
   sortSequenceDeclarations = SortAllNonVariables
 }

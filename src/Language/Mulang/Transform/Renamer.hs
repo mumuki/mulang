@@ -29,7 +29,7 @@ renameState f@(Findall _ _ _)   = return f
 renameState f@(Forall _ _)      = return f
 renameState n@(Not _)           = return n
 --
-renameState (For stms e1)       = do { e1' <- renameState e1; return $ For stms e1' }
+renameState (For stms e1)       = do { stms' <- mapM renameStatement stms; e1' <- renameState e1; return $ For stms' e1' }
 renameState (ForLoop i c a b)   = do { [i', c', a', b'] <- mapM renameState [i, c, a, b]; return $ ForLoop i' c' a' b' }
 renameState (Lambda ps e2)      = do { e2' <- renameState e2; return $ Lambda ps e2' }
 renameState (Match e1 eqs)      = do { e1' <- renameState e1; eqs' <- renameEquations eqs; return $ Match e1' eqs' }
@@ -50,6 +50,10 @@ renameState e@Terminal                             = return e
 
 renameTryCases    = mapM (\(p, e) -> do { e' <- renameState e; return (p, e') })
 renameSwitchCases = mapM (\(e1, e2) -> do { e1' <- renameState e1; e2' <- renameState e2; return (e1', e2') })
+
+renameStatement :: Statement -> RenameState Statement
+renameStatement (Generator p e)  = do { p' <- renameParameter p; e' <- renameState e; return $ Generator p' e' }
+renameStatement (Guard e)        = do { e' <- renameState e; return $ Guard e' }
 
 renameEquations :: [Equation] -> RenameState [Equation]
 renameEquations equations = do

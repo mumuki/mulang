@@ -1,6 +1,7 @@
 {-# LANGUAGE PatternSynonyms, ViewPatterns #-}
 
 module Language.Mulang.Ast.Visitor (
+    mapEquation,
     pattern Terminal,
     pattern SingleExpression,
     pattern TwoExpressions,
@@ -143,3 +144,8 @@ extractExpressionAndExpressionsList :: Expression -> Maybe (Expression, [Express
 extractExpressionAndExpressionsList (Application e1 es) = Just (e1, es, Application)
 extractExpressionAndExpressionsList (New e1 es)         = Just (e1, es, New)
 extractExpressionAndExpressionsList _                   = Nothing
+
+-- Maps the conditions and bodies of the given equations' expressions
+mapEquation :: (Expression -> Expression) -> (Expression -> Expression) -> Equation -> Equation
+mapEquation _  bf (Equation ps (UnguardedBody e)) = Equation ps (UnguardedBody (bf e))
+mapEquation cf bf (Equation ps (GuardedBody gs))  = Equation ps (GuardedBody (map (\(c, b) -> (cf c, bf b)) gs))

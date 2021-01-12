@@ -3,7 +3,8 @@ module ExpectationsCompilerSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Analyzer hiding (spec)
 import           Language.Mulang.Analyzer.ExpectationsCompiler (compileExpectation)
-import           Language.Mulang.Ast
+import           Language.Mulang.Ast hiding (Equal, NotEqual)
+import           Language.Mulang.Ast.Operator
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Parsers.Java
@@ -282,13 +283,17 @@ spec = do
     run (java "class Foo extends Bar {}") "Foo" "Inherits:Bar" `shouldBe` True
     run (java "class Foo extends Bar {}") "Foo" "Inherits:Baz" `shouldBe` False
 
-  it "works with primitive operators in js" $ do
+  it "works with primitive operators usage in js" $ do
     run (js "x == 4") "*" "UsesEqual" `shouldBe` False
     run (js "x != 4") "*" "UsesEqual" `shouldBe` False
     run (js "x == 4") "*" "UsesSimilar" `shouldBe` True
     run (js "x != 4") "*" "UsesSimilar" `shouldBe` False
     run (js "x === 4") "*" "UsesEqual" `shouldBe` True
     run (js "x !== 4") "*" "UsesEqual" `shouldBe` False
+
+  it "works with primitive operators essence with ast" $ do
+    run (Primitive Equal)    "*" "IsEqual" `shouldBe` True
+    run (Primitive NotEqual) "*" "IsEqual" `shouldBe` False
 
   it "works with primitive operators in hs" $ do
     run (hs "x = x . y") "*" "UsesForwardComposition" `shouldBe` False

@@ -4,6 +4,7 @@ module AnalysisJsonSpec(spec) where
 
 import           Test.Hspec
 
+import qualified Data.Map.Strict as Map
 import           Data.Text (unpack, Text)
 import           Data.ByteString.Lazy.Char8 (pack, ByteString)
 
@@ -11,7 +12,7 @@ import           Language.Mulang.Analyzer.Analysis.Json ()
 import           Language.Mulang.Analyzer hiding (spec)
 import           Language.Mulang.Ast
 import           Language.Mulang.Ast.Operator (Operator(..))
-import           Language.Mulang.Transform.Normalizer (NormalizationOptions (..), defaultNormalizationOptions)
+import           Language.Mulang.Transform.Normalizer (NormalizationOptions (..), unnormalized)
 
 import           Data.Maybe (fromJust)
 import           Data.Aeson (decode)
@@ -102,6 +103,35 @@ spec = describe "AnalysisJson" $ do
 } |]
     let analysis = Analysis (CodeSample JavaScript "function foo(x, y) { return x + y; }")
                             (emptyAnalysisSpec { signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
+
+    run json `shouldBe` analysis
+
+  it "works with trasnform analysis" $ do
+    let json = [text|
+{
+   "sample" : {
+      "tag" : "CodeSample",
+      "language" : "JavaScript",
+      "content" : "plus(count([]), 1)"
+   },
+   "spec" : {
+      "transformationSpecs" : [
+        [
+          {"tag" : "Crop", "contents": "IsVariable:y"},
+          {"tag" : "RenameVariables"},
+          {"tag" : "Alias", "contents": { "count": "Size", "plus": "Plus" }}
+        ]
+      ]
+   }
+} |]
+    let analysis = Analysis (CodeSample JavaScript "plus(count([]), 1)")
+                            (emptyAnalysisSpec { transformationSpecs = Just [
+                              [
+                                Crop "IsVariable:y",
+                                RenameVariables,
+                                Alias (Map.fromList [("count",Size),("plus",Plus)])
+                              ]
+                            ]})
 
     run json `shouldBe` analysis
 
@@ -294,17 +324,16 @@ spec = describe "AnalysisJson" $ do
     "normalizationOptions": {
       "insertImplicitReturn": true
     },
-    "includeIntermediateLanguage": true
+    "includeOutputAst": true
   }
 } |]
     let analysis = Analysis (MulangSample (SimpleProcedure "foo" [VariablePattern "x"]
                                               (Application (Primitive Multiply) [MuNumber 2.0,Reference "x"])))
                             (emptyAnalysisSpec {
-                              normalizationOptions = Just (defaultNormalizationOptions {
+                              normalizationOptions = Just (unnormalized {
                                 insertImplicitReturn = True
                               }),
-                              includeIntermediateLanguage = Just True
+                              includeOutputAst = Just True
                             })
 
     run json `shouldBe` analysis
-
