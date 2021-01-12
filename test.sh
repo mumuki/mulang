@@ -2,7 +2,7 @@
 set -e
 
 echo "[Mulang] Building...."
-./build.sh
+./build.sh --fast
 
 pushd gem
 
