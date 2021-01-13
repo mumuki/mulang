@@ -51,7 +51,7 @@ instance FromJSON TransformationOperation
 instance FromJSON InterpreterOptions
 instance FromJSON Operator
 
-instance ToJSON AnalysisResult
+instance ToJSON a => ToJSON (GenericAnalysisResult a)
 instance ToJSON ExpectationResult
 
 instance ToJSON Expectation

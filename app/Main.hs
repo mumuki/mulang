@@ -2,9 +2,11 @@
 
 module Main where
 
-import Language.Mulang.Analyzer (analyse, analyseMany)
+import Language.Mulang.Ast (Expression)
+import Language.Mulang.Serializer (bracket, brace)
+import Language.Mulang.Analyzer (analyse, genericAnalyseMany)
 import Language.Mulang.Analyzer.Analysis.Json ()
-import Data.Aeson (eitherDecode, encode)
+import Data.Aeson (eitherDecode, encode, ToJSON)
 import System.Environment (getArgs)
 import Control.Fallible (orFail)
 
@@ -29,13 +31,14 @@ analyseIO = fmap  (JSS.pack . C8.unpack) . analyseJson . JSS.unpack
 
 analyseJson :: String -> IO ByteString
 analyseJson = fmap encode . analyse . decode . encodeUtf8 . T.pack
-  where
-    decode = orFail . eitherDecode
+   where decode = orFail . eitherDecode
 
 analyseJsons :: String -> IO ByteString
-analyseJsons = fmap encode . analyseMany . decode . encodeUtf8 . T.pack
-   where
-      decode = orFail . eitherDecode
+analyseJsons = genericAnalyseJsons id
+
+genericAnalyseJsons :: ToJSON a => (Expression -> a) -> String -> IO ByteString
+genericAnalyseJsons f = fmap encode . genericAnalyseMany f . decode . encodeUtf8 . T.pack
+   where decode = orFail . eitherDecode
 
 main :: IO ()
 main = do
@@ -48,19 +51,29 @@ main = do
     run :: [String] -> String ->  IO ByteString
     run ["-s"] body = analyseJson body
     run ["-S"] body = analyseJsons body
+    run ["-B"] body = genericAnalyseJsons bracket body
+    run ["-C"] body = genericAnalyseJsons brace   body
     run [body] _    = analyseJson body
     run  _     _    = error (intercalate "\n" [prettyVersion, usage])
 
     usage = unpack [text|
         Wrong usage.
 
-         #read from STDIN
+         # read from STDIN
          $ mulang -s
 
-         #read from STDIN a list of analyses
+         # read from STDIN a list of analyses
          $ mulang -S
 
-         #read from argument
+         # read from STDIN a list of analyses
+         # and produce asts results in bracket format
+         $ mulang -B
+
+         # read from STDIN a list of analyses
+         # and produce asts results in brace format
+         $ mulang -C
+
+         # read from argument
          $ mulang '{
              "sample" : {
                 "tag" : "CodeSample",

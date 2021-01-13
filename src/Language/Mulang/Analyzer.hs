@@ -1,6 +1,7 @@
 module Language.Mulang.Analyzer (
   analyse,
-  analyseMany,
+  genericAnalyse,
+  genericAnalyseMany,
   module Language.Mulang.Analyzer.Analysis) where
 
 import Language.Mulang
@@ -16,13 +17,18 @@ import Language.Mulang.Analyzer.Autocorrector  (autocorrect)
 import Language.Mulang.Analyzer.Transformer  (transformMany')
 import Data.Maybe (fromMaybe)
 
-
 --
 -- Analysis running
 --
 
-analyseMany :: [Analysis] -> IO [AnalysisResult]
-analyseMany = mapM analyse
+genericAnalyseMany :: (Expression -> a) -> [Analysis] -> IO [GenericAnalysisResult a]
+genericAnalyseMany f = mapM (genericAnalyse f)
+
+genericAnalyse :: (Expression -> a) -> Analysis -> IO (GenericAnalysisResult a)
+genericAnalyse f analysis = fmap serialize (analyse analysis)
+  where
+    serialize r@(AnalysisCompleted { transformedAsts = asts, outputAst = out }) = r { transformedAsts = fmap (map f) asts, outputAst = fmap f out }
+    serialize (AnalysisFailed m) = (AnalysisFailed m)
 
 analyse, analyse' :: Analysis -> IO AnalysisResult
 analyse = analyse' . autocorrect
