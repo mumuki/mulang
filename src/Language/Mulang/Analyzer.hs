@@ -50,10 +50,16 @@ analyseAst ast spec = do
                              (analyseSmells ast context (smellsSet spec))
                              (analyseSignatures ast (signatureAnalysisType spec))
                              testResults
-                             (analyzeIntermediateLanguage ast spec)
+                             (analyzeOutputAst ast spec)
+                             (analyzeOutputIdentifiers ast spec)
                              (transformMany' ast (transformationSpecs spec))
 
-analyzeIntermediateLanguage :: Expression -> AnalysisSpec -> Maybe Expression
-analyzeIntermediateLanguage ast spec
+analyzeOutputAst :: Expression -> AnalysisSpec -> Maybe Expression
+analyzeOutputAst ast spec
   | fromMaybe False (includeOutputAst spec) = Just ast
+  | otherwise = Nothing
+
+analyzeOutputIdentifiers :: Expression -> AnalysisSpec -> Maybe ([String], [String])
+analyzeOutputIdentifiers ast spec
+  | fromMaybe False (includeOutputIdentifiers spec) = Just (declaredIdentifiers ast, referencedIdentifiers ast)
   | otherwise = Nothing

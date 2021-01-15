@@ -86,6 +86,7 @@ data AnalysisSpec = AnalysisSpec {
   transformationSpecs :: Maybe [TransformationSpec],
   domainLanguage :: Maybe DomainLanguage,
   includeOutputAst :: Maybe Bool,
+  includeOutputIdentifiers :: Maybe Bool,
   originalLanguage :: Maybe Language,
   autocorrectionRules :: Maybe AutocorrectionRules,
   normalizationOptions :: Maybe NormalizationOptions
@@ -180,6 +181,7 @@ data GenericAnalysisResult a
       signatures :: [Code],
       testResults :: [TestResult],
       outputAst :: Maybe a,
+      outputIdentifiers :: Maybe ([String], [String]),
       transformedAsts :: Maybe [a] }
   | AnalysisFailed { reason :: String } deriving (Show, Eq, Generic)
 
@@ -215,6 +217,7 @@ emptyAnalysisSpec = AnalysisSpec {
     transformationSpecs = Nothing,
     domainLanguage = Nothing,
     includeOutputAst = Nothing,
+    includeOutputIdentifiers = Nothing,
     originalLanguage = Nothing,
     autocorrectionRules = Nothing,
     normalizationOptions = Nothing
@@ -242,7 +245,7 @@ testsAnalysis :: Fragment -> TestAnalysisType -> Analysis
 testsAnalysis code testAnalysisType = Analysis code (emptyAnalysisSpec { testAnalysisType = Just testAnalysisType })
 
 emptyCompletedAnalysisResult :: AnalysisResult
-emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing Nothing
+emptyCompletedAnalysisResult = AnalysisCompleted [] [] [] [] Nothing Nothing Nothing
 
 emptyDomainLanguage :: DomainLanguage
 emptyDomainLanguage = DomainLanguage Nothing Nothing Nothing Nothing
