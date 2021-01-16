@@ -35,18 +35,20 @@ muJSAST (JSAstStatement statement _)    = muJSStatement statement
 muJSAST (JSAstExpression expression _)  = muJSExpression expression
 muJSAST (JSAstLiteral expression _)     = muJSExpression expression
 
-
 muJSStatement:: JSStatement -> Expression
 muJSStatement (JSStatementBlock _ statements _ _)                           = compactMap muJSStatement statements
 --muJSStatement (JSConstant _ (JSCommaList JSExpression) _) -- ^const, decl, autosemi
 muJSStatement (JSDoWhile _ statement _ _ expression _ _)                    = While (muJSExpression expression) (muJSStatement statement)
+muJSStatement (JSForLetIn _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForIn VariablePattern id gen body
+muJSStatement (JSForIn _ _ id _ gen _ body)                                 = muForIn muJsVarPattern id gen body
+muJSStatement (JSForVarIn _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForIn muJsVarPattern id gen body
 muJSStatement (JSFor _ _ inits _ conds _ progs _ body)                      = muFor inits conds progs body
 muJSStatement (JSForVar _ _ _ inits _ conds _ progs _ body)                 = muFor inits conds progs body
 muJSStatement (JSForLet _ _ _ inits _ conds _ progs _ body)                 = muFor inits conds progs body
 muJSStatement (JSForConstOf _ _ _ (JSVarInitExpression id _) _ gen _ body)  = muForOf ConstantPattern id gen body
 muJSStatement (JSForLetOf _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForOf VariablePattern id gen body
-muJSStatement (JSForOf _ _ id _ gen _ body)                                 = muForOf (otherPattern "JSVar" . VariablePattern) id gen body
-muJSStatement (JSForVarOf _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForOf (otherPattern "JSVar" . VariablePattern) id gen body
+muJSStatement (JSForOf _ _ id _ gen _ body)                                 = muForOf muJsVarPattern id gen body
+muJSStatement (JSForVarOf _ _ _ (JSVarInitExpression id _) _ gen _ body)    = muForOf muJsVarPattern id gen body
 muJSStatement (JSFunction _ ident _ params _ body _)                        = muComputation ident params body
 muJSStatement (JSIf _ _ expression _ statement)                             = If (muJSExpression expression) (muJSStatement statement) None
 muJSStatement (JSIfElse _ _ expression _ ifStatement _ elseStatement)       = If (muJSExpression expression) (muJSStatement ifStatement) (muJSStatement elseStatement)
@@ -97,6 +99,8 @@ muJSPatternList = mapJSList muExpressionPattern
 
 muJSExpressionFromList = compact . muJSExpressionList
 
+muJsVarPattern = otherPattern "JSVar" . VariablePattern
+
 muFor inits conds progs body = (ForLoop
                                   (muJSExpressionFromList inits)
                                   (muJSExpressionFromList conds)
@@ -106,6 +110,7 @@ muFor inits conds progs body = (ForLoop
 muForOf kind (JSIdentifier _ id) generator body = (For
                                                 [Generator (kind id) (muJSExpression generator)]
                                                 (muJSStatement body))
+muForIn kind id generator body = other "JSForIn" $ muForOf kind id generator body
 
 muSwitch expression (def, cases) = Switch (muJSExpression expression) (map muCase cases) (headOrElse None . map muDefault $ def)
 
