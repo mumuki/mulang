@@ -87,7 +87,8 @@ allSmells = [
   "UsesFail",
   "UsesNamedSelfReference",
   "UsesUnificationOperator",
-  "JavaScript#UsesVarInsteadOfLet" ]
+  "JavaScript#UsesVarInsteadOfLet",
+  "JavaScript#UsesForInInsteadOfForOf" ]
 
 ---
 --- Instantiation
@@ -131,49 +132,50 @@ evalSmellInstance :: SmellsContext -> Expression -> SmellInstance -> [Expectatio
 evalSmellInstance context expression smellInstance =  map (expectationFor smellInstance) . detectionFor smellInstance context $ expression
 
 detectionFor :: SmellInstance -> Detection
-detectionFor ("DiscardsExceptions", Nothing)              = simple discardsExceptions
-detectionFor ("DoesConsolePrint", Nothing)                = simple doesConsolePrint
-detectionFor ("DoesNilTest", Nothing)                     = simple doesNilTest
-detectionFor ("DoesNullTest", Nothing)                    = simple doesNilTest
-detectionFor ("DoesTypeTest", Nothing)                    = simple doesTypeTest
-detectionFor ("HasAssignmentCondition", Nothing)          = simple hasAssignmentCondition
-detectionFor ("HasAssignmentReturn", Nothing)             = simple hasAssignmentReturn
-detectionFor ("HasCodeDuplication", Nothing)              = unsupported
-detectionFor ("HasDeclarationTypos", Just target)         = raw (detectDeclarationTypos target)
-detectionFor ("HasEmptyIfBranches", Nothing)              = simple hasEmptyIfBranches
-detectionFor ("HasEmptyRepeat", Nothing)                  = simple hasEmptyRepeat
-detectionFor ("HasEqualIfBranches", Nothing)              = simple hasEqualIfBranches
-detectionFor ("HasLongParameterList", Nothing)            = simple hasLongParameterList
-detectionFor ("HasMisspelledBindings", Nothing)           = withLanguage hasMisspelledIdentifiers
-detectionFor ("HasMisspelledIdentifiers", Nothing)        = withLanguage hasMisspelledIdentifiers
-detectionFor ("HasRedundantBooleanComparison", Nothing)   = simple hasRedundantBooleanComparison
-detectionFor ("HasRedundantGuards", Nothing)              = simple hasRedundantGuards
-detectionFor ("HasRedundantIf", Nothing)                  = simple hasRedundantIf
-detectionFor ("HasRedundantLambda", Nothing)              = simple hasRedundantLambda
-detectionFor ("HasRedundantLocalVariableReturn", Nothing) = simple hasRedundantLocalVariableReturn
-detectionFor ("HasRedundantParameter", Nothing)           = simple hasRedundantParameter
-detectionFor ("HasRedundantReduction", Nothing)           = simple hasRedundantReduction
-detectionFor ("HasRedundantRepeat", Nothing)              = simple hasRedundantRepeat
-detectionFor ("HasTooManyMethods", Nothing)               = simple hasTooManyMethods
-detectionFor ("HasTooShortBindings", Nothing)             = withLanguage hasTooShortIdentifiers
-detectionFor ("HasTooShortIdentifiers", Nothing)          = withLanguage hasTooShortIdentifiers
-detectionFor ("HasUnreachableCode", Nothing)              = simple hasUnreachableCode
-detectionFor ("HasUsageTypos", Just target)               = raw (detectUsageTypos target)
-detectionFor ("HasWrongCaseBinding", Nothing)             = withLanguage hasWrongCaseIdentifiers
-detectionFor ("HasWrongCaseIdentifiers", Nothing)         = withLanguage hasWrongCaseIdentifiers
-detectionFor ("IsLongCode", Nothing)                      = unsupported
-detectionFor ("OverridesEqualOrHashButNotBoth", Nothing)  = simple overridesEqualOrHashButNotBoth
-detectionFor ("ReturnsNil", Nothing)                      = simple returnsNil
-detectionFor ("ReturnsNull", Nothing)                     = simple returnsNil
-detectionFor ("ShouldInvertIfCondition", Nothing)         = simple shouldInvertIfCondition
-detectionFor ("ShouldUseOtherwise", Nothing)              = simple shouldUseOtherwise
-detectionFor ("ShouldUseStrictComparators", Nothing)      = simple shouldUseStrictComparators
-detectionFor ("UsesCut", Nothing)                         = simple usesCut
-detectionFor ("UsesFail", Nothing)                        = simple usesFail
-detectionFor ("UsesNamedSelfReference", Nothing)          = simple usesNamedSelfReference
-detectionFor ("UsesUnificationOperator", Nothing)         = simple usesUnificationOperator
-detectionFor ("JavaScript#UsesVarInsteadOfLet", Nothing)  = simple usesVarInsteadOfLet
-detectionFor _                                            = unsupported
+detectionFor ("DiscardsExceptions", Nothing)                  = simple discardsExceptions
+detectionFor ("DoesConsolePrint", Nothing)                    = simple doesConsolePrint
+detectionFor ("DoesNilTest", Nothing)                         = simple doesNilTest
+detectionFor ("DoesNullTest", Nothing)                        = simple doesNilTest
+detectionFor ("DoesTypeTest", Nothing)                        = simple doesTypeTest
+detectionFor ("HasAssignmentCondition", Nothing)              = simple hasAssignmentCondition
+detectionFor ("HasAssignmentReturn", Nothing)                 = simple hasAssignmentReturn
+detectionFor ("HasCodeDuplication", Nothing)                  = unsupported
+detectionFor ("HasDeclarationTypos", Just target)             = raw (detectDeclarationTypos target)
+detectionFor ("HasEmptyIfBranches", Nothing)                  = simple hasEmptyIfBranches
+detectionFor ("HasEmptyRepeat", Nothing)                      = simple hasEmptyRepeat
+detectionFor ("HasEqualIfBranches", Nothing)                  = simple hasEqualIfBranches
+detectionFor ("HasLongParameterList", Nothing)                = simple hasLongParameterList
+detectionFor ("HasMisspelledBindings", Nothing)               = withLanguage hasMisspelledIdentifiers
+detectionFor ("HasMisspelledIdentifiers", Nothing)            = withLanguage hasMisspelledIdentifiers
+detectionFor ("HasRedundantBooleanComparison", Nothing)       = simple hasRedundantBooleanComparison
+detectionFor ("HasRedundantGuards", Nothing)                  = simple hasRedundantGuards
+detectionFor ("HasRedundantIf", Nothing)                      = simple hasRedundantIf
+detectionFor ("HasRedundantLambda", Nothing)                  = simple hasRedundantLambda
+detectionFor ("HasRedundantLocalVariableReturn", Nothing)     = simple hasRedundantLocalVariableReturn
+detectionFor ("HasRedundantParameter", Nothing)               = simple hasRedundantParameter
+detectionFor ("HasRedundantReduction", Nothing)               = simple hasRedundantReduction
+detectionFor ("HasRedundantRepeat", Nothing)                  = simple hasRedundantRepeat
+detectionFor ("HasTooManyMethods", Nothing)                   = simple hasTooManyMethods
+detectionFor ("HasTooShortBindings", Nothing)                 = withLanguage hasTooShortIdentifiers
+detectionFor ("HasTooShortIdentifiers", Nothing)              = withLanguage hasTooShortIdentifiers
+detectionFor ("HasUnreachableCode", Nothing)                  = simple hasUnreachableCode
+detectionFor ("HasUsageTypos", Just target)                   = raw (detectUsageTypos target)
+detectionFor ("HasWrongCaseBinding", Nothing)                 = withLanguage hasWrongCaseIdentifiers
+detectionFor ("HasWrongCaseIdentifiers", Nothing)             = withLanguage hasWrongCaseIdentifiers
+detectionFor ("IsLongCode", Nothing)                          = unsupported
+detectionFor ("OverridesEqualOrHashButNotBoth", Nothing)      = simple overridesEqualOrHashButNotBoth
+detectionFor ("ReturnsNil", Nothing)                          = simple returnsNil
+detectionFor ("ReturnsNull", Nothing)                         = simple returnsNil
+detectionFor ("ShouldInvertIfCondition", Nothing)             = simple shouldInvertIfCondition
+detectionFor ("ShouldUseOtherwise", Nothing)                  = simple shouldUseOtherwise
+detectionFor ("ShouldUseStrictComparators", Nothing)          = simple shouldUseStrictComparators
+detectionFor ("UsesCut", Nothing)                             = simple usesCut
+detectionFor ("UsesFail", Nothing)                            = simple usesFail
+detectionFor ("UsesNamedSelfReference", Nothing)              = simple usesNamedSelfReference
+detectionFor ("UsesUnificationOperator", Nothing)             = simple usesUnificationOperator
+detectionFor ("JavaScript#UsesVarInsteadOfLet", Nothing)      = simple usesVarInsteadOfLet
+detectionFor ("JavaScript#UsesForInInsteadOfForOf", Nothing)  = simple usesForInInsteadOfForOf
+detectionFor _                                                = unsupported
 
 unsupported :: Detection
 unsupported _ _ = []
