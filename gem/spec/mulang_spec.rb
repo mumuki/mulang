@@ -150,6 +150,9 @@ describe Mulang::Code do
     end
     let(:code) { Mulang::Code.external(input) }
 
+    it { expect(code.ast).to eq input }
+    it { expect(code.ast serialization: :bracket).to eq "[Procedure[x][Equation[UnguardedBody[MuNumber[1.0]]]]]" }
+
     it do
       expect(code.sample).to eq tag: 'MulangSample', ast: input
     end
