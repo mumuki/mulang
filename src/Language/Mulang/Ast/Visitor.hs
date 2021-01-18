@@ -53,10 +53,8 @@ extractTerminal (Record _)          = True
 extractTerminal (Reference _)       = True
 extractTerminal (TypeAlias _ _)     = True
 extractTerminal (TypeSignature _ _) = True
-extractTerminal Equal               = True
 extractTerminal MuNil               = True
 extractTerminal None                = True
-extractTerminal NotEqual            = True
 extractTerminal Self                = True
 extractTerminal _                   = False
 
@@ -121,9 +119,7 @@ pattern SingleEquationsList es e <- (extractSingleEquationsList -> Just (es, e))
 
 extractSingleEquationsList :: Expression -> Maybe ([Equation],
                                                    [Equation] -> Expression)
-extractSingleEquationsList (EqualMethod eqs)       = Just (eqs, (EqualMethod))
 extractSingleEquationsList (Function v eqs)        = Just (eqs, (Function v))
-extractSingleEquationsList (HashMethod eqs)        = Just (eqs, (HashMethod))
 extractSingleEquationsList (Method v eqs)          = Just (eqs, (Method v))
 extractSingleEquationsList (PrimitiveMethod v eqs) = Just (eqs, (PrimitiveMethod v))
 extractSingleEquationsList (Procedure v eqs)       = Just (eqs, (Procedure v))

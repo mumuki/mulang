@@ -111,8 +111,6 @@ data Expression
     | Procedure Identifier SubroutineBody
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
     | Method Identifier SubroutineBody
-    | EqualMethod SubroutineBody -- deprecated
-    | HashMethod SubroutineBody -- deprecated
     | PrimitiveMethod Operator SubroutineBody
     | Variable Identifier Expression
     | Constant Identifier Expression
@@ -190,8 +188,6 @@ data Expression
     -- ^ Generic sequence of statements
     | Other (Maybe Code) (Maybe Expression)
     -- ^ Unrecognized expression, with optional description and body
-    | Equal -- ^ deprecated
-    | NotEqual -- ^ deprecated
     | Arrow Expression Expression
     -- ^ Generic arrow - AKA pair or entry - that is typically used to build dictionaries.
     -- It corresponds to ruby's, perl's and php's `=>` operator, or ruby's and javascript's `:` operator
