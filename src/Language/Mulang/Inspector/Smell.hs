@@ -72,8 +72,6 @@ isLongCode = containsExpression f
 compares :: (Expression -> Bool) -> Inspection
 compares f = containsExpression (any f.comparisonOperands)
 
-comparisonOperands (Call Equal                     [a1, a2])   = [a1, a2] -- deprecated
-comparisonOperands (Call NotEqual                  [a1, a2])   = [a1, a2] -- deprecated
 comparisonOperands (Call (Primitive O.Like)        [a1, a2])   = [a1, a2]
 comparisonOperands (Call (Primitive O.NotLike)     [a1, a2])   = [a1, a2]
 comparisonOperands _                                           = []
@@ -186,17 +184,13 @@ overridesEqualOrHashButNotBoth :: Inspection
 overridesEqualOrHashButNotBoth = containsExpression f
   where f (Sequence expressions) = (any isEqual expressions) /= (any isHash expressions)
         f (Class _ _ (PrimitiveMethod O.Like     _)) = True
-        f (Class _ _ (EqualMethod _))                = True
         f (Class _ _ (PrimitiveMethod O.Hash _))     = True
-        f (Class _ _ (HashMethod _))                 = True
         f _ = False
 
         isEqual (PrimitiveMethod O.Like     _) = True
-        isEqual (EqualMethod _)                = True -- deprecated
         isEqual _ = False
 
         isHash (PrimitiveMethod O.Hash _) = True
-        isHash (HashMethod _)             = True -- deprecated
         isHash _ = False
 
 shouldInvertIfCondition :: Inspection
