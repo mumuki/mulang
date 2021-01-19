@@ -3,11 +3,16 @@ require "spec_helper"
 describe Mulang::Code do
   context 'when language is javascript' do
     let(:code) { Mulang::Code.native('JavaScript', 'let x = 1') }
+    let(:code_with_function) { Mulang::Code.native('JavaScript', 'let x = 1; function m(a, b) { return a + b + x }') }
+
+    it { expect(code_with_function.identifiers).to eq [["x", "m"], ["a", "b", "x"]] }
+
 
     it { expect(code.ast).to eq "tag"=>"Variable", "contents"=>["x", {"tag"=>"MuNumber", "contents"=>1}] }
     it { expect(code.ast serialization: :bracket).to eq "[Variable[x][MuNumber[1.0]]]" }
     it { expect(code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }). to eq 'tag'=>'AnalysisCompleted',
                                                                                       'outputAst'=>nil,
+                                                                                      'outputIdentifiers' => nil,
                                                                                       'transformedAsts' => nil,
                                                                                       'signatures'=>[],
                                                                                       'smells'=>[],
@@ -157,6 +162,7 @@ describe Mulang::Code do
                                                                                       'contents'=>['x', [[[], {
                                                                                         'tag'=>'UnguardedBody',
                                                                                         'contents'=>{'tag'=>'Return', 'contents'=>{'tag'=>'MuNumber', 'contents'=>1}}}]]]},
+                                                                                    'outputIdentifiers' => nil,
                                                                                     'transformedAsts' => nil,
                                                                                     'signatures' => [],
                                                                                     'smells' => [],
@@ -192,6 +198,7 @@ describe Mulang::Code do
                                                                                         'contents'=>['x', [[[], {
                                                                                           'tag'=>'UnguardedBody',
                                                                                           'contents'=>{'tag'=>'Return', 'contents'=>{'tag'=>'MuNumber', 'contents'=>1}}}]]]},
+                                                                                      'outputIdentifiers' => nil,
                                                                                       'transformedAsts' => nil,
                                                                                       'signatures' => [],
                                                                                       'smells' => [],

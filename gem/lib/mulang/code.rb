@@ -6,6 +6,10 @@ module Mulang
       @content  = content
     end
 
+    def identifiers(**options)
+      @language.identifiers @content, **options
+    end
+
     def ast(**options)
       @language.ast @content, **options
     end
