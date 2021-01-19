@@ -1,5 +1,43 @@
 # Changelog
 
+## [v6.0.0](https://github.com/mumuki/mulang/tree/v6.0.0) (2021-01-19)
+
+[Full Changelog](https://github.com/mumuki/mulang/compare/v5.3.0...v6.0.0)
+
+**Closed issues:**
+
+- Code smell for not using self [\#296](https://github.com/mumuki/mulang/issues/296)
+- Expectations translations should use \<code\> instead of \<strong\> tags  [\#268](https://github.com/mumuki/mulang/issues/268)
+- Add support for direct attribute access [\#203](https://github.com/mumuki/mulang/issues/203)
+
+**Merged pull requests:**
+
+- Removing deprecated AST elements [\#313](https://github.com/mumuki/mulang/pull/313) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature identifiers analysis [\#311](https://github.com/mumuki/mulang/pull/311) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature scoped replacer [\#310](https://github.com/mumuki/mulang/pull/310) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature ast serialization [\#309](https://github.com/mumuki/mulang/pull/309) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature interpreter dicts and list improved support [\#308](https://github.com/mumuki/mulang/pull/308) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature customizable normalization [\#306](https://github.com/mumuki/mulang/pull/306) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature batch mode [\#305](https://github.com/mumuki/mulang/pull/305) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature generalized normalization [\#304](https://github.com/mumuki/mulang/pull/304) ([flbulgarelli](https://github.com/flbulgarelli))
+- Fix js decimal parsing error [\#303](https://github.com/mumuki/mulang/pull/303) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature renamer [\#302](https://github.com/mumuki/mulang/pull/302) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature fix broken js ast semantics [\#301](https://github.com/mumuki/mulang/pull/301) ([flbulgarelli](https://github.com/flbulgarelli))
+- Setup Github Actions [\#299](https://github.com/mumuki/mulang/pull/299) ([julian-berbel](https://github.com/julian-berbel))
+- Feature return normalization [\#298](https://github.com/mumuki/mulang/pull/298) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature uses named self reference smell [\#297](https://github.com/mumuki/mulang/pull/297) ([julian-berbel](https://github.com/julian-berbel))
+- Feature strict operators [\#294](https://github.com/mumuki/mulang/pull/294) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature tokens code generation [\#292](https://github.com/mumuki/mulang/pull/292) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature inspection family [\#291](https://github.com/mumuki/mulang/pull/291) ([flbulgarelli](https://github.com/flbulgarelli))
+- Improve return support [\#290](https://github.com/mumuki/mulang/pull/290) ([flbulgarelli](https://github.com/flbulgarelli))
+- Removing duplicates in smells [\#289](https://github.com/mumuki/mulang/pull/289) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature interpreter refactor [\#287](https://github.com/mumuki/mulang/pull/287) ([flbulgarelli](https://github.com/flbulgarelli))
+- Adding operators for collections and numbers [\#286](https://github.com/mumuki/mulang/pull/286) ([flbulgarelli](https://github.com/flbulgarelli))
+- Updating rake [\#285](https://github.com/mumuki/mulang/pull/285) ([flbulgarelli](https://github.com/flbulgarelli))
+- Issue \#268 use code instead of strong [\#284](https://github.com/mumuki/mulang/pull/284) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature useless if [\#282](https://github.com/mumuki/mulang/pull/282) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature field access [\#274](https://github.com/mumuki/mulang/pull/274) ([flbulgarelli](https://github.com/flbulgarelli))
+
 ## [v5.3.0](https://github.com/mumuki/mulang/tree/v5.3.0) (2020-04-20)
 
 [Full Changelog](https://github.com/mumuki/mulang/compare/v5.2.0...v5.3.0)
