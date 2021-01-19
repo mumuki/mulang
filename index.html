@@ -204,13 +204,13 @@ The javascript version is also available as <a href="https://rubygems.org/gems/m
 <p>Better than explaining what Mulang is, let's see what it can do for you.</p>
 <h3 id="inspections">Inspections</h3>
 <p>Let's suppose we have the following JS code...</p>
-<pre><code class="javascript">var aPlace = buenosAires;
-var aBird = {position: aPlace, weight: 20};
+<pre><code class="javascript">let aPlace = buenosAires;
+let aBird = {position: aPlace, weight: 20};
 </code></pre>
 
 <p>...and we want to recognize some code patterns on it. We will first load the expression into Mulang:</p>
 <pre><code class="ruby">&gt; require &quot;mulang&quot;
-&gt; code = Mulang::Code.native &quot;JavaScript&quot;, &quot;var aPlace = buenosAires; var aBird = {position: aPlace, weight: 20};&quot;
+&gt; code = Mulang::Code.native &quot;JavaScript&quot;, &quot;let aPlace = buenosAires; let aBird = {position: aPlace, weight: 20};&quot;
 </code></pre>
 
 <p>Now we want to know if the code expression <em>uses</em> - that is, contains any reference to - a given <em>identifier</em>. Such identifier could be a variable, function, or anything that has a name:</p>
@@ -414,5 +414,5 @@ var aBird = {position: aPlace, weight: 20};
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2020-06-25 20:55:12
+Build Date UTC : 2021-01-19 22:00:54
 -->

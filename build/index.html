@@ -174,7 +174,11 @@
 <ol>
 <li>Install stack: <code>wget -qO- https://get.haskellstack.org/ | sh</code></li>
 <li>Go to the mulang project directory and setup it: <code>stack setup</code></li>
-<li>Build the project: <code>./build.sh</code></li>
+<li>Build the project:<ol>
+<li>If you need a production ready build, run <code>./build.sh</code></li>
+<li>If you just need a quick-to-compile development version, run <code>./build.sh --fast</code></li>
+</ol>
+</li>
 </ol>
 <h2 id="installing-and-creating-an-executable">Installing and creating an executable</h2>
 <pre><code class="bash"># This will generate a `mulang` executable in the folder `~/.local/bin`.

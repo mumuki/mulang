@@ -12723,7 +12723,7 @@ mumuki.load(function () {
   function getExplorerHeader(canBrowse) {
     return $([
       '<header>',
-          canBrowse ? '<i class="fa fa-fw fa-arrow-left"></i>' : '',
+          canBrowse ? '<i class="fas fa-fw fa-arrow-left"></i>' : '',
       '  <input class="mu-file-browser-path" type="text" readonly>',
       '</header>'
     ].join(''))
@@ -12877,7 +12877,7 @@ mumuki.load(function () {
   }
 
   function keyIconFor(column, field) {
-    return !!column[field] ? '<i class="fa fa-fw fa-key mu-erd-' + field + '"></i>' : '';
+    return !!column[field] ? '<i class="fas fa-fw fa-key mu-erd-' + field + '"></i>' : '';
   }
 
   function generateEntityColumns(entity, index) {
@@ -13036,7 +13036,7 @@ mumuki.load(function () {
       '      <span>', title, '<span>',
       '    </li>',
       '    <li class="mu-browser-tab mu-browser-new-tab">',
-      '      <i class="fa fa-fw fa-plus"></i>',
+      '      <i class="fas fa-fw fa-plus"></i>',
       '    </li>',
       '  </ul>',
       '  <div class="mu-browser-bar">',
@@ -13146,7 +13146,7 @@ mumuki.load(function () {
   }
 
   function keyIconFor(column, field) {
-    return !!column[field] ? '<i class="fa fa-fw fa-key mu-sql-table-' + field + '"></i>' : '';
+    return !!column[field] ? '<i class="fas fa-fw fa-key mu-sql-table-' + field + '"></i>' : '';
   }
 
   $.fn.renderSqlTable = function () {
@@ -13174,7 +13174,7 @@ mumuki.load(function () {
       var text = $th.text();
       $th.empty();
       if ($th.children('i').length == 0) {
-        $th.prepend('<i class="fa fa-fw fa-key ' + $th.attr('class') + '"></i>');
+        $th.prepend('<i class="fas fa-fw fa-key ' + $th.attr('class') + '"></i>');
       }
       $th.append('<span>' + text + '</span>');
     });
@@ -13288,7 +13288,7 @@ mumuki.load(function () {
         $pre.children('span').remove();
         var $clipboard = $('<span>', {
           class: 'mu-clipboard',
-          html: '<i class="fa fa-fw fa-clipboard"></i> <span>' + getCopiedText().copy + '</span>',
+          html: '<i class="far fa-fw fa-copy"></i> <span>' + getCopiedText().copy + '</span>',
           click: function () {
             copyToClipboard($code.text());
             pasteInEditor($code.text());

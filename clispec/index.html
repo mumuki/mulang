@@ -161,8 +161,8 @@
                 <li class="third-level"><a href="#with-expressiveness-smells">With expressiveness smells</a></li>
                 <li class="third-level"><a href="#with-typos-smells">With typos smells</a></li>
                 <li class="third-level"><a href="#with-intermediate-language-generation">With intermediate language generation</a></li>
-            <li class="second-level"><a href="#with-test-running">With test running</a></li>
-                
+                <li class="third-level"><a href="#with-normalization-options">With normalization options</a></li>
+                <li class="third-level"><a href="#with-test-running">With test running</a></li>
             <li class="second-level"><a href="#code-execution">Code Execution</a></li>
                 
                 <li class="third-level"><a href="#examples_1">Examples</a></li>
@@ -560,7 +560,7 @@ by the <code>domainLanguage</code> setting, which you <em>can</em> configure:</p
 }
 ' | json_pp
 {
-   &quot;intermediateLanguage&quot; : null,
+   &quot;outputAst&quot; : null,
    &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
    &quot;expectationResults&quot; : [
       {
@@ -591,13 +591,13 @@ by the <code>domainLanguage</code> setting, which you <em>can</em> configure:</p
       &quot;content&quot; : &quot;function foo(x, y) { return null; }&quot;
    },
    &quot;spec&quot; : {
-      &quot;includeIntermediateLanguage&quot; : true
+      &quot;includeOutputAst&quot; : true
    }
 }
 ' | json_pp
 {
    &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
-   &quot;intermediateLanguage&quot; : {
+   &quot;outputAst&quot; : {
       &quot;tag&quot; : &quot;Function&quot;,
       &quot;contents&quot; : [
          &quot;foo&quot;,
@@ -627,10 +627,111 @@ by the <code>domainLanguage</code> setting, which you <em>can</em> configure:</p
       ]
    }
 }
-
 </code></pre>
 
-<h2 id="with-test-running">With test running</h2>
+<h3 id="with-normalization-options">With normalization options</h3>
+<pre><code class="bash">$ mulang '
+{
+  &quot;sample&quot;: {
+    &quot;tag&quot;: &quot;MulangSample&quot;,
+    &quot;normalizationOptions&quot;: {
+      &quot;insertImplicitReturn&quot;: true
+    },
+    &quot;ast&quot;: {
+      &quot;tag&quot;: &quot;Procedure&quot;,
+      &quot;contents&quot;: [
+        &quot;foo&quot;,
+        [
+          [
+            [
+              {
+                &quot;tag&quot;: &quot;VariablePattern&quot;,
+                &quot;contents&quot;: &quot;x&quot;
+              }
+            ],
+            {
+              &quot;tag&quot;: &quot;UnguardedBody&quot;,
+              &quot;contents&quot;: {
+                &quot;tag&quot;: &quot;Application&quot;,
+                &quot;contents&quot;: [
+                  {
+                    &quot;tag&quot;: &quot;Primitive&quot;,
+                    &quot;contents&quot;: &quot;Multiply&quot;
+                  },
+                  [
+                    {
+                      &quot;tag&quot;: &quot;MuNumber&quot;,
+                      &quot;contents&quot;: 2
+                    },
+                    {
+                      &quot;tag&quot;: &quot;Reference&quot;,
+                      &quot;contents&quot;: &quot;x&quot;
+                    }
+                  ]
+                ]
+              }
+            }
+          ]
+        ]
+      ]
+    }
+  },
+  &quot;spec&quot;: {
+    &quot;includeOutputAst&quot;: true
+  }
+}
+' | json_pp
+{
+   &quot;tag&quot; : &quot;AnalysisCompleted&quot;,
+   &quot;signatures&quot; : [],
+   &quot;smells&quot; : [],
+   &quot;expectationResults&quot; : [],
+   &quot;testResults&quot; : [],
+   &quot;outputAst&quot; : {
+      &quot;tag&quot; : &quot;Procedure&quot;,
+      &quot;contents&quot; : [
+         &quot;foo&quot;,
+         [
+            [
+               [
+                  {
+                     &quot;contents&quot; : &quot;x&quot;,
+                     &quot;tag&quot; : &quot;VariablePattern&quot;
+                  }
+               ],
+               {
+                  &quot;contents&quot; : {
+                     &quot;tag&quot; : &quot;Return&quot;,
+                     &quot;contents&quot; : {
+                        &quot;contents&quot; : [
+                           {
+                              &quot;tag&quot; : &quot;Primitive&quot;,
+                              &quot;contents&quot; : &quot;Multiply&quot;
+                           },
+                           [
+                              {
+                                 &quot;tag&quot; : &quot;MuNumber&quot;,
+                                 &quot;contents&quot; : 2
+                              },
+                              {
+                                 &quot;contents&quot; : &quot;x&quot;,
+                                 &quot;tag&quot; : &quot;Reference&quot;
+                              }
+                           ]
+                        ],
+                        &quot;tag&quot; : &quot;Application&quot;
+                     }
+                  },
+                  &quot;tag&quot; : &quot;UnguardedBody&quot;
+               }
+            ]
+         ]
+      ]
+   }
+}
+</code></pre>
+
+<h3 id="with-test-running">With test running</h3>
 <pre><code class="bash">mulang '{
 &quot;sample&quot; : {
    &quot;tag&quot; : &quot;CodeSample&quot;,

@@ -205,7 +205,56 @@ const examples = {
        "content" : "function foo(x, y) { return null; }"
     },
     "spec" : {
-       "includeIntermediateLanguage" : true
+       "includeOutputAst" : true
+    }
+  },
+  "normalization": {
+    "sample": {
+      "tag": "MulangSample",
+      "normalizationOptions": {
+        "insertImplicitReturn": true
+      },
+      "ast": {
+        "tag": "Procedure",
+        "contents": [
+          "foo",
+          [
+            [
+              [
+                {
+                  "tag": "VariablePattern",
+                  "contents": "x"
+                }
+              ],
+              {
+                "tag": "UnguardedBody",
+                "contents": {
+                  "tag": "Application",
+                  "contents": [
+                    {
+                      "tag": "Primitive",
+                      "contents": "Multiply"
+                    },
+                    [
+                      {
+                        "tag": "MuNumber",
+                        "contents": 2
+                      },
+                      {
+                        "tag": "Reference",
+                        "contents": "x"
+                      }
+                    ]
+                  ]
+                }
+              }
+            ]
+          ]
+        ]
+      }
+    },
+    "spec": {
+      "includeOutputAst": true
     }
   },
   "testRunning" : {
