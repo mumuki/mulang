@@ -82,7 +82,9 @@ describe("mulang", () => {
           "result": true
         },
       ],
+      "outputIdentifiers": null,
       "outputAst": null,
+      "transformedAsts": null,
       "signatures": [],
       "smells": [],
       "tag": "AnalysisCompleted",
@@ -104,6 +106,7 @@ describe("mulang", () => {
       }
     })).be.eql({
       "expectationResults": [],
+      "outputIdentifiers": null,
       "outputAst": {
         "contents": [
           "foo",
@@ -134,6 +137,7 @@ describe("mulang", () => {
         ],
         "tag": "Function"
       },
+      "transformedAsts": null,
       "signatures": [],
       "smells": [],
       "tag": "AnalysisCompleted",
