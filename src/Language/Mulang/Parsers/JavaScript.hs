@@ -1,6 +1,6 @@
 module Language.Mulang.Parsers.JavaScript (js, js', parseJavaScript) where
 
-import Language.Mulang.Ast hiding (Equal, NotEqual)
+import Language.Mulang.Ast
 import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Builder (compact, compactMap)
 import Language.Mulang.Parsers

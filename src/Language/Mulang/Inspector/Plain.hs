@@ -5,7 +5,7 @@ module Language.Mulang.Inspector.Plain (
   isClass,
   isDeclaration) where
 
-import Language.Mulang.Ast hiding (Equal, NotEqual)
+import Language.Mulang.Ast
 import Language.Mulang.Inspector.Bound (BoundInspection)
 
 isLValue :: BoundInspection

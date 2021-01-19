@@ -70,7 +70,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
   where
     subExpressions :: Generator Expression
     --
-    subExpressions (Assert _ a)                           = [] -- FIXME
+    subExpressions (Assert _ _)                           = [] -- FIXME
     subExpressions (For stmts a)                          = statementsExpressions stmts ++ [a]
     subExpressions (ForLoop i c p s)                      = [i, c, p, s]
     subExpressions (Lambda _ e)                           = [e]

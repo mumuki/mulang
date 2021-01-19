@@ -11,7 +11,7 @@ module Language.Mulang.Inspector.Functional (
 
 import Data.Function.Extra (orElse)
 
-import Language.Mulang.Ast hiding (Equal, NotEqual)
+import Language.Mulang.Ast
 import Language.Mulang.Ast.Operator (Operator (..))
 import Language.Mulang.Inspector.Primitive (Inspection, containsExpression, containsBody)
 import Language.Mulang.Inspector.Generic (usesIf, usesYield)

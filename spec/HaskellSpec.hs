@@ -1,7 +1,7 @@
 module HaskellSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang.Ast hiding (Equal, NotEqual)
+import           Language.Mulang.Ast
 import           Language.Mulang.Ast.Operator
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Operators.Haskell

@@ -1,7 +1,7 @@
 module CounterSpec (spec) where
 
 import           Test.Hspec
-import           Language.Mulang hiding (Equal, NotEqual)
+import           Language.Mulang
 import           Language.Mulang.Parsers.JavaScript (js)
 
 spec :: Spec

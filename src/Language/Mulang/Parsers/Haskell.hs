@@ -1,6 +1,6 @@
 module Language.Mulang.Parsers.Haskell (hs, parseHaskell) where
 
-import Language.Mulang.Ast hiding (Equal, NotEqual)
+import Language.Mulang.Ast
 import Language.Mulang.Operators.Haskell (haskellTokensTable)
 import Language.Mulang.Operators (parseOperator)
 import Language.Mulang.Builder (compact)
