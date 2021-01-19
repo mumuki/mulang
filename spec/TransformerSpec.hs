@@ -36,6 +36,44 @@ spec = do
 
       transform ast [Replace "IsVariable" None] `shouldBe` Sequence [None, None]
 
+
+    it "transform global scope" $ do
+      let ast = (Sequence [
+                    Variable "x" (MuNumber 5),
+                    Variable "y" (MuNumber 5),
+                    SimpleFunction "m" [] (Sequence [ Variable "x" (MuNumber 5), Return (Reference "x")])])
+
+      transform ast [ReplaceAt GlobalScope "IsVariable:x" None] `shouldBe` (
+                Sequence [
+                    None,
+                    Variable "y" (MuNumber 5),
+                    SimpleFunction "m" [] (Sequence [ Variable "x" (MuNumber 5), Return (Reference "x")])])
+
+      transform ast [ReplaceAt GlobalScope "IsDeclaration:x" None] `shouldBe` (
+                Sequence [
+                    None,
+                    Variable "y" (MuNumber 5),
+                    SimpleFunction "m" [] (Sequence [ Variable "x" (MuNumber 5), Return (Reference "x")])])
+
+      transform ast [ReplaceAt GlobalScope "IsVariable" None] `shouldBe` (
+                Sequence [
+                    None,
+                    None,
+                    SimpleFunction "m" [] (Sequence [ Variable "x" (MuNumber 5), Return (Reference "x")])])
+
+    it "transform local scope" $ do
+      let ast = (Sequence [
+                    Variable "x" (MuNumber 5),
+                    Variable "y" (MuNumber 5),
+                    SimpleFunction "m" [] (Sequence [ Variable "x" (MuNumber 5), Return (Reference "x")])])
+
+      transform ast [ReplaceAt LocalScope "IsVariable:x" None] `shouldBe` (
+                Sequence [
+                    Variable "x" (MuNumber 5),
+                    Variable "y" (MuNumber 5),
+                    SimpleFunction "m" [] (Sequence [None, Return (Reference "x")])])
+
+
     it "transform with crop" $ do
       transform (Sequence [
                     Variable "x" (MuNumber 5),
