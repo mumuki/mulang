@@ -1,4 +1,6 @@
 {
+{-# LANGUAGE FlexibleContexts #-}
+
 module Language.Mulang.Edl.Parser (parseExpectations, parseQuery) where
 
 import           Language.Mulang.Edl.Expectation

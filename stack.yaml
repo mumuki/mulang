@@ -1,10 +1,9 @@
-resolver: lts-7.24
+resolver: lts-12.13
 packages:
 - '.'
 extra-deps:
 # Using newest aeson, with no contents in tagged
 # unions with nullary constructors
-- aeson-1.2.1.0
 - github: mumuki/language-javascript
   commit: 3640442ea562cc125f219b5c60fbc1b77882fd62
 - github: julian-berbel/language-python

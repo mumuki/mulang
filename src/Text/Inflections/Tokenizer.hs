@@ -7,21 +7,21 @@ module Text.Inflections.Tokenizer (
   tokenize) where
 
 import Data.Char (toLower, isDigit, isLower)
-import Data.Either (isRight)
+import Data.Maybe (isJust)
+import Data.Text (pack)
 
 import Text.Inflections
-import Text.Inflections.Parse.Types
 import Text.Parsec.Error (ParseError)
 
 import Control.Fallible
 
-type CaseStyle = String -> Either Text.Parsec.Error.ParseError [Text.Inflections.Parse.Types.Word]
+type CaseStyle = String -> Maybe [SomeWord]
 
 camelCase      :: CaseStyle
-camelCase      = parseCamelCase [] . filter (not.isDigit)
+camelCase      = orNothing . parseCamelCase [] . pack . filter (not.isDigit)
 
 snakeCase      :: CaseStyle
-snakeCase      = parseSnakeCase []
+snakeCase      = orNothing . parseSnakeCase [] . pack
 
 rubyCase       :: CaseStyle
 rubyCase  word | (isLower.head) word = snakeCase baseWord
@@ -30,7 +30,7 @@ rubyCase  word | (isLower.head) word = snakeCase baseWord
                where baseWord = filter (`notElem` "!?+-=[]<>|&*/") word
 
 canTokenize :: CaseStyle -> String -> Bool
-canTokenize style = isRight . style
+canTokenize style = isJust . style
 
 tokenize :: CaseStyle -> String -> [String]
 tokenize style s | Just words <- (wordsOrNothing . style) s = concatMap toToken words
@@ -38,6 +38,6 @@ tokenize style s | Just words <- (wordsOrNothing . style) s = concatMap toToken 
                   where toToken = return . map toLower
 
 
-wordsOrNothing = fmap (concatMap c) . orNothing
-                where c (Word w) = [w]
+wordsOrNothing = fmap (concatMap c)
+                where --c (Text.Inflections.Word w) = [w]
                       c _        = []

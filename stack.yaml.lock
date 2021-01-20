@@ -5,18 +5,8 @@
 
 packages:
 - completed:
-    hackage: aeson-1.2.1.0@sha256:0d75e98ddd49a00eefcc8f4e7d274a99545eb694d02ac927ffb18fc70726ecb8,6550
-    pantry-tree:
-      size: 39483
-      sha256: b747862dd05b373d87bf187f81eccdd68bacbc14782525cb2450114275d0f9d5
-  original:
-    hackage: aeson-1.2.1.0
-- completed:
     size: 162082
     url: https://github.com/mumuki/language-javascript/archive/3640442ea562cc125f219b5c60fbc1b77882fd62.tar.gz
-    cabal-file:
-      size: 3865
-      sha256: 3c68380fc4794475ff4ebec608f8cf7ce9b15b9b69eb938d423f8aafdefbe0d7
     name: language-javascript
     version: 0.7.1.0
     sha256: 4c9ac2f683f4be52673da8795ae93c0d63d62ac3fe4091e69fb54470f3b774b0
@@ -28,9 +18,6 @@ packages:
 - completed:
     size: 56176
     url: https://github.com/julian-berbel/language-python/archive/cbdf9b33cc3c30e66c8455165ed1c7d70a300a3e.tar.gz
-    cabal-file:
-      size: 2418
-      sha256: 6798ef2d0951909950dd00c40a6338ef80bc2a51c032ce998984e4f4c8dbda3f
     name: language-python
     version: 0.5.5
     sha256: 3f41a52d49545b34e2a92c34b7721e576bfa09e7e9474dde266e3ac1bca6c950
@@ -41,7 +28,7 @@ packages:
     url: https://github.com/julian-berbel/language-python/archive/cbdf9b33cc3c30e66c8455165ed1c7d70a300a3e.tar.gz
 snapshots:
 - completed:
-    size: 504292
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/7/24.yaml
-    sha256: 06475226ae77d200ef106e999bfb280cb658f1ebb166b56f6f579890aab66942
-  original: lts-7.24
+    size: 504553
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/12/13.yaml
+    sha256: 8bf2a28cdf049f056ec71c0e61a731ba9400c1f01ee15a73d815519d842437f2
+  original: lts-12.13

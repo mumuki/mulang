@@ -126,7 +126,7 @@ library
     containers                ,
     hashable                  ,
     haskell-src               ,
-    inflections               <= 0.2.0.1,
+    inflections               ,
     language-c                ,
     language-java             ,
     language-javascript       ,
