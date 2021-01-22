@@ -1,15 +1,34 @@
 module AutocorrectorSpec (spec) where
 
 import           Test.Hspec
+import           Language.Mulang
 import           Language.Mulang.Analyzer.Autocorrector
 import           Language.Mulang.Analyzer.Analysis hiding (spec)
 import qualified Language.Mulang.Analyzer.Analysis as A
 import           Data.Maybe (fromJust)
+import qualified Data.Map as Map
 
-run language = head . fromJust . expectations . A.spec . autocorrect . expectationsAnalysis (CodeSample language "foo") . (:[])
+transform = head . fromJust . expectations . A.spec . autocorrect
 
+run language = transform . expectationsAnalysis (CodeSample language "foo") . (:[])
+runWithCustomRules language code rules e = transform (Analysis
+                                          code
+                                          (emptyAnalysisSpec { originalLanguage = language, expectations = Just [e], autocorrectionRules = Just $ Map.fromList rules }))
 spec :: Spec
 spec = do
+  describe "correct custom usages" $ do
+    it "corrects given rules when using MulangSample" $ do
+      let setting = runWithCustomRules (Just Ruby) (MulangSample None) [("Uses:foo", "UsesPlus")]
+
+      setting (Expectation "*" "UsesPlus")  `shouldBe` (Expectation "*" "UsesPlus")
+      setting (Expectation "*" "Uses:foo")  `shouldBe` (Expectation "*" "UsesPlus")
+
+    it "corrects given rules when using CodeSample" $ do
+      let setting = runWithCustomRules Nothing (CodeSample JavaScript "x") [("Uses:foo", "UsesPlus")]
+
+      setting (Expectation "*" "UsesPlus")  `shouldBe` (Expectation "*" "UsesPlus")
+      setting (Expectation "*" "Uses:foo")  `shouldBe` (Expectation "*" "UsesPlus")
+
   describe "correct primitive usages" $ do
     it "corrects haskell otherwise negated" $ do
       run Haskell (Expectation "*" "Not:Uses:otherwise")  `shouldBe` (Expectation "*" "Not:UsesOtherwise")
