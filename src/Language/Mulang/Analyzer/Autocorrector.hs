@@ -39,7 +39,7 @@ import qualified Data.Map.Strict as Map
 --  7. fills the normalizationOption when they are not present but can be inferred from the originalLanguage
 autocorrect :: Analysis -> Analysis
 autocorrect (Analysis f s@(AnalysisSpec { originalLanguage = Just _ })) = Analysis f (autocorrectSpec s)
-autocorrect (Analysis f@(MulangSample _) s)                             = autocorrect (Analysis f s { originalLanguage = Just Json }) -- (1)
+autocorrect (Analysis f@(MulangSample _) s)                             = autocorrect (Analysis f s { originalLanguage = Just Mulang }) -- (1)
 autocorrect (Analysis f@(CodeSample { language = l } ) s)               = autocorrect (Analysis f s { originalLanguage = Just l }) -- (1)
 
 autocorrectSpec :: AnalysisSpec -> AnalysisSpec
