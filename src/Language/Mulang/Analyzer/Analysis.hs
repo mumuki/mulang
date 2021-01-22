@@ -151,8 +151,7 @@ data TransformationOperation
 data TransformationScope = GlobalScope | LocalScope deriving (Show, Eq, Generic)
 
 data Language
-  =  Json
-  |  Java
+  =  Java
   |  JavaScript
   |  Prolog
   |  Haskell
@@ -162,6 +161,7 @@ data Language
   |  Ruby
   |  Php
   |  C
+  |  Mulang
   deriving (Show, Eq, Generic)
 
 --
