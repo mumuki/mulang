@@ -17,8 +17,14 @@ runWithCustomRules language code rules e = transform (Analysis
 spec :: Spec
 spec = do
   describe "correct custom usages" $ do
-    it "corrects given rules when using MulangSample" $ do
+    it "corrects given rules when using MulangSample and originalLanguage" $ do
       let setting = runWithCustomRules (Just Ruby) (MulangSample None) [("Uses:foo", "UsesPlus")]
+
+      setting (Expectation "*" "UsesPlus")  `shouldBe` (Expectation "*" "UsesPlus")
+      setting (Expectation "*" "Uses:foo")  `shouldBe` (Expectation "*" "UsesPlus")
+
+    it "corrects given rules when using MulangSample and no originalLanguage" $ do
+      let setting = runWithCustomRules Nothing (MulangSample None) [("Uses:foo", "UsesPlus")]
 
       setting (Expectation "*" "UsesPlus")  `shouldBe` (Expectation "*" "UsesPlus")
       setting (Expectation "*" "Uses:foo")  `shouldBe` (Expectation "*" "UsesPlus")
