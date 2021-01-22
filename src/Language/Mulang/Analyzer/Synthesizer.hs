@@ -56,10 +56,13 @@ generateOperatorEncodingRules :: EncodingRuleGenerator Token Operator
 generateOperatorEncodingRules = generateEncodingRules encodeUsageInspection encodeDeclarationInspection
 
 generateEncodingRules :: Encoder a -> Encoder a -> EncodingRuleGenerator Token a
-generateEncodingRules _            _                  ("*", _) = []
-generateEncodingRules usageEncoder declarationEncoder (k, v)   = concatMap generateEncodingNegationRules baseEncodings
+generateEncodingRules usageEncoder declarationEncoder = baseMatchers >=> generateBaseEncodingRules >=> generateNegationEncodingRules
   where
-    baseEncodings = [("Uses:" ++ k, usageEncoder v), ("Declares:" ++ k, declarationEncoder v)]
+    baseMatchers ("*", v)      = [("=*", v)]
+    baseMatchers (('=':xs), v) = [(('=':'=':xs), v)]
+    baseMatchers (k, v)        = [(k, v), ("=" ++ k, v)]
 
-    generateEncodingNegationRules :: EncodingRuleGenerator Inspection Inspection
-    generateEncodingNegationRules (k, v) = [(k, v), ("Not:" ++ k, "Not:" ++ v)]
+    generateBaseEncodingRules (k, v) = [("Uses:" ++ k, usageEncoder v), ("Declares:" ++ k, declarationEncoder v)]
+
+    generateNegationEncodingRules :: EncodingRuleGenerator Inspection Inspection
+    generateNegationEncodingRules (k, v) = [(k, v), ("Not:" ++ k, "Not:" ++ v)]
