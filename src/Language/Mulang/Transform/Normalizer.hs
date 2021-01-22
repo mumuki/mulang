@@ -129,6 +129,7 @@ isImplicitReturn (Application _ _ )    = True
 isImplicitReturn (Send _ _ _ )         = True
 isImplicitReturn (New _ _ )            = True
 isImplicitReturn (If _ _ _)            = True
+isImplicitReturn MuNil                 = False
 isImplicitReturn e                     = isLiteral e
 
 

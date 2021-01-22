@@ -1,7 +1,7 @@
 module NormalizerSpec (spec) where
 
   import           Test.Hspec
-  import           Language.Mulang.Ast hiding (Equal)
+  import           Language.Mulang.Ast
   import           Language.Mulang.Ast.Operator
   import           Language.Mulang.Parsers.Haskell (hs)
   import           Language.Mulang.Parsers.Java (java)
@@ -83,6 +83,18 @@ module NormalizerSpec (spec) where
 
       it "inserts return in single literal expression" $ do
         n (py "def x(): 3") `shouldBe`  SimpleProcedure "x" [] (Return (MuNumber 3.0))
+
+      it "dos not insert return in empty block" $ do
+        n (SimpleFunction "x" [] None) `shouldBe`  (SimpleFunction "x" [] None)
+
+      it "does not insert return in singleton nil block" $ do
+        let expression = SimpleFunction "x" [] MuNil
+        n expression `shouldBe`  expression
+
+      it "insert return in non-singleton nil block" $ do
+        let expression = SimpleFunction "x" [] (Sequence [Print (MuString "hello"),  MuNil])
+        n expression `shouldBe`  expression
+
 
       it "inserts return in last literal expression" $ do
         n (js "function x() { let x = 1; x += 1; x }") `shouldBe`  SimpleProcedure "x" [] (Sequence [
