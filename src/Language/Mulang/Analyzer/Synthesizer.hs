@@ -56,7 +56,8 @@ generateOperatorEncodingRules :: EncodingRuleGenerator Token Operator
 generateOperatorEncodingRules = generateEncodingRules encodeUsageInspection encodeDeclarationInspection
 
 generateEncodingRules :: Encoder a -> Encoder a -> EncodingRuleGenerator Token a
-generateEncodingRules usageEncoder declarationEncoder (k, v) = concatMap generateEncodingNegationRules baseEncodings
+generateEncodingRules _            _                  ("*", _) = []
+generateEncodingRules usageEncoder declarationEncoder (k, v)   = concatMap generateEncodingNegationRules baseEncodings
   where
     baseEncodings = [("Uses:" ++ k, usageEncoder v), ("Declares:" ++ k, declarationEncoder v)]
 

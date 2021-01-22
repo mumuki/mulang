@@ -36,6 +36,15 @@ spec = do
       setting (Expectation "*" "Uses:foo")  `shouldBe` (Expectation "*" "UsesPlus")
 
   describe "correct primitive usages" $ do
+    it "corrects never corrects *" $ do
+      let uses = Expectation "*" "Uses:*"
+
+      run Mulang uses `shouldBe` uses
+      run Ruby uses `shouldBe` uses
+      run JavaScript uses `shouldBe` uses
+      run Prolog uses `shouldBe` uses
+      run Php uses `shouldBe` uses
+
     it "corrects haskell otherwise negated" $ do
       run Haskell (Expectation "*" "Not:Uses:otherwise")  `shouldBe` (Expectation "*" "Not:UsesOtherwise")
 
