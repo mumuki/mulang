@@ -20,6 +20,14 @@ module Mulang::Language
       options.except(:serialization).presence
     end
 
+    def ast(content, **options)
+      Mulang.analyse(ast_analysis(content, **options), **options)['outputAst'] rescue nil
+    end
+
+    def ast_analysis(content, **options)
+      base_analysis content, {includeOutputAst: true}, **options
+    end
+
     private
 
     def base_analysis(content, spec, **options)
@@ -40,14 +48,6 @@ module Mulang::Language
       @language = language
     end
 
-    def ast(content, **options)
-      Mulang.analyse(ast_analysis(content, **options), **options)['outputAst'] rescue nil
-    end
-
-    def ast_analysis(content, **options)
-      base_analysis content, {includeOutputAst: true}, **options
-    end
-
     def sample(content)
       {
         tag: 'CodeSample',
@@ -63,14 +63,24 @@ module Mulang::Language
     end
 
     def ast(content, **args)
-      @tool.call(content) rescue nil
+      if args[:serialization]
+        super
+      else
+        call_tool content
+      end
     end
 
     def sample(content)
       {
         tag: 'MulangSample',
-        ast: ast(content)
+        ast: call_tool(content)
       }
+    end
+
+    private
+
+    def call_tool(content)
+      @tool.call(content) rescue nil
     end
   end
 end
