@@ -57,7 +57,17 @@ module Mulang::Expectation
     ShouldUseStrictComparators
   )
 
-  SMELLS = GENERIC_SMELLS + EXPRESSIVENESS_SMELLS +  IMPERATIVE_SMELLS + OBJECT_ORIENTED_SMELLS + FUNCTIONAL_SMELLS + LOGIC_SMELLS
+  JAVA_SCRIPT_SMELLS = %w(
+    JavaScript#UsesVarInsteadOfLet
+  )
+
+  SMELLS = GENERIC_SMELLS +
+           EXPRESSIVENESS_SMELLS +
+           IMPERATIVE_SMELLS +
+           OBJECT_ORIENTED_SMELLS +
+           FUNCTIONAL_SMELLS +
+           LOGIC_SMELLS +
+           JAVA_SCRIPT_SMELLS
 
   def self.guess_type(expectation)
     if expectation[:binding] == '<<custom>>'
