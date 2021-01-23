@@ -36,6 +36,32 @@ spec = do
       setting (Expectation "*" "Uses:foo")  `shouldBe` (Expectation "*" "UsesPlus")
 
   describe "correct primitive usages" $ do
+    it "never corrects plain *" $ do
+      let uses = Expectation "*" "Uses:*"
+
+      run Mulang uses `shouldBe` uses
+      run Ruby uses `shouldBe` uses
+      run JavaScript uses `shouldBe` uses
+      run Prolog uses `shouldBe` uses
+      run Php uses `shouldBe` uses
+
+    it "always corrects plain * with strict match " $ do
+      let strictUses = Expectation "*" "Uses:=*"
+      let usesMultiply = Expectation "*" "UsesMultiply"
+
+      run Mulang strictUses `shouldBe` strictUses
+
+      run Ruby strictUses `shouldBe` usesMultiply
+      run JavaScript strictUses `shouldBe` usesMultiply
+      run Prolog strictUses `shouldBe` usesMultiply
+      run Php strictUses `shouldBe` usesMultiply
+
+    it "corrects operators when strict match" $ do
+      run Java (Expectation "*" "Uses:=+") `shouldBe` (Expectation "*" "UsesPlus")
+      run Haskell (Expectation "*" "Uses:=-") `shouldBe` (Expectation "*" "UsesMinus")
+      run JavaScript (Expectation "*" "Uses:====") `shouldBe` (Expectation "*" "UsesEqual")
+      run JavaScript (Expectation "*" "Uses:===") `shouldBe` (Expectation "*" "UsesSimilar")
+
     it "corrects haskell otherwise negated" $ do
       run Haskell (Expectation "*" "Not:Uses:otherwise")  `shouldBe` (Expectation "*" "Not:UsesOtherwise")
 
