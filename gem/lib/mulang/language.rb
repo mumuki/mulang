@@ -44,21 +44,26 @@ module Mulang::Language
   end
 
   class Native < Base
-    def initialize(language)
-      @language = language
+    attr_accessor :name
+
+    def initialize(language_name)
+      @name = language_name
     end
 
     def sample(content)
       {
         tag: 'CodeSample',
-        language: @language,
+        language: @name,
         content: content
       }
     end
   end
 
   class External < Base
-    def initialize(&tool)
+    attr_accessor :name
+
+    def initialize(language_name = nil, &tool)
+      @name = language_name
       @tool = block_given? ? tool : proc { |it| it }
     end
 
@@ -75,6 +80,10 @@ module Mulang::Language
         tag: 'MulangSample',
         ast: call_tool(content)
       }
+    end
+
+    def base_analysis(*)
+      super.deep_merge(spec: {originalLanguage: @name}.compact)
     end
 
     private
