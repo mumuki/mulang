@@ -60,8 +60,8 @@ module Mulang
       native(*args).tap { |it| it.expect('Parses') }
     end
 
-    def self.external(content, &tool)
-      new Mulang::Language::External.new(&tool), content
+    def self.external(language_name = nil, content, &tool)
+      new Mulang::Language::External.new(language_name, &tool), content
     end
 
     def self.analyse_many(codes, spec, **options)
