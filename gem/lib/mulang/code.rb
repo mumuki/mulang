@@ -76,12 +76,12 @@ module Mulang
       run_many(codes, key: 'transformedAsts', **options) { |it| it.transformed_asts_analysis(operations, **options) }
     end
 
-    private
-
     def self.run_many(codes, key: nil, **options)
       result = Mulang.analyse(codes.map { |it| yield it }, **options)
       key ? result.map { |it| it[key] } : result
     end
+
+    private
 
     def expectation_results_for(result)
       raise result['reason'] if result['tag'] == 'AnalysisFailed'
