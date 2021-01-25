@@ -19,6 +19,7 @@ module Mulang::Expectation
     OverridesEqualOrHashButNotBoth
     ReturnsNil
     ReturnsNull
+    DoesTypeTest
   )
 
   IMPERATIVE_SMELLS = %w(
@@ -40,7 +41,6 @@ module Mulang::Expectation
   GENERIC_SMELLS = %w(
     DiscardsExceptions
     DoesConsolePrint
-    DoesTypeTest
     HasCodeDuplication
     HasDeclarationTypos
     HasEmptyIfBranches
