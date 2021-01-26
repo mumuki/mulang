@@ -1,5 +1,19 @@
 # Changelog
 
+## [v6.0.1](https://github.com/mumuki/mulang/tree/v6.0.1) (2021-01-26)
+
+[Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.0...v6.0.1)
+
+**Merged pull requests:**
+
+- Fix parsing of assignment to this in Java [\#320](https://github.com/mumuki/mulang/pull/320) ([flbulgarelli](https://github.com/flbulgarelli))
+- Fixes to HasRedundantVariableReturn [\#319](https://github.com/mumuki/mulang/pull/319) ([flbulgarelli](https://github.com/flbulgarelli))
+- Accept and use originalLanguage in External [\#318](https://github.com/mumuki/mulang/pull/318) ([flbulgarelli](https://github.com/flbulgarelli))
+- Fix multiply operator hides wildcard [\#317](https://github.com/mumuki/mulang/pull/317) ([flbulgarelli](https://github.com/flbulgarelli))
+- Avoid introducing implicit return on nil [\#316](https://github.com/mumuki/mulang/pull/316) ([flbulgarelli](https://github.com/flbulgarelli))
+- Infer language from mulang sample [\#315](https://github.com/mumuki/mulang/pull/315) ([flbulgarelli](https://github.com/flbulgarelli))
+- Allow serialization of external languages [\#314](https://github.com/mumuki/mulang/pull/314) ([flbulgarelli](https://github.com/flbulgarelli))
+
 ## [v6.0.0](https://github.com/mumuki/mulang/tree/v6.0.0) (2021-01-19)
 
 [Full Changelog](https://github.com/mumuki/mulang/compare/v5.3.0...v6.0.0)
