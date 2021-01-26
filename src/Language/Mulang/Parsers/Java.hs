@@ -110,6 +110,7 @@ muExp This                              = Self
 muExp (BinOp arg1 op arg2)              = Send (muExp arg1) (muOp op) [muExp arg2]
 muExp (Cond cond ifTrue ifFalse)        = If (muExp cond) (muExp ifTrue) (muExp ifFalse)
 muExp (ExpName name)                    = muName name
+muExp (Assign (FieldLhs (PrimaryFieldAccess This ident)) EqualA exp)   = FieldAssignment Self (i ident) (muExp exp)
 muExp (Assign (NameLhs n) EqualA exp)   = muAssignment n (muExp exp)
 muExp (InstanceCreation _ clazz args _) = New (Reference $ r clazz) (map muExp args)
 muExp (PreNot exp)                      | PrimitiveSend r O.Equal [a] <- (muExp exp) = PrimitiveSend r O.NotEqual [a]

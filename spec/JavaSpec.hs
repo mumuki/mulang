@@ -397,6 +397,16 @@ spec = do
                             SubroutineSignature "foo" ["M"] "void" [],
                             (SimpleMethod "foo" [VariablePattern "m"] (FieldAssignment (Reference "m") "x" (MuNumber 3)))])
 
+    it "parses this attribute assignment" $ do
+      run [text|class Foo {
+             public void foo(M m) {
+                this.x = 3;
+             }
+          }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                            SubroutineSignature "foo" ["M"] "void" [],
+                            (SimpleMethod "foo" [VariablePattern "m"] (FieldAssignment Self "x" (MuNumber 3)))])
+
+
     it "parses complex attribute assignment" $ do
       run [text|class Foo {
              public void foo(M m) {
