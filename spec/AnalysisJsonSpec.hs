@@ -1,4 +1,4 @@
-{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+{-# LANGUAGE CPP, QuasiQuotes, OverloadedStrings #-}
 
 module AnalysisJsonSpec(spec) where
 
@@ -118,7 +118,11 @@ spec = describe "AnalysisJson" $ do
       "transformationSpecs" : [
         [
           {"tag" : "Crop", "contents": "IsVariable:y"},
-          {"tag" : "RenameVariables"},
+#ifdef ghcjs_HOST_OS
+          {"tag" : "RenameVariables", "contents": [] },
+#else
+          {"tag" : "RenameVariables" },
+#endif
           {"tag" : "Alias", "contents": { "count": "Size", "plus": "Plus" }}
         ]
       ]
