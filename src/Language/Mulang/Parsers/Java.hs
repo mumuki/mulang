@@ -110,7 +110,7 @@ muExp This                              = Self
 muExp (BinOp arg1 op arg2)              = Send (muExp arg1) (muOp op) [muExp arg2]
 muExp (Cond cond ifTrue ifFalse)        = If (muExp cond) (muExp ifTrue) (muExp ifFalse)
 muExp (ExpName name)                    = muName name
-muExp (Assign (NameLhs n) EqualA exp)   = muAssignment n (muExp exp)
+muExp (Assign lhs EqualA exp)           = muAssignment lhs (muExp exp)
 muExp (InstanceCreation _ clazz args _) = New (Reference $ r clazz) (map muExp args)
 muExp (PreNot exp)                      | PrimitiveSend r O.Equal [a] <- (muExp exp) = PrimitiveSend r O.NotEqual [a]
                                         | otherwise = PrimitiveSend (muExp exp) O.Negation []
@@ -128,8 +128,9 @@ muLambdaParams (LambdaFormalParams params)  = map muFormalParam params
 muCatch :: Catch -> (Pattern, Expression)
 muCatch (Catch param block) = (TypePattern (muFormalParamType param), muBlock block)
 
-muAssignment (Name [name]) exp           = Assignment (i name) exp
-muAssignment (Name ns) exp               = FieldAssignment r f exp
+muAssignment (FieldLhs (PrimaryFieldAccess This name)) exp = FieldAssignment Self (i name) exp
+muAssignment (NameLhs (Name [name])) exp                   = Assignment (i name) exp
+muAssignment (NameLhs (Name ns)) exp                       = FieldAssignment r f exp
   where (r, f) = foldReferences ns
 
 muName (Name [name]) = Reference (i name)
