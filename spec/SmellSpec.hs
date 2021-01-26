@@ -117,6 +117,9 @@ spec = do
     it "is True when local variable is not necessary" $ do
       hasRedundantLocalVariableReturn (js "function x(m) { let x  = 5; return x; }") `shouldBe` True
 
+    it "is True when local variable is not necessary and there are previous statements" $ do
+      hasRedundantLocalVariableReturn (js "function x(m) { let z = 0; let x  = 5; return x; }") `shouldBe` True
+
     it "is False when local variable is not necessary, but there are many variables" $ do
       hasRedundantLocalVariableReturn (js "function x(m) { let x = 5; let y = 2; return x; }") `shouldBe` False
 
