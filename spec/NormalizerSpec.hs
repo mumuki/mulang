@@ -84,14 +84,14 @@ module NormalizerSpec (spec) where
       it "inserts return in single literal expression" $ do
         n (py "def x(): 3") `shouldBe`  SimpleProcedure "x" [] (Return (MuNumber 3.0))
 
-      it "dos not insert return in empty block" $ do
+      it "does not insert return in empty block" $ do
         n (SimpleFunction "x" [] None) `shouldBe`  (SimpleFunction "x" [] None)
 
       it "does not insert return in singleton nil block" $ do
         let expression = SimpleFunction "x" [] MuNil
         n expression `shouldBe`  expression
 
-      it "insert return in non-singleton nil block" $ do
+      it "inserts return in non-singleton nil block" $ do
         let expression = SimpleFunction "x" [] (Sequence [Print (MuString "hello"),  MuNil])
         n expression `shouldBe`  expression
 
