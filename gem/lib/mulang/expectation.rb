@@ -26,7 +26,6 @@ module Mulang::Expectation
     HasAssignmentCondition
     HasAssignmentReturn
     HasEmptyRepeat
-    HasRedundantLocalVariableReturn
     HasRedundantRepeat
   )
 
@@ -47,6 +46,7 @@ module Mulang::Expectation
     HasEqualIfBranches
     HasLongParameterList
     HasRedundantBooleanComparison
+    HasRedundantLocalVariableReturn
     HasRedundantIf
     HasRedundantLambda
     HasTooShortBindings

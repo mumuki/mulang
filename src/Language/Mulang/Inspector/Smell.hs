@@ -141,9 +141,10 @@ isBooleanLiteral _          = False
 
 hasRedundantLocalVariableReturn :: Inspection
 hasRedundantLocalVariableReturn = containsExpression f
-  where f (Sequence [ Variable declaredVariable _,
-                      Return (Reference returnedVariable)]) = returnedVariable == declaredVariable
-        f _                                                 = False
+  where f (Sequence (reverse ->
+                      (Return (Reference returnedVariable) :
+                        Variable declaredVariable _:_))) = returnedVariable == declaredVariable
+        f _                                              = False
 
 hasAssignmentCondition :: Inspection
 hasAssignmentCondition = containsExpression f
