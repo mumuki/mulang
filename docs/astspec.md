@@ -1232,31 +1232,56 @@ function foo(x, y) { }
 
 ## Primitive Operators
 
-Primitive operators represent low-level language operations that are well known and common to most languages, usually in the fashion of operators.
+Primitive operators represent low-level language operations that are well known and common to most languages, usually in the fashion of operators. They are natively supported by mulang.
 
-* `Equal`: equal operator
-* `NotEqual`: distinct operator
-* `Negation`: not operator
-* `And`: and operator
-* `Or`: or operator
-* `Hash`: hashcode operator
-* `GreatherOrEqualThan`
-* `GreatherThan`
-* `LessOrEqualThan`
-* `LessThan`
-* `Otherwise`: guard's otherwise operator
-* `Plus`
-* `Minus`
-* `Multiply`
-* `Divide`
-* `ForwardComposition`: `(f >> g)(x) = (g . f)(x) = g(f(x))` operator
+* `Absolute`: numeric `abs`-like absolute operator
+* `AllSatisfy`: collection `all`-like / `every`-like operator
+* `And`:  `&&`-like and operator
+* `AnySatisfy`: collection `any`-like / `some`-like operator
 * `BackwardComposition`: `(g << f)(x) = (g . f)(x) = g(f(x))` operator
-* `Mod`
-* `BitwiseOr`
-* `BitwiseAnd`
-* `BitwiseXor`
-* `BitwiseLeftShift`
-* `BitwiseRightShift`
+* `BitwiseAnd`: bit-level `&`-like and operator
+* `BitwiseLeftShift`: bit-level left `<<`-like shift operator
+* `BitwiseOr`: bit-level `|`-like or operator
+* `BitwiseRightShift`: bit-level right `>>`-like shift operator
+* `BitwiseXor`: bit-level `^`-like xor operator
+* `Ceil`: numeric `ceil`-like ceiling operator
+* `Collect`: collection `map`-like operator
+* `Count`: collection `count`-like operator
+* `Detect`: collection `find`-like search operator
+* `DetectMax`: collection `max`-like maximum operator
+* `DetectMin`: collection `min`-like minumum operator
+* `Divide`:  numeric `/` operator
+* `Equal`:  `===`-like equal operator
+* `Flatten`: collection `flatten`-like operator
+* `Floor`: numeric `ceil`-like floor operator
+* `ForwardComposition`: `(f >> g)(x) = (g . f)(x) = g(f(x))` operator
+* `Gather`: collection `flatmap`-like operator
+* `GetAt`: collection `[]`-like operator
+* `GreatherOrEqualThan`:  `>=` operator
+* `GreatherThan`:  `>` operator
+* `Hash`:  hashcode operator
+* `Inject`: collection `reduce`-like / `fold`-like operator
+* `LessOrEqualThan`:  `<=` operator
+* `LessThan`:  `<` operator
+* `Max`: `max`-like maximum value binary operator
+* `Min`: `min`-like minimum value binary operator
+* `Minus`:  numeric `-` operator
+* `Modulo`: numeric `%-like` modulo operator
+* `Multiply`:  numeric `*` operator
+* `Negation`:  `!`-like not operator
+* `NotEqual`:  `!==`-like distinct operator
+* `NotSame`:  not reference-identical operator
+* `NotSimilar`:  not equal-ignoring-type operator
+* `Or`:  `||`-like or operator
+* `Otherwise`:  guard's otherwise operator
+* `Plus`:  numeric `+` operator
+* `Push`: collection `insertAtEnd`-like operator
+* `Round`: numeric `round`-like round operator
+* `Same`:  reference-identical operator
+* `Select`: collection `filter`-like operator
+* `SetAt`: collection `[]=`-like operator
+* `Similar`:  equal-ignoring-type operator
+* `Size`: collection `length`-like size operator
 
 ## Types
 

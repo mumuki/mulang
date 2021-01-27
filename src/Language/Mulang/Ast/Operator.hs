@@ -13,15 +13,15 @@ data Operator
     = Equal
     -- ^ `===`-like equal operator
     | NotEqual
-    --    ^ `!==`-like distinct operator
+    -- ^ `!==`-like distinct operator
     | Similar
-    -- ^ equ   al-ignoring-type operator
+    -- ^ equal-ignoring-type operator
     | NotSimilar
     -- ^ not equal-ignoring-type operator
     | Same
-      -- ^ reference-identical operator
+    -- ^ reference-identical operator
     | NotSame
-     -- ^ not reference-identical operator
+    -- ^ not reference-identical operator
     | Negation
     -- ^ `!`-like not operator
     | And
@@ -29,7 +29,7 @@ data Operator
     | Or
     -- ^ `||`-like or operator
     | Hash
-    -- ^ hashcode operator
+    -- ^ `hashcode` operator
     | GreatherOrEqualThan
     -- ^ `>=` operator
     | GreatherThan
@@ -49,9 +49,9 @@ data Operator
     | Divide
     -- ^ numeric `/` operator
     | ForwardComposition
-    -- (f >> g)(x) = (g . f)(x) = g(f(x)) operator
+    -- `>>`-like functional forward composition operator
     | BackwardComposition
-    -- (f << g)(x) = (f . g)(x) = f(g(x)) operator
+    -- `.`-like functional forward composition operator
     | Modulo
     -- ^ numeric `%-like` modulo operator
     | BitwiseOr

@@ -33,11 +33,12 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `HasEmptyIfBranches`              | has the given code an empty `if` branch?
 | `HasEmptyRepeat`                  | has the given code a `repeat` with empty body?
 | `HasEqualIfBranches`              | are both branches of an `if` equal?
+| `UsesNamedSelfReference`          | does an object reference itself by its name instead of using `self`?
 | `HasLongParameterList`            | does a given method/function/predicate take too many parameters?
 | `HasMisspelledIdentifiers`        | an identifier is not a domain language dictionary's word and not part of its jargon
 | `HasRedundantBooleanComparison`   |
 | `HasRedundantIf`                  | can a combination of `if`s, `assignment`s and `return`s be replaced by a boolean expression?
-| `HasRedundantLocalVariableReturn` |
+| `HasRedundantLocalVariableReturn` | does a callable declare and return a variable just after declaring it?
 | `HasRedundantRepeat`              | has the given code an unnecesary - 1 iteration - `repeat` statement?
 | `HasTooShortIdentifiers`          | whether an identifier is too short and not part of domain language's jargon
 | `HasUnreachableCode`              | is there unreachable code?
@@ -69,31 +70,61 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 
 ## Operator Inspections
 
+> 👀 See also [operators section in AST Specs](./astspec/#primitive-operators).
+>
+> ⚠️ Please notice that the operators inspections are the preferred and most reliable way of checking
+> usage of language primitives. For example, prefer `UsesPlus` over `Uses:+`
+
 | Inspection                       | Meaning
 |----------------------------------|-----------------------
-| `UsesAnd`                        | is the `&&`-like logic operator used?
+| `UsesAbsolute`                   | is the numeric `abs`-like absolute operator used?
+| `UsesAllSatisfy`                 | is the collection `all`-like / `every`-like operator used?
+| `UsesAnd`                        | is the `&&`-like and operator used?
+| `UsesAnySatisfy`                 | is the collection `any`-like / `some`-like operator used?
 | `UsesBackwardComposition`        | is the `.`-like functional backward composition operator used?
-| `UsesBitwiseAnd`                 | is the `&`-like bit-level and operator used?
-| `UsesBitwiseLeftShift`           | is the `<<`-like bit-level left shift operator used?
-| `UsesBitwiseOr`                  | is the `|`-like bit-level or operator used?
-| `UsesBitwiseRightShift`          | is the `>>`-like bit-level right shift operator used?
-| `UsesBitwiseXor`                 | is the `^`-like bit-level xor operator used?
-| `UsesDivide`                     | is the `/`-like aritmetic operator used?
-| `UsesEqual`                      | is the `==`-like operator used?
-| `UsesForwardComposition`         | is the `<<`-like functional forward composition operator used?
+| `UsesBitwiseAnd`                 | is the bit-level `&`-like and operator used?
+| `UsesBitwiseLeftShift`           | is the bit-level left `<<`-like shift operator used?
+| `UsesBitwiseOr`                  | is the bit-level `|`-like or operator used?
+| `UsesBitwiseRightShift`          | is the bit-level right `>>`-like shift operator used?
+| `UsesBitwiseXor`                 | is the bit-level `^`-like xor operator used?
+| `UsesCeil`                       | is the numeric `ceil`-like ceiling operator used?
+| `UsesCollect`                    | is the collection `map`-like operator used?
+| `UsesCount`                      | is the collection `count`-like operator used?
+| `UsesDetect`                     | is the collection `find`-like search operator used?
+| `UsesDetectMax`                  | is the collection `max`-like maximum operator used?
+| `UsesDetectMin`                  | is the collection `min`-like minumum operator used?
+| `UsesDivide`                     | is the numeric `/` operator used?
+| `UsesEqual`                      | is the `===`-like equal operator used?
+| `UsesFlatten`                    | is the collection `flatten`-like operator used?
+| `UsesFloor`                      | is the numeric `ceil`-like floor operator used?
+| `UsesForwardComposition`         | is the `>>`-like functional forward composition operator used?
+| `UsesGather`                     | is the collection `flatmap`-like operator used?
+| `UsesGetAt`                      | is the collection `[]`-like operator used?
 | `UsesGreatherOrEqualThan`        | is the `>=` operator used?
 | `UsesGreatherThan`               | is the `>` operator used?
-| `UsesHash`                       | is the `hash`-like operator used?
-| `UsesLessOrEqualThan`            | is the `>=` operator used?
-| `UsesLessThan`                   | is the `>` operator used?
-| `UsesMinus`                      | is the `-` aritmetic operator used?
-| `UsesModulo`                     | is the `%`-like modulo operator used?
-| `UsesMultiply`                   | is the `*` aritmetic operator used?
-| `UsesNegation`                   | is the `!`-like logic operator used?
-| `UsesNotEqual`                   | is the `!=`-like operator used?
-| `UsesOr`                         | is the `||`-like logic operator used?
-| `UsesOtherwise`                  | is the `otherwise` operator used?
-| `UsesPlus`                       | is the `+` aritmetic operator used?
+| `UsesHash`                       | is the `hashcode` operator used?
+| `UsesInject`                     | is the collection `reduce`-like / `fold`-like operator used?
+| `UsesLessOrEqualThan`            | is the `<=` operator used?
+| `UsesLessThan`                   | is the `<` operator used?
+| `UsesMax`                        | is the `max`-like maximum value binary operator used?
+| `UsesMin`                        | is the `min`-like minimum value binary operator used?
+| `UsesMinus`                      | is the numeric `-` operator used?
+| `UsesModulo`                     | is the numeric `%-like` modulo operator used?
+| `UsesMultiply`                   | is the numeric `*` operator used?
+| `UsesNegation`                   | is the `!`-like not operator used?
+| `UsesNotEqual`                   | is the `!==`-like distinct operator used?
+| `UsesNotSame`                    | is the not reference-identical operator used?
+| `UsesNotSimilar`                 | is the not equal-ignoring-type operator used?
+| `UsesOr`                         | is the `||`-like or operator used?
+| `UsesOtherwise`                  | is the guard's otherwise operator used?
+| `UsesPlus`                       | is the numeric `+` operator used?
+| `UsesPush`                       | is the collection `insertAtEnd`-like operator used?
+| `UsesRound`                      | is the numeric `round`-like round operator used?
+| `UsesSame`                       | is the reference-identical operator used?
+| `UsesSelect`                     | is the collection `filter`-like operator used?
+| `UsesSetAt`                      | is the collection `[]=`-like operator used?
+| `UsesSimilar`                    | is the equal-ignoring-type operator used?
+| `UsesSize`                       | is the collection `length`-like size operator used?
 
 
 ## Imperative Inspections
