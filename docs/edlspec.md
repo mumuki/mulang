@@ -420,3 +420,9 @@ expectation "`Pet` must declare `eat` and `Owner` must send it":
   %% expectations
   (within `Pet` declares `eat`) and (within `Owner` sends `eat`);
 ```
+
+# ⚠️ Caveats
+
+Mulang by default will apply autocorrection rules that transform language-dependant
+inspections - like `Uses:length` in JavaScript - into proper operator inspections like `UsesSize`. Those transformation
+**will not be applied when using EDL**, so be careful when using languages primitives.
