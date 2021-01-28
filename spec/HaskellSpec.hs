@@ -35,6 +35,9 @@ spec = do
     it "parses left infix partial application" $ do
       hs "f = (1+)" `shouldBe` Variable "f" (Application (Primitive Plus) [MuNumber 1.0])
 
+    it "parses prefix total application" $ do
+      hs "f = not True" `shouldBe` Variable "f" (Application (Primitive Negation) [MuTrue])
+
     it "parses right infix partial application" $ do
       hs "f = (+1)" `shouldBe` Variable "f" (Application (Reference "flip") [Primitive Plus, MuNumber 1.0])
 

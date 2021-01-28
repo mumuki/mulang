@@ -211,13 +211,25 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run Prolog "foo(X):-bar(X)." test) `shouldReturn` nok
     (run Prolog "foo(X):-not(bar(X))." test) `shouldReturn` ok
 
-  it "evaluates uses `not`" $ do
-    -- (run Haskell "x = not y" "expectation: uses `not`") `shouldReturn` nok
-    pendingWith "autocorrector does not work with EDL"
+  it "evaluates uses `+`" $ do
+    (run Haskell "x = 1 + y" "expectation: uses `+`") `shouldReturn` ok
+    (run Haskell "x = y" "expectation: uses `+`") `shouldReturn` nok
+
+  it "evaluates uses `*`" $ do
+    (run Haskell "x = 1 * y" "expectation: uses `*`") `shouldReturn` ok
+    (run Haskell "x = y" "expectation: uses `*`") `shouldReturn` nok
+
+  it "evaluates uses `*`, negated" $ do
+    (run Haskell "x = 1 * y" "expectation: ! uses `*`") `shouldReturn` nok
+    (run Haskell "x = y" "expectation: ! uses `*`") `shouldReturn` ok
 
   it "evaluates uses `!`" $ do
-    -- (run JavaScript "let x = ! y" "expectation: uses `!`") `shouldReturn` nok
-    pendingWith "autocorrector does not work with EDL"
+    (run JavaScript "let x = ! y" "expectation: Uses `!`") `shouldReturn` ok
+    (run JavaScript "let x = y" "expectation: Uses `!`") `shouldReturn` nok
+
+  it "evaluates uses `!`" $ do
+    (run JavaScript "let x = ! y" "expectation: uses `!`") `shouldReturn` ok
+    (run JavaScript "let x = y" "expectation: uses `!`") `shouldReturn` nok
 
   it "evaluates count ( uses negation )" $ do
     (run Haskell "x = not $ not y" "expectation: count ( uses negation ) >= 1") `shouldReturn` ok
@@ -228,6 +240,21 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "let x = f(f(y))" "expectation: count ( uses `f` ) >= 1") `shouldReturn` ok
     (run JavaScript "let x = f(y)" "expectation: count ( uses `f` ) >= 1") `shouldReturn` ok
     (run JavaScript "let x = y" "expectation: count ( uses `f` ) >= 1") `shouldReturn` nok
+
+  it "evaluates count ( uses size )" $ do
+    (run JavaScript "let x = m.length + y.length" "expectation: count ( uses size ) >= 1") `shouldReturn` ok
+    (run JavaScript "let x = m.length" "expectation: count ( uses size ) >= 1") `shouldReturn` ok
+    (run JavaScript "let x = y" "expectation: count ( uses size ) >= 1") `shouldReturn` nok
+
+  it "evaluates count ( uses `length` )" $ do
+    (run JavaScript "let x = m.length + y.length" "expectation: count ( uses `length` ) >= 1") `shouldReturn` ok
+    (run JavaScript "let x = m.length" "expectation: count ( uses `length` ) >= 1") `shouldReturn` ok
+    (run JavaScript "let x = y" "expectation: count ( uses `length` ) >= 1") `shouldReturn` nok
+
+  it "evaluates count ( Uses `length` )" $ do
+    (run JavaScript "let x = m.length + y.length" "expectation: count ( Uses `length` ) >= 1") `shouldReturn` ok
+    (run JavaScript "let x = m.length" "expectation: count ( Uses `length` ) >= 1") `shouldReturn` ok
+    (run JavaScript "let x = y" "expectation: count ( Uses `length` ) >= 1") `shouldReturn` nok
 
   it "evaluates uses negation" $ do
     let test = "expectation: uses negation"

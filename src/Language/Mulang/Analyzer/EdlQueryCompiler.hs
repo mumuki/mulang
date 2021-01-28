@@ -49,7 +49,7 @@ scopeFor f name = (contextualized (f names), andAlso (except (last names)))
   where names = splitOn "." name
 
 compileCQuery :: AutocorrectionRules -> (IdentifierPredicate -> IdentifierPredicate) -> E.CQuery -> Maybe ContextualizedInspection
-compileCQuery rules pm (E.Inspection i p m) = ($ (compilePredicate pm p))         <$> compileInspection rules (compileVerb i) m
+compileCQuery rules pm (E.Inspection i p m) = compileOrCorrectInspection rules pm (E.Inspection (compileVerb i) p m)
 compileCQuery rules pm (E.AtLeast n q)      = contextualized (atLeast (encode n)) <$> compileTQuery rules pm q
 compileCQuery rules pm (E.AtMost n q)       = contextualized (atMost (encode n))  <$> compileTQuery rules pm q
 compileCQuery rules pm (E.Exactly n q)      = contextualized (exactly (encode n)) <$> compileTQuery rules pm q
@@ -57,9 +57,17 @@ compileCQuery rules pm (E.CNot q)           = contextualized never              
 compileCQuery rules pm (E.CAnd q1 q2)       = contextualized2 andAlso             <$> compileCQuery rules pm q1 <*> compileCQuery rules pm q2
 compileCQuery rules pm (E.COr q1 q2)        = contextualized2 orElse              <$> compileCQuery rules pm q1 <*> compileCQuery rules pm q2
 
+compileOrCorrectInspection rules pm query = foo rules pm . fromMaybe query . Map.lookup query $ rules
+foo rules pm (E.Inspection i p m) = ($ (compilePredicate pm p)) <$> compileInspection rules i m
+
 compileTQuery :: AutocorrectionRules -> (IdentifierPredicate -> IdentifierPredicate) -> E.TQuery -> Maybe ContextualizedCounter
-compileTQuery rules pm (E.Counter i p m) = ($ (compilePredicate pm p)) <$> compileCounter rules (compileVerb i) m
+compileTQuery rules pm (E.Counter i p m) = compileOrCorrectCounter rules pm (E.Counter (compileVerb i) p m)
 compileTQuery rules pm (E.Plus q1 q2)    = contextualized2 plus        <$> (compileTQuery rules pm q1) <*> (compileTQuery rules pm q2)
+
+compileOrCorrectCounter rules pm query = foo1 rules pm . fromMaybe query . fmap toCounter . Map.lookup (fromCounter query) $ rules
+foo1 rules pm (E.Counter i p m) = ($ (compilePredicate pm p)) <$> compileCounter rules i m
+toCounter (E.Inspection i p m) = (E.Counter i p m)
+fromCounter (E.Counter i p m) = (E.Inspection i p m)
 
 compilePredicate :: (IdentifierPredicate -> IdentifierPredicate) -> E.Predicate -> IdentifierPredicate
 compilePredicate p E.Any             = p $ anyone
