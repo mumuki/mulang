@@ -1,7 +1,8 @@
 {-# LANGUAGE ViewPatterns #-}
 
 module Language.Mulang.Analyzer.ExpectationsCompiler(
-  compileExpectation) where
+  compileExpectation,
+  compileBaseQueryAndNegator) where
 
 import           Language.Mulang.Edl.Expectation
 
@@ -15,10 +16,14 @@ import           Data.List.Split (splitOn)
 compileExpectation :: A.Expectation -> (Query, Inspection)
 compileExpectation (A.Expectation s i) = (topQuery, compileTopQuery topQuery)
   where
-    (inspectionParts, negator) = compileInspectionPartsAndNegator (splitOn ":" i)
+    (baseQuery, negator) = compileBaseQueryAndNegator i
     scope = compileScope (splitOn ":" s)
-    baseQuery = compileCQuery inspectionParts
     topQuery = negator . scope $ baseQuery
+
+compileBaseQueryAndNegator :: String -> (CQuery, Query -> Query)
+compileBaseQueryAndNegator i = (compileCQuery inspectionParts, negator)
+  where
+    (inspectionParts, negator) = compileInspectionPartsAndNegator (splitOn ":" i)
 
 compileInspectionPartsAndNegator :: [String] -> ([String], Query -> Query)
 compileInspectionPartsAndNegator ("Not":ps) = (ps, Not)

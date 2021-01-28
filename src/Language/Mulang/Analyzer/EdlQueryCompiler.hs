@@ -1,7 +1,8 @@
 {-# LANGUAGE ViewPatterns #-}
 
 module Language.Mulang.Analyzer.EdlQueryCompiler(
-  compileTopQuery) where
+  compileTopQuery,
+  compileTopQuery') where
 
 import Data.Char (toUpper)
 import Data.Count (encode)

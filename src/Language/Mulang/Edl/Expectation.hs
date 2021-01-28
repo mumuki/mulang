@@ -16,7 +16,7 @@ data Expectation =
   Expectation {
     name :: String,
     query :: Query
-  } deriving (Eq, Show, Generic)
+  } deriving (Eq, Ord, Show, Generic)
 
 data Query
   = Decontextualize CQuery
@@ -25,7 +25,7 @@ data Query
   | Not Query
   | And Query Query
   | Or Query Query
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Ord, Show, Generic)
 
 data CQuery
   = Inspection String Predicate Matcher
@@ -35,12 +35,12 @@ data CQuery
   | AtLeast Int TQuery
   | AtMost Int TQuery
   | Exactly Int TQuery
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Ord, Show, Generic)
 
 data TQuery
   = Plus TQuery TQuery
   | Counter String Predicate Matcher
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Ord, Show, Generic)
 
 data Predicate
   = Any
@@ -52,12 +52,12 @@ data Predicate
   | NoneOf [String]
   | LikeAnyOf [String]
   | LikeNoneOf [String]
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Ord, Show, Generic)
 
 data Matcher
   = Unmatching
   | Matching [Clause]
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Ord, Show, Generic)
 
 data Clause
   = That Query
@@ -74,7 +74,7 @@ data Clause
   | IsString String
   | IsSymbol String
   | IsTrue
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Ord, Show, Generic)
 
 cQuery :: Query -> Maybe CQuery
 cQuery (Decontextualize q) = Just q
