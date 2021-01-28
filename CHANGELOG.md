@@ -1,5 +1,13 @@
 # Changelog
 
+## [v6.0.2](https://github.com/mumuki/mulang/tree/v6.0.2) (2021-01-28)
+
+[Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.1...v6.0.2)
+
+**Merged pull requests:**
+
+- Chore improve backwards compatibility [\#321](https://github.com/mumuki/mulang/pull/321) ([flbulgarelli](https://github.com/flbulgarelli))
+
 ## [v6.0.1](https://github.com/mumuki/mulang/tree/v6.0.1) (2021-01-26)
 
 [Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.0...v6.0.1)
