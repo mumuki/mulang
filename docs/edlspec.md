@@ -391,6 +391,7 @@ Not all inspections can be counted. Currently, only the following are supported:
 * `declares procedure`
 * `declares variable`
 * `returns`
+* `uses`
 * `uses for each`
 * `uses for loop`
 * `uses for`
@@ -402,6 +403,7 @@ Not all inspections can be counted. Currently, only the following are supported:
 * `uses try`
 * `uses while`
 * `uses yield`
+* All the [primitive operator inspections](./inspections/#primitive-operator-inspections), e.g. `uses plus` or `uses size`
 
 ## Boolean operators on scoped queries
 

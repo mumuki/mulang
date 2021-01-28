@@ -72,27 +72,29 @@ compileVerb = concat . map headToUpper . words
 compileCounter :: String -> E.Matcher -> Maybe (ContextualizedBoundCounter)
 compileCounter = f
   where
-  f "Calls"               = boundMatching countCalls
-  f "DeclaresAttribute"   = boundMatching countAttributes
-  f "DeclaresClass"       = boundMatching countClasses
-  f "DeclaresFunction"    = boundMatching countFunctions
-  f "DeclaresInterface"   = boundMatching countInterfaces
-  f "DeclaresMethod"      = boundMatching countMethods
-  f "DeclaresObject"      = boundMatching countObjects
-  f "DeclaresProcedure"   = boundMatching countProcedures
-  f "DeclaresVariable"    = boundMatching countVariables
-  f "Returns"             = plainMatching countReturns
-  f "UsesFor"             = plainMatching countFors
-  f "UsesForEach"         = plainMatching countForEaches
-  f "UsesForLoop"         = plainMatching countForLoops
-  f "UsesIf"              = plainMatching countIfs
-  f "UsesLambda"          = plainMatching countLambdas
-  f "UsesPrint"           = plainMatching countPrints
-  f "UsesRepeat"          = plainMatching countRepeats
-  f "UsesSwitch"          = plainMatching countSwitches
-  f "UsesWhile"           = plainMatching countWhiles
-  f "UsesYield"           = plainMatching countYiels
-  f _                     = const Nothing
+  f "Calls"                      m            = boundMatching countCalls m
+  f "DeclaresAttribute"          m            = boundMatching countAttributes m
+  f "DeclaresClass"              m            = boundMatching countClasses m
+  f "DeclaresFunction"           m            = boundMatching countFunctions m
+  f "DeclaresInterface"          m            = boundMatching countInterfaces m
+  f "DeclaresMethod"             m            = boundMatching countMethods m
+  f "DeclaresObject"             m            = boundMatching countObjects m
+  f "DeclaresProcedure"          m            = boundMatching countProcedures m
+  f "DeclaresVariable"           m            = boundMatching countVariables m
+  f "Returns"                    m            = plainMatching countReturns m
+  f "Uses"                       E.Unmatching = bound countUses
+  f "UsesFor"                    m            = plainMatching countFors m
+  f "UsesForEach"                m            = plainMatching countForEaches m
+  f "UsesForLoop"                m            = plainMatching countForLoops m
+  f "UsesIf"                     m            = plainMatching countIfs m
+  f "UsesLambda"                 m            = plainMatching countLambdas m
+  f "UsesPrint"                  m            = plainMatching countPrints m
+  f "UsesRepeat"                 m            = plainMatching countRepeats m
+  f "UsesSwitch"                 m            = plainMatching countSwitches m
+  f "UsesWhile"                  m            = plainMatching countWhiles m
+  f "UsesYield"                  m            = plainMatching countYiels m
+  f (primitiveUsage -> Just p)   E.Unmatching = plain (countUsesPrimitive p)
+  f _                            _            = Nothing
 
 
 compileInspection :: String -> E.Matcher -> Maybe ContextualizedBoundInspection
@@ -186,9 +188,9 @@ compileInspection = f
   f (primitiveEssence -> Just p)       E.Unmatching   = plain (isPrimitive p)
   f _                                  _              = Nothing
 
-  primitiveEssence = decodeIsInspection
-  primitiveUsage = decodeUsageInspection
-  primitiveDeclaration = decodeDeclarationInspection
+primitiveEssence = decodeIsInspection
+primitiveUsage = decodeUsageInspection
+primitiveDeclaration = decodeDeclarationInspection
 
 contextual :: ContextualizedConsult a -> Maybe (ContextualizedBoundConsult a)
 contextual = Just . contextualizedBind

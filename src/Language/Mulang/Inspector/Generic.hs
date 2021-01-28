@@ -33,6 +33,7 @@ module Language.Mulang.Inspector.Generic (
   subordinatesDeclarationsToEntryPoint,
   isPrimitive,
   uses,
+  countUses,
   usesAnonymousVariable,
   usesExceptionHandling,
   usesExceptions,
@@ -43,6 +44,7 @@ module Language.Mulang.Inspector.Generic (
   usesLogic,
   usesMath,
   usesPrimitive,
+  countUsesPrimitive,
   usesPrint,
   usesPrintMatching,
   usesYield,
@@ -79,11 +81,17 @@ assignsMatching matcher predicate = containsExpression f
 -- | Inspection that tells whether an expression uses the the given target identifier
 -- in its definition
 uses :: BoundInspection
-uses p = containsExpression f
+uses = positive . countUses
+
+countUses :: BoundCounter
+countUses p = countExpressions f
   where f = any p . referencedIdentifiers
 
 usesPrimitive :: Operator -> Inspection
-usesPrimitive operator = containsExpression (isPrimitive operator)
+usesPrimitive  = positive . countUsesPrimitive
+
+countUsesPrimitive :: Operator -> Counter
+countUsesPrimitive operator = countExpressions (isPrimitive operator)
 
 isPrimitive :: Operator -> Inspection
 isPrimitive operator (Primitive o) = operator == o

@@ -63,12 +63,11 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `UsesIf`                          | is an `if` control structure used?
 | `UsesLogic`                       | are boolean operators used?
 | `UsesMath`                        | are artithmetic operators used?
-| `UsesPrimitive`                   | is the given primitive operator used?
 | `UsesPrint`                       | is a print statement used?
 | `UsesType`                        | is the given typed used in a signature?
 
 
-## Operator Inspections
+## Primitive Operator Inspections
 
 > 👀 See also [operators section in AST Specs](./astspec/#primitive-operators).
 >
