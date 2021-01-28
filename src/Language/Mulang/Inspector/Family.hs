@@ -1,6 +1,7 @@
 {-# LANGUAGE LiberalTypeSynonyms #-}
 
 module Language.Mulang.Inspector.Family (
+  deriveSpecial,
   deriveUses,
   deriveDeclares,
   InspectionFamily,
@@ -16,8 +17,13 @@ type Family a = ((a Bool), Matcher -> (a Bool), Matcher -> (a Count))
 type InspectionFamily = Family Consult
 type BoundInspectionFamily = Family BoundConsult
 
+-- | Derives a non-standard family of inspections from a primal inspection that takes a generic argument,
+-- which consist of just an inspection and a counter
+deriveSpecial :: (a -> Inspection) -> (a -> Inspection, a -> Counter)
+deriveSpecial f = (positive . f', f')
+  where f' = countExpressions . f
 
--- | Derives a family of usage inspections from a primal   inspection,
+-- | Derives a family of usage inspections from a primal inspection,
 -- which consist of a simple inspection, a matching inspection and a counter
 deriveUses :: (Matcher -> Inspection) -> InspectionFamily
 deriveUses f = (uses, usesMatching, countUses)
