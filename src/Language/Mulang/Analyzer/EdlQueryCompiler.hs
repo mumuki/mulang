@@ -57,14 +57,17 @@ compileCQuery rules pm (E.CNot q)           = contextualized never              
 compileCQuery rules pm (E.CAnd q1 q2)       = contextualized2 andAlso             <$> compileCQuery rules pm q1 <*> compileCQuery rules pm q2
 compileCQuery rules pm (E.COr q1 q2)        = contextualized2 orElse              <$> compileCQuery rules pm q1 <*> compileCQuery rules pm q2
 
-compileOrCorrectInspection rules pm query = foo rules pm . fromMaybe query . Map.lookup query $ rules
+compileOrCorrectInspection rules pm query@(E.Inspection "Uses" _ _) = foo rules pm . fromMaybe query . Map.lookup query $ rules
+compileOrCorrectInspection rules pm query@(E.Inspection "Declares" _ _) = foo rules pm . fromMaybe query . Map.lookup query $ rules
+compileOrCorrectInspection rules pm query = foo rules pm query
 foo rules pm (E.Inspection i p m) = ($ (compilePredicate pm p)) <$> compileInspection rules i m
 
 compileTQuery :: AutocorrectionRules -> (IdentifierPredicate -> IdentifierPredicate) -> E.TQuery -> Maybe ContextualizedCounter
 compileTQuery rules pm (E.Counter i p m) = compileOrCorrectCounter rules pm (E.Counter (compileVerb i) p m)
 compileTQuery rules pm (E.Plus q1 q2)    = contextualized2 plus        <$> (compileTQuery rules pm q1) <*> (compileTQuery rules pm q2)
 
-compileOrCorrectCounter rules pm query = foo1 rules pm . fromMaybe query . fmap toCounter . Map.lookup (fromCounter query) $ rules
+compileOrCorrectCounter rules pm query@(E.Counter "Uses" _ _) = foo1 rules pm . fromMaybe query . fmap toCounter . Map.lookup (fromCounter query) $ rules
+compileOrCorrectCounter rules pm query = foo1 rules pm query
 foo1 rules pm (E.Counter i p m) = ($ (compilePredicate pm p)) <$> compileCounter rules i m
 toCounter (E.Inspection i p m) = (E.Counter i p m)
 fromCounter (E.Counter i p m) = (E.Inspection i p m)
