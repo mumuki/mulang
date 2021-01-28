@@ -28,6 +28,14 @@ expectation:
 
 ...which is just syntactic sugar - the `something` keyword is just a dummy token you can add to make the expectation syntax more human-readable.
 
+Likewise, you can use `somewhere` keyword in order to be more explicit about using an _unscoped_ query - more on this later:
+
+```edl
+expectation:
+  %% equivalent to previous example, `somewhere` is just a dummy token
+  somewhere calls something;
+```
+
 Although you can declare unnamed expectations, it is usually more convenient to add an intention-revealing name:
 
 ```edl
