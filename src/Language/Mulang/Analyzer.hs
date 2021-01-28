@@ -42,7 +42,8 @@ analyseAst ast spec = do
   domainLang <- compileDomainLanguage (domainLanguage spec)
   testResults <- analyseTests ast (testAnalysisType spec) (normalizationOptions spec)
 
-  let queryResults = (analyseExpectations ast (expectations spec) ++ analyseCustomExpectations ast (customExpectations spec))
+  let queryResults = (analyseExpectations ast (expectations spec) ++
+                      analyseCustomExpectations (autocorrectionRules spec) ast (customExpectations spec))
   let expectationResults = map snd queryResults
   let context = (queryResults, domainLang)
 

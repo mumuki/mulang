@@ -14,11 +14,9 @@ import Language.Mulang.Analyzer.ExpectationsCompiler (compileBaseQueryAndNegator
 
 import Language.Mulang.Edl (parseExpectations, Expectation (..))
 
-analyseCustomExpectations :: Expression -> Maybe String -> [QueryResult]
-analyseCustomExpectations = analyseCustomExpectations' Map.empty
-
-analyseCustomExpectations' :: AutocorrectionRules -> Expression -> Maybe String -> [QueryResult]
-analyseCustomExpectations' rules ast = map (runExpectation rules ast) . fromMaybe [] . fmap parseExpectations
+analyseCustomExpectations :: Maybe AutocorrectionRules -> Expression -> Maybe String -> [QueryResult]
+analyseCustomExpectations Nothing      ast = analyseCustomExpectations (Just Map.empty) ast
+analyseCustomExpectations (Just rules) ast = map (runExpectation rules ast) . fromMaybe [] . fmap parseExpectations
 
 runExpectation :: AutocorrectionRules -> Expression -> Expectation -> QueryResult
 runExpectation rules ast (Expectation name q) = (q, customExpectationResult name (compileTopQuery' compiledRules q ast))
