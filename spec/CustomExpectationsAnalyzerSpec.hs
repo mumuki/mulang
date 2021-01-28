@@ -219,6 +219,16 @@ spec = describe "ExpectationsAnalyzer" $ do
     -- (run JavaScript "let x = ! y" "expectation: uses `!`") `shouldReturn` nok
     pendingWith "autocorrector does not work with EDL"
 
+  it "evaluates count ( uses negation )" $ do
+    (run Haskell "x = not $ not y" "expectation: count ( uses negation ) >= 1") `shouldReturn` ok
+    (run Haskell "x = not y" "expectation: count ( uses negation ) >= 1") `shouldReturn` ok
+    (run Haskell "x = y" "expectation: count ( uses negation ) >= 1") `shouldReturn` nok
+
+  it "evaluates count calls" $ do
+    (run JavaScript "let x = f(f(y))" "expectation: count ( uses `f` ) >= 1") `shouldReturn` ok
+    (run JavaScript "let x = f(y)" "expectation: count ( uses `f` ) >= 1") `shouldReturn` ok
+    (run JavaScript "let x = y" "expectation: count ( uses `f` ) >= 1") `shouldReturn` nok
+
   it "evaluates uses negation" $ do
     let test = "expectation: uses negation"
 
