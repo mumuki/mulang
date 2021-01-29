@@ -175,7 +175,7 @@ pt:
       UsesComprehension: '%{binding} %{must} usar listas pelo entendimento'
       UsesConditional: '%{binding} %{must} usar conditional'
       UsesCut: '%{binding}  usa o operador !, que é uma má prática'
-      UsesDyamicPolymorphism: '%{binding} %{must} usar polimorfismo'
+      UsesDynamicPolymorphism: '%{binding} %{must} usar polimorfismo'
       UsesDynamicMethodOverload: '%{binding} %{must} usar sobrecarga'
       UsesExceptionHandling: '%{binding} %{must} executar o tratamento de exceção'
       UsesExceptions: '%{binding} %{must} usar exceções'

@@ -133,25 +133,25 @@ spec = do
             int size;
           }|]) `shouldBe` False
 
-  describe "usesDyamicPolymorphism" $ do
+  describe "usesDynamicPolymorphism" $ do
     it "is True when uses" $ do
-      usesDyamicPolymorphism (java [text|
+      usesDynamicPolymorphism (java [text|
           class Bird { void sing() {} }
           class Performer { void sing() {} }
           class Festival { void run(Object o) { o.sing(); } }|]) `shouldBe` True
 
     it "is False when there is just one implementor" $ do
-      usesDyamicPolymorphism (java [text|
+      usesDynamicPolymorphism (java [text|
           class Bird { void sing() {} }
           class Festival { void run(Object o) { o.sing(); } }|]) `shouldBe` False
 
     it "is False when there is no user" $ do
-      usesDyamicPolymorphism (java [text|
+      usesDynamicPolymorphism (java [text|
         class Bird { void sing() {} }
         class Performer { void sing() {} }|]) `shouldBe` False
 
     it "is False when not uses" $ do
-      usesDyamicPolymorphism (java [text|
+      usesDynamicPolymorphism (java [text|
         class Sample { void aMethod() { throw new Exception(); } }|]) `shouldBe` False
 
   describe "usesStaticPolymorphism'" $ do
