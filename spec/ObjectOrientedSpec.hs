@@ -26,6 +26,14 @@ spec = do
     it "is False when not instantiates" $ do
       instantiates (named "Bird") (java "class Main {  void main(String[] args) { Animal a = new Mammal(); }  }") `shouldBe` False
 
+    it "is True when instantiates a HashSet" $ do
+      instantiates (named "TreeSet") (java "class Main {  private Set<String> aSet = new TreeSet<>(); }") `shouldBe` True
+      instantiates (named "HashSet") (java "class Main {  private Set<String> aSet = new TreeSet<>(); }") `shouldBe` False
+
+    it "is False when not instantiates a HashSet" $ do
+      instantiates (named "TreeSet") (java "class Main {  private Set<String> aSet = new HashSet<>(); }") `shouldBe` False
+      instantiates (named "HashSet") (java "class Main {  private Set<String> aSet = new HashSet<>(); }") `shouldBe` True
+
   describe "implements" $ do
     it "is True when implements" $ do
       implements (named "Bird") (java "class Eagle implements Bird {}") `shouldBe` True
