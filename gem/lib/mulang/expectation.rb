@@ -72,7 +72,7 @@ module Mulang::Expectation
   def self.guess_type(expectation)
     if expectation[:binding] == '<<custom>>'
       Custom
-    elsif expectation[:inspection] =~ /(Not\:)?Has.*/ && !has_smell?(expectation[:inspection])
+    elsif expectation[:inspection] =~ /^(Not\:)?Has.*/ && !has_smell?(expectation[:inspection])
       V0
     else
       V2

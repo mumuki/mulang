@@ -31,6 +31,10 @@ describe Mulang::Expectation do
 
     it { expect(subject.guess_type binding: 'foo', inspection: 'HasEmptyRepeat').to be Mulang::Expectation::V2 }
     it { expect(subject.guess_type binding: 'foo', inspection: 'HasRedundantBooleanComparison').to be Mulang::Expectation::V2 }
+
+    context 'when inspections have dangling `Has`' do
+      it { expect(subject.guess_type binding: 'foo', inspection: 'Instantiates:HashMap').to be Mulang::Expectation::V2 }
+    end
   end
 
   describe 'it can convert back to hash' do
@@ -111,7 +115,15 @@ describe Mulang::Expectation do
           .to json_like binding: 'foo', inspection: {type: 'UsesWhile', negated: false}   }
 
     it { expect(subject.parse(binding: 'foo', inspection: 'HasUsage:bar').as_v2)
-          .to json_like binding: 'foo', inspection: {type: 'Uses', target: {type: :named, value: 'bar'}, negated: false}   }
+          .to json_like binding: 'foo', inspection: {type: 'Uses', target: {type: :named, value: 'bar'}, negated: false} }
+
+    context 'when inspections have dangling `Has`' do
+      it { expect(subject.parse(binding: '*', inspection: 'UsesHash').as_v2)
+            .to json_like binding: '*', inspection: {type: 'UsesHash', negated: false }  }
+
+      it { expect(subject.parse(binding: '*', inspection: 'Instantiates:HashMap').as_v2)
+            .to json_like binding: '*', inspection: {type: 'Instantiates', target: {type: :unknown, value: 'HashMap'}, negated: false } }
+    end
 
   end
 end
