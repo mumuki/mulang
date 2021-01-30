@@ -97,6 +97,10 @@ spec = do
       run Ruby (Expectation "*" "Uses:and") `shouldBe` (Expectation "*" "UsesAnd")
       run Ruby (Expectation "*"  "Uses:&&") `shouldBe` (Expectation "*" "UsesAnd")
 
+    it "corrects ruby size" $ do
+      run Ruby (Expectation "*" "Uses:size") `shouldBe` (Expectation "*" "UsesSize")
+      run Ruby (Expectation "*"  "Uses:length") `shouldBe` (Expectation "*" "UsesSize")
+
     it "corrects JS operators" $ do
       run JavaScript (Expectation "*" "Uses:+") `shouldBe` (Expectation "*" "UsesPlus")
       run JavaScript (Expectation "*" "Uses:&&") `shouldBe` (Expectation "*" "UsesAnd")

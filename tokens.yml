@@ -156,6 +156,9 @@ Ruby:
     Switch: 'case'
   operators:
     <<: *common_operators
+    Size:
+      - "length"
+      - "size"
     And:
       - "&&"
       - "and"
