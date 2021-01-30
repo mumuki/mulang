@@ -121,12 +121,20 @@ spec = do
     it "handles length" $ do
       js "[1, 2].length" `shouldBe` (Application (Primitive Size) [MuList [MuNumber 1, MuNumber 2]])
 
+    it "handles length following function call" $ do
+      js "f().length" `shouldBe` (Application (Primitive Size) [Application (Reference "f") []])
+
+    it "handles length following field access" $ do
+      js "a.b.length" `shouldBe` (Application (Primitive Size) [FieldReference (Reference "a") "b"])
+
     it "handles push" $ do
       js "[1, 2].push(r)" `shouldBe` (Application (Primitive Push) [MuList [MuNumber 1, MuNumber 2], Reference "r"])
 
     it "handles push following function call" $ do
       js "f().push(r)" `shouldBe` (Application (Primitive Push) [Application (Reference "f") [], Reference "r"])
 
+    it "handles push following field access" $ do
+      js "a.b.push(r)" `shouldBe` (Application (Primitive Push) [FieldReference (Reference "a") "b",Reference "r"])
 
     it "handles parenthesis around variables" $ do
       js "function f() { return (x) } " `shouldBe` (SimpleFunction "f" [] (Return (Reference "x")))

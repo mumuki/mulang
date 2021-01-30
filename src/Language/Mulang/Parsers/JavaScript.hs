@@ -165,6 +165,7 @@ muJSExpression (JSArrayLiteral _ list _)                            = MuList (mu
 muJSExpression (JSAssignExpression (JSIdentifier _ name) op value)  = Assignment name (muJSAssignOp op name.muJSExpression $ value)
 muJSExpression (JSMemberExpression (JSMemberDot r _ m) _ ps _)      = muSend r m ps
 muJSExpression (JSCallExpression (JSCallExpressionDot r _ m) _ ps _)= muSend r m ps
+muJSExpression (JSCallExpressionDot e _ (JSIdentifier _ "length"))  = Application (Primitive Size) [(muJSExpression e)]
 --muJSExpression (JSCallExpressionSquare JSExpression _ JSExpression _)  -- ^expr, [, expr, ]
 --muJSExpression (JSCommaExpression JSExpression _ JSExpression)          -- ^expression components
 muJSExpression (JSExpressionBinary firstVal op secondVal)           = Application (muJSBinOp op) [muJSExpression firstVal, muJSExpression secondVal]
