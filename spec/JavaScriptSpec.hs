@@ -121,6 +121,13 @@ spec = do
     it "handles length" $ do
       js "[1, 2].length" `shouldBe` (Application (Primitive Size) [MuList [MuNumber 1, MuNumber 2]])
 
+    it "handles push" $ do
+      js "[1, 2].push(r)" `shouldBe` (Application (Primitive Push) [MuList [MuNumber 1, MuNumber 2], Reference "r"])
+
+    it "handles push following function call" $ do
+      js "f().push(r)" `shouldBe` (Application (Primitive Push) [Application (Reference "f") [], Reference "r"])
+
+
     it "handles parenthesis around variables" $ do
       js "function f() { return (x) } " `shouldBe` (SimpleFunction "f" [] (Return (Reference "x")))
       js "let y = (x)" `shouldBe` (Variable "y" (Reference "x"))

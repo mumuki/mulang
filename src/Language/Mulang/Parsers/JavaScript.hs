@@ -57,7 +57,7 @@ muJSStatement (JSEmptyStatement _)                                          = No
 muJSStatement (JSExpressionStatement (JSIdentifier _ val) _)                = Reference val
 muJSStatement (JSExpressionStatement expression _)                          = muJSExpression expression
 muJSStatement (JSAssignStatement to op value _)                             = muAssignment to op (muJSExpression value)
-muJSStatement (JSMethodCall (JSMemberDot receptor _ message) _ params _ _)  = normalizeReference $ muSend receptor message params
+muJSStatement (JSMethodCall (JSMemberDot receptor _ message) _ params _ _)  = muSend receptor message params
 muJSStatement (JSMethodCall ident _ params _ _)                             = normalizeReference $ Application (muJSExpression ident) (muJSExpressionList params)
 muJSStatement (JSReturn _ maybeExpression _)                                = Return (maybe None muJSExpression maybeExpression)
 muJSStatement (JSSwitch _ _ expression _ _ cases _ _)                       = muSwitch expression . partition isDefault $ cases
@@ -147,7 +147,7 @@ containsReturn _             = False
 
 
 muSend :: JSExpression -> JSExpression -> JSCommaList JSExpression -> Expression
-muSend r m ps = Send (muJSExpression r) (muJSExpression m) (muJSExpressionList ps)
+muSend r m ps = normalizeReference $ Send (muJSExpression r) (muJSExpression m) (muJSExpressionList ps)
 
 muJSExpression:: JSExpression -> Expression
 muJSExpression (JSIdentifier _ "undefined")                         = None
