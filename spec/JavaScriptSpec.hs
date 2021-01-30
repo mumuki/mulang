@@ -135,6 +135,21 @@ spec = do
     it "handles lambdas" $ do
       js "(function(x, y) { 1 })" `shouldBe` (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1))
 
+    it "handles arrow lambdas" $ do
+      js "((x, y) => { 1 })" `shouldBe` (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1))
+
+    it "handles arrow lambdas without body" $ do
+      js "((x, y) => 1 )" `shouldBe` (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1))
+
+    it "handles arrow lambdas without body nor parenthesis" $ do
+      js "(x => 1 )" `shouldBe` (Lambda [VariablePattern "x"] (MuNumber 1))
+
+    it "handles method calls with arrow lambdas without body" $ do
+      js "list.map(x => x + 1)" `shouldBe` ( Send (Reference "list") (Reference "map") [Lambda [VariablePattern "x"] (Application (Primitive Plus) [Reference "x",MuNumber 1.0])])
+
+    it "handles method calls with arrow lambdas without body following a function call" $ do
+      js "f(xs).map(b => b.m)" `shouldBe` (Send (Application (Reference "f") [Reference "xs"]) (Reference "map") [Lambda [VariablePattern "b"] (FieldReference (Reference "b") "m")])
+
     it "handles application" $ do
       js "f(2)" `shouldBe` (Application (Reference "f") [MuNumber 2])
 
@@ -143,6 +158,9 @@ spec = do
 
     it "handles message send" $ do
       js "o.f(2)" `shouldBe` (Send (Reference "o") (Reference "f") [(MuNumber 2)])
+
+    it "handles message send following a function call" $ do
+      js "o().f(2)" `shouldBe` (Send (Application (Reference "o") []) (Reference "f") [(MuNumber 2)])
 
     it "handles ifs" $ do
       js "if(x) y else z" `shouldBe` If (Reference "x") (Reference "y") (Reference "z")

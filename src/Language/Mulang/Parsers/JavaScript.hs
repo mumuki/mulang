@@ -160,9 +160,8 @@ muJSExpression (JSStringLiteral _ val)                              = MuString (
 --muJSExpression (JSRegEx _ String)
 muJSExpression (JSArrayLiteral _ list _)                            = MuList (muJSArrayList list)
 muJSExpression (JSAssignExpression (JSIdentifier _ name) op value)  = Assignment name (muJSAssignOp op name.muJSExpression $ value)
-muJSExpression (JSMemberExpression (JSMemberDot receptor _ message) _ params _)  = Send (muJSExpression receptor) (muJSExpression message) (muJSExpressionList params)
---muJSExpression (JSCallExpression expression _ params _) = Application (muJSExpression expression) (muJSExpressionList expressionList)
---muJSExpression (JSCallExpressionDot JSExpression _ JSExpression)  -- ^expr, dot, expr
+muJSExpression (JSMemberExpression (JSMemberDot r _ m) _ ps _)      = Send (muJSExpression r) (muJSExpression m) (muJSExpressionList ps)
+muJSExpression (JSCallExpression (JSCallExpressionDot r _ m) _ ps _)= Send (muJSExpression r) (muJSExpression m) (muJSExpressionList ps)
 --muJSExpression (JSCallExpressionSquare JSExpression _ JSExpression _)  -- ^expr, [, expr, ]
 --muJSExpression (JSCommaExpression JSExpression _ JSExpression)          -- ^expression components
 muJSExpression (JSExpressionBinary firstVal op secondVal)           = Application (muJSBinOp op) [muJSExpression firstVal, muJSExpression secondVal]
