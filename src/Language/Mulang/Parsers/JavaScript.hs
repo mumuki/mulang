@@ -145,6 +145,9 @@ containsReturn (Return _)    = True
 containsReturn (Sequence xs) = any containsReturn xs
 containsReturn _             = False
 
+muFieldReference :: JSExpression -> String -> Expression
+muFieldReference e "length"  = Application (Primitive Size) [(muJSExpression e)]
+muFieldReference e other     = FieldReference (muJSExpression e) other
 
 muSend :: JSExpression -> JSExpression -> JSCommaList JSExpression -> Expression
 muSend r m ps = normalizeReference $ Send (muJSExpression r) (muJSExpression m) (muJSExpressionList ps)
@@ -165,8 +168,8 @@ muJSExpression (JSArrayLiteral _ list _)                            = MuList (mu
 muJSExpression (JSAssignExpression (JSIdentifier _ name) op value)  = Assignment name (muJSAssignOp op name.muJSExpression $ value)
 muJSExpression (JSMemberExpression (JSMemberDot r _ m) _ ps _)      = muSend r m ps
 muJSExpression (JSCallExpression (JSCallExpressionDot r _ m) _ ps _)= muSend r m ps
-muJSExpression (JSCallExpressionDot e _ (JSIdentifier _ "length"))  = Application (Primitive Size) [(muJSExpression e)]
-muJSExpression (JSCallExpressionDot e _ (JSIdentifier _ field))     = FieldReference (muJSExpression e) field
+muJSExpression (JSMemberDot e _ (JSIdentifier _ field))             = muFieldReference e field
+muJSExpression (JSCallExpressionDot e _ (JSIdentifier _ field))     = muFieldReference e field
 --muJSExpression (JSCallExpressionSquare JSExpression _ JSExpression _)  -- ^expr, [, expr, ]
 --muJSExpression (JSCommaExpression JSExpression _ JSExpression)          -- ^expression components
 muJSExpression (JSExpressionBinary firstVal op secondVal)           = Application (muJSBinOp op) [muJSExpression firstVal, muJSExpression secondVal]
@@ -175,8 +178,6 @@ muJSExpression (JSExpressionPostfix (JSIdentifier _ name) op)       = Assignment
 muJSExpression (JSExpressionTernary condition _ trueVal _ falseVal) = If (muJSExpression condition) (muJSExpression trueVal) (muJSExpression falseVal)
 muJSExpression (JSFunctionExpression _ ident _ params _ body)       = muComputation ident params body
 muJSExpression (JSArrowExpression  params _ body)                   = Lambda (muJSArrowParameterList params) (muJSStatement body)
-muJSExpression (JSMemberDot receptor _ (JSIdentifier _ "length"))   = Application (Primitive Size) [muJSExpression receptor]
-muJSExpression (JSMemberDot receptor _ (JSIdentifier _ field))      = FieldReference (muJSExpression receptor) field
 muJSExpression (JSMemberExpression id _ params _)                   = Application (muJSExpression id) (muJSExpressionList params)
 muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _)       = New (Reference name) (muJSExpressionList args)
 muJSExpression (JSMemberSquare receptor _ index _)                  = Application (Primitive GetAt) [muJSExpression receptor, muJSExpression index]
