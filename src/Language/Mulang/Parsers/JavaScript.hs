@@ -80,9 +80,10 @@ normalizeReference (Application (Reference "context")            [description, L
 normalizeReference (Application (Reference "it")                 [description, Lambda [] e]) = Test description e
 normalizeReference e                                                                         = e
 
-muAssignment (JSIdentifier _ name) op value                       = Assignment name (muJSAssignOp op name value)
-muAssignment (JSMemberDot expr1 _ (JSIdentifier _ name)) op value = FieldAssignment (muJSExpression expr1) name (muJSAssignOp op name value)
-muAssignment other op value                                       = MuTuple [debug other, debug op, debug value]
+muAssignment (JSIdentifier _ name) op value                           = Assignment name (muJSAssignOp op name value)
+muAssignment (JSMemberDot e _ (JSIdentifier _ name)) op value         = muFieldAssignment e name op value
+muAssignment (JSCallExpressionDot e _ (JSIdentifier _ name)) op value = muFieldAssignment e name op value
+muAssignment other op value                                           = MuTuple [debug other, debug op, debug value]
 
 muLValue :: (Identifier -> Expression -> Expression) -> JSCommaList JSExpression -> Expression
 muLValue kind = compact . mapJSList f
@@ -148,6 +149,9 @@ containsReturn _             = False
 muFieldReference :: JSExpression -> String -> Expression
 muFieldReference e "length"  = Application (Primitive Size) [(muJSExpression e)]
 muFieldReference e other     = FieldReference (muJSExpression e) other
+
+muFieldAssignment :: JSExpression -> String -> JSAssignOp -> Expression -> Expression
+muFieldAssignment e name op value = FieldAssignment (muJSExpression e) name (muJSAssignOp op name value)
 
 muSend :: JSExpression -> JSExpression -> JSCommaList JSExpression -> Expression
 muSend r m ps = normalizeReference $ Send (muJSExpression r) (muJSExpression m) (muJSExpressionList ps)

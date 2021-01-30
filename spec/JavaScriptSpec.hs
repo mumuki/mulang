@@ -111,6 +111,9 @@ spec = do
     it "handles field assignment" $ do
       js "x.y = 4;" `shouldBe` (FieldAssignment (Reference "x") "y" (MuNumber (4.0)))
 
+    it "handles field assignment after field reference" $ do
+      js "x.y.z = 4;" `shouldBe` (FieldAssignment (FieldReference (Reference "x") "y") "z" (MuNumber (4.0)))
+
     it "handles dict assignment" $ do
       -- js "x['y'] = 4;" `shouldBe` (Application  (Primitive SetAt) [Reference "x", MuString "y", MuNumber (4.0)])
       pending
@@ -185,6 +188,9 @@ spec = do
 
     it "handles message send followed by a field reference" $ do
       js "a.f(2).b" `shouldBe` (FieldReference (Send (Reference "a") (Reference "f") [MuNumber 2.0]) "b")
+
+    it "handles message send followed by a field assignment" $ do
+      js "a.f(2).b = 3" `shouldBe` (FieldAssignment (Send (Reference "a") (Reference "f") [MuNumber 2.0]) "b" (MuNumber 3.0))
 
     it "handles ifs" $ do
       js "if(x) y else z" `shouldBe` If (Reference "x") (Reference "y") (Reference "z")
