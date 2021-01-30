@@ -102,7 +102,7 @@ spec = do
     it "handles this" $ do
       js "this" `shouldBe` Self
 
-    it "handles field access" $ do
+    it "handles field reference" $ do
       js "x.y" `shouldBe` (FieldReference (Reference "x") "y")
 
     it "handles dict access" $ do
@@ -124,7 +124,7 @@ spec = do
     it "handles length following function call" $ do
       js "f().length" `shouldBe` (Application (Primitive Size) [Application (Reference "f") []])
 
-    it "handles length following field access" $ do
+    it "handles length following field reference" $ do
       js "a.b.length" `shouldBe` (Application (Primitive Size) [FieldReference (Reference "a") "b"])
 
     it "handles push" $ do
@@ -133,7 +133,7 @@ spec = do
     it "handles push following function call" $ do
       js "f().push(r)" `shouldBe` (Application (Primitive Push) [Application (Reference "f") [], Reference "r"])
 
-    it "handles push following field access" $ do
+    it "handles push following field reference" $ do
       js "a.b.push(r)" `shouldBe` (Application (Primitive Push) [FieldReference (Reference "a") "b",Reference "r"])
 
     it "handles parenthesis around variables" $ do
@@ -176,6 +176,15 @@ spec = do
 
     it "handles message send following a function call" $ do
       js "o().f(2)" `shouldBe` (Send (Application (Reference "o") []) (Reference "f") [(MuNumber 2)])
+
+    it "handles message send following a field reference" $ do
+      js "a.b.f(2)" `shouldBe` (Send (FieldReference (Reference "a") "b") (Reference "f") [MuNumber 2.0])
+
+    it "handles message send followed by another message send" $ do
+      js "a.o().f(2)" `shouldBe` (Send (Send (Reference "a") (Reference "o") []) (Reference "f") [MuNumber 2.0])
+
+    it "handles message send followed by a field reference" $ do
+      js "a.f(2).b" `shouldBe` (FieldReference (Send (Reference "a") (Reference "f") [MuNumber 2.0]) "b")
 
     it "handles ifs" $ do
       js "if(x) y else z" `shouldBe` If (Reference "x") (Reference "y") (Reference "z")

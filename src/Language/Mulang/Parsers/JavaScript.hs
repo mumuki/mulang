@@ -166,6 +166,7 @@ muJSExpression (JSAssignExpression (JSIdentifier _ name) op value)  = Assignment
 muJSExpression (JSMemberExpression (JSMemberDot r _ m) _ ps _)      = muSend r m ps
 muJSExpression (JSCallExpression (JSCallExpressionDot r _ m) _ ps _)= muSend r m ps
 muJSExpression (JSCallExpressionDot e _ (JSIdentifier _ "length"))  = Application (Primitive Size) [(muJSExpression e)]
+muJSExpression (JSCallExpressionDot e _ (JSIdentifier _ field))     = FieldReference (muJSExpression e) field
 --muJSExpression (JSCallExpressionSquare JSExpression _ JSExpression _)  -- ^expr, [, expr, ]
 --muJSExpression (JSCommaExpression JSExpression _ JSExpression)          -- ^expression components
 muJSExpression (JSExpressionBinary firstVal op secondVal)           = Application (muJSBinOp op) [muJSExpression firstVal, muJSExpression secondVal]
@@ -175,7 +176,7 @@ muJSExpression (JSExpressionTernary condition _ trueVal _ falseVal) = If (muJSEx
 muJSExpression (JSFunctionExpression _ ident _ params _ body)       = muComputation ident params body
 muJSExpression (JSArrowExpression  params _ body)                   = Lambda (muJSArrowParameterList params) (muJSStatement body)
 muJSExpression (JSMemberDot receptor _ (JSIdentifier _ "length"))   = Application (Primitive Size) [muJSExpression receptor]
-muJSExpression (JSMemberDot receptor _ (JSIdentifier _ message))    = FieldReference (muJSExpression receptor) message
+muJSExpression (JSMemberDot receptor _ (JSIdentifier _ field))      = FieldReference (muJSExpression receptor) field
 muJSExpression (JSMemberExpression id _ params _)                   = Application (muJSExpression id) (muJSExpressionList params)
 muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _)       = New (Reference name) (muJSExpressionList args)
 muJSExpression (JSMemberSquare receptor _ index _)                  = Application (Primitive GetAt) [muJSExpression receptor, muJSExpression index]
