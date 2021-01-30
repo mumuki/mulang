@@ -57,7 +57,7 @@ muJSStatement (JSEmptyStatement _)                                          = No
 muJSStatement (JSExpressionStatement (JSIdentifier _ val) _)                = Reference val
 muJSStatement (JSExpressionStatement expression _)                          = muJSExpression expression
 muJSStatement (JSAssignStatement to op value _)                             = muAssignment to op (muJSExpression value)
-muJSStatement (JSMethodCall (JSMemberDot receptor _ message) _ params _ _)  = normalizeReference $ Send (muJSExpression receptor) (muJSExpression message) (muJSExpressionList params)
+muJSStatement (JSMethodCall (JSMemberDot receptor _ message) _ params _ _)  = normalizeReference $ muSend receptor message params
 muJSStatement (JSMethodCall ident _ params _ _)                             = normalizeReference $ Application (muJSExpression ident) (muJSExpressionList params)
 muJSStatement (JSReturn _ maybeExpression _)                                = Return (maybe None muJSExpression maybeExpression)
 muJSStatement (JSSwitch _ _ expression _ _ cases _ _)                       = muSwitch expression . partition isDefault $ cases
@@ -146,6 +146,9 @@ containsReturn (Sequence xs) = any containsReturn xs
 containsReturn _             = False
 
 
+muSend :: JSExpression -> JSExpression -> JSCommaList JSExpression -> Expression
+muSend r m ps = Send (muJSExpression r) (muJSExpression m) (muJSExpressionList ps)
+
 muJSExpression:: JSExpression -> Expression
 muJSExpression (JSIdentifier _ "undefined")                         = None
 muJSExpression (JSIdentifier _ name)                                = Reference name
@@ -160,8 +163,8 @@ muJSExpression (JSStringLiteral _ val)                              = MuString (
 --muJSExpression (JSRegEx _ String)
 muJSExpression (JSArrayLiteral _ list _)                            = MuList (muJSArrayList list)
 muJSExpression (JSAssignExpression (JSIdentifier _ name) op value)  = Assignment name (muJSAssignOp op name.muJSExpression $ value)
-muJSExpression (JSMemberExpression (JSMemberDot r _ m) _ ps _)      = Send (muJSExpression r) (muJSExpression m) (muJSExpressionList ps)
-muJSExpression (JSCallExpression (JSCallExpressionDot r _ m) _ ps _)= Send (muJSExpression r) (muJSExpression m) (muJSExpressionList ps)
+muJSExpression (JSMemberExpression (JSMemberDot r _ m) _ ps _)      = muSend r m ps
+muJSExpression (JSCallExpression (JSCallExpressionDot r _ m) _ ps _)= muSend r m ps
 --muJSExpression (JSCallExpressionSquare JSExpression _ JSExpression _)  -- ^expr, [, expr, ]
 --muJSExpression (JSCommaExpression JSExpression _ JSExpression)          -- ^expression components
 muJSExpression (JSExpressionBinary firstVal op secondVal)           = Application (muJSBinOp op) [muJSExpression firstVal, muJSExpression secondVal]
