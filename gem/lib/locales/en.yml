@@ -171,7 +171,7 @@ en:
       UsesComprehension: '%{binding} %{must} use comprehensions'
       UsesConditional: '%{binding} %{must} use conditionals'
       UsesCut: '%{binding} uses <code>!</li> operator, which is a bad practice'
-      UsesDyamicPolymorphism: '%{binding} %{must} use polymorphism'
+      UsesDynamicPolymorphism: '%{binding} %{must} use polymorphism'
       UsesDynamicMethodOverload: '%{binding} %{must} use overload'
       UsesFail: '%{binding} uses <code>%{keyword_Fail}</li>, which is a bad practice'
       UsesFindall: '%{binding} %{must} use <code>%{keyword_Findall}</code>'

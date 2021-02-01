@@ -1,8 +1,8 @@
 {-# LANGUAGE ViewPatterns #-}
 
 module Language.Mulang.Inspector.ObjectOriented.Polymorphism (
-  usesDyamicPolymorphism,
-  usesDyamicPolymorphism',
+  usesDynamicPolymorphism,
+  usesDynamicPolymorphism',
   usesStaticPolymorphism,
   usesStaticPolymorphism',
   usesTemplateMethod,
@@ -47,11 +47,11 @@ usesTemplateMethod expression = inspect $ do
   (SimpleSend Self selector _) <- expressions klass
   select (not . declaresMethod (named selector) $ klass)
 
-usesDyamicPolymorphism :: Inspection
-usesDyamicPolymorphism = decontextualize usesDyamicPolymorphism'
+usesDynamicPolymorphism :: Inspection
+usesDynamicPolymorphism = decontextualize usesDynamicPolymorphism'
 
-usesDyamicPolymorphism' :: ContextualizedInspection
-usesDyamicPolymorphism' context expression = inspect $ do
+usesDynamicPolymorphism' :: ContextualizedInspection
+usesDynamicPolymorphism' context expression = inspect $ do
   (SimpleSend _ selector _) <- expressions expression
   selectCount (>1) (methodDeclarationsOf selector context)
 

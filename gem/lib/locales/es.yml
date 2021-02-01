@@ -183,7 +183,7 @@ es:
       UsesComprehension: '%{binding} %{must} emplear listas por comprensión'
       UsesConditional: '%{binding} %{must} utilizar condicionales'
       UsesCut: '%{binding} usa el operador !, lo cual es una mala práctica'
-      UsesDyamicPolymorphism: '%{binding} %{must} usar polimorfismo'
+      UsesDynamicPolymorphism: '%{binding} %{must} usar polimorfismo'
       UsesDynamicMethodOverload: '%{binding} %{must} usar sobrecarga'
       UsesExceptionHandling: '%{binding} %{must} realizar manejo de excepciones'
       UsesExceptions: '%{binding} %{must} usar excepciones'

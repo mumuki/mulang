@@ -158,7 +158,7 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `Instantiates`                    | is the given class instantiated?
 | `OverridesEqualsOrHashButNotBoth` | does a given class override equals but not hash? or hash but not equals?
 | `ReturnsNil`                      |
-| `UsesDyamicPolymorphism`          | are there two or more methods definitions for some sent selector?
+| `UsesDynamicPolymorphism`          | are there two or more methods definitions for some sent selector?
 | `UsesDynamicMethodOverload`       | is there a class that defined two methods with different arity but with the same name?
 | `UsesInheritance`                 | is any superclass explicitly declared?
 | `UsesMixins`                      | is any mixins explicitly included?
