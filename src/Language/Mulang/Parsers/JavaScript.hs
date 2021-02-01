@@ -57,7 +57,7 @@ muJSStatement (JSEmptyStatement _)                                          = No
 muJSStatement (JSExpressionStatement (JSIdentifier _ val) _)                = Reference val
 muJSStatement (JSExpressionStatement expression _)                          = muJSExpression expression
 muJSStatement (JSAssignStatement to op value _)                             = muAssignment to op (muJSExpression value)
-muJSStatement (JSMethodCall (JSMemberDot receptor _ message) _ params _ _)  = normalizeReference $ Send (muJSExpression receptor) (muJSExpression message) (muJSExpressionList params)
+muJSStatement (JSMethodCall (JSMemberDot receptor _ message) _ params _ _)  = muSend receptor message params
 muJSStatement (JSMethodCall ident _ params _ _)                             = normalizeReference $ Application (muJSExpression ident) (muJSExpressionList params)
 muJSStatement (JSReturn _ maybeExpression _)                                = Return (maybe None muJSExpression maybeExpression)
 muJSStatement (JSSwitch _ _ expression _ _ cases _ _)                       = muSwitch expression . partition isDefault $ cases
@@ -80,9 +80,10 @@ normalizeReference (Application (Reference "context")            [description, L
 normalizeReference (Application (Reference "it")                 [description, Lambda [] e]) = Test description e
 normalizeReference e                                                                         = e
 
-muAssignment (JSIdentifier _ name) op value                       = Assignment name (muJSAssignOp op name value)
-muAssignment (JSMemberDot expr1 _ (JSIdentifier _ name)) op value = FieldAssignment (muJSExpression expr1) name (muJSAssignOp op name value)
-muAssignment other op value                                       = MuTuple [debug other, debug op, debug value]
+muAssignment (JSIdentifier _ name) op value                           = Assignment name (muJSAssignOp op name value)
+muAssignment (JSMemberDot e _ (JSIdentifier _ name)) op value         = muFieldAssignment e name op value
+muAssignment (JSCallExpressionDot e _ (JSIdentifier _ name)) op value = muFieldAssignment e name op value
+muAssignment other op value                                           = MuTuple [debug other, debug op, debug value]
 
 muLValue :: (Identifier -> Expression -> Expression) -> JSCommaList JSExpression -> Expression
 muLValue kind = compact . mapJSList f
@@ -145,6 +146,15 @@ containsReturn (Return _)    = True
 containsReturn (Sequence xs) = any containsReturn xs
 containsReturn _             = False
 
+muFieldReference :: JSExpression -> String -> Expression
+muFieldReference e "length"  = Application (Primitive Size) [(muJSExpression e)]
+muFieldReference e other     = FieldReference (muJSExpression e) other
+
+muFieldAssignment :: JSExpression -> String -> JSAssignOp -> Expression -> Expression
+muFieldAssignment e name op value = FieldAssignment (muJSExpression e) name (muJSAssignOp op name value)
+
+muSend :: JSExpression -> JSExpression -> JSCommaList JSExpression -> Expression
+muSend r m ps = normalizeReference $ Send (muJSExpression r) (muJSExpression m) (muJSExpressionList ps)
 
 muJSExpression:: JSExpression -> Expression
 muJSExpression (JSIdentifier _ "undefined")                         = None
@@ -160,9 +170,10 @@ muJSExpression (JSStringLiteral _ val)                              = MuString (
 --muJSExpression (JSRegEx _ String)
 muJSExpression (JSArrayLiteral _ list _)                            = MuList (muJSArrayList list)
 muJSExpression (JSAssignExpression (JSIdentifier _ name) op value)  = Assignment name (muJSAssignOp op name.muJSExpression $ value)
-muJSExpression (JSMemberExpression (JSMemberDot receptor _ message) _ params _)  = Send (muJSExpression receptor) (muJSExpression message) (muJSExpressionList params)
---muJSExpression (JSCallExpression expression _ params _) = Application (muJSExpression expression) (muJSExpressionList expressionList)
---muJSExpression (JSCallExpressionDot JSExpression _ JSExpression)  -- ^expr, dot, expr
+muJSExpression (JSMemberExpression (JSMemberDot r _ m) _ ps _)      = muSend r m ps
+muJSExpression (JSCallExpression (JSCallExpressionDot r _ m) _ ps _)= muSend r m ps
+muJSExpression (JSMemberDot e _ (JSIdentifier _ field))             = muFieldReference e field
+muJSExpression (JSCallExpressionDot e _ (JSIdentifier _ field))     = muFieldReference e field
 --muJSExpression (JSCallExpressionSquare JSExpression _ JSExpression _)  -- ^expr, [, expr, ]
 --muJSExpression (JSCommaExpression JSExpression _ JSExpression)          -- ^expression components
 muJSExpression (JSExpressionBinary firstVal op secondVal)           = Application (muJSBinOp op) [muJSExpression firstVal, muJSExpression secondVal]
@@ -171,8 +182,6 @@ muJSExpression (JSExpressionPostfix (JSIdentifier _ name) op)       = Assignment
 muJSExpression (JSExpressionTernary condition _ trueVal _ falseVal) = If (muJSExpression condition) (muJSExpression trueVal) (muJSExpression falseVal)
 muJSExpression (JSFunctionExpression _ ident _ params _ body)       = muComputation ident params body
 muJSExpression (JSArrowExpression  params _ body)                   = Lambda (muJSArrowParameterList params) (muJSStatement body)
-muJSExpression (JSMemberDot receptor _ (JSIdentifier _ "length"))   = Application (Primitive Size) [muJSExpression receptor]
-muJSExpression (JSMemberDot receptor _ (JSIdentifier _ message))    = FieldReference (muJSExpression receptor) message
 muJSExpression (JSMemberExpression id _ params _)                   = Application (muJSExpression id) (muJSExpressionList params)
 muJSExpression (JSMemberNew _ (JSIdentifier _ name) _ args _)       = New (Reference name) (muJSExpressionList args)
 muJSExpression (JSMemberSquare receptor _ index _)                  = Application (Primitive GetAt) [muJSExpression receptor, muJSExpression index]

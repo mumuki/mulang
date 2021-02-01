@@ -102,7 +102,7 @@ spec = do
     it "handles this" $ do
       js "this" `shouldBe` Self
 
-    it "handles field access" $ do
+    it "handles field reference" $ do
       js "x.y" `shouldBe` (FieldReference (Reference "x") "y")
 
     it "handles dict access" $ do
@@ -110,6 +110,9 @@ spec = do
 
     it "handles field assignment" $ do
       js "x.y = 4;" `shouldBe` (FieldAssignment (Reference "x") "y" (MuNumber (4.0)))
+
+    it "handles field assignment after field reference" $ do
+      js "x.y.z = 4;" `shouldBe` (FieldAssignment (FieldReference (Reference "x") "y") "z" (MuNumber (4.0)))
 
     it "handles dict assignment" $ do
       -- js "x['y'] = 4;" `shouldBe` (Application  (Primitive SetAt) [Reference "x", MuString "y", MuNumber (4.0)])
@@ -120,6 +123,21 @@ spec = do
 
     it "handles length" $ do
       js "[1, 2].length" `shouldBe` (Application (Primitive Size) [MuList [MuNumber 1, MuNumber 2]])
+
+    it "handles length following function call" $ do
+      js "f().length" `shouldBe` (Application (Primitive Size) [Application (Reference "f") []])
+
+    it "handles length following field reference" $ do
+      js "a.b.length" `shouldBe` (Application (Primitive Size) [FieldReference (Reference "a") "b"])
+
+    it "handles push" $ do
+      js "[1, 2].push(r)" `shouldBe` (Application (Primitive Push) [MuList [MuNumber 1, MuNumber 2], Reference "r"])
+
+    it "handles push following function call" $ do
+      js "f().push(r)" `shouldBe` (Application (Primitive Push) [Application (Reference "f") [], Reference "r"])
+
+    it "handles push following field reference" $ do
+      js "a.b.push(r)" `shouldBe` (Application (Primitive Push) [FieldReference (Reference "a") "b",Reference "r"])
 
     it "handles parenthesis around variables" $ do
       js "function f() { return (x) } " `shouldBe` (SimpleFunction "f" [] (Return (Reference "x")))
@@ -135,6 +153,21 @@ spec = do
     it "handles lambdas" $ do
       js "(function(x, y) { 1 })" `shouldBe` (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1))
 
+    it "handles arrow lambdas" $ do
+      js "((x, y) => { 1 })" `shouldBe` (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1))
+
+    it "handles arrow lambdas without body" $ do
+      js "((x, y) => 1 )" `shouldBe` (Lambda [VariablePattern "x", VariablePattern "y"] (MuNumber 1))
+
+    it "handles arrow lambdas without body nor parenthesis" $ do
+      js "(x => 1 )" `shouldBe` (Lambda [VariablePattern "x"] (MuNumber 1))
+
+    it "handles method calls with arrow lambdas without body" $ do
+      js "list.map(x => x + 1)" `shouldBe` ( Send (Reference "list") (Reference "map") [Lambda [VariablePattern "x"] (Application (Primitive Plus) [Reference "x",MuNumber 1.0])])
+
+    it "handles method calls with arrow lambdas without body following a function call" $ do
+      js "f(xs).map(b => b.m)" `shouldBe` (Send (Application (Reference "f") [Reference "xs"]) (Reference "map") [Lambda [VariablePattern "b"] (FieldReference (Reference "b") "m")])
+
     it "handles application" $ do
       js "f(2)" `shouldBe` (Application (Reference "f") [MuNumber 2])
 
@@ -143,6 +176,21 @@ spec = do
 
     it "handles message send" $ do
       js "o.f(2)" `shouldBe` (Send (Reference "o") (Reference "f") [(MuNumber 2)])
+
+    it "handles message send following a function call" $ do
+      js "o().f(2)" `shouldBe` (Send (Application (Reference "o") []) (Reference "f") [(MuNumber 2)])
+
+    it "handles message send following a field reference" $ do
+      js "a.b.f(2)" `shouldBe` (Send (FieldReference (Reference "a") "b") (Reference "f") [MuNumber 2.0])
+
+    it "handles message send followed by another message send" $ do
+      js "a.o().f(2)" `shouldBe` (Send (Send (Reference "a") (Reference "o") []) (Reference "f") [MuNumber 2.0])
+
+    it "handles message send followed by a field reference" $ do
+      js "a.f(2).b" `shouldBe` (FieldReference (Send (Reference "a") (Reference "f") [MuNumber 2.0]) "b")
+
+    it "handles message send followed by a field assignment" $ do
+      js "a.f(2).b = 3" `shouldBe` (FieldAssignment (Send (Reference "a") (Reference "f") [MuNumber 2.0]) "b" (MuNumber 3.0))
 
     it "handles ifs" $ do
       js "if(x) y else z" `shouldBe` If (Reference "x") (Reference "y") (Reference "z")
