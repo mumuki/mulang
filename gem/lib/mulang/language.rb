@@ -76,7 +76,7 @@ module Mulang::Language
     def sample(content)
       {
         tag: 'MulangSample',
-        ast: call_tool(content)
+        ast: call_tool(content) || {tag: :None}
       }
     end
 

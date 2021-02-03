@@ -105,10 +105,53 @@ describe Mulang::Code do
   end
 
   context 'when code is expressed as an ast' do
-    let(:ast) { {'tag'=>'Variable', 'contents'=>['x', {'tag'=>'MuNumber', 'contents'=>1}]} }
     let(:code) { Mulang::Code.external(ast) }
 
-    it { expect(code.ast).to eq ast }
+    context "when ast is valid" do
+      let(:ast) { {'tag'=>'Variable', 'contents'=>['x', {'tag'=>'MuNumber', 'contents'=>1}]} }
+
+      it { expect(code.ast).to eq ast }
+      it { expect(code.sample).to eq :ast=>ast, :tag=>"MulangSample" }
+      it { expect(code.analyse(expectations: [])).to eq 'tag'=>'AnalysisCompleted',
+                                                        'outputAst'=>nil,
+                                                        'outputIdentifiers' => nil,
+                                                        'transformedAsts' => nil,
+                                                        'signatures'=>[],
+                                                        'smells'=>[],
+                                                        'expectationResults'=>[],
+                                                        'testResults' => [] }
+    end
+
+    context "when ast is nil" do
+      let(:ast) { nil }
+
+      it { expect(code.ast).to be nil }
+      it { expect(code.sample).to eq :ast=>{tag: :None}, :tag=>"MulangSample" }
+      it { expect(code.analyse(expectations: [])).to eq 'tag'=>'AnalysisCompleted',
+                                                        'outputAst'=>nil,
+                                                        'outputIdentifiers' => nil,
+                                                        'transformedAsts' => nil,
+                                                        'signatures'=>[],
+                                                        'smells'=>[],
+                                                        'expectationResults'=>[],
+                                                        'testResults' => [] }
+    end
+
+    context "when tool fails" do
+      let(:code) { Mulang::Code.external("foo") { raise "ups" } }
+
+      it { expect(code.ast).to be nil }
+      it { expect(code.sample).to eq :ast=>{tag: :None}, :tag=>"MulangSample" }
+      it { expect(code.analyse(expectations: [])).to eq 'tag'=>'AnalysisCompleted',
+                                                        'outputAst'=>nil,
+                                                        'outputIdentifiers' => nil,
+                                                        'transformedAsts' => nil,
+                                                        'signatures'=>[],
+                                                        'smells'=>[],
+                                                        'expectationResults'=>[],
+                                                        'testResults' => [] }
+    end
+
   end
 
   context 'when code is ill-formed' do
