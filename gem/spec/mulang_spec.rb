@@ -126,30 +126,18 @@ describe Mulang::Code do
       let(:ast) { nil }
 
       it { expect(code.ast).to be nil }
-      it { expect(code.sample).to eq :ast=>{tag: :None}, :tag=>"MulangSample" }
-      it { expect(code.analyse(expectations: [])).to eq 'tag'=>'AnalysisCompleted',
-                                                        'outputAst'=>nil,
-                                                        'outputIdentifiers' => nil,
-                                                        'transformedAsts' => nil,
-                                                        'signatures'=>[],
-                                                        'smells'=>[],
-                                                        'expectationResults'=>[],
-                                                        'testResults' => [] }
+      it { expect(code.sample).to eq :ast=>nil, :tag=>"MulangSample" }
+      it { expect(code.analyse(expectations: [])).to eq 'tag'=>'AnalysisFailed',
+                                                        'reason'=>'missing AST' }
     end
 
     context "when tool fails" do
       let(:code) { Mulang::Code.external("foo") { raise "ups" } }
 
       it { expect(code.ast).to be nil }
-      it { expect(code.sample).to eq :ast=>{tag: :None}, :tag=>"MulangSample" }
-      it { expect(code.analyse(expectations: [])).to eq 'tag'=>'AnalysisCompleted',
-                                                        'outputAst'=>nil,
-                                                        'outputIdentifiers' => nil,
-                                                        'transformedAsts' => nil,
-                                                        'signatures'=>[],
-                                                        'smells'=>[],
-                                                        'expectationResults'=>[],
-                                                        'testResults' => [] }
+      it { expect(code.sample).to eq :ast=>nil, :tag=>"MulangSample" }
+      it { expect(code.analyse(expectations: [])).to eq 'tag'=>'AnalysisFailed',
+                                                        'reason'=>'missing AST' }
     end
 
   end

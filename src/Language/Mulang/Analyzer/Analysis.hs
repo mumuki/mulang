@@ -120,7 +120,7 @@ data SignatureStyle
   | PrologStyle deriving (Show, Eq, Generic)
 
 data Fragment
-  = MulangSample { ast :: Expression }
+  = MulangSample { ast :: Maybe Expression }
   | CodeSample { language :: Language, content :: Code } deriving (Show, Eq, Generic)
 
 data InterpreterOptions = InterpreterOptions {

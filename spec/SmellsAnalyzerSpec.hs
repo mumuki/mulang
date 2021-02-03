@@ -74,7 +74,7 @@ spec = describe "SmellsAnalyzer" $ do
         runWithTypos JavaScript "function bar() {}\nfunction other(){}" [Expectation "*" "SubordinatesDeclarationsTo:bar"] `shouldReturn` []
 
   it "Using domain language and nested structures" $ do
-    let runRuby sample = analyse (domainLanguageAnalysis (MulangSample sample) (DomainLanguage Nothing (Just RubyCase) (Just 3) Nothing))
+    let runRuby sample = analyse (domainLanguageAnalysis (MulangSample (Just sample)) (DomainLanguage Nothing (Just RubyCase) (Just 3) Nothing))
     (runRuby (Sequence [
       (Object "Foo_Bar" (Sequence [
         (SimpleMethod "y" [] None),

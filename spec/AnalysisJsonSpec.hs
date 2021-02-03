@@ -171,7 +171,7 @@ spec = describe "AnalysisJson" $ do
       }
    }
 }|]
-    let analysis = Analysis (MulangSample (Sequence [Variable "x" (MuNumber 1), Variable "y" (MuNumber 2)]))
+    let analysis = Analysis (MulangSample (Just (Sequence [Variable "x" (MuNumber 1), Variable "y" (MuNumber 2)])))
                             (emptyAnalysisSpec { signatureAnalysisType = Just (StyledSignatures HaskellStyle) })
 
     run json `shouldBe` analysis
@@ -331,8 +331,8 @@ spec = describe "AnalysisJson" $ do
     "includeOutputAst": true
   }
 } |]
-    let analysis = Analysis (MulangSample (SimpleProcedure "foo" [VariablePattern "x"]
-                                              (Application (Primitive Multiply) [MuNumber 2.0,Reference "x"])))
+    let analysis = Analysis (MulangSample (Just (SimpleProcedure "foo" [VariablePattern "x"]
+                                              (Application (Primitive Multiply) [MuNumber 2.0,Reference "x"]))))
                             (emptyAnalysisSpec {
                               normalizationOptions = Just (unnormalized {
                                 insertImplicitReturn = True
