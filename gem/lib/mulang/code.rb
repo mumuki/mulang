@@ -30,8 +30,8 @@ module Mulang
       @language.sample @content
     end
 
-    def analysis(spec)
-      { sample: sample, spec: spec }
+    def analysis(spec, **options)
+      @language.build_analysis @content, spec, **options
     end
 
     def analyse(spec, **options)

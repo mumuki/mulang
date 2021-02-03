@@ -5,7 +5,7 @@ module Mulang::Language
     end
 
     def identifiers_analysis(content, **options)
-      base_analysis content, {includeOutputIdentifiers: true}, **options
+      build_analysis content, {includeOutputIdentifiers: true}, **options
     end
 
     def transformed_asts(content, operations, **options)
@@ -13,7 +13,7 @@ module Mulang::Language
     end
 
     def transformed_asts_analysis(content, operations, **options)
-      base_analysis content, {transformationSpecs: operations}, **options
+      build_analysis content, {transformationSpecs: operations}, **options
     end
 
     def normalization_options(**options)
@@ -25,12 +25,10 @@ module Mulang::Language
     end
 
     def ast_analysis(content, **options)
-      base_analysis content, {includeOutputAst: true}, **options
+      build_analysis content, {includeOutputAst: true}, **options
     end
 
-    private
-
-    def base_analysis(content, spec, **options)
+    def build_analysis(content, spec, **options)
       {
         sample: sample(content),
         spec: {
@@ -82,7 +80,7 @@ module Mulang::Language
       }
     end
 
-    def base_analysis(*)
+    def build_analysis(*)
       super.deep_merge(spec: {originalLanguage: @name}.compact)
     end
 

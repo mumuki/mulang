@@ -174,19 +174,23 @@ describe Mulang::Code do
 
     end
   end
+  describe 'original language' do
+    let(:ast) { {:tag=>:Method, :contents=>[:drive!, [[[], {:tag=>:UnguardedBody, :contents=>{:tag=>:MuNil}}]]]} }
+    context 'when language is external with original language name' do
+      let(:code) { Mulang::Code.external('Ruby', ast) }
+      it { expect(code.language.name).to eq 'Ruby' }
+      it { expect(code.ast_analysis[:spec][:originalLanguage]).to eq 'Ruby' }
+      it { expect(code.analyse(smellsSet: {tag: :NoSmells, include: ['HasWrongCaseIdentifiers']})['smells']).to eq [] }
+      it { expect(code.ast serialization: :bracket).to eq '[Method[drive!][Equation[UnguardedBody[MuNil]]]]' }
+    end
 
-  context 'when language is external with original language name' do
-    let(:code) { Mulang::Code.external('Ruby', tag: :None) }
-    it { expect(code.language.name).to eq 'Ruby' }
-    it { expect(code.ast_analysis[:spec][:originalLanguage]).to eq 'Ruby' }
-    it { expect(code.ast serialization: :bracket).to eq '[None]' }
-  end
-
-  context 'when language is external with no original language name' do
-    let(:code) { Mulang::Code.external(tag: :None) }
-    it { expect(code.language.name).to be nil }
-    it { expect(code.ast_analysis[:spec][:originalLanguage]).to be nil }
-    it { expect(code.ast serialization: :bracket).to eq '[None]' }
+    context 'when language is external with no original language name' do
+      let(:code) { Mulang::Code.external(ast) }
+      it { expect(code.language.name).to be nil }
+      it { expect(code.ast_analysis[:spec][:originalLanguage]).to be nil }
+      it { expect(code.analyse(smellsSet: {tag: :NoSmells, include: ['HasWrongCaseIdentifiers']})['smells']).to eq [{"binding"=>"drive!", "inspection"=>"HasWrongCaseIdentifiers"}] }
+      it { expect(code.ast serialization: :bracket).to eq '[Method[drive!][Equation[UnguardedBody[MuNil]]]]' }
+    end
   end
 
   context 'when language is native with normalization options' do
