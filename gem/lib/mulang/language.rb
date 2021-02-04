@@ -1,4 +1,18 @@
 module Mulang::Language
+  CORE_LANGUAGES = %w(
+    Java
+    JavaScript
+    Prolog
+    Haskell
+    Python
+    Python2
+    Python3
+    Ruby
+    Php
+    C
+    Mulang
+  )
+
   class Base
     def identifiers(content, **options)
       Mulang.analyse(identifiers_analysis(content, **options), **options)['outputIdentifiers'] rescue nil
@@ -55,6 +69,10 @@ module Mulang::Language
         content: content
       }
     end
+
+    def core_name
+      @name
+    end
   end
 
   class External < Base
@@ -81,7 +99,11 @@ module Mulang::Language
     end
 
     def build_analysis(*)
-      super.deep_merge(spec: {originalLanguage: @name}.compact)
+      super.deep_merge(spec: {originalLanguage: core_name}.compact)
+    end
+
+    def core_name
+      @name.in?(CORE_LANGUAGES) ? name : nil
     end
 
     private
