@@ -164,6 +164,7 @@
                 <li class="third-level"><a href="#supported-counters">Supported counters</a></li>
             <li class="second-level"><a href="#boolean-operators-on-scoped-queries">Boolean operators on scoped queries</a></li>
                 
+        <li class="first-level "><a href="#caveats">⚠️ Caveats</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
@@ -187,6 +188,12 @@
 </code></pre>
 
 <p>...which is just syntactic sugar - the <code>something</code> keyword is just a dummy token you can add to make the expectation syntax more human-readable.</p>
+<p>Likewise, you can use <code>somewhere</code> keyword in order to be more explicit about using an <em>unscoped</em> query - more on this later:</p>
+<pre><code class="edl">expectation:
+  %% equivalent to previous example, `somewhere` is just a dummy token
+  somewhere calls something;
+</code></pre>
+
 <p>Although you can declare unnamed expectations, it is usually more convenient to add an intention-revealing name:</p>
 <pre><code class="edl">expectation &quot;you should call something&quot;:
   calls something;
@@ -500,6 +507,7 @@ expectation &quot;`max` must have 2 returns&quot;:
 <li><code>declares procedure</code></li>
 <li><code>declares variable</code></li>
 <li><code>returns</code></li>
+<li><code>uses</code></li>
 <li><code>uses for each</code></li>
 <li><code>uses for loop</code></li>
 <li><code>uses for</code></li>
@@ -511,6 +519,7 @@ expectation &quot;`max` must have 2 returns&quot;:
 <li><code>uses try</code></li>
 <li><code>uses while</code></li>
 <li><code>uses yield</code></li>
+<li>All the <a href="./inspections/#primitive-operator-inspections">primitive operator inspections</a>, e.g. <code>uses plus</code> or <code>uses size</code></li>
 </ul>
 <h2 id="boolean-operators-on-scoped-queries">Boolean operators on scoped queries</h2>
 <p>Finally, EDL allows to use logical operations with scoped queries:</p>
@@ -533,7 +542,12 @@ expectation &quot;`Pet` must declare `eat` and `Owner` must send it&quot;:
   %% however in most cases, it is better to declare two different, separate
   %% expectations
   (within `Pet` declares `eat`) and (within `Owner` sends `eat`);
-</code></pre></div>
+</code></pre>
+
+<h1 id="caveats">⚠️ Caveats</h1>
+<p>Mulang by default will apply autocorrection rules that transform language-dependant
+inspections - like <code>Uses:length</code> in JavaScript - into proper operator inspections like <code>UsesSize</code>. Those transformation
+<strong>will not be applied when using EDL</strong>, so be careful when using languages primitives.</p></div>
         
         
     </div>

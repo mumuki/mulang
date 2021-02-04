@@ -26,7 +26,7 @@ rm -rf ${DOCSDIR}/themes/cinder/
 
 echo "[Mulang::Docs] Installing mulang.js..."
 MULANG_TMPFILE=mulang.js.zip
-MULANG_VERSION=6.0.0
+MULANG_VERSION=6.0.4
 wget https://github.com/mumuki/mulang/releases/download/v${MULANG_VERSION}/mulang.js.zip -O ${MULANG_TMPFILE}
 unzip -d ${DOCSDIR}/js ${MULANG_TMPFILE}
 rm ${MULANG_TMPFILE}

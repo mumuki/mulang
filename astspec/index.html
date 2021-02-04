@@ -1175,31 +1175,56 @@ and to simple pattern matching against a free identifier.</p>
 </code></pre>
 
 <h2 id="primitive-operators">Primitive Operators</h2>
-<p>Primitive operators represent low-level language operations that are well known and common to most languages, usually in the fashion of operators.</p>
+<p>Primitive operators represent low-level language operations that are well known and common to most languages, usually in the fashion of operators. They are natively supported by mulang.</p>
 <ul>
-<li><code>Equal</code>: equal operator</li>
-<li><code>NotEqual</code>: distinct operator</li>
-<li><code>Negation</code>: not operator</li>
-<li><code>And</code>: and operator</li>
-<li><code>Or</code>: or operator</li>
-<li><code>Hash</code>: hashcode operator</li>
-<li><code>GreatherOrEqualThan</code></li>
-<li><code>GreatherThan</code></li>
-<li><code>LessOrEqualThan</code></li>
-<li><code>LessThan</code></li>
-<li><code>Otherwise</code>: guard's otherwise operator</li>
-<li><code>Plus</code></li>
-<li><code>Minus</code></li>
-<li><code>Multiply</code></li>
-<li><code>Divide</code></li>
-<li><code>ForwardComposition</code>: <code>(f &gt;&gt; g)(x) = (g . f)(x) = g(f(x))</code> operator</li>
+<li><code>Absolute</code>: numeric <code>abs</code>-like absolute operator</li>
+<li><code>AllSatisfy</code>: collection <code>all</code>-like / <code>every</code>-like operator</li>
+<li><code>And</code>:  <code>&amp;&amp;</code>-like and operator</li>
+<li><code>AnySatisfy</code>: collection <code>any</code>-like / <code>some</code>-like operator</li>
 <li><code>BackwardComposition</code>: <code>(g &lt;&lt; f)(x) = (g . f)(x) = g(f(x))</code> operator</li>
-<li><code>Mod</code></li>
-<li><code>BitwiseOr</code></li>
-<li><code>BitwiseAnd</code></li>
-<li><code>BitwiseXor</code></li>
-<li><code>BitwiseLeftShift</code></li>
-<li><code>BitwiseRightShift</code></li>
+<li><code>BitwiseAnd</code>: bit-level <code>&amp;</code>-like and operator</li>
+<li><code>BitwiseLeftShift</code>: bit-level left <code>&lt;&lt;</code>-like shift operator</li>
+<li><code>BitwiseOr</code>: bit-level <code>|</code>-like or operator</li>
+<li><code>BitwiseRightShift</code>: bit-level right <code>&gt;&gt;</code>-like shift operator</li>
+<li><code>BitwiseXor</code>: bit-level <code>^</code>-like xor operator</li>
+<li><code>Ceil</code>: numeric <code>ceil</code>-like ceiling operator</li>
+<li><code>Collect</code>: collection <code>map</code>-like operator</li>
+<li><code>Count</code>: collection <code>count</code>-like operator</li>
+<li><code>Detect</code>: collection <code>find</code>-like search operator</li>
+<li><code>DetectMax</code>: collection <code>max</code>-like maximum operator</li>
+<li><code>DetectMin</code>: collection <code>min</code>-like minumum operator</li>
+<li><code>Divide</code>:  numeric <code>/</code> operator</li>
+<li><code>Equal</code>:  <code>===</code>-like equal operator</li>
+<li><code>Flatten</code>: collection <code>flatten</code>-like operator</li>
+<li><code>Floor</code>: numeric <code>ceil</code>-like floor operator</li>
+<li><code>ForwardComposition</code>: <code>(f &gt;&gt; g)(x) = (g . f)(x) = g(f(x))</code> operator</li>
+<li><code>Gather</code>: collection <code>flatmap</code>-like operator</li>
+<li><code>GetAt</code>: collection <code>[]</code>-like operator</li>
+<li><code>GreatherOrEqualThan</code>:  <code>&gt;=</code> operator</li>
+<li><code>GreatherThan</code>:  <code>&gt;</code> operator</li>
+<li><code>Hash</code>:  hashcode operator</li>
+<li><code>Inject</code>: collection <code>reduce</code>-like / <code>fold</code>-like operator</li>
+<li><code>LessOrEqualThan</code>:  <code>&lt;=</code> operator</li>
+<li><code>LessThan</code>:  <code>&lt;</code> operator</li>
+<li><code>Max</code>: <code>max</code>-like maximum value binary operator</li>
+<li><code>Min</code>: <code>min</code>-like minimum value binary operator</li>
+<li><code>Minus</code>:  numeric <code>-</code> operator</li>
+<li><code>Modulo</code>: numeric <code>%-like</code> modulo operator</li>
+<li><code>Multiply</code>:  numeric <code>*</code> operator</li>
+<li><code>Negation</code>:  <code>!</code>-like not operator</li>
+<li><code>NotEqual</code>:  <code>!==</code>-like distinct operator</li>
+<li><code>NotSame</code>:  not reference-identical operator</li>
+<li><code>NotSimilar</code>:  not equal-ignoring-type operator</li>
+<li><code>Or</code>:  <code>||</code>-like or operator</li>
+<li><code>Otherwise</code>:  guard's otherwise operator</li>
+<li><code>Plus</code>:  numeric <code>+</code> operator</li>
+<li><code>Push</code>: collection <code>insertAtEnd</code>-like operator</li>
+<li><code>Round</code>: numeric <code>round</code>-like round operator</li>
+<li><code>Same</code>:  reference-identical operator</li>
+<li><code>Select</code>: collection <code>filter</code>-like operator</li>
+<li><code>SetAt</code>: collection <code>[]=</code>-like operator</li>
+<li><code>Similar</code>:  equal-ignoring-type operator</li>
+<li><code>Size</code>: collection <code>length</code>-like size operator</li>
 </ul>
 <h2 id="types">Types</h2>
 <p>When processing statically-typed languages, all type-information - regardless we are typing a function, a variable or a class - is represented with the <code>Type</code> ADT, can be one of:</p>
