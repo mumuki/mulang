@@ -1,5 +1,13 @@
 # Changelog
 
+## [v6.0.4](https://github.com/mumuki/mulang/tree/v6.0.4) (2021-02-04)
+
+[Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.3...v6.0.4)
+
+**Merged pull requests:**
+
+- Fix external languages fixes [\#331](https://github.com/mumuki/mulang/pull/331) ([flbulgarelli](https://github.com/flbulgarelli))
+
 ## [v6.0.3](https://github.com/mumuki/mulang/tree/v6.0.3) (2021-02-01)
 
 [Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.2...v6.0.3)
