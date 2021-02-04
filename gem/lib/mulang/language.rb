@@ -1,11 +1,25 @@
 module Mulang::Language
+  CORE_LANGUAGES = %w(
+    Java
+    JavaScript
+    Prolog
+    Haskell
+    Python
+    Python2
+    Python3
+    Ruby
+    Php
+    C
+    Mulang
+  )
+
   class Base
     def identifiers(content, **options)
       Mulang.analyse(identifiers_analysis(content, **options), **options)['outputIdentifiers'] rescue nil
     end
 
     def identifiers_analysis(content, **options)
-      base_analysis content, {includeOutputIdentifiers: true}, **options
+      build_analysis content, {includeOutputIdentifiers: true}, **options
     end
 
     def transformed_asts(content, operations, **options)
@@ -13,7 +27,7 @@ module Mulang::Language
     end
 
     def transformed_asts_analysis(content, operations, **options)
-      base_analysis content, {transformationSpecs: operations}, **options
+      build_analysis content, {transformationSpecs: operations}, **options
     end
 
     def normalization_options(**options)
@@ -25,12 +39,10 @@ module Mulang::Language
     end
 
     def ast_analysis(content, **options)
-      base_analysis content, {includeOutputAst: true}, **options
+      build_analysis content, {includeOutputAst: true}, **options
     end
 
-    private
-
-    def base_analysis(content, spec, **options)
+    def build_analysis(content, spec, **options)
       {
         sample: sample(content),
         spec: {
@@ -57,6 +69,10 @@ module Mulang::Language
         content: content
       }
     end
+
+    def core_name
+      @name
+    end
   end
 
   class External < Base
@@ -82,8 +98,12 @@ module Mulang::Language
       }
     end
 
-    def base_analysis(*)
-      super.deep_merge(spec: {originalLanguage: @name}.compact)
+    def build_analysis(*)
+      super.deep_merge(spec: {originalLanguage: core_name}.compact)
+    end
+
+    def core_name
+      @name.in?(CORE_LANGUAGES) ? name : nil
     end
 
     private

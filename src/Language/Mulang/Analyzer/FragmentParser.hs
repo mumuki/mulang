@@ -22,7 +22,8 @@ parseFragment :: Maybe NormalizationOptions -> Fragment -> Either String Express
 parseFragment options = fmap (normalizerFor options) . parse
   where
     parse (CodeSample language content) = (parserFor language) content
-    parse (MulangSample ast)            = Right ast
+    parse (MulangSample (Just ast))     = Right ast
+    parse (MulangSample Nothing)        = Left "missing AST"
 
 parserFor :: Language -> EitherParser
 parserFor C              = parseC
