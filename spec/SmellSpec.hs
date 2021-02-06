@@ -506,5 +506,17 @@ spec = do
   describe "usesVarInsteadOfLet" $ do
     it "is True when there is a var" $ do
       usesVarInsteadOfLet (js "var x = 1; x++") `shouldBe` True
+
+    it "is False when there is no var" $ do
       usesVarInsteadOfLet (js "let x = 1; x++") `shouldBe` False
       usesVarInsteadOfLet (js "const x = 1; x++") `shouldBe` False
+
+  describe "usesForInInsteadOfForOf" $ do
+    it "is True when there is a for..in" $ do
+      usesForInInsteadOfForOf (js "for (let x in []) {}") `shouldBe` True
+      usesForInInsteadOfForOf (js "for (var x in []) {}") `shouldBe` True
+
+    it "is False when there is no for..in" $ do
+      usesForInInsteadOfForOf (js "for (var x of []) {}") `shouldBe` False
+      usesForInInsteadOfForOf (js "for (let x of []) {}") `shouldBe` False
+      usesForInInsteadOfForOf (js "for (const x of []) {}") `shouldBe` False
