@@ -9,6 +9,7 @@ import        Language.Mulang.Parsers (EitherParser, maybeToEither)
 import        Language.Mulang.Parsers.Haskell
 import        Language.Mulang.Parsers.C (parseC)
 import        Language.Mulang.Parsers.JavaScript (parseJavaScript)
+import        Language.Mulang.Parsers.Html (parseHtml)
 import        Language.Mulang.Parsers.Prolog (parseProlog)
 import        Language.Mulang.Parsers.Java (parseJava)
 import        Language.Mulang.Parsers.Python (parsePython, parsePython2, parsePython3)
@@ -34,6 +35,7 @@ parserFor Prolog         = parseProlog
 parserFor Python         = parsePython
 parserFor Python2        = parsePython2
 parserFor Python3        = parsePython3
+parserFor Html           = maybeToEither parseHtml
 
 normalizerFor :: Maybe NormalizationOptions -> (Expression -> Expression)
 normalizerFor Nothing        = id

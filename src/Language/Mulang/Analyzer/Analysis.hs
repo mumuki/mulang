@@ -161,6 +161,7 @@ data Language
   |  Ruby
   |  Php
   |  C
+  |  Html
   |  Mulang
   deriving (Show, Eq, Generic)
 

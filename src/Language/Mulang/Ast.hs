@@ -188,6 +188,8 @@ data Expression
     -- ^ Generic sequence of statements
     | Other (Maybe Code) (Maybe Expression)
     -- ^ Unrecognized expression, with optional description and body
+    | Element String [(String, Expression)] [Expression]
+    -- ^ Generic element, with named and positional subexpressions
     | Arrow Expression Expression
     -- ^ Generic arrow - AKA pair or entry - that is typically used to build dictionaries.
     -- It corresponds to ruby's, perl's and php's `=>` operator, or ruby's and javascript's `:` operator
