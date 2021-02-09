@@ -29,13 +29,14 @@ renameState f@(Findall _ _ _)   = return f
 renameState f@(Forall _ _)      = return f
 renameState n@(Not _)           = return n
 --
+renameState (Element n ns ps)   = do { ns' <- mapRenameSnd ns; ps' <- mapM renameState ps; return $ Element n ns' ps' }
 renameState (For stms e1)       = do { stms' <- mapM renameStatement stms; e1' <- renameState e1; return $ For stms' e1' }
 renameState (ForLoop i c a b)   = do { [i', c', a', b'] <- mapM renameState [i, c, a, b]; return $ ForLoop i' c' a' b' }
 renameState (Lambda ps e2)      = do { e2' <- renameState e2; return $ Lambda ps e2' }
 renameState (Match e1 eqs)      = do { e1' <- renameState e1; eqs' <- renameEquations eqs; return $ Match e1' eqs' }
 renameState (Send r e es)       = do { (r':e':es') <- mapM renameState (r:e:es); return $ Send r' e' es' }
 renameState (Switch v cs d)     = do { v' <- renameState v; cs' <- renameSwitchCases cs; d' <- renameState d; return $ Switch v' cs' d' }
-renameState (Try t cs f)        = do { t' <- renameState t; cs' <- renameTryCases cs; f' <- renameState f; return $ Try t' cs' f' }
+renameState (Try t cs f)        = do { t' <- renameState t; cs' <- mapRenameSnd cs; f' <- renameState f; return $ Try t' cs' f' }
 renameState a@(Assert _ _)      = return a
 renameState r@(Rule _ _ _)      = return r
 --
@@ -48,8 +49,8 @@ renameState (TwoExpressions e1 e2 c)               = do { e1' <- renameState e1;
 renameState e@(SinglePatternsList _ _)             = return e
 renameState e@Terminal                             = return e
 
-renameTryCases    = mapM (\(p, e) -> do { e' <- renameState e; return (p, e') })
 renameSwitchCases = mapM (\(e1, e2) -> do { e1' <- renameState e1; e2' <- renameState e2; return (e1', e2') })
+mapRenameSnd      = mapM (\(x, e) -> do { e' <- renameState e; return (x, e') })
 
 renameStatement :: Statement -> RenameState Statement
 renameStatement (Generator p e)  = do { p' <- renameParameter p; e' <- renameState e; return $ Generator p' e' }

@@ -63,6 +63,7 @@ normalize ops (Object n e)                          = Object n (normalizeObjectL
 normalize ops (Sequence es)                         = normalizeSequence ops . sortDeclarations ops .  mapNormalize ops $ es
 --
 normalize _    a@(Assert _ _)                       = a
+normalize ops (Element n ns ps)                     = Element n (mapNormalizeSnd ops ns) (mapNormalize ops ps)
 normalize ops (For stms e1)                         = For stms (normalize ops e1)
 normalize ops (ForLoop e c i b)                     = ForLoop (normalize ops e) (normalize ops c) (normalize ops i) (normalize ops b)
 normalize ops (Lambda ps e2)                        = Lambda ps (normalize ops e2)
@@ -70,7 +71,7 @@ normalize ops (Match e1 equations)                  = Match (normalize ops e1) (
 normalize ops (Rule n args es)                      = Rule n args (mapNormalize ops es)
 normalize ops (Send r e es)                         = Send (normalize ops r) (normalize ops e) (mapNormalize ops es)
 normalize ops (Switch v cs d)                       = Switch (normalize ops v) (normalizeSwitchCases ops cs) (normalize ops d)
-normalize ops (Try t cs f)                          = Try (normalize ops t) (normalizeTryCases ops cs) (normalize ops f)
+normalize ops (Try t cs f)                          = Try (normalize ops t) (mapNormalizeSnd ops cs) (normalize ops f)
 --
 normalize _   (SinglePatternsList ps c)             = c ps
 normalize _   c@(Terminal)                          = c
@@ -118,7 +119,7 @@ normalizeReturn _   e             | isImplicitReturn e = Return e
 normalizeReturn _   (Sequence es) | Just (i, l) <- unwind es, isImplicitReturn l = Sequence $ i ++ [Return l]
 normalizeReturn _   e             = e
 
-normalizeTryCases    ops = map (\(p, e) -> (p, normalize ops e))
+mapNormalizeSnd      ops = map (\(p, e) -> (p, normalize ops e))
 normalizeSwitchCases ops = map (\(e1, e2) -> (normalize ops e1, normalize ops e2))
 
 isImplicitReturn :: Expression -> Bool

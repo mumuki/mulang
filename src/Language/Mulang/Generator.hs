@@ -35,6 +35,7 @@ type Declarator = (Identifier, Expression)
 declarators :: Generator Declarator
 declarators (Sequence es)          = concatMap declarators es
 declarators e@(Attribute n _)      = [(n, e)]
+declarators e@(Element n _ _)      = [(n, e)]
 declarators e@(Class n _ b)        = (n, e) : declarators b
 declarators e@(Clause n _ es)      = (n, e) : concatMap declarators es
 declarators e@(Enumeration n _)    = [(n, e)]
@@ -71,6 +72,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions :: Generator Expression
     --
     subExpressions (Assert _ _)                           = [] -- FIXME
+    subExpressions (Element _ ns ps)                      = map snd ns ++ ps
     subExpressions (For stmts a)                          = statementsExpressions stmts ++ [a]
     subExpressions (ForLoop i c p s)                      = [i, c, p, s]
     subExpressions (Lambda _ e)                           = [e]

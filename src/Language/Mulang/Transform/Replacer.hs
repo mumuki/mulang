@@ -14,6 +14,7 @@ replace :: Replacer
 replace i o e                                     | i e = o
 --
 replace _ _  a@(Assert _ _)                       = a
+replace i o (Element n ns ps)                     = Element n (mapReplaceSnd i o ns) (mapReplace i o ps)
 replace i o (For stms e1)                         = For stms (replace i o e1)
 replace i o (ForLoop e c inc b)                   = ForLoop (replace i o e) (replace i o c) (replace i o inc) (replace i o b)
 replace i o (Lambda ps e2)                        = Lambda ps (replace i o e2)
@@ -21,8 +22,8 @@ replace i o (Match e1 equations)                  = Match (replace i o e1) (mapR
 replace i o (Rule n args es)                      = Rule n args (mapReplace i o es)
 replace i o (Send r e es)                         = Send (replace i o r) (replace i o e) (mapReplace i o es)
 replace i o (Switch v cs d)                       = Switch (replace i o v) (replaceSwitchCases i o cs) (replace i o d)
-replace i o (Try t cs f)                          = Try (replace i o t) (replaceTryCases i o cs) (replace i o f)
 --
+replace i o (Try t cs f)                          = Try (replace i o t) (mapReplaceSnd i o cs) (replace i o f)
 replace _ _ (SinglePatternsList ps c)             = c ps
 replace _ _ c@(Terminal)                          = c
 replace i o (ExpressionAndExpressionsList e es c) = c (replace i o e) (mapReplace i o es)
@@ -39,8 +40,8 @@ replaceEquation :: Inspection -> Expression -> Equation -> Equation
 replaceEquation i o = mapEquation f f
   where f = replace i o
 
-replaceTryCases    i o = map (\(p, e) -> (p, replace i o e))
 replaceSwitchCases i o = map (\(e1, e2) -> (replace i o e1, replace i o e2))
+mapReplaceSnd i o      = map (\(x, e) -> (x, replace i o e))
 
 localReplace :: Replacer
 localReplace i o (Sequence es)                         = Sequence (map (localReplace i o) es)
