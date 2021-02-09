@@ -41,6 +41,7 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('*', 'UsesNegation').translate :Haskell).to eq('solution must use <code>not</code>') }
       it { expect(expectation('*', 'UsesNegation').translate :Ruby).to eq('solution must use <code>!</code>') }
 
+      it { expect(expectation('*', 'UsesSize').translate :Ruby).to eq('solution must use <code>length</code>') }
       it { expect(expectation('*', 'UsesEqual').translate).to eq('solution must use <code>==</code>') }
       it { expect(expectation('*', 'UsesNotEqual').translate).to eq('solution must use <code>!=</code>') }
       it { expect(expectation('*', 'UsesNegation').translate).to eq('solution must use <code>!</code>') }
