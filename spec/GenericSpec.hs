@@ -61,6 +61,48 @@ spec = do
       assigns (named "x") (Other Nothing Nothing) `shouldBe` False
       assigns (named "x") (MuFalse) `shouldBe` False
 
+  describe "declaresElement" $ do
+    describe "without matcher" $ do
+      it "is True when present" $ do
+        declaresElement (named "p") (Element "p" [] []) `shouldBe` True
+
+      it "is False when not present" $ do
+        declaresElement (named "p") (Element "h1" [] []) `shouldBe` False
+
+      describe "nested" $ do
+        it "is True when present" $ do
+          declaresElement (named "p") (Element "body" [] [Element "p" [] []]) `shouldBe` True
+
+        it "is False when not present" $ do
+          declaresElement (named "p") (Element "body" [] [Element "h1" [] []]) `shouldBe` False
+
+    describe "with matcher" $ do
+      describe "when matching named children" $ do
+        it "is True when present" $ do
+          declaresElementMatching (withEvery [isString "wrap"]) (named "p") (Element "p" [("class", MuString "wrap")] []) `shouldBe` True
+
+        it "is False when not present" $ do
+          declaresElementMatching (withEvery [isString "wrap"]) (named "p") (Element "p" [] []) `shouldBe` False
+          declaresElementMatching (withEvery [isString "wrap"]) (named "p") (Element "p" [("class", MuString "other")] []) `shouldBe` False
+          declaresElementMatching (withEvery [isString "wrap"]) (named "p") (Element "div" [("class", MuString "wrap")] []) `shouldBe` False
+
+      describe "when matching positional children" $ do
+        it "is True when present" $ do
+          declaresElementMatching (withEvery [
+                                    isAnything,
+                                    isString "hello world"]) (named "p") (Element "p" [] [MuString "hello world"]) `shouldBe` True
+
+        it "is False when not present" $ do
+          declaresElementMatching (withEvery [
+                                    isAnything,
+                                    isString "hello world"]) (named "p") (Element "p" [] []) `shouldBe` False
+          declaresElementMatching (withEvery [
+                                    isAnything,
+                                    isString "hello world"]) (named "p") (Element "p" [] [MuString "foobar"]) `shouldBe` False
+          declaresElementMatching (withEvery [
+                                    isAnything,
+                                    isString "hello world"]) (named "p") (Element "div" [] [MuString "hello world"]) `shouldBe` False
+
   describe "declaresFunction" $ do
     describe "with function declarations, hs" $ do
       it "is True when functions is declared" $ do

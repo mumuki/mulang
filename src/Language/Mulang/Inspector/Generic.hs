@@ -22,6 +22,9 @@ module Language.Mulang.Inspector.Generic (
   declaresRecursively,
   declaresVariable,
   declaresVariableMatching,
+  declaresElement,
+  declaresElementMatching,
+  countElements,
   delegates,
   delegates',
   parses,
@@ -52,6 +55,7 @@ module Language.Mulang.Inspector.Generic (
 
 import Language.Mulang.Ast
 import Language.Mulang.Ast.Operator (Operator (..))
+import Language.Mulang.Builder (compact)
 import Language.Mulang.Generator (Generator, declaredIdentifiers, expressions, declarations, referencedIdentifiers, equationsExpandedExpressions, declarators, boundDeclarators)
 import Language.Mulang.Identifier
 import Language.Mulang.Inspector.Bound (uncounting, containsBoundDeclaration, BoundInspection, BoundCounter)
@@ -188,6 +192,10 @@ declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
         equationArityIs (Equation args _) = argsHaveArity args
 
         argsHaveArity = arityPredicate.length
+
+(declaresElement, declaresElementMatching, countElements) = deriveDeclares f :: BoundInspectionFamily
+  where f matcher (Element _ named positionals) = matches matcher id [compact . map snd $ named, compact positionals]
+        f _       _                             = False
 
 usesLogic :: Inspection
 usesLogic = containsExpression isLogic
