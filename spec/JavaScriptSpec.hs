@@ -17,7 +17,7 @@ run = js . unpack
 
 spec :: Spec
 spec = do
-  describe "foo" $ do
+  describe "simple assignation, with var" $ do
     it "simple assignation" $ do
       js "var x = 1" `shouldBe` (other "JSVar" (Variable "x" (MuNumber 1)))
 
