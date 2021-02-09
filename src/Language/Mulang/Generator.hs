@@ -77,7 +77,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Match e eqs)                          = e : equationsExpressions eqs
     subExpressions (Rule _ _ es)                          = es
     subExpressions (Send e1 e2 es)                        = e1 : e2 : es
-    subExpressions (Switch e1 list e2)                     = e1 : concatMap (\(x,y) -> [x,y]) list ++ [e2]
+    subExpressions (Switch e1 list e2)                    = e1 : concatMap (\(x,y) -> [x,y]) list ++ [e2]
     subExpressions (Try t cs f)                           = t : map snd cs ++ [f]
     --
     subExpressions (ExpressionAndExpressionsList e es _)  = e : es

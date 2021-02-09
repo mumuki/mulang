@@ -113,7 +113,7 @@ extractSingleExpressionsList :: Expression -> Maybe ([Expression],
 extractSingleExpressionsList (MuList es)   = Just (es, MuList)
 extractSingleExpressionsList (MuTuple es)  = Just (es, MuTuple)
 extractSingleExpressionsList (Sequence es) = Just (es, Sequence)
-extractSingleExpressionsList _               = Nothing
+extractSingleExpressionsList _             = Nothing
 
 pattern SingleEquationsList es e <- (extractSingleEquationsList -> Just (es, e))
 
