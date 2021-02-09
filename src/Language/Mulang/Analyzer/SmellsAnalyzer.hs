@@ -78,6 +78,7 @@ allSmells = [
   "HasUsageTypos",
   "HasWrongCaseIdentifiers",
   "IsLongCode",
+  "JavaScript#UsesVarInsteadOfLet",
   "OverridesEqualOrHashButNotBoth",
   "ReturnsNil",
   "ShouldInvertIfCondition",
@@ -86,8 +87,7 @@ allSmells = [
   "UsesCut",
   "UsesFail",
   "UsesNamedSelfReference",
-  "UsesUnificationOperator",
-  "JavaScript#UsesVarInsteadOfLet" ]
+  "UsesUnificationOperator" ]
 
 ---
 --- Instantiation
