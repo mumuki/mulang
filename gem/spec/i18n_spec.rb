@@ -188,6 +188,11 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'HasLongParameterList').translate).to eq('<code>foo</code> tiene demasiados parámetros. Te podría estar faltando una abstracción') }
       it { expect(expectation('foo', 'OverridesEqualOrHashButNotBoth').translate).to eq('<code>foo</code> redefine los métodos <code>equals</code> o <code>hash</code>, pero no ambos') }
 
+      it { expect(expectation('foo', 'HasEqualIfBranches').translate).to eq('<code>foo</code> tiene <code>if</code>s innecesarios porque sus dos ramas son iguales') }
+      it { expect(expectation('foo', 'UsesNamedSelfReference').translate :Java).to eq('<code>foo</code> debería usar <code>this</code> en lugar de una referencia global') }
+      it { expect(expectation('foo', 'UsesNamedSelfReference').translate :Ruby).to eq('<code>foo</code> debería usar <code>self</code> en lugar de una referencia global') }
+      it { expect(expectation('foo', 'UsesNamedSelfReference').translate :Python).to eq('<code>foo</code> debería usar <code>self</code> en lugar de una referencia global') }
+
       it { expect(expectation('Foo', 'HasDeclarationTypos:foo').translate).to eq('La solución parece tener un error de tipeo: debe declarar <code>foo</code>, pero declara <code>Foo</code>. ¿Quizás quisiste decir <code>foo</code>?') }
       it { expect(expectation('Foo', 'HasUsageTypos:foo').translate).to eq('La solución parece tener un error de tipeo: debe usar <code>foo</code>, pero usa <code>Foo</code>. ¿Quizás quisiste decir <code>foo</code>?') }
 

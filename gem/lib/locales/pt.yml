@@ -192,6 +192,7 @@ pt:
       UsesLoop: '%{binding} %{must} usar um loop%{matching}'
       UsesMath: '%{binding} %{must} usar expressões matemáticas'
       UsesMixins: '%{binding} %{must} usar mixins'
+      UsesNamedSelfReference: '%{binding} deve usar <code>%{keyword_Self}</code> em vez de uma referência global'
       UsesNot: '%{binding} %{must} usar <code>%{keyword_Not}</code>'
       UsesObjectComposition: '%{binding} %{must} usar composição'
       UsesPatternMatching: '%{binding} %{must} usar o padrão de correspondência'

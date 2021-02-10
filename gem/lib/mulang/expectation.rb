@@ -15,11 +15,12 @@ module Mulang::Expectation
   OBJECT_ORIENTED_SMELLS = %w(
     DoesNilTest
     DoesNullTest
+    DoesTypeTest
     HasTooManyMethods
     OverridesEqualOrHashButNotBoth
     ReturnsNil
     ReturnsNull
-    DoesTypeTest
+    UsesNamedSelfReference
   )
 
   IMPERATIVE_SMELLS = %w(

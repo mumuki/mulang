@@ -201,6 +201,7 @@ es:
       UsesMath: '%{binding} %{must} usar expresiones matemáticas'
       UsesMixin: '%{binding} %{must} utilizar mixins'
       UsesMixins: '%{binding} %{must} usar mixins'
+      UsesNamedSelfReference: '%{binding} debería usar <code>%{keyword_Self}</code> en lugar de una referencia global'
       UsesNot: '%{binding} %{must} utilizar <code>%{keyword_Not}</code>'
       UsesObjectComposition: '%{binding} %{must} usar composición'
       UsesPatternMatching: '%{binding} %{must} utilizar pattern matching'
