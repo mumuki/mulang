@@ -145,7 +145,7 @@ pt:
       Instantiates_named: '%{binding} %{must} instantiate %{target}'
       Instantiates: '%{binding} %{must} instanciar objetos'
       IsLongCode: '%{binding}  é muito longo. Tente delegar mais'
-      JavaScript#UsesVarInsteadOfLet: '% {binding} deve usar <code>let</code> em vez de <code>var</code>'
+      JavaScript#UsesVarInsteadOfLet: '%{binding} deve usar <code>let</code> em vez de <code>var</code>'
       OverridesEqualOrHashButNotBoth: '%{binding} redefine os métodos <code>equals</code> ou <code>hash </code>, mas não ambos'
       Raises_except: '%{binding} %{must} lançar exceções diferentes de %{target}'
       Raises_like: '%{binding} %{must} lançar exceções semelhantes a %{target}'
