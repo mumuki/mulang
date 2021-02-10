@@ -1,5 +1,18 @@
 # Changelog
 
+## [v6.0.5](https://github.com/mumuki/mulang/tree/v6.0.5) (2021-02-10)
+
+[Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.4...v6.0.5)
+
+**Closed issues:**
+
+- Instantiates expectation not properly working in java [\#324](https://github.com/mumuki/mulang/issues/324)
+- size message in ruby should be parsed as primitive [\#323](https://github.com/mumuki/mulang/issues/323)
+
+**Merged pull requests:**
+
+- Fix misc new smells issues [\#332](https://github.com/mumuki/mulang/pull/332) ([flbulgarelli](https://github.com/flbulgarelli))
+
 ## [v6.0.4](https://github.com/mumuki/mulang/tree/v6.0.4) (2021-02-04)
 
 [Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.3...v6.0.4)
@@ -16,8 +29,6 @@
 
 - Typo in usesDyamicPolymorphism [\#328](https://github.com/mumuki/mulang/issues/328)
 - TypesAttributeAs expectation not properly working [\#327](https://github.com/mumuki/mulang/issues/327)
-- Instantiates expectation not properly working in java [\#324](https://github.com/mumuki/mulang/issues/324)
-- size message in ruby should be parsed as primitive [\#323](https://github.com/mumuki/mulang/issues/323)
 - Lambda parsing in JS can cause failed expectations [\#322](https://github.com/mumuki/mulang/issues/322)
 - Mulang 5 renames [\#211](https://github.com/mumuki/mulang/issues/211)
 - Add support for case insensitive matching [\#155](https://github.com/mumuki/mulang/issues/155)
