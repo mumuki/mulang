@@ -69,7 +69,7 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 
 ## Primitive Operator Inspections
 
-> 👀 See also [operators section in AST Specs](./astspec/#primitive-operators).
+> 👀 See also [operators section in AST Specs](../astspec/#primitive-operators).
 >
 > ⚠️ Please notice that the operators inspections are the preferred and most reliable way of checking
 > usage of language primitives. For example, prefer `UsesPlus` over `Uses:+`

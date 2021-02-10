@@ -403,7 +403,7 @@ Not all inspections can be counted. Currently, only the following are supported:
 * `uses try`
 * `uses while`
 * `uses yield`
-* All the [primitive operator inspections](./inspections/#primitive-operator-inspections), e.g. `uses plus` or `uses size`
+* All the [primitive operator inspections](../inspections/#primitive-operator-inspections), e.g. `uses plus` or `uses size`
 
 ## Boolean operators on scoped queries
 
