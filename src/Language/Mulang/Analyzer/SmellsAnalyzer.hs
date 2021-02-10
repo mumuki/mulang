@@ -62,6 +62,7 @@ allSmells = [
   "HasDeclarationTypos",
   "HasEmptyIfBranches",
   "HasEmptyRepeat",
+  "HasEqualIfBranches",
   "HasLongParameterList",
   "HasMisspelledIdentifiers",
   "HasRedundantBooleanComparison",
