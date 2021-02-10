@@ -23,32 +23,8 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `DeclaresTypeSignature`           | is a given computation type signature declared?
 | `DeclaresVariable`                | is a given local or global variable declared?
 | `Delegates`                       | is a non-empty method, function or procedure declared *and* called?
-| `DiscardsExceptions`              | are exceptions discarded within an empty catch block?
-| `DoesConsolePrint`                | is there any console-print-statement like `System.out.println`, `puts` or `console.log`?
-| `DoesTypeTest`                    |
-| `HasAssignmentCondition`          | is the code evaluating the result of an assignment where a boolean condition is expected?
-| `HasAssignmentReturn`             | is the code returning the result of an assignment?
-| `HasCodeDuplication`              | has the given code simple literal code duplication?
-| `HasDeclarationTypos`             | is an identifier *not* declared but a very similar one declared instead?
-| `HasEmptyIfBranches`              | has the given code an empty `if` branch?
-| `HasEmptyRepeat`                  | has the given code a `repeat` with empty body?
-| `HasEqualIfBranches`              | are both branches of an `if` equal?
-| `UsesNamedSelfReference`          | does an object reference itself by its name instead of using `self`?
-| `HasLongParameterList`            | does a given method/function/predicate take too many parameters?
-| `HasMisspelledIdentifiers`        | an identifier is not a domain language dictionary's word and not part of its jargon
-| `HasRedundantBooleanComparison`   |
-| `HasRedundantIf`                  | can a combination of `if`s, `assignment`s and `return`s be replaced by a boolean expression?
-| `HasRedundantLocalVariableReturn` | does a callable declare and return a variable just after declaring it?
-| `HasRedundantRepeat`              | has the given code an unnecesary - 1 iteration - `repeat` statement?
-| `HasTooShortIdentifiers`          | whether an identifier is too short and not part of domain language's jargon
-| `HasUnreachableCode`              | is there unreachable code?
-| `HasUsageTypos`                   | is an identifier *not* called but a very similar one called instead?
-| `HasWrongCaseIdentifiers`         | whether an identifier does not match the domain language's case style
-| `IsLongCode`                      | has the code long sequences of statements?
 | `Raises`                          | is the given _exception type_ raised?
 | `Rescues`                         | is the given _exception type_ rescued?
-| `ShouldInvertIfCondition`         | has the given code an `if` with an empty `then` but a non-empty `else`?
-| `ShouldUseStrictComparators`      | does the given use a non-strict comparator like `==` in JavaScript?
 | `SubordinatesDeclarationsTo`      | are all the declarations in the code called from the given declaration?
 | `SubordinatesDeclarationsToEntryPoint` | are all the declarations in the code called from an entry point?
 | `TypesAs`                         | is the given type used to type a variable?
@@ -66,6 +42,30 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `UsesPrint`                       | is a print statement used?
 | `UsesType`                        | is the given typed used in a signature?
 
+
+### Code Smells
+
+| Inspection                        | Meaning
+|-----------------------------------|------------------------------------------------------
+| `DiscardsExceptions`              | are exceptions discarded within an empty catch block?
+| `DoesConsolePrint`                | is there any console-print-statement like `System.out.println`, `puts` or `console.log`?
+| `HasCodeDuplication`              | has the given code simple literal code duplication?
+| `HasDeclarationTypos`             | is an identifier *not* declared but a very similar one declared instead?
+| `HasEmptyIfBranches`              | has the given code an empty `if` branch?
+| `HasEqualIfBranches`              | are both branches of an `if` equal?
+| `HasLongParameterList`            | does a given method/function/predicate take too many parameters?
+| `HasMisspelledIdentifiers`        | an identifier is not a domain language dictionary's word and not part of its jargon
+| `HasRedundantBooleanComparison`   |
+| `HasRedundantIf`                  | can a combination of `if`s, `assignment`s and `return`s be replaced by a boolean expression?
+| `HasRedundantLocalVariableReturn` | does a callable declare and return a variable just after declaring it?
+| `HasTooShortIdentifiers`          | whether an identifier is too short and not part of domain language's jargon
+| `HasUnreachableCode`              | is there unreachable code?
+| `HasUsageTypos`                   | is an identifier *not* called but a very similar one called instead?
+| `HasWrongCaseIdentifiers`         | whether an identifier does not match the domain language's case style
+| `IsLongCode`                      | has the code long sequences of statements?
+| `ShouldInvertIfCondition`         | has the given code an `if` with an empty `then` but a non-empty `else`?
+| `ShouldUseStrictComparators`      | does the given use a non-strict comparator like `==` in JavaScript?
+| `JavaScript#UsesVarInsteadOfLet`  | ⚠️ **JavaScript-specific** does the code use `var` instead of `let`?
 
 ## Primitive Operator Inspections
 
@@ -139,6 +139,15 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `UsesSwitch`                      | is a `switch` control structure used?
 | `UsesWhile`                       | is a `while` control structure used?
 
+### Code Smells
+
+| Inspection                        | Meaning
+|-----------------------------------|------------------------------------------------------
+| `HasAssignmentCondition`          | is the code evaluating the result of an assignment where a boolean condition is expected?
+| `HasAssignmentReturn`             | is the code returning the result of an assignment?
+| `HasEmptyRepeat`                  | has the given code a `repeat` with empty body?
+| `HasRedundantRepeat`              | has the given code an unnecesary - 1 iteration - `repeat` statement?
+
 ## Object Oriented Inspections
 
 | Inspection                        | Meaning
@@ -150,14 +159,10 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `DeclaresObject`                  | is a given named object declared?
 | `DeclaresPrimitive`               | Is the given primitive operator overriden?
 | `DeclaresSuperclass`              | is a given class declared as superclass?
-| `DoesNullTest`                    | is there a test agains a null value, like `if x == nil then puts 'is nil'`
-| `HasTooManyMethods`               | does a given class/object/interface have too many methods?
 | `Implements`                      | is the given interface implemented?
 | `Includes`                        | is a given mixins included?
 | `Inherits`                        | is a given class declared as superclass? - alias of `declaresSuperclass`
 | `Instantiates`                    | is the given class instantiated?
-| `OverridesEqualsOrHashButNotBoth` | does a given class override equals but not hash? or hash but not equals?
-| `ReturnsNil`                      |
 | `UsesDynamicPolymorphism`          | are there two or more methods definitions for some sent selector?
 | `UsesDynamicMethodOverload`       | is there a class that defined two methods with different arity but with the same name?
 | `UsesInheritance`                 | is any superclass explicitly declared?
@@ -168,19 +173,37 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `UsesTemplateMethod`              | is there a class that sends a message whose corresonding method is not declared?
 
 
+
+### Code Smells
+
+| Inspection                        | Meaning
+|-----------------------------------|------------------------------------------------------
+| `DoesNilTest`                     | is there a test agains a null value, like `if x == nil then puts 'is nil'`
+| `DoesTypeTest`                    | are there any tests against literal strings?
+| `HasTooManyMethods`               | does a given class/object/interface have too many methods?
+| `OverridesEqualOrHashButNotBoth` | does a given class override equals but not hash? or hash but not equals?
+| `ReturnsNil`                      |
+| `UsesNamedSelfReference`          | does an object reference itself by its name instead of using `self`?
+
 ## Functional Inspections
 
 | Inspection                        | Meaning
 |-----------------------------------|------------------------------------------------------
-| `HasRedundantGuards`              |
-| `HasRedundantLambda`              |
-| `HasRedundantParameter`           |
 | `UsesAnonymousVariable`           |
 | `UsesComposition`                 |
 | `UsesForComprehension`            | is the functional for/do/list comprehension used?
 | `UsesGuards`                      |
 | `UsesLambda`                      |
 | `UsesYield`                       | is an expression yielded within a comprehension?
+
+### Code Smells
+
+| Inspection                        | Meaning
+|-----------------------------------|------------------------------------------------------
+| `HasRedundantGuards`              |
+| `HasRedundantLambda`              |
+| `HasRedundantParameter`           |
+| `ShouldUseOtherwise`              |
 
 ## Logic Inspections
 
@@ -189,10 +212,16 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `DeclaresFact`                    | is a given logic fact declared?
 | `DeclaresPredicate`               | is a given rule o fact declared?
 | `DeclaresRule`                    | is a given logic rule declared?
-| `HasRedundantReduction`           | is a is-operator used to unify individuals that don't require a reduction, like `X is 4`
-| `UsesCut`                         | is the logic `!` consult used?
-| `UsesFail`                        | is the logic `fail` consult used?
 | `UsesFindall`                     | is the logic `findall` consult used?
 | `UsesForall`                      | is the logic `forall` consult used?
 | `UsesNot`                         |
+
+
+### Code Smells
+
+| Inspection                        | Meaning
+|-----------------------------------|------------------------------------------------------
+| `HasRedundantReduction`           | is a is-operator used to unify individuals that don't require a reduction, like `X is 4`
+| `UsesCut`                         | is the logic `!` consult used?
+| `UsesFail`                        | is the logic `fail` consult used?
 | `UsesUnificationOperator`         | is the logic unification operator `=` used?

@@ -106,6 +106,7 @@ Java:
     ForEach: 'for'
     Interface: 'interface'
     Switch: 'switch'
+    Self: 'this'
   operators:
     <<: *common_operators
     Hash: 'hashCode'
@@ -118,6 +119,7 @@ Java:
 JavaScript:
   keywords:
     <<: *common_keywords
+    Self: 'this'
   operators:
     <<: *common_operators
     Size:
@@ -138,6 +140,7 @@ Python:
     'False': 'False'
     'Null': 'None'
     'True': 'True'
+    Self: 'self'
   operators:
     <<: *common_operators
     NotEqual:
@@ -154,6 +157,7 @@ Ruby:
     ForEach: 'for'
     Include: 'include'
     Switch: 'case'
+    Self: 'self'
   operators:
     <<: *common_operators
     Size:
@@ -171,6 +175,7 @@ Ruby:
 Php:
   keywords:
     <<: *common_keywords
+    Self: 'this'
   operators:
     <<: *common_operators
 Prolog:

@@ -8,6 +8,7 @@ module Mulang::Expectation
 
   FUNCTIONAL_SMELLS = %w(
     HasRedundantGuards
+    HasRedundantLambda
     HasRedundantParameter
     ShouldUseOtherwise
   )
@@ -15,11 +16,12 @@ module Mulang::Expectation
   OBJECT_ORIENTED_SMELLS = %w(
     DoesNilTest
     DoesNullTest
+    DoesTypeTest
     HasTooManyMethods
     OverridesEqualOrHashButNotBoth
     ReturnsNil
     ReturnsNull
-    DoesTypeTest
+    UsesNamedSelfReference
   )
 
   IMPERATIVE_SMELLS = %w(
@@ -32,6 +34,7 @@ module Mulang::Expectation
   EXPRESSIVENESS_SMELLS = %w(
     HasMisspelledBindings
     HasMisspelledIdentifiers
+    HasTooShortBindings
     HasTooShortIdentifiers
     HasWrongCaseBinding
     HasWrongCaseIdentifiers
@@ -46,10 +49,8 @@ module Mulang::Expectation
     HasEqualIfBranches
     HasLongParameterList
     HasRedundantBooleanComparison
-    HasRedundantLocalVariableReturn
     HasRedundantIf
-    HasRedundantLambda
-    HasTooShortBindings
+    HasRedundantLocalVariableReturn
     HasUnreachableCode
     HasUsageTypos
     IsLongCode
