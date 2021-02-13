@@ -71,7 +71,10 @@ spec = do
 
       describe "nested" $ do
         it "is True when present" $ do
+          declaresElement (named "body") (Element "body" [] [Element "p" [] []]) `shouldBe` True
           declaresElement (named "p") (Element "body" [] [Element "p" [] []]) `shouldBe` True
+          declaresElement (named "p") (Element "body" [] [Element "p" [] [Element "span" [] []]]) `shouldBe` True
+          declaresElement (named "span") (Element "body" [] [Element "p" [] [Element "span" [] []]]) `shouldBe` True
 
         it "is False when not present" $ do
           declaresElement (named "p") (Element "body" [] [Element "h1" [] []]) `shouldBe` False

@@ -8,11 +8,21 @@ import           Language.Mulang.Parsers.JavaScript (js)
 spec :: Spec
 spec = do
   describe "declaredIdentifiers" $ do
-    let code = hs "f x =  (:[]) . m x y . g h 2\n\
-                   \w k = p\n\
-                   \     where z = 2"
-    it "answers declared identifiers" $ do
-      (declaredIdentifiers code) `shouldBe` ["f", "w", "z"]
+    context "standard code" $ do
+      let code = hs "f x =  (:[]) . m x y . g h 2\n\
+                    \w k = p\n\
+                    \     where z = 2"
+      it "answers declared identifiers" $ do
+        (declaredIdentifiers code) `shouldBe` ["f", "w", "z"]
+
+    context "generic elements" $ do
+      it "answers declared nested positional identifiers" $ do
+        let code = (Element "a" [] [Element "b" [] [Element "c" [] [], Element "d" [] []]])
+        (declaredIdentifiers code) `shouldBe` ["a", "b", "c", "d"]
+
+      it "answers declared nested named identifiers" $ do
+        let code = (Element "a" [] [Element "b" [("x", (Element "c" [] [])), ("y", (Element "d" [] []))] []])
+        (declaredIdentifiers code) `shouldBe` ["a", "b", "c", "d"]
 
   describe "referencedIdentifiers" $ do
     it "answers referenced identifiers" $ do

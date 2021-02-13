@@ -4,7 +4,7 @@ import Language.Mulang.Ast
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compact)
 
-import Text.HTML.TagSoup (Tag (..), Attribute (..))
+import Text.HTML.TagSoup (Tag (..), Attribute)
 import Text.HTML.TagSoup.Tree (TagTree (..), parseTree)
 
 html :: Parser

@@ -19,6 +19,7 @@ module Language.Mulang.Generator (
   Expression(..)) where
 
 import Language.Mulang.Ast
+import Language.Mulang.Builder (compact)
 import Language.Mulang.Ast.Visitor
 import Language.Mulang.Identifier
 
@@ -35,7 +36,7 @@ type Declarator = (Identifier, Expression)
 declarators :: Generator Declarator
 declarators (Sequence es)          = concatMap declarators es
 declarators e@(Attribute n _)      = [(n, e)]
-declarators e@(Element n _ _)      = [(n, e)]
+declarators e@(Element n ns ps)    = (n, e) : declarators (compact . map snd $ ns)  ++ declarators (compact ps)
 declarators e@(Class n _ b)        = (n, e) : declarators b
 declarators e@(Clause n _ es)      = (n, e) : concatMap declarators es
 declarators e@(Enumeration n _)    = [(n, e)]
