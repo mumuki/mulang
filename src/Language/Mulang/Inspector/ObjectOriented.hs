@@ -60,14 +60,14 @@ usesMixins :: Inspection
 usesMixins = includes anyone
 
 (declaresObject, declaresObjectMatching, countObjects) = deriveDeclares f :: BoundInspectionFamily
-  where f matcher (Object _ body) = matches matcher id [body]
+  where f matcher (Object _ body) = matcher [body]
         f _        _              = False
 
 declaresSuperclass :: BoundInspection
 declaresSuperclass = inherits
 
 (declaresClass, declaresClassMatching, countClasses) = deriveDeclares f :: BoundInspectionFamily
-  where f matcher (Class _ _ body) = matches matcher id [body]
+  where f matcher (Class _ _ body) = matcher [body]
         f _        _               = False
 
 declaresEnumeration :: BoundInspection
@@ -76,11 +76,11 @@ declaresEnumeration =  containsBoundDeclaration f
         f _                 = False
 
 (declaresInterface, declaresInterfaceMatching, countInterfaces) = deriveDeclares f :: BoundInspectionFamily
-  where f matcher (Interface _ _ body) = matches matcher id [body]
+  where f matcher (Interface _ _ body) = matcher [body]
         f _        _                    = False
 
 (declaresAttribute, declaresAttributeMatching, countAttributes) = deriveDeclares f :: BoundInspectionFamily
-  where f matcher (Attribute _ body) = matches matcher id [body]
+  where f matcher (Attribute _ body) = matcher [body]
         f _ _                        = False
 
 (declaresMethod, declaresMethodMatching, countMethods) = deriveDeclares f :: BoundInspectionFamily

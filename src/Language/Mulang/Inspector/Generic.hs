@@ -165,7 +165,7 @@ declaresRecursively = containsBoundDeclaration f
         f _       _                      = False
 
 (declaresVariable, declaresVariableMatching, countVariables) = deriveDeclares f :: BoundInspectionFamily
-  where f matcher (Variable _ body) = matches matcher id [body]
+  where f matcher (Variable _ body) = matcher [body]
         f _       _                 = False
 
 declaresEntryPoint :: BoundInspection
