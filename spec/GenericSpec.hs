@@ -87,9 +87,24 @@ spec = do
         it "is False when not present" $ do
           declaresElementMatching (withEvery [isString "wrap"]) (named "p") (Element "p" [] []) `shouldBe` False
           declaresElementMatching (withEvery [isString "wrap"]) (named "p") (Element "p" [("class", MuString "other")] []) `shouldBe` False
-          declaresElementMatching (withEvery [isString "wrap"]) (named "p") (Element "div" [("class", MuString "wrap")] []) `shouldBe` False
+          declaresElementMatching (withEvery [isString "wrap"]) (named "p") (Element "p" [] []) `shouldBe` False
 
-      describe "when matching positional children" $ do
+      describe "when matching named children and any positional child" $ do
+        it "is True when present" $ do
+          declaresElementMatching (withEvery [isString "wrap", isAnything]) (named "p") (Element "p" [("class", MuString "wrap")] []) `shouldBe` True
+
+        it "is False when not present" $ do
+          declaresElementMatching (withEvery [
+                                    isString "wrap",
+                                    isAnything]) (named "p") (Element "p" [] []) `shouldBe` False
+          declaresElementMatching (withEvery [
+                                    isString "wrap",
+                                    isAnything]) (named "p") (Element "p" [("class", MuString "other")] []) `shouldBe` False
+          declaresElementMatching (withEvery [
+                                    isString "wrap",
+                                    isAnything]) (named "p") (Element "p" [] []) `shouldBe` False
+
+      describe "when matching any named child and positional children" $ do
         it "is True when present" $ do
           declaresElementMatching (withEvery [
                                     isAnything,

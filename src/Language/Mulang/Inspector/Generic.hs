@@ -194,7 +194,7 @@ declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
         argsHaveArity = arityPredicate.length
 
 (declaresElement, declaresElementMatching, countElements) = deriveDeclares f :: BoundInspectionFamily
-  where f matcher (Element _ named positionals) = matches matcher id [compact . map snd $ named, compact positionals]
+  where f matcher (Element _ named positionals) = matcher [compact . map snd $ named, compact positionals]
         f _       _                             = False
 
 usesLogic :: Inspection
