@@ -36,6 +36,7 @@ renameState (Match e1 eqs)      = do { e1' <- renameState e1; eqs' <- renameEqua
 renameState (Send r e es)       = do { (r':e':es') <- mapM renameState (r:e:es); return $ Send r' e' es' }
 renameState (Switch v cs d)     = do { v' <- renameState v; cs' <- renameSwitchCases cs; d' <- renameState d; return $ Switch v' cs' d' }
 renameState (Try t cs f)        = do { t' <- renameState t; cs' <- renameTryCases cs; f' <- renameState f; return $ Try t' cs' f' }
+renameState (RecordUpdate r us) = do { r' <- renameState r; us' <- renameRecordUpdates us; return $ RecordUpdate r' us' }
 renameState a@(Assert _ _)      = return a
 renameState r@(Rule _ _ _)      = return r
 --
@@ -48,8 +49,9 @@ renameState (TwoExpressions e1 e2 c)               = do { e1' <- renameState e1;
 renameState e@(SinglePatternsList _ _)             = return e
 renameState e@Terminal                             = return e
 
-renameTryCases    = mapM (\(p, e) -> do { e' <- renameState e; return (p, e') })
-renameSwitchCases = mapM (\(e1, e2) -> do { e1' <- renameState e1; e2' <- renameState e2; return (e1', e2') })
+renameRecordUpdates = mapM (\(i, e) -> do { e' <- renameState e; return (i, e') })
+renameTryCases      = mapM (\(p, e) -> do { e' <- renameState e; return (p, e') })
+renameSwitchCases   = mapM (\(e1, e2) -> do { e1' <- renameState e1; e2' <- renameState e2; return (e1', e2') })
 
 renameStatement :: Statement -> RenameState Statement
 renameStatement (Generator p e)  = do { p' <- renameParameter p; e' <- renameState e; return $ Generator p' e' }

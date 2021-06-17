@@ -22,6 +22,7 @@ replace i o (Rule n args es)                      = Rule n args (mapReplace i o 
 replace i o (Send r e es)                         = Send (replace i o r) (replace i o e) (mapReplace i o es)
 replace i o (Switch v cs d)                       = Switch (replace i o v) (replaceSwitchCases i o cs) (replace i o d)
 replace i o (Try t cs f)                          = Try (replace i o t) (replaceTryCases i o cs) (replace i o f)
+replace i o (RecordUpdate r ups)                  = RecordUpdate (replace i o r) (replaceRecordUpdates i o ups)
 --
 replace _ _ (SinglePatternsList ps c)             = c ps
 replace _ _ c@(Terminal)                          = c
@@ -39,8 +40,9 @@ replaceEquation :: Inspection -> Expression -> Equation -> Equation
 replaceEquation i o = mapEquation f f
   where f = replace i o
 
-replaceTryCases    i o = map (\(p, e) -> (p, replace i o e))
-replaceSwitchCases i o = map (\(e1, e2) -> (replace i o e1, replace i o e2))
+replaceRecordUpdates i o = map (\(id, e)  -> (id, replace i o e))
+replaceTryCases      i o = map (\(p, e)   -> (p, replace i o e))
+replaceSwitchCases   i o = map (\(e1, e2) -> (replace i o e1, replace i o e2))
 
 localReplace :: Replacer
 localReplace i o (Sequence es)                         = Sequence (map (localReplace i o) es)
