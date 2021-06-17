@@ -111,6 +111,7 @@ library
     Language.Mulang.Serializer
     Language.Mulang.Interpreter
     Language.Mulang.Interpreter.Internals
+    Language.Mulang.Interpreter.Repl
     Language.Mulang.Interpreter.Runner
     Language.Mulang.Transform.Aliaser
     Language.Mulang.Transform.Cropper
