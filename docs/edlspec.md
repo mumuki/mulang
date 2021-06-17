@@ -227,7 +227,7 @@ expectation "a method that performs boolean operations must be declared":
   %% equivalent to * DeclaresMethod:WithLogic
   declares method with logic;
 
-expectation "`getAge` must not return a hardcoded value:
+expectation "`getAge` must not return a hardcoded value":
   %% equivalent to Intransitive:getAge Returns:WithNonliteral
   within `getAge` returns with nonliteral;
 ```
