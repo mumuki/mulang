@@ -94,7 +94,10 @@ mu (HsModule _ _ _ _ decls) = compact (concatMap muDecls decls)
     muExp (HsListComp exp stmts)         = For (map muStmt stmts) (Yield (muExp exp))
     muExp (HsDo stmts) | (HsQualifier exp) <- last stmts  = For (map muStmt stmts)  (Yield (muExp exp))
     muExp (HsExpTypeSig _ exp (HsQualType cs t))          = TypeCast (muExp exp) (muType t cs)
+    muExp (HsRecUpdate record updates)   = RecordUpdate (muExp record) $ map muFieldUpdate updates
     muExp e = debug e
+
+    muFieldUpdate (HsFieldUpdate field value) = (muQName field, muExp value)
 
     muLit (HsCharPrim    v) = MuChar v
     muLit (HsStringPrim  v) = MuString v
