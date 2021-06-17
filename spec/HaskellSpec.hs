@@ -64,3 +64,6 @@ spec = do
 
     it "parses chars as MuChars" $ do
       hs "x = 'a'" `shouldBe` Variable "x" (MuChar 'a')
+
+    it "parses record syntax update" $ do
+      hs "f = someData { someField = someValue, someOtherField = someOtherValue }" `shouldBe` Variable "f" (RecordUpdate (Reference "someData") [("someField", Reference "someValue"), ("someOtherField", Reference "someOtherValue")])
