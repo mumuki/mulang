@@ -65,11 +65,13 @@ allSmells = [
   "HasEqualIfBranches",
   "HasLongParameterList",
   "HasMisspelledIdentifiers",
+  "HasRedundantAnd",
   "HasRedundantBooleanComparison",
   "HasRedundantGuards",
   "HasRedundantIf",
   "HasRedundantLambda",
   "HasRedundantLocalVariableReturn",
+  "HasRedundantOr",
   "HasRedundantParameter",
   "HasRedundantReduction",
   "HasRedundantRepeat",
@@ -147,11 +149,13 @@ detectionFor ("HasEqualIfBranches", Nothing)              = simple hasEqualIfBra
 detectionFor ("HasLongParameterList", Nothing)            = simple hasLongParameterList
 detectionFor ("HasMisspelledBindings", Nothing)           = withLanguage hasMisspelledIdentifiers
 detectionFor ("HasMisspelledIdentifiers", Nothing)        = withLanguage hasMisspelledIdentifiers
+detectionFor ("HasRedundantAnd", Nothing)                 = simple hasRedundantAnd
 detectionFor ("HasRedundantBooleanComparison", Nothing)   = simple hasRedundantBooleanComparison
 detectionFor ("HasRedundantGuards", Nothing)              = simple hasRedundantGuards
 detectionFor ("HasRedundantIf", Nothing)                  = simple hasRedundantIf
 detectionFor ("HasRedundantLambda", Nothing)              = simple hasRedundantLambda
 detectionFor ("HasRedundantLocalVariableReturn", Nothing) = simple hasRedundantLocalVariableReturn
+detectionFor ("HasRedundantOr", Nothing)                  = simple hasRedundantOr
 detectionFor ("HasRedundantParameter", Nothing)           = simple hasRedundantParameter
 detectionFor ("HasRedundantReduction", Nothing)           = simple hasRedundantReduction
 detectionFor ("HasRedundantRepeat", Nothing)              = simple hasRedundantRepeat

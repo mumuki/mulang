@@ -185,6 +185,32 @@ spec = do
     it "is False when not does type test" $ do
       doesTypeTest (js "function x(m) { return 1 }") `shouldBe` False
 
+  describe "hasRedundantAnd" $ do
+    it "is True when true is first argument" $ do
+      hasRedundantAnd (js "true && x") `shouldBe` True
+
+    it "is False when false is first argument" $ do
+      hasRedundantAnd (js "false && x") `shouldBe` False
+
+    it "is False when non-literal is first argument" $ do
+      hasRedundantAnd (js "x && z") `shouldBe` False
+
+    it "is False when or is used" $ do
+      hasRedundantAnd (js "true || z") `shouldBe` False
+
+  describe "hasRedundantOr" $ do
+    it "is True when false is first argument" $ do
+      hasRedundantOr (js "false || x") `shouldBe` True
+
+    it "is False when true is first argument" $ do
+      hasRedundantOr (js "true || x") `shouldBe` False
+
+    it "is False when non-literal is first argument" $ do
+      hasRedundantOr (js "x || z") `shouldBe` False
+
+    it "is False when or is used" $ do
+      hasRedundantOr (js "true || z") `shouldBe` False
+
   describe "hasRedundantLambda" $ do
     it "is True whn etha-conversion applies, hs" $ do
       hasRedundantLambda (hs "g = map (\\m -> f m)") `shouldBe` True

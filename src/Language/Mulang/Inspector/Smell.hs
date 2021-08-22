@@ -5,20 +5,22 @@ module Language.Mulang.Inspector.Smell (
   doesConsolePrint,
   doesNilTest,
   doesTypeTest,
-  hasAssignmentReturn,
   hasAssignmentCondition,
+  hasAssignmentReturn,
   hasEmptyIfBranches,
   hasEmptyRepeat,
+  hasEqualIfBranches,
   hasLongParameterList,
+  hasRedundantAnd,
   hasRedundantBooleanComparison,
   hasRedundantGuards,
   hasRedundantIf,
   hasRedundantLambda,
   hasRedundantLocalVariableReturn,
+  hasRedundantOr,
   hasRedundantParameter,
   hasRedundantRepeat,
   hasTooManyMethods,
-  hasEqualIfBranches,
   detectDeclarationTypos,
   detectUsageTypos,
   hasUnreachableCode,
@@ -42,6 +44,18 @@ import           Data.Text (pack)
 -- | Inspection that tells whether an expression has expressions like 'x == True'
 hasRedundantBooleanComparison :: Inspection
 hasRedundantBooleanComparison = compares isBooleanLiteral
+
+hasRedundantAnd :: Inspection
+hasRedundantAnd = containsExpression f
+  where f (Application (Primitive O.And) [MuTrue, _]) = True
+        f _                                           = False
+
+
+hasRedundantOr :: Inspection
+hasRedundantOr = containsExpression f
+  where f (Application (Primitive O.Or) [MuFalse, _]) = True
+        f _                                           = False
+
 
 hasRedundantRepeat :: Inspection
 hasRedundantRepeat = containsExpression f

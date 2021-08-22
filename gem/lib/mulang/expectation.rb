@@ -48,9 +48,11 @@ module Mulang::Expectation
     HasEmptyIfBranches
     HasEqualIfBranches
     HasLongParameterList
+    HasRedundantAnd
     HasRedundantBooleanComparison
     HasRedundantIf
     HasRedundantLocalVariableReturn
+    HasRedundantOr
     HasUnreachableCode
     HasUsageTypos
     IsLongCode
