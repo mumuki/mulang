@@ -55,7 +55,9 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `HasEqualIfBranches`              | are both branches of an `if` equal?
 | `HasLongParameterList`            | does a given method/function/predicate take too many parameters?
 | `HasMisspelledIdentifiers`        | an identifier is not a domain language dictionary's word and not part of its jargon
-| `HasRedundantBooleanComparison`   |
+| `HasRedundantBooleanComparison`   | is there an expression in the form of `x == true` or `x == false`?
+| `HasRedundantAnd`                 | is there an expression in the form of `true && x`?
+| `HasRedundantOr`                  | is there an expression in the form of `false || x`?
 | `HasRedundantIf`                  | can a combination of `if`s, `assignment`s and `return`s be replaced by a boolean expression?
 | `HasRedundantLocalVariableReturn` | does a callable declare and return a variable just after declaring it?
 | `HasTooShortIdentifiers`          | whether an identifier is too short and not part of domain language's jargon

@@ -114,6 +114,8 @@ en:
       HasMisspelledBindings: '%{binding} is misspelled'
       HasMisspelledIdentifiers: '%{binding} is misspelled'
       HasRedundantBooleanComparison: '%{binding} makes unnecesary boolean comparisons'
+      HasRedundantAnd: '%{binding} has an expression in the form `%{keyword_True} %{operator_And} condition`, which may be replaced by just `condition`'
+      HasRedundantOr: '%{binding} has an expression in the form `%{keyword_False} %{operator_Or} condition`, which may be replaced by just `condition`'
       HasRedundantGuards: '%{binding} has unnecessary guards'
       HasRedundantIf: '%{binding} has unnecessary <code>%{keyword_If}</code>s that can be replaced by a boolean expression'
       HasRedundantLambda: '%{binding} has unnecessary lambdas'

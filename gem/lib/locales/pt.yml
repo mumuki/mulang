@@ -118,6 +118,8 @@ pt:
       HasMisspelledBindings: '%{binding}  está incorreto. Verifique a ortografia e tente não usar abreviaturas'
       HasMisspelledIdentifiers: '%{binding}  está incorreto. Verifique a ortografia e tente não usar abreviaturas'
       HasRedundantBooleanComparison: '%{binding}  faz comparações booleanas desnecessárias'
+      HasRedundantAnd: '%{binding} tem uma expressão no formato `%{keyword_True} %{operator_And} condição`, que pode ser reescrita diretamente como `condição`'
+      HasRedundantOr: '%{binding} tem uma expressão na forma `%{keyword_False} %{operator_Or} condição`, que pode ser reescrita diretamente como `condição`'
       HasRedundantGuards: '%{binding}  possui protetores desnecessários'
       HasRedundantIf: '%{binding} possui <code>%{keyword_If}</code>s desnecessários que podem ser substituídos por expressões booleanas'
       HasRedundantLambda: '%{binding}  possui lambdas desnecessários'
