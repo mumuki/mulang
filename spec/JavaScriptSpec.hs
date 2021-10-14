@@ -90,6 +90,10 @@ spec = do
     it "sum should be parseable" $ do
       js "x + y" `shouldBe` (Application (Primitive Plus) [Reference "x",Reference "y"])
 
+    it "parses bitwise operations correctly" $ do
+      js "x & y" `shouldBe` (Application (Primitive BitwiseAnd) [Reference "x", Reference "y"])
+      js "x | y" `shouldBe` (Application (Primitive BitwiseOr) [Reference "x", Reference "y"])
+
     it "list literal top level expression" $ do
       js "[8, 7]" `shouldBe` MuList [MuNumber 8, MuNumber 7]
 
