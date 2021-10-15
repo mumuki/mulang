@@ -1,5 +1,9 @@
 # Changelog
 
+## [v6.0.6](https://github.com/mumuki/mulang/tree/v6.0.6) (2021-10-15)
+
+[Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.5...v6.0.6)
+
 ## [v6.0.5](https://github.com/mumuki/mulang/tree/v6.0.5) (2021-02-10)
 
 [Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.4...v6.0.5)
