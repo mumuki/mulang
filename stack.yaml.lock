@@ -12,25 +12,19 @@ packages:
   original:
     hackage: aeson-1.2.1.0
 - completed:
-    size: 162082
-    url: https://github.com/mumuki/language-javascript/archive/3640442ea562cc125f219b5c60fbc1b77882fd62.tar.gz
-    cabal-file:
-      size: 3865
-      sha256: 3c68380fc4794475ff4ebec608f8cf7ce9b15b9b69eb938d423f8aafdefbe0d7
+    size: 162254
+    url: https://github.com/mumuki/language-javascript/archive/63f9a9cb7445cc10aa0ab6966b66caf58e59f9d3.tar.gz
     name: language-javascript
     version: 0.7.1.0
-    sha256: 4c9ac2f683f4be52673da8795ae93c0d63d62ac3fe4091e69fb54470f3b774b0
+    sha256: 1879cbfe55b5df9f84d0aa08211cb53c2d59cd25565f74d763452fa06fb6a9bd
     pantry-tree:
-      size: 3229
-      sha256: 9e052a863d218f8db4f55161534ca2caef9d03f5213f452b123576219d606f6c
+      size: 3180
+      sha256: 7a094a06763fd7c1934aa2c0a887db4ecc93ca6882333057e10b6b1c8ecdea86
   original:
-    url: https://github.com/mumuki/language-javascript/archive/3640442ea562cc125f219b5c60fbc1b77882fd62.tar.gz
+    url: https://github.com/mumuki/language-javascript/archive/63f9a9cb7445cc10aa0ab6966b66caf58e59f9d3.tar.gz
 - completed:
     size: 56176
     url: https://github.com/julian-berbel/language-python/archive/cbdf9b33cc3c30e66c8455165ed1c7d70a300a3e.tar.gz
-    cabal-file:
-      size: 2418
-      sha256: 6798ef2d0951909950dd00c40a6338ef80bc2a51c032ce998984e4f4c8dbda3f
     name: language-python
     version: 0.5.5
     sha256: 3f41a52d49545b34e2a92c34b7721e576bfa09e7e9474dde266e3ac1bca6c950
