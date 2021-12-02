@@ -12,16 +12,16 @@ packages:
   original:
     hackage: aeson-1.2.1.0
 - completed:
-    size: 162254
-    url: https://github.com/mumuki/language-javascript/archive/63f9a9cb7445cc10aa0ab6966b66caf58e59f9d3.tar.gz
+    size: 163085
+    url: https://github.com/mumuki/language-javascript/archive/e190ac795a553d3bd39b7924fe5c09dceeeddf2f.tar.gz
     name: language-javascript
     version: 0.7.1.0
-    sha256: 1879cbfe55b5df9f84d0aa08211cb53c2d59cd25565f74d763452fa06fb6a9bd
+    sha256: 231bfdeb905a2dae78b7f6533fa1e5e34b8d75971cd323dfe3920e06f7620757
     pantry-tree:
-      size: 3180
-      sha256: 7a094a06763fd7c1934aa2c0a887db4ecc93ca6882333057e10b6b1c8ecdea86
+      size: 3230
+      sha256: d94e8eee59a1ebb05e6377df4a874f4856c1eda2cef46febf10ce773c080d3b6
   original:
-    url: https://github.com/mumuki/language-javascript/archive/63f9a9cb7445cc10aa0ab6966b66caf58e59f9d3.tar.gz
+    url: https://github.com/mumuki/language-javascript/archive/e190ac795a553d3bd39b7924fe5c09dceeeddf2f.tar.gz
 - completed:
     size: 56176
     url: https://github.com/julian-berbel/language-python/archive/cbdf9b33cc3c30e66c8455165ed1c7d70a300a3e.tar.gz
