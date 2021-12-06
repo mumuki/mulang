@@ -62,6 +62,35 @@ spec = do
     it "simple function declaration" $ do
       js "function f(x) { return 1 }" `shouldBe` hs "f x = 1"
 
+    it "comments do not affect return semantics" $ do
+      run [text|
+      function f(x) {
+        return x
+      }|] `shouldBe` SimpleFunction "f" [VariablePattern "x"] (Return (Reference "x"))
+
+      run [text|
+      function f(x) {
+        return
+        x
+      }|] `shouldBe` SimpleFunction "f" [VariablePattern "x"] (Sequence [Return None, Reference "x"])
+
+      run [text|
+      function f(x) {
+        return //
+        x
+      }|] `shouldBe` SimpleFunction "f" [VariablePattern "x"] (Sequence [Return None, Reference "x"])
+
+      run [text|
+      function f(x) {
+        return /*
+        */ x
+      }|] `shouldBe` SimpleFunction "f" [VariablePattern "x"] (Sequence [Return None, Reference "x"])
+
+      run [text|
+      function f(x) {
+        return /**/ x
+      }|] `shouldBe` SimpleFunction "f" [VariablePattern "x"] (Return (Reference "x"))
+
     it "simple procedure declaration" $ do
       js "function f(x) { console.log('fruit') }" `shouldBe` (
                 SimpleProcedure
