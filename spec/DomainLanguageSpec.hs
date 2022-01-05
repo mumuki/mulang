@@ -6,6 +6,7 @@ import           Language.Mulang.Inspector.Combiner (detect)
 import           Language.Mulang.DomainLanguage (DomainLanguage(..), hasMisspelledIdentifiers, hasTooShortIdentifiers, hasWrongCaseIdentifiers)
 import           Language.Mulang.Parsers.Haskell (hs)
 import           Language.Mulang.Parsers.JavaScript (js)
+import           Language.Mulang.Parsers.Python (py)
 import           Text.Dictionary (toDictionary)
 import           Text.Inflections.Tokenizer (camelCase, rubyCase)
 
@@ -74,10 +75,10 @@ spec = do
     context "camelCase language" $ do
       let run = hasWrongCaseIdentifiers language
 
-      it "is True when there are snake case identifier on a camel case language" $ do
+      it "is True when it is a snake case identifier on a camel case language" $ do
         run (js "let a_day = 'monday'") `shouldBe` True
 
-      it "is False when there are only camel case identifier on a camel case language" $ do
+      it "is False when it is a only camel case identifier on a camel case language" $ do
         run (js "let aDay = 'monday'") `shouldBe` False
 
       it "is False when it has numbers but proper casing" $ do
@@ -101,13 +102,13 @@ spec = do
       it "is False when method is a symbol" $ do
         run (SimpleMethod "+" [] None) `shouldBe` False
 
-      it "is True when there are lower camel case identifier" $ do
+      it "is True when it is a lower camel case identifier" $ do
         run (Variable "helloWorld" None) `shouldBe` True
 
-      it "is False when there are upper camel case identifier" $ do
+      it "is False when it is a upper camel case identifier" $ do
         run (Variable "HelloWorld" None) `shouldBe` False
 
-      it "is False when there are lower snake case identifier" $ do
+      it "is False when it is a lower snake case identifier" $ do
         run (Variable "hello_world" None) `shouldBe` False
 
       it "is False when there is a single upper case char" $ do
@@ -116,8 +117,17 @@ spec = do
       it "is False when there is a single lower case char" $ do
         run (Variable "h" None) `shouldBe` False
 
-      it "is True when there are upper snake case identifier" $ do
+      it "is True when it is a upper snake case identifier" $ do
         run (Variable "Hello_World" None) `shouldBe` True
+
+      it "is False when it is private snake case method identifier" $ do
+
+        run (Variable "_var" None) `shouldBe` False
+        run (SimpleMethod "__send__" [] None) `shouldBe` False
+
+        run (py "def __init__(self): pass") `shouldBe` False
+
+        run (py "def ___too_private_to_be_true__(self): pass") `shouldBe` True
 
   describe "hasMisspelledIdentifiers" $ do
     let run = hasMisspelledIdentifiers language
@@ -134,6 +144,6 @@ spec = do
     it "is True when it is a single, bad written token" $ do
       run (hs "tuday = True") `shouldBe` True
 
-    it "is False when there are typos" $ do
+    it "is False when it is a typos" $ do
       run (hs "tudayIsAGreatDay = True") `shouldBe` True
       run (hs "todayIsAGraetDay = True") `shouldBe` True

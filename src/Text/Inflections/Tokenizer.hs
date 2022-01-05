@@ -24,10 +24,21 @@ snakeCase      :: CaseStyle
 snakeCase      = parseSnakeCase []
 
 rubyCase       :: CaseStyle
-rubyCase  word | (isLower.head) word = snakeCase baseWord
-               | otherwise           = camelCase baseWord
+rubyCase word@(i:_) | i == '_' = snakeCase . unprivatize $ baseWord
+                    | isLower i = snakeCase baseWord
+                    | otherwise = camelCase baseWord
 
-               where baseWord = filter (`notElem` "!?+-=[]<>|&*/") word
+                    where
+
+                      baseWord = filter (`notElem` "!?+-=[]<>|&*/") word
+
+                      unprivatize = unprivatizeRight . unprivatizeLeft
+
+                      unprivatizeLeft ('_':'_':xs) = xs
+                      unprivatizeLeft ('_':xs)     = xs
+                      unprivatizeLeft xs           = xs
+
+                      unprivatizeRight = reverse .  unprivatizeLeft . reverse
 
 canTokenize :: CaseStyle -> String -> Bool
 canTokenize style = isRight . style
