@@ -83,8 +83,8 @@ spec = do
     it "parses classes with methods" $ do
       py "class Something:\n  def __init__(self): pass\n  def foo(self, x): return x" `shouldBe` (
         Class "Something" Nothing (Sequence [
-          (SimpleMethod "__init__" [] None),
-          (SimpleMethod "foo" [VariablePattern "x"] (Return (Reference "x")))
+          (SimpleMethod "__init__" [VariablePattern "self"] None),
+          (SimpleMethod "foo" [VariablePattern "self", VariablePattern "x"] (Return (Reference "x")))
         ]))
 
     it "doesn't parse methods without self" $ do

@@ -43,7 +43,7 @@ muModule :: ModuleSpan -> M.Expression
 muModule (Module statements) = compactMap muStatement statements
 
 muClassStatement :: StatementSpan -> M.Expression
-muClassStatement (Fun name ((Param (Ident "self" _) _ _ _):args) _ body _) =
+muClassStatement (Fun name args@((Param (Ident "self" _) _ _ _):_) _ body _) =
   M.SimpleMethod (muIdent name) (map muParameter args) (muSuite body)
 muClassStatement other = muStatement other
 
