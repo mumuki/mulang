@@ -1,6 +1,6 @@
 {
   "name": "mulang",
-  "version": "6.0.7",
+  "version": "6.0.8",
   "description": "An intermediate language designed to perform advanced code analysis",
   "main": "build/mulang.js",
   "bin": {
