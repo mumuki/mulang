@@ -1,5 +1,25 @@
 # Changelog
 
+## [v6.0.8](https://github.com/mumuki/mulang/tree/v6.0.8) (2022-01-06)
+
+[Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.7...v6.0.8)
+
+**Closed issues:**
+
+- Problems with HasWrongCaseIdentifiers smell in Python [\#340](https://github.com/mumuki/mulang/issues/340)
+
+## [v6.0.7](https://github.com/mumuki/mulang/tree/v6.0.7) (2021-12-07)
+
+[Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.6...v6.0.7)
+
+**Closed issues:**
+
+- Newline after return is not considered in javascript [\#338](https://github.com/mumuki/mulang/issues/338)
+
+**Merged pull requests:**
+
+- Issue\#338 comments affect js semantics [\#339](https://github.com/mumuki/mulang/pull/339) ([julian-berbel](https://github.com/julian-berbel))
+
 ## [v6.0.6](https://github.com/mumuki/mulang/tree/v6.0.6) (2021-10-15)
 
 [Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.5...v6.0.6)
@@ -614,6 +634,11 @@
 - Feature \#62 language sensitive code signatures [\#68](https://github.com/mumuki/mulang/pull/68) ([flbulgarelli](https://github.com/flbulgarelli))
 - Feature signatures [\#61](https://github.com/mumuki/mulang/pull/61) ([flbulgarelli](https://github.com/flbulgarelli))
 - Moving rungs to gs-weblang-cli repository and updating to last version [\#50](https://github.com/mumuki/mulang/pull/50) ([rodri042](https://github.com/rodri042))
+- Is long code [\#48](https://github.com/mumuki/mulang/pull/48) ([FedeLochbaum](https://github.com/FedeLochbaum))
+- Including simple script for parsing gobstones [\#47](https://github.com/mumuki/mulang/pull/47) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature code duplication [\#46](https://github.com/mumuki/mulang/pull/46) ([flbulgarelli](https://github.com/flbulgarelli))
+- new inspection called isLongCode [\#45](https://github.com/mumuki/mulang/pull/45) ([flbulgarelli](https://github.com/flbulgarelli))
+- Gobstones inspections support [\#44](https://github.com/mumuki/mulang/pull/44) ([flbulgarelli](https://github.com/flbulgarelli))
 
 ## [v0.3.2](https://github.com/mumuki/mulang/tree/v0.3.2) (2017-01-27)
 
@@ -630,14 +655,6 @@
 ## [v0.3.0](https://github.com/mumuki/mulang/tree/v0.3.0) (2017-01-27)
 
 [Full Changelog](https://github.com/mumuki/mulang/compare/v0.2.8...v0.3.0)
-
-**Merged pull requests:**
-
-- Is long code [\#48](https://github.com/mumuki/mulang/pull/48) ([FedeLochbaum](https://github.com/FedeLochbaum))
-- Including simple script for parsing gobstones [\#47](https://github.com/mumuki/mulang/pull/47) ([flbulgarelli](https://github.com/flbulgarelli))
-- Feature code duplication [\#46](https://github.com/mumuki/mulang/pull/46) ([flbulgarelli](https://github.com/flbulgarelli))
-- new inspection called isLongCode [\#45](https://github.com/mumuki/mulang/pull/45) ([flbulgarelli](https://github.com/flbulgarelli))
-- Gobstones inspections support [\#44](https://github.com/mumuki/mulang/pull/44) ([flbulgarelli](https://github.com/flbulgarelli))
 
 ## [v0.2.8](https://github.com/mumuki/mulang/tree/v0.2.8) (2016-09-13)
 
