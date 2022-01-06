@@ -42,12 +42,16 @@ muPyAST (modul, _) = muModule modul
 muModule :: ModuleSpan -> M.Expression
 muModule (Module statements) = compactMap muStatement statements
 
+muClassStatement :: StatementSpan -> M.Expression
+muClassStatement (Fun name ((Param (Ident "self" _) _ _ _):args) _ body _) =
+  M.SimpleMethod (muIdent name) (map muParameter args) (muSuite body)
+muClassStatement other = muStatement other
 
 muStatement :: StatementSpan -> M.Expression
 muStatement (While cond body _ _)             = M.While (muExpr cond) (muSuite body)
 muStatement (For targets generator body _ _)  = M.For [M.Generator (M.TuplePattern (map (M.VariablePattern . muVariable) targets)) (muExpr generator)] (muSuite body)
 muStatement (Fun name args _ body _)          = muComputation (muIdent name) (map muParameter args) (muSuite body)
-muStatement (Class name parents body _)       = muClass (listToMaybe . map muParent $ parents) (muIdent name) (muSuite body)
+muStatement (Class name parents body _)       = muClass (listToMaybe . map muParent $ parents) (muIdent name) (muClassSuite body)
 muStatement (Conditional guards els _ )       = foldr muIf (muSuite els) guards
 muStatement (Assign [to] from _)              = muAssignment to (muExpr from)
 muStatement (AugmentedAssign to op from _)    = muAssignment to (M.Application (muAssignOp $ op) [muExpr to, muExpr from])
@@ -120,9 +124,9 @@ muParameter (Param name _ _ _) = M.VariablePattern (muIdent name)
 muIdent :: IdentSpan -> String
 muIdent (Ident id _) = id
 
-muSuite :: SuiteSpan -> M.Expression
+muSuite, muClassSuite :: SuiteSpan -> M.Expression
 muSuite = compactMap muStatement
-
+muClassSuite = compactMap muClassStatement
 
 muExpr :: ExprSpan -> M.Expression
 muExpr (Var (Ident "True" _) _)   = M.MuTrue

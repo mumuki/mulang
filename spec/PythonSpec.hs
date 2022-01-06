@@ -78,7 +78,21 @@ spec = do
       py "not True" `shouldBe` (Application (Primitive Negation) [MuBool True])
 
     it "parses classes" $ do
-      py "class DerivedClassName: pass" `shouldBe` Class "DerivedClassName" Nothing None
+      py "class Something: pass" `shouldBe` Class "Something" Nothing None
+
+    it "parses classes with methods" $ do
+      py "class Something:\n  def __init__(self): pass\n  def foo(self, x): return x" `shouldBe` (
+        Class "Something" Nothing (Sequence [
+          (SimpleMethod "__init__" [] None),
+          (SimpleMethod "foo" [VariablePattern "x"] (Return (Reference "x")))
+        ]))
+
+    it "doesn't parse methods without self" $ do
+      py "class Something:\n  def bar(): return None\n" `shouldBe` (
+        Class "Something" Nothing (SimpleFunction "bar" [] (Return MuNil)))
+
+    it "doesn't parse methods pseudo-methods outside a class" $ do
+      py "def bar(self): return None\n" `shouldBe` (SimpleFunction "bar" [VariablePattern "self"] (Return MuNil))
 
     it "parses inheritance" $ do
       py "class DerivedClassName(BaseClassName): pass" `shouldBe` Class "DerivedClassName" (Just "BaseClassName") None
