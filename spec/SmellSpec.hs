@@ -35,8 +35,8 @@ spec = do
 
   describe "hasRedundantIf" $ do
     it "is True when both branches are boolean literal returns" $ do
-      hasRedundantIf (js "function x() { if(m) return true else return false }") `shouldBe` True
-      hasRedundantIf (js "function x() { if(m) return false else return true }") `shouldBe` True
+      hasRedundantIf (js "function x() { if(m) return true; else return false }") `shouldBe` True
+      hasRedundantIf (js "function x() { if(m) return false; else return true }") `shouldBe` True
 
     it "is True when return an if with boolean literals" $ do
       hasRedundantIf (js "function x() { return m ? true : false }") `shouldBe` True
@@ -61,7 +61,7 @@ spec = do
       hasRedundantIf (js "let x = false") `shouldBe` False
 
     it "is False when there are no literals" $ do
-      hasRedundantIf (js "function x() { if(m) 2 else 4 }") `shouldBe` False
+      hasRedundantIf (js "function x() { if(m) 2; else 4 }") `shouldBe` False
 
     it "is True even if a variable is used" $ do
       hasRedundantIf (js "function x(b) { let r = true; if(b) { r = true; } else { r = false; }; return r; }") `shouldBe` True
@@ -167,20 +167,20 @@ spec = do
 
   describe "doesNilTest" $ do
     it "is True when tests for null" $ do
-      doesNilTest (js "function x(m) { if ( m == null) 1 else 2 } ") `shouldBe` True
+      doesNilTest (js "function x(m) { if ( m == null) 1; else 2 } ") `shouldBe` True
 
     it "is True when tests for null with ===" $ do
-      doesNilTest (js "function x(m) { if ( m === null) 1 else 2 } ") `shouldBe` True
+      doesNilTest (js "function x(m) { if ( m === null) 1; else 2 } ") `shouldBe` True
 
     it "is False when not does null test" $ do
       doesNilTest (js "function x(m) { return 1 }") `shouldBe` False
 
   describe "doesTypeTest" $ do
     it "is True when tests for string" $ do
-      doesTypeTest (js "function x(m) { if ( m == \"foo\") 1 else 2 } ") `shouldBe` True
+      doesTypeTest (js "function x(m) { if ( m == \"foo\") 1; else 2 } ") `shouldBe` True
 
     it "is True when tests for string flipped with ===" $ do
-      doesTypeTest (js "function x(m) { if ( \"foo\" === m) 1 else 2 } ") `shouldBe` True
+      doesTypeTest (js "function x(m) { if ( \"foo\" === m) 1; else 2 } ") `shouldBe` True
 
     it "is False when not does type test" $ do
       doesTypeTest (js "function x(m) { return 1 }") `shouldBe` False

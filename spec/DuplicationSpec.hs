@@ -17,11 +17,11 @@ spec = do
         hasCodeDuplication (js code) `shouldBe` False
 
       it "is False when two functions have same literal return " $ do
-        let code = "function f(){ Sacar(Verde) return 2 } function g(){return 2 }"
+        let code = "function f(){ Sacar(Verde); return 2 } function g(){return 2 }"
         hasCodeDuplication (js code) `shouldBe` False
 
       it "is False when two functions have same expressions" $ do
-        let code = "function f(){ Sacar(Verde) return x == y } function g(){ while(x==y){} return 2 }"
+        let code = "function f(){ Sacar(Verde); return x == y } function g(){ while(x==y){} return 2 }"
         hasCodeDuplication (js code) `shouldBe` False
 
       describe "is False when two computations have marginal similities" $ do
@@ -36,7 +36,7 @@ spec = do
                                 \function G(){ Mover(Sur) ; Poner(Verde) ; Mover(Este) }") `shouldBe` False
 
       it "is False when two functions have different body" $ do
-        let code = "function f(){ Sacar(Verde) return 2 } function g(){return 3 }"
+        let code = "function f(){ Sacar(Verde); return 2 } function g(){return 3 }"
         hasCodeDuplication (js code) `shouldBe` False
 
       it "is True when two functions are equals" $ do
@@ -52,5 +52,5 @@ spec = do
         hasCodeDuplication (js code) `shouldBe` True
 
       it "is True when two functions have same expressions" $ do
-        let code = "function f(){ Sacar(Verde) return (x * 2) == y } function g(){ while((x * 2) == y){} return 2 }"
+        let code = "function f(){ Sacar(Verde); return (x * 2) == y } function g(){ while((x * 2) == y){} return 2 }"
         hasCodeDuplication (js code) `shouldBe` True

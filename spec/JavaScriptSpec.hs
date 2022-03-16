@@ -226,7 +226,7 @@ spec = do
       js "a.f(2).b = 3" `shouldBe` (FieldAssignment (Send (Reference "a") (Reference "f") [MuNumber 2.0]) "b" (MuNumber 3.0))
 
     it "handles ifs" $ do
-      js "if(x) y else z" `shouldBe` If (Reference "x") (Reference "y") (Reference "z")
+      js "if(x) y; else z" `shouldBe` If (Reference "x") (Reference "y") (Reference "z")
 
     it "handles partial ifs" $ do
       js "if(x) y" `shouldBe` If (Reference "x") (Reference "y") None

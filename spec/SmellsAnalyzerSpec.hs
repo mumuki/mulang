@@ -28,7 +28,7 @@ spec = describe "SmellsAnalyzer" $ do
     it "works when there are missing usages and multiple potential typos" $ do
       let typos = [ Expectation "baz" "HasUsageTypos:bar", Expectation "Bar" "HasUsageTypos:bar" ]
 
-      runWithTypos JavaScript "baz()\nBar() {}" [Expectation "*" "Uses:bar"] `shouldReturn` typos
+      runWithTypos JavaScript "baz()\nBar(); {}" [Expectation "*" "Uses:bar"] `shouldReturn` typos
 
     it "works when there are missing usages but no typos" $ do
       runWithTypos JavaScript "goo()" [Expectation "*" "Uses:bar"] `shouldReturn` []
