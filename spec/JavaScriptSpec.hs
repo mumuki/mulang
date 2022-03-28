@@ -8,6 +8,7 @@ import           Language.Mulang.Ast.Operator
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
 import           Language.Mulang.Inspector.Literal (isOther)
+import           Control.Exception (evaluate)
 
 import           Data.Text (Text, unpack)
 import           NeatInterpolation (text)
@@ -236,6 +237,16 @@ spec = do
 
     it "handles whiles" $ do
       js "while (x) { y }" `shouldBe` While (Reference "x") (Reference "y")
+
+    it "foo" $ do
+      evaluate (js ("function f(xs){\n"
+        ++ " let s= 0;\n"
+        ++ "  if (xs.y > 0)\n"
+        ++ " s = s + xs.ys {\n"
+        ++ "   return s; \n"
+        ++ " }\n"
+        ++ " }\n")) `shouldThrow` anyException
+
 
     it "handles objects" $ do
       js "({x: 6})" `shouldBe` MuObject (Variable "x" (MuNumber 6))
