@@ -161,7 +161,7 @@ spec = do
       isLongCode (js "function f() { while(true) { console.log('foo') }  }")  `shouldBe` False
 
     it "is True when the program contains 16 or more nodes" $ do
-      isLongCode (js "function f(){Poner(Verde) Mover(Norte) Poner(Verde)Mover(Norte) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) Poner(Verde) Mover(Norte) Poner(Verde)Mover(Norte) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Este) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Sur) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde) Mover(Oeste) Poner(Verde)}")  `shouldBe` True
+      isLongCode (js "function f(){Poner(Verde);  Mover(Norte); Poner(Verde); Mover(Norte); Poner(Verde);  Mover(Este); Poner(Verde);  Mover(Este); Poner(Verde);  Mover(Este); Poner(Verde);  Mover(Este); Poner(Verde);  Mover(Sur); Poner(Verde);  Mover(Sur); Poner(Verde);  Mover(Oeste); Poner(Verde);  Mover(Oeste); Poner(Verde);  Mover(Oeste); Poner(Verde);  Poner(Verde);  Mover(Norte); Poner(Verde); Mover(Norte); Poner(Verde);  Mover(Este); Poner(Verde);  Mover(Este); Poner(Verde);  Mover(Este); Poner(Verde);  Mover(Este); Poner(Verde);  Mover(Sur); Poner(Verde);  Mover(Sur); Poner(Verde);  Mover(Oeste); Poner(Verde);  Mover(Oeste); Poner(Verde);  Mover(Oeste); Poner(Verde); }")  `shouldBe` True
 
   describe "uses" $ do
     it "is True on direct usage in entry point" $ do

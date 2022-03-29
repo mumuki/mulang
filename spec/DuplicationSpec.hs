@@ -48,7 +48,7 @@ spec = do
         hasCodeDuplication (js code) `shouldBe` True
 
       it "is True when two functions have same body" $ do
-        let code = "function f(){ Sacar(Verde) return 2 } function g(){ Sacar(Verde) return 2 }"
+        let code = "function f(){ Sacar(Verde); return 2 } function g(){ Sacar(Verde); return 2 }"
         hasCodeDuplication (js code) `shouldBe` True
 
       it "is True when two functions have same expressions" $ do
