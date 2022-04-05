@@ -15,6 +15,9 @@ echo "[Mulang::Ghcjslib] Building mulang with GHCJS..."
 mkdir -p .deploy/build
 cp LICENSE ghcjslib/README.md ghcjslib/package.json .deploy/
 cp ghcjslib/index.js .deploy/mulang-cli.js
+
+VERSION=$(sed -nr 's/^\s*\"version": "([0-9]{1,}\.[0-9]{1,}.*)"$/\1/p' package.json)
+sed -i "0,/require('..\/package.json').version/s//$VERSION/" ghcjslib/build/mulang.js
 cp ghcjslib/build/mulang.js .deploy/build/mulang.js
 
 echo "[Mulang::Ghcjslib] Publishing package to npm..."
