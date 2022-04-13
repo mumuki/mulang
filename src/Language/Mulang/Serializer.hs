@@ -8,7 +8,6 @@ import GHC.Generics
 
 import Language.Mulang.Ast
 import Language.Mulang.Ast.Operator
-import Language.Mulang.Ast.Modifier
 
 bracket :: Expression -> String
 bracket = bracketize "[" "]"

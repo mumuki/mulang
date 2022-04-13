@@ -18,6 +18,7 @@ module Language.Mulang.Ast (
     Equation(..),
     EquationBody(..),
     Type(..),
+    Modifier(..),
     Expression(..),
     Assertion(..),
     Statement(..),
@@ -26,9 +27,11 @@ module Language.Mulang.Ast (
     SubroutineBody,
     debug,
     debugType,
+    debugModifier,
     debugPattern,
     other,
     otherType,
+    otherModifier,
     otherPattern,
     pattern SimpleEquation,
     pattern SimpleFunction,
@@ -53,7 +56,6 @@ module Language.Mulang.Ast (
 import           GHC.Generics
 import           Language.Mulang.Identifier (Identifier)
 import           Language.Mulang.Ast.Operator (Operator)
-import           Language.Mulang.Ast.Modifier (Modifier)
 
 type Code = String
 
@@ -83,6 +85,15 @@ data Type
         | OtherType (Maybe Code) (Maybe Type)
         -- ^ unrecognized type, with optional code and nested type
         deriving (Eq, Show, Read, Generic, Ord)
+
+data Modifier
+    = Abstract
+    | Static
+    | Private
+    | Protected
+    | Annotation Expression
+    | OtherModifier (Maybe Code) (Maybe Modifier)
+  deriving (Eq, Show, Read, Generic, Ord)
 
 -- | Expression is the root element of a Mulang program.
 -- | With the exception of Patterns, nearly everything is an Expression: variable declarations, literals,
@@ -277,6 +288,9 @@ debug a = Other (Just (show a)) Nothing
 debugType :: Show a => a -> Type
 debugType a = OtherType (Just (show a)) Nothing
 
+debugModifier :: Show a => a -> Modifier
+debugModifier a = OtherModifier (Just (show a)) Nothing
+
 debugPattern :: Show a => a -> Pattern
 debugPattern a = OtherPattern (Just (show a)) Nothing
 
@@ -285,6 +299,9 @@ other s e = Other (Just s) (Just e)
 
 otherType :: String -> Type -> Type
 otherType s e = OtherType (Just s) (Just e)
+
+otherModifier :: String -> Modifier -> Modifier
+otherModifier s e = OtherModifier (Just s) (Just e)
 
 otherPattern :: String -> Pattern -> Pattern
 otherPattern s e = OtherPattern (Just s) (Just e)

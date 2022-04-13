@@ -5,7 +5,6 @@ module JavaSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Ast
 import           Language.Mulang.Ast.Operator
-import           Language.Mulang.Ast.Modifier
 import           Language.Mulang.Parsers.Java
 
 import           Data.Text (Text, unpack)
@@ -23,7 +22,7 @@ spec = do
     it "parses abstract Class" $ do
       run "public abstract class Foo {}" `shouldBe` Decorator [Abstract] (Class "Foo" Nothing None)
 
-    it "parsers Class With Superclass" $ do
+    it "parsers Class with Superclass" $ do
       run "public class Foo extends Bar {}" `shouldBe` Class "Foo" (Just "Bar") None
 
     it "parses Simple Interface" $ do
@@ -44,25 +43,25 @@ spec = do
           ModuleSignature "Foo" ["A"],
           Class "Foo" Nothing None]
 
-    it "parses Simple Interface With Messages" $ do
+    it "parses Simple Interface with Messages" $ do
       run "public interface Foo { void foo(); }" `shouldBe` Interface "Foo" [] (SubroutineSignature "foo" [] "void" [])
 
-    it "parses Simple Interface With Non-Void Messages" $ do
+    it "parses Simple Interface with Non-Void Messages" $ do
       run "public interface Foo { int foo(); }" `shouldBe` Interface "Foo" [] (SubroutineSignature "foo" [] "int" [])
 
-    it "parses Simple Interface With Messages With Params" $ do
+    it "parses Simple Interface with Messages with Params" $ do
       run "public interface Foo { void foo(String x, int y); }" `shouldBe` Interface "Foo" [] (SubroutineSignature "foo" ["String", "int"] "void" [])
 
     it "parses Interface with superinterfaces" $ do
       run "public interface Foo extends Bar, Baz {}" `shouldBe` Interface "Foo" ["Bar", "Baz"] None
 
-    it "parses Class With initializers" $ do
+    it "parses Class with initializers" $ do
       run [text|
             class Foo {
                static { System.out.println("hello"); }
             }|] `shouldBe` Class "Foo" Nothing (Print (MuString "hello"))
 
-    it "parses Class With Methods" $ do
+    it "parses Class with Methods" $ do
       run [text|
             class Foo {
                public void hello() {}
@@ -70,13 +69,36 @@ spec = do
                               SubroutineSignature "hello" [] "void" [],
                               (SimpleMethod "hello" [] None)])
 
-    it "parses Class With private Methods" $ do
+    it "parses Class with private Methods" $ do
       run [text|
             class Foo {
                private void hello() {}
-            }|] `shouldBe` Class "Foo" Nothing (Decorator [Private] (Sequence [
-                              SubroutineSignature "hello" [] "void" [],
-                              (SimpleMethod "hello" [] None)]))
+            }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                              Decorator [Private] (SubroutineSignature "hello" [] "void" []),
+                              Decorator [Private] (SimpleMethod "hello" [] None)])
+
+    it "parses Class with static, private Methods" $ do
+      run [text|
+            class Foo {
+               private static void hello() {}
+            }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                              Decorator [Private, Static] (SubroutineSignature "hello" [] "void" []),
+                              Decorator [Private, Static] (SimpleMethod "hello" [] None)])
+
+    it "parses Class with Methods with simple annotations" $ do
+      run [text|
+            class Foo {
+               @AfterSave public void hello() {}
+            }|] `shouldBe` Class "Foo" Nothing (Sequence [
+                              Decorator [Annotation (Reference "AfterSave")] (SubroutineSignature "hello" [] "void" []),
+                              Decorator [Annotation (Reference "AfterSave")] (SimpleMethod "hello" [] None)])
+
+    it "parses Class with protected, abstract Methods" $ do
+      run [text|
+            public abstract class Foo {
+               protected abstract void hello();
+            }|] `shouldBe` (Decorator [Abstract] (Class "Foo" Nothing (
+                              Decorator [Protected, Abstract] (SubroutineSignature "hello" [] "void" []))))
 
     it "parses Methods with type arguments" $ do
       run [text|
@@ -147,21 +169,19 @@ spec = do
 
     it "parses equals methods invocations" $ do
       run [text|public class Foo {
-            public static void main() {
+            public static void main(String[] args) {
               System.out.println((5).equals(6));
             }
-          }|] `shouldBe` Class "Foo" Nothing (Sequence [
-                          SubroutineSignature "main" [] "void" [],
-                          (SimpleMethod "main" [] (Print (PrimitiveSend (MuNumber 5) Equal [MuNumber 6])))])
+          }|] `shouldBe` Class "Foo" Nothing (
+                          (EntryPoint "main" (Print (PrimitiveSend (MuNumber 5) Equal [MuNumber 6]))))
 
     it "parses not equals constructs" $ do
       run [text|public class Foo {
-            public static void main() {
+            public static void main(String[] args) {
               System.out.println(! (5).equals(6) );
             }
-          }|] `shouldBe` Class "Foo" Nothing (Sequence [
-                          SubroutineSignature "main" [] "void" [],
-                          (SimpleMethod "main" [] (Print (PrimitiveSend (MuNumber 5) NotEqual [MuNumber 6])))])
+          }|] `shouldBe` Class "Foo" Nothing (
+                          (EntryPoint "main" (Print (PrimitiveSend (MuNumber 5) NotEqual [MuNumber 6]))))
 
     it "parses Parameters" $ do
       run "public class Foo extends Bar { int succ(int y) {} }" `shouldBe` Class "Foo" (Just "Bar") (Sequence [
@@ -429,9 +449,7 @@ spec = do
                             (SimpleMethod "foo" [VariablePattern "m"] (FieldAssignment (FieldReference (Reference "m") "x") "y" (MuNumber 3)))])
 
     context "assertions" $ do
-      let wrapped expression =  Class "Foo" Nothing (Sequence [
-                                  TypeSignature "test" (ParameterizedType [] "void" []),
-                                  SimpleMethod "test" [] expression])
+      let wrapped expression =  Class "Foo" Nothing (Test (MuString "test") expression)
 
       it "parses assertions" $ do
         run [text|
