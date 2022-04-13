@@ -47,7 +47,8 @@ declarators e@(Record n)           = [(n, e)]
 declarators e@(TypeAlias n _)      = [(n, e)]
 declarators e@(TypeSignature n _)  = [(n, e)]
 declarators e@(LValue n _)         = [(n, e)]
-declarators e@(Decorator _ e')     = declarators e'
+declarators (Decorator _ e)        = declarators e
+declarators (EigenClass _ b)       = declarators b
 declarators (Other _ (Just e))     = declarators e
 declarators _                      = []
 

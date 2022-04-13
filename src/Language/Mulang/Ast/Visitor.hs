@@ -91,6 +91,7 @@ pattern TwoExpressions e1 e2 c <- (extractTwoExpressions -> Just (e1, e2, c))
 extractTwoExpressions :: Expression -> Maybe (Expression, Expression,
                                               Expression -> Expression -> Expression)
 extractTwoExpressions (Arrow e1 e2)               = Just (e1, e2, \e1 e2 -> (Arrow e1 e2))
+extractTwoExpressions (EigenClass e1 e2)          = Just (e1, e2, \e1 e2 -> (EigenClass e1 e2))
 extractTwoExpressions (FieldAssignment e1 v1 e2)  = Just (e1, e2, \e1 e2 -> (FieldAssignment e1 v1 e2))
 extractTwoExpressions (Forall e1 e2)              = Just (e1, e2, \e1 e2 -> (Forall e1 e2))
 extractTwoExpressions (Repeat e1 e2)              = Just (e1, e2, \e1 e2 -> (Repeat e1 e2))

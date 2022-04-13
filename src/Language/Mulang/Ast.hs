@@ -137,6 +137,8 @@ data Expression
     | Class Identifier (Maybe Identifier) Expression
     -- ^ Object oriented programming global, class declaration,
     --   composed by a name, an optional superclass, implemented interfaces and a body
+    | EigenClass Expression Expression
+    -- ^ Object oriented access to an object eigenclass, composed by the opened instance and the eigenclass body
     | Enumeration Identifier [Identifier]
     -- ^ Imperative named enumeration of values
     | Interface Identifier [Identifier] Expression
@@ -173,6 +175,7 @@ data Expression
     -- ^ Object oriented mixin inclusion
     | Decorator [Modifier] Expression
     -- ^ Generic expression decorator for language modifiers and user-defined annotations
+    -- ^ Eigenclass object
     | Lambda [Pattern] Expression
     | If Expression Expression Expression
     | Return Expression
