@@ -5,6 +5,7 @@ module JavaSpec (spec) where
 import           Test.Hspec
 import           Language.Mulang.Ast
 import           Language.Mulang.Ast.Operator
+import           Language.Mulang.Ast.Modifier
 import           Language.Mulang.Parsers.Java
 
 import           Data.Text (Text, unpack)
@@ -18,6 +19,9 @@ spec = do
   describe "parse" $ do
     it "parses Simple Class" $ do
       run "public class Foo {}" `shouldBe` Class "Foo" Nothing None
+
+    it "parses abstract Class" $ do
+      run "public abstract class Foo {}" `shouldBe` Decorator [Abstract] (Class "Foo" Nothing None)
 
     it "parsers Class With Superclass" $ do
       run "public class Foo extends Bar {}" `shouldBe` Class "Foo" (Just "Bar") None
@@ -65,6 +69,14 @@ spec = do
             }|] `shouldBe` Class "Foo" Nothing (Sequence [
                               SubroutineSignature "hello" [] "void" [],
                               (SimpleMethod "hello" [] None)])
+
+    it "parses Class With private Methods" $ do
+      run [text|
+            class Foo {
+               private void hello() {}
+            }|] `shouldBe` Class "Foo" Nothing (Decorator [Private] (Sequence [
+                              SubroutineSignature "hello" [] "void" [],
+                              (SimpleMethod "hello" [] None)]))
 
     it "parses Methods with type arguments" $ do
       run [text|
@@ -375,8 +387,8 @@ spec = do
       run [text|class Foo {
              private int foo = 4;
           }|] `shouldBe` Class "Foo" Nothing (Sequence [
-                            VariableSignature "foo" "int" [],
-                            Attribute "foo" (MuNumber 4)])
+                            Decorator [Private] (VariableSignature "foo" "int" []),
+                            Decorator [Private] (Attribute "foo" (MuNumber 4))])
 
     it "parses attribute access" $ do
       run [text|class Foo {

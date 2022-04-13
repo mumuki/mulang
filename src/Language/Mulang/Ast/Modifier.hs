@@ -10,5 +10,5 @@ data Modifier
     | Static
     | Private
     | Protected
-    | Public
+    | OtherModifier
   deriving (Eq, Show, Read, Generic, Ord, Enum)
