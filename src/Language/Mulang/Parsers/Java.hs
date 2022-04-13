@@ -4,8 +4,9 @@
 module Language.Mulang.Parsers.Java (java, parseJava) where
 
 import Language.Mulang.Ast hiding (Primitive, While, Return, Lambda, Try, Switch, Assert)
-import qualified Language.Mulang.Ast as M
+import qualified Language.Mulang.Ast as Mu
 import qualified Language.Mulang.Ast.Operator as O
+import qualified Language.Mulang.Ast.Modifier as M
 import Language.Mulang.Parsers
 import Language.Mulang.Builder (compact, compactMap, compactConcatMap)
 
@@ -57,7 +58,8 @@ muDecl (InitDecl _ block)      = [muBlock block]
 
 muMemberDecl :: MemberDecl -> [Expression]
 muMemberDecl (FieldDecl _ typ varDecls)                                       = concatMap (variableToAttribute.muVarDecl typ) varDecls
-muMemberDecl (MethodDecl _ typeParams typ name params _ (MethodBody Nothing)) = return $ muMethodSignature name params typ typeParams
+muMemberDecl (MethodDecl modifiers typeParams typ name params _ (MethodBody Nothing))
+                                                                              = return $ muModifiers modifiers $ muMethodSignature name params typ typeParams
 muMemberDecl (MethodDecl (elem Static -> True) _ Nothing (Ident "main") [_] _ body)
                                                                               = return $ EntryPoint "main" (muMethodBody body)
 muMemberDecl (MethodDecl _ _ _ (Ident "equals") params _ body)                = return $ PrimitiveMethod O.Equal [SimpleEquation (map muFormalParam params) (muMethodBody body)]
@@ -70,6 +72,18 @@ muMemberDecl (MemberInterfaceDecl decl)                                       = 
 
 muMethodSignature name params returnType typeParams = SubroutineSignature (i name) (map muFormalParamType params) (muReturnType returnType) (map muTypeParam typeParams)
 muTypeParam (TypeParam (Ident i) _) = i
+
+muModifiers :: [Modifier] -> Expression -> Expression
+muModifiers []        = id
+muModifiers modifiers = Decorator (map muModifier modifiers)
+
+muModifier :: Modifier -> M.Modifier
+muModifier Static    = M.Static
+muModifier Abstract  = M.Abstract
+muModifier Public    = M.Public
+muModifier Private   = M.Private
+muModifier Protected = M.Protected
+-- TODO muModifier other     = Mu.Annotation (show other)
 
 muEnumConstant (EnumConstant name _ _) = i name
 
@@ -89,15 +103,15 @@ muReturnType = fromMaybe "void" . fmap muType
 muStmt (StmtBlock block)               = muBlock block
 muStmt (IfThen exp ifTrue)             = If (muExp exp) (muStmt ifTrue) None
 muStmt (IfThenElse exp ifTrue ifFalse) = If (muExp exp) (muStmt ifTrue) (muStmt ifFalse)
-muStmt (While cond body)               = M.While (muExp cond) (muStmt body)
-muStmt (Do body cond)                  = M.While (muStmt body) (muExp cond)
-muStmt (Return exp)                    = M.Return $ fmapOrNone muExp exp
+muStmt (While cond body)               = Mu.While (muExp cond) (muStmt body)
+muStmt (Do body cond)                  = Mu.While (muStmt body) (muExp cond)
+muStmt (Return exp)                    = Mu.Return $ fmapOrNone muExp exp
 muStmt (ExpStmt exp)                   = muExp exp
 muStmt Empty                           = None
 muStmt (Synchronized _ block)          = muBlock block
 muStmt (Labeled _ stmt)                = muStmt stmt
 muStmt (Throw exp)                     = Raise $ muExp exp
-muStmt (Try block catches finally)     = M.Try (muBlock block) (map muCatch catches) (fmapOrNone muBlock finally)
+muStmt (Try block catches finally)     = Mu.Try (muBlock block) (map muCatch catches) (fmapOrNone muBlock finally)
 muStmt (BasicFor init cond prog stmt)  = ForLoop (fmapOrNone muForInit init) (fmapOrNone muExp cond) (fmapOrNone (compactMap muExp) prog) (muStmt stmt)
 muStmt (EnhancedFor _ _ name gen body) = For [Generator (VariablePattern (i name)) (muExp gen)] (muStmt body)
 muStmt (Switch exp cases)              = muSwitch exp . partition isDefault $ cases
@@ -114,8 +128,8 @@ muExp (Assign lhs EqualA exp)           = muAssignment lhs (muExp exp)
 muExp (InstanceCreation _ clazz args _) = New (Reference $ r clazz) (map muExp args)
 muExp (PreNot exp)                      | PrimitiveSend r O.Equal [a] <- (muExp exp) = PrimitiveSend r O.NotEqual [a]
                                         | otherwise = PrimitiveSend (muExp exp) O.Negation []
-muExp (Lambda params exp)               = M.Lambda (muLambdaParams params) (muLambdaExp exp)
-muExp (MethodRef _ message)             = M.Lambda [VariablePattern "it"] (SimpleSend (Reference "it") (i message) [])
+muExp (Lambda params exp)               = Mu.Lambda (muLambdaParams params) (muLambdaExp exp)
+muExp (MethodRef _ message)             = Mu.Lambda [VariablePattern "it"] (SimpleSend (Reference "it") (i message) [])
 muExp e                                 = debug e
 
 muLambdaExp (LambdaExpression exp) = muExp exp
@@ -154,24 +168,24 @@ muLit e           = debug e
 preMinus (MuNumber n) = MuNumber (negate n)
 preMinus other        = other
 
-muOp Add    = M.Primitive O.Plus
-muOp And    = M.Primitive O.BitwiseAnd
-muOp CAnd   = M.Primitive O.And
-muOp COr    = M.Primitive O.Or
-muOp Div    = M.Primitive O.Divide
-muOp Equal  = M.Primitive O.Same
-muOp GThan  = M.Primitive O.GreatherThan
-muOp GThanE = M.Primitive O.GreatherOrEqualThan
-muOp LShift = M.Primitive O.BitwiseLeftShift
-muOp LThan  = M.Primitive O.LessThan
-muOp LThanE = M.Primitive O.LessOrEqualThan
-muOp Mult   = M.Primitive O.Multiply
-muOp NotEq  = M.Primitive O.NotSame
-muOp Or     = M.Primitive O.BitwiseOr
-muOp Rem    = M.Primitive O.Modulo
-muOp RShift = M.Primitive O.BitwiseRightShift
-muOp Sub    = M.Primitive O.Minus
-muOp Xor    = M.Primitive O.BitwiseXor
+muOp Add    = Mu.Primitive O.Plus
+muOp And    = Mu.Primitive O.BitwiseAnd
+muOp CAnd   = Mu.Primitive O.And
+muOp COr    = Mu.Primitive O.Or
+muOp Div    = Mu.Primitive O.Divide
+muOp Equal  = Mu.Primitive O.Same
+muOp GThan  = Mu.Primitive O.GreatherThan
+muOp GThanE = Mu.Primitive O.GreatherOrEqualThan
+muOp LShift = Mu.Primitive O.BitwiseLeftShift
+muOp LThan  = Mu.Primitive O.LessThan
+muOp LThanE = Mu.Primitive O.LessOrEqualThan
+muOp Mult   = Mu.Primitive O.Multiply
+muOp NotEq  = Mu.Primitive O.NotSame
+muOp Or     = Mu.Primitive O.BitwiseOr
+muOp Rem    = Mu.Primitive O.Modulo
+muOp RShift = Mu.Primitive O.BitwiseRightShift
+muOp Sub    = Mu.Primitive O.Minus
+muOp Xor    = Mu.Primitive O.BitwiseXor
 muOp e      = debug e
 
 muVarDecl typ (VarDecl id init) = [
@@ -192,11 +206,11 @@ muMethodInvocation (MethodCall (Name receptorAndMessage) args)  = muNormalizeRef
 muMethodInvocation (PrimaryMethodCall receptor _ selector args) = muNormalizeReference $ SimpleSend (muExp receptor) (i selector) (map muExp args)
 muMethodInvocation e = debug e
 
-muNormalizeReference (SimpleSend Self "assertTrue" [expression])         = M.Assert False $ Truth expression
-muNormalizeReference (SimpleSend Self "assertFalse" [expression])        = M.Assert True $ Truth expression
-muNormalizeReference (SimpleSend Self "assertEquals" [expected, actual]) = M.Assert False $ Equality expected actual
-muNormalizeReference (SimpleSend one  "equals" [other])                  = M.PrimitiveSend one O.Equal [other]
-muNormalizeReference (SimpleSend one  "hashCode" [other])                = M.PrimitiveSend one O.Hash [other]
+muNormalizeReference (SimpleSend Self "assertTrue" [expression])         = Mu.Assert False $ Truth expression
+muNormalizeReference (SimpleSend Self "assertFalse" [expression])        = Mu.Assert True $ Truth expression
+muNormalizeReference (SimpleSend Self "assertEquals" [expected, actual]) = Mu.Assert False $ Equality expected actual
+muNormalizeReference (SimpleSend one  "equals" [other])                  = Mu.PrimitiveSend one O.Equal [other]
+muNormalizeReference (SimpleSend one  "hashCode" [other])                = Mu.PrimitiveSend one O.Hash [other]
 muNormalizeReference e = e
 
 muRefType (ClassRefType clazz) = r clazz
@@ -204,7 +218,7 @@ muRefType (ArrayType t)        = (muType t) ++ "[]"
 
 muPrimType = map toLower . dropLast 1 . show
 
-muSwitch exp (def, cases) =  M.Switch (muExp exp) (map muCase cases) (headOrElse None . map muDefault $ def)
+muSwitch exp (def, cases) =  Mu.Switch (muExp exp) (map muCase cases) (headOrElse None . map muDefault $ def)
 
 muCase (SwitchBlock (SwitchCase exp) block) = (muExp exp, compactConcatMap muBlockStmt block)
 

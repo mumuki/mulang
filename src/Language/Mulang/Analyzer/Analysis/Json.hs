@@ -51,6 +51,7 @@ instance FromJSON TransformationOperation
 instance FromJSON TransformationScope
 instance FromJSON InterpreterOptions
 instance FromJSON Operator
+instance FromJSON Modifier
 
 instance ToJSON a => ToJSON (GenericAnalysisResult a)
 instance ToJSON ExpectationResult
@@ -67,3 +68,4 @@ instance ToJSON Assertion
 instance ToJSON TestResult
 instance ToJSON TestStatus
 instance ToJSON Operator
+instance ToJSON Modifier

@@ -8,6 +8,7 @@ import GHC.Generics
 
 import Language.Mulang.Ast
 import Language.Mulang.Ast.Operator
+import Language.Mulang.Ast.Modifier
 
 bracket :: Expression -> String
 bracket = bracketize "[" "]"
@@ -21,6 +22,7 @@ instance Bracket Equation
 instance Bracket EquationBody
 instance Bracket Statement
 instance Bracket Operator
+instance Bracket Modifier
 instance Bracket Type
 instance Bracket Assertion
 

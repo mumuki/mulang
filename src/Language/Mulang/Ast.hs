@@ -53,6 +53,7 @@ module Language.Mulang.Ast (
 import           GHC.Generics
 import           Language.Mulang.Identifier (Identifier)
 import           Language.Mulang.Ast.Operator (Operator)
+import           Language.Mulang.Ast.Modifier (Modifier)
 
 type Code = String
 
@@ -159,6 +160,8 @@ data Expression
     -- ^ Object oriented interface implementation
     | Include Expression
     -- ^ Object oriented mixin inclusion
+    | Decorator [Modifier] Expression
+    -- ^ Generic expression decorator for language modifiers and user-defined annotations
     | Lambda [Pattern] Expression
     | If Expression Expression Expression
     | Return Expression
