@@ -73,25 +73,25 @@ spec = do
       run [text|
             class Foo {
                private void hello() {}
-            }|] `shouldBe` Class "Foo" Nothing (Sequence [
-                              Decorator [Private] (SubroutineSignature "hello" [] "void" []),
-                              Decorator [Private] (SimpleMethod "hello" [] None)])
+            }|] `shouldBe` Class "Foo" Nothing (Decorator [Private] (Sequence [
+                                                  (SubroutineSignature "hello" [] "void" []),
+                                                  (SimpleMethod "hello" [] None)]))
 
     it "parses Class with static, private Methods" $ do
       run [text|
             class Foo {
                private static void hello() {}
-            }|] `shouldBe` Class "Foo" Nothing (Sequence [
-                              Decorator [Private, Static] (SubroutineSignature "hello" [] "void" []),
-                              Decorator [Private, Static] (SimpleMethod "hello" [] None)])
+            }|] `shouldBe` Class "Foo" Nothing (Decorator [Private, Static] (Sequence [
+                                                  (SubroutineSignature "hello" [] "void" []),
+                                                  (SimpleMethod "hello" [] None)]))
 
     it "parses Class with Methods with simple annotations" $ do
       run [text|
             class Foo {
                @AfterSave public void hello() {}
-            }|] `shouldBe` Class "Foo" Nothing (Sequence [
-                              Decorator [Annotation (Reference "AfterSave")] (SubroutineSignature "hello" [] "void" []),
-                              Decorator [Annotation (Reference "AfterSave")] (SimpleMethod "hello" [] None)])
+            }|] `shouldBe` Class "Foo" Nothing (Decorator [Annotation (Reference "AfterSave")] (Sequence [
+                                                  (SubroutineSignature "hello" [] "void" []),
+                                                  (SimpleMethod "hello" [] None)]))
 
     it "parses Class with protected, abstract Methods" $ do
       run [text|
@@ -406,9 +406,9 @@ spec = do
     it "parses attributes" $ do
       run [text|class Foo {
              private int foo = 4;
-          }|] `shouldBe` Class "Foo" Nothing (Sequence [
-                            Decorator [Private] (VariableSignature "foo" "int" []),
-                            Decorator [Private] (Attribute "foo" (MuNumber 4))])
+          }|] `shouldBe` Class "Foo" Nothing (Decorator [Private] (Sequence [
+                                                (VariableSignature "foo" "int" []),
+                                                (Attribute "foo" (MuNumber 4))]))
 
     it "parses attribute access" $ do
       run [text|class Foo {

@@ -39,9 +39,9 @@ muClass (ClassDecl _ name _ superclass interfaces (ClassBody body)) =
 muInterface (InterfaceDecl _ name _ interfaces (InterfaceBody body)) =
   Interface (i name) (map muRefType interfaces) (compactConcatMap muMemberDecl body)
 
-muClassTypeDecl clazz@(ClassDecl modifiers name args _ _ _) = muModifiers modifiers . muDeclaration name args $ muClass clazz
+muClassTypeDecl clazz@(ClassDecl modifiers name args _ _ _) = decorate modifiers . muDeclaration name args $ muClass clazz
 muClassTypeDecl (EnumDecl modifiers name _ (EnumBody constants _)) =
-  muModifiers modifiers $ Enumeration (i name) (map muEnumConstant constants)
+  decorate modifiers $ Enumeration (i name) (map muEnumConstant constants)
 
 muImplements interface = Implement $ Reference (muRefType interface)
 
@@ -55,18 +55,18 @@ muDecl (MemberDecl memberDecl) = muMemberDecl memberDecl
 muDecl (InitDecl _ block)      = [muBlock block]
 
 muMemberDecl :: MemberDecl -> [Expression]
-muMemberDecl (FieldDecl modifiers typ varDecls)                               = map (muModifiers modifiers) . concatMap (variableToAttribute.muVarDecl typ) $ varDecls
+muMemberDecl (FieldDecl modifiers typ varDecls)                               = decorateMany modifiers . concatMap (variableToAttribute.muVarDecl typ) $ varDecls
 muMemberDecl (MethodDecl (elem (Annotation (MarkerAnnotation (Name [Ident "Test"]))) -> True) _ Nothing (Ident name) [] _ body)
                                                                               = return $ Test (MuString name) (muMethodBody body)
 muMemberDecl (MethodDecl (elem Static -> True) _ Nothing (Ident "main") [_] _ body)
                                                                               = return $ EntryPoint "main" (muMethodBody body)
 muMemberDecl (MethodDecl modifiers typeParams typ name params _ (MethodBody Nothing))
-                                                                              = return $ muModifiers modifiers $ muMethodSignature name params typ typeParams
+                                                                              = return $ decorate modifiers $ muMethodSignature name params typ typeParams
 muMemberDecl (MethodDecl (elem Public -> True) _ _ (Ident "equals") params _ body)
                                                                               = return $ PrimitiveMethod O.Equal [SimpleEquation (map muFormalParam params) (muMethodBody body)]
 muMemberDecl (MethodDecl (elem Public -> True) _ _ (Ident "hashCode") params _ body)
                                                                               = return $ PrimitiveMethod O.Hash [SimpleEquation (map muFormalParam params) (muMethodBody body)]
-muMemberDecl (MethodDecl modifiers typeParams returnType name params _ body)  = map (muModifiers modifiers) [
+muMemberDecl (MethodDecl modifiers typeParams returnType name params _ body)  = decorateMany modifiers [
                                                                                   muMethodSignature name params returnType typeParams,
                                                                                   SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)]
 muMemberDecl e@(ConstructorDecl _ _ _ _params _ _constructorBody)             = return . debug $ e
@@ -76,9 +76,12 @@ muMemberDecl (MemberInterfaceDecl decl)                                       = 
 muMethodSignature name params returnType typeParams = SubroutineSignature (i name) (map muFormalParamType params) (muReturnType returnType) (map muTypeParam typeParams)
 muTypeParam (TypeParam (Ident i) _) = i
 
-muModifiers :: [Modifier] -> Expression -> Expression
-muModifiers modifiers | null nonPublicModifiers = id
-                      | otherwise = Decorator (map muModifier nonPublicModifiers)
+decorate :: [Modifier] -> Expression -> Expression
+decorate ms = head . decorateMany ms . return
+
+decorateMany :: [Modifier] -> [Expression] -> [Expression]
+decorateMany modifiers es | null nonPublicModifiers = es
+                          | otherwise = [Decorator (map muModifier nonPublicModifiers) (compact es)]
   where
     nonPublicModifiers = filter (/=Public) modifiers
 
