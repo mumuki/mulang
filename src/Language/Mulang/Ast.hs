@@ -89,6 +89,7 @@ data Type
 data Modifier
     = Abstract
     | Static
+    | Classy
     | Private
     | Protected
     | Annotation Expression

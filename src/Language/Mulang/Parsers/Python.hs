@@ -43,9 +43,14 @@ muModule :: ModuleSpan -> M.Expression
 muModule (Module statements) = compactMap muStatement statements
 
 muClassStatement :: StatementSpan -> M.Expression
-muClassStatement (Fun name args@((Param (Ident "self" _) _ _ _):_) _ body _) =
-  M.SimpleMethod (muIdent name) (map muParameter args) (muSuite body)
+muClassStatement (Fun name args _ body _)   = M.SimpleMethod (muIdent name) (map muParameter args) (muSuite body)
+muClassStatement (Decorated ds statement _) = M.Decorator (map muDecorator ds) (muClassStatement statement)
 muClassStatement other = muStatement other
+
+muDecorator (Decorator [Ident "staticmethod" _] [] _) = M.Static
+muDecorator (Decorator [Ident "classmethod" _] [] _)  = M.Classy
+muDecorator (Decorator [Ident name _] [] _)           = M.Annotation (M.Reference name)
+muDecorator other                                     = M.debugModifier other
 
 muStatement :: StatementSpan -> M.Expression
 muStatement (While cond body _ _)             = M.While (muExpr cond) (muSuite body)
@@ -98,10 +103,10 @@ muClass parent name                     body = M.Class name parent body
 normalizeTests (M.Sequence exprs) = M.Sequence $ map normalizeTest exprs
 normalizeTests expr               = normalizeTest expr
 
-normalizeTest func@(M.SimpleProcedure name _ body) =  if isPrefixOf "test_" name
-                                                      then M.Test (M.MuString name) body
-                                                      else func
-normalizeTest e                                    = e
+normalizeTest func@(M.SimpleMethod name _ body) =  if isPrefixOf "test_" name
+                                                   then M.Test (M.MuString name) body
+                                                   else func
+normalizeTest e                                  = e
 
 muIf (condition, body) otherwise = M.If (muExpr condition) (muSuite body) otherwise
 
