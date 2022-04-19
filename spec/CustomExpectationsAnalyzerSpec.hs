@@ -176,8 +176,8 @@ spec = describe "ExpectationsAnalyzer" $ do
 
   it "evaluates count (returns)" $ do
     (run JavaScript "" "expectation: count (returns) = 0") `shouldReturn` ok
-    (run JavaScript "function foo(x) { if (x) return 1 else return 3 }" "expectation: within `foo` count (returns) = 1") `shouldReturn` nok
-    (run JavaScript "function foo(x) { if (x) return 1 else return 3 }" "expectation: within `foo` count (returns) = 2") `shouldReturn` ok
+    (run JavaScript "function foo(x) { if (x) return 1; else return 3 }" "expectation: within `foo` count (returns) = 1") `shouldReturn` nok
+    (run JavaScript "function foo(x) { if (x) return 1; else return 3 }" "expectation: within `foo` count (returns) = 2") `shouldReturn` ok
 
   it "is case sensitive in standard syntax" $ do
     (run JavaScript "" "expectation: UsesIf") `shouldReturn` nok
