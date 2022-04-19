@@ -18,6 +18,7 @@ module Language.Mulang.Ast (
     Equation(..),
     EquationBody(..),
     Type(..),
+    Modifier(..),
     Expression(..),
     Assertion(..),
     Statement(..),
@@ -26,9 +27,11 @@ module Language.Mulang.Ast (
     SubroutineBody,
     debug,
     debugType,
+    debugModifier,
     debugPattern,
     other,
     otherType,
+    otherModifier,
     otherPattern,
     pattern SimpleEquation,
     pattern SimpleFunction,
@@ -83,6 +86,16 @@ data Type
         -- ^ unrecognized type, with optional code and nested type
         deriving (Eq, Show, Read, Generic, Ord)
 
+data Modifier
+    = Abstract
+    | Static
+    | Classy
+    | Private
+    | Protected
+    | Annotation Expression
+    | OtherModifier (Maybe Code) (Maybe Modifier)
+  deriving (Eq, Show, Read, Generic, Ord)
+
 -- | Expression is the root element of a Mulang program.
 -- | With the exception of Patterns, nearly everything is an Expression: variable declarations, literals,
 -- | control structures, even object oriented classes declarations.
@@ -125,6 +138,8 @@ data Expression
     | Class Identifier (Maybe Identifier) Expression
     -- ^ Object oriented programming global, class declaration,
     --   composed by a name, an optional superclass, implemented interfaces and a body
+    | EigenClass Expression Expression
+    -- ^ Object oriented access to an object eigenclass, composed by the opened instance and the eigenclass body
     | Enumeration Identifier [Identifier]
     -- ^ Imperative named enumeration of values
     | Interface Identifier [Identifier] Expression
@@ -159,6 +174,8 @@ data Expression
     -- ^ Object oriented interface implementation
     | Include Expression
     -- ^ Object oriented mixin inclusion
+    | Decorator [Modifier] Expression
+    -- ^ Generic expression decorator for language modifiers and user-defined annotations
     | Lambda [Pattern] Expression
     | If Expression Expression Expression
     | Return Expression
@@ -274,6 +291,9 @@ debug a = Other (Just (show a)) Nothing
 debugType :: Show a => a -> Type
 debugType a = OtherType (Just (show a)) Nothing
 
+debugModifier :: Show a => a -> Modifier
+debugModifier a = OtherModifier (Just (show a)) Nothing
+
 debugPattern :: Show a => a -> Pattern
 debugPattern a = OtherPattern (Just (show a)) Nothing
 
@@ -282,6 +302,9 @@ other s e = Other (Just s) (Just e)
 
 otherType :: String -> Type -> Type
 otherType s e = OtherType (Just s) (Just e)
+
+otherModifier :: String -> Modifier -> Modifier
+otherModifier s e = OtherModifier (Just s) (Just e)
 
 otherPattern :: String -> Pattern -> Pattern
 otherPattern s e = OtherPattern (Just s) (Just e)

@@ -21,6 +21,7 @@ instance Bracket Equation
 instance Bracket EquationBody
 instance Bracket Statement
 instance Bracket Operator
+instance Bracket Modifier
 instance Bracket Type
 instance Bracket Assertion
 

@@ -87,9 +87,21 @@ spec = do
           (SimpleMethod "foo" [VariablePattern "self", VariablePattern "x"] (Return (Reference "x")))
         ]))
 
-    it "doesn't parse methods without self" $ do
+    it "parses classes with static methods" $ do
+      py "class Something:\n  @staticmethod\n  def foo(x): return x" `shouldBe` (
+        Class "Something" Nothing (Decorator [Static]
+          (SimpleMethod "foo" [VariablePattern "x"] (Return (Reference "x")))
+        ))
+
+    it "parses classes with class methods" $ do
+      py "class Something:\n  @classmethod\n  def foo(cls, x): return x" `shouldBe` (
+        Class "Something" Nothing (Decorator [Classy]
+          (SimpleMethod "foo" [VariablePattern "cls", VariablePattern "x"] (Return (Reference "x")))
+        ))
+
+    it "does parse methods without self" $ do
       py "class Something:\n  def bar(): return None\n" `shouldBe` (
-        Class "Something" Nothing (SimpleFunction "bar" [] (Return MuNil)))
+        Class "Something" Nothing (SimpleMethod "bar" [] (Return MuNil)))
 
     it "doesn't parse methods pseudo-methods outside a class" $ do
       py "def bar(self): return None\n" `shouldBe` (SimpleFunction "bar" [VariablePattern "self"] (Return MuNil))
