@@ -176,7 +176,6 @@ data Expression
     -- ^ Object oriented mixin inclusion
     | Decorator [Modifier] Expression
     -- ^ Generic expression decorator for language modifiers and user-defined annotations
-    -- ^ Eigenclass object
     | Lambda [Pattern] Expression
     | If Expression Expression Expression
     | Return Expression
