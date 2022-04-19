@@ -6,7 +6,7 @@ extra-deps:
 # unions with nullary constructors
 - aeson-1.2.1.0
 - github: mumuki/language-javascript
-  commit: d72836016544cd1a91d05519fd90aeabf3cf06da
+  commit: 7cadfa30838c69d165df39a5c1524dae5a0fc81f
 - github: julian-berbel/language-python
   commit: cbdf9b33cc3c30e66c8455165ed1c7d70a300a3e
 flags: {}
