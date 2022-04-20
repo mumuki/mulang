@@ -1,5 +1,18 @@
 # Changelog
 
+## [v6.0.9](https://github.com/mumuki/mulang/tree/v6.0.9) (2022-04-20)
+
+[Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.8...v6.0.9)
+
+**Closed issues:**
+
+- Support static/class vs non-static/instance methods  [\#174](https://github.com/mumuki/mulang/issues/174)
+
+**Merged pull requests:**
+
+- Feature Modifiers and Eigenclasses [\#346](https://github.com/mumuki/mulang/pull/346) ([flbulgarelli](https://github.com/flbulgarelli))
+- Update language-javascript [\#343](https://github.com/mumuki/mulang/pull/343) ([julian-berbel](https://github.com/julian-berbel))
+
 ## [v6.0.8](https://github.com/mumuki/mulang/tree/v6.0.8) (2022-01-06)
 
 [Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.7...v6.0.8)
