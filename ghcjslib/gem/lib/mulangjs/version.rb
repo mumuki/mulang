@@ -1,4 +1,4 @@
 module MulangJs
-  VERSION = "6.0.8"
-  MULANG_VERSION = "6.0.8"
+  VERSION = "6.0.9"
+  MULANG_VERSION = "6.0.9"
 end
