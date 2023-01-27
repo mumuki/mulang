@@ -80,9 +80,14 @@ normalizeReference (Application (Reference "context")            [description, L
 normalizeReference (Application (Reference "it")                 [description, Lambda [] e]) = Test description e
 normalizeReference e                                                                         = e
 
-muAssignment (JSIdentifier _ name) op value                           = Assignment name (muJSAssignOp op name value)
+muAssignment (JSIdentifier _ name) op value                           = Assignment name (muJSAssignIdentifierOp op name value)
 muAssignment (JSMemberDot e _ (JSIdentifier _ name)) op value         = muFieldAssignment e name op value
 muAssignment (JSCallExpressionDot e _ (JSIdentifier _ name)) op value = muFieldAssignment e name op value
+muAssignment ms@(JSMemberSquare receptor _ index _) op value          = Application (Primitive SetAt) [
+                                                                            muJSExpression receptor,
+                                                                            muJSExpression index,
+                                                                            muJSAssignExpressionOp op (muJSExpression ms) value
+                                                                        ]
 muAssignment other op value                                           = MuTuple [debug other, debug op, debug value]
 
 muLValue :: (Identifier -> Expression -> Expression) -> JSCommaList JSExpression -> Expression
@@ -151,7 +156,7 @@ muFieldReference e "length"  = Application (Primitive Size) [(muJSExpression e)]
 muFieldReference e other     = FieldReference (muJSExpression e) other
 
 muFieldAssignment :: JSExpression -> String -> JSAssignOp -> Expression -> Expression
-muFieldAssignment e name op value = FieldAssignment (muJSExpression e) name (muJSAssignOp op name value)
+muFieldAssignment e name op value = FieldAssignment (muJSExpression e) name (muJSAssignIdentifierOp op name value)
 
 muSend :: JSExpression -> JSExpression -> JSCommaList JSExpression -> Expression
 muSend r m ps = normalizeReference $ Send (muJSExpression r) (muJSExpression m) (muJSExpressionList ps)
@@ -169,7 +174,7 @@ muJSExpression (JSLiteral _ "this")                                 = Self
 muJSExpression (JSStringLiteral _ val)                              = MuString (removeQuotes val)
 --muJSExpression (JSRegEx _ String)
 muJSExpression (JSArrayLiteral _ list _)                            = MuList (muJSArrayList list)
-muJSExpression (JSAssignExpression (JSIdentifier _ name) op value)  = Assignment name (muJSAssignOp op name.muJSExpression $ value)
+muJSExpression (JSAssignExpression (JSIdentifier _ name) op value)  = Assignment name (muJSAssignIdentifierOp op name.muJSExpression $ value)
 muJSExpression (JSMemberExpression (JSMemberDot r _ m) _ ps _)      = muSend r m ps
 muJSExpression (JSCallExpression (JSCallExpressionDot r _ m) _ ps _)= muSend r m ps
 muJSExpression (JSMemberDot e _ (JSIdentifier _ field))             = muFieldReference e field
@@ -230,23 +235,26 @@ muJSUnaryOp (JSUnaryOpIncr _) r = (Application (Primitive Plus) [Reference r, Mu
 --muJSUnaryOp (JSUnaryOpVoid _)
 muJSUnaryOp e _                 = debug e
 
-muJSAssignOp:: JSAssignOp -> Identifier -> Expression -> Expression
-muJSAssignOp (JSAssign _) _ v = v
-muJSAssignOp op r v           = (Application (muJSAssignOp' op) [Reference r, v])
+muJSAssignIdentifierOp:: JSAssignOp -> Identifier -> Expression -> Expression
+muJSAssignIdentifierOp op identifier = muJSAssignExpressionOp op (Reference identifier)
 
-muJSAssignOp':: JSAssignOp -> Expression
-muJSAssignOp' (JSTimesAssign _)   = Primitive Multiply
-muJSAssignOp' (JSDivideAssign _)  = Primitive Divide
---muJSAssignOp' (JSModAssign _)
-muJSAssignOp' (JSPlusAssign _)    = Primitive Plus
-muJSAssignOp' (JSMinusAssign _)   = Primitive Minus
---muJSAssignOp' (JSLshAssign _)
---muJSAssignOp' (JSRshAssign _)
---muJSAssignOp' (JSUrshAssign _)
-muJSAssignOp' (JSBwAndAssign _)   = Reference "&"
-muJSAssignOp' (JSBwXorAssign _)   = Reference "^"
-muJSAssignOp' (JSBwOrAssign _)    = Reference "|"
-muJSAssignOp' e                   = debug e
+muJSAssignExpressionOp:: JSAssignOp -> Expression -> Expression -> Expression
+muJSAssignExpressionOp (JSAssign _) _ v = v
+muJSAssignExpressionOp op e v           = (Application (muJsAssignOp op) [e, v])
+
+muJsAssignOp :: JSAssignOp -> Expression
+muJsAssignOp  (JSTimesAssign _)   = Primitive Multiply
+muJsAssignOp  (JSDivideAssign _)  = Primitive Divide
+--muJsAssignOp  (JSModAssign _)
+muJsAssignOp  (JSPlusAssign _)    = Primitive Plus
+muJsAssignOp  (JSMinusAssign _)   = Primitive Minus
+--muJsAssignOp  (JSLshAssign _)
+--muJsAssignOp  (JSRshAssign _)
+--muJsAssignOp  (JSUrshAssign _)
+muJsAssignOp  (JSBwAndAssign _)   = Reference "&"
+muJsAssignOp  (JSBwXorAssign _)   = Reference "^"
+muJsAssignOp  (JSBwOrAssign _)    = Reference "|"
+muJsAssignOp  e                   = debug e
 
 muJSTryCatch:: JSTryCatch -> (Pattern, Expression)
 muJSTryCatch (JSCatch _ _ (JSIdentifier _ name) _ block) = (VariablePattern name, muJSBlock block)

@@ -149,8 +149,7 @@ spec = do
       js "x.y.z = 4;" `shouldBe` (FieldAssignment (FieldReference (Reference "x") "y") "z" (MuNumber (4.0)))
 
     it "handles dict assignment" $ do
-      -- js "x['y'] = 4;" `shouldBe` (Application  (Primitive SetAt) [Reference "x", MuString "y", MuNumber (4.0)])
-      pending
+      js "x['y'] = 4;" `shouldBe` (Application  (Primitive SetAt) [Reference "x", MuString "y", MuNumber (4.0)])
 
     it "handles booleans" $ do
       js "true" `shouldBe` MuTrue

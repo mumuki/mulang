@@ -171,11 +171,17 @@ except:
     it "parses field assignment" $ do
       py "x.y = 2" `shouldBe` (FieldAssignment (Reference "x") "y" (MuNumber 2))
 
-    it "parses indexed access" $ do
-      py "x['y']" `shouldBe` (FieldReference (Reference "x") "y")
+    it "parses indexed dict access" $ do
+      py "x['y']" `shouldBe` (Application (Primitive GetAt) [Reference "x", MuString "y"])
 
-    it "parses indexed assignments" $ do
-      py "x['y'] = 2" `shouldBe` (FieldAssignment (Reference "x") "y" (MuNumber 2))
+    it "parses indexed dict assignments" $ do
+      py "x['y'] = 2" `shouldBe` Application (Primitive SetAt) [Reference "x", MuString "y", MuNumber 2.0]
+
+    it "parses indexed list access" $ do
+      py "x[0]" `shouldBe` (Application (Primitive GetAt) [Reference "x", MuNumber 0.0])
+
+    it "parses indexed list assignments" $ do
+      py "x[0] = 2" `shouldBe` (Application (Primitive SetAt) [Reference "x", MuNumber 0.0, MuNumber 2.0])
 
     it "parses test groups" $ do
       run [text|

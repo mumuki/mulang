@@ -7,6 +7,7 @@ import           Language.Mulang.Ast
 import           Language.Mulang.Ast.Operator
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.JavaScript
+import           Language.Mulang.Parsers.Python
 import           Language.Mulang.Parsers.Java
 
 spec :: Spec
@@ -290,6 +291,14 @@ spec = do
     run (js "x != 4") "*" "UsesSimilar" `shouldBe` False
     run (js "x === 4") "*" "UsesEqual" `shouldBe` True
     run (js "x !== 4") "*" "UsesEqual" `shouldBe` False
+
+  it "works with primitive operators usage in py" $ do
+    run (py "x[0]") "*" "UsesGetAt" `shouldBe` True
+    run (py "x[0]") "*" "UsesSetAt" `shouldBe` False
+    run (py "x[0] = 9") "*" "UsesGetAt" `shouldBe` False
+    run (py "x[0] = 9") "*" "UsesSetAt" `shouldBe` True
+    run (py "x['y'] = 10") "*" "UsesGetAt" `shouldBe` False
+    run (py "x['y'] = 10") "*" "UsesSetAt" `shouldBe` True
 
   it "works with primitive operators essence with ast" $ do
     run (Primitive Equal)    "*" "IsEqual" `shouldBe` True
