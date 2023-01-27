@@ -149,7 +149,7 @@ muExpr (None _)                   = M.MuNil
 muExpr (Strings strings _)        = muString strings
 muExpr (UnicodeStrings strings _) = muString strings
 muExpr (Call fun args _)          = muCallType fun (map muArgument args)
---muExpr (Subscript { subscriptee :: Expr annot, subscript_expr :: Expr annot, expr_annot :: annot }
+muExpr (Subscript value sub _)    = M.Application (M.Primitive O.GetAt) [muExpr value, muExpr sub]
 --muExpr (SlicedExpr { slicee :: Expr annot, slices :: [Slice annot], expr_annot :: annot }
 --muExpr (CondExpr
 --     { ce_true_branch :: Expr annot -- ^ Expression to evaluate if condition is True.
@@ -207,8 +207,10 @@ muVariable (Var ident _) = muIdent ident
 muVariable other         = error (show other)
 
 muAssignment :: ExprSpan -> M.Expression -> M.Expression
-muAssignment (Var ident _)      = M.Assignment (muIdent ident)
-muAssignment (Dot expr ident _) = M.FieldAssignment (muExpr expr) (muIdent ident)
+muAssignment (Var ident _)           = M.Assignment (muIdent ident)
+muAssignment (Dot expr ident _)      = M.FieldAssignment (muExpr expr) (muIdent ident)
+muAssignment (Subscript expr sub _)  = \value -> M.Application (M.Primitive O.SetAt) [muExpr expr, muExpr sub, value]
+muAssignment other                   = const (M.debug other)
 
 muArgument (ArgExpr expr _)             = muExpr expr
 muArgument (ArgVarArgsPos expr _ )      = muExpr expr
