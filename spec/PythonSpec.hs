@@ -183,6 +183,26 @@ except:
     it "parses indexed list assignments" $ do
       py "x[0] = 2" `shouldBe` (Application (Primitive SetAt) [Reference "x", MuNumber 0.0, MuNumber 2.0])
 
+    it "parses indexed list increments" $ do
+      py "x[0] += 2" `shouldBe` (Application (Primitive SetAt) [
+                                                Reference "x",
+                                                MuNumber 0.0,
+                                                Application (Primitive Plus) [
+                                                  Application (Primitive GetAt) [Reference "x", MuNumber 0.0],
+                                                  MuNumber 2.0
+                                                ]
+                                              ])
+
+    it "parses indexed list decrements" $ do
+      py "x[5] -= 10" `shouldBe` (Application (Primitive SetAt) [
+                                                Reference "x",
+                                                MuNumber 5.0,
+                                                Application (Primitive Minus) [
+                                                  Application (Primitive GetAt) [Reference "x", MuNumber 5.0],
+                                                  MuNumber 10.0
+                                                ]
+                                              ])
+
     it "parses test groups" $ do
       run [text|
         class TestGroup(unittest.TestCase):

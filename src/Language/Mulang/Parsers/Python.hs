@@ -210,7 +210,7 @@ muAssignment :: ExprSpan -> M.Expression -> M.Expression
 muAssignment (Var ident _)           = M.Assignment (muIdent ident)
 muAssignment (Dot expr ident _)      = M.FieldAssignment (muExpr expr) (muIdent ident)
 muAssignment (Subscript expr sub _)  = \value -> M.Application (M.Primitive O.SetAt) [muExpr expr, muExpr sub, value]
-muAssignment other                   = error (show other)
+muAssignment other                   = const (M.debug other)
 
 muArgument (ArgExpr expr _)             = muExpr expr
 muArgument (ArgVarArgsPos expr _ )      = muExpr expr
