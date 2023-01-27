@@ -171,6 +171,12 @@ except:
     it "parses field assignment" $ do
       py "x.y = 2" `shouldBe` (FieldAssignment (Reference "x") "y" (MuNumber 2))
 
+    it "parses indexed access" $ do
+      py "x['y']" `shouldBe` (FieldReference (Reference "x") "y")
+
+    it "parses indexed assignments" $ do
+      py "x['y'] = 2" `shouldBe` (FieldAssignment (Reference "x") "y" (MuNumber 2))
+
     it "parses test groups" $ do
       run [text|
         class TestGroup(unittest.TestCase):
