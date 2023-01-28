@@ -203,6 +203,16 @@ except:
                                                 ]
                                               ])
 
+    it "parses list comprehensions" $ do
+      py "[x for x in xs]" `shouldBe` (
+          For [Generator (VariablePattern "x") (Reference "xs")] (Yield (Reference "x"))
+        )
+
+    it "parses list comprehensions with if" $ do
+      py "[x for x in xs if x]" `shouldBe` (
+          For [Generator (VariablePattern "x") (Reference "xs"), Guard (Reference "x")] (Yield (Reference "x"))
+        )
+
     it "parses test groups" $ do
       run [text|
         class TestGroup(unittest.TestCase):

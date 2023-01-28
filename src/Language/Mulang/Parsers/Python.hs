@@ -164,7 +164,12 @@ muExpr (Lambda args body _)       = M.Lambda (map muParameter args) (muExpr body
 muExpr (Tuple exprs _)            = M.MuTuple $ map muExpr exprs
 muExpr (Yield arg _)              = M.Yield $ fmapOrNull muYieldArg arg
 --muExpr (Generator { gen_comprehension :: Comprehension annot, expr_annot :: annot }
---muExpr (ListComp { list_comprehension :: Comprehension annot, expr_annot :: annot }
+muExpr (ListComp
+          (Comprehension
+              (ComprehensionExpr e)
+              for
+              _)
+          _)                      = M.For (muComprehensionFor for) (M.Yield (muExpr e))
 muExpr (List exprs _)             = muList exprs
 muExpr (Dictionary mappings _)    = muDict mappings
 --muExpr (DictComp { dict_comprehension :: Comprehension annot, expr_annot :: annot }
@@ -175,6 +180,15 @@ muExpr (Paren expr _)             = muExpr expr
 --muExpr (StringConversion { backquoted_expr :: Expr annot, expr_anot :: annot }
 muExpr e                          = M.debug e
 
+muComprehensionFor :: CompForSpan -> [M.Statement]
+muComprehensionFor (CompFor False [forExpr] inExpr Nothing _) = [muGenerator forExpr inExpr]
+muComprehensionFor (CompFor False [forExpr] inExpr (Just (IterIf (CompIf ifExpr Nothing _) _)) _) = [muGenerator forExpr inExpr, muGuard ifExpr]
+
+muGenerator :: ExprSpan -> ExprSpan -> M.Statement
+muGenerator (Var (Ident v _) _) e = M.Generator (M.VariablePattern v) (muExpr e)
+
+muGuard :: ExprSpan -> M.Statement
+muGuard = M.Guard . muExpr
 
 muList = M.MuList . map muExpr
 
