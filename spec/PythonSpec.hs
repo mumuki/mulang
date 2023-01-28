@@ -213,6 +213,24 @@ except:
           For [Generator (VariablePattern "x") (Reference "xs"), Guard (Reference "x")] (Yield (Reference "x"))
         )
 
+    it "parses list comprehensions with multiple if" $ do
+      py "[x for x in xs if x if x > 0]" `shouldBe` (
+          For [
+            Generator (VariablePattern "x") (Reference "xs"),
+            Guard (Reference "x"),
+            Guard (Application (Primitive GreatherThan) [Reference "x", MuNumber 0])
+          ] (Yield (Reference "x"))
+        )
+
+    it "parses list comprehensions with multiple if" $ do
+      py "[(x, y) for x in xs if x > 0 for y in ys if y > 0]" `shouldBe` (
+          For [
+            Generator (VariablePattern "x") (Reference "xs"),
+            Guard (Reference "x"),
+            Guard (Application (Primitive GreatherThan) [Reference "x", MuNumber 0])
+          ] (Yield (Reference "x"))
+        )
+
     it "parses test groups" $ do
       run [text|
         class TestGroup(unittest.TestCase):

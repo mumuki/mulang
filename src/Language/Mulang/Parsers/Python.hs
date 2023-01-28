@@ -181,8 +181,17 @@ muExpr (Paren expr _)             = muExpr expr
 muExpr e                          = M.debug e
 
 muComprehensionFor :: CompForSpan -> [M.Statement]
-muComprehensionFor (CompFor False [forExpr] inExpr Nothing _) = [muGenerator forExpr inExpr]
-muComprehensionFor (CompFor False [forExpr] inExpr (Just (IterIf (CompIf ifExpr Nothing _) _)) _) = [muGenerator forExpr inExpr, muGuard ifExpr]
+muComprehensionFor e = unfoldStatements $ Just (IterFor e undefined)
+
+unfoldStatements :: (Maybe CompIterSpan) -> [M.Statement]
+unfoldStatements = reverse . unfoldStatements' []
+
+unfoldStatements' acc Nothing = acc
+unfoldStatements' acc (Just (IterIf (CompIf ifExpr statements _) _)) = unfoldStatements' (muGuard ifExpr : acc) statements
+unfoldStatements' acc (Just (IterFor (CompFor False [fors] ins_ statements _) _))
+                                                                     = unfoldStatements' (muGenerator fors ins_ : acc) statements
+unfoldStatements' _ (Just e)                                         = error . show $ e
+
 
 muGenerator :: ExprSpan -> ExprSpan -> M.Statement
 muGenerator (Var (Ident v _) _) e = M.Generator (M.VariablePattern v) (muExpr e)
