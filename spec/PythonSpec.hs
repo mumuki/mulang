@@ -226,9 +226,10 @@ except:
       py "[(x, y) for x in xs if x > 0 for y in ys if y > 0]" `shouldBe` (
           For [
             Generator (VariablePattern "x") (Reference "xs"),
-            Guard (Reference "x"),
-            Guard (Application (Primitive GreaterThan) [Reference "x", MuNumber 0])
-          ] (Yield (Reference "x"))
+            Guard (Application (Primitive GreaterThan) [Reference "x",MuNumber 0.0]),
+            Generator (VariablePattern "y") (Reference "ys"),
+            Guard (Application (Primitive GreaterThan) [Reference "y",MuNumber 0.0])
+          ] (Yield (MuTuple [Reference "x",Reference "y"]))
         )
 
     it "parses test groups" $ do
