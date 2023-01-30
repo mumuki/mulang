@@ -218,7 +218,7 @@ except:
           For [
             Generator (VariablePattern "x") (Reference "xs"),
             Guard (Reference "x"),
-            Guard (Application (Primitive GreatherThan) [Reference "x", MuNumber 0])
+            Guard (Application (Primitive GreaterThan) [Reference "x", MuNumber 0])
           ] (Yield (Reference "x"))
         )
 
@@ -227,7 +227,7 @@ except:
           For [
             Generator (VariablePattern "x") (Reference "xs"),
             Guard (Reference "x"),
-            Guard (Application (Primitive GreatherThan) [Reference "x", MuNumber 0])
+            Guard (Application (Primitive GreaterThan) [Reference "x", MuNumber 0])
           ] (Yield (Reference "x"))
         )
 

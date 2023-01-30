@@ -48,8 +48,8 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('*', 'UsesAnd').translate).to eq('solution must use <code>&amp;&amp;</code>') }
       it { expect(expectation('*', 'UsesOr').translate).to eq('solution must use <code>||</code>') }
       it { expect(expectation('*', 'UsesHash').translate).to eq('solution must use <code>hash</code>') }
-      it { expect(expectation('*', 'UsesGreatherOrEqualThan').translate).to eq('solution must use <code>&gt;=</code>') }
-      it { expect(expectation('*', 'UsesGreatherThan').translate).to eq('solution must use <code>&gt;</code>') }
+      it { expect(expectation('*', 'UsesGreaterOrEqualThan').translate).to eq('solution must use <code>&gt;=</code>') }
+      it { expect(expectation('*', 'UsesGreaterThan').translate).to eq('solution must use <code>&gt;</code>') }
       it { expect(expectation('*', 'UsesLessOrEqualThan').translate).to eq('solution must use <code>&lt;=</code>') }
       it { expect(expectation('*', 'UsesLessThan').translate).to eq('solution must use <code>&lt;</code>') }
       it { expect(expectation('*', 'UsesOtherwise').translate :Haskell).to eq('solution must use <code>otherwise</code>') }

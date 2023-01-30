@@ -85,8 +85,8 @@ describe('en', () => {
     it('UsesAnd', () => should(mulang.I18n.translate('*', 'UsesAnd')).eql('solution must use <code>&amp;&amp;</code>'));
     it('UsesOr', () => should(mulang.I18n.translate('*', 'UsesOr')).eql('solution must use <code>||</code>'));
     it('UsesHash', () => should(mulang.I18n.translate('*', 'UsesHash')).eql('solution must use <code>hash</code>'));
-    it('UsesGreatherOrEqualThan', () => should(mulang.I18n.translate('*', 'UsesGreatherOrEqualThan')).eql('solution must use <code>&gt;=</code>'));
-    it('UsesGreatherThan', () => should(mulang.I18n.translate('*', 'UsesGreatherThan')).eql('solution must use <code>&gt;</code>'));
+    it('UsesGreaterOrEqualThan', () => should(mulang.I18n.translate('*', 'UsesGreaterOrEqualThan')).eql('solution must use <code>&gt;=</code>'));
+    it('UsesGreaterThan', () => should(mulang.I18n.translate('*', 'UsesGreaterThan')).eql('solution must use <code>&gt;</code>'));
     it('UsesLessOrEqualThan', () => should(mulang.I18n.translate('*', 'UsesLessOrEqualThan')).eql('solution must use <code>&lt;=</code>'));
     it('UsesLessThan', () => should(mulang.I18n.translate('*', 'UsesLessThan')).eql('solution must use <code>&lt;</code>'));
     it('UsesOtherwise', () => should(mulang.I18n.translate('*', 'UsesOtherwise', 'Haskell')).eql('solution must use <code>otherwise</code>'));

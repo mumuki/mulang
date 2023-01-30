@@ -30,9 +30,9 @@ data Operator
     -- ^ `||`-like or operator
     | Hash
     -- ^ `hashcode` operator
-    | GreatherOrEqualThan
+    | GreaterOrEqualThan
     -- ^ `>=` operator
-    | GreatherThan
+    | GreaterThan
     -- ^ `>` operator
     | LessOrEqualThan
     -- ^ `<=` operator
