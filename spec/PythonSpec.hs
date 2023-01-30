@@ -117,6 +117,11 @@ spec = do
     it "parses functions" $ do
       py "def foo(): return 1" `shouldBe` SimpleFunction "foo" [] (Return (MuNumber 1.0))
 
+    it "parses print" $ do
+      py "print()" `shouldBe` (Print None)
+      py "print(x)" `shouldBe` (Print (Reference "x"))
+      py "print(x, y)" `shouldBe` (Print (MuTuple [Reference "x", Reference "y"]))
+
     it "parses procedures" $ do
       py "def foo(param): print(param)" `shouldBe` SimpleProcedure "foo" [VariablePattern "param"] (Print (Reference "param"))
 
@@ -124,7 +129,24 @@ spec = do
       py "while True: pass" `shouldBe` While (MuBool True) None
 
     it "parses fors" $ do
-      py "for x in range(0, 3): pass" `shouldBe` For [Generator (TuplePattern [VariablePattern "x"]) (Application (Reference "range") [MuNumber 0, MuNumber 3])] None
+      py "for x in range(0, 3): pass" `shouldBe` For [Generator (VariablePattern "x") (Application (Reference "range") [MuNumber 0.0,MuNumber 3.0])] None
+
+    it "parses fors with patterns" $ do
+      py "for (x, y) in enumerate(range(10, 30)): print('x', x, 'y', y)" `shouldBe` For [
+          Generator (TuplePattern [
+            VariablePattern "x",
+            VariablePattern "y"
+          ]) (Application (Reference "enumerate") [Application (Reference "range") [MuNumber 10, MuNumber 30]])
+        ] (Print (MuTuple [MuString "x", Reference "x", MuString "y", Reference "y"]))
+
+    it "parses fors with multiple vars" $ do
+      py "for x, y in enumerate(range(10, 30)): print('x', x, 'y', y)" `shouldBe` For [
+          Generator (TuplePattern [
+            VariablePattern "x",
+            VariablePattern "y"
+          ]) (Application (Reference "enumerate") [Application (Reference "range") [MuNumber 10, MuNumber 30]])
+        ] (Print (MuTuple [MuString "x", Reference "x", MuString "y", Reference "y"]))
+
 
     it "parses tries" $ do
       run [text|
@@ -203,9 +225,19 @@ except:
                                                 ]
                                               ])
 
-    it "parses list comprehensions" $ do
+    it "parses list comprehensions with one variable" $ do
       py "[x for x in xs]" `shouldBe` (
           For [Generator (VariablePattern "x") (Reference "xs")] (Yield (Reference "x"))
+        )
+
+    it "parses list comprehensions with two variables" $ do
+      py "[x for x, y in xs]" `shouldBe` (
+          For [Generator (TuplePattern [VariablePattern "x",VariablePattern "y"]) (Reference "xs")] (Yield (Reference "x"))
+        )
+
+    it "parses list comprehensions with tuple" $ do
+      py "[x for (x, y) in xs]" `shouldBe` (
+          For [Generator (TuplePattern [VariablePattern "x", VariablePattern "y"]) (Reference "xs")] (Yield (Reference "x"))
         )
 
     it "parses list comprehensions with if" $ do

@@ -3,6 +3,7 @@ module Language.Mulang.Builder (
     trim,
     compact,
     compactMap,
+    compactTuple,
     compactConcatMap) where
 
 import Language.Mulang.Ast
@@ -17,6 +18,11 @@ compact :: [Expression] -> Expression
 compact []  = None
 compact [e] = e
 compact es  = Sequence es
+
+compactTuple :: [Expression] -> Expression
+compactTuple []  = None
+compactTuple [e] = e
+compactTuple es  = MuTuple es
 
 trim :: [Expression] -> [Expression]
 trim = filter (/= None)

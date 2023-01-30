@@ -8,7 +8,7 @@ module Language.Mulang.Parsers.Python (
 
 import qualified Language.Mulang.Ast as M
 import qualified Language.Mulang.Ast.Operator as O
-import           Language.Mulang.Builder (compactMap)
+import           Language.Mulang.Builder (compactMap, compactTuple)
 import           Language.Mulang.Parsers
 
 import qualified Language.Python.Version3.Parser as Python3
@@ -54,7 +54,7 @@ muDecorator other                                     = M.debugModifier other
 
 muStatement :: StatementSpan -> M.Expression
 muStatement (While cond body _ _)             = M.While (muExpr cond) (muSuite body)
-muStatement (For targets generator body _ _)  = M.For [M.Generator (M.TuplePattern (map (M.VariablePattern . muVariable) targets)) (muExpr generator)] (muSuite body)
+muStatement (For targets generator body _ _)  = M.For [M.Generator (muPatterns targets) (muExpr generator)] (muSuite body)
 muStatement (Fun name args _ body _)          = muComputation (muIdent name) (map muParameter args) (muSuite body)
 muStatement (Class name parents body _)       = muClass (listToMaybe . map muParent $ parents) (muIdent name) (muClassSuite body)
 muStatement (Conditional guards els _ )       = foldr muIf (muSuite els) guards
@@ -93,7 +93,7 @@ muStatement (StmtExpr expr _)                 = muExpr expr
 --     { assert_exprs :: [Expr annot] -- ^ Expressions being asserted.
 --     , stmt_annot :: annot
 --     }
-muStatement (Print _ exprs _ _)               = M.Print $ compactMap muExpr exprs
+muStatement (Print _ exprs _ _)               = M.Print . compactTuple . map muExpr $ exprs
 muStatement (Exec expr _ _)                   = muExpr expr
 muStatement e                                 = M.debug e
 
@@ -188,16 +188,24 @@ unfoldStatements = reverse . unfoldStatements' []
 
 unfoldStatements' acc Nothing = acc
 unfoldStatements' acc (Just (IterIf (CompIf ifExpr statements _) _)) = unfoldStatements' (muGuard ifExpr : acc) statements
-unfoldStatements' acc (Just (IterFor (CompFor False [fors] ins_ statements _) _))
+unfoldStatements' acc (Just (IterFor (CompFor False fors ins_ statements _) _))
                                                                      = unfoldStatements' (muGenerator fors ins_ : acc) statements
-unfoldStatements' _ (Just e)                                         = error . show $ e
 
-
-muGenerator :: ExprSpan -> ExprSpan -> M.Statement
-muGenerator (Var (Ident v _) _) e = M.Generator (M.VariablePattern v) (muExpr e)
+muGenerator :: [ExprSpan] -> ExprSpan ->  M.Statement
+muGenerator fors e = M.Generator (muPatterns fors) (muExpr e)
 
 muGuard :: ExprSpan -> M.Statement
 muGuard = M.Guard . muExpr
+
+muPatterns :: [ExprSpan] -> M.Pattern
+muPatterns [pattern]      = muPattern pattern
+muPatterns patterns@(_:_) = M.TuplePattern . map muPattern $ patterns
+
+muPattern :: ExprSpan -> M.Pattern
+muPattern (Var ident _) = M.VariablePattern . muIdent $ ident
+muPattern (Tuple es _)  = M.TuplePattern . map muPattern $ es
+muPattern (Paren e  _)  = muPattern e
+muPattern other         = M.debugPattern other
 
 muList = M.MuList . map muExpr
 
@@ -208,7 +216,7 @@ muCallType (Dot _ (Ident "assertEqual" _) _) [a, b] = M.Assert False $ M.Equalit
 muCallType (Dot _ (Ident "assertTrue" _) _)  [a]    = M.Assert False $ M.Truth a
 muCallType (Dot _ (Ident "assertFalse" _) _) [a]    = M.Assert True $ M.Truth a
 muCallType (Dot receiver ident _)            x      = muCall (M.Send $ muExpr receiver) ident x
-muCallType (Var (Ident "print" _) _)         [x]    = M.Print x -- FIXME python print can have multiple arguments
+muCallType (Var (Ident "print" _) _)         xs     = M.Print . compactTuple $ xs
 muCallType (Var ident _)                     x      = muCall M.Application ident x
 
 muCall callType ident = callType (M.Reference $ muIdent ident)
@@ -224,10 +232,6 @@ muString = M.MuString . concat . map removeQuotes
         removeQuotes other                 = other
 
 muNumberFromInt = M.MuNumber . fromInteger
-
-muVariable :: ExprSpan -> M.Identifier
-muVariable (Var ident _) = muIdent ident
-muVariable other         = error (show other)
 
 muAssignment :: ExprSpan -> M.Expression -> M.Expression
 muAssignment (Var ident _)           = M.Assignment (muIdent ident)
@@ -294,10 +298,10 @@ muAssignOp (FloorDivAssign _)   = M.Reference "/"
 muHandler (Handler (ExceptClause clause _) suite _) = (muExceptClause clause, muSuite suite)
 
 muExceptClause Nothing                    = M.WildcardPattern
-muExceptClause (Just (except, maybeVar))  = muPattern maybeVar (M.TypePattern $ muVarToId except)
+muExceptClause (Just (except, maybeVar))  = muExceptPattern maybeVar (M.TypePattern $ muVarToId except)
 
-muPattern Nothing = id
-muPattern (Just var) = M.AsPattern (muVarToId var)
+muExceptPattern Nothing = id
+muExceptPattern (Just var) = M.AsPattern (muVarToId var)
 
 muRaiseExpr (RaiseV3 Nothing)                    = M.None
 muRaiseExpr (RaiseV3 (Just (expr, _)))           = muExpr expr
