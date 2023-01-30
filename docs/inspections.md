@@ -99,8 +99,8 @@ The power of Mulang is grounded on more than 120 different kind of inspections
 | `UsesForwardComposition`         | is the `>>`-like functional forward composition operator used?
 | `UsesGather`                     | is the collection `flatmap`-like operator used?
 | `UsesGetAt`                      | is the collection `[]`-like operator used?
-| `UsesGreatherOrEqualThan`        | is the `>=` operator used?
-| `UsesGreatherThan`               | is the `>` operator used?
+| `UsesGreaterOrEqualThan`        | is the `>=` operator used?
+| `UsesGreaterThan`               | is the `>` operator used?
 | `UsesHash`                       | is the `hashcode` operator used?
 | `UsesInject`                     | is the collection `reduce`-like / `fold`-like operator used?
 | `UsesLessOrEqualThan`            | is the `<=` operator used?

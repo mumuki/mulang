@@ -88,9 +88,9 @@ evalExpr (M.Assert negated (M.Equality expected actual)) =
           | muEquals v1 v2 /= negated = return nullRef
           | otherwise                 = raiseString $ "Expected " ++ show v1 ++ " but got: " ++ show v2
 
-evalExpr (M.Application (M.Primitive O.GreatherOrEqualThan) expressions) = evalBinaryNumeric expressions (>=) createBool
+evalExpr (M.Application (M.Primitive O.GreaterOrEqualThan) expressions) = evalBinaryNumeric expressions (>=) createBool
 evalExpr (M.Application (M.Primitive O.Modulo) expressions) = evalBinaryNumeric expressions (mod') createNumber
-evalExpr (M.Application (M.Primitive O.GreatherThan) expressions) = evalBinaryNumeric expressions (>) createBool
+evalExpr (M.Application (M.Primitive O.GreaterThan) expressions) = evalBinaryNumeric expressions (>) createBool
 
 evalExpr (M.Application (M.Primitive O.Or) expressions) = evalBinaryBoolean expressions (||)
 evalExpr (M.Application (M.Primitive O.And) expressions) = evalBinaryBoolean expressions (&&)

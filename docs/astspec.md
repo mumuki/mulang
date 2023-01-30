@@ -1257,8 +1257,8 @@ Primitive operators represent low-level language operations that are well known 
 * `ForwardComposition`: `(f >> g)(x) = (g . f)(x) = g(f(x))` operator
 * `Gather`: collection `flatmap`-like operator
 * `GetAt`: collection `[]`-like operator
-* `GreatherOrEqualThan`:  `>=` operator
-* `GreatherThan`:  `>` operator
+* `GreaterOrEqualThan`:  `>=` operator
+* `GreaterThan`:  `>` operator
 * `Hash`:  hashcode operator
 * `Inject`: collection `reduce`-like / `fold`-like operator
 * `LessOrEqualThan`:  `<=` operator
