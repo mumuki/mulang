@@ -74,12 +74,9 @@ muStatement (Raise expr _)                    = M.Raise $ muRaiseExpr expr
 --     , stmt_annot :: annot
 --     }
 muStatement (Pass _)                          = M.None
---muStatement (Break { stmt_annot :: annot }
---muStatement (Continue { stmt_annot :: annot }
---muStatement (Delete
---     { del_exprs :: [Expr annot] -- ^ Items to delete.
---     , stmt_annot :: annot
---     }
+muStatement (Break _)                         = M.Break M.None
+muStatement (Continue _)                      = M.Continue M.None
+muStatement (Delete exprs _)                  = compactMap (M.Application (M.Reference "del") . (:[]) . muExpr) exprs
 muStatement (StmtExpr expr _)                 = muExpr expr
 --muStatement (Global
 --     { global_vars :: [Ident annot] -- ^ Variables declared global in the current block.
@@ -220,7 +217,8 @@ muCallType (Dot _ (Ident "assertTrue" _) _)  [a]    = M.Assert False $ M.Truth a
 muCallType (Dot _ (Ident "assertFalse" _) _) [a]    = M.Assert True $ M.Truth a
 muCallType (Dot receiver ident _)            x      = muCall (M.Send $ muExpr receiver) ident x
 muCallType (Var (Ident "print" _) _)         xs     = M.Print . compactTuple $ xs
-muCallType (Var ident _)                     x      = muCall M.Application ident x
+muCallType (Var (Ident "len" _) _)           xs     = M.Application (M.Primitive O.Size) xs
+muCallType (Var ident _)                     xs     = muCall M.Application ident xs
 
 muCall callType ident = callType (M.Reference $ muIdent ident)
 

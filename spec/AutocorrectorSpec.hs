@@ -101,6 +101,9 @@ spec = do
       run Ruby (Expectation "*" "Uses:size") `shouldBe` (Expectation "*" "UsesSize")
       run Ruby (Expectation "*"  "Uses:length") `shouldBe` (Expectation "*" "UsesSize")
 
+    it "corrects python len" $ do
+      run Python (Expectation "*" "Uses:len") `shouldBe` (Expectation "*" "UsesSize")
+
     it "corrects JS operators" $ do
       run JavaScript (Expectation "*" "Uses:+") `shouldBe` (Expectation "*" "UsesPlus")
       run JavaScript (Expectation "*" "Uses:&&") `shouldBe` (Expectation "*" "UsesAnd")

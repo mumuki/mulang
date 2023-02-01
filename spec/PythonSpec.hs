@@ -207,6 +207,12 @@ except:
     it "parses indexed dict assignments" $ do
       py "x['y'] = 2" `shouldBe` Application (Primitive SetAt) [Reference "x", MuString "y", MuNumber 2.0]
 
+    it "parses indexed dict removal" $ do
+      py "del x['y']" `shouldBe` Application (Reference "del") [Application (Primitive GetAt) [Reference "x",MuString "y"]]
+
+    it "parses list length" $ do
+      py "len(x)" `shouldBe` Application (Primitive Size) [Reference "x"]
+
     it "parses indexed list access" $ do
       py "x[0]" `shouldBe` (Application (Primitive GetAt) [Reference "x", MuNumber 0.0])
 

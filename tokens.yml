@@ -150,6 +150,7 @@ Python:
     And: "and"
     Or: "or"
     Hash: "hash"
+    Size: "len"
 Ruby:
   keywords:
     <<: *common_keywords
