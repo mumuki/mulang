@@ -71,6 +71,13 @@ spec = do
     it "parses assign-operators" $ do
       py "x += 8" `shouldBe` (Assignment "x" (Application (Primitive Plus) [Reference "x",MuNumber 8.0]))
 
+    it "parses global variable access" $ do
+      py "def foo(): \n\tglobal x\n\tx = 0" `shouldBe` (
+        Procedure "foo" [Equation [] (UnguardedBody (Sequence [
+          Application (Reference "global") [Reference "x"],
+          Assignment "x" (MuNumber 0.0)
+        ]))])
+
     it "parses binary operators" $ do
       py "x + y" `shouldBe` (Application (Primitive Plus) [Reference "x",Reference "y"])
 
@@ -240,43 +247,57 @@ except:
                                               ])
 
     it "parses list comprehensions with one variable" $ do
-      py "[x for x in xs]" `shouldBe` (
+      py "[x for x in xs]" `shouldBe` Application (Reference "list") [
           For [Generator (VariablePattern "x") (Reference "xs")] (Yield (Reference "x"))
-        )
+        ]
 
     it "parses list comprehensions with two variables" $ do
-      py "[x for x, y in xs]" `shouldBe` (
+      py "[x for x, y in xs]" `shouldBe` Application (Reference "list") [
           For [Generator (TuplePattern [VariablePattern "x",VariablePattern "y"]) (Reference "xs")] (Yield (Reference "x"))
-        )
+        ]
 
     it "parses list comprehensions with tuple" $ do
-      py "[x for (x, y) in xs]" `shouldBe` (
+      py "[x for (x, y) in xs]" `shouldBe` Application (Reference "list") [
           For [Generator (TuplePattern [VariablePattern "x", VariablePattern "y"]) (Reference "xs")] (Yield (Reference "x"))
-        )
+        ]
 
     it "parses list comprehensions with if" $ do
-      py "[x for x in xs if x]" `shouldBe` (
+      py "[x for x in xs if x]" `shouldBe` Application (Reference "list") [
           For [Generator (VariablePattern "x") (Reference "xs"), Guard (Reference "x")] (Yield (Reference "x"))
-        )
+        ]
 
     it "parses list comprehensions with multiple if" $ do
-      py "[x for x in xs if x if x > 0]" `shouldBe` (
+      py "[x for x in xs if x if x > 0]" `shouldBe` Application (Reference "list") [
           For [
             Generator (VariablePattern "x") (Reference "xs"),
             Guard (Reference "x"),
             Guard (Application (Primitive GreaterThan) [Reference "x", MuNumber 0])
           ] (Yield (Reference "x"))
-        )
+        ]
 
     it "parses list comprehensions with multiple if" $ do
-      py "[(x, y) for x in xs if x > 0 for y in ys if y > 0]" `shouldBe` (
+      py "[(x, y) for x in xs if x > 0 for y in ys if y > 0]" `shouldBe` Application (Reference "list") [
           For [
             Generator (VariablePattern "x") (Reference "xs"),
             Guard (Application (Primitive GreaterThan) [Reference "x",MuNumber 0.0]),
             Generator (VariablePattern "y") (Reference "ys"),
             Guard (Application (Primitive GreaterThan) [Reference "y",MuNumber 0.0])
           ] (Yield (MuTuple [Reference "x",Reference "y"]))
+        ]
+
+    it "parses plain generators comprehensions" $ do
+      py "(x for x in xs)" `shouldBe` (
+          For [Generator (VariablePattern "x") (Reference "xs")] (Yield (Reference "x"))
         )
+
+    it "parses set comprehensions" $ do
+      py "{x for x in xs}" `shouldBe` Application (Reference "set") [
+          For [Generator (VariablePattern "x") (Reference "xs")] (Yield (Reference "x"))
+        ]
+
+    it "parses dict comprehensions" $ do
+      -- py "{x:y for (x,y) in xs}"}
+      pending
 
     it "parses test groups" $ do
       run [text|

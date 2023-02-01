@@ -78,10 +78,7 @@ muStatement (Break _)                         = M.Break M.None
 muStatement (Continue _)                      = M.Continue M.None
 muStatement (Delete exprs _)                  = compactMap (M.Application (M.Reference "del") . (:[]) . muExpr) exprs
 muStatement (StmtExpr expr _)                 = muExpr expr
---muStatement (Global
---     { global_vars :: [Ident annot] -- ^ Variables declared global in the current block.
---     , stmt_annot :: annot
---     }
+muStatement (Global exprs _)                  = compactMap (M.Application (M.Reference "global") . (:[]) . muReference) exprs
 --muStatement (NonLocal
 --     { nonLocal_vars :: [Ident annot] -- ^ Variables declared nonlocal in the current block (their binding comes from bound the nearest enclosing scope).
 --     , stmt_annot :: annot
@@ -134,7 +131,7 @@ muClassSuite = compactMap muClassStatement
 muExpr :: ExprSpan -> M.Expression
 muExpr (Var (Ident "True" _) _)   = M.MuTrue
 muExpr (Var (Ident "False" _) _)  = M.MuFalse
-muExpr (Var ident _)              = M.Reference (muIdent ident)
+muExpr (Var ident _)              = muReference ident
 muExpr (Dot expr ident _)          = M.FieldReference (muExpr expr) (muIdent ident)
 muExpr (Int value _ _)            = muNumberFromInt value
 muExpr (LongInt value _ _)        = muNumberFromInt value
@@ -161,22 +158,21 @@ muExpr (UnaryOp op arg _)         = muApplication op [arg]
 muExpr (Lambda args body _)       = M.Lambda (map muParameter args) (muExpr body)
 muExpr (Tuple exprs _)            = M.MuTuple $ map muExpr exprs
 muExpr (Yield arg _)              = M.Yield $ fmapOrNull muYieldArg arg
---muExpr (Generator { gen_comprehension :: Comprehension annot, expr_annot :: annot }
-muExpr (ListComp
-          (Comprehension
-              (ComprehensionExpr e)
-              for
-              _)
-          _)                      = M.For (muComprehensionFor for) (M.Yield (muExpr e))
+muExpr (Generator comp _)         = muComprehension comp
+muExpr (ListComp comp _)          = M.Application (M.Reference "list") [muComprehension comp]
 muExpr (List exprs _)             = muList exprs
 muExpr (Dictionary mappings _)    = muDict mappings
---muExpr (DictComp { dict_comprehension :: Comprehension annot, expr_annot :: annot }
+muExpr (DictComp comp _)          = M.Application (M.Reference "dict") [muComprehension comp]
 muExpr (Set exprs _)              = muList exprs
---muExpr (SetComp { set_comprehension :: Comprehension annot, expr_annot :: annot }
+muExpr (SetComp comp _)           = M.Application (M.Reference "set") [muComprehension comp]
 --muExpr (Starred { starred_expr :: Expr annot, expr_annot :: annot }
 muExpr (Paren expr _)             = muExpr expr
 --muExpr (StringConversion { backquoted_expr :: Expr annot, expr_anot :: annot }
 muExpr e                          = M.debug e
+
+
+muComprehension (Comprehension (ComprehensionExpr e) for _) = M.For (muComprehensionFor for) (M.Yield (muExpr e))
+muComprehension (Comprehension other                 for _) = M.For (muComprehensionFor for) (M.Yield (M.debug other))
 
 muComprehensionFor :: CompForSpan -> [M.Statement]
 muComprehensionFor e = unfoldStatements $ Just (IterFor e undefined)
@@ -220,7 +216,9 @@ muCallType (Var (Ident "print" _) _)         xs     = M.Print . compactTuple $ x
 muCallType (Var (Ident "len" _) _)           xs     = M.Application (M.Primitive O.Size) xs
 muCallType (Var ident _)                     xs     = muCall M.Application ident xs
 
-muCall callType ident = callType (M.Reference $ muIdent ident)
+muCall callType ident = callType (muReference ident)
+
+muReference = M.Reference . muIdent
 
 
 muApplication op args = M.Application (muOp op) (map muExpr args)
@@ -244,7 +242,6 @@ muArgument (ArgExpr expr _)             = muExpr expr
 muArgument (ArgVarArgsPos expr _ )      = muExpr expr
 muArgument (ArgVarArgsKeyword expr _ )  = muExpr expr
 muArgument (ArgKeyword name expr _)     = M.As (muIdent name) (muExpr expr)
-muArgument e                            = M.debug e
 
 --muYieldArg (YieldFrom expr _)(Expr annot) annot -- ^ Yield from a generator (Version 3 only)
 muYieldArg (YieldExpr expr) = muExpr expr
