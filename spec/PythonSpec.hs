@@ -53,6 +53,9 @@ spec = do
     it "parses assignment" $ do
       py "one = 1" `shouldBe` Assignment "one" (MuNumber 1.0)
 
+    it "parses arg keywords" $ do
+      py "f(x=1)" `shouldBe` Application (Reference "f") [As "x" (MuNumber 1.0)]
+
     it "allows parentheses" $ do
       py "(123)" `shouldBe` MuNumber 123
 

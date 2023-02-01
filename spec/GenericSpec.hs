@@ -269,14 +269,22 @@ spec = do
       usesLogic (hs "f x y = or x")  `shouldBe` False
 
   describe "usesMath" $ do
-    it "is when it is used in function bodies" $ do
+    it "is True when it is used in function bodies" $ do
       usesMath (hs "f x y = x + y")    `shouldBe` True
       usesMath (hs "f x y = x * y")    `shouldBe` True
       usesMath (hs "f x y = x / x")    `shouldBe` True
       usesMath (hs "f x y = div x z")  `shouldBe` True
       usesMath (hs "f x y = x - y")    `shouldBe` True
 
-    it "is when it is used in composite literals" $ do
+    it "is True when it is used in named arguments" $ do
+      usesMath (py3 "f(x = 4 + 5)")     `shouldBe` True
+      usesMath (py3 "f(x = 4)")         `shouldBe` False
+
+    it "is True when it is used in default parameters" $ do
+      usesMath (py3 "def f(x = 4 + 5): pass") `shouldBe` True
+      usesMath (py3 "def f(x = 4): pass")      `shouldBe` False
+
+    it "is True when it is used in composite literals" $ do
       usesMath (py3 "{'hello': 4 + 5}") `shouldBe` True
       usesMath (py3 "{'hello': 4}")     `shouldBe` False
 
@@ -286,7 +294,7 @@ spec = do
       usesMath (js "[4+5, 0]")          `shouldBe` True
       usesMath (js "[9, 0]")            `shouldBe` False
 
-    it "is is not used otherwise" $ do
+    it "is True is not used otherwise" $ do
       usesMath (hs "f x y = x")       `shouldBe` False
       usesMath (hs "f x y = plus x")  `shouldBe` False
       usesMath (hs "f x y = minus x") `shouldBe` False

@@ -81,7 +81,7 @@ data Type
         -- Useful for modelling functions, methods and procedures types
         | ConstrainedType [Identifier]
         -- ^ constrained type, with just type constraints.
-        -- Usefull for modelling classes and interfaces types
+        -- Useful for modelling classes and interfaces types
         | OtherType (Maybe Code) (Maybe Type)
         -- ^ unrecognized type, with optional code and nested type
         deriving (Eq, Show, Read, Generic, Ord)
@@ -125,6 +125,8 @@ data Expression
     -- ^ Imperative programming procedure declaration. It is composed by a name and one or more equations
     | Method Identifier SubroutineBody
     | PrimitiveMethod Operator SubroutineBody
+    | As Identifier Expression
+    -- ^ Unstable API, subject to change
     | Variable Identifier Expression
     | Constant Identifier Expression
     | Assignment Identifier Expression
@@ -150,24 +152,25 @@ data Expression
     | Fact Identifier [Pattern]
     -- ^ Logic programming declaration of a fact , composed by the fact name and fact arguments
     | Exist Identifier [Pattern]
-    -- ^ Logic programming existential cuantification / consult
+    -- ^ Logic programming existential quantification / consult
     | Not Expression
     -- ^ Logic programming negation
     | Findall Expression Expression Expression
     -- ^ Logic programming findall
     | Forall Expression Expression
-    -- ^ Logic programming universal cuantification
+    -- ^ Logic programming universal quantification
     | Reference Identifier
     -- ^ Generic variable
     | FieldReference Expression Identifier
     -- ^ Generic nested field access
     | Primitive Operator
-    -- ^ Reference to special, low level, universal operations like logical operaions and math, that may or may not be primitives
+    -- ^ Reference to special, low level, universal operations like logical operations and math, that may or may not be primitives
     -- in the original language
     | Application Expression [Expression]
-    -- ^ Generic, non-curried application of a function or procedure, composed by the applied element itself, and the application arguments
+    -- ^ Generic, non-curried application of a function or procedure, composed by the applied element itself,
+    -- and the application arguments
     | Send Expression Expression [Expression]
-    -- ^ Object oriented programming message send, composed by the reciever, selector and arguments
+    -- ^ Object oriented programming message send, composed by the receiver, selector and arguments
     | New Expression [Expression]
     -- ^ Object oriented instantiation, composed by the class reference and instantiation arguments
     | Implement Expression
@@ -192,9 +195,9 @@ data Expression
     | Continue Expression
     -- ^ Imperative programming step skip statement
     | Try Expression [(Pattern, Expression)] Expression
-    -- ^ Generic try expression, composed by a body, a list of exception-handling patterns and statments, and a finally expression
+    -- ^ Generic try expression, composed by a body, a list of exception-handling patterns and statements, and a finally expression
     | Raise Expression
-    -- ^ Generic raise expression, like a throw or raise statament, composed by the raised expression
+    -- ^ Generic raise expression, like a throw or raise statement, composed by the raised expression
     | Print Expression
     -- ^ Generic print expression
     | For [Statement] Expression

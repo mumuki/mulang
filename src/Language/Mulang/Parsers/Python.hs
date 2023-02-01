@@ -245,11 +245,7 @@ muAssignment other                   = const (M.debug other)
 muArgument (ArgExpr expr _)             = muExpr expr
 muArgument (ArgVarArgsPos expr _ )      = muExpr expr
 muArgument (ArgVarArgsKeyword expr _ )  = muExpr expr
---muArgument ArgKeyword
---     { arg_keyword :: Ident annot -- ^ Keyword name.
---     , arg_expr :: Expr annot -- ^ Argument expression.
---     , arg_annot :: annot
---     }
+muArgument (ArgKeyword name expr _)     = M.As (muIdent name) (muExpr expr)
 muArgument e                            = M.debug e
 
 --muYieldArg (YieldFrom expr _)(Expr annot) annot -- ^ Yield from a generator (Version 3 only)
