@@ -39,8 +39,9 @@ usesPatternMatching = containsExpression f
         patterns = concatMap (\(Equation ps _) -> ps)
 
         nonVariablePattern :: Pattern -> Bool
-        nonVariablePattern (VariablePattern _) = False
-        nonVariablePattern _                   = True
+        nonVariablePattern (VariablePattern _)  = False
+        nonVariablePattern (DefaultPattern p _) = nonVariablePattern p
+        nonVariablePattern _                    = True
 
 
 -- | Inspection that tells whether an expression uses

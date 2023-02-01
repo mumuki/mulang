@@ -124,7 +124,8 @@ containsReturn (M.Sequence xs) = any containsReturn xs
 containsReturn _               = False
 
 muParameter :: ParameterSpan -> M.Pattern
-muParameter (Param name _ _ _) = M.VariablePattern (muIdent name)
+muParameter (Param name _ Nothing _)  = muVariablePattern name
+muParameter (Param name _ (Just e) _) = M.DefaultPattern (muVariablePattern name) (muExpr e)
 
 muIdent :: IdentSpan -> String
 muIdent (Ident id _) = id
@@ -202,10 +203,12 @@ muPatterns [pattern]      = muPattern pattern
 muPatterns patterns@(_:_) = M.TuplePattern . map muPattern $ patterns
 
 muPattern :: ExprSpan -> M.Pattern
-muPattern (Var ident _) = M.VariablePattern . muIdent $ ident
+muPattern (Var ident _) = muVariablePattern ident
 muPattern (Tuple es _)  = M.TuplePattern . map muPattern $ es
 muPattern (Paren e  _)  = muPattern e
 muPattern other         = M.debugPattern other
+
+muVariablePattern = M.VariablePattern . muIdent
 
 muList = M.MuList . map muExpr
 

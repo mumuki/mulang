@@ -217,9 +217,10 @@ hasUnreachableCode = containsExpression f
 
         equationMatchesAnyValue (Equation patterns body) = all patternMatchesAnyValue patterns && bodyMatchesAnyValue body
 
-        patternMatchesAnyValue WildcardPattern     = True
-        patternMatchesAnyValue (VariablePattern _) = True
-        patternMatchesAnyValue _                   = False
+        patternMatchesAnyValue WildcardPattern      = True
+        patternMatchesAnyValue (VariablePattern _)  = True
+        patternMatchesAnyValue (DefaultPattern p _) = patternMatchesAnyValue p
+        patternMatchesAnyValue _                    = False
 
         bodyMatchesAnyValue (UnguardedBody _)    = True
         bodyMatchesAnyValue (GuardedBody guards) = any (isTruthy . fst) guards

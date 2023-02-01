@@ -117,6 +117,11 @@ spec = do
     it "parses functions" $ do
       py "def foo(): return 1" `shouldBe` SimpleFunction "foo" [] (Return (MuNumber 1.0))
 
+    it "parses functions with optional args" $ do
+      py "def foo(x=1): return x" `shouldBe` Function "foo" [
+          Equation [DefaultPattern (VariablePattern "x") (MuNumber 1)] (UnguardedBody (Return (Reference "x")))
+        ]
+
     it "parses print" $ do
       py "print()" `shouldBe` (Print None)
       py "print(x)" `shouldBe` (Print (Reference "x"))

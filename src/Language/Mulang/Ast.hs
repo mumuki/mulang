@@ -276,6 +276,9 @@ data Pattern
     | WildcardPattern
     -- ^ wildcard pattern @_@
     | UnionPattern [Pattern]
+    | DefaultPattern Pattern Expression
+    -- ^ Pattern for patterns with a default value when no matching is produced,
+    -- like for example optional arguments
     | OtherPattern (Maybe Code) (Maybe Pattern)
     -- ^ Other unrecognized pattern with optional code and nested pattern
   deriving (Eq, Show, Read, Generic, Ord)
@@ -353,8 +356,9 @@ extractLValue (Constant name value) = Just (name, value)
 extractLValue _                     = Nothing
 
 extractLValuePattern :: Pattern -> Maybe Identifier
-extractLValuePattern (VariablePattern name) = Just name
 extractLValuePattern (ConstantPattern name) = Just name
+extractLValuePattern (VariablePattern name) = Just name
+extractLValuePattern (DefaultPattern p _)   = extractLValuePattern p
 extractLValuePattern _                      = Nothing
 
 extractUnification :: Expression -> Maybe (Identifier, Expression)

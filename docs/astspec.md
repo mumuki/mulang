@@ -1220,6 +1220,16 @@ function foo(x, y) { }
 (UnionPattern [Pattern])
 ```
 
+### `DefaultPattern`
+
+Pattern for patterns with a default value when no matching is produced, like for example optional arguments.
+
+#### Syntax
+
+```haskell
+(DefaultPattern Pattern Expression)
+```
+
 ### `OtherPattern`
 
 > Other unrecognized pattern
