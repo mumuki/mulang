@@ -42,6 +42,7 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('*', 'UsesNegation').translate :Ruby).to eq('solution must use <code>!</code>') }
 
       it { expect(expectation('*', 'UsesSize').translate :Ruby).to eq('solution must use <code>length</code>') }
+      it { expect(expectation('*', 'UsesSize').translate :Python).to eq('solution must use <code>len</code>') }
       it { expect(expectation('*', 'UsesEqual').translate).to eq('solution must use <code>==</code>') }
       it { expect(expectation('*', 'UsesNotEqual').translate).to eq('solution must use <code>!=</code>') }
       it { expect(expectation('*', 'UsesNegation').translate).to eq('solution must use <code>!</code>') }
@@ -53,6 +54,8 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('*', 'UsesLessOrEqualThan').translate).to eq('solution must use <code>&lt;=</code>') }
       it { expect(expectation('*', 'UsesLessThan').translate).to eq('solution must use <code>&lt;</code>') }
       it { expect(expectation('*', 'UsesOtherwise').translate :Haskell).to eq('solution must use <code>otherwise</code>') }
+      it { expect(expectation('*', 'UsesSlice').translate :Python).to eq('solution must use <code>[:]</code>') }
+      it { expect(expectation('*', 'UsesSlice').translate :JavaScript).to eq('solution must use <code>slice</code>') }
       it { expect(expectation('*', 'UsesPlus').translate).to eq('solution must use <code>+</code>') }
       it { expect(expectation('*', 'UsesMinus').translate).to eq('solution must use <code>-</code>') }
       it { expect(expectation('*', 'UsesMultiply').translate).to eq('solution must use <code>*</code>') }

@@ -21,6 +21,7 @@ import           Data.List.Extra (dropLast)
 import           Data.Maybe (fromMaybe, listToMaybe)
 
 import           Control.Fallible
+import           Control.Monad (msum)
 
 py, py2, py3 :: Parser
 py = py3
@@ -145,13 +146,8 @@ muExpr (Strings strings _)        = muString strings
 muExpr (UnicodeStrings strings _) = muString strings
 muExpr (Call fun args _)          = muCallType fun (map muArgument args)
 muExpr (Subscript value sub _)    = M.Application (M.Primitive O.GetAt) [muExpr value, muExpr sub]
---muExpr (SlicedExpr { slicee :: Expr annot, slices :: [Slice annot], expr_annot :: annot }
---muExpr (CondExpr
---     { ce_true_branch :: Expr annot -- ^ Expression to evaluate if condition is True.
---     , ce_condition :: Expr annot -- ^ Boolean condition.
---     , ce_false_branch :: Expr annot -- ^ Expression to evaluate if condition is False.
---     , expr_annot :: annot
---     }
+muExpr (SlicedExpr expr [s] _)    = M.Application (M.Primitive O.Slice) (muExpr expr:muSlices s)
+muExpr (CondExpr t c f _)         = M.If (muExpr c) (muExpr t) (muExpr f)
 muExpr (BinaryOp op left right _) = muApplication op [left, right]
 muExpr (UnaryOp op arg _)         = muApplication op [arg]
 --muExpr (Dot { dot_expr :: Expr annot, dot_attribute :: Ident annot, expr_annot :: annot }
@@ -170,6 +166,14 @@ muExpr (Paren expr _)             = muExpr expr
 --muExpr (StringConversion { backquoted_expr :: Expr annot, expr_anot :: annot }
 muExpr e                          = M.debug e
 
+
+muSlices :: SliceSpan -> [M.Expression]
+muSlices (SliceProper l u s _)  = map muSlice $ [l, u, msum s]
+muSlices other                  = [M.debug other]
+
+muSlice :: Maybe ExprSpan -> M.Expression
+muSlice Nothing  = M.None
+muSlice (Just e) = muExpr e
 
 muComprehension (Comprehension (ComprehensionExpr e) for _) = M.For (muComprehensionFor for) (M.Yield (muExpr e))
 muComprehension (Comprehension other                 for _) = M.For (muComprehensionFor for) (M.Yield (M.debug other))

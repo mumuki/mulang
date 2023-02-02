@@ -27,6 +27,7 @@ Common:
     Multiply: '*'
     Negation: '!'
     NotEqual: '!='
+    Slice: 'slice'
     Or: '||'
     Plus: '+'
     Modulo: '%'
@@ -151,6 +152,7 @@ Python:
     Or: "or"
     Hash: "hash"
     Size: "len"
+    Slice: '[:]'
 Ruby:
   keywords:
     <<: *common_keywords

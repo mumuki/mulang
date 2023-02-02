@@ -119,6 +119,11 @@ spec = do
     it "parses inheritance" $ do
       py "class DerivedClassName(BaseClassName): pass" `shouldBe` Class "DerivedClassName" (Just "BaseClassName") None
 
+
+    it "parses inline if" $ do
+      py "1 if cond else 0" `shouldBe` If (Reference "cond") (MuNumber 1) (MuNumber 0)
+
+
     it "parses if, elif and else" $ do
       run [text|if True: 1
         elif False: 2
@@ -219,6 +224,21 @@ except:
 
     it "parses list length" $ do
       py "len(x)" `shouldBe` Application (Primitive Size) [Reference "x"]
+
+    it "parses slices with steps" $ do
+      py "x[0:10:2]" `shouldBe` (Application (Primitive Slice) [Reference "x", MuNumber 0, MuNumber 10, MuNumber 2])
+
+    it "parses slices without start" $ do
+      py "x[:10]" `shouldBe` (Application (Primitive Slice) [Reference "x", None, MuNumber 10, None ])
+
+    it "parses slices without end" $ do
+      py "x[4:]" `shouldBe` (Application (Primitive Slice) [Reference "x", MuNumber 4, None, None ])
+
+    it "parses slices with start and end" $ do
+      py "x[4:9]" `shouldBe` (Application (Primitive Slice) [Reference "x", MuNumber 4, MuNumber 9, None ])
+
+    it "parses slices without start and end" $ do
+      py "x[:]" `shouldBe` (Application (Primitive Slice) [Reference "x", None, None, None ])
 
     it "parses indexed list access" $ do
       py "x[0]" `shouldBe` (Application (Primitive GetAt) [Reference "x", MuNumber 0.0])

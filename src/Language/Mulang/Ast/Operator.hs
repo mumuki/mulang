@@ -106,6 +106,8 @@ data Operator
     -- ^ collection `[]=`-like operator
     | Push
     -- ^ collection `insertAtEnd`-like operator
+    | Slice
+    -- ^ list slicing operator, like Ruby's `[..]` or Python's `[:]`
   deriving (Eq, Show, Read, Generic, Ord, Enum)
 
 
