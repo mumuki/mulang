@@ -21,6 +21,7 @@ import           Data.List.Extra (dropLast)
 import           Data.Maybe (fromMaybe, listToMaybe)
 
 import           Control.Fallible
+import           Control.Monad (msum)
 
 py, py2, py3 :: Parser
 py = py3
@@ -74,17 +75,11 @@ muStatement (Raise expr _)                    = M.Raise $ muRaiseExpr expr
 --     , stmt_annot :: annot
 --     }
 muStatement (Pass _)                          = M.None
---muStatement (Break { stmt_annot :: annot }
---muStatement (Continue { stmt_annot :: annot }
---muStatement (Delete
---     { del_exprs :: [Expr annot] -- ^ Items to delete.
---     , stmt_annot :: annot
---     }
+muStatement (Break _)                         = M.Break M.None
+muStatement (Continue _)                      = M.Continue M.None
+muStatement (Delete exprs _)                  = compactMap (M.Application (M.Reference "del") . (:[]) . muExpr) exprs
 muStatement (StmtExpr expr _)                 = muExpr expr
---muStatement (Global
---     { global_vars :: [Ident annot] -- ^ Variables declared global in the current block.
---     , stmt_annot :: annot
---     }
+muStatement (Global exprs _)                  = compactMap (M.Application (M.Reference "global") . (:[]) . muReference) exprs
 --muStatement (NonLocal
 --     { nonLocal_vars :: [Ident annot] -- ^ Variables declared nonlocal in the current block (their binding comes from bound the nearest enclosing scope).
 --     , stmt_annot :: annot
@@ -137,7 +132,7 @@ muClassSuite = compactMap muClassStatement
 muExpr :: ExprSpan -> M.Expression
 muExpr (Var (Ident "True" _) _)   = M.MuTrue
 muExpr (Var (Ident "False" _) _)  = M.MuFalse
-muExpr (Var ident _)              = M.Reference (muIdent ident)
+muExpr (Var ident _)              = muReference ident
 muExpr (Dot expr ident _)          = M.FieldReference (muExpr expr) (muIdent ident)
 muExpr (Int value _ _)            = muNumberFromInt value
 muExpr (LongInt value _ _)        = muNumberFromInt value
@@ -151,35 +146,37 @@ muExpr (Strings strings _)        = muString strings
 muExpr (UnicodeStrings strings _) = muString strings
 muExpr (Call fun args _)          = muCallType fun (map muArgument args)
 muExpr (Subscript value sub _)    = M.Application (M.Primitive O.GetAt) [muExpr value, muExpr sub]
---muExpr (SlicedExpr { slicee :: Expr annot, slices :: [Slice annot], expr_annot :: annot }
---muExpr (CondExpr
---     { ce_true_branch :: Expr annot -- ^ Expression to evaluate if condition is True.
---     , ce_condition :: Expr annot -- ^ Boolean condition.
---     , ce_false_branch :: Expr annot -- ^ Expression to evaluate if condition is False.
---     , expr_annot :: annot
---     }
+muExpr (SlicedExpr expr [s] _)    = M.Application (M.Primitive O.Slice) (muExpr expr:muSlices s)
+muExpr (CondExpr t c f _)         = M.If (muExpr c) (muExpr t) (muExpr f)
 muExpr (BinaryOp op left right _) = muApplication op [left, right]
 muExpr (UnaryOp op arg _)         = muApplication op [arg]
 --muExpr (Dot { dot_expr :: Expr annot, dot_attribute :: Ident annot, expr_annot :: annot }
 muExpr (Lambda args body _)       = M.Lambda (map muParameter args) (muExpr body)
 muExpr (Tuple exprs _)            = M.MuTuple $ map muExpr exprs
 muExpr (Yield arg _)              = M.Yield $ fmapOrNull muYieldArg arg
---muExpr (Generator { gen_comprehension :: Comprehension annot, expr_annot :: annot }
-muExpr (ListComp
-          (Comprehension
-              (ComprehensionExpr e)
-              for
-              _)
-          _)                      = M.For (muComprehensionFor for) (M.Yield (muExpr e))
+muExpr (Generator comp _)         = muComprehension comp
+muExpr (ListComp comp _)          = M.Application (M.Reference "list") [muComprehension comp]
 muExpr (List exprs _)             = muList exprs
 muExpr (Dictionary mappings _)    = muDict mappings
---muExpr (DictComp { dict_comprehension :: Comprehension annot, expr_annot :: annot }
+muExpr (DictComp comp _)          = M.Application (M.Reference "dict") [muComprehension comp]
 muExpr (Set exprs _)              = muList exprs
---muExpr (SetComp { set_comprehension :: Comprehension annot, expr_annot :: annot }
+muExpr (SetComp comp _)           = M.Application (M.Reference "set") [muComprehension comp]
 --muExpr (Starred { starred_expr :: Expr annot, expr_annot :: annot }
 muExpr (Paren expr _)             = muExpr expr
 --muExpr (StringConversion { backquoted_expr :: Expr annot, expr_anot :: annot }
 muExpr e                          = M.debug e
+
+
+muSlices :: SliceSpan -> [M.Expression]
+muSlices (SliceProper l u s _)  = map muSlice $ [l, u, msum s]
+muSlices other                  = [M.debug other]
+
+muSlice :: Maybe ExprSpan -> M.Expression
+muSlice Nothing  = M.None
+muSlice (Just e) = muExpr e
+
+muComprehension (Comprehension (ComprehensionExpr e) for _) = M.For (muComprehensionFor for) (M.Yield (muExpr e))
+muComprehension (Comprehension other                 for _) = M.For (muComprehensionFor for) (M.Yield (M.debug other))
 
 muComprehensionFor :: CompForSpan -> [M.Statement]
 muComprehensionFor e = unfoldStatements $ Just (IterFor e undefined)
@@ -220,9 +217,12 @@ muCallType (Dot _ (Ident "assertTrue" _) _)  [a]    = M.Assert False $ M.Truth a
 muCallType (Dot _ (Ident "assertFalse" _) _) [a]    = M.Assert True $ M.Truth a
 muCallType (Dot receiver ident _)            x      = muCall (M.Send $ muExpr receiver) ident x
 muCallType (Var (Ident "print" _) _)         xs     = M.Print . compactTuple $ xs
-muCallType (Var ident _)                     x      = muCall M.Application ident x
+muCallType (Var (Ident "len" _) _)           xs     = M.Application (M.Primitive O.Size) xs
+muCallType (Var ident _)                     xs     = muCall M.Application ident xs
 
-muCall callType ident = callType (M.Reference $ muIdent ident)
+muCall callType ident = callType (muReference ident)
+
+muReference = M.Reference . muIdent
 
 
 muApplication op args = M.Application (muOp op) (map muExpr args)
@@ -246,7 +246,6 @@ muArgument (ArgExpr expr _)             = muExpr expr
 muArgument (ArgVarArgsPos expr _ )      = muExpr expr
 muArgument (ArgVarArgsKeyword expr _ )  = muExpr expr
 muArgument (ArgKeyword name expr _)     = M.As (muIdent name) (muExpr expr)
-muArgument e                            = M.debug e
 
 --muYieldArg (YieldFrom expr _)(Expr annot) annot -- ^ Yield from a generator (Version 3 only)
 muYieldArg (YieldExpr expr) = muExpr expr

@@ -1292,6 +1292,7 @@ Primitive operators represent low-level language operations that are well known 
 * `SetAt`: collection `[]=`-like operator
 * `Similar`:  equal-ignoring-type operator
 * `Size`: collection `length`-like size operator
+* `Slice`: list slicing operator, like Ruby's `[..]` or Python's `[:]`
 
 ## Types
 
