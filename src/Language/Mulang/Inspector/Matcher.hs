@@ -10,7 +10,7 @@ import           Language.Mulang.Inspector.Primitive (Inspection)
 
 type Matcher = [Expression] -> Bool
 
--- | Creates a simple matcher that evaluates the given inspection only againts the first of its arguments
+-- | Creates a simple matcher that evaluates the given inspection only against the first of its arguments
 with :: Inspection -> Matcher
 with inspection = inspection . head
 

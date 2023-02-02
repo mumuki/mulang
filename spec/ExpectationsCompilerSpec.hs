@@ -300,6 +300,41 @@ spec = do
     run (py "x['y'] = 10") "*" "UsesGetAt" `shouldBe` False
     run (py "x['y'] = 10") "*" "UsesSetAt" `shouldBe` True
 
+  it "works with primitive operators call in py - single matcher" $ do
+    run (py "len('hello')") "*" "CallsSize" `shouldBe` True
+    run (py "len('hello')") "*" "CallsSize:WithLiteral" `shouldBe` True
+    run (py "len('hello')") "*" "CallsSize:WithString:\"hello\"" `shouldBe` True
+    run (py "len('hello')") "*" "CallsSize:WithString:\"baz\"" `shouldBe` False
+
+  it "works with primitive operators call in py - two basic matchers" $ do
+    run (py "x[0]") "*" "CallsGetAt" `shouldBe` True
+
+    run (py "x[0]") "*" "CallsGetAt:WithAnything" `shouldBe` True
+    run (py "x[0]") "*" "CallsGetAt:WithLiteral" `shouldBe` False
+
+    run (py "x[0]") "*" "CallsGetAt:WithAnything:WithAnything" `shouldBe` True
+    run (py "x[0]") "*" "CallsGetAt:WithNonliteral:WithAnything" `shouldBe` True
+    run (py "x[0]") "*" "CallsGetAt:WithNonliteral:WithLiteral" `shouldBe` True
+
+  it "works with primitive operators call in py - two matchers with args" $ do
+    run (py "x[0]") "*" "CallsGetAt:WithAnything:WithLiteral" `shouldBe` True
+    run (py "x[0]") "*" "CallsGetAt:WithAnything:WithNumber:0" `shouldBe` True
+    run (py "x[0]") "*" "CallsGetAt:WithAnything:WithNumber:2" `shouldBe` False
+    run (py "x[0]") "*" "CallsSetAt:WithAnything:WithNumber:0" `shouldBe` False
+
+  it "works with primitive operators call in py - three matchers" $ do
+    run (py "x[0] = 9") "*" "CallsGetAt:WithAnything:WithNumber:0" `shouldBe` False
+    run (py "x[0] = 9") "*" "CallsSetAt:WithAnything:WithNumber:5" `shouldBe` False
+    run (py "x[0] = 9") "*" "CallsSetAt:WithAnything:WithNumber:0" `shouldBe` True
+
+    run (py "x[0] = 9") "*" "CallsSetAt:WithAnything:WithNumber:0:WithNumber:9" `shouldBe` True
+    run (py "x[0] = 9") "*" "CallsSetAt:WithAnything:WithNumber:0:WithNumber:0" `shouldBe` False
+
+    run (py "x['y'] = 10") "*" "CallsGetAt:WithAnything:WithString:\"y\"" `shouldBe` False
+    run (py "x['y'] = 10") "*" "CallsSetAt:WithAnything:WithString:\"j\"" `shouldBe` False
+    run (py "x['y'] = 10") "*" "CallsSetAt:WithAnything:WithString:\"y\"" `shouldBe` True
+    run (py "x['y'] = 10") "*" "CallsSetAt:WithAnything:WithString:\"y\":WithNumber:10" `shouldBe` True
+
   it "works with primitive operators essence with ast" $ do
     run (Primitive Equal)    "*" "IsEqual" `shouldBe` True
     run (Primitive NotEqual) "*" "IsEqual" `shouldBe` False

@@ -33,7 +33,7 @@ compileScope _                     q = Decontextualize q
 compileCQuery :: [String] -> CQuery
 compileCQuery []                            = compileCQuery ["Parses","*"]
 compileCQuery [verb]                        = compileCQuery [verb,"*"]
-compileCQuery [verb,name]                   | Map.member name nullaryMatchers = compileCQuery [verb,"*",name]
+compileCQuery (verb:name:args)              | Map.member name nullaryMatchers = compileCQuery (verb:"*":name:args)
 compileCQuery (verb:"WithChar":args)        = compileCQuery (verb:"*":"WithChar":args)
 compileCQuery (verb:"WithNumber":args)      = compileCQuery (verb:"*":"WithNumber":args)
 compileCQuery (verb:"WithString":args)      = compileCQuery (verb:"*":"WithString":args)
@@ -63,6 +63,7 @@ compileMatcher = matching . f
 
 nullaryMatchers =
   Map.fromList [
+    ("WithAnything", IsAnything),
     ("WithFalse", IsFalse),
     ("WithLiteral", IsLiteral),
     ("WithLogic", IsLogic),

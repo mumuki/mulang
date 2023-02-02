@@ -3,7 +3,10 @@ module Language.Mulang.Inspector.Generic (
   assignsMatching,
   calls,
   callsMatching,
+  callsPrimitive,
+  callsPrimitiveMatching,
   countCalls,
+  countPrimitiveCalls,
   countFors,
   countFunctions,
   countIfs,
@@ -99,6 +102,17 @@ countCalls :: Matcher -> BoundCounter
 countCalls matcher p = countExpressions f
   where f (Call (Reference id) arguments) = p id && matcher arguments
         f _                               = False
+
+callsPrimitive :: Operator -> Inspection
+callsPrimitive = unmatching callsPrimitiveMatching
+
+callsPrimitiveMatching :: Matcher -> Operator -> Inspection
+callsPrimitiveMatching matcher = positive . (countPrimitiveCalls matcher)
+
+countPrimitiveCalls :: Matcher -> Operator -> Counter
+countPrimitiveCalls matcher o = countExpressions f
+  where f (Call callee arguments) = isPrimitive o callee && matcher arguments
+        f _                       = False
 
 delegates :: BoundInspection
 delegates = decontextualize . delegates'
