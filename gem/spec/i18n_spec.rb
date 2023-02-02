@@ -23,7 +23,7 @@ describe Mulang::Expectation::I18n do
     it { expect(expectation('*', "Returns:WithFalse").translate).to eq('solution must return with value <code>false</code>') }
     it { expect(expectation('*', "UsesRepeat:WithMath").translate).to eq('solution must use <code>repeat</code> with a math expression') }
     it { expect(expectation('*', "Calls:g:WithLiteral").translate).to eq('solution must use <code>g</code> with a literal value') }
-    it { expect(expectation('*', "Calls:g:WithNonliteral").translate).to eq('solution must use <code>g</code> with a non-literal expresson') }
+    it { expect(expectation('*', "Calls:g:WithNonliteral").translate).to eq('solution must use <code>g</code> with a non-literal expression') }
     it { expect(expectation('*', "Calls:g:WithLogic").translate).to eq('solution must use <code>g</code> with a boolean expression') }
     it { expect(expectation('*', "DeclaresVariable:x:WithNumber:4").translate).to eq('solution must declare a variable <code>x</code> with number <code>4</code>') }
     it { expect(expectation('*', "Assigns:x:WithSymbol:bar").translate).to eq('solution must assign <code>x</code> with symbol <code>bar</code>') }
@@ -68,6 +68,10 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('*', 'UsesBitwiseXor').translate).to eq('solution must use <code>^</code>') }
       it { expect(expectation('*', 'UsesBitwiseLeftShift').translate).to eq('solution must use <code>&lt;&lt;</code>') }
       it { expect(expectation('*', 'UsesBitwiseRightShift').translate).to eq('solution must use <code>&gt;&gt;</code>') }
+
+      it { expect(expectation('*', 'CallsSetAt').translate).to eq('solution must use <code>[]=</code>') }
+      it { expect(expectation('*', 'CallsSetAt:WithAnything').translate).to eq('solution must use <code>[]=</code> with some expression') }
+      it { expect(expectation('*', 'CallsSetAt:WithLiteral').translate).to eq('solution must use <code>[]=</code> with a literal value') }
     end
   end
 
@@ -111,6 +115,9 @@ describe Mulang::Expectation::I18n do
 
       it { expect(expectation('foo', 'HasIf').translate(keyword_If: 'si')).to eq('<code>foo</code> debe usar <code>si</code>') }
       it { expect(expectation('foo', 'HasIf').translate(keyword_Repeat: 'repetir')).to eq('<code>foo</code> debe usar <code>if</code>') }
+
+      it { expect(expectation('*', 'CallsSize:WithNonliteral').translate :Python).to eq('la solución debe usar <code>len</code> con una expresión no literal') }
+      it { expect(expectation('*', 'CallsSize:WithNonliteral').translate :JavaScript).to eq('la solución debe usar <code>length</code> con una expresión no literal') }
     end
 
     describe 'custom expectations' do

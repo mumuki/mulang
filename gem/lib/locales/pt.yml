@@ -5,6 +5,7 @@ pt:
       must_not: 'não deve'
       must: 'deve'
       solution: 'a solução'
+      with_anything: ' com alguma expressão'
       with_char: ' com o caractere <code>%{value}</code>'
       with_false: ' com o valor <code>%{keyword_False}</code>'
       with_literal: ' com um valor literal'

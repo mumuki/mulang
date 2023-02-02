@@ -78,8 +78,10 @@ def operators_translations_yml(operators, use)
 %Q{
   mulang:
     inspection:
-#{operators.map do |it|
-"      Uses#{it}: '%{binding} %{must} #{use} <code>%{operator_#{it}}</code>'"
+#{operators.flat_map do |it| [
+"      Uses#{it}: '%{binding} %{must} #{use} <code>%{operator_#{it}}</code>'",
+"      Calls#{it}: '%{binding} %{must} #{use} <code>%{operator_#{it}}</code>%{matching}'"
+]
 end.join("\n")}}
 end
 
