@@ -61,6 +61,7 @@ extractTerminal _                   = False
 pattern SingleExpression e1 c <- (extractSingleExpression -> Just (e1, c))
 
 extractSingleExpression :: Expression -> Maybe (Expression, Expression -> Expression)
+extractSingleExpression (As n e)                 = Just (e, \e -> (As n e))
 extractSingleExpression (Assignment v1 e)        = Just (e, \e -> (Assignment v1 e))
 extractSingleExpression (Attribute v1 e)         = Just (e, \e -> (Attribute v1 e))
 extractSingleExpression (Break e)                = Just (e, \e -> (Break e))

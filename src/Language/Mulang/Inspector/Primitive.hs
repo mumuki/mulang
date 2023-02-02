@@ -34,6 +34,7 @@ containsDeclaration f = has f declarations
 matchesType :: IdentifierPredicate -> Pattern -> Bool
 matchesType predicate (TypePattern n)               = predicate n
 matchesType predicate (AsPattern _ (TypePattern n)) = predicate n
+matchesType predicate (DefaultPattern pattern _)    = matchesType predicate pattern
 matchesType predicate (UnionPattern patterns)       = any (matchesType predicate) patterns
 matchesType _         _                             = False
 

@@ -67,8 +67,9 @@ parameterNamesOf :: [Equation] -> [Maybe Identifier]
 parameterNamesOf = map msum . transpose . map (map parameterNameOf . equationPatterns)
 
 parameterNameOf :: Pattern -> Maybe Identifier
-parameterNameOf (VariablePattern v) = Just v
-parameterNameOf _                   = Nothing
+parameterNameOf (VariablePattern v)  = Just v
+parameterNameOf (DefaultPattern p _) = parameterNameOf p
+parameterNameOf _                    = Nothing
 
 codeSignaturesOf :: Expression -> [Code]
 codeSignaturesOf = styledCodeSignaturesOf mulangStyle

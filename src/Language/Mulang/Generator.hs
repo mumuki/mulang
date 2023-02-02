@@ -149,10 +149,14 @@ extractReference (Exist n _)          = Just n
 extractReference _                    = Nothing
 
 equationsExpressions :: [Equation] -> [Expression]
-equationsExpressions = concatMap (\(Equation _ body) -> bodyExpressions body)
+equationsExpressions = concatMap (\(Equation params body) -> paramsExpression params ++ bodyExpressions body)
   where
     bodyExpressions (UnguardedBody e)      = [e]
     bodyExpressions (GuardedBody b)        = b >>= \(es1, es2) -> [es1, es2]
+
+    paramsExpression ((DefaultPattern _ e):ps) = e:paramsExpression ps
+    paramsExpression (_:ps)                    = paramsExpression ps
+    paramsExpression _                         = []
 
 statementsExpressions :: [Statement] -> [Expression]
 statementsExpressions = map expression

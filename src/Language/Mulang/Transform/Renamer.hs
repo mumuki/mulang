@@ -69,8 +69,9 @@ renameEquation (Equation ps b) = do
   return $ Equation ps' b'
 
 renameParameter :: Pattern -> RenameState Pattern
-renameParameter (VariablePattern n) = fmap VariablePattern . createParameter $ n
-renameParameter e                   = return e
+renameParameter (VariablePattern n)  = fmap VariablePattern . createParameter $ n
+renameParameter (DefaultPattern p e) = fmap (`DefaultPattern` e) $ renameParameter p
+renameParameter e                    = return e
 
 renameEquationBody (UnguardedBody e) = fmap UnguardedBody . renameState $ e
 renameEquationBody (GuardedBody es)  = fmap GuardedBody . mapM renameGuard $ es
