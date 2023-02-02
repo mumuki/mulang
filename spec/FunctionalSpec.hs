@@ -4,6 +4,7 @@ module FunctionalSpec (spec) where
 
 import           Test.Hspec
 import           Language.Mulang.Parsers.Haskell
+import           Language.Mulang.Parsers.Python
 import           Language.Mulang.Inspector.Generic
 import           Language.Mulang.Inspector.Functional
 
@@ -69,9 +70,18 @@ spec = do
     it "is True when do syntax is used" $ do
       usesForComprehension (hs "y = do { x <- xs; return x }") `shouldBe` True
 
-  describe "usesComprehension" $ do
+  describe "usesComprehension, in hs" $ do
     it "is True when list comprehension exists" $ do
       usesComprehension (hs "x = [m|m<-t]") `shouldBe` True
 
     it "is False when comprehension doesnt exists" $ do
       usesComprehension (hs "x = []") `shouldBe` False
+
+  describe "usesComprehension, in py" $ do
+    it "is True when comprehension exists" $ do
+      usesComprehension (py "(x for x in xs)") `shouldBe` True
+      usesComprehension (py "[x for x in xs]") `shouldBe` True
+      usesComprehension (py "{x:x+1 for x in xs}") `shouldBe` True
+
+    it "is False when comprehension doesnt exists" $ do
+      usesComprehension (py "[]") `shouldBe` False
