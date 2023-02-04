@@ -57,6 +57,7 @@ describe Mulang::Inspection do
   it { expect(Mulang::Inspection.parse("Returns:WithFalse")).to json_like(type: 'Returns', negated: false, matcher: {type: :with_false }) }
   it { expect(Mulang::Inspection.parse("Returns:WithNil")).to json_like(type: 'Returns', negated: false, matcher: {type: :with_nil }) }
   it { expect(Mulang::Inspection.parse("Returns:WithTrue")).to json_like(type: 'Returns', negated: false, matcher: {type: :with_true }) }
+  it { expect(Mulang::Inspection.parse("Returns:WithReference:c")).to json_like(type: 'Returns', negated: false, matcher: {type: :with_reference, value: "c" }) }
   it { expect(Mulang::Inspection.parse("Returns:WithChar:'c'")).to json_like(type: 'Returns', negated: false, matcher: {type: :with_char, value: "'c'" }) }
   it { expect(Mulang::Inspection.parse("Returns:WithNumber:2")).to json_like(type: 'Returns', negated: false, matcher: {type: :with_number, value: "2" }) }
   it { expect(Mulang::Inspection.parse("Returns:WithString:'hooper'")).to json_like(type: 'Returns', negated: false, matcher: {type: :with_string, value: "'hooper'" }) }

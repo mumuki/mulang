@@ -70,6 +70,7 @@ data Clause
   | IsNil
   | IsNonliteral
   | IsNumber Double
+  | IsReference String
   | IsSelf
   | IsString String
   | IsSymbol String

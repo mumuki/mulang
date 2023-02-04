@@ -141,6 +141,7 @@ spec = do
     test "within `bar` calls `foo` with (0, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsNumber 0, IsSelf]))
     test "within `bar` calls `foo` with (\"hello\", self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsString "hello", IsSelf]))
     test "within `bar` calls `foo` with (`hello`, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsSymbol "hello", IsSelf]))
+    test "within `bar` calls `foo` with (&`hello`, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsReference "hello", IsSelf]))
     test "within `bar` calls `foo` with ('a', self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsChar 'a', IsSelf]))
     test "within `bar` calls `foo` with (true, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsTrue, IsSelf]))
     test "within `bar` calls `foo` with (false, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsFalse, IsSelf]))
@@ -153,6 +154,10 @@ spec = do
     test "declares function like `total` that (uses not)" (simpleMatching "declares function" (Like "total") (Matching [That (simple "uses not" Any)]))
     test "declares function like `total` that (uses logic)" (simpleMatching "declares function" (Like "total") (Matching [That (simple "uses logic" Any)]))
     test "declares function like `total` that (uses math)" (simpleMatching "declares function" (Like "total") (Matching [That (simple "uses math" Any)]))
+
+    test "calls size with (&`items`)" (simpleMatching "calls size" Any (Matching [IsReference "items"]))
+    test "calls get at with (&`items`, 0)" (simpleMatching "calls get at" Any (Matching [IsReference "items", IsNumber 0.0]))
+    test "calls set at with (&`items`, 0, &`first_item`)" (simpleMatching "calls set at" Any (Matching [IsReference "items", IsNumber 0.0, IsReference "first_item"]))
 
     test "declares function like `total` that (returns that (uses math))" (
       simpleMatching "declares function" (Like "total") (Matching [That (

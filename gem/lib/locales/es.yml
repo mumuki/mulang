@@ -5,12 +5,14 @@ es:
       must_not: no debe
       must: debe
       solution: la solución
+      with_anything: ' con alguna expresión'
       with_char: ' con el carácter <code>%{value}</code>'
       with_false: ' con el valor <code>%{keyword_False}</code>'
       with_literal: ' con un valor literal'
       with_logic: ' con una expresión booleana'
       with_math:  'con una expresión matemática'
       with_nil: ' con <code>%{keyword_Nil}</code>'
+      with_reference: ' con <code>%{value}</code>'
       with_nonliteral: ' con una expresión no literal'
       with_number: ' con el número <code>%{value}</code>'
       with_string: ' con la cadena <code>%{value}</code>'

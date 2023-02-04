@@ -159,11 +159,18 @@ Finally, you can provide a _matcher_ to many of the available expectations, that
 > code.expect 'DeclaresAttribute:WithLiteral'
 => true # because weight is initialized with a literal value
 > code.expect 'DeclaresAttribute:WithNil'
-=> false # because no attribute is initialied with null
+=> false # because no attribute is initialized with null
+> code.expect 'DeclaresVariable:aPlace:WithReference:buenosAires'
+=> true # because the reference buenosAires is assigned to aPlace
+> code.expect 'DeclaresVariable:aBird:WithReference:aPlace'
+=> false # because the reference aPlace is NOT assigned to aBird...
+> code.expect 'aBird', 'Uses:aPlace'
+=> true # ...eventhough it is used
 ```
 
 The complete list of supported matchers is the following:
 
+  * `WithAnything`
   * `WithFalse`
   * `WithLiteral`
   * `WithLogic`
@@ -171,11 +178,35 @@ The complete list of supported matchers is the following:
   * `WithNil`
   * `WithNonliteral`
   * `WithTrue`
+  * `WithReference:value`
   * `WithChar:'value'`
   * `WithSymbol:value`
   * `WithNumber:value`
   * `WithString:"value"`
 
+## Custom expectations
+
+Finally, Mulang support custom expectations, defined using the [EDL]((./edlspec)) language:
+
+```ruby
+> code = Mulang::Code.native "JavaScript", %q{
+  aBird['name'] = 'Norita';
+  aBird['energy'] = 100;
+  aBird.fly(rosario);
+}
+> code.custom_expect %q{
+  expectation "sets `aBird`'s name": calls set at with (&`aBird`, "name");
+  expectation "sets `'Pepita'` as `aBird`'s name": calls set at with (&`aBird`, "name", "Pepita");
+  expectation "assigns `100` to `aBird`'s energy ": calls set at with (&`aBird`, "energy", 100);
+  expectation "makes `aBird`'s fly to `rosario` ": calls `fly` with (&`aBird`, &`rosario`);
+}
+=> {
+ "sets `aBird`'s name"=>true,
+ "sets `'Pepita'` as `aBird`'s name"=>false,
+ "assigns `100` to `aBird`'s energy "=>true,
+ "makes `aBird`'s fly to `rosario` "=>true
+}
+```
 
 # Contributors
 

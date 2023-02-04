@@ -254,6 +254,33 @@ spec = do
     it "is False when using a matcher that does not match" $ do
       (callsMatching (with . isNumber $ 1) anyone) (hs "f = g 2") `shouldBe` False
 
+  describe "callsPrimitive" $ do
+    it "is True on direct usage in entry point" $ do
+      callsPrimitive GetAt (py3 "x[5]") `shouldBe` True
+      callsPrimitive SetAt (py3 "x[5] = 0") `shouldBe` True
+      callsPrimitive Slice (py3 "x[5:6]") `shouldBe` True
+      callsPrimitive Size (py3 "len(x)") `shouldBe` True
+
+    it "is False if there is no usage" $ do
+      callsPrimitive SetAt (py3 "x[5]") `shouldBe` False
+      callsPrimitive Slice (py3 "x[5] = 0") `shouldBe` False
+      callsPrimitive Size (py3 "x[5:6]") `shouldBe` False
+      callsPrimitive GetAt (py3 "len(x)") `shouldBe` False
+
+    it "is True when using a matcher that matches" $ do
+      (callsPrimitiveMatching (with . isString $ "hello") Size) (py3 "len('hello')")                       `shouldBe` True
+      (callsPrimitiveMatching (with isLiteral) Size) (py3 "len('hello')")                                  `shouldBe` True
+      (callsPrimitiveMatching (with isLiteral) Size) (py3 "len([])")                                       `shouldBe` True
+      (callsPrimitiveMatching (withEvery [isAnything, isAnything, isNumber 0]) SetAt) (py3 "x['i'] = 0")   `shouldBe` True
+      (callsPrimitiveMatching (withEvery [isAnything, isString "i", isNumber 0]) SetAt) (py3 "x['i'] = 0") `shouldBe` True
+
+    it "is False when using a matcher that does not match" $ do
+      (callsPrimitiveMatching (with . isString $ "hello") Size) (py3 "len('bye!!')")                       `shouldBe` False
+      (callsPrimitiveMatching (with isLiteral) Size) (py3 "len(greet)")                                    `shouldBe` False
+      (callsPrimitiveMatching (with . isString $ "hello") Size) (py3 "len([])")                            `shouldBe` False
+      (callsPrimitiveMatching (withEvery [isAnything, isAnything, isNumber 0]) SetAt) (py3 "x['i'] = 5")   `shouldBe` False
+      (callsPrimitiveMatching (withEvery [isAnything, isString "i", isNumber 0]) SetAt) (py3 "x['j'] = 0") `shouldBe` False
+
   describe "usesLogic" $ do
     it "is when it is used" $ do
       usesLogic (hs "f x y = x || y")   `shouldBe` True

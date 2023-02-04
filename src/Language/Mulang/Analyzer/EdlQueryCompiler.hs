@@ -12,7 +12,7 @@ import Language.Mulang.Consult (Consult)
 import Language.Mulang.Counter (plus)
 import Language.Mulang.Inspector.Primitive (atLeast, atMost, exactly)
 import Language.Mulang.Inspector.Literal (isNil, isNumber, isBool, isChar, isString, isSymbol, isSelf, isLiteral)
-import Language.Mulang.Analyzer.Synthesizer (decodeIsInspection, decodeUsageInspection, decodeDeclarationInspection)
+import Language.Mulang.Analyzer.Synthesizer (decodeIsInspection, decodeCallsInspection, decodeUsageInspection, decodeDeclarationInspection)
 
 import qualified Language.Mulang.Edl.Expectation as E
 
@@ -93,6 +93,7 @@ compileCounter = f
   f "UsesSwitch"                 m            = plainMatching countSwitches m
   f "UsesWhile"                  m            = plainMatching countWhiles m
   f "UsesYield"                  m            = plainMatching countYiels m
+  f (primitiveCalls -> Just p)   m            = plainMatching (\m -> countPrimitiveCalls m p) m
   f (primitiveUsage -> Just p)   E.Unmatching = plain (countUsesPrimitive p)
   f _                            _            = Nothing
 
@@ -183,6 +184,7 @@ compileInspection = f
   f "UsesType"                         E.Unmatching   = bound usesType
   f "UsesWhile"                        m              = plainMatching usesWhileMatching m
   f "UsesYield"                        m              = plainMatching usesYieldMatching m
+  f (primitiveCalls -> Just p)         m              = plainMatching (\m -> callsPrimitiveMatching m p) m
   f (primitiveDeclaration -> Just p)   E.Unmatching   = plain (declaresPrimitive p)
   f (primitiveUsage -> Just p)         E.Unmatching   = plain (usesPrimitive p)
   f (primitiveEssence -> Just p)       E.Unmatching   = plain (isPrimitive p)
@@ -191,6 +193,7 @@ compileInspection = f
 primitiveEssence = decodeIsInspection
 primitiveUsage = decodeUsageInspection
 primitiveDeclaration = decodeDeclarationInspection
+primitiveCalls = decodeCallsInspection
 
 contextual :: ContextualizedConsult a -> Maybe (ContextualizedBoundConsult a)
 contextual = Just . contextualizedBind
@@ -220,6 +223,7 @@ compileClauses = withEvery . f
     f :: [E.Clause] -> [Inspection]
     f (E.IsAnything:args)       = isAnything : (f args)
     f (E.IsChar value:args)     = isChar value : (f args)
+    f (E.IsReference value:args)= isReference value : (f args)
     f (E.IsFalse:args)          = isBool False : (f args)
     f (E.IsLiteral:args)        = isLiteral : (f args)
     f (E.IsLogic:args)          = usesLogic : (f args)

@@ -20,6 +20,7 @@ import           Control.Monad.Error
 
   and { TAnd {} }
   anything { TAnything {} }
+  reference { TReference {} }
   atLeast { TAtLeast {} }
   atMost { TAtMost {} }
   cand { TCAnd {} }
@@ -161,6 +162,7 @@ Clauses : Clause { [$1] }
 Clause :: { Clause }
 Clause : number { IsNumber . numberValue $ $1 }
   | string { IsString . stringValue $ $1 }
+  | reference { IsReference . referenceValue $ $1 }
   | char { IsChar . charValue $ $1 }
   | symbol { IsSymbol . symbolValue $ $1 }
   | anything { IsAnything }
@@ -194,6 +196,7 @@ scopeOperatorError operator = unlines [
 m (TChar v) = "char " ++ show v ++ " is not expected here"
 m (TIdentifier id) = "Unexpected keyword " ++ id
 m (TNumber v) = "number " ++ show v ++ " is not expected here"
+m (TReference v) = "reference " ++ show v ++ " is not expected here"
 m (TString v) = "string " ++ show v ++ " is not expected here"
 m (TSymbol v) = "symbol " ++ v ++ " is not expected here"
 m TAnd = "and is not expected here"

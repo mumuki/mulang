@@ -1,7 +1,11 @@
 class Mulang::Inspection::Matcher
   include Mulang::Inspection::Compacted
 
-  TYPES = %w(WithChar WithFalse WithLiteral WithLogic WithMath WithNil WithNonliteral WithNumber WithString WithSymbol WithTrue)
+  TYPES = %w(
+    WithAnything WithChar WithFalse WithLiteral
+    WithLogic WithMath WithNil WithNonliteral
+    WithNumber WithReference WithString
+    WithSymbol WithTrue)
 
   attr_accessor :type, :value
 

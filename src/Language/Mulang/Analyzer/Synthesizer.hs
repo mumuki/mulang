@@ -4,6 +4,7 @@ module Language.Mulang.Analyzer.Synthesizer (
   encodeUsageInspection,
   encodeDeclarationInspection,
   decodeIsInspection,
+  decodeCallsInspection,
   decodeUsageInspection,
   decodeDeclarationInspection,
   generateInspectionEncodingRules,
@@ -39,6 +40,9 @@ encodeInspection prefix = (prefix ++) . show
 
 decodeIsInspection :: Decoder Operator
 decodeIsInspection = decodeInspection "Is"
+
+decodeCallsInspection :: Decoder Operator
+decodeCallsInspection = decodeInspection "Calls"
 
 decodeUsageInspection :: Decoder Operator
 decodeUsageInspection = decodeInspection "Uses"

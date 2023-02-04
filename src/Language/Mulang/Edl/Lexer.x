@@ -55,9 +55,10 @@ tokens :-
 
   "%%" ($not_eol_char)* ;  -- skip comments
 
-  ' @char '    { mkChar }
-  \" @string \"     { mkString TString }
+  ' @char '     { mkChar }
+  \" @string \" { mkString TString }
   ` @symbol `   { mkString TSymbol }
+  &` @symbol `  { mkReference }
   ("+" | "-")? @float_number { token TNumber readFloat }
   ("+" | "-")? $digit+ { token TNumber (fromIntegral.readInt) }
 
@@ -134,6 +135,7 @@ data Token
   | TOpenParen
   | TOr
   | TPlus
+  | TReference { referenceValue :: String }
   | TSelf
   | TSemi
   | TSomething
@@ -213,8 +215,13 @@ mkChar :: Action
 mkChar = token TChar (head.tail)
 
 mkString :: (String -> Token) -> Action
-mkString kind = token kind (\str -> drop 1 . take (length str - 1) $ str)
+mkString kind = token kind (stripString 1)
 
 mkIdentifier :: Action
 mkIdentifier = token TIdentifier id
+
+mkReference :: Action
+mkReference = token TReference (stripString 2)
+
+stripString n str = drop n . take (length str - 1) $ str
 }
