@@ -12,8 +12,8 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@21351ecc0a7c196081abca5dc55b08f085efe09a
       with:
-        ruby-version: 2.6.3
-        bundler: 2.1.4
+        ruby-version: 2.7.7
+        bundler: 2.4.6
         bundler-cache: true
     - name: Generate template files
       run: ./generators/run
