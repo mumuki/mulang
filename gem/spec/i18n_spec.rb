@@ -84,6 +84,9 @@ describe Mulang::Expectation::I18n do
     it { expect(expectation('*', "Calls:g:WithLiteral").translate).to eq('a solução deve usar <code>g</code> com um valor literal') }
 
     it { expect(expectation('foo', 'HasEmptyRepeat').translate).to eq('<code>foo</code> tem um <code>repeat</code> vazio') }
+
+    it { expect(expectation('*', 'DeclaresComputationWithArity1:foo').translate).to eq('<code>foo</code> deve ter um parâmetro') }
+
   end
 
   context 'es locale' do
