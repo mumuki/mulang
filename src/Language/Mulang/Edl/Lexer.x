@@ -58,7 +58,7 @@ tokens :-
   ' @char '     { mkChar }
   \" @string \" { mkString TString }
   ` @symbol `   { mkString TSymbol }
-  & @identifier { mkReference }
+  &` @symbol `  { mkReference }
   ("+" | "-")? @float_number { token TNumber readFloat }
   ("+" | "-")? $digit+ { token TNumber (fromIntegral.readInt) }
 
@@ -215,11 +215,13 @@ mkChar :: Action
 mkChar = token TChar (head.tail)
 
 mkString :: (String -> Token) -> Action
-mkString kind = token kind (\str -> drop 1 . take (length str - 1) $ str)
+mkString kind = token kind (stripString 1)
 
 mkIdentifier :: Action
 mkIdentifier = token TIdentifier id
 
 mkReference :: Action
-mkReference = token TReference (drop 1)
+mkReference = token TReference (stripString 2)
+
+stripString n str = drop n . take (length str - 1) $ str
 }

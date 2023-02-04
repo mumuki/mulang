@@ -205,15 +205,6 @@ expectation "`tell` must be called with value 10 and true":
 expectation "`play` must be called with this":
   %% equivalent to * Calls:play:WithSelf
   calls `play` with self;
-
-expectation "uses a repeat with a non-literal amount of iterations":
-  %% matches repeat blocks where the repeat count expression is a non-literal
-  %% and the loop body is anything
-  uses repeat with (nonliteral, anything);
-
-expectation "uses a repeat with a non-literal amount of iterations":
-  %% shorter version of previous example
-  uses repeat with nonliteral;
 ```
 
 Most of the matchers are designed to perform literal queries, but some of them allow more complex matching:
@@ -230,6 +221,18 @@ expectation "a method that performs boolean operations must be declared":
 expectation "`getAge` must not return a hardcoded value":
   %% equivalent to Intransitive:getAge Returns:WithNonliteral
   within `getAge` returns with nonliteral;
+
+expectation "uses a repeat with a non-literal amount of iterations":
+  %% matches repeat blocks where the repeat count expression is a non-literal
+  %% and the loop body is anything
+  uses repeat with (nonliteral, anything);
+
+expectation "uses a repeat with a non-literal amount of iterations":
+  %% shorter version of previous example
+  uses repeat with nonliteral;
+
+expectation "uses items[0] to get first item":
+  calls get at with (&`items`, 0);
 ```
 
 As you can see in previous examples, many of the simplest matchers can also be used in the standard expectation syntax. However, EDL also supports the `that` matcher,
@@ -333,10 +336,11 @@ This is the complete list of inspections that support matchers:
 ### Supported matchers
 
 * `(<matcher1>, <matcher2>.., <matcherN>)`: matches a tuple of expressions, like a callable's arguments or a control structure parts. If less elements than required are passed, the list is padded with `anything` matchers.
-* `<character>`: matches a single character
-* `<number>`: matches a number literal
-* `<string>`: matches a single string
-* `<symbol>`: matches a symbol literal
+* `'<character>'`: matches a single character - e.g. `'h'`
+* `<number>`: matches a number literal - e.g. `5` or `10.9`
+* `"<string>"`: matches a string literal - e.g. `"hello"`
+* `` `<symbol>` ``: matches a symbol literal - e.g. `` `id` ``
+* `` &`<identifier>` ``: matches a reference - e.g. `` &`counter` ``
 * `anything`: matches anything
 * `false` and `true`: matches the `true` and `false` literals
 * `literal`: matches any literal
@@ -428,7 +432,7 @@ expectation "pacakge `vet` must declare a class, enum or interface named `Pet`":
 expectation "`Pet` must declare `eat` and `Owner` must send it":
   %% however in most cases, it is better to declare two different, separate
   %% expectations
-  (within `Pet` declares `eat`) and (within `Owner` sends `eat`);
+  (within `Pet` declares `eat`) and (within `Owner` calls `eat`);
 ```
 
 # ⚠️ Caveats
