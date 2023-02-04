@@ -49,7 +49,7 @@ module Mulang::Language
           expectations: [],
           smellsSet: { tag: 'NoSmells' },
           includeOutputAst: false,
-          normalizationOptions: normalization_options(options)
+          normalizationOptions: normalization_options(**options)
         }.merge(spec).compact
       }
     end
@@ -98,7 +98,7 @@ module Mulang::Language
       }
     end
 
-    def build_analysis(*)
+    def build_analysis(*, **)
       super.deep_merge(spec: {originalLanguage: core_name}.compact)
     end
 

@@ -40,11 +40,11 @@ module Mulang
 
     def expect(binding='*', inspection)
       expectation = Mulang::Expectation.parse(binding: binding, inspection: inspection).as_v2.to_h
-      expectation_results_for(analyse(expectations: [expectation])).first['result']
+      expectation_results_for(analyse({expectations: [expectation]})).first['result']
     end
 
     def custom_expect(edl)
-      expectation_results_for(analyse(customExpectations: edl))
+      expectation_results_for(analyse({customExpectations: edl}))
         .map { |e| [e['expectation']['inspection'], e['result']] }
         .to_h
     end
