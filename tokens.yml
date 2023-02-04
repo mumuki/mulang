@@ -28,6 +28,8 @@ Common:
     Negation: '!'
     NotEqual: '!='
     Slice: 'slice'
+    GetAt: '[]'
+    SetAt: '[]='
     Or: '||'
     Plus: '+'
     Modulo: '%'
