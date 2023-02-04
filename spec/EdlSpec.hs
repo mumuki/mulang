@@ -141,6 +141,7 @@ spec = do
     test "within `bar` calls `foo` with (0, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsNumber 0, IsSelf]))
     test "within `bar` calls `foo` with (\"hello\", self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsString "hello", IsSelf]))
     test "within `bar` calls `foo` with (`hello`, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsSymbol "hello", IsSelf]))
+    test "within `bar` calls `foo` with (&hello, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsReference "hello", IsSelf]))
     test "within `bar` calls `foo` with ('a', self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsChar 'a', IsSelf]))
     test "within `bar` calls `foo` with (true, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsTrue, IsSelf]))
     test "within `bar` calls `foo` with (false, self)" (simpleMatchingWithin "bar" "calls" (Named "foo") (Matching [IsFalse, IsSelf]))

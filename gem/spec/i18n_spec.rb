@@ -72,6 +72,7 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('*', 'CallsSetAt').translate).to eq('solution must use <code>[]=</code>') }
       it { expect(expectation('*', 'CallsSetAt:WithAnything').translate).to eq('solution must use <code>[]=</code> with some expression') }
       it { expect(expectation('*', 'CallsSetAt:WithLiteral').translate).to eq('solution must use <code>[]=</code> with a literal value') }
+      it { expect(expectation('*', 'CallsSetAt:WithReference:x').translate).to eq('solution must use <code>[]=</code> with <code>x</code>') }
     end
   end
 
@@ -90,6 +91,8 @@ describe Mulang::Expectation::I18n do
     it { expect(expectation('foo', 'HasEmptyRepeat').translate).to eq('<code>foo</code> tem um <code>repeat</code> vazio') }
 
     it { expect(expectation('*', 'DeclaresComputationWithArity1:foo').translate).to eq('<code>foo</code> deve ter um parâmetro') }
+
+    it { expect(expectation('*', 'CallsSlice:WithReference:nomes').translate :Python).to eq('a solução deve utilizar <code>[:]</code> com <code>nomes</code>') }
 
   end
 
@@ -117,7 +120,7 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'HasIf').translate(keyword_Repeat: 'repetir')).to eq('<code>foo</code> debe usar <code>if</code>') }
 
       it { expect(expectation('*', 'CallsSize:WithNonliteral').translate :Python).to eq('la solución debe usar <code>len</code> con una expresión no literal') }
-      it { expect(expectation('*', 'CallsSize:WithNonliteral').translate :JavaScript).to eq('la solución debe usar <code>length</code> con una expresión no literal') }
+      it { expect(expectation('*', 'CallsSize:WithReference:y').translate :JavaScript).to eq('la solución debe usar <code>length</code> con <code>y</code>') }
     end
 
     describe 'custom expectations' do

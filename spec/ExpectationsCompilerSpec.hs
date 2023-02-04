@@ -193,6 +193,10 @@ spec = do
     run (Assignment "x" (MuSymbol "foo")) "*" "Assigns:x:WithSymbol:foo" `shouldBe` True
     run (Assignment "x" (MuSymbol "foo")) "*" "Assigns:x:WithSymbol:bar" `shouldBe` False
 
+  it "works with Assigns WithReference" $ do
+    run (Assignment "x" (Reference "foo")) "*" "Assigns:x:WithReference:foo" `shouldBe` True
+    run (Assignment "x" (Reference "foo")) "*" "Assigns:x:WithReference:bar" `shouldBe` False
+
   it "works with Assigns WithChar" $ do
     run (java "class Foo { char x = 'a'; }") "Foo" "Assigns:x:WithChar:'a'" `shouldBe` True
     run (java "class Foo { char x = 'b'; }") "Foo" "Assigns:x:WithChar:'a'" `shouldBe` False

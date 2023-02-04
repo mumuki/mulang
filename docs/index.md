@@ -164,6 +164,7 @@ Finally, you can provide a _matcher_ to many of the available expectations, that
 
 The complete list of supported matchers is the following:
 
+  * `WithAnything`
   * `WithFalse`
   * `WithLiteral`
   * `WithLogic`
@@ -171,6 +172,7 @@ The complete list of supported matchers is the following:
   * `WithNil`
   * `WithNonliteral`
   * `WithTrue`
+  * `WithReference:value`
   * `WithChar:'value'`
   * `WithSymbol:value`
   * `WithNumber:value`

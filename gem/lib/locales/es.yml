@@ -12,6 +12,7 @@ es:
       with_logic: ' con una expresión booleana'
       with_math:  'con una expresión matemática'
       with_nil: ' con <code>%{keyword_Nil}</code>'
+      with_reference: ' con <code>%{value}</code>'
       with_nonliteral: ' con una expresión no literal'
       with_number: ' con el número <code>%{value}</code>'
       with_string: ' con la cadena <code>%{value}</code>'

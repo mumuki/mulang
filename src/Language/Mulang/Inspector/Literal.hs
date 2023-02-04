@@ -1,6 +1,7 @@
 module Language.Mulang.Inspector.Literal (
   isAnything,
   isBool,
+  isReference,
   isChar,
   isNil,
   isNumber,
@@ -32,6 +33,10 @@ isNumber = (==) . MuNumber
 
 isBool :: Bool -> Inspection
 isBool = (==) . MuBool
+
+isReference :: String -> Inspection
+isReference = (==) . Reference
+
 
 isString :: String -> Inspection
 isString = (==) . MuString

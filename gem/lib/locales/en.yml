@@ -12,6 +12,7 @@ en:
       with_logic: ' with a boolean expression'
       with_math:  ' with a math expression'
       with_nil: ' with <code>%{keyword_Nil}</code>'
+      with_reference: ' with <code>%{value}</code>'
       with_nonliteral: ' with a non-literal expression'
       with_number: ' with number <code>%{value}</code>'
       with_string: ' with string <code>%{value}</code>'

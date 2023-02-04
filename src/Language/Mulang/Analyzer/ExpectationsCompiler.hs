@@ -34,6 +34,7 @@ compileCQuery :: [String] -> CQuery
 compileCQuery []                            = compileCQuery ["Parses","*"]
 compileCQuery [verb]                        = compileCQuery [verb,"*"]
 compileCQuery (verb:name:args)              | Map.member name nullaryMatchers = compileCQuery (verb:"*":name:args)
+compileCQuery (verb:"WithReference":args)   = compileCQuery (verb:"*":"WithReference":args)
 compileCQuery (verb:"WithChar":args)        = compileCQuery (verb:"*":"WithChar":args)
 compileCQuery (verb:"WithNumber":args)      = compileCQuery (verb:"*":"WithNumber":args)
 compileCQuery (verb:"WithString":args)      = compileCQuery (verb:"*":"WithString":args)
@@ -53,13 +54,16 @@ compileMatcher = matching . f
     matching [] = Unmatching
     matching xs = Matching xs
 
+    readAsString value = read ("\""++value++"\"")
+
     f :: [String] -> [Clause]
-    f (name:args)               |  Just matcher <- Map.lookup name nullaryMatchers = matcher : f args
-    f ("WithChar":value:args)   =  IsChar (read value) : f args
-    f ("WithNumber":value:args) =  IsNumber (read value) : f args
-    f ("WithString":value:args) =  IsString (read value) : f args
-    f ("WithSymbol":value:args) =  IsSymbol (read ("\""++value++"\"")) : f args
-    f []                        = []
+    f (name:args)                  |  Just matcher <- Map.lookup name nullaryMatchers = matcher : f args
+    f ("WithReference":value:args) =  IsReference (readAsString value) : f args
+    f ("WithChar":value:args)      =  IsChar (read value) : f args
+    f ("WithNumber":value:args)    =  IsNumber (read value) : f args
+    f ("WithString":value:args)    =  IsString (read value) : f args
+    f ("WithSymbol":value:args)    =  IsSymbol (readAsString value) : f args
+    f []                           = []
 
 nullaryMatchers =
   Map.fromList [
