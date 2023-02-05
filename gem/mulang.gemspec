@@ -17,6 +17,7 @@ Gem::Specification.new do |spec|
   spec.files         = Dir['lib/**/*', 'bin/**/*']
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib', 'bin']
+  spec.required_ruby_version = '>= 2.6', '< 3.2'
 
   spec.add_dependency "mumukit-core", '> 1.0'
 
