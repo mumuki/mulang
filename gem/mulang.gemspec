@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "mumukit-core", '> 1.0'
 
   spec.add_development_dependency 'codeclimate-test-reporter'
-  spec.add_development_dependency "activesupport", "~> 5.0"
+  spec.add_development_dependency "activesupport", "~> 6.0"
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "pry", "~> 3.0"
