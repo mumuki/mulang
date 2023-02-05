@@ -6,11 +6,11 @@ on:
 
 jobs:
   test_and_deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
-      uses: ruby/setup-ruby@21351ecc0a7c196081abca5dc55b08f085efe09a
+      uses: ruby/setup-ruby@v1
       with:
         ruby-version: 2.7.7
         bundler: 2.4.6
