@@ -29,5 +29,6 @@ ghcjsExports.astCode = function(ast) {
 };
 
 if (typeof require != 'undefined') {
+  // Will get overriden at release time (see release.sh)
   ghcjsExports.version = require('../package.json').version;
 }
