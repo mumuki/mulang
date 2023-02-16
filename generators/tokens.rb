@@ -27,7 +27,14 @@ def generate_frontend_tokens_list(values, kind)
   end
 end
 
-$tokens = YAML.load(File.read('./tokens.yml'))
+
+tokens_yml = File.read('./tokens.yml')
+begin
+  $tokens = YAML.load(tokens_yml, aliases: true)
+rescue ArgumentError
+  $tokens = YAML.load(tokens_yml)
+end
+
 $operators = $tokens.flat_map { |_, values| values['operators'].map { |operator, _| operator } }.uniq.sort
 $frontend_tokens_table = generate_frontend_tokens_table($tokens)
 $frontend_polyfills_table = generate_frontend_tokens_table($tokens, polyfills: true)

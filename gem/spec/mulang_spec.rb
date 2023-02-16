@@ -10,7 +10,7 @@ describe Mulang::Code do
 
     it { expect(code.ast).to eq "tag"=>"Variable", "contents"=>["x", {"tag"=>"MuNumber", "contents"=>1}] }
     it { expect(code.ast serialization: :bracket).to eq "[Variable[x][MuNumber[1.0]]]" }
-    it { expect(code.analyse expectations: [], smellsSet: { tag: 'NoSmells' }). to eq 'tag'=>'AnalysisCompleted',
+    it { expect(code.analyse({expectations: [], smellsSet: { tag: 'NoSmells' }})). to eq 'tag'=>'AnalysisCompleted',
                                                                                       'outputAst'=>nil,
                                                                                       'outputIdentifiers' => nil,
                                                                                       'transformedAsts' => nil,
@@ -112,7 +112,7 @@ describe Mulang::Code do
 
       it { expect(code.ast).to eq ast }
       it { expect(code.sample).to eq :ast=>ast, :tag=>"MulangSample" }
-      it { expect(code.analyse(expectations: [])).to eq 'tag'=>'AnalysisCompleted',
+      it { expect(code.analyse({expectations: []})).to eq 'tag'=>'AnalysisCompleted',
                                                         'outputAst'=>nil,
                                                         'outputIdentifiers' => nil,
                                                         'transformedAsts' => nil,
@@ -127,7 +127,7 @@ describe Mulang::Code do
 
       it { expect(code.ast).to be nil }
       it { expect(code.sample).to eq :ast=>nil, :tag=>"MulangSample" }
-      it { expect(code.analyse(expectations: [])).to eq 'tag'=>'AnalysisFailed',
+      it { expect(code.analyse({expectations: []})).to eq 'tag'=>'AnalysisFailed',
                                                         'reason'=>'missing AST' }
     end
 
@@ -136,7 +136,7 @@ describe Mulang::Code do
 
       it { expect(code.ast).to be nil }
       it { expect(code.sample).to eq :ast=>nil, :tag=>"MulangSample" }
-      it { expect(code.analyse(expectations: [])).to eq 'tag'=>'AnalysisFailed',
+      it { expect(code.analyse({expectations: []})).to eq 'tag'=>'AnalysisFailed',
                                                         'reason'=>'missing AST' }
     end
 
@@ -189,8 +189,8 @@ describe Mulang::Code do
     end
 
     it do
-      expect(code.analyse(includeOutputAst: true,
-                          normalizationOptions: {insertImplicitReturn: true})).to eq 'expectationResults' => [],
+      expect(code.analyse({includeOutputAst: true,
+                          normalizationOptions: {insertImplicitReturn: true}})).to eq 'expectationResults' => [],
                                                                                     'outputAst' => {
                                                                                       'tag'=>'Procedure',
                                                                                       'contents'=>['x', [[[], {
@@ -214,7 +214,7 @@ describe Mulang::Code do
       it { expect(code.language.name).to eq 'Ruby' }
       it { expect(code.language.core_name).to eq 'Ruby' }
       it { expect(code.ast_analysis[:spec][:originalLanguage]).to eq 'Ruby' }
-      it { expect(code.analyse(smellsSet: {tag: :NoSmells, include: ['HasWrongCaseIdentifiers']})['smells']).to eq [] }
+      it { expect(code.analyse({smellsSet: {tag: :NoSmells, include: ['HasWrongCaseIdentifiers']}})['smells']).to eq [] }
       it { expect(code.ast serialization: :bracket).to eq bracket_ast }
     end
 
@@ -223,7 +223,7 @@ describe Mulang::Code do
       it { expect(code.language.name).to eq 'C#' }
       it { expect(code.language.core_name).to be nil }
       it { expect(code.ast_analysis[:spec][:originalLanguage]).to be nil }
-      it { expect(code.analyse(smellsSet: {tag: :NoSmells, include: ['HasWrongCaseIdentifiers']})['smells']).to eq [{"binding"=>"drive!", "inspection"=>"HasWrongCaseIdentifiers"}] }
+      it { expect(code.analyse({smellsSet: {tag: :NoSmells, include: ['HasWrongCaseIdentifiers']}})['smells']).to eq [{"binding"=>"drive!", "inspection"=>"HasWrongCaseIdentifiers"}] }
       it { expect(code.ast serialization: :bracket).to eq bracket_ast }
     end
 
@@ -232,7 +232,7 @@ describe Mulang::Code do
       it { expect(code.language.name).to be nil }
       it { expect(code.language.core_name).to be nil }
       it { expect(code.ast_analysis[:spec][:originalLanguage]).to be nil }
-      it { expect(code.analyse(smellsSet: {tag: :NoSmells, include: ['HasWrongCaseIdentifiers']})['smells']).to eq [{"binding"=>"drive!", "inspection"=>"HasWrongCaseIdentifiers"}] }
+      it { expect(code.analyse({smellsSet: {tag: :NoSmells, include: ['HasWrongCaseIdentifiers']}})['smells']).to eq [{"binding"=>"drive!", "inspection"=>"HasWrongCaseIdentifiers"}] }
       it { expect(code.ast serialization: :bracket).to eq bracket_ast }
     end
   end
@@ -256,8 +256,8 @@ describe Mulang::Code do
     end
 
     it do
-      expect(code.analyse(includeOutputAst: true,
-                          normalizationOptions: {insertImplicitReturn: true})).to eq 'expectationResults' => [],
+      expect(code.analyse({includeOutputAst: true,
+                          normalizationOptions: {insertImplicitReturn: true}})).to eq 'expectationResults' => [],
                                                                                       'outputAst' => {
                                                                                         'tag'=>'Procedure',
                                                                                         'contents'=>['x', [[[], {

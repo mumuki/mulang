@@ -16,6 +16,11 @@ if [[ -z $CHANGELOG_GITHUB_TOKEN ]]; then
   exit 1
 fi
 
+if ! github_changelog_generator --version; then
+  echo "github_changelog_generator not installed. Install it first"
+  exit 1
+fi
+
 echo "[Mulang] Updating version..."
 sed -i -r "s/version:             ${VERSION_REGEXP}/version:             ${NEW_VERSION}/" mulang.cabal
 sed -i -r "s/version = \"${VERSION_REGEXP}\"/version = \"${NEW_VERSION}\"/"               app/Version.hs

@@ -1,5 +1,22 @@
 # Changelog
 
+## [v6.10.0](https://github.com/mumuki/mulang/tree/v6.10.0) (2023-02-04)
+
+[Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.9...v6.10.0)
+
+**Closed issues:**
+
+- UsesComprehension expectation in Python [\#335](https://github.com/mumuki/mulang/issues/335)
+- Ruby methods with self as a receiver aren't being parsed correctly [\#173](https://github.com/mumuki/mulang/issues/173)
+
+**Merged pull requests:**
+
+- Feature calls primitive [\#352](https://github.com/mumuki/mulang/pull/352) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature misc python improvements [\#351](https://github.com/mumuki/mulang/pull/351) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature parse keyword arguments [\#350](https://github.com/mumuki/mulang/pull/350) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature python comprehensions [\#349](https://github.com/mumuki/mulang/pull/349) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature parse Python subscripts [\#348](https://github.com/mumuki/mulang/pull/348) ([flbulgarelli](https://github.com/flbulgarelli))
+
 ## [v6.0.9](https://github.com/mumuki/mulang/tree/v6.0.9) (2022-04-20)
 
 [Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.8...v6.0.9)
