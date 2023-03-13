@@ -5,5 +5,5 @@ import Language.Mulang.Transform.Normalizer (unnormalized, NormalizationOptions(
 pythonNormalizationOptions :: NormalizationOptions
 pythonNormalizationOptions = unnormalized {
   sortSequenceDeclarations = SortAllNonVariables,
-  convertPartialProcedureIntoFunction = True
+  convertProcedureByPartsIntoFunction = True
 }

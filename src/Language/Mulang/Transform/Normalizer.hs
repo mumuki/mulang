@@ -25,7 +25,7 @@ data NormalizationOptions = NormalizationOptions {
   convertObjectLevelLambdaVariableIntoMethod :: Bool,
   convertObjectLevelVariableIntoAttribute :: Bool,
   convertObjectIntoDict :: Bool,
-  convertPartialProcedureIntoFunction :: Bool,
+  convertProcedureByPartsIntoFunction :: Bool,
   sortSequenceDeclarations :: SequenceSortMode,
   insertImplicitReturn :: Bool,
   compactSequences :: Bool,
@@ -47,7 +47,7 @@ unnormalized = NormalizationOptions {
   convertObjectLevelLambdaVariableIntoMethod = False,
   convertObjectLevelVariableIntoAttribute = False,
   convertObjectIntoDict = False,
-  convertPartialProcedureIntoFunction = False,
+  convertProcedureByPartsIntoFunction = False,
   sortSequenceDeclarations = SortNothing,
   insertImplicitReturn = False,
   compactSequences = False,
@@ -61,7 +61,7 @@ normalize ops (Application (Primitive op) [e1, e2]) | isCommutative op = Applica
 normalize ops (LValue n (Lambda vars e))            | convertLambdaVariableIntoFunction ops = SimpleFunction n vars (normalize ops e)
 normalize ops (LValue n (MuObject e))               | convertObjectVariableIntoObject ops = Object n (normalizeObjectLevel ops e)
 normalize ops (MuObject e)                          | convertObjectIntoDict ops = MuDict . normalize ops . normalizeArrows $ e
-normalize ops (SimpleProcedure name params body)    | convertPartialProcedureIntoFunction ops && isPartialBody body = SimpleFunction name params (normalize ops body)
+normalize ops (SimpleProcedure name params body)    | convertProcedureByPartsIntoFunction ops && isBodyByParts body = SimpleFunction name params (normalize ops body)
 normalize ops (Object n e)                          = Object n (normalizeObjectLevel ops e)
 normalize ops (Sequence es)                         = normalizeSequence ops . sortDeclarations ops .  mapNormalize ops $ es
 --
@@ -109,17 +109,17 @@ normalizeObjectLevel ops (LValue n e)                 | convertObjectLevelVariab
 normalizeObjectLevel ops (Sequence es)                = normalizeSequence ops (map (normalizeObjectLevel ops) es)
 normalizeObjectLevel ops e                            = normalize ops e
 
-isPartialBody (If _ ifTrue ifFalse)           = isPartialBranch ifTrue && isPartialBranch ifFalse
-isPartialBody (Sequence
+isBodyByParts (If _ ifTrue ifFalse)           = isBodyPart ifTrue && isBodyPart ifFalse
+isBodyByParts (Sequence
                 (reverse ->
-                  (If _ ifTrue ifFalse) : _)) = isPartialBranch ifTrue && isPartialBranch ifFalse
-isPartialBody _                               = False
+                  (If _ ifTrue ifFalse) : _)) = isBodyPart ifTrue && isBodyPart ifFalse
+isBodyByParts _                               = False
 
-isPartialBranch (Return _)           = True
-isPartialBranch (Sequence
-                  (reverse ->
-                    (Return _ : _))) = True
-isPartialBranch _                    = False
+isBodyPart (Return _)            = True
+isBodyPart (Sequence
+              (reverse ->
+                (Return _ : _))) = True
+isBodyPart _                     = False
 
 normalizeEquation :: NormalizationOptions -> Equation -> Equation
 normalizeEquation ops = mapEquation (normalize ops) (normalizeBody ops)
