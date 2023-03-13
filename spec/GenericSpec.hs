@@ -86,6 +86,15 @@ spec = do
       it "is True when functions is declared" $ do
         declaresFunction (named "f") (js "function f(x) {return 1}") `shouldBe` True
 
+      it "is True when a function by parts is declared" $ do
+        declaresFunction (named "f") (js "function f(x) { if (x > 4) { return 1 } else { return 5 } }") `shouldBe` True
+
+      it "is True when a function by parts is declared using an imperative style" $ do
+        declaresFunction (named "f") (js "function f(x) { if (x > 4) { return 1 } return 5 }") `shouldBe` True
+
+      it "is False when a partial function is declared" $ do
+        declaresFunction (named "f") (js "function f(x) { if (x > 4) { return 1 } }") `shouldBe` False
+
       it "is True when functions is declared" $ do
         declaresFunction (named "f") (js "function f(x) {return 1}") `shouldBe` True
 
