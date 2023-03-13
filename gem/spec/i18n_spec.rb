@@ -152,6 +152,8 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('foo', 'Uses').translate).to eq('<code>foo</code> debe delegar') }
       it { expect(expectation('foo', 'Delegates').translate).to eq('<code>foo</code> debe delegar') }
       it { expect(expectation('foo', 'UsesForall').translate :Prolog).to eq('<code>foo</code> debe utilizar <code>forall</code>') }
+      it { expect(expectation('foo', 'UsesForeach').translate :Python).to eq('<code>foo</code> debe usar <code>for..in</code>') }
+      it { expect(expectation('foo', 'UsesForeach').translate :JavaScript).to eq('<code>foo</code> debe usar <code>for..of</code>') }
 
       it { expect(expectation('foo', 'Not:Uses:=baz').translate).to eq('<code>foo</code> no debe utilizar <code>baz</code>') }
       it { expect(expectation('foo', 'Not:Uses:~baz').translate).to eq('<code>foo</code> no debe delegar en algo parecido a <code>baz</code>') }

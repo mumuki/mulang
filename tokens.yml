@@ -123,6 +123,7 @@ JavaScript:
   keywords:
     <<: *common_keywords
     Self: 'this'
+    ForEach: 'for..of'
   operators:
     <<: *common_operators
     Size:
@@ -144,6 +145,7 @@ Python:
     'Null': 'None'
     'True': 'True'
     Self: 'self'
+    ForEach: 'for..in'
   operators:
     <<: *common_operators
     NotEqual:
