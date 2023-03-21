@@ -547,6 +547,32 @@ spec = do
       it "is True when exists" $ do
         declaresComputation (named "x") (hs "x _ = True") `shouldBe` True
 
+    describe "with matchers" $ do
+      it "is True when using a matcher that matches" $ do
+        (declaresComputationMatching (with isSelf) anyone) (js "function f(x) { this; return 0; }") `shouldBe` True
+        (declaresComputationMatching (with isSelf) anyone) (js "function f(x) { this; }") `shouldBe` True
+
+      it "is False when using a matcher that does not match" $ do
+        (declaresComputationMatching (with isSelf) anyone) (js "function f(x) { return 0; }") `shouldBe` False
+        (declaresComputationMatching (with isSelf) anyone) (js "function f(x) { }") `shouldBe` False
+
+      it "is True when using a non literal returns matcher that matches" $ do
+        (declaresComputationMatching (with (returnsMatching (with (isNumber 2)))) anyone) (js "function f() { return 2; }") `shouldBe` True
+
+      it "is False when using a non literal returns matcher that doesn't match" $ do
+        (declaresComputationMatching (with (returnsMatching (with (isNumber 2)))) anyone) (js "function f() { return 3; }") `shouldBe` False
+
+      it "is True when using a non literal assigns matcher that matches" $ do
+        (declaresComputationMatching (with (assignsMatching (with (isNumber 2)) anyone)) anyone) (js "function f() { window.aGlobal = 2; }") `shouldBe` True
+
+      it "is False when using a non literal assigns matcher that doesn't match" $ do
+        (declaresComputationMatching (with (assignsMatching (with (isNumber 2)) anyone)) anyone) (js "function f() { window.aGlobal = 3; }") `shouldBe` False
+
+      it "is False when using a literal matcher and it does not match literally" $ do
+        (declaresComputationMatching (with . isNumber $ 2) anyone) (js "function f() { return 2; }") `shouldBe` False
+        (declaresComputationMatching (with . isNumber $ 2) anyone) (js "function f() { window.aGlobal = 2 }") `shouldBe` False
+
+
   describe "declares" $ do
     describe "with constants" $ do
       it "is True when exists" $ do

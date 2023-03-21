@@ -17,7 +17,8 @@ module Language.Mulang.Inspector.Generic (
   declares,
   declaresComputation,
   declaresComputationWithArity,
-  declaresComputationWithArity',
+  declaresComputationMatching,
+  declaresComputationWithArityMatching,
   declaresEntryPoint,
   declaresEntryPointMatching,
   declaresFunction,
@@ -187,16 +188,22 @@ declaresEntryPointMatching matcher = containsBoundDeclaration f
         f _                 = False
 
 -- | Inspection that tells whether a top level computation declaration exists
-declaresComputation :: BoundInspection
-declaresComputation = declaresComputationWithArity' (const True)
+declaresComputation ::BoundInspection
+declaresComputation = unmatching declaresComputationMatching
+
+declaresComputationMatching :: Matcher -> BoundInspection
+declaresComputationMatching = declaresComputationWithArityMatching' (const True)
 
 declaresComputationWithArity :: Int -> BoundInspection
-declaresComputationWithArity arity = declaresComputationWithArity' (== arity)
+declaresComputationWithArity arity = unmatching (declaresComputationWithArityMatching arity)
 
-declaresComputationWithArity' :: (Int -> Bool) -> BoundInspection
-declaresComputationWithArity' arityPredicate = containsBoundDeclaration f
-  where f (Subroutine _ es)       = any equationArityIs es
-        f (Clause _ args _)       = argsHaveArity args
+declaresComputationWithArityMatching :: Int -> Matcher -> BoundInspection
+declaresComputationWithArityMatching arity = declaresComputationWithArityMatching' (== arity)
+
+declaresComputationWithArityMatching' :: (Int -> Bool) -> Matcher -> BoundInspection
+declaresComputationWithArityMatching' arityPredicate matcher = containsBoundDeclaration f
+  where f (Subroutine _ eqs)       = any equationArityIs eqs && matches matcher equationsExpandedExpressions eqs
+        f (Clause _ args es)       = argsHaveArity args && matcher es
         f _  = False
 
         equationArityIs (Equation args _) = argsHaveArity args
