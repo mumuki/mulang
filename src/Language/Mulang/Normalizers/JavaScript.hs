@@ -9,5 +9,6 @@ javaScriptNormalizationOptions = unnormalized {
   convertObjectLevelFunctionIntoMethod = True,
   convertObjectLevelLambdaVariableIntoMethod = True,
   convertObjectLevelVariableIntoAttribute = True,
-  sortSequenceDeclarations = SortUniqueNonVariables
+  sortSequenceDeclarations = SortUniqueNonVariables,
+  convertProcedureByPartsIntoFunction = True
 }

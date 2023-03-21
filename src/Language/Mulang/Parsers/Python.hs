@@ -1,4 +1,5 @@
 module Language.Mulang.Parsers.Python (
+  npy,
   py,
   py2,
   py3,
@@ -10,9 +11,11 @@ import qualified Language.Mulang.Ast as M
 import qualified Language.Mulang.Ast.Operator as O
 import           Language.Mulang.Builder (compactMap, compactTuple)
 import           Language.Mulang.Parsers
+import           Language.Mulang.Transform.Normalizer (normalize)
 
 import qualified Language.Python.Version3.Parser as Python3
 import qualified Language.Python.Version2.Parser as Python2
+import           Language.Mulang.Normalizers.Python (pythonNormalizationOptions)
 import           Language.Python.Common.Token (Token)
 import           Language.Python.Common.AST
 
@@ -23,7 +26,8 @@ import           Data.Maybe (fromMaybe, listToMaybe)
 import           Control.Fallible
 import           Control.Monad (msum)
 
-py, py2, py3 :: Parser
+npy, py, py2, py3 :: Parser
+npy = normalize pythonNormalizationOptions . py
 py = py3
 py2 = parsePythonOrFail Python2.parseModule
 py3 = parsePythonOrFail Python3.parseModule

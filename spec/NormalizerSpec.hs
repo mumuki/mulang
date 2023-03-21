@@ -6,14 +6,12 @@ module NormalizerSpec (spec) where
   import           Language.Mulang.Parsers.Haskell (hs)
   import           Language.Mulang.Parsers.Java (java)
   import           Language.Mulang.Parsers.JavaScript (js)
-  import           Language.Mulang.Parsers.Python (py)
+  import           Language.Mulang.Parsers.Python (npy, py)
   import           Language.Mulang.Normalizers.Java (javaNormalizationOptions)
-  import           Language.Mulang.Normalizers.Python (pythonNormalizationOptions)
   import           Language.Mulang.Normalizers.Haskell (haskellNormalizationOptions)
   import           Language.Mulang.Transform.Normalizer
 
   njava = normalize javaNormalizationOptions . java
-  npy = normalize pythonNormalizationOptions . py
   nhs = normalize haskellNormalizationOptions . hs
 
   spec :: Spec
@@ -79,10 +77,10 @@ module NormalizerSpec (spec) where
       let n = normalize options
 
       it "does not insert return in single literal statement" $ do
-        n (py "def x(): x = 1") `shouldBe`  SimpleProcedure "x" [] (Assignment "x" (MuNumber 1.0))
+        n (npy "def x(): x = 1") `shouldBe`  SimpleProcedure "x" [] (Assignment "x" (MuNumber 1.0))
 
       it "inserts return in single literal expression" $ do
-        n (py "def x(): 3") `shouldBe`  SimpleProcedure "x" [] (Return (MuNumber 3.0))
+        n (npy "def x(): 3") `shouldBe`  SimpleProcedure "x" [] (Return (MuNumber 3.0))
 
       it "does not insert return in empty block" $ do
         n (SimpleFunction "x" [] None) `shouldBe`  (SimpleFunction "x" [] None)

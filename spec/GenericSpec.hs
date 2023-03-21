@@ -16,7 +16,7 @@ import           Language.Mulang.Normalizers.Haskell (haskellNormalizationOption
 import           Language.Mulang.Parsers.Haskell
 import           Language.Mulang.Parsers.Java (java)
 import           Language.Mulang.Parsers.JavaScript
-import           Language.Mulang.Parsers.Python (py2, py3)
+import           Language.Mulang.Parsers.Python (npy, py2, py3)
 import           Language.Mulang.Transform.Normalizer
 
 nhs = normalize haskellNormalizationOptions . hs
@@ -82,9 +82,28 @@ spec = do
       it "is False when constant is declared with a variable literal" $ do
         declaresFunction (named "f") (hs "f = snd") `shouldBe` False
 
+    describe "with function declarations, npy" $ do
+      it "is True when a function by parts is declared" $ do
+        declaresFunction (named "f") (npy "def f(x):\n\tif x > 4:\n\t\treturn 1\n\telse:\n\t\treturn 5") `shouldBe` True
+
+      it "is True when a function by parts is declared using an imperative style" $ do
+        declaresFunction (named "f") (npy "def f(x):\n\tif x > 4:\n\t\treturn 1\n\treturn 5") `shouldBe` True
+
+      it "is False when a partial function is declared" $ do
+        declaresFunction (named "f") (npy "def f(x):\n\tif x > 4:\n\t\treturn 1\n") `shouldBe` False
+
     describe "with function declarations, js" $ do
       it "is True when functions is declared" $ do
         declaresFunction (named "f") (js "function f(x) {return 1}") `shouldBe` True
+
+      it "is True when a function by parts is declared" $ do
+        declaresFunction (named "f") (js "function f(x) { if (x > 4) { return 1 } else { return 5 } }") `shouldBe` True
+
+      it "is True when a function by parts is declared using an imperative style" $ do
+        declaresFunction (named "f") (js "function f(x) { if (x > 4) { return 1 } return 5 }") `shouldBe` True
+
+      it "is False when a partial function is declared" $ do
+        declaresFunction (named "f") (js "function f(x) { if (x > 4) { return 1 } }") `shouldBe` False
 
       it "is True when functions is declared" $ do
         declaresFunction (named "f") (js "function f(x) {return 1}") `shouldBe` True

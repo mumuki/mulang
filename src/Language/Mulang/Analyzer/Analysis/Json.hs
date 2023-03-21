@@ -28,6 +28,7 @@ instance FromJSON NormalizationOptions where
         <*> v .:? "convertObjectLevelLambdaVariableIntoMethod"    .!= convertObjectLevelLambdaVariableIntoMethod d
         <*> v .:? "convertObjectLevelVariableIntoAttribute"       .!= convertObjectLevelVariableIntoAttribute d
         <*> v .:? "convertObjectIntoDict"                         .!= convertObjectIntoDict d
+        <*> v .:? "convertProcedureByPartsIntoFunction"           .!= convertProcedureByPartsIntoFunction d
         <*> v .:? "sortSequenceDeclarations"                      .!= sortSequenceDeclarations d
         <*> v .:? "insertImplicitReturn"                          .!= insertImplicitReturn d
         <*> v .:? "compactSequences"                              .!= compactSequences d
