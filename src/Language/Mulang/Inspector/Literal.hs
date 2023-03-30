@@ -5,8 +5,10 @@ module Language.Mulang.Inspector.Literal (
   isChar,
   isNil,
   isNumber,
+  isAnyNumber,
   isSelf,
   isString,
+  isAnyString,
   isSymbol,
   isLogic,
   isMath,
@@ -31,15 +33,22 @@ isNil = (==) MuNil
 isNumber :: Double -> Inspection
 isNumber = (==) . MuNumber
 
+isAnyNumber :: Inspection
+isAnyNumber (MuNumber _) = True
+isAnyNumber _            = False
+
 isBool :: Bool -> Inspection
 isBool = (==) . MuBool
 
 isReference :: String -> Inspection
 isReference = (==) . Reference
 
-
 isString :: String -> Inspection
 isString = (==) . MuString
+
+isAnyString :: Inspection
+isAnyString (MuString _) = True
+isAnyString _            = False
 
 isChar :: Char -> Inspection
 isChar = (==) . MuChar

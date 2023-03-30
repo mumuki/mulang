@@ -348,6 +348,8 @@ This is the complete list of inspections that support matchers:
 * `math`: matches an arithmetic expresion
 * `nil`: matches the nil/null literal
 * `nonliteral`: matches a non-literal expression
+* `anystring`: matches any string literal
+* `anynumber`: matches any numeric literal
 * `self`: matches the self/this literal
 * `that (<other query>)`: matches an expression that makes the given query true
 
