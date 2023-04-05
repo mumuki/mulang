@@ -47,12 +47,12 @@ spec = do
       isNonliteral (MuNumber 4) `shouldBe` False
 
     it "works with anynumber and anystring" $ do
-      isAnyNumber MuNil `shouldBe` False
-      isAnyNumber (MuString "Nil") `shouldBe` False
-      isAnyNumber MuTrue `shouldBe` False
-      isAnyNumber (MuNumber 4) `shouldBe` True
-
       isAnyString MuNil `shouldBe` False
       isAnyString (MuString "Nil") `shouldBe` True
       isAnyString MuTrue `shouldBe` False
       isAnyString (MuNumber 4) `shouldBe` False
+
+      isAnyNumber MuNil `shouldBe` False
+      isAnyNumber (MuString "Nil") `shouldBe` False
+      isAnyNumber MuTrue `shouldBe` False
+      isAnyNumber (MuNumber 4) `shouldBe` True

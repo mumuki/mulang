@@ -5,7 +5,8 @@ class Mulang::Inspection::Matcher
     WithAnything WithChar WithFalse WithLiteral
     WithLogic WithMath WithNil WithNonliteral
     WithNumber WithReference WithString
-    WithSymbol WithTrue)
+    WithSymbol WithTrue
+    WithAnyString WithAnyNumber)
 
   attr_accessor :type, :value
 

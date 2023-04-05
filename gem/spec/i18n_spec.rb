@@ -73,6 +73,9 @@ describe Mulang::Expectation::I18n do
       it { expect(expectation('*', 'CallsSetAt:WithAnything').translate).to eq('solution must use <code>[]=</code> with some expression') }
       it { expect(expectation('*', 'CallsSetAt:WithLiteral').translate).to eq('solution must use <code>[]=</code> with a literal value') }
       it { expect(expectation('*', 'CallsSetAt:WithReference:x').translate).to eq('solution must use <code>[]=</code> with <code>x</code>') }
+
+      it { expect(expectation('*', 'CallsPlus:WithAnyString').translate).to eq('solution must use <code>+</code> with a string literal') }
+      it { expect(expectation('*', 'CallsPlus:WithAnyNumber').translate).to eq('solution must use <code>+</code> with a number literal') }
     end
   end
 
@@ -94,6 +97,8 @@ describe Mulang::Expectation::I18n do
 
     it { expect(expectation('*', 'CallsSlice:WithReference:nomes').translate :Python).to eq('a solução deve utilizar <code>[:]</code> com <code>nomes</code>') }
 
+    it { expect(expectation('*', 'CallsPlus:WithAnyString').translate).to eq('a solução deve utilizar <code>+</code> com uma string literal') }
+    it { expect(expectation('*', 'CallsPlus:WithAnyNumber').translate).to eq('a solução deve utilizar <code>+</code> com um número literal') }
   end
 
   context 'es locale' do
@@ -121,6 +126,9 @@ describe Mulang::Expectation::I18n do
 
       it { expect(expectation('*', 'CallsSize:WithNonliteral').translate :Python).to eq('la solución debe usar <code>len</code> con una expresión no literal') }
       it { expect(expectation('*', 'CallsSize:WithReference:y').translate :JavaScript).to eq('la solución debe usar <code>length</code> con <code>y</code>') }
+
+      it { expect(expectation('*', 'CallsPlus:WithAnyString').translate).to eq('la solución debe usar <code>+</code> con un string literal') }
+      it { expect(expectation('*', 'CallsPlus:WithAnyNumber').translate).to eq('la solución debe usar <code>+</code> con un número literal') }
     end
 
     describe 'custom expectations' do

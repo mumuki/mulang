@@ -176,8 +176,8 @@ Clause : number { IsNumber . numberValue $ $1 }
   | math { IsMath }
   | nil { IsNil }
   | nonliteral { IsNonliteral }
-  | anynumber { IsAnyNumber }
   | anystring { IsAnyString }
+  | anynumber { IsAnyNumber }
   | self { IsSelf }
   | true { IsTrue }
   | something that openParen TopQuery closeParen { That $4 }
@@ -226,8 +226,8 @@ m TLogic = "logic is not expected here"
 m TMath = "math is not expected here"
 m TNil = "nil is not expected here"
 m TNonliteral = "nonliteral is not expected here"
-m TAnyNumber = "anynumber is not expected here"
 m TAnyString = "anystring is not expected here"
+m TAnyNumber = "anynumber is not expected here"
 m TNot = "not is not expected here"
 m TOpenParen = "Unexpected )"
 m TOr = "or is not expected here"

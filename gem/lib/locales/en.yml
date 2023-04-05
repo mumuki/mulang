@@ -9,6 +9,8 @@ en:
       with_char: ' with character <code>%{value}</code>'
       with_false: ' with value <code>%{keyword_False}</code>'
       with_literal: ' with a literal value'
+      with_any_string: ' with a string literal'
+      with_any_number: ' with a number literal'
       with_logic: ' with a boolean expression'
       with_math:  ' with a math expression'
       with_nil: ' with <code>%{keyword_Nil}</code>'

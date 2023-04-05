@@ -2,7 +2,7 @@ hljs.registerLanguage('edl', () => {
   return {
     k: {
       keyword: "count except in like unlike something somewhere expectation that through with within",
-      literal: "anything false logic math nil self true literal nonliteral",
+      literal: "anything false logic math nil self true literal nonliteral anystring anynumber",
       built_in: "and or not"
     },
     c: [

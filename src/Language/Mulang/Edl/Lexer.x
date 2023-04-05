@@ -88,8 +88,8 @@ tokens :-
   "math" { symbolToken TMath }
   "nil" { symbolToken TNil }
   "nonliteral" { symbolToken TNonliteral }
-  "anynumber" { symbolToken TAnyNumber }
   "anystring" { symbolToken TAnyString }
+  "anynumber" { symbolToken TAnyNumber }
   "not" { symbolToken TNot }
   "or" { symbolToken TOr }
   "self" { symbolToken TSelf }
