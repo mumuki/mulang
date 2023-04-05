@@ -26,5 +26,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "pry", "~> 3.0"
 
-  spec.required_ruby_version = '>= 3.0'
+  spec.required_ruby_version = '>= 2.3'
 end
