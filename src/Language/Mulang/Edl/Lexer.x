@@ -88,6 +88,8 @@ tokens :-
   "math" { symbolToken TMath }
   "nil" { symbolToken TNil }
   "nonliteral" { symbolToken TNonliteral }
+  "anystring" { symbolToken TAnyString }
+  "anynumber" { symbolToken TAnyNumber }
   "not" { symbolToken TNot }
   "or" { symbolToken TOr }
   "self" { symbolToken TSelf }
@@ -130,6 +132,8 @@ data Token
   | TMath
   | TNil
   | TNonliteral
+  | TAnyString
+  | TAnyNumber
   | TNot
   | TNumber { numberValue :: Double }
   | TOpenParen

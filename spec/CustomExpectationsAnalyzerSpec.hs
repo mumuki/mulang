@@ -90,6 +90,13 @@ spec = describe "ExpectationsAnalyzer" $ do
     (run JavaScript "function totalAmount() { return 2 }" test) `shouldReturn` nok
     (run JavaScript "function totalAmount() { return null }" test) `shouldReturn` ok
 
+  it "evaluates calls plus with anynumber" $ do
+    let test = "expectation: calls plus with (anything, anynumber)"
+
+    (run JavaScript "function totalAmount(x) { return x + 2 }" test) `shouldReturn` ok
+    (run JavaScript "function totalAmount(x) { return x + ';'  }" test) `shouldReturn` nok
+
+
   it "evaluates returns with math" $ do
     let test = "expectation: returns with math"
 

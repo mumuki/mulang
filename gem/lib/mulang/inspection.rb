@@ -12,7 +12,7 @@ module Mulang
       ^(?<negation>Not:)?
       (?<type>[^:]+)
       (
-        :(?<matcher>WithAnything|WithLiteral|WithNonliteral|WithLogic|WithMath|WithFalse|WithNil|WithTrue) |
+        :(?<matcher>WithAnything|WithLiteral|WithNonliteral|WithAnyString|WithAnyNumber|WithLogic|WithMath|WithFalse|WithNil|WithTrue) |
         :(?<matcher>WithReference|WithChar|WithNumber|WithString|WithSymbol):(?<value>[^:]+) |
         :(?<target>[^:]+)(:(?<matcher>[^:]+)(:(?<value>[^:]+))?)?
       )?$}.gsub(/\s/, '')

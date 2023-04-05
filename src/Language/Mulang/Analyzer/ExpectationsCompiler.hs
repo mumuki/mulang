@@ -74,5 +74,7 @@ nullaryMatchers =
     ("WithMath", IsMath),
     ("WithNil", IsNil),
     ("WithNonliteral", IsNonliteral),
+    ("WithAnyString", IsAnyString),
+    ("WithAnyNumber", IsAnyNumber),
     ("WithTrue", IsTrue)
   ]

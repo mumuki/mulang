@@ -69,6 +69,8 @@ data Clause
   | IsMath
   | IsNil
   | IsNonliteral
+  | IsAnyString
+  | IsAnyNumber
   | IsNumber Double
   | IsReference String
   | IsSelf

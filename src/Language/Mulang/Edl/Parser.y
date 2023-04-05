@@ -20,6 +20,8 @@ import           Control.Monad.Error
 
   and { TAnd {} }
   anything { TAnything {} }
+  anystring { TAnyString {} }
+  anynumber { TAnyNumber {} }
   reference { TReference {} }
   atLeast { TAtLeast {} }
   atMost { TAtMost {} }
@@ -117,6 +119,8 @@ Inspection : identifier { identifierValue $1 }
 Keyword :: { String }
 Keyword : and { "and" }
   | anything { "anything" }
+  | anystring { "anystring" }
+  | anynumber { "anynumber" }
   | count { "count" }
   | expectation { "expectation" }
   | false { "false" }
@@ -172,6 +176,8 @@ Clause : number { IsNumber . numberValue $ $1 }
   | math { IsMath }
   | nil { IsNil }
   | nonliteral { IsNonliteral }
+  | anystring { IsAnyString }
+  | anynumber { IsAnyNumber }
   | self { IsSelf }
   | true { IsTrue }
   | something that openParen TopQuery closeParen { That $4 }
@@ -220,6 +226,8 @@ m TLogic = "logic is not expected here"
 m TMath = "math is not expected here"
 m TNil = "nil is not expected here"
 m TNonliteral = "nonliteral is not expected here"
+m TAnyString = "anystring is not expected here"
+m TAnyNumber = "anynumber is not expected here"
 m TNot = "not is not expected here"
 m TOpenParen = "Unexpected )"
 m TOr = "or is not expected here"
