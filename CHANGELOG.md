@@ -1,5 +1,17 @@
 # Changelog
 
+## [v6.11.0](https://github.com/mumuki/mulang/tree/v6.11.0) (2023-04-05)
+
+[Full Changelog](https://github.com/mumuki/mulang/compare/v6.10.0...v6.11.0)
+
+**Merged pull requests:**
+
+- Add anynumber & anystring matchers [\#359](https://github.com/mumuki/mulang/pull/359) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature generalize declares computation [\#358](https://github.com/mumuki/mulang/pull/358) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature normalize functions by parts [\#356](https://github.com/mumuki/mulang/pull/356) ([flbulgarelli](https://github.com/flbulgarelli))
+- Feature update ruby  [\#353](https://github.com/mumuki/mulang/pull/353) ([flbulgarelli](https://github.com/flbulgarelli))
+- Replacing ghcjslib's version at release time [\#344](https://github.com/mumuki/mulang/pull/344) ([asanzo](https://github.com/asanzo))
+
 ## [v6.10.0](https://github.com/mumuki/mulang/tree/v6.10.0) (2023-02-04)
 
 [Full Changelog](https://github.com/mumuki/mulang/compare/v6.0.9...v6.10.0)
