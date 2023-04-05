@@ -34,13 +34,18 @@ sed -i -r "s/MULANG_VERSION=${VERSION_REGEXP}/MULANG_VERSION=${NEW_VERSION}/"   
 echo "[Mulang] Running tests..."
 ./test.sh
 
-echo "[Mulang] Running ghcjslib tests..."
-./ghcjslib/swap.sh
-./ghcjslib/test.sh
+if [[ -z $MULANG_SKIP_GHCJS_DEPLOY ]]; then
+  echo "[Mulang] Running ghcjslib tests..."
+  ./ghcjslib/swap.sh
+  ./ghcjslib/test.sh
 
-echo "[Mulang] Releasing to NPM..."
-./ghcjslib/release.sh
-./ghcjslib/swap.sh
+  echo "[Mulang] Releasing to NPM..."
+  ./ghcjslib/release.sh
+  ./ghcjslib/swap.sh
+else
+  echo "Skipping GHCJS deploy..."
+fi
+
 
 echo "[Mulang] Commiting files..."
 git commit mulang.cabal \
