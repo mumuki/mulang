@@ -9,7 +9,7 @@ module Mulang::Expectation::I18n
     def translate!(e, tokens = nil)
       e = e.as_v2
       key = key_for e.binding, e.inspection
-      ::I18n.t key, translation_params(e, tokens)
+      ::I18n.t(key, **translation_params(e, tokens))
     end
 
     alias t translate
@@ -41,7 +41,7 @@ module Mulang::Expectation::I18n
     end
 
     def t_matching(tokens, parsed)
-      ::I18n.t("mulang.expectation.#{parsed.matcher.type}", with_tokens(tokens, value: parsed.matcher.value)) if parsed.matcher
+      ::I18n.t("mulang.expectation.#{parsed.matcher.type}", **with_tokens(tokens, value: parsed.matcher.value)) if parsed.matcher
     end
 
     def with_tokens(tokens, params)
