@@ -81,6 +81,7 @@ expressions expr = expr : concatMap expressions (subExpressions expr)
     subExpressions (Send e1 e2 es)                        = e1 : e2 : es
     subExpressions (Switch e1 list e2)                    = e1 : concatMap (\(x,y) -> [x,y]) list ++ [e2]
     subExpressions (Try t cs f)                           = t : map snd cs ++ [f]
+    subExpressions (RecordUpdate e ups)                   = e : map snd ups
     --
     subExpressions (ExpressionAndExpressionsList e es _)  = e : es
     subExpressions (SingleEquationsList eqs _)            = equationsExpressions eqs

@@ -189,6 +189,11 @@ spec = do
     it "is False if there is no usage" $ do
       uses (named "m") (EntryPoint "main" (Reference "f")) `shouldBe` False
 
+    it "works with RecordUpdate" $ do
+      uses (named "f") (RecordUpdate (Reference "f") [("g", Reference "h")]) `shouldBe` True
+      uses (named "h") (RecordUpdate (Reference "f") [("g", Reference "h")]) `shouldBe` True
+      uses (named "g") (RecordUpdate (Reference "f") [("g", Reference "h")]) `shouldBe` False
+
   describe "delegates'" $ do
     it "is True when used with a scope" $ do
       decontextualize (contextualized (scoped "main") (delegates' anyone)) (

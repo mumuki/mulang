@@ -109,6 +109,9 @@ data Expression
     | Record Identifier
     -- ^ Imperative / Functional programming struct declaration.
     --   Only the record name is parsed
+    | RecordUpdate Expression [(Identifier, Expression)]
+    -- ^ Functional programming side-effect-less record update. For example:
+    -- a Haskell update such as someData { someField = someValue, someOtherField = someOtherValue }
     | TypeSignature Identifier Type
     -- ^ Generic type signature for a computation,
     --   composed by a name and its type
@@ -150,7 +153,7 @@ data Expression
     | Rule Identifier [Pattern] [Expression]
     -- ^ Logic programming declaration of a fact, composed by the rue name, rule arguments, and rule body
     | Fact Identifier [Pattern]
-    -- ^ Logic programming declaration of a fact , composed by the fact name and fact arguments
+    -- ^ Logic programming declaration of a fact, composed by the fact name and fact arguments
     | Exist Identifier [Pattern]
     -- ^ Logic programming existential quantification / consult
     | Not Expression

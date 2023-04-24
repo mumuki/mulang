@@ -74,6 +74,7 @@ normalize ops (Rule n args es)                      = Rule n args (mapNormalize 
 normalize ops (Send r e es)                         = Send (normalize ops r) (normalize ops e) (mapNormalize ops es)
 normalize ops (Switch v cs d)                       = Switch (normalize ops v) (normalizeSwitchCases ops cs) (normalize ops d)
 normalize ops (Try t cs f)                          = Try (normalize ops t) (normalizeTryCases ops cs) (normalize ops f)
+normalize ops (RecordUpdate r ups)                  = RecordUpdate (normalize ops r) (normalizeRecordUpdates ops ups)
 --
 normalize _   (SinglePatternsList ps c)             = c ps
 normalize _   c@(Terminal)                          = c
@@ -133,8 +134,9 @@ normalizeReturn _   e             | isImplicitReturn e = Return e
 normalizeReturn _   (Sequence es) | Just (i, l) <- unwind es, isImplicitReturn l = Sequence $ i ++ [Return l]
 normalizeReturn _   e             = e
 
-normalizeTryCases    ops = map (\(p, e) -> (p, normalize ops e))
-normalizeSwitchCases ops = map (\(e1, e2) -> (normalize ops e1, normalize ops e2))
+normalizeRecordUpdates ops = map (\(i, e) -> (i, normalize ops e))
+normalizeTryCases      ops = map (\(p, e) -> (p, normalize ops e))
+normalizeSwitchCases   ops = map (\(e1, e2) -> (normalize ops e1, normalize ops e2))
 
 isImplicitReturn :: Expression -> Bool
 isImplicitReturn (Reference _)         = True
