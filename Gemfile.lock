@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (6.1.7.2)
+    activesupport (6.1.7.5)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -28,7 +28,7 @@ GEM
       async
     async-pool (0.3.12)
       async (>= 1.25)
-    concurrent-ruby (1.2.0)
+    concurrent-ruby (1.2.2)
     console (1.16.2)
       fiber-local
     faraday (2.7.4)
@@ -47,10 +47,10 @@ GEM
       octokit (~> 4.6)
       rainbow (>= 2.2.1)
       rake (>= 10.0)
-    i18n (1.12.0)
+    i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     io-event (1.1.6)
-    minitest (5.17.0)
+    minitest (5.19.0)
     multi_json (1.15.0)
     octokit (4.25.1)
       faraday (>= 1, < 3)
@@ -73,13 +73,13 @@ GEM
     traces (0.8.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    zeitwerk (2.6.6)
+    zeitwerk (2.6.11)
 
 PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  activesupport (~> 6.0)
+  activesupport (~> 6.1)
   github_changelog_generator (~> 1.16)
 
 BUNDLED WITH
