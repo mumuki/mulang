@@ -1,13 +1,12 @@
-resolver: lts-7.24
+resolver: lts-23.28
+allow-newer: true
 packages:
-- '.'
+  - "."
 extra-deps:
-# Using newest aeson, with no contents in tagged
-# unions with nullary constructors
-- aeson-1.2.1.0
-- github: mumuki/language-javascript
-  commit: 7cadfa30838c69d165df39a5c1524dae5a0fc81f
-- github: julian-berbel/language-python
-  commit: cbdf9b33cc3c30e66c8455165ed1c7d70a300a3e
+  - inflections-0.4.0.7
+  - github: bjpop/language-python
+    commit: 9fa3c8b258c05d388a0cbb4e69c639bd9fddfdbb
+    subdirs:
+      - language-python
 flags: {}
 extra-package-dbs: []
