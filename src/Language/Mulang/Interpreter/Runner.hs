@@ -8,7 +8,7 @@ module Language.Mulang.Interpreter.Runner (
 
 import GHC.Generics
 
-import           Control.Monad (forM)
+import           Control.Monad (forM, forM_)
 import           Control.Exception (ErrorCall, catch)
 import           Control.Monad.State.Strict
 import           Data.Maybe (fromMaybe, fromJust)
