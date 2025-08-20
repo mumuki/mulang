@@ -79,13 +79,13 @@ spec = do
       function f(x) {
         return //
         x
-      }|] `shouldBe` SimpleFunction "f" [VariablePattern "x"] (Return $ Reference "x")
+      }|] `shouldBe` SimpleFunction "f" [VariablePattern "x"] (Sequence [Return None, Reference "x"])
 
       run [text|
       function f(x) {
         return /*
         */ x
-      }|] `shouldBe` SimpleFunction "f" [VariablePattern "x"] (Return $ Reference "x")
+      }|] `shouldBe` SimpleFunction "f" [VariablePattern "x"] (Sequence [Return None, Reference "x"])
 
       run [text|
       function f(x) {

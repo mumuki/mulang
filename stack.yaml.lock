@@ -12,6 +12,17 @@ packages:
   original:
     hackage: inflections-0.2.0.1
 - completed:
+    name: language-javascript
+    pantry-tree:
+      sha256: e85fdd2dbc9abbeaff04d8f8cbfd1ec3ef1c7261c8fc7390122e53698cb447e1
+      size: 3230
+    sha256: aee208e8e6622ef2842a7afab8cb7d4beaa48411a137ac3838ff53daedb1bb3a
+    size: 163999
+    url: https://github.com/mumuki/language-javascript/archive/7cadfa30838c69d165df39a5c1524dae5a0fc81f.tar.gz
+    version: 0.7.1.0
+  original:
+    url: https://github.com/mumuki/language-javascript/archive/7cadfa30838c69d165df39a5c1524dae5a0fc81f.tar.gz
+- completed:
     name: language-python
     pantry-tree:
       sha256: 8df4a93a55558bfd11588d66101100407f311811f8ce237ec916476c826608a2
