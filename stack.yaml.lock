@@ -5,12 +5,12 @@
 
 packages:
 - completed:
-    hackage: inflections-0.4.0.7@sha256:1fd4a14864f24d643c0f19d5c47ad022c8c9748d5842ebb2ec892ba98394de53,3551
+    hackage: inflections-0.2.0.1@sha256:f486f8caad1a9d1d11d8cbb4275369bffbd80e87d1df0241ddb17ebb01e6e80f,2227
     pantry-tree:
-      sha256: d566a6956df9a1b9e04b5a85e9bbf69921d362a70fa7c145fe4963dfdf0ca942
-      size: 2077
+      sha256: 8471af52b2b16017e541ea9084f563913845112e2cef02d22b797343fcf3de9a
+      size: 1716
   original:
-    hackage: inflections-0.4.0.7
+    hackage: inflections-0.2.0.1
 - completed:
     name: language-python
     pantry-tree:

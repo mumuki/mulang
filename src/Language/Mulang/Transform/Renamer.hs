@@ -30,20 +30,20 @@ renameState f@(Forall _ _)      = return f
 renameState n@(Not _)           = return n
 --
 renameState (For stms e1)       = do { stms' <- mapM renameStatement stms; e1' <- renameState e1; return $ For stms' e1' }
-renameState (ForLoop i c a b)   = do { [i', c', a', b'] <- mapM renameState [i, c, a, b]; return $ ForLoop i' c' a' b' }
+renameState (ForLoop i c a b)   = do { l <- mapM renameState [i, c, a, b]; case l of { [i', c', a', b'] -> return $ ForLoop i' c' a' b' } }
 renameState (Lambda ps e2)      = do { e2' <- renameState e2; return $ Lambda ps e2' }
 renameState (Match e1 eqs)      = do { e1' <- renameState e1; eqs' <- renameEquations eqs; return $ Match e1' eqs' }
-renameState (Send r e es)       = do { (r':e':es') <- mapM renameState (r:e:es); return $ Send r' e' es' }
+renameState (Send r e es)       = do { o <- mapM renameState (r:e:es); case o of { (r':e':es') -> return $ Send r' e' es' } }
 renameState (Switch v cs d)     = do { v' <- renameState v; cs' <- renameSwitchCases cs; d' <- renameState d; return $ Switch v' cs' d' }
 renameState (Try t cs f)        = do { t' <- renameState t; cs' <- renameTryCases cs; f' <- renameState f; return $ Try t' cs' f' }
 renameState a@(Assert _ _)      = return a
 renameState r@(Rule _ _ _)      = return r
 --
-renameState (ExpressionAndExpressionsList e es c)  = do { (e':es') <- mapM renameState (e:es); return $ c e' es' }
+renameState (ExpressionAndExpressionsList e es c)  = do { o <- mapM renameState (e:es); case o of { (e':es') -> return $ c e' es' } }
 renameState (SingleEquationsList eqs c)            = do { eqs' <- renameEquations eqs; return $ c eqs' }
 renameState (SingleExpression e c)                 = do { e' <- renameState e; return $ c e' }
 renameState (SingleExpressionsList es c)           = do { es' <- mapM renameState es; return $ c es' }
-renameState (ThreeExpressions e1 e2 e3 c)          = do { [e1', e2', e3'] <- mapM renameState [e1, e2, e3]; return $ c e1' e2' e3' }
+renameState (ThreeExpressions e1 e2 e3 c)          = do { o <- mapM renameState [e1, e2, e3]; case o of { [e1', e2', e3'] -> return $ c e1' e2' e3' } }
 renameState (TwoExpressions e1 e2 c)               = do { e1' <- renameState e1; e2' <- renameState e2; return $ c e1' e2' }
 renameState e@(SinglePatternsList _ _)             = return e
 renameState e@Terminal                             = return e

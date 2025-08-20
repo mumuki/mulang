@@ -3,7 +3,7 @@ allow-newer: true
 packages:
   - "."
 extra-deps:
-  - inflections-0.4.0.7
+  - inflections-0.2.0.1
   - github: bjpop/language-python
     commit: 9fa3c8b258c05d388a0cbb4e69c639bd9fddfdbb
     subdirs:

@@ -36,7 +36,7 @@ muTypeDecl (InterfaceTypeDecl decl) = muInterfaceTypeDecl decl
 muClass (ClassDecl _ name _ superclass interfaces (ClassBody body)) =
   Class (i name) (fmap muRefType superclass) (compact (map muImplements interfaces ++ concatMap muDecl body))
 
-muInterface (InterfaceDecl _ name _ interfaces (InterfaceBody body)) =
+muInterface (InterfaceDecl _ _ name _ interfaces (InterfaceBody body)) =
   Interface (i name) (map muRefType interfaces) (compactConcatMap muMemberDecl body)
 
 muClassTypeDecl clazz@(ClassDecl modifiers name args _ _ _) = decorate modifiers . muDeclaration name args $ muClass clazz
@@ -45,7 +45,7 @@ muClassTypeDecl (EnumDecl modifiers name _ (EnumBody constants _)) =
 
 muImplements interface = Implement $ Reference (muRefType interface)
 
-muInterfaceTypeDecl interface@(InterfaceDecl _ name args _ _) = muDeclaration name args $ muInterface interface
+muInterfaceTypeDecl interface@(InterfaceDecl _ _ name args _ _) = muDeclaration name args $ muInterface interface
 
 muDeclaration _ [] decl = decl
 muDeclaration name args decl = Sequence [ModuleSignature (i name) (map prettyPrint args), decl]
@@ -56,17 +56,17 @@ muDecl (InitDecl _ block)      = [muBlock block]
 
 muMemberDecl :: MemberDecl -> [Expression]
 muMemberDecl (FieldDecl modifiers typ varDecls)                               = decorateMany modifiers . concatMap (variableToAttribute.muVarDecl typ) $ varDecls
-muMemberDecl (MethodDecl (elem (Annotation (MarkerAnnotation (Name [Ident "Test"]))) -> True) _ Nothing (Ident name) [] _ body)
+muMemberDecl (MethodDecl (elem (Annotation (MarkerAnnotation (Name [Ident "Test"]))) -> True) _ Nothing (Ident name) [] _ _ body)
                                                                               = return $ Test (MuString name) (muMethodBody body)
-muMemberDecl (MethodDecl (elem Static -> True) _ Nothing (Ident "main") [_] _ body)
+muMemberDecl (MethodDecl (elem Static -> True) _ Nothing (Ident "main") [_] _ _ body)
                                                                               = return $ EntryPoint "main" (muMethodBody body)
-muMemberDecl (MethodDecl modifiers typeParams typ name params _ (MethodBody Nothing))
+muMemberDecl (MethodDecl modifiers typeParams typ name params _ _ (MethodBody Nothing))
                                                                               = return $ decorate modifiers $ muMethodSignature name params typ typeParams
-muMemberDecl (MethodDecl (elem Public -> True) _ _ (Ident "equals") params _ body)
+muMemberDecl (MethodDecl (elem Public -> True) _ _ (Ident "equals") params _ _ body)
                                                                               = return $ PrimitiveMethod O.Equal [SimpleEquation (map muFormalParam params) (muMethodBody body)]
-muMemberDecl (MethodDecl (elem Public -> True) _ _ (Ident "hashCode") params _ body)
+muMemberDecl (MethodDecl (elem Public -> True) _ _ (Ident "hashCode") params _ _ body)
                                                                               = return $ PrimitiveMethod O.Hash [SimpleEquation (map muFormalParam params) (muMethodBody body)]
-muMemberDecl (MethodDecl modifiers typeParams returnType name params _ body)  = decorateMany modifiers [
+muMemberDecl (MethodDecl modifiers typeParams returnType name params _ _ body)  = decorateMany modifiers [
                                                                                   muMethodSignature name params returnType typeParams,
                                                                                   SimpleMethod (i name) (map muFormalParam params) (muMethodBody body)]
 muMemberDecl e@(ConstructorDecl _ _ _ _params _ _constructorBody)             = return . debug $ e
@@ -133,7 +133,9 @@ muExp (BinOp arg1 op arg2)              = Send (muExp arg1) (muOp op) [muExp arg
 muExp (Cond cond ifTrue ifFalse)        = If (muExp cond) (muExp ifTrue) (muExp ifFalse)
 muExp (ExpName name)                    = muName name
 muExp (Assign lhs EqualA exp)           = muAssignment lhs (muExp exp)
-muExp (InstanceCreation _ clazz args _) = New (Reference $ r clazz) (map muExp args)
+muExp (InstanceCreation _ (TypeDeclSpecifier clazz) args _) = New (Reference $ r clazz) (map muExp args)
+muExp (InstanceCreation _ (TypeDeclSpecifierWithDiamond clazz _ _) args _) = New (Reference $ r clazz) (map muExp args)
+muExp (InstanceCreation _ (TypeDeclSpecifierUnqualifiedWithDiamond (Ident i) _) args _) = New (Reference i) (map muExp args)
 muExp (PreNot exp)                      | PrimitiveSend r O.Equal [a] <- (muExp exp) = PrimitiveSend r O.NotEqual [a]
                                         | otherwise = PrimitiveSend (muExp exp) O.Negation []
 muExp (Lambda params exp)               = M.Lambda (muLambdaParams params) (muLambdaExp exp)

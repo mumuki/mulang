@@ -45,7 +45,7 @@ main = do
   streamBody <- getContents
   args <- getArgs
   result <- run args streamBody
-  LBS.putStrLn result
+  LBS.putStr result
 
   where
     run :: [String] -> String ->  IO ByteString

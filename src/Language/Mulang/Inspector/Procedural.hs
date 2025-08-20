@@ -26,33 +26,33 @@ import Language.Mulang.Inspector.Primitive (Inspection)
 import Language.Mulang.Inspector.Generic (usesYield)
 import Language.Mulang.Inspector.Family (deriveUses, deriveDeclares, InspectionFamily, BoundInspectionFamily)
 
-(declaresProcedure, declaresProcedureMatching, countProcedures) = deriveDeclares f :: BoundInspectionFamily
+(declaresProcedure, declaresProcedureMatching, countProcedures) = deriveDeclares f
   where f matcher (Procedure _ equations) = matches matcher equationsExpandedExpressions $ equations
         f _        _                       = False
 
 -- | Inspection that tells whether an expression uses while
 -- in its definition
-(usesWhile, usesWhileMatching, countWhiles) = deriveUses f :: InspectionFamily
+(usesWhile, usesWhileMatching, countWhiles) = deriveUses f
   where f matcher (While c a) = matcher [c, a]
         f _        _ = False
 
 -- | Inspection that tells whether an expression uses Switch
 -- in its definition
-(usesSwitch, usesSwitchMatching, countSwitches) = deriveUses f :: InspectionFamily
+(usesSwitch, usesSwitchMatching, countSwitches) = deriveUses f
   where f matcher (Switch value cases orElse) = matcher [value, (Sequence . map snd $ cases), orElse]
         f _        _                          = False
 
 -- | Inspection that tells whether an expression uses reoeat
 -- in its definition
-(usesRepeat, usesRepeatMatching, countRepeats) = deriveUses f :: InspectionFamily
+(usesRepeat, usesRepeatMatching, countRepeats) = deriveUses f
   where f matcher (Repeat c a) = matcher [c, a]
         f _       _            = False
 
-(usesForEach, usesForEachMatching, countForEaches) = deriveUses f :: InspectionFamily
+(usesForEach, usesForEachMatching, countForEaches) = deriveUses f
   where f matcher (For ss e) = not (usesYield e) && matcher [Sequence (statementsExpressions ss), e]
         f _       _          = False
 
-(usesForLoop, usesForLoopMatching, countForLoops) = deriveUses f :: InspectionFamily
+(usesForLoop, usesForLoopMatching, countForLoops) = deriveUses f
   where f matcher (ForLoop i c incr e) = matcher [i, c, incr, e]
         f _       _                    = False
 
