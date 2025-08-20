@@ -24,7 +24,7 @@ jobs:
         stack-version: 'latest'
     - name: Haskell - prep, build, test
       run: |
-        stack --no-terminal --skip-ghc-check --allow-different-user test
+        stack test
     - name: Wrap gem
       run: ./bin/setup
       working-directory: gem
