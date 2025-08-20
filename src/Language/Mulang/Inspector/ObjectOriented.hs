@@ -59,14 +59,14 @@ usesInheritance = declaresSuperclass anyone
 usesMixins :: Inspection
 usesMixins = includes anyone
 
-(declaresObject, declaresObjectMatching, countObjects) = deriveDeclares f :: BoundInspectionFamily
+(declaresObject, declaresObjectMatching, countObjects) = deriveDeclares f
   where f matcher (Object _ body) = matches matcher id [body]
         f _        _              = False
 
 declaresSuperclass :: BoundInspection
 declaresSuperclass = inherits
 
-(declaresClass, declaresClassMatching, countClasses) = deriveDeclares f :: BoundInspectionFamily
+(declaresClass, declaresClassMatching, countClasses) = deriveDeclares f
   where f matcher (Class _ _ body) = matches matcher id [body]
         f _        _               = False
 
@@ -75,16 +75,16 @@ declaresEnumeration =  containsBoundDeclaration f
   where f (Enumeration _ _) = True
         f _                 = False
 
-(declaresInterface, declaresInterfaceMatching, countInterfaces) = deriveDeclares f :: BoundInspectionFamily
+(declaresInterface, declaresInterfaceMatching, countInterfaces) = deriveDeclares f
   where f matcher (Interface _ _ body) = matches matcher id [body]
         f _        _                    = False
 
-(declaresAttribute, declaresAttributeMatching, countAttributes) = deriveDeclares f :: BoundInspectionFamily
+(declaresAttribute, declaresAttributeMatching, countAttributes) = deriveDeclares f
   where f matcher (Attribute _ body) = matches matcher id [body]
         f _ _                        = False
 
-(declaresMethod, declaresMethodMatching, countMethods) = deriveDeclares f :: BoundInspectionFamily
-  where f matcher (Method _ equations) = matches matcher equationsExpandedExpressions $ equations
+(declaresMethod, declaresMethodMatching, countMethods) = deriveDeclares f
+  where f matcher (Method _ equations) = matches matcher equationsExpandedExpressions equations
         f _       _                    = False
 
 -- primitive can only be declared as methods

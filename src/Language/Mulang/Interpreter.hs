@@ -16,7 +16,7 @@ module Language.Mulang.Interpreter (
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import           Data.List (find, intercalate, genericLength)
-import           Control.Monad (forM, (>=>))
+import           Control.Monad (forM, (>=>), unless)
 import           Control.Monad.State.Class
 import           Control.Monad.Loops
 import           Control.Monad.State.Strict

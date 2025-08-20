@@ -17,18 +17,14 @@ jobs:
         bundler-cache: true
     - name: Generate template files
       run: ./generators/run
+
+    - uses: haskell-actions/setup@v2
+      with:
+        enable-stack: true
+        stack-version: 'latest'
     - name: Haskell - prep, build, test
       run: |
-        docker run -v $PWD:/root/mulang haskell:8.0.1 bash -c '
-          set -e
-
-          stack upgrade --binary-version 1.9.3
-          export PATH=/root/.local/bin:$PATH
-
-          cd /root/mulang
-
-          stack --no-terminal --skip-ghc-check --allow-different-user test
-        '
+        stack test
     - name: Wrap gem
       run: ./bin/setup
       working-directory: gem

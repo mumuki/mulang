@@ -14,7 +14,7 @@ import           Data.List (intercalate)
 import           Version (prettyVersion)
 import           Data.Text.Lazy.Encoding (encodeUtf8)
 import           Data.ByteString.Lazy (ByteString)
-import qualified Data.ByteString.Lazy as LBS (putStrLn)
+import qualified Data.ByteString.Lazy as LBS (putStr)
 import qualified Data.Text.Lazy as T (pack)
 import           Data.Text (unpack)
 import           NeatInterpolation (text)
@@ -45,7 +45,7 @@ main = do
   streamBody <- getContents
   args <- getArgs
   result <- run args streamBody
-  LBS.putStrLn result
+  LBS.putStr result
 
   where
     run :: [String] -> String ->  IO ByteString

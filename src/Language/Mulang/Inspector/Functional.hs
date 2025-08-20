@@ -58,7 +58,7 @@ usesComprehension = usesForComprehension
 
 -- | Inspection that tells whether an expression uses a lambda expression
 -- in its definition
-(usesLambda, usesLambdaMatching, countLambdas) = deriveUses f :: InspectionFamily
+(usesLambda, usesLambdaMatching, countLambdas) = deriveUses f
   where f matcher (Lambda _ e) = matcher [e]
         f _       _            = False
 

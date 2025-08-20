@@ -131,23 +131,23 @@ delegates' p context expression = inspect $ do
 
 -- | Inspection that tells whether an expression uses ifs
 -- in its definition
-(usesIf, usesIfMatching, countIfs) = deriveUses f :: InspectionFamily
+(usesIf, usesIfMatching, countIfs) = deriveUses f
   where f matcher (If c t e) = matcher [c, t, e]
         f _       _          = False
 
-(usesYield, usesYieldMatching, countYiels) = deriveUses f :: InspectionFamily
+(usesYield, usesYieldMatching, countYiels) = deriveUses f
   where f matcher (Yield e) = matcher [e]
         f _       _         = False
 
-(usesPrint, usesPrintMatching, countPrints) = deriveUses f :: InspectionFamily
+(usesPrint, usesPrintMatching, countPrints) = deriveUses f
   where f matcher (Print e) = matcher [e]
         f _       _         = False
 
-(usesFor, usesForMatching, countFors) = deriveUses f :: InspectionFamily
+(usesFor, usesForMatching, countFors) = deriveUses f
   where f matcher (For _ e) = matcher [e]
         f _      _          = False
 
-(returns, returnsMatching, countReturns) = deriveUses f :: InspectionFamily
+(returns, returnsMatching, countReturns) = deriveUses f
   where f matcher (Return body) = matcher [body]
         f _       _             = False
 
@@ -171,11 +171,11 @@ declaresRecursively = containsBoundDeclaration f
         nameOf :: Expression -> Maybe Identifier
         nameOf = listToMaybe . declaredIdentifiers
 
-(declaresFunction, declaresFunctionMatching, countFunctions) = deriveDeclares f :: BoundInspectionFamily
+(declaresFunction, declaresFunctionMatching, countFunctions) = deriveDeclares f
   where f matcher (Function _ equations) = matches matcher equationsExpandedExpressions $ equations
         f _       _                      = False
 
-(declaresVariable, declaresVariableMatching, countVariables) = deriveDeclares f :: BoundInspectionFamily
+(declaresVariable, declaresVariableMatching, countVariables) = deriveDeclares f
   where f matcher (Variable _ body) = matches matcher id [body]
         f _       _                 = False
 
