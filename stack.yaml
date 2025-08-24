@@ -3,7 +3,7 @@ allow-newer: true
 packages:
 - "."
 extra-deps:
-- inflections-0.2.0.1
+- inflections-0.4.0.7
 - github: mumuki/language-javascript
   commit: 7cadfa30838c69d165df39a5c1524dae5a0fc81f
 - github: bjpop/language-python

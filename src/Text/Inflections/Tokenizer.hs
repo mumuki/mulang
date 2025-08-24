@@ -6,22 +6,25 @@ module Text.Inflections.Tokenizer (
   canTokenize,
   tokenize) where
 
+import Data.Text (Text, pack, unpack)
 import Data.Char (toLower, isDigit, isLower)
 import Data.Either (isRight)
+import Data.Void (Void)
+
+import Text.Megaparsec.Error (ParseErrorBundle)
 
 import Text.Inflections
-import Text.Inflections.Parse.Types
 import Text.Parsec.Error (ParseError)
 
 import Control.Fallible
 
-type CaseStyle = String -> Either Text.Parsec.Error.ParseError [Text.Inflections.Parse.Types.Word]
+type CaseStyle = String -> Either (ParseErrorBundle Text Void) [SomeWord]
 
 camelCase      :: CaseStyle
-camelCase      = parseCamelCase [] . filter (not.isDigit)
+camelCase      = parseCamelCase [] . pack . filter (not.isDigit)
 
 snakeCase      :: CaseStyle
-snakeCase      = parseSnakeCase []
+snakeCase      = parseSnakeCase [] . pack
 
 rubyCase       :: CaseStyle
 rubyCase word@(i:_) | i == '_' = snakeCase . unprivatize $ baseWord
@@ -48,7 +51,7 @@ tokenize style s | Just words <- (wordsOrNothing . style) s = concatMap toToken 
                  | otherwise = []
                   where toToken = return . map toLower
 
-
-wordsOrNothing = fmap (concatMap c) . orNothing
-                where c (Word w) = [w]
+wordsOrNothing :: Either (ParseErrorBundle Text Void) [SomeWord] -> Maybe [String]
+wordsOrNothing = fmap (concatMap c ) . orNothing
+                where c (SomeWord w) = [unpack . unWord $ w]
                       c _        = []
